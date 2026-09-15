@@ -1,0 +1,32 @@
+server {
+    listen 80;
+    listen [::]:80;
+    server_name {{ nntmux_hostname }};
+    location ^~ /.well-known/acme-challenge/ { root /var/www/acme; }
+    location / { return 301 https://$host$request_uri; }
+}
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    server_name {{ nntmux_hostname }};
+    ssl_certificate /etc/letsencrypt/live/{{ nntmux_hostname }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ nntmux_hostname }}/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    root /srv/nntmux/current/public;
+    index index.php;
+    charset utf-8;
+    client_max_body_size 100m;
+    location / { try_files $uri $uri/ /index.php?$query_string; }
+    location ^~ /storage/ { alias /srv/nntmux/shared/storage/app/public/; }
+    location ^~ /covers/ { alias /srv/nntmux/shared/storage/covers/; }
+    location = /index.php {
+        include fastcgi_params;
+        fastcgi_pass unix:/run/php/nntmux.sock;
+        fastcgi_param SCRIPT_FILENAME $realpath_root/index.php;
+        fastcgi_param DOCUMENT_ROOT $realpath_root;
+    }
+    location ~ \.php$ { return 404; }
+    location ~ /\.(?!well-known).* { deny all; }
+    access_log /var/log/nginx/nntmux-access.log;
+    error_log /var/log/nginx/nntmux-error.log;
+}

@@ -9,6 +9,10 @@ on:
       - '.dockerignore'
       - 'app/Console/Commands/DeployInitialize.php'
       - 'tests/Feature/DeployInitializeTest.php'
+      - 'app/Console/Commands/NntmuxCreateESIndexes.php'
+      - 'tests/Feature/NntmuxCreateESIndexesTest.php'
+      - 'infra/ansible/**'
+      - 'package-lock.json'
       - '.github/workflows/terraform.yml'
   push:
     paths:
@@ -18,6 +22,10 @@ on:
       - '.dockerignore'
       - 'app/Console/Commands/DeployInitialize.php'
       - 'tests/Feature/DeployInitializeTest.php'
+      - 'app/Console/Commands/NntmuxCreateESIndexes.php'
+      - 'tests/Feature/NntmuxCreateESIndexesTest.php'
+      - 'infra/ansible/**'
+      - 'package-lock.json'
       - '.github/workflows/terraform.yml'
 
 permissions:
@@ -29,7 +37,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        provider: [aws, hetzner, ovh]
+        provider: [aws, hetzner, ovh, baremetal]
     defaults:
       run:
         working-directory: infra/terraform/${{ matrix.provider }}
@@ -48,6 +56,39 @@ jobs:
       - run: tflint
       - name: Plan-only tests with mocked cloud providers
         run: terraform test
+
+  baremetal:
+    runs-on: ubuntu-24.04
+    env:
+      ANSIBLE_CONFIG: ${{ github.workspace }}/infra/ansible/ansible.cfg
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r infra/ansible/requirements.txt
+      - run: ansible-galaxy collection install -r infra/ansible/requirements.yml
+      - run: yamllint -c infra/ansible/.yamllint.yml infra/ansible
+      - run: ansible-lint --offline playbooks/*.yml
+        working-directory: infra/ansible
+      - name: Syntax check every native operation
+        working-directory: infra/ansible
+        run: |
+          for playbook in playbooks/*.yml; do
+            ansible-playbook -i inventory/hosts.yml.example "$playbook" --syntax-check
+          done
+      - run: python3 -m unittest discover -s deploy/baremetal/tests -v
+      - run: shellcheck deploy/baremetal/tmux.sh
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: pdo_sqlite, pdo_mysql, redis, pcntl, sockets, gd, imagick
+      - run: composer install --no-interaction --no-scripts --prefer-dist
+      - name: Search initialization regressions
+        env:
+          APP_CONFIG_CACHE: /tmp/nntmux-baremetal-test-config.php
+        run: vendor/bin/phpunit tests/Feature/DeployInitializeTest.php tests/Feature/NntmuxCreateESIndexesTest.php
+      - run: php -l deploy/baremetal/health.php
 
   deployment-scripts:
     runs-on: ubuntu-latest

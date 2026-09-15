@@ -1,0 +1,17 @@
+---
+nntmux_commit: REPLACE_WITH_FULL_40_CHARACTER_COMMIT_SHA
+nntmux_acme_email: admin@example.com
+nntmux_search_driver: manticore  # manticore or elasticsearch
+nntmux_backup_repository: s3:https://s3.example.com/nntmux-backups/indexer
+nntmux_backup_region: us-east-1
+# Install fails rather than silently auto-sizing a smaller server.
+nntmux_min_memory_mb: 8192
+nntmux_min_disk_bytes: 21474836480
+nntmux_php_workers: 8
+nntmux_elasticsearch_heap: 2g
+# Additional non-secret application settings; infrastructure keys cannot be overridden.
+nntmux_application_settings:
+  MAIL_MAILER: smtp
+  MAIL_HOST: smtp.example.com
+  MAIL_PORT: '587'
+  MAIL_FROM_ADDRESS: indexer@example.com

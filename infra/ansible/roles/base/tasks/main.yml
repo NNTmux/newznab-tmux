@@ -1,0 +1,105 @@
+---
+- name: Install host management prerequisites
+  ansible.builtin.apt:
+    name: [ca-certificates, curl, gnupg, git, acl, ufw, chrony, python3-pymysql, python3-apt]
+    update_cache: true
+    state: present
+
+- name: Create application group
+  ansible.builtin.group:
+    name: nntmux
+
+- name: Create application account
+  ansible.builtin.user:
+    name: nntmux
+    group: nntmux
+    home: /srv/nntmux
+    shell: /bin/bash
+    create_home: false
+
+- name: Allow Nginx to read application public files
+  ansible.builtin.user:
+    name: www-data
+    groups: nntmux
+    append: true
+
+- name: Create protected configuration and runtime directories
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ item.owner }}"
+    group: nntmux
+    mode: "{{ item.mode }}"
+  loop:
+    - {path: /etc/nntmux, owner: root, mode: '0750'}
+    - {path: /usr/local/lib/nntmux, owner: root, mode: '0755'}
+    - {path: /srv/nntmux, owner: root, mode: '0755'}
+    - {path: /srv/nntmux/releases, owner: nntmux, mode: '0755'}
+    - {path: /srv/nntmux/shared, owner: nntmux, mode: '0750'}
+    - {path: /srv/nntmux/shared/storage, owner: nntmux, mode: '0750'}
+    - {path: /srv/nntmux/shared/_install, owner: nntmux, mode: '0750'}
+    - {path: /var/www/acme, owner: root, mode: '0755'}
+
+- name: Validate administrator networks before changing the firewall
+  ansible.builtin.command:
+    argv:
+      - python3
+      - -c
+      - "import ipaddress, json, sys; networks=[ipaddress.ip_network(c) for c in json.loads(sys.argv[1])]; assert networks and all(n.prefixlen > 0 for n in networks)"
+      - "{{ nntmux_admin_cidrs | to_json }}"
+  changed_when: false
+  check_mode: false
+
+- name: Permit trusted administrator SSH before enabling firewall
+  community.general.ufw:
+    rule: allow
+    port: "{{ ansible_port | default(22) }}"
+    proto: tcp
+    from_ip: "{{ item }}"
+  loop: "{{ nntmux_admin_cidrs }}"
+
+- name: Permit HTTP and HTTPS
+  community.general.ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+  loop: ['80', '443']
+
+- name: Deny other inbound connections
+  community.general.ufw:
+    direction: incoming
+    policy: deny
+
+- name: Enable firewall
+  community.general.ufw:
+    state: enabled
+
+- name: Enable time synchronization
+  ansible.builtin.systemd_service:
+    name: chrony
+    enabled: true
+    state: started
+
+- name: Install lifecycle helpers
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../../../deploy/baremetal/{{ item }}"
+    dest: "/usr/local/lib/nntmux/{{ item }}"
+    owner: root
+    group: root
+    mode: '0755'
+  loop: [host.py, tmux.sh, health.php]
+
+- name: Configure application log rotation
+  ansible.builtin.copy:
+    dest: /etc/logrotate.d/nntmux
+    mode: '0644'
+    content: |
+      /srv/nntmux/shared/storage/logs/*.log {
+          daily
+          rotate 14
+          compress
+          missingok
+          notifempty
+          su nntmux nntmux
+          copytruncate
+      }

@@ -1,0 +1,15 @@
+[Unit]
+Description=NNTmux Horizon
+After=network-online.target mariadb.service redis-server.service {{ nntmux_search_driver }}.service
+[Service]
+User=nntmux
+Group=nntmux
+WorkingDirectory=/srv/nntmux/current
+ExecStartPre=/usr/bin/php8.5 /usr/local/lib/nntmux/health.php /srv/nntmux/current
+ExecStart=/usr/bin/php8.5 artisan horizon
+Restart=on-failure
+RestartSec=10
+TimeoutStopSec=1900
+KillSignal=SIGTERM
+[Install]
+WantedBy=multi-user.target

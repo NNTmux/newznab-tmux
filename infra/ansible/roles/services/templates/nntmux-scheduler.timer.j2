@@ -1,0 +1,8 @@
+[Unit]
+Description=Run NNTmux scheduler once per minute
+[Timer]
+OnCalendar=*-*-* *:*:00
+AccuracySec=1s
+Unit=nntmux-scheduler.service
+[Install]
+WantedBy=timers.target

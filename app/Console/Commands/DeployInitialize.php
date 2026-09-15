@@ -60,7 +60,12 @@ class DeployInitialize extends Command
                 throw new RuntimeException('Administrator or settings verification failed.');
             }
 
-            if ($this->call('manticore:create-indexes', ['--no-interaction' => true]) !== self::SUCCESS) {
+            $searchCommand = config('search.default') === 'elasticsearch' ? 'nntmux:create-es-indexes' : 'manticore:create-indexes';
+            $searchOptions = ['--no-interaction' => true];
+            if (config('search.default') === 'elasticsearch') {
+                $searchOptions['--create-missing'] = true;
+            }
+            if ($this->call($searchCommand, $searchOptions) !== self::SUCCESS) {
                 throw new RuntimeException('Search initialization failed; initialization remains incomplete.');
             }
 
@@ -89,6 +94,10 @@ class DeployInitialize extends Command
 
     private function validateConfiguration(): void
     {
+        if (! in_array(config('search.default'), ['manticore', 'elasticsearch'], true)) {
+            throw new RuntimeException('Unsupported deployment search driver.');
+        }
+
         $key = config('app.key');
         if (! is_string($key)) {
             throw new RuntimeException('A valid APP_KEY must be supplied before initialization.');

@@ -1,0 +1,156 @@
+---
+- name: Create repository key directory
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+
+- name: Fetch signed repository keys
+  ansible.builtin.get_url:
+    url: "{{ item.url }}"
+    dest: "/etc/apt/keyrings/{{ item.name }}.asc"
+    mode: '0644'
+  loop:
+    - {name: php, url: 'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x14aa40ec0831756756d7f66c4f4ea0aae5267a6c'}
+    - {name: mariadb, url: 'https://mariadb.org/mariadb_release_signing_key.asc'}
+    - {name: node, url: 'https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key'}
+
+- name: Configure version-scoped package repositories
+  ansible.builtin.apt_repository:
+    repo: "{{ item.repo }}"
+    filename: "nntmux-{{ item.name }}"
+    update_cache: false
+  loop:
+    - {name: php, repo: 'deb [signed-by=/etc/apt/keyrings/php.asc] https://ppa.launchpadcontent.net/ondrej/php/ubuntu noble main'}
+    - {name: mariadb, repo: 'deb [signed-by=/etc/apt/keyrings/mariadb.asc] https://mirror.mariadb.org/repo/11.4/ubuntu noble main'}
+    - {name: node, repo: 'deb [signed-by=/etc/apt/keyrings/node.asc] https://deb.nodesource.com/node_22.x nodistro main'}
+
+- name: Enable Ubuntu multiverse for full archive support
+  ansible.builtin.apt_repository:
+    repo: deb http://archive.ubuntu.com/ubuntu noble multiverse
+    filename: nntmux-multiverse
+    update_cache: false
+
+- name: Install native runtime and build dependencies
+  ansible.builtin.apt:
+    update_cache: true
+    state: present
+    policy_rc_d: 101
+    name:
+      - nginx
+      - php8.5-cli
+      - php8.5-fpm
+      - php8.5-common
+      - php8.5-bcmath
+      - php8.5-curl
+      - php8.5-gd
+      - php8.5-intl
+      - php8.5-mbstring
+      - php8.5-mysql
+      - php8.5-xml
+      - php8.5-zip
+      - php8.5-redis
+      - php8.5-imagick
+      - php8.5-sqlite3
+      - mariadb-server
+      - mariadb-client
+      - redis-server
+      - nodejs
+      - tmux
+      - unrar
+      - unzip
+      - ffmpeg
+      - lame
+      - mediainfo
+      - jpegoptim
+      - webp
+      - optipng
+      - pngquant
+      - libavif-bin
+      - libmagic1
+      - time
+      - procps
+      - restic
+      - certbot
+      - logrotate
+
+- name: Fetch Manticore signing key
+  ansible.builtin.get_url:
+    url: https://repo.manticoresearch.com/GPG-KEY-SHA256-manticore
+    dest: /etc/apt/keyrings/manticore.asc
+    mode: '0644'
+  when: nntmux_search_driver == 'manticore'
+
+- name: Configure official Manticore compatibility repository for Ubuntu Noble
+  ansible.builtin.apt_repository:
+    repo: deb [signed-by=/etc/apt/keyrings/manticore.asc] https://repo.manticoresearch.com/repository/manticoresearch_jammy jammy main
+    filename: nntmux-manticore
+    update_cache: false
+  when: nntmux_search_driver == 'manticore'
+
+- name: Pin Manticore to the supported release series
+  ansible.builtin.copy:
+    dest: /etc/apt/preferences.d/nntmux-manticore
+    mode: '0644'
+    content: |
+      Package: manticore manticore-server manticore-server-core
+      Pin: version 28.4.4*
+      Pin-Priority: 1001
+  when: nntmux_search_driver == 'manticore'
+
+- name: Install Manticore and its extensions
+  ansible.builtin.apt:
+    name: [manticore, manticore-extra]
+    update_cache: true
+    policy_rc_d: 101
+    state: present
+  when: nntmux_search_driver == 'manticore'
+
+- name: Fetch Elasticsearch signing key
+  ansible.builtin.get_url:
+    url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    dest: /etc/apt/keyrings/elasticsearch.asc
+    mode: '0644'
+  when: nntmux_search_driver == 'elasticsearch'
+
+- name: Configure Elasticsearch 8 repository
+  ansible.builtin.apt_repository:
+    repo: deb [signed-by=/etc/apt/keyrings/elasticsearch.asc] https://artifacts.elastic.co/packages/8.x/apt stable main
+    filename: nntmux-elasticsearch
+    update_cache: false
+  when: nntmux_search_driver == 'elasticsearch'
+
+- name: Install Elasticsearch 8.19
+  ansible.builtin.apt:
+    name: elasticsearch=8.19.0
+    update_cache: true
+    policy_rc_d: 101
+    state: present
+  when: nntmux_search_driver == 'elasticsearch'
+
+- name: Hold database and search packages against unattended upgrades
+  ansible.builtin.dpkg_selections:
+    name: "{{ item }}"
+    selection: hold
+  loop: "{{ ['mariadb-server', 'mariadb-client'] + (['manticore', 'manticore-server', 'manticore-server-core'] if nntmux_search_driver == 'manticore' else ['elasticsearch']) }}"
+
+- name: Download Composer 2.8.12
+  ansible.builtin.get_url:
+    url: https://getcomposer.org/download/2.8.12/composer.phar
+    dest: /usr/local/bin/composer
+    checksum: sha256:https://getcomposer.org/download/2.8.12/composer.phar.sha256sum
+    mode: '0755'
+
+- name: Verify installed PHP extensions and tools
+  ansible.builtin.command:
+    argv:
+      - php8.5
+      - -r
+      - >-
+        foreach (['bcmath','ctype','curl','exif','fileinfo','filter','gd','hash','iconv','intl','json','libxml','mbstring','mysqlnd','openssl','pcre','pdo','pdo_mysql','session','simplexml','sockets','sodium','spl','xmlwriter','zlib','pcntl','posix','redis','imagick','zip'] as $e) {
+        if (!extension_loaded($e)) { fwrite(STDERR, "Missing extension: ".$e.PHP_EOL); exit(1); } }
+        foreach (['unrar','unzip','ffmpeg','ffprobe','lame','mediainfo','tmux','timeout','node','npm'] as $b) {
+        if (!is_executable('/usr/bin/'.$b)) { fwrite(STDERR, "Missing tool: ".$b.PHP_EOL); exit(1); } }
+        if (PHP_VERSION_ID < 80500) { exit(1); }
+  changed_when: false
+  when: not ansible_check_mode

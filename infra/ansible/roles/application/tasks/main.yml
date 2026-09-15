@@ -1,0 +1,64 @@
+---
+- name: Prepare an immutable application release
+  become: true
+  become_user: nntmux
+  ansible.builtin.git:
+    repo: "{{ nntmux_repository }}"
+    dest: "/srv/nntmux/releases/{{ nntmux_commit }}"
+    version: "{{ nntmux_commit }}"
+    update: false
+  when: not ansible_check_mode
+
+- name: Inspect completed release manifest
+  ansible.builtin.stat:
+    path: "/srv/nntmux/releases/{{ nntmux_commit }}/.baremetal-ready.json"
+  register: application_release_ready
+
+- name: Inspect deployed initialization marker
+  ansible.builtin.stat:
+    path: /srv/nntmux/shared/_install/install.lock
+  register: application_install_marker
+
+- name: Refuse implicit upgrades through the install operation
+  ansible.builtin.command:
+    argv: [python3, /usr/local/lib/nntmux/host.py, require-release, "{{ nntmux_commit }}"]
+  changed_when: false
+  when: nntmux_operation == 'install' and application_install_marker.stat.exists and not ansible_check_mode
+
+- name: Create protected candidate configuration directory
+  ansible.builtin.file:
+    path: /etc/nntmux/candidates
+    state: directory
+    owner: root
+    group: root
+    mode: '0700'
+
+- name: Write protected candidate application configuration
+  ansible.builtin.copy:
+    dest: "/etc/nntmux/candidates/{{ nntmux_commit }}.json"
+    owner: root
+    group: nntmux
+    mode: '0600'
+    content: "{{ {'settings': nntmux_application_settings, 'secrets': nntmux_secrets} | to_nice_json }}\n"
+  no_log: true
+
+- name: Build release with locked dependencies
+  ansible.builtin.command:
+    argv: [python3, /usr/local/lib/nntmux/host.py, prepare, "{{ nntmux_commit }}"]
+  changed_when: true
+  no_log: true
+  when: not ansible_check_mode and not application_release_ready.stat.exists
+
+- name: Explain release changes in check mode
+  ansible.builtin.debug:
+    msg: "Would prepare and validate release {{ nntmux_commit }}; builds, initialization and activation are skipped in check mode."
+  changed_when: true
+  when: ansible_check_mode
+
+- name: Initialize or update the selected release
+  ansible.builtin.command:
+    argv: [python3, /usr/local/lib/nntmux/host.py, "{{ nntmux_operation }}", "{{ nntmux_commit }}"]
+  register: application_activation
+  changed_when: "'UNCHANGED' not in application_activation.stdout"
+  no_log: true
+  when: not ansible_check_mode

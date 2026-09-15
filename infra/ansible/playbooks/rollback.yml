@@ -1,0 +1,21 @@
+---
+- name: NNTmux bare metal rollback
+  hosts: nntmux
+  become: true
+  gather_facts: false
+  serial: 1
+  vars:
+    nntmux_operation: rollback
+  roles:
+    - role: nntmux
+    - role: base
+      when: nntmux_operation in ['install', 'restore']
+    - role: packages
+      when: nntmux_operation in ['install', 'restore']
+    - role: services
+      when: nntmux_operation in ['install', 'restore']
+    - role: application
+      when: nntmux_operation in ['install', 'update']
+    - role: tls
+      when: nntmux_operation == 'install'
+    - role: lifecycle

@@ -754,3 +754,86 @@ Verify there is no planned disk replacement, and adjust `data_volume_size` if th
 Run `terraform fmt -check -recursive`, `terraform init -backend=false`, `terraform validate`, `tflint --init && tflint`, and `terraform test` from each provider root. Terraform tests use provider mocks and plan only; CI never provisions infrastructure. Run `python3 -m unittest discover -s deploy/cloud/tests -p 'test_*.py'`, and `vendor/bin/phpunit tests/Feature/DeployInitializeTest.php` for deployment failures and initialization guards. CI also builds the production image, checks PHP extensions and bundled assets, runs disposable database/search/web/Horizon/scheduler integration with `deploy/cloud/tests/smoke.sh IMAGE`, and reports image vulnerabilities; ECR scans manually published images on push.
 
 Before production acceptance, exercise a disposable environment on each provider: initialization, repeated release, reboot, HTTPS, authenticated cover/logo delivery, Horizon and scheduler activity, tmux ingestion with configured NNTP credentials, daily backup, staged restore, activated restore, and a repeated Terraform plan with no changes. Local/mocked checks alone do not prove provider permissions, live volume discovery, Vault access, certificate issuance, or live Usenet processing. CI also runs guarded loopback LUKS storage integration and native encrypted backup/restore tests; it never applies infrastructure.
+
+
+## Native bare metal installation
+
+The native installer targets existing **physical Ubuntu 24.04 LTS amd64 servers**. It installs Nginx/PHP 8.5, MariaDB 11.4, Redis 7, Manticore 28.4.4 or Elasticsearch 8.19, Horizon, the Laravel scheduler, archive/media tools, HTTPS, and encrypted remote backups directly on the host. Each server contains the full stack. It does not order hardware, install Ubuntu, create virtual machines, partition disks, or migrate an existing unmanaged installation. Existing cloud/Docker deployments retain their own tooling and state.
+
+Provide SSH key/agent access with verified host keys, sudo, at least 8 GiB RAM and 20 GiB free disk for installation (production indexing needs substantially more), a public DNS hostname pointing directly to the server, and an existing S3-compatible backup bucket. Inbound ports 80/443 must be reachable for Let's Encrypt. Supply trusted SSH administrator CIDRs that include your current control-node address. Configure storage/RAID and mount data disks before running the installer. Unsupported virtualization/container targets and unmanaged service conflicts are rejected.
+
+### Control-node setup and configuration
+
+Use a Linux/WSL control node with Python 3.12 and Terraform >=1.10,<2.0. Install the pinned tools in a virtual environment:
+
+```bash
+python3 -m venv .venv-ansible
+.venv-ansible/bin/pip install -r infra/ansible/requirements.txt
+source .venv-ansible/bin/activate
+ansible-galaxy collection install -r infra/ansible/requirements.yml
+```
+
+Keep operator files outside the checkout. Copy `infra/ansible/inventory/hosts.yml.example`, `settings.yml.example`, and `vault.yml.example` into a protected operator directory. Fill in settings and credentials, then encrypt the **whole** Vault file with `ansible-vault encrypt /secure/indexer-vault.yml`. Supply a valid, persistent APP_KEY (`base64:` plus 32 random bytes encoded as base64); preserve it for every update and restore. Never commit real credentials or pass secret values in command arguments. Protect Vault password files with mode 0600; omitting that file makes the entrypoint prompt for the Vault password. Use a distinct Vault file per host. Add `--ask-become-pass` when the SSH account requires a sudo password; it is prompted interactively.
+
+Choose an immutable 40-character commit that contains this native deployment support. Set `nntmux_search_driver` to `manticore` (default) or `elasticsearch`. Installation settings and optional SMTP/API credentials are illustrated in the example files. Backup credentials are reserved for restic and are excluded from the application's environment. Native database/search listeners bind to loopback; Elasticsearch HTTP uses authenticated loopback access. Database and search packages are held against unattended upgrades. Keep the recorded package versions available in your package mirror for disaster recovery.
+
+Terraform is optional for hand-written inventory. To use its separate, secret-free inventory root:
+
+```bash
+cp infra/terraform/baremetal/backend.hcl.example /secure/baremetal-backend.hcl
+cp infra/terraform/baremetal/terraform.tfvars.example /secure/baremetal.tfvars
+terraform -chdir=infra/terraform/baremetal init -backend-config=/secure/baremetal-backend.hcl
+terraform -chdir=infra/terraform/baremetal plan -var-file=/secure/baremetal.tfvars -out=/secure/baremetal.tfplan
+terraform -chdir=infra/terraform/baremetal apply /secure/baremetal.tfplan
+```
+
+Use an encrypted S3 state backend with locking and a key separate from every cloud deployment. Terraform manages inventory metadata only; it runs no remote commands. Omit `--inventory` below to consume its `ansible_inventory` output. Hand-written inventory must put each host directly under `all.children.nntmux.hosts`.
+
+### Install and activate processing
+
+```bash
+python3 deploy/baremetal/deploy.py install --host indexer \
+  --inventory /secure/hosts.yml --settings /secure/indexer-settings.yml \
+  --vault-vars /secure/indexer-vault.yml
+python3 deploy/baremetal/deploy.py verify --host indexer --inventory /secure/hosts.yml
+```
+
+The entrypoint selects one exact host and validates inputs before invoking Ansible. Add `--check` for a preview; Python bootstrap, builds, database changes, certificate issuance, and lifecycle operations are skipped. A preview does not demonstrate a working install, and an unbootstrapped host still needs Python for facts. `--diff` suppresses secret-bearing tasks. Installation reruns preserve application identity, database contents, group settings, and processing activation. Use `update` to change the deployed commit. A populated database without a successful managed install marker is refused; the installer never runs `migrate:fresh` or reseeds an installed database.
+
+The website, Horizon, scheduler, renewal timer, and backup timer start after initialization. Usenet groups remain inactive and the tmux service remains disabled. Log in as the configured administrator, select groups and processing settings, and then start processing:
+
+```bash
+python3 deploy/baremetal/deploy.py processing-start --host indexer --inventory /secure/hosts.yml
+python3 deploy/baremetal/deploy.py processing-stop --host indexer --inventory /secure/hosts.yml
+```
+
+Processing start enables reboot recovery; stop disables it. The tmux session belongs to `nntmux` and is named `nntmux`. Attach on the server with `sudo -u nntmux tmux attach -t nntmux`. Use `journalctl -u nntmux-horizon -u nntmux-tmux -u nntmux-scheduler` for service output. Application logs live under `/srv/nntmux/shared/storage/logs`.
+
+### Updates, backups, and recovery
+
+```bash
+python3 deploy/baremetal/deploy.py update --host indexer --inventory /secure/hosts.yml \
+  --settings /secure/indexer-settings.yml --vault-vars /secure/indexer-vault.yml \
+  --commit FULL_40_CHARACTER_NEW_COMMIT
+python3 deploy/baremetal/deploy.py rollback --host indexer --inventory /secure/hosts.yml \
+  --commit FULL_40_CHARACTER_PREVIOUS_COMMIT --schema-compatible
+python3 deploy/baremetal/deploy.py backup --host indexer --inventory /secure/hosts.yml
+```
+
+Updates build a separate release, enter maintenance, stop writers, take a consistent backup, run ordinary migrations without seeding, switch the current symlink, and restart previously active services. Completed release configuration is immutable. Application rollback requires an explicitly schema-compatible, previously built release; it cannot reverse database migrations. A migration or activation failure leaves maintenance enabled and writers stopped. Inspect `/etc/nntmux/operation-state.json` and protected service logs before recovering; use a schema-compatible rollback or restore the recorded backup for incompatible changes.
+
+Nightly restic backups run around 03:00 server time with up to five minutes of jitter. Backups stop web/application writers and data services for the **entire capture window**. Retention keeps seven daily, four weekly, and six monthly snapshots. Backups include native service data, application releases/files, configuration, certificates, and a package/version manifest. Backup upload failure attempts to restore the previous service state and still reports failure. Inspect `journalctl -u nntmux-backup`, `/etc/nntmux/last-backup.json`, and verification output for backup age. Test renewal with `sudo certbot renew --dry-run` during physical-server acceptance testing.
+
+Restore requires an explicit snapshot ID and the same hostname/search engine. The restore playbook prepares host packages and configuration, retrieves the manifest, restores exact recorded runtime package versions, and verifies restored services before activation:
+
+```bash
+python3 deploy/baremetal/deploy.py restore --host indexer --inventory /secure/hosts.yml \
+  --settings /secure/indexer-settings.yml --vault-vars /secure/indexer-vault.yml \
+  --snapshot EXPLICIT_SNAPSHOT_ID --move-data-aside
+```
+
+`--move-data-aside` explicitly authorizes preserving existing managed data/configuration under `.before-restore-TIMESTAMP` names before replacement. It is normally needed even on a replacement server because package installation creates initial data directories. Reserve enough space for the existing data, downloaded snapshot, and restored files. Restore does not delete the preserved copies. Failures leave application writers stopped for explicit recovery. Restore uses the snapshot's original APP_KEY and credentials, so preserve the corresponding encrypted Vault file and restic password separately.
+
+### Validation
+
+Run Terraform formatting/validation/TFLint/tests, YAML and Ansible lint, syntax checks for every playbook, `python3 -m unittest discover -s deploy/baremetal/tests -v`, and the deployment initialization PHPUnit tests. CI checks native tooling independently of existing cloud deployments. Automated checks use mocked services/APIs; they do not establish physical-server acceptance. Before production use, exercise fresh installation, rerun, reboot, admin login, queue/scheduler work, certificate renewal, manual NNTP activation, update failure, rollback, and backup/restore on disposable physical servers for **both** search engines.

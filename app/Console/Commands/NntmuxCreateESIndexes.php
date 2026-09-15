@@ -16,7 +16,7 @@ class NntmuxCreateESIndexes extends Command
      *
      * @var string
      */
-    protected $signature = 'nntmux:create-es-indexes';
+    protected $signature = 'nntmux:create-es-indexes {--create-missing : Create absent indexes without replacing existing indexes}';
 
     /**
      * The console command description.
@@ -28,7 +28,20 @@ class NntmuxCreateESIndexes extends Command
     /**
      * Execute the console command.
      */
-    public function handle(): void
+    public function handle(): int
+    {
+        try {
+            $this->createIndexes();
+
+            return self::SUCCESS;
+        } catch (\Throwable) {
+            $this->error('Elasticsearch index creation failed. Existing indexes are preserved when --create-missing is used.');
+
+            return self::FAILURE;
+        }
+    }
+
+    private function createIndexes(): void
     {
         /** @var Client $client */
         $client = app('elasticsearch');
@@ -307,6 +320,11 @@ class NntmuxCreateESIndexes extends Command
     private function recreateIndex(Client $client, string $indexName, array $body): void
     {
         if (ElasticsearchResponseHelper::boolResponse($client, fn (Client $elasticClient) => $elasticClient->indices()->exists(['index' => $indexName]))) {
+            if ($this->option('create-missing')) {
+                $this->info("Index {$indexName} already exists; preserved.");
+
+                return;
+            }
             Elasticsearch::indices()->delete(['index' => $indexName]);
         }
 

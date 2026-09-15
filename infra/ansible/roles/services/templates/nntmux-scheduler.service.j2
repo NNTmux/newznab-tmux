@@ -1,0 +1,10 @@
+[Unit]
+Description=NNTmux scheduled tasks
+After=mariadb.service redis-server.service {{ nntmux_search_driver }}.service
+[Service]
+Type=oneshot
+User=nntmux
+Group=nntmux
+WorkingDirectory=/srv/nntmux/current
+ExecStart=/usr/bin/php8.5 artisan schedule:run --no-interaction
+TimeoutStartSec=1900

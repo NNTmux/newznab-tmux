@@ -1,0 +1,8 @@
+---
+collections:
+  - name: community.general
+    version: 12.1.0
+  - name: community.mysql
+    version: 4.0.1
+  - name: ansible.posix
+    version: 2.1.0

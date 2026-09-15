@@ -1,0 +1,117 @@
+---
+- name: Bootstrap Python on supported physical Ubuntu hosts
+  ansible.builtin.raw: |
+    set -eu
+    . /etc/os-release
+    test "$ID" = ubuntu && test "$VERSION_ID" = 24.04
+    test "$(uname -m)" = x86_64
+    test "$(systemd-detect-virt || true)" = none
+    if ! command -v python3 >/dev/null; then
+      apt-get update >&2
+      apt-get install -y python3 >&2
+      echo PYTHON_INSTALLED
+    fi
+  register: nntmux_python
+  changed_when: "'PYTHON_INSTALLED' in nntmux_python.stdout"
+  when: not ansible_check_mode
+
+- name: Gather native host facts
+  ansible.builtin.setup:
+
+- name: Require supported hardware and OS
+  ansible.builtin.assert:
+    that:
+      - ansible_facts.distribution == 'Ubuntu'
+      - ansible_facts.distribution_version == '24.04'
+      - ansible_facts.architecture == 'x86_64'
+      - ansible_facts.virtualization_role != 'guest'
+    fail_msg: A physical Ubuntu 24.04 amd64 server with sufficient free memory and disk is required.
+
+- name: Require memory and disk headroom for installation or release builds
+  ansible.builtin.assert:
+    that:
+      - ansible_facts.memtotal_mb >= nntmux_min_memory_mb | int
+      - ansible_facts.mounts | selectattr('mount', 'equalto', '/') | map(attribute='size_available') | first | int >= nntmux_min_disk_bytes | int
+  when: nntmux_operation in ['install', 'update', 'restore']
+
+- name: Validate installation settings
+  ansible.builtin.assert:
+    that:
+      - nntmux_commit | default('') is match('^[a-f0-9]{40}$')
+      - nntmux_hostname | default('') is match('^[a-z0-9][a-z0-9.-]+\.[a-z0-9-]+$')
+      - nntmux_acme_email | default('') is match('^[^@ ]+@[^@ ]+\.[^@ ]+$')
+      - nntmux_search_driver in ['manticore', 'elasticsearch']
+      - nntmux_admin_cidrs | default([]) | length > 0
+      - nntmux_backup_repository | default('') is match('^s3:https://[^ ]+/[^ ]+$')
+      - nntmux_repository is match('^https://[^ ]+\.git$')
+    fail_msg: Supply a full commit, public hostname, ACME email, trusted SSH CIDRs, search driver, and HTTPS S3 backup repository.
+  when: nntmux_operation in ['install', 'update', 'restore']
+
+- name: Validate public hostname resolves to this server
+  ansible.builtin.command:
+    argv:
+      - python3
+      - -c
+      - "import socket,sys; expected=set(sys.argv[2:]); actual={a[4][0] for a in socket.getaddrinfo(sys.argv[1],80)}; assert actual and actual <= expected, 'Public DNS must point only to this server'"
+      - "{{ nntmux_hostname }}"
+      - "{{ ansible_host }}"
+      - "{{ ansible_facts.default_ipv4.address }}"
+      - "{{ ansible_facts.default_ipv6.address | default('::1') }}"
+  changed_when: false
+  when: nntmux_operation in ['install', 'restore'] and not ansible_check_mode
+
+
+- name: Validate encrypted application configuration
+  ansible.builtin.assert:
+    that:
+      - nntmux_secrets is mapping
+      - nntmux_secrets.APP_KEY is match('^base64:[A-Za-z0-9+/]{43}=$')
+      - nntmux_secrets.ADMIN_PASS | length >= 12
+      - nntmux_secrets.ADMIN_EMAIL is match('^[^@ ]+@[^@ ]+\.[^@ ]+$')
+      - nntmux_secrets.DB_DATABASE is match('^[a-zA-Z][a-zA-Z0-9_]{0,63}$')
+      - nntmux_secrets.DB_USERNAME is match('^[a-zA-Z][a-zA-Z0-9_]{0,31}$')
+      - nntmux_secrets.DB_PASSWORD | length >= 12
+      - nntmux_secrets.REDIS_PASSWORD | length >= 12
+      - nntmux_secrets.NNTP_SERVER | length > 0
+      - nntmux_secrets.NNTP_USERNAME | length > 0
+      - nntmux_secrets.NNTP_PASSWORD | length > 0
+      - nntmux_secrets.NNTP_PORT | int > 0
+      - nntmux_secrets.NNTP_PORT | int <= 65535
+      - nntmux_secrets.RESTIC_PASSWORD | length >= 12
+      - nntmux_secrets.AWS_ACCESS_KEY_ID | length > 0
+      - nntmux_secrets.AWS_SECRET_ACCESS_KEY | length > 0
+      - nntmux_search_driver != 'elasticsearch' or (nntmux_secrets.ELASTICSEARCH_USER == 'nntmux' and nntmux_secrets.ELASTICSEARCH_PASS | length >= 12)
+    fail_msg: Missing or invalid encrypted installation credentials.
+  no_log: true
+  when: nntmux_operation in ['install', 'update', 'restore']
+
+- name: Collect existing services
+  ansible.builtin.service_facts:
+  when: nntmux_operation == 'install'
+
+- name: Inspect deployment ownership marker
+  ansible.builtin.stat:
+    path: /etc/nntmux/host.json
+  register: nntmux_managed
+
+- name: Refuse unmanaged service conflicts
+  ansible.builtin.assert:
+    that:
+      - item not in ansible_facts.services
+    fail_msg: Existing unmanaged services require a separate migration; this installer will not replace them.
+  loop: [nginx.service, apache2.service, mariadb.service, mysql.service, redis-server.service, manticore.service, elasticsearch.service, docker.service]
+  when: nntmux_operation == 'install' and not nntmux_managed.stat.exists
+
+- name: Read existing deployment metadata
+  ansible.builtin.slurp:
+    src: /etc/nntmux/host.json
+  register: nntmux_existing_host
+  when: nntmux_managed.stat.exists
+
+- name: Preserve hostname and search engine on managed installations
+  ansible.builtin.assert:
+    that:
+      - (nntmux_existing_host.content | b64decode | from_json).hostname == nntmux_hostname
+      - (nntmux_existing_host.content | b64decode | from_json).search_driver == nntmux_search_driver
+    fail_msg: Hostname or search engine changes require a separate migration.
+  when: nntmux_managed.stat.exists and nntmux_operation in ['install', 'update']

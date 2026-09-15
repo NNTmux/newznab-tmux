@@ -1,0 +1,157 @@
+---
+- name: Inspect persisted application identity
+  ansible.builtin.stat:
+    path: /etc/nntmux/application.json
+  register: services_identity
+
+- name: Read persisted application environment
+  ansible.builtin.slurp:
+    src: /etc/nntmux/application.json
+  register: services_previous_environment
+  when: services_identity.stat.exists and nntmux_operation == 'install'
+  no_log: true
+
+- name: Preserve deployment identity on installation reruns
+  ansible.builtin.assert:
+    that:
+      - (services_previous_environment.content | b64decode | from_json)[item] == nntmux_secrets[item] | string
+    fail_msg: Existing application identity cannot be changed by an installation rerun.
+  loop: [APP_KEY, DB_DATABASE, DB_USERNAME, DB_PASSWORD, REDIS_PASSWORD, ADMIN_USER, ADMIN_EMAIL, ADMIN_PASS]
+  when: services_identity.stat.exists and nntmux_operation == 'install'
+  no_log: true
+
+- name: Render native service configuration
+  ansible.builtin.template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: "{{ item.group | default('root') }}"
+    mode: "{{ item.mode | default('0644') }}"
+  loop:
+    - {src: mariadb.cnf.j2, dest: /etc/mysql/mariadb.conf.d/70-nntmux.cnf}
+    - {src: redis.conf.j2, dest: /etc/redis/redis.conf, group: redis, mode: '0640'}
+    - {src: php-fpm.conf.j2, dest: /etc/php/8.5/fpm/pool.d/nntmux.conf}
+    - {src: php.ini.j2, dest: /etc/php/8.5/fpm/conf.d/99-nntmux.ini}
+    - {src: php.ini.j2, dest: /etc/php/8.5/cli/conf.d/99-nntmux.ini}
+  no_log: true
+
+- name: Create Manticore systemd override directory
+  ansible.builtin.file:
+    path: /etc/systemd/system/manticore.service.d
+    state: directory
+    mode: '0755'
+  when: nntmux_search_driver == 'manticore'
+
+- name: Configure Manticore loopback listeners and file limits
+  ansible.builtin.template:
+    src: manticore.conf.j2
+    dest: /etc/manticoresearch/manticore.conf
+    mode: '0644'
+  when: nntmux_search_driver == 'manticore'
+
+- name: Set Manticore process limits
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/manticore.service.d/nntmux.conf
+    mode: '0644'
+    content: |
+      [Service]
+      LimitNOFILE=1048576
+      LimitNPROC=65535
+  when: nntmux_search_driver == 'manticore'
+
+- name: Configure Elasticsearch for authenticated loopback use
+  ansible.builtin.template:
+    src: elasticsearch.yml.j2
+    dest: /etc/elasticsearch/elasticsearch.yml
+    owner: root
+    group: elasticsearch
+    mode: '0640'
+  when: nntmux_search_driver == 'elasticsearch'
+
+- name: Configure Elasticsearch heap
+  ansible.builtin.copy:
+    dest: /etc/elasticsearch/jvm.options.d/nntmux.options
+    owner: root
+    group: elasticsearch
+    mode: '0640'
+    content: |
+      -Xms{{ nntmux_elasticsearch_heap }}
+      -Xmx{{ nntmux_elasticsearch_heap }}
+  when: nntmux_search_driver == 'elasticsearch'
+
+- name: Configure Elasticsearch virtual memory
+  ansible.posix.sysctl:
+    name: vm.max_map_count
+    value: '1048576'
+    state: present
+    sysctl_set: true
+  when: nntmux_search_driver == 'elasticsearch'
+
+- name: Configure Elasticsearch application role
+  ansible.builtin.copy:
+    dest: /etc/elasticsearch/roles.yml
+    owner: root
+    group: elasticsearch
+    mode: '0640'
+    content: |
+      nntmux:
+        cluster: [monitor]
+        indices:
+          - names: ['releases*', 'predb*', 'movies*', 'tvshows*', 'music*', 'books*', 'games*', 'console*', 'steam*', 'anime*']
+            privileges: [all]
+  when: nntmux_search_driver == 'elasticsearch'
+
+- name: Install service unit definitions
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: "/etc/systemd/system/{{ item }}"
+    mode: '0644'
+  loop: [nntmux-horizon.service, nntmux-scheduler.service, nntmux-scheduler.timer, nntmux-tmux.service, nntmux-backup.service, nntmux-backup.timer]
+
+- name: Record public host metadata
+  ansible.builtin.copy:
+    dest: /etc/nntmux/host.json
+    owner: root
+    group: nntmux
+    mode: '0640'
+    content: "{{ {'hostname': nntmux_hostname, 'search_driver': nntmux_search_driver, 'backup_repository': nntmux_backup_repository, 'backup_region': nntmux_backup_region} | to_nice_json }}\n"
+
+- name: Record private restic credentials
+  ansible.builtin.copy:
+    dest: /etc/nntmux/backup.json
+    owner: root
+    group: root
+    mode: '0600'
+    content: "{{ {'AWS_ACCESS_KEY_ID': nntmux_secrets.AWS_ACCESS_KEY_ID, 'AWS_SECRET_ACCESS_KEY': nntmux_secrets.AWS_SECRET_ACCESS_KEY, 'RESTIC_PASSWORD': nntmux_secrets.RESTIC_PASSWORD} | to_nice_json }}\n"
+  no_log: true
+
+- name: Start dependency services for initial installation
+  ansible.builtin.systemd_service:
+    name: "{{ item }}"
+    enabled: true
+    state: started
+    daemon_reload: true
+  loop: "{{ ['mariadb', 'redis-server'] + [nntmux_search_driver] }}"
+  when: nntmux_operation == 'install'
+
+- name: Create application database without changing existing contents
+  community.mysql.mysql_db:
+    name: "{{ nntmux_secrets.DB_DATABASE }}"
+    encoding: utf8mb4
+    collation: utf8mb4_unicode_ci
+    login_unix_socket: /run/mysqld/mysqld.sock
+    state: present
+  no_log: true
+  when: nntmux_operation == 'install'
+
+- name: Create scoped loopback database account
+  community.mysql.mysql_user:
+    name: "{{ nntmux_secrets.DB_USERNAME }}"
+    password: "{{ nntmux_secrets.DB_PASSWORD }}"
+    host: '127.0.0.1'
+    priv: "{{ nntmux_secrets.DB_DATABASE }}.*:ALL"
+    login_unix_socket: /run/mysqld/mysqld.sock
+    update_password: on_create
+    state: present
+  no_log: true
+  when: nntmux_operation == 'install'

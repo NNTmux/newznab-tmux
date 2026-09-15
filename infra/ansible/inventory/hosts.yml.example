@@ -1,0 +1,11 @@
+---
+all:
+  children:
+    nntmux:
+      hosts:
+        indexer:
+          ansible_host: 192.0.2.10
+          ansible_user: administrator
+          ansible_port: 22
+          nntmux_hostname: indexer.example.com
+          nntmux_admin_cidrs: [198.51.100.0/24]

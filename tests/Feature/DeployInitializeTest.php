@@ -37,6 +37,7 @@ class DeployInitializeTest extends TestCase
         $this->app->useStoragePath($this->directory.'/storage');
         File::ensureDirectoryExists($this->directory);
         config([
+            'search.default' => 'manticore',
             'app.key' => 'base64:'.base64_encode(str_repeat('k', 32)),
             'app.cipher' => 'AES-256-CBC',
             'nntmux.admin_username' => 'deployment-admin',
@@ -160,6 +161,42 @@ class DeployInitializeTest extends TestCase
             flock($lock, LOCK_UN);
             fclose($lock);
         }
+    }
+
+    public function test_elasticsearch_initialization_creates_only_missing_indexes(): void
+    {
+        config(['search.default' => 'elasticsearch']);
+        $command = $this->command();
+        $this->expectMigration($command);
+        $this->expectAdministrator($command);
+        $command->shouldReceive('call')->once()->with('nntmux:create-es-indexes', ['--no-interaction' => true, '--create-missing' => true])->andReturn(0);
+
+        $this->assertSame(0, $this->runCommand($command)[0]);
+        $this->assertFileExists($this->marker());
+    }
+
+    public function test_unsupported_search_driver_fails_before_migration(): void
+    {
+        config(['search.default' => 'unknown']);
+        $command = $this->command();
+        $command->shouldReceive('call')->never();
+
+        [$status, $output] = $this->runCommand($command);
+        $this->assertSame(1, $status);
+        $this->assertStringContainsString('Unsupported deployment search driver', $output);
+        $this->assertFileDoesNotExist($this->marker());
+    }
+
+    public function test_elasticsearch_failure_leaves_initialization_incomplete(): void
+    {
+        config(['search.default' => 'elasticsearch']);
+        $command = $this->command();
+        $this->expectMigration($command);
+        $this->expectAdministrator($command);
+        $command->shouldReceive('call')->once()->with('nntmux:create-es-indexes', ['--no-interaction' => true, '--create-missing' => true])->andReturn(1);
+
+        $this->assertSame(1, $this->runCommand($command)[0]);
+        $this->assertFileDoesNotExist($this->marker());
     }
 
     private function marker(): string

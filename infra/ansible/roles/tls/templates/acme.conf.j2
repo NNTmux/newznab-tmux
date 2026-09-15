@@ -1,0 +1,7 @@
+server {
+    listen 80;
+    listen [::]:80;
+    server_name {{ nntmux_hostname }};
+    location ^~ /.well-known/acme-challenge/ { root /var/www/acme; }
+    location / { return 503; }
+}

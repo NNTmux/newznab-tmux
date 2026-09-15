@@ -1,0 +1,8 @@
+[Unit]
+Description=NNTmux consistent encrypted backup
+After=network-online.target
+[Service]
+Type=oneshot
+UMask=0077
+ExecStart=/usr/bin/python3 /usr/local/lib/nntmux/host.py backup
+TimeoutStartSec=infinity

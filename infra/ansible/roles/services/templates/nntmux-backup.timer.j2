@@ -1,0 +1,8 @@
+[Unit]
+Description=Nightly NNTmux encrypted backup
+[Timer]
+OnCalendar={{ nntmux_backup_schedule }}
+RandomizedDelaySec=300
+Persistent=true
+[Install]
+WantedBy=timers.target

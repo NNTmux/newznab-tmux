@@ -1,0 +1,15 @@
+[Unit]
+Description=NNTmux processing engine
+After=network-online.target mariadb.service redis-server.service {{ nntmux_search_driver }}.service
+[Service]
+User=nntmux
+Group=nntmux
+WorkingDirectory=/srv/nntmux/current
+ExecStartPre=/usr/bin/php8.5 /usr/local/lib/nntmux/health.php /srv/nntmux/current
+ExecStart=/usr/local/lib/nntmux/tmux.sh
+Restart=on-failure
+RestartSec=15
+TimeoutStopSec=1900
+KillMode=control-group
+[Install]
+WantedBy=multi-user.target

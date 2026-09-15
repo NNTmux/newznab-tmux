@@ -1,0 +1,45 @@
+---
+- name: Invoke service or verification operation
+  ansible.builtin.command:
+    argv: [python3, /usr/local/lib/nntmux/host.py, "{{ nntmux_operation }}"]
+  register: lifecycle_operation_result
+  changed_when: nntmux_operation != 'verify'
+  when: nntmux_operation in ['verify', 'backup', 'processing-start', 'processing-stop'] and not ansible_check_mode
+
+- name: Require explicit schema compatibility for rollback
+  ansible.builtin.assert:
+    that:
+      - nntmux_schema_compatible | default(false) | bool
+      - nntmux_commit | default('') is match('^[a-f0-9]{40}$')
+  when: nntmux_operation == 'rollback'
+
+- name: Roll back a schema-compatible application release
+  ansible.builtin.command:
+    argv: [python3, /usr/local/lib/nntmux/host.py, rollback, "{{ nntmux_commit }}", --schema-compatible]
+  register: lifecycle_rollback_result
+  changed_when: "'UNCHANGED' not in lifecycle_rollback_result.stdout"
+  when: nntmux_operation == 'rollback' and not ansible_check_mode
+
+- name: Require explicit restore snapshot
+  ansible.builtin.assert:
+    that:
+      - nntmux_snapshot | default('') is match('^[a-f0-9]{8,64}$')
+  when: nntmux_operation == 'restore'
+
+- name: Restore and validate the selected snapshot
+  ansible.builtin.command:
+    argv: "{{ ['python3', '/usr/local/lib/nntmux/host.py', 'restore', nntmux_snapshot] + (['--move-data-aside'] if nntmux_move_data_aside | default(false) | bool else []) }}"
+  register: lifecycle_restore_result
+  changed_when: true
+  when: nntmux_operation == 'restore' and not ansible_check_mode
+
+- name: Verify installation after HTTPS activation
+  ansible.builtin.command:
+    argv: [python3, /usr/local/lib/nntmux/host.py, verify]
+  register: lifecycle_verification
+  changed_when: false
+  when: nntmux_operation in ['install', 'update'] and not ansible_check_mode
+
+- name: Display operation report
+  ansible.builtin.debug:
+    msg: "{{ lifecycle_verification.stdout | default(lifecycle_operation_result.stdout | default(lifecycle_rollback_result.stdout | default(lifecycle_restore_result.stdout | default('Lifecycle mutations skipped in check mode.')))) }}"

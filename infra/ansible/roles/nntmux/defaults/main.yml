@@ -1,0 +1,10 @@
+---
+nntmux_repository: https://github.com/NNTmux/newznab-tmux.git
+nntmux_search_driver: manticore
+nntmux_min_memory_mb: 8192
+nntmux_min_disk_bytes: 21474836480
+nntmux_php_workers: 8
+nntmux_elasticsearch_heap: 2g
+nntmux_application_settings: {}
+nntmux_backup_region: us-east-1
+nntmux_backup_schedule: '*-*-* 03:00:00'

@@ -1,0 +1,15 @@
+[nntmux]
+user = nntmux
+group = nntmux
+listen = /run/php/nntmux.sock
+listen.owner = www-data
+listen.group = www-data
+listen.mode = 0660
+pm = dynamic
+pm.max_children = {{ nntmux_php_workers }}
+pm.start_servers = 2
+pm.min_spare_servers = 1
+pm.max_spare_servers = 3
+pm.max_requests = 500
+clear_env = yes
+catch_workers_output = yes

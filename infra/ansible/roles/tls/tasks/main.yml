@@ -1,0 +1,89 @@
+---
+- name: Inspect existing ACME certificate
+  ansible.builtin.stat:
+    path: "/etc/letsencrypt/live/{{ nntmux_hostname }}/fullchain.pem"
+  register: tls_certificate
+
+- name: Install ACME-only HTTP configuration
+  ansible.builtin.template:
+    src: acme.conf.j2
+    dest: /etc/nginx/sites-available/nntmux
+    mode: '0644'
+  when: not tls_certificate.stat.exists
+
+- name: Remove default Nginx site
+  ansible.builtin.file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+
+- name: Enable NNTmux Nginx site
+  ansible.builtin.file:
+    src: /etc/nginx/sites-available/nntmux
+    dest: /etc/nginx/sites-enabled/nntmux
+    state: link
+
+- name: Validate Nginx configuration
+  ansible.builtin.command: nginx -t
+  changed_when: false
+  when: not ansible_check_mode
+
+- name: Start Nginx for ACME challenges
+  ansible.builtin.systemd_service:
+    name: nginx
+    enabled: true
+    state: started
+  when: not ansible_check_mode
+
+- name: Issue certificate through webroot
+  ansible.builtin.command:
+    argv:
+      - certbot
+      - certonly
+      - --webroot
+      - -w
+      - /var/www/acme
+      - --domain
+      - "{{ nntmux_hostname }}"
+      - --email
+      - "{{ nntmux_acme_email }}"
+      - --agree-tos
+      - --non-interactive
+      - --keep-until-expiring
+    creates: "/etc/letsencrypt/live/{{ nntmux_hostname }}/fullchain.pem"
+  when: not ansible_check_mode
+
+- name: Install HTTPS application site
+  ansible.builtin.template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/sites-available/nntmux
+    mode: '0644'
+  when: not ansible_check_mode
+
+- name: Install certificate renewal reload hook
+  ansible.builtin.copy:
+    dest: /etc/letsencrypt/renewal-hooks/deploy/nntmux-nginx
+    mode: '0755'
+    content: |
+      #!/bin/sh
+      set -eu
+      nginx -t
+      systemctl reload nginx
+  when: not ansible_check_mode
+
+- name: Validate HTTPS configuration
+  ansible.builtin.command: nginx -t
+  changed_when: false
+  when: not ansible_check_mode
+
+- name: Reload Nginx after HTTPS activation
+  ansible.builtin.systemd_service:
+    name: nginx
+    state: reloaded
+  when: not ansible_check_mode
+
+- name: Enable automatic certificate renewal
+  ansible.builtin.systemd_service:
+    name: certbot.timer
+    enabled: true
+    state: started
+  when: not ansible_check_mode

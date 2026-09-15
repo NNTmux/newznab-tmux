@@ -1,0 +1,10 @@
+bind 127.0.0.1 ::1
+protected-mode yes
+port 6379
+daemonize no
+supervised systemd
+dir /var/lib/redis
+logfile /var/log/redis/redis-server.log
+appendonly yes
+appendfsync everysec
+requirepass {{ nntmux_secrets.REDIS_PASSWORD | to_json }}

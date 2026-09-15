@@ -1,0 +1,8 @@
+servers = {
+  indexer = {
+    address     = "192.0.2.10"
+    ssh_user    = "administrator"
+    hostname    = "indexer.example.com"
+    admin_cidrs = ["198.51.100.0/24"]
+  }
+}

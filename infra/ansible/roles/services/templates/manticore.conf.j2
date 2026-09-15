@@ -1,0 +1,10 @@
+searchd {
+    listen = 127.0.0.1:9306:mysql
+    listen = 127.0.0.1:9308:http
+    data_dir = /var/lib/manticore
+    log = /var/log/manticore/searchd.log
+    pid_file = /run/manticore/searchd.pid
+    max_open_files = 524288
+    binlog_flush = 2
+    rt_flush_period = 900
+}
