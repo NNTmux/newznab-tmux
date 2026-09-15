@@ -45,3 +45,8 @@ composer.lock	-binary text
 docker			-binary text
 Dockerfile		-binary text
 .mytop			-binary text
+
+# Deployment configuration is source code and must remain reviewable as text.
+/infra/terraform/** -binary text eol=lf
+/deploy/** -binary text eol=lf
+.env.example -binary text eol=lf

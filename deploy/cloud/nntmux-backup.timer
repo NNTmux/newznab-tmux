@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily NNTmux backup
+
+[Timer]
+OnCalendar=*-*-* 03:00:00 UTC
+Persistent=true
+RandomizedDelaySec=300
+Unit=nntmux-backup.service
+
+[Install]
+WantedBy=timers.target

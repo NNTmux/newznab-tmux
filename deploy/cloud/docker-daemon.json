@@ -1,0 +1,11 @@
+{
+  "data-root": "/srv/nntmux/docker",
+  "features": {
+    "containerd-snapshotter": false
+  },
+  "log-driver": "local",
+  "log-opts": {
+    "max-size": "10m",
+    "max-file": "3"
+  }
+}

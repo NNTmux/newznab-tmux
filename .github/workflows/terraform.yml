@@ -1,0 +1,96 @@
+name: Cloud deployment validation
+
+on:
+  pull_request:
+    paths:
+      - 'infra/terraform/**'
+      - 'deploy/**'
+      - 'Dockerfile'
+      - '.dockerignore'
+      - 'app/Console/Commands/DeployInitialize.php'
+      - 'tests/Feature/DeployInitializeTest.php'
+      - '.github/workflows/terraform.yml'
+  push:
+    paths:
+      - 'infra/terraform/**'
+      - 'deploy/**'
+      - 'Dockerfile'
+      - '.dockerignore'
+      - 'app/Console/Commands/DeployInitialize.php'
+      - 'tests/Feature/DeployInitializeTest.php'
+      - '.github/workflows/terraform.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  infrastructure:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        provider: [aws, hetzner, ovh]
+    defaults:
+      run:
+        working-directory: infra/terraform/${{ matrix.provider }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.10.5'
+      - uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: 'v0.55.1'
+      - run: terraform fmt -check -recursive
+      - run: terraform init -backend=false -input=false -lockfile=readonly
+      - run: terraform validate
+      - run: tflint --init
+      - run: tflint
+      - name: Plan-only tests with mocked cloud providers
+        run: terraform test
+
+  deployment-scripts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - run: python3 deploy/cloud/tests/test_deploy.py
+      - run: python3 deploy/cloud/tests/test_portable.py
+      - run: python3 deploy/cloud/tests/test_selection.py
+      - name: ShellCheck
+        run: shellcheck deploy/select.sh deploy/aws/*.sh deploy/cloud/*.sh deploy/cloud/providers/*.sh deploy/cloud/tests/*.sh
+      - name: Install volume test prerequisites
+        run: sudo apt-get update && sudo apt-get install -y cryptsetup restic
+      - name: Disposable encrypted volume integration
+        run: sudo deploy/cloud/tests/test_volume.sh
+      - name: Native encrypted backup and restore integration
+        run: deploy/cloud/tests/test_restic.sh
+
+  production-image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build production image
+        run: docker build --tag nntmux-validation:local .
+      - name: Verify PHP and bundled frontend
+        run: >-
+          docker run --rm --entrypoint php nntmux-validation:local -r
+          'require "/app/vendor/autoload.php";
+          foreach (["pdo_mysql", "redis", "pcntl", "gd", "imagick", "sockets"] as $extension) {
+          if (!extension_loaded($extension)) { exit(1); } }
+          foreach (["unrar", "unzip", "ffmpeg", "ffprobe", "lame", "mediainfo", "tmux", "timeout"] as $binary) {
+          if (!is_executable("/usr/bin/".$binary)) { exit(1); } }
+          if (PHP_VERSION_ID < 80500 || !is_file("/app/public/build/manifest.json") || is_file("/app/.env")) { exit(1); }'
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+      - name: Disposable production service integration
+        run: deploy/cloud/tests/smoke.sh nntmux-validation:local
+      - name: Configuration parser tests in the production image
+        run: docker run --rm --entrypoint python3 -v "$PWD/deploy/cloud/tests:/app/deploy/cloud/tests:ro" nntmux-validation:local /app/deploy/cloud/tests/test_configuration.py
+      - name: Scan image
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: nntmux-validation:local
+          format: table
+          severity: HIGH,CRITICAL
+          exit-code: '0'

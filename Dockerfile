@@ -1,60 +1,44 @@
-
-FROM composer:latest AS composer-base
-FROM dunglas/frankenphp:1-php8.4
-LABEL maintainer="PyRowMan"
-ENV SERVER_NAME=:${APP_PORT:-80}
-ARG MYSQL_CLIENT="mariadb-client"
-
+# syntax=docker/dockerfile:1
+FROM composer:2.8 AS composer
+FROM node:22-bookworm AS node
+FROM dunglas/frankenphp:1-php8.5-bookworm AS build
 WORKDIR /app
-
-
-COPY --from=node:22 /usr/local/ /usr/local/
-COPY --from=composer-base --link /usr/bin/composer /usr/bin/composer
-
-RUN apt update \
- && apt install -y --no-install-recommends \
-     unrar-free lame libcap2-bin python3 gettext-base \
-     curl zip unzip git nano bash-completion sudo wget tmux time fonts-powerline \
-     gnupg libpng-dev dnsutils jq htop iputils-ping net-tools ffmpeg \
-     jpegoptim webp optipng pngquant libavif-bin watch iproute2 nmon \
-     libonig-dev libxml2-dev libicu-dev libjpeg-dev libfreetype6-dev libxslt-dev $MYSQL_CLIENT libcurl4-openssl-dev \
- && wget https://mediaarea.net/repo/deb/repo-mediaarea_1.0-24_all.deb \
- && dpkg -i repo-mediaarea_1.0-24_all.deb \
- && apt update \
- && apt install -y libmediainfo0v5 mediainfo libzen0v5
-RUN install-php-extensions imagick/imagick@master
-RUN docker-php-ext-install \
-     bcmath \
-     exif \
-     gd \
-     intl \
-     pdo_mysql \
-     sockets \
-     pcntl \
- && pecl install redis \
- && docker-php-ext-enable redis \
- && apt clean \
- && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
-COPY ./docker/8.5/php.ini "$PHP_INI_DIR/conf.d/custom-conf.ini"
-
-COPY --chmod=755 ./docker-entrypoint.sh /usr/local/bin/docker-entrypoint
-
+COPY --from=composer /usr/bin/composer /usr/local/bin/composer
+COPY --from=node /usr/local/ /usr/local/
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates git unzip curl tmux unrar-free lame ffmpeg mediainfo \
+    jpegoptim webp optipng pngquant libavif-bin python3 time procps \
+    mariadb-client libmagic1 \
+    && rm -rf /var/lib/apt/lists/*
+RUN install-php-extensions bcmath exif gd intl mbstring pdo_mysql pdo_sqlite sockets pcntl redis imagick zip
+COPY composer.json composer.lock /app/
+RUN --mount=type=cache,target=/root/.composer/cache composer install --no-dev --prefer-dist --no-interaction --no-progress --no-scripts --no-autoloader
+COPY package*.json /app/
+RUN --mount=type=cache,target=/root/.npm npm install --no-audit --no-fund
 COPY . /app
+RUN composer dump-autoload --no-dev --no-scripts --optimize \
+    && mkdir -p bootstrap/cache storage/framework/cache/data storage/framework/sessions storage/framework/views storage/logs \
+    && touch /tmp/build.sqlite \
+    && APP_ENV=testing DB_CONNECTION=sqlite DB_DATABASE=/tmp/build.sqlite CACHE_STORE=array SESSION_DRIVER=array QUEUE_CONNECTION=sync MAIL_MAILER=array php artisan package:discover --ansi \
+    && APP_ENV=testing DB_CONNECTION=sqlite DB_DATABASE=/tmp/build.sqlite CACHE_STORE=array SESSION_DRIVER=array QUEUE_CONNECTION=sync MAIL_MAILER=array npm run build \
+    && rm -rf node_modules /tmp/build.sqlite bootstrap/cache/*.php
 
-RUN rm -Rf tests/
-
-RUN composer install
-
-RUN chmod -R 755 /app/vendor/
-RUN chmod -R 777 /app/storage/
-RUN chmod -R 777 /app/resources/
-RUN chmod -R 777 /app/public/
-
-EXPOSE ${APP_PORT:-80}
-
-CMD ["--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]
-ENTRYPOINT ["docker-entrypoint"]
-
-
+FROM dunglas/frankenphp:1-php8.5-bookworm AS production
+WORKDIR /app
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates curl unzip tmux unrar-free lame ffmpeg mediainfo jpegoptim webp \
+    optipng pngquant libavif-bin python3 time procps mariadb-client libmagic1 \
+    && rm -rf /var/lib/apt/lists/*
+RUN install-php-extensions bcmath exif gd intl mbstring pdo_mysql pdo_sqlite sockets pcntl redis imagick zip
+COPY --from=build --chown=www-data:www-data /app /app
+COPY docker/8.5/php.ini /usr/local/etc/php/conf.d/99-nntmux.ini
+RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
+    && mkdir -p /app/_install /app/storage/covers /app/storage/app/public \
+    && ln -s ../storage/covers /app/public/covers \
+    && ln -s ../storage/app/public /app/public/storage \
+    && chmod +x /app/deploy/cloud/*.sh \
+    && chown -R www-data:www-data /app/_install /app/storage /app/bootstrap/cache
+USER www-data
+EXPOSE 80
+ENTRYPOINT ["/app/deploy/cloud/entrypoint.sh"]
+CMD ["frankenphp", "run", "--config", "/app/deploy/cloud/Frankenphp.Caddyfile", "--adapter", "caddyfile"]

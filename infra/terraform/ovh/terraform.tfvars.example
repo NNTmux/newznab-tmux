@@ -1,0 +1,15 @@
+environment = "production"
+hostname = "indexer.example.com"
+region = "GRA11"
+availability_zone = "nova"
+flavor_name = "b3-32"
+image_name = "Ubuntu 24.04"
+volume_type = "high-speed-gen2"
+repository_url = "ghcr.io/REPLACE-WITH-LOWERCASE-OWNER/nntmux"
+vault_address = "https://vault.example.com"
+vault_secret_path = "secret/data/nntmux/production"
+admin_cidrs = ["203.0.113.10/32"]
+ssh_public_key = "ssh-ed25519 REPLACE_WITH_PUBLIC_KEY"
+# dns_zone = "example.com" # Existing OVH DNS zone, using separate OVH API credentials.
+# create_recovery_volume = true
+# use_recovery_volume = true # Only after successful explicit restore activation.

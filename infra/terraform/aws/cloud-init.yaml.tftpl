@@ -1,0 +1,38 @@
+#cloud-config
+package_update: true
+packages:
+  - ca-certificates
+  - curl
+  - unzip
+  - jq
+  - util-linux
+  - e2fsprogs
+  - python3
+write_files:
+  - path: /etc/nntmux/host.json
+    permissions: '0600'
+    encoding: b64
+    content: ${host_config}
+runcmd:
+  - |
+    set -eu
+    install -m 0755 -d /etc/apt/keyrings /opt/nntmux
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+    echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu noble stable" > /etc/apt/sources.list.d/docker.list
+    apt-get update
+    apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+    curl -fsSL https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -o /tmp/awscliv2.zip
+    unzip -q /tmp/awscliv2.zip -d /tmp/awscli
+    /tmp/awscli/aws/install
+    aws s3 cp 's3://${assets_bucket}/${assets_prefix}/' /opt/nntmux/ --recursive --region '${region}' --only-show-errors
+    chmod 0755 /opt/nntmux/*.sh /opt/nntmux/providers/*.sh
+    cp /opt/nntmux/nntmux*.service /opt/nntmux/nntmux-backup.timer /etc/systemd/system/
+    install -m 0755 -d /etc/systemd/system/docker.service.d
+    cp /opt/nntmux/docker-data.conf /etc/systemd/system/docker.service.d/nntmux-data.conf
+    install -m 0755 -d /etc/docker
+    install -m 0600 /opt/nntmux/docker-daemon.json /etc/docker/daemon.json
+    systemctl stop docker.service docker.socket containerd.service
+    systemctl daemon-reload
+    systemctl enable docker nntmux-data.service nntmux.service nntmux-backup.timer
+    snap start amazon-ssm-agent
+    # An empty volume is initialized explicitly by the operator, never at boot.

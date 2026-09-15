@@ -1,0 +1,132 @@
+name: nntmux
+x-app: &app
+  image: ${APP_IMAGE:?Supply an immutable ECR image digest}
+  restart: unless-stopped
+  init: true
+  user: "33:33"
+  volumes:
+    - type: bind
+      source: ${CONFIG_DIRECTORY:?}/application.env
+      target: /app/.env
+      read_only: true
+      bind:
+        create_host_path: false
+    - ${DATA_ROOT:?}/storage:/app/storage
+    - ${DATA_ROOT:?}/install:/app/_install
+  networks: [application]
+  depends_on:
+    mariadb:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+    manticore:
+      condition: service_healthy
+  stop_grace_period: 120s
+services:
+  caddy:
+    image: caddy:2.10.2-alpine
+    restart: unless-stopped
+    ports: ["80:80", "443:443"]
+    environment:
+      APPLICATION_HOSTNAME: ${APPLICATION_HOSTNAME:?}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ${DATA_ROOT:?}/caddy/data:/data
+      - ${DATA_ROOT:?}/caddy/config:/config
+    networks: [application]
+    depends_on:
+      web:
+        condition: service_healthy
+    mem_limit: 256m
+  web:
+    <<: *app
+    mem_limit: 2g
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://localhost:80/up"]
+      interval: 15s
+      timeout: 5s
+      retries: 6
+      start_period: 60s
+  horizon:
+    <<: *app
+    command: ["php", "artisan", "horizon"]
+    mem_limit: 2g
+    healthcheck:
+      test: ["CMD", "php", "artisan", "horizon:status"]
+      interval: 30s
+      timeout: 15s
+      retries: 4
+      start_period: 60s
+  scheduler:
+    <<: *app
+    command: ["php", "artisan", "schedule:work"]
+    mem_limit: 1g
+    healthcheck:
+      test: ["CMD", "php", "/app/deploy/cloud/process-health.php", "schedule:work"]
+      interval: 30s
+      timeout: 5s
+      retries: 4
+  indexer:
+    <<: *app
+    command: ["/app/deploy/cloud/tmux.sh"]
+    tty: true
+    mem_limit: 8g
+    healthcheck:
+      test: ["CMD", "php", "artisan", "tmux:health-check", "--session=nntmux"]
+      interval: 30s
+      timeout: 25s
+      retries: 4
+      start_period: 90s
+  mariadb:
+    image: mariadb:11.4.8
+    restart: unless-stopped
+    env_file:
+      - path: ${CONFIG_DIRECTORY:?}/database.env
+        format: raw
+    command: ["--max_allowed_packet=128M", "--group_concat_max_len=16384", "--max_connections=200"]
+    volumes: ["${DATA_ROOT:?}/mariadb:/var/lib/mysql"]
+    networks: [application]
+    mem_limit: 12g
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 60s
+    stop_grace_period: 120s
+  redis:
+    image: redis:7.4.2-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--appendfsync", "everysec"]
+    volumes: ["${DATA_ROOT:?}/redis:/data"]
+    networks: [application]
+    mem_limit: 1g
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    stop_grace_period: 60s
+  manticore:
+    image: manticoresearch/manticore:28.4.4
+    restart: unless-stopped
+    environment:
+      EXTRA: "1"
+    volumes: ["${DATA_ROOT:?}/manticore:/var/lib/manticore"]
+    networks: [application]
+    mem_limit: 4g
+    ulimits:
+      nofile: {soft: 65535, hard: 65535}
+    healthcheck:
+      test: ["CMD", "mysql", "--protocol=tcp", "--host=127.0.0.1", "--port=9306", "--execute=SHOW TABLES"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+      start_period: 45s
+    stop_grace_period: 120s
+networks:
+  application:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.42.0/24

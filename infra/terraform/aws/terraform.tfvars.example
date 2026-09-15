@@ -1,0 +1,8 @@
+aws_region = "eu-central-1"
+availability_zone = "eu-central-1a"
+environment = "production"
+hostname = "indexer.example.com"
+route53_zone_id = "ZREPLACEWITHYOURZONE"
+instance_type = "m7i.2xlarge"
+root_volume_size = 40
+data_volume_size = 250

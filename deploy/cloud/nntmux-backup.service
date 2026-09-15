@@ -1,0 +1,9 @@
+[Unit]
+Description=Consistent daily NNTmux backup
+Requires=nntmux-data.service
+After=nntmux-data.service
+
+[Service]
+Type=oneshot
+ExecStart=/opt/nntmux/deploy.sh backup
+TimeoutStartSec=3600

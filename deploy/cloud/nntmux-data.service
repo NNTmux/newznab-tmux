@@ -1,0 +1,14 @@
+[Unit]
+Description=Mount the NNTmux persistent data volume
+After=network-online.target
+Before=docker.service nntmux.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/opt/nntmux/volume.sh mount
+ExecStop=/opt/nntmux/volume.sh unmount
+TimeoutStartSec=180
+
+[Install]
+WantedBy=multi-user.target

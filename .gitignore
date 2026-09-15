@@ -75,3 +75,15 @@ pnpm-lock.yaml
 /.agents/skills/
 /.claude/skills/
 /.cursor/skills/
+
+# Terraform providers, local configuration, plans, and state
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfvars
+!*.tfvars.example
+infra/terraform/**/backend.hcl
+
+# Generated deployment test bytecode
+deploy/**/__pycache__/

@@ -37,5 +37,8 @@ jobs:
           APP_KEY=$(php -r "echo 'base64:' . base64_encode(random_bytes(32));")
           sed -i "s|APP_KEY=.*|APP_KEY=$APP_KEY|" .env
 
+      - name: Deployment configuration parser tests
+        run: python3 deploy/cloud/tests/test_configuration.py
+
       - name: Run tests
         run: vendor/bin/phpunit

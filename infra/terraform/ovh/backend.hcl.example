@@ -1,0 +1,5 @@
+bucket = "REPLACE-WITH-EXISTING-STATE-BUCKET"
+key = "nntmux/ovh/production/terraform.tfstate"
+region = "eu-central-1"
+encrypt = true
+use_lockfile = true

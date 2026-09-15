@@ -1,0 +1,16 @@
+[Unit]
+Description=NNTmux production containers
+Requires=nntmux-data.service
+After=docker.service nntmux-data.service network-online.target
+Wants=docker.service network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/opt/nntmux/deploy.sh start
+ExecStop=/opt/nntmux/deploy.sh stop
+TimeoutStartSec=600
+TimeoutStopSec=300
+
+[Install]
+WantedBy=multi-user.target
