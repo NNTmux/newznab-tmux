@@ -128,9 +128,9 @@ class NNTPService extends NntpClient
     protected string $_yEncTempOutput;
 
     /**
-     * YEnc encoding/decoding service.
+     * Resolved on first BODY read so diagnostics can boot with an unusable native library.
      */
-    protected YencService $_yencService;
+    protected ?YencService $_yencService = null;
 
     /**
      * Create a new NNTP service instance.
@@ -141,7 +141,7 @@ class NNTPService extends NntpClient
 
         $this->_echo = config('nntmux.echocli');
         $this->_tmux = $tmux ?? new Tmux;
-        $this->_yencService = $yencService ?? app(YencService::class);
+        $this->_yencService = $yencService;
         $this->_nntpRetries = Settings::settingValue('nntpretries') !== '' ? (int) Settings::settingValue('nntpretries') : 0 + 1;
 
         $this->initializeConfig();
@@ -1075,6 +1075,8 @@ class NNTPService extends NntpClient
                 continue;
             }
             if ($line === ".\r\n") {
+                $this->_yencService ??= app(YencService::class);
+
                 return $this->_yencService->decodeIgnore($body);
             }
             $body .= str_starts_with($line, '..') ? substr($line, 1) : $line;

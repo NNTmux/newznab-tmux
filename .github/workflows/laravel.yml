@@ -20,7 +20,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite
+          extensions: dom, curl, ffi, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite
           coverage: none
 
       - name: Copy env file
@@ -36,6 +36,20 @@ jobs:
         run: |
           APP_KEY=$(php -r "echo 'base64:' . base64_encode(random_bytes(32));")
           sed -i "s|APP_KEY=.*|APP_KEY=$APP_KEY|" .env
+
+      - name: Cache RapidYenc library
+        uses: actions/cache@v4
+        with:
+          path: storage/app/rapidyenc
+          key: rapidyenc-${{ hashFiles('scripts/build-rapidyenc.sh') }}
+
+      - name: Build RapidYenc native library
+        run: bash scripts/build-rapidyenc.sh
+
+      - name: Run native yEnc parity tests
+        env:
+          YENC_NATIVE_LIBRARY: ${{ github.workspace }}/storage/app/rapidyenc/librapidyenc.so
+        run: php -d ffi.enable=true vendor/bin/phpunit --fail-on-skipped --filter='YencNativeDecoderTest|YencNativeLibraryTest|YencServiceTest|YencDoctorCommandTest|NNTPBodyDecodingTest'
 
       - name: Deployment configuration parser tests
         run: python3 deploy/cloud/tests/test_configuration.py

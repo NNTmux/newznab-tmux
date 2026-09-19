@@ -6,13 +6,64 @@ namespace Tests\Unit;
 
 use App\Services\YencService;
 use DariusIII\NetNntp\Error as NntpError;
+use Illuminate\Container\Container;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use Tests\Fixtures\YencArticles;
 use Tests\Support\YencNntpHarness;
 
 final class NNTPBodyDecodingTest extends TestCase
 {
+    public function test_decoder_is_resolved_once_when_a_body_is_read(): void
+    {
+        $previous = Container::getInstance();
+        $container = new Container;
+        $resolutions = 0;
+        $container->bind(YencService::class, function () use (&$resolutions): YencService {
+            $resolutions++;
+
+            return new YencService;
+        });
+        Container::setInstance($container);
+        $stream = fopen('php://memory', 'w+');
+        fwrite($stream, YencArticles::article('ABC')."\r\n.\r\n");
+        rewind($stream);
+        try {
+            $harness = new YencNntpHarness($stream);
+            $this->assertSame(0, $resolutions);
+            $this->assertSame('ABC', $harness->fetch());
+            rewind($stream);
+            $this->assertSame('ABC', $harness->fetch());
+            $this->assertSame(1, $resolutions);
+        } finally {
+            Container::setInstance($previous);
+            fclose($stream);
+        }
+    }
+
+    public function test_required_decoder_failure_is_not_hidden_when_reading_a_body(): void
+    {
+        $previous = Container::getInstance();
+        $container = new Container;
+        $container->bind(YencService::class, function (): never {
+            throw new RuntimeException('Native yEnc is unavailable');
+        });
+        Container::setInstance($container);
+        $stream = fopen('php://memory', 'w+');
+        fwrite($stream, YencArticles::article('ABC')."\r\n.\r\n");
+        rewind($stream);
+        try {
+            $harness = new YencNntpHarness($stream);
+            $this->expectException(RuntimeException::class);
+            $this->expectExceptionMessage('Native yEnc is unavailable');
+            $harness->fetch();
+        } finally {
+            Container::setInstance($previous);
+            fclose($stream);
+        }
+    }
+
     /** @return iterable<string, array{bool}> */
     public static function entryPaths(): iterable
     {

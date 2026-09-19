@@ -13,7 +13,7 @@ final class YencNntpHarness extends NNTPService
     public array $commands = [];
 
     /** @param resource $stream */
-    public function __construct($stream, YencService $decoder)
+    public function __construct($stream, ?YencService $decoder = null)
     {
         $this->_socket = $stream;
         $this->_yencService = $decoder;

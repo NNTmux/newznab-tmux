@@ -36,7 +36,7 @@ mkdir "$work_dir/source"
 tar -xzf "$archive" --strip-components=1 -C "$work_dir/source"
 cmake -S "$work_dir/source" -B "$work_dir/build" \
     -DCMAKE_BUILD_TYPE=Release -DBUILD_NATIVE=OFF \
-    -DDISABLE_ENCODE=ON -DDISABLE_CRC=ON -DDISABLE_TOOL=ON
+    -DDISABLE_ENCODE=ON -DDISABLE_TOOL=ON
 cmake --build "$work_dir/build" --target rapidyenc_shared --parallel 2
 mv -fT -- "$work_dir/build/librapidyenc.so" "$output_dir/librapidyenc.so"
 printf 'Source archive: %s\nLibrary: %s/librapidyenc.so\n' "$archive" "$output_dir"

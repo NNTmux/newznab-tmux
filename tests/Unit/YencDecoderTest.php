@@ -125,6 +125,45 @@ class YencDecoderTest extends TestCase
         $this->assertSame("\xd3\xd3", $this->service()->decode($article));
     }
 
+    public function test_escape_marker_before_line_end_decodes_consistently(): void
+    {
+        foreach (["\r\n", "\n"] as $eol) {
+            $article = '=ybegin line=128 size=4 name=x'.$eol.'klm='.$eol.'M'.$eol.'=yend size=4';
+            $this->assertSame("ABC\xe3", $this->service()->decode($article));
+        }
+    }
+
+    public function test_escape_before_bare_carriage_return_preserves_tolerant_recovery(): void
+    {
+        $article = "=ybegin line=128 size=4 name=x\nklm=\rM\n=yend size=4";
+        $service = $this->service();
+        $this->assertSame("ABC\xe3", $service->decode($article));
+        $this->assertSame("ABC\xe3", $service->decodeIgnore($article));
+    }
+
+    public function test_trailing_escape_pairs_can_span_line_endings(): void
+    {
+        foreach (["=\n=", "==\r=\n=", "=\r\n=\n=\r="] as $payload) {
+            $expected = str_repeat("\xd3", intdiv(substr_count($payload, '='), 2));
+            $article = '=ybegin line=128 size='.strlen($expected)." name=x\n".$payload
+                ."\n=yend size=".strlen($expected);
+            $service = $this->service();
+            $this->assertSame($expected, $service->decode($article));
+            $this->assertSame($expected, $service->decodeIgnore($article));
+        }
+    }
+
+    public function test_strict_rejects_unmatched_escape_even_when_recovered_size_matches(): void
+    {
+        $article = "=ybegin line=128 size=1 name=x\n=\n==\n=yend size=1";
+        $service = $this->service();
+        $original = $article;
+        $this->assertSame("\xd3", $service->decodeIgnore($article));
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Unmatched yEnc escape marker');
+        $service->decode($original);
+    }
+
     public function test_tolerant_dangling_escape_does_not_reach_native_backend(): void
     {
         $decoder = new class implements PayloadDecoder

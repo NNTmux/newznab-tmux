@@ -8,6 +8,7 @@ use App\Services\Yenc\ArticleFrame;
 use App\Services\Yenc\NativePayloadDecoder;
 use App\Services\Yenc\PayloadDecoder;
 use App\Services\Yenc\PhpPayloadDecoder;
+use App\Services\Yenc\RawPayloadDecoder;
 use RuntimeException;
 
 class YencService
@@ -25,11 +26,11 @@ class YencService
         if ($frame === null) {
             return false;
         }
-        $payload = $this->payload($text, $frame);
-        if ($this->hasDanglingEscape($payload)) {
+        $slice = $this->payloadSlice($text, $frame);
+        if ($this->hasDanglingEscape($slice)) {
             throw new RuntimeException('Unmatched yEnc escape marker. The file is probably corrupt.');
         }
-        $decoded = $this->decoder->decode($payload);
+        $decoded = $this->decodePayload($slice);
         $size = $this->number($frame->header, 'size');
         $trailerSize = $this->number($frame->trailer, 'size');
         $checksum = $frame->trailer['crc32'] ?? null;
@@ -56,7 +57,7 @@ class YencService
             throw new RuntimeException('Declared and decoded yEnc sizes do not match. The file is probably corrupt.');
         }
         if ($checksum !== null && (! preg_match('/\A[0-9a-f]{1,8}\z/i', $checksum)
-            || strcasecmp(str_pad($checksum, 8, '0', STR_PAD_LEFT), hash('crc32b', $decoded)) !== 0)) {
+            || strcasecmp(str_pad($checksum, 8, '0', STR_PAD_LEFT), $this->crc32($decoded)) !== 0)) {
             throw new RuntimeException('CRC32 checksums do not match. The file is probably corrupt.');
         }
 
@@ -67,9 +68,10 @@ class YencService
     {
         $frame = ArticleFrame::parse($text);
         if ($frame !== null) {
-            $payload = $this->payload($text, $frame);
-            $decoder = $this->hasDanglingEscape($payload) ? new PhpPayloadDecoder : $this->decoder;
-            $text = $decoder->decode($payload);
+            $slice = $this->payloadSlice($text, $frame);
+            $text = $this->hasDanglingEscape($slice)
+                ? (new PhpPayloadDecoder)->decode($this->stripLineEndings($slice))
+                : $this->decodePayload($slice);
         }
 
         return $text;
@@ -83,6 +85,12 @@ class YencService
     public function decoderName(): string
     {
         return $this->decoder instanceof NativePayloadDecoder ? 'RapidYenc' : 'PHP';
+    }
+
+    /** RapidYenc version when the native decoder is active, null otherwise. */
+    public function decoderVersion(): ?string
+    {
+        return $this->decoder instanceof NativePayloadDecoder ? $this->decoder->version() : null;
     }
 
     public function isYencEncoded(string $text): bool
@@ -140,16 +148,53 @@ class YencService
         ];
     }
 
-    private function payload(string $text, ArticleFrame $frame): string
+    private function payloadSlice(string $text, ArticleFrame $frame): string
     {
-        return str_replace(["\r", "\n"], '', substr($text, $frame->payloadOffset, $frame->payloadLength));
+        return substr($text, $frame->payloadOffset, $frame->payloadLength);
+    }
+
+    private function decodePayload(string $slice): string
+    {
+        if ($this->decoder instanceof RawPayloadDecoder) {
+            // Search line endings rather than every escape; split escapes need stripped recovery.
+            $splitEscape = preg_match('/(?<==)[\r\n]/', $slice);
+            if ($splitEscape === false) {
+                throw new RuntimeException('Unable to inspect yEnc line endings: '.preg_last_error_msg());
+            }
+            if ($splitEscape === 0) {
+                return $this->decoder->decodeRaw($slice);
+            }
+        }
+
+        return $this->decoder->decode($this->stripLineEndings($slice));
+    }
+
+    private function stripLineEndings(string $payload): string
+    {
+        return str_replace(["\r", "\n"], '', $payload);
+    }
+
+    private function crc32(string $decoded): string
+    {
+        if ($this->decoder instanceof NativePayloadDecoder) {
+            $native = $this->decoder->crc32($decoded);
+            if ($native !== null) {
+                return $native;
+            }
+        }
+
+        return hash('crc32b', $decoded);
     }
 
     private function hasDanglingEscape(string $payload): bool
     {
         $count = 0;
-        for ($offset = strlen($payload) - 1; $offset >= 0 && $payload[$offset] === '='; $offset--) {
-            $count++;
+        for ($offset = strlen($payload) - 1; $offset >= 0; $offset--) {
+            if ($payload[$offset] === '=') {
+                $count++;
+            } elseif ($payload[$offset] !== "\r" && $payload[$offset] !== "\n") {
+                break;
+            }
         }
 
         return ($count & 1) === 1;

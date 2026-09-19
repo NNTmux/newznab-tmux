@@ -6,6 +6,7 @@ namespace Tests\Unit;
 
 use App\Services\Yenc\NativePayloadDecoder;
 use App\Services\YencService;
+use Tests\Fixtures\YencArticles;
 
 final class YencNativeDecoderTest extends YencDecoderTest
 {
@@ -25,5 +26,23 @@ final class YencNativeDecoderTest extends YencDecoderTest
     public function test_reports_rapidyenc_decoder(): void
     {
         $this->assertSame('RapidYenc', $this->service()->decoderName());
+    }
+
+    public function test_crc32_matches_php_hash(): void
+    {
+        $decoder = new NativePayloadDecoder((string) getenv('YENC_NATIVE_LIBRARY'));
+        $data = YencArticles::randomBytes(65536);
+        $crc = $decoder->crc32($data);
+        $this->assertNotNull($crc, 'Rebuild the native parity library with CRC enabled.');
+        $this->assertSame(hash('crc32b', $data), $crc);
+        $this->assertSame('00000000', $decoder->crc32(''));
+    }
+
+    public function test_reports_library_version(): void
+    {
+        $decoder = new NativePayloadDecoder((string) getenv('YENC_NATIVE_LIBRARY'));
+        $version = $decoder->version();
+        $this->assertMatchesRegularExpression('/\A\d+\.\d+/', $version);
+        $this->assertSame($version, $this->service()->decoderVersion());
     }
 }

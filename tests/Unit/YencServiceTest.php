@@ -2,9 +2,12 @@
 
 namespace Tests\Unit;
 
+use App\Services\Yenc\PhpPayloadDecoder;
+use App\Services\Yenc\RawPayloadDecoder;
 use App\Services\YencService;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
+use Tests\Fixtures\YencArticles;
 
 class YencServiceTest extends TestCase
 {
@@ -173,5 +176,85 @@ class YencServiceTest extends TestCase
         $decoded = $this->yencService->decode($encoded);
 
         $this->assertEquals($data, $decoded);
+    }
+
+    public function test_raw_capable_decoder_receives_unstripped_payload(): void
+    {
+        $decoder = new class implements RawPayloadDecoder
+        {
+            public ?string $received = null;
+
+            public function decode(string $payload): string
+            {
+                throw new RuntimeException('Stripped payload path must not be used.');
+            }
+
+            public function decodeRaw(string $payload): string
+            {
+                $this->received = $payload;
+
+                return (new PhpPayloadDecoder)->decode(str_replace(["\r", "\n"], '', $payload));
+            }
+        };
+        $data = YencArticles::randomBytes(4096);
+        $article = 'preamble'."\r\n".YencArticles::article($data)."\r\n".'suffix';
+        $service = new YencService($decoder);
+
+        $strict = $article;
+        $this->assertSame($data, $service->decode($strict));
+        $this->assertNotNull($decoder->received);
+        $this->assertStringContainsString("\r\n", $decoder->received);
+
+        $decoder->received = null;
+        $tolerant = $article;
+        $this->assertSame($data, $service->decodeIgnore($tolerant));
+        $this->assertNotNull($decoder->received);
+        $this->assertStringContainsString("\r\n", $decoder->received);
+    }
+
+    public function test_tolerant_dangling_escape_bypasses_raw_decoder(): void
+    {
+        $decoder = new class implements RawPayloadDecoder
+        {
+            public function decode(string $payload): string
+            {
+                throw new RuntimeException('Backend must not receive an unmatched escape.');
+            }
+
+            public function decodeRaw(string $payload): string
+            {
+                throw new RuntimeException('Backend must not receive an unmatched escape.');
+            }
+        };
+        $article = "=ybegin line=128 size=2 name=x\r\n====k=\r\n=yend size=2";
+        $this->assertSame("\xd3\xd3A", (new YencService($decoder))->decodeIgnore($article));
+    }
+
+    public function test_escape_at_line_end_falls_back_to_stripped_decode(): void
+    {
+        $decoder = new class implements RawPayloadDecoder
+        {
+            public ?string $receivedRaw = null;
+
+            public ?string $receivedStripped = null;
+
+            public function decode(string $payload): string
+            {
+                $this->receivedStripped = $payload;
+
+                return (new PhpPayloadDecoder)->decode($payload);
+            }
+
+            public function decodeRaw(string $payload): string
+            {
+                $this->receivedRaw = $payload;
+
+                return (new PhpPayloadDecoder)->decode(str_replace(["\r", "\n"], '', $payload));
+            }
+        };
+        $article = "=ybegin line=128 size=4 name=x\r\nklm=\r\nM\r\n=yend size=4";
+        $this->assertSame("ABC\xe3", (new YencService($decoder))->decode($article));
+        $this->assertNull($decoder->receivedRaw);
+        $this->assertSame('klm=M', $decoder->receivedStripped);
     }
 }
