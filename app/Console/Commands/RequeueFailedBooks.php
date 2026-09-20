@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use App\Facades\Search;
 use App\Models\Category;
 use App\Models\Release;
 use App\Services\NameFixing\Extractors\ObfuscatedSubjectExtractor;
+use App\Support\ReleaseSearchIndexSync;
 use Illuminate\Console\Command;
 
 class RequeueFailedBooks extends Command
@@ -115,7 +115,7 @@ class RequeueFailedBooks extends Command
             }
 
             Release::query()->where('id', $release->id)->update($updates);
-            Search::updateRelease((int) $release->id);
+            ReleaseSearchIndexSync::forIds([(int) $release->id]);
 
             $queued++;
             if (isset($updates['searchname'])) {

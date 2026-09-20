@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use App\Facades\Search;
 use App\Models\Category;
 use App\Models\Release;
+use App\Support\ReleaseSearchIndexSync;
 use Illuminate\Console\Command;
 
 class NntmuxResetPostProcessing extends Command
@@ -89,7 +89,7 @@ class NntmuxResetPostProcessing extends Command
                             'nfostatus' => -1,
                         ]
                     );
-                    Search::updateRelease((int) $releases->id);
+                    ReleaseSearchIndexSync::forIds([(int) $releases->id]);
                     $bar->advance();
                 }
                 $bar->finish();
@@ -245,7 +245,7 @@ class NntmuxResetPostProcessing extends Command
                         'movieinfo_id' => null,
                         'imdbid' => null,
                     ]);
-                Search::updateRelease((int) $releases->id);
+                ReleaseSearchIndexSync::forIds([(int) $releases->id]);
                 $bar->advance();
             }
             $bar->finish();
@@ -339,7 +339,7 @@ class NntmuxResetPostProcessing extends Command
                         'videos_id' => 0,
                         'tv_episodes_id' => 0,
                     ]);
-                Search::updateRelease((int) $releases->id);
+                ReleaseSearchIndexSync::forIds([(int) $releases->id]);
                 $bar->advance();
             }
             $bar->finish();
@@ -367,7 +367,7 @@ class NntmuxResetPostProcessing extends Command
                         'videostatus' => 0,
                         'nfostatus' => -1,
                     ]);
-                Search::updateRelease((int) $releases->id);
+                ReleaseSearchIndexSync::forIds([(int) $releases->id]);
                 $bar->advance();
             }
             $bar->finish();

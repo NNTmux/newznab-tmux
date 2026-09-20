@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Enums\BlacklistConstants;
-use App\Facades\Search;
 use App\Services\Nzb\NzbService;
 use App\Services\ReleaseImageService;
 use App\Services\ReleaseRemoverService;
@@ -13,6 +12,7 @@ use App\Services\Releases\ReleaseManagementService;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Schema;
 use Mockery;
 use PDO;
@@ -58,6 +58,7 @@ class ReleaseRemoverBatchingTest extends TestCase
         DB::reconnect();
 
         Schema::dropIfExists('release_files');
+        Schema::dropIfExists('search_index_outbox');
         Schema::dropIfExists('releases');
         Schema::dropIfExists('binaryblacklist');
         Schema::dropIfExists('usenet_groups');
@@ -85,6 +86,14 @@ class ReleaseRemoverBatchingTest extends TestCase
         Schema::create('release_files', function (Blueprint $table): void {
             $table->unsignedInteger('releases_id');
             $table->string('name');
+        });
+        Schema::create('search_index_outbox', function (Blueprint $table): void {
+            $table->id();
+            $table->string('entity_type', 32);
+            $table->unsignedBigInteger('entity_id');
+            $table->string('action', 16);
+            $table->json('payload')->nullable();
+            $table->timestamp('created_at');
         });
     }
 
@@ -197,7 +206,7 @@ class ReleaseRemoverBatchingTest extends TestCase
         $nzb->shouldReceive('deleteNzb')->twice()->andReturnTrue();
         $images = Mockery::mock(ReleaseImageService::class);
         $images->shouldReceive('delete')->twice();
-        Search::shouldReceive('deleteReleases')->once()->with([1, 2]);
+        Queue::fake();
 
         $deleted = (new ReleaseManagementService)->deleteBatch([
             (object) ['id' => 1, 'guid' => str_repeat('a', 40)],
@@ -206,5 +215,7 @@ class ReleaseRemoverBatchingTest extends TestCase
 
         self::assertSame(2, $deleted);
         self::assertSame(0, DB::table('releases')->count());
+        self::assertSame([1, 2], DB::table('search_index_outbox')->orderBy('id')->pluck('entity_id')->all());
+        self::assertSame(['delete', 'delete'], DB::table('search_index_outbox')->orderBy('id')->pluck('action')->all());
     }
 }

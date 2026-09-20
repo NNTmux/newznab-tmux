@@ -136,7 +136,7 @@
                             <label for="maxmssgs" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fas fa-envelope mr-1"></i>Max Messages
                             </label>
-                            <input type="text" id="maxmssgs" name="maxmssgs" value="{{ $site['maxmssgs'] ?? '' }}"
+                            <input type="number" id="maxmssgs" name="maxmssgs" min="1000" max="100000" value="{{ $site['maxmssgs'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">The maximum number of messages to fetch at a time from the server.</p>
                         </div>

@@ -51,6 +51,8 @@ class AdminSiteController extends BasePageController
                             ->max('2mb'),
                     ],
                     'remove_site_logo' => ['nullable', 'boolean'],
+                    'backfillthreads' => ['required', 'integer', 'between:1,8'],
+                    'maxmssgs' => ['required', 'integer', 'between:1000,100000'],
                 ]);
 
                 $data = $request->except(['site_logo', 'remove_site_logo']);

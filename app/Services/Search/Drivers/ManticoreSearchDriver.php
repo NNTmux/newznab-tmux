@@ -514,7 +514,11 @@ class ManticoreSearchDriver implements SearchDriverInterface
         $this->deleteReleases([$id]);
     }
 
-    public function deleteReleases(iterable $ids): void
+    /**
+     * @param  iterable<int|string>  $ids
+     * @return array{success: int, errors: int}
+     */
+    public function deleteReleases(iterable $ids): array
     {
         $ids = array_values(array_unique(array_filter(
             array_map('intval', is_array($ids) ? $ids : iterator_to_array($ids)),
@@ -524,7 +528,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
         if ($ids === []) {
             Log::warning('ManticoreSearch: Cannot delete release without ID');
 
-            return;
+            return ['success' => 0, 'errors' => 0];
         }
 
         $attempts = max(1, (int) ($this->config['retry_attempts'] ?? config('search.drivers.manticore.retry_attempts', 2)));
@@ -538,7 +542,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
                     $this->resolveReleaseIndexFailure((int) $id);
                 }
 
-                return;
+                return ['success' => count($ids), 'errors' => 0];
             } catch (\Throwable $e) {
                 if ($attempt < $attempts - 1) {
                     if ($delayMs > 0) {
@@ -554,8 +558,12 @@ class ManticoreSearchDriver implements SearchDriverInterface
                 foreach ($ids as $id) {
                     $this->recordReleaseIndexFailure((int) $id, 'deleteReleases: '.$e->getMessage(), 'delete');
                 }
+
+                return ['success' => 0, 'errors' => count($ids)];
             }
         }
+
+        return ['success' => 0, 'errors' => count($ids)];
     }
 
     /**

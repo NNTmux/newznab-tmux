@@ -156,17 +156,25 @@
                             </x-form.group>
                         </div>
 
-                        <x-form.group label="Backfill Quantity" for="backfill_qty" help="Number of headers per group per thread to download.">
-                            <x-input id="backfill_qty" name="backfill_qty" type="number" value="{{ $site['backfill_qty'] ?? 20000 }}" class="w-full" />
+                        <x-form.group label="Backfill Quantity" for="backfill_qty" help="Maximum number of headers per group per loop. Each group uses one writer and splits this work into Max Messages chunks.">
+                            <x-input id="backfill_qty" name="backfill_qty" type="number" min="1000" max="1000000" value="{{ $site['backfill_qty'] ?? 20000 }}" class="w-full" />
+                        </x-form.group>
+
+                        <x-form.group label="Backfill Threads" for="backfillthreads" help="Maximum concurrent safe-backfill groups. A group is never processed by more than one writer.">
+                            <x-input id="backfillthreads" name="backfillthreads" type="number" min="1" max="8" value="{{ $site['backfillthreads'] ?? 1 }}" class="w-full" />
                         </x-form.group>
 
                         <x-form.group label="Backfill Groups" for="backfill_groups" help="Number of groups to backfill per loop.">
-                            <x-input id="backfill_groups" name="backfill_groups" type="number" value="{{ $site['backfill_groups'] ?? 1 }}" class="w-full" />
+                            <x-input id="backfill_groups" name="backfill_groups" type="number" min="1" max="16" value="{{ $site['backfill_groups'] ?? 1 }}" class="w-full" />
+                        </x-form.group>
+
+                        <x-form.group label="Max Messages" for="maxmssgs" help="Maximum number of headers in one pressure-aware NNTP chunk.">
+                            <x-input id="maxmssgs" name="maxmssgs" type="number" min="1000" max="100000" value="{{ $site['maxmssgs'] ?? 10000 }}" class="w-full" />
                         </x-form.group>
 
                         <x-form.group label="Backfill Sleep Timer" for="back_timer">
                             <div class="flex gap-2">
-                                <x-input id="back_timer" name="back_timer" type="number" value="{{ $site['back_timer'] ?? 300 }}" class="flex-1" />
+                                <x-input id="back_timer" name="back_timer" type="number" min="5" max="3600" value="{{ $site['back_timer'] ?? 300 }}" class="flex-1" />
                                 <span class="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-sm">seconds</span>
                             </div>
                         </x-form.group>

@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use App\Facades\Search;
 use App\Models\Release;
 use App\Models\ReleaseFile;
 use App\Services\Nzb\NzbService;
 use App\Services\ReleaseImageService;
+use App\Support\ReleaseSearchIndexSync;
 use Illuminate\Console\Command;
 
 class NntmuxRemoveBadReleases extends Command
@@ -50,8 +50,6 @@ class NntmuxRemoveBadReleases extends Command
         foreach ($badReleases as $badRelease) {
             app(NzbService::class)->deleteNzb($badRelease->guid);
             (new ReleaseImageService)->delete($badRelease->guid);
-            // Delete from search index
-            Search::deleteRelease($badRelease->id);
             $badRelease->delete();
         }
         Release::query()->where('passwordstatus', '=', -2)->delete();
@@ -62,7 +60,7 @@ class NntmuxRemoveBadReleases extends Command
         foreach ($passReleases as $passRelease) {
             $releasesId = (int) $passRelease->releases_id;
             Release::whereId($releasesId)->update(['passwordstatus' => 1]);
-            Search::updateRelease($releasesId);
+            ReleaseSearchIndexSync::forIds([$releasesId]);
             $count++;
         }
 

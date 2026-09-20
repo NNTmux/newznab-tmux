@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Support;
 
-use App\Facades\Search;
 use App\Models\Category;
 use App\Models\Release;
 use App\Observers\ReleaseObserver;
+use App\Services\Search\SearchIndexOutbox;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
@@ -21,12 +21,15 @@ final class ReleaseSearchIndexSync
      */
     public static function forIds(iterable $releaseIds): void
     {
-        foreach ($releaseIds as $id) {
-            $intId = (int) $id;
-            if ($intId > 0) {
-                Search::updateRelease($intId);
-            }
-        }
+        app(SearchIndexOutbox::class)->upsertReleases($releaseIds);
+    }
+
+    /**
+     * @param  iterable<int|string>  $releaseIds
+     */
+    public static function deleteIds(iterable $releaseIds): void
+    {
+        app(SearchIndexOutbox::class)->deleteReleases($releaseIds);
     }
 
     public static function forMovieInfo(int $movieInfoId): void
@@ -85,7 +88,7 @@ final class ReleaseSearchIndexSync
     }
 
     /**
-     * Reindex every release (chunked). Use after mass UPDATEs that match an optional raw WHERE suffix.
+     * Enqueue every matching release after a mass UPDATE.
      *
      * @param  string  $whereSuffix  SQL fragment starting with "AND ..." or empty for all rows
      */
@@ -100,12 +103,6 @@ final class ReleaseSearchIndexSync
             }
         }
 
-        $query->chunkById(500, function ($releases): bool {
-            foreach ($releases as $release) {
-                Search::updateRelease((int) $release->id);
-            }
-
-            return true;
-        });
+        self::forQuery($query);
     }
 }

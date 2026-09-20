@@ -41,7 +41,10 @@ final class ManticoreDeleteReleasesTest extends TestCase
         $prop->setAccessible(true);
         $prop->setValue($driver, $client);
 
-        $driver->deleteReleases([149331415, 42, 0, 149331415]);
+        self::assertSame(
+            ['success' => 2, 'errors' => 0],
+            $driver->deleteReleases([149331415, 42, 0, 149331415]),
+        );
     }
 
     #[Test]
@@ -65,6 +68,6 @@ final class ManticoreDeleteReleasesTest extends TestCase
         $prop->setAccessible(true);
         $prop->setValue($driver, $client);
 
-        $driver->deleteReleases([0, -1]);
+        self::assertSame(['success' => 0, 'errors' => 0], $driver->deleteReleases([0, -1]));
     }
 }

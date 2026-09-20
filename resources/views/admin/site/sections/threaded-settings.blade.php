@@ -16,9 +16,9 @@
                             <label for="backfillthreads" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fas fa-tasks mr-1"></i>Backfill Threads
                             </label>
-                            <input type="text" id="backfillthreads" name="backfillthreads" value="{{ $site['backfillthreads'] ?? '' }}"
+                            <input type="number" id="backfillthreads" name="backfillthreads" min="1" max="8" value="{{ $site['backfillthreads'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                            <p class="mt-1 text-sm text-gray-500">The number of threads for backfill.</p>
+                            <p class="mt-1 text-sm text-gray-500">Maximum concurrent safe-backfill groups. A group is never processed by more than one writer.</p>
                         </div>
 
                         <div>

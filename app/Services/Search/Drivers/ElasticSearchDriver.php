@@ -1218,19 +1218,25 @@ class ElasticSearchDriver implements SearchDriverInterface
         $this->deleteReleases([$id]);
     }
 
-    public function deleteReleases(iterable $ids): void
+    /**
+     * @param  iterable<int|string>  $ids
+     * @return array{success: int, errors: int}
+     */
+    public function deleteReleases(iterable $ids): array
     {
         $ids = array_values(array_unique(array_filter(
             array_map('intval', is_array($ids) ? $ids : iterator_to_array($ids)),
             static fn (int $id): bool => $id > 0
         )));
 
-        if ($ids === [] || ! $this->isElasticsearchAvailable()) {
-            if ($ids === []) {
-                Log::warning('ElasticSearch: Cannot delete release without ID');
-            }
+        if ($ids === []) {
+            Log::warning('ElasticSearch: Cannot delete release without ID');
 
-            return;
+            return ['success' => 0, 'errors' => 0];
+        }
+
+        if (! $this->isElasticsearchAvailable()) {
+            return ['success' => 0, 'errors' => count($ids)];
         }
 
         try {
@@ -1239,7 +1245,19 @@ class ElasticSearchDriver implements SearchDriverInterface
             foreach ($ids as $id) {
                 $body[] = ['delete' => ['_index' => $this->getReleasesIndex(), '_id' => $id]];
             }
-            $client->bulk(['body' => $body]);
+            $response = $client->bulk(['body' => $body]);
+            $errors = 0;
+
+            if (($response['errors'] ?? false) === true) {
+                foreach ($response['items'] ?? [] as $item) {
+                    $delete = $item['delete'] ?? [];
+                    if (isset($delete['error']) && (int) ($delete['status'] ?? 0) !== 404) {
+                        $errors++;
+                    }
+                }
+            }
+
+            return ['success' => count($ids) - $errors, 'errors' => $errors];
 
         } catch (\Throwable $e) {
             if (ElasticsearchResponseHelper::isNotFound($e)) {
@@ -1247,7 +1265,7 @@ class ElasticSearchDriver implements SearchDriverInterface
                     Log::debug('ElasticSearch deleteReleases: document not found', ['release_ids' => $ids]);
                 }
 
-                return;
+                return ['success' => count($ids), 'errors' => 0];
             }
 
             if ($e instanceof ElasticsearchException) {
@@ -1255,12 +1273,14 @@ class ElasticSearchDriver implements SearchDriverInterface
                     'release_ids' => $ids,
                 ]);
 
-                return;
+                return ['success' => 0, 'errors' => count($ids)];
             }
 
             Log::error('ElasticSearch deleteReleases unexpected error: '.$e->getMessage(), [
                 'release_ids' => $ids,
             ]);
+
+            return ['success' => 0, 'errors' => count($ids)];
         }
     }
 
@@ -1317,8 +1337,12 @@ class ElasticSearchDriver implements SearchDriverInterface
      */
     public function bulkInsertReleases(array $releases): array
     {
-        if (empty($releases) || ! $this->isElasticsearchAvailable()) {
+        if (empty($releases)) {
             return ['success' => 0, 'errors' => 0];
+        }
+
+        if (! $this->isElasticsearchAvailable()) {
+            return ['success' => 0, 'errors' => count($releases)];
         }
 
         $success = 0;

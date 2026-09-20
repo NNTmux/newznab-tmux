@@ -6,7 +6,6 @@ namespace App\Services;
 
 use aharen\OMDbAPI;
 use App\Enums\ImageAssetProfile;
-use App\Facades\Search;
 use App\Models\Category;
 use App\Models\MovieInfo;
 use App\Models\Release;
@@ -1023,7 +1022,7 @@ class MovieService
                     'movieinfo_id' => $movieInfoId !== null ? $movieInfoId['id'] : null,
                 ]);
 
-                Search::updateRelease($id);
+                ReleaseSearchIndexSync::forIds([(int) $id]);
 
                 return $imdbId;
             } catch (\Exception $e) {

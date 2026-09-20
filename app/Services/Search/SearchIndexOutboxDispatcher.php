@@ -6,19 +6,115 @@ namespace App\Services\Search;
 
 use App\Enums\SecondarySearchIndex;
 use App\Facades\Search;
+use App\Services\Search\Support\ReleaseIndexProjection;
+use Closure;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use JsonException;
+use RuntimeException;
 use stdClass;
+use Throwable;
 
 /**
  * Dispatches compacted search outbox rows to the active search driver.
  *
- * The outbox is written outside PHP (database triggers), so this class accepts a
- * small set of action/entity aliases to keep the consumer tolerant of table and
- * model naming differences while still routing only to the existing Search API.
+ * Release rows are written transactionally by database triggers and explicit
+ * related-record sync events. Entity aliases keep the legacy dispatcher API
+ * tolerant while routing only to the existing Search API.
  */
 final class SearchIndexOutboxDispatcher
 {
+    /** @var Closure(list<int>): list<array<string, mixed>> */
+    private readonly Closure $releaseProjector;
+
+    /**
+     * @param  (Closure(list<int>): list<array<string, mixed>>)|null  $releaseProjector
+     */
+    public function __construct(?Closure $releaseProjector = null)
+    {
+        $this->releaseProjector = $releaseProjector
+            ?? static fn (array $releaseIds): array => ReleaseIndexProjection::forIds($releaseIds);
+    }
+
+    public function dispatchReleaseBatch(int $limit = 1000): int
+    {
+        $rows = DB::table('search_index_outbox')
+            ->where('entity_type', 'release')
+            ->orderBy('id')
+            ->limit(max(1, min(5000, $limit)))
+            ->get()
+            ->all();
+
+        if ($rows === []) {
+            return 0;
+        }
+
+        $compacted = self::compactRows($rows);
+        $upsertIds = [];
+        $deleteIds = [];
+        $operations = [];
+
+        foreach ($compacted as $row) {
+            $releaseId = self::entityId($row, self::payload($row));
+            $action = self::normalizeAction($row->action ?? '');
+
+            if ($releaseId <= 0) {
+                throw new RuntimeException('Search outbox release row has no valid entity id.');
+            }
+
+            match ($action) {
+                'insert', 'upsert', 'update' => $upsertIds[] = $releaseId,
+                'delete' => $deleteIds[] = $releaseId,
+                default => throw new RuntimeException('Search outbox release row has an unknown action: '.$action),
+            };
+            $operations[$releaseId] = $action === 'delete' ? 'delete' : 'upsert';
+        }
+
+        $releaseIds = array_values(array_unique(array_merge($upsertIds, $deleteIds)));
+
+        try {
+            $documents = ($this->releaseProjector)($upsertIds);
+            $projectedIds = array_map(static fn (array $document): int => (int) $document['id'], $documents);
+            $deleteIds = array_values(array_unique(array_merge(
+                $deleteIds,
+                array_diff($upsertIds, $projectedIds),
+            )));
+            foreach (array_diff($upsertIds, $projectedIds) as $missingReleaseId) {
+                $operations[$missingReleaseId] = 'delete';
+            }
+
+            if ($documents !== []) {
+                $result = Search::bulkInsertReleases($documents);
+                if ((int) ($result['errors'] ?? 0) > 0) {
+                    throw new RuntimeException(sprintf(
+                        'Bulk search upsert reported %d error(s).',
+                        (int) $result['errors'],
+                    ));
+                }
+            }
+
+            if ($deleteIds !== []) {
+                $result = Search::deleteReleases($deleteIds);
+                if ((int) ($result['errors'] ?? 0) > 0) {
+                    throw new RuntimeException(sprintf(
+                        'Bulk search delete reported %d error(s).',
+                        (int) $result['errors'],
+                    ));
+                }
+            }
+
+            DB::table('search_index_outbox')->whereIn('id', array_map(self::rowId(...), $rows))->delete();
+            $this->resolveFailures($releaseIds);
+
+            return count($rows);
+        } catch (Throwable $exception) {
+            $this->recordFailures($operations, $exception->getMessage());
+
+            throw $exception;
+        }
+    }
+
     /**
      * Keep only the latest row for each logical search document in a batch.
      *
@@ -384,5 +480,52 @@ final class SearchIndexOutboxDispatcher
             'entity_type' => $entityType,
             'entity_id' => $entityId,
         ]);
+    }
+
+    /**
+     * @param  array<int, 'delete'|'upsert'>  $operations
+     */
+    private function recordFailures(array $operations, string $error): void
+    {
+        if (! Schema::hasTable('search_index_failures')) {
+            return;
+        }
+
+        foreach ($operations as $releaseId => $operation) {
+            $existingAttempts = (int) (DB::table('search_index_failures')
+                ->where('release_id', $releaseId)
+                ->value('attempts') ?? 0);
+            $attempts = $existingAttempts + 1;
+
+            DB::table('search_index_failures')->updateOrInsert(
+                ['release_id' => $releaseId],
+                [
+                    'operation' => $operation,
+                    'attempts' => $attempts,
+                    'last_error' => $error,
+                    'next_attempt_at' => now()->addMinutes(min(60, 2 ** min(6, $attempts))),
+                    'resolved_at' => null,
+                    'updated_at' => now(),
+                    'created_at' => now(),
+                ],
+            );
+        }
+    }
+
+    /**
+     * @param  list<int>  $releaseIds
+     */
+    private function resolveFailures(array $releaseIds): void
+    {
+        if ($releaseIds === [] || ! Schema::hasTable('search_index_failures')) {
+            return;
+        }
+
+        DB::table('search_index_failures')
+            ->whereIn('release_id', $releaseIds)
+            ->update([
+                'resolved_at' => now(),
+                'updated_at' => now(),
+            ]);
     }
 }
