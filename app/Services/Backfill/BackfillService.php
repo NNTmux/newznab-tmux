@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Services\Backfill;
 
 use App\Models\UsenetGroup;
-use App\Services\BackgroundWorkPressureGate;
 use App\Services\Binaries\BinariesService;
 use App\Services\NNTP\NNTPService;
 use Illuminate\Support\Carbon;
@@ -82,13 +81,8 @@ final class BackfillService
      *
      * @throws \Throwable
      */
-    public function backfillGroup(
-        array $groupArr,
-        int $remainingGroups,
-        int|string $articles = '',
-        ?int $targetDays = null,
-        ?BackgroundWorkPressureGate $pressureGate = null,
-    ): void {
+    public function backfillGroup(array $groupArr, int $remainingGroups, int|string $articles = ''): void
+    {
         $startTime = now();
         $this->binaries->logIndexerStart();
 
@@ -105,7 +99,7 @@ final class BackfillService
 
         $this->log("Processing {$shortGroupName}", 'primary');
 
-        $targetPost = $this->calculateTargetPost($groupArr, $articles, $serverData, $targetDays);
+        $targetPost = $this->calculateTargetPost($groupArr, $articles, $serverData);
 
         if (! $this->validateTargetPost($groupArr, $targetPost, $serverData, $shortGroupName)) {
             return;
@@ -113,36 +107,9 @@ final class BackfillService
 
         $this->logGroupInfo($groupArr, $serverData, $targetPost, $shortGroupName);
 
-        $this->processBackfillChunks($groupArr, $targetPost, $remainingGroups, $shortGroupName, $pressureGate);
+        $this->processBackfillChunks($groupArr, $targetPost, $remainingGroups, $shortGroupName);
 
         $this->logGroupComplete($shortGroupName, $startTime);
-    }
-
-    /**
-     * Process one bounded safe-backfill batch for one group.
-     *
-     * @throws \Throwable
-     */
-    public function backfillBoundedGroup(
-        string $groupName,
-        int $articleLimit,
-        int $targetDays,
-        BackgroundWorkPressureGate $pressureGate,
-    ): void {
-        $group = UsenetGroup::getByName($groupName);
-        if ($group === null) {
-            $this->log('Backfill group not found: '.$groupName, 'error');
-
-            return;
-        }
-
-        $this->backfillGroup(
-            $group->toArray(),
-            0,
-            max(1, min(1_000_000, $articleLimit)),
-            max(0, $targetDays),
-            $pressureGate,
-        );
     }
 
     /**
@@ -252,7 +219,7 @@ final class BackfillService
      * @param  array<string, mixed>  $groupArr
      * @param  array<string, mixed>  $serverData
      */
-    private function calculateTargetPost(array $groupArr, int|string $articles, array $serverData, ?int $targetDays = null): int
+    private function calculateTargetPost(array $groupArr, int|string $articles, array $serverData): int
     {
         $isArticleBased = $articles !== '';
 
@@ -260,11 +227,7 @@ final class BackfillService
             ? (int) round($groupArr['first_record'] - (int) $articles)
             : (int) $this->binaries->daytopost($groupArr['backfill_target'], $serverData);
 
-        if ($targetDays !== null && $targetDays > 0) {
-            $targetPost = max($targetPost, (int) $this->binaries->daytopost($targetDays, $serverData));
-        }
-
-        // Ensure target is not below server's oldest article.
+        // Ensure target is not below server's oldest article
         return max($targetPost, (int) $serverData['first']);
     }
 
@@ -299,22 +262,13 @@ final class BackfillService
      *
      * @param  array<string, mixed>  $groupArr
      */
-    private function processBackfillChunks(
-        array $groupArr,
-        int $targetPost,
-        int $remainingGroups,
-        string $shortGroupName,
-        ?BackgroundWorkPressureGate $pressureGate = null,
-    ): void {
+    private function processBackfillChunks(array $groupArr, int $targetPost, int $remainingGroups, string $shortGroupName): void
+    {
         $messageBuffer = $this->binaries->getMessageBuffer();
         $last = $groupArr['first_record'] - 1;
         $first = max($last - $messageBuffer + 1, $targetPost);
 
         while (true) {
-            $pressureGate?->awaitPermission(function (string $reason): void {
-                $this->log('Safe backfill paused: '.$reason, 'warning');
-            });
-
             $this->logChunkProgress($first, $last, $shortGroupName, $remainingGroups, $targetPost);
 
             flush();
