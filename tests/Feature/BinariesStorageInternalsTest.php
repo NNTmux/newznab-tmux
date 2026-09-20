@@ -401,6 +401,27 @@ class BinariesStorageInternalsTest extends TestCase
         }
     }
 
+    public function test_soft_header_storage_rollback_does_not_log_error_without_exception(): void
+    {
+        $this->createHeaderStorageTables();
+        DB::statement('CREATE TRIGGER skip_collections BEFORE INSERT ON collections BEGIN SELECT RAISE(IGNORE); END');
+        config(['app.debug' => false]);
+        Log::spy();
+
+        $service = new HeaderStorageService($this->deterministicCollectionHandler(), config: new BinariesConfig);
+
+        $failed = $service->store([
+            $this->parsedHeader(801, 1),
+        ], ['id' => 1, 'name' => 'alt.test'], true);
+
+        $this->assertSame([801], $failed);
+        $this->assertSame(0, DB::table('parts')->count());
+        $this->assertSame(0, DB::table('binaries')->count());
+        $this->assertSame(0, DB::table('collections')->count());
+        $this->assertSame(0, DB::transactionLevel());
+        Log::shouldNotHaveReceived('error');
+    }
+
     public function test_part_repair_retires_filtered_articles_but_keeps_invalid_and_missing_articles(): void
     {
         $this->createHeaderStorageTables();

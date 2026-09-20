@@ -118,15 +118,17 @@ final class HeaderStorageService
 
             $attempt++;
             if ($attempt >= self::LOCK_RETRY_MAX || ! $this->isTransientLockError($this->lastStorageException)) {
-                Log::error('Binary header storage chunk rolled back', [
-                    'groups_id' => $groupMySQL['id'],
-                    'article_count' => \count($headers),
-                    'attempts' => $attempt,
-                    'reason' => $this->isTransientLockError($this->lastStorageException)
-                        ? 'Lock retries exhausted' : 'Storage failed',
-                    'exception' => $this->lastStorageException !== null ? $this->lastStorageException::class : null,
-                    'code' => $this->lastStorageException?->getCode(),
-                ]);
+                if ($this->lastStorageException !== null) {
+                    Log::error('Binary header storage chunk rolled back', [
+                        'groups_id' => $groupMySQL['id'],
+                        'article_count' => \count($headers),
+                        'attempts' => $attempt,
+                        'reason' => $this->isTransientLockError($this->lastStorageException)
+                            ? 'Lock retries exhausted' : 'Storage failed',
+                        'exception' => $this->lastStorageException::class,
+                        'code' => $this->lastStorageException->getCode(),
+                    ]);
+                }
 
                 return;
             }

@@ -11,7 +11,6 @@ use App\Services\Search\Drivers\ElasticSearchDriver;
 use App\Services\Search\Drivers\ManticoreSearchDriver;
 use App\Services\Search\DTO\ReleaseSearchQuery;
 use App\Services\Search\DTO\SearchPage;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Manager;
 
 /**
@@ -524,21 +523,7 @@ class SearchService extends Manager implements SearchServiceInterface
 
     public function searchReleasePage(ReleaseSearchQuery $query): SearchPage
     {
-        $page = $this->driver()->searchReleasePage($query);
-        Log::debug('Release search completed', [
-            'driver' => $page->driver,
-            'available' => $page->available,
-            'duration_ms' => round($page->durationMs, 2),
-            'result_count' => count($page->ids),
-            'total' => $page->total,
-            'fuzzy' => $page->fuzzy,
-            'pagination_mode' => $query->cursor === null ? 'offset' : 'cursor',
-            'offset' => $query->offset,
-            'limit' => $query->limit,
-            'track_total' => $query->trackTotal,
-        ]);
-
-        return $page;
+        return $this->driver()->searchReleasePage($query);
     }
 
     public function insertSecondary(SecondarySearchIndex $index, int $id, array $document): void
