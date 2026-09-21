@@ -29,6 +29,8 @@ class ReleaseBrowseService
 
     private const API_BROWSE_SEARCH_BLOCK_MAX_PAGE_SIZE = 100;
 
+    private const API_BROWSE_SEARCH_BLOCK_START_OFFSET = 100;
+
     // RAR/ZIP Password indicator.
     public const PASSWD_NONE = 0; // No password.
 
@@ -388,10 +390,16 @@ class ReleaseBrowseService
 
         $requestedLimit = max(1, (int) $num);
         $requestedOffset = max(0, (int) $start);
-        $blockOffset = intdiv($requestedOffset, self::API_BROWSE_SEARCH_BLOCK_SIZE) * self::API_BROWSE_SEARCH_BLOCK_SIZE;
+        $blockOffset = $requestedOffset >= self::API_BROWSE_SEARCH_BLOCK_START_OFFSET
+            ? self::API_BROWSE_SEARCH_BLOCK_START_OFFSET
+                + intdiv(
+                    $requestedOffset - self::API_BROWSE_SEARCH_BLOCK_START_OFFSET,
+                    self::API_BROWSE_SEARCH_BLOCK_SIZE
+                ) * self::API_BROWSE_SEARCH_BLOCK_SIZE
+            : $requestedOffset;
         $sliceOffset = $requestedOffset - $blockOffset;
         $useBlockCache = $requestedLimit <= self::API_BROWSE_SEARCH_BLOCK_MAX_PAGE_SIZE
-            && $requestedOffset >= self::API_BROWSE_SEARCH_BLOCK_SIZE
+            && $requestedOffset >= self::API_BROWSE_SEARCH_BLOCK_START_OFFSET
             && $sliceOffset + $requestedLimit <= self::API_BROWSE_SEARCH_BLOCK_SIZE;
 
         $searchOffset = $useBlockCache ? $blockOffset : $requestedOffset;

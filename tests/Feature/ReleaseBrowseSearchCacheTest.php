@@ -44,25 +44,29 @@ final class ReleaseBrowseSearchCacheTest extends TestCase
     }
 
     #[Test]
-    public function it_keeps_different_offsets_in_separate_search_cache_entries(): void
+    public function it_keeps_the_first_page_independent_from_the_paginated_block(): void
     {
-        Search::shouldReceive('isAvailable')->twice()->andReturnTrue();
+        Search::shouldReceive('isAvailable')->times(3)->andReturnTrue();
         Search::shouldReceive('searchReleasesFiltered')
             ->once()
             ->withArgs(fn (array $criteria, int $limit, int $offset): bool => $limit === 100 && $offset === 0)
             ->andReturn($this->searchResult(42));
         Search::shouldReceive('searchReleasesFiltered')
             ->once()
-            ->withArgs(fn (array $criteria, int $limit, int $offset): bool => $limit === 100 && $offset === 100)
-            ->andReturn($this->searchResult(84));
+            ->withArgs(fn (array $criteria, int $limit, int $offset): bool => $limit === 500 && $offset === 100)
+            ->andReturn($this->searchResultRange(101, 500, 10_000));
 
         $service = new ReleaseBrowseService;
 
         $firstPage = $service->getBrowseRangeForApi(1, [], 0, 100, 'posted_desc');
         $secondPage = $service->getBrowseRangeForApi(2, [], 100, 100, 'posted_desc');
+        $thirdPage = $service->getBrowseRangeForApi(3, [], 200, 100, 'posted_desc');
 
         $this->assertSame(42, $firstPage[0]->id);
-        $this->assertSame(84, $secondPage[0]->id);
+        $this->assertSame(101, $secondPage[0]->id);
+        $this->assertSame(200, $secondPage[99]->id);
+        $this->assertSame(201, $thirdPage[0]->id);
+        $this->assertSame(300, $thirdPage[99]->id);
     }
 
     #[Test]
@@ -71,20 +75,20 @@ final class ReleaseBrowseSearchCacheTest extends TestCase
         Search::shouldReceive('isAvailable')->twice()->andReturnTrue();
         Search::shouldReceive('searchReleasesFiltered')
             ->once()
-            ->withArgs(fn (array $criteria, int $limit, int $offset): bool => $limit === 500 && $offset === 2500)
-            ->andReturn($this->searchResultRange(2501, 500, 10_000));
+            ->withArgs(fn (array $criteria, int $limit, int $offset): bool => $limit === 500 && $offset === 2600)
+            ->andReturn($this->searchResultRange(2601, 500, 10_000));
 
         $service = new ReleaseBrowseService;
 
-        $firstPage = $service->getBrowseRangeForApi(26, [], 2500, 100, 'posted_desc');
-        $secondPage = $service->getBrowseRangeForApi(27, [], 2600, 100, 'posted_desc');
+        $firstPage = $service->getBrowseRangeForApi(27, [], 2600, 100, 'posted_desc');
+        $secondPage = $service->getBrowseRangeForApi(28, [], 2700, 100, 'posted_desc');
 
         $this->assertCount(100, $firstPage);
-        $this->assertSame(2501, $firstPage[0]->id);
-        $this->assertSame(2600, $firstPage[99]->id);
+        $this->assertSame(2601, $firstPage[0]->id);
+        $this->assertSame(2700, $firstPage[99]->id);
         $this->assertCount(100, $secondPage);
-        $this->assertSame(2601, $secondPage[0]->id);
-        $this->assertSame(2700, $secondPage[99]->id);
+        $this->assertSame(2701, $secondPage[0]->id);
+        $this->assertSame(2800, $secondPage[99]->id);
     }
 
     #[Test]
@@ -93,16 +97,16 @@ final class ReleaseBrowseSearchCacheTest extends TestCase
         Search::shouldReceive('isAvailable')->once()->andReturnTrue();
         Search::shouldReceive('searchReleasesFiltered')
             ->once()
-            ->withArgs(fn (array $criteria, int $limit, int $offset): bool => $limit === 100 && $offset === 2950)
-            ->andReturn($this->searchResultRange(2951, 100, 10_000));
+            ->withArgs(fn (array $criteria, int $limit, int $offset): bool => $limit === 100 && $offset === 3050)
+            ->andReturn($this->searchResultRange(3051, 100, 10_000));
 
         $service = new ReleaseBrowseService;
 
-        $page = $service->getBrowseRangeForApi(30, [], 2950, 100, 'posted_desc');
+        $page = $service->getBrowseRangeForApi(31, [], 3050, 100, 'posted_desc');
 
         $this->assertCount(100, $page);
-        $this->assertSame(2951, $page[0]->id);
-        $this->assertSame(3050, $page[99]->id);
+        $this->assertSame(3051, $page[0]->id);
+        $this->assertSame(3150, $page[99]->id);
     }
 
     /**
