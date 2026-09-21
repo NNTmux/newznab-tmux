@@ -22,6 +22,9 @@ class ReleaseBrowseService
 {
     private const CACHE_VERSION_KEY = 'releases:cache_version';
 
+    /** @var array{0: int, 1: int} */
+    private const API_BROWSE_SEARCH_CACHE_TTL = [15, 60];
+
     // RAR/ZIP Password indicator.
     public const PASSWD_NONE = 0; // No password.
 
@@ -379,7 +382,23 @@ class ReleaseBrowseService
             'include_documents' => true,
         ];
 
-        $filtered = Search::searchReleasesFiltered($criteria, (int) $num, (int) $start);
+        $cacheCriteria = $criteria;
+        if (is_array($cacheCriteria['category_ids'])) {
+            sort($cacheCriteria['category_ids']);
+        }
+        sort($cacheCriteria['excluded_category_ids']);
+
+        $searchCacheKey = 'release-api-browse:'.md5($cacheVersion.serialize([
+            'criteria' => $cacheCriteria,
+            'limit' => (int) $num,
+            'offset' => (int) $start,
+        ]));
+
+        $filtered = Cache::flexible(
+            $searchCacheKey,
+            self::API_BROWSE_SEARCH_CACHE_TTL,
+            fn (): array => Search::searchReleasesFiltered($criteria, (int) $num, (int) $start)
+        );
         if ($filtered['ids'] === []) {
             return [];
         }
