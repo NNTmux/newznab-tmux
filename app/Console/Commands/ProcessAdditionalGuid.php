@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Facades\Search;
 use App\Models\Release;
 use App\Services\AdditionalProcessing\AdditionalProcessingOrchestrator;
 use App\Services\AdditionalProcessing\DTO\ReleaseProcessingResult;
-use App\Support\ReleaseSearchIndexSync;
 use Illuminate\Console\Command;
 
 class ProcessAdditionalGuid extends Command
@@ -77,7 +77,7 @@ class ProcessAdditionalGuid extends Command
                 'videostatus' => 0,
                 'nfostatus' => -1,
             ]);
-            ReleaseSearchIndexSync::forIds([(int) $release->id]);
+            Search::updateRelease((int) $release->id);
             $this->info('Reset postprocessing flags for release ID '.$release->id.' (GUID '.$guid.')');
         }
 

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services\AdditionalProcessing;
 
+use App\Facades\Search;
 use App\Services\AdditionalProcessing\State\PersistenceMetricsCollector;
-use App\Support\ReleaseSearchIndexSync;
 use Closure;
 
 final class ReleaseSearchSyncCoordinator
@@ -26,7 +26,7 @@ final class ReleaseSearchSyncCoordinator
         private readonly bool $coalesce = true,
     ) {
         $this->synchronize = $synchronize ?? static function (int $releaseId): void {
-            ReleaseSearchIndexSync::forIds([$releaseId]);
+            Search::updateRelease($releaseId);
         };
     }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
+use App\Facades\Search;
 use App\Http\Controllers\BasePageController;
 use App\Models\MovieInfo;
 use App\Models\Release;
@@ -92,7 +93,7 @@ class AdminMovieController extends BasePageController
                     if ($movieInfoId !== null) {
                         foreach ($forUpdate as $rel) {
                             Release::query()->where('id', $rel->id)->update(['movieinfo_id' => $movieInfoId->id]);
-                            ReleaseSearchIndexSync::forIds([(int) $rel->id]);
+                            Search::updateRelease((int) $rel->id);
                         }
                     }
                 }

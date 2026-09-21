@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Support\ReleaseSearchIndexSync;
+use App\Facades\Search;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -146,7 +147,9 @@ class ReleaseFile extends Model
             if (\strlen($hash) === 32) {
                 ParHash::insertOrIgnore(['releases_id' => $id, 'hash' => $hash]);
             }
-            ReleaseSearchIndexSync::forIds([(int) $id]);
+            DB::afterCommit(function () use ($id): void {
+                Search::updateRelease($id);
+            });
         }
 
         return $insert ?? 0;

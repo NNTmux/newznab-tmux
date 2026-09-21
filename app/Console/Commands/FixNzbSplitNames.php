@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Facades\Search;
 use App\Models\Release;
 use App\Services\Categorization\CategorizationService;
 use App\Services\NameFixing\NzbSplitUnwrapper;
-use App\Support\ReleaseSearchIndexSync;
 use Illuminate\Console\Command;
 
 class FixNzbSplitNames extends Command
@@ -102,7 +102,7 @@ class FixNzbSplitNames extends Command
                         'anidbid' => null,
                     ]);
 
-                ReleaseSearchIndexSync::forIds([(int) $release->id]);
+                Search::updateRelease((int) $release->id);
                 $updated++;
             }
         });

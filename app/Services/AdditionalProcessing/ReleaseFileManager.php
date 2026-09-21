@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\AdditionalProcessing;
 
+use App\Facades\Search;
 use App\Models\Category;
 use App\Models\MediaInfo as MediaInfoModel;
 use App\Models\ParHash;
@@ -21,7 +22,6 @@ use App\Services\NNTP\NNTPService;
 use App\Services\Nzb\NzbService;
 use App\Services\ReleaseImageService;
 use App\Services\Releases\ReleaseBrowseService;
-use App\Support\ReleaseSearchIndexSync;
 use dariusiii\rarinfo\Par2Info;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Carbon;
@@ -373,12 +373,16 @@ class ReleaseFileManager
             } catch (\Throwable) {
             }
 
+            // Delete from search index
+            try {
+                Search::deleteRelease($id);
+            } catch (\Throwable) {
+                // Ignore
+            }
+
             // Delete release row
             try {
-                $deleted = Release::where('id', $id)->delete();
-                if ($deleted > 0) {
-                    ReleaseSearchIndexSync::deleteIds([$id]);
-                }
+                Release::where('id', $id)->delete();
             } catch (\Throwable) {
             }
         } catch (\Throwable) {

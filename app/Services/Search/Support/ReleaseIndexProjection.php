@@ -118,27 +118,4 @@ final class ReleaseIndexProjection
 
         return $row === null ? null : ReleaseSearchIndexDocument::normalize((array) $row);
     }
-
-    /**
-     * @param  iterable<int|string>  $releaseIds
-     * @return list<array<string, mixed>>
-     */
-    public static function forIds(iterable $releaseIds): array
-    {
-        $ids = array_values(array_unique(array_filter(
-            array_map('intval', is_array($releaseIds) ? $releaseIds : iterator_to_array($releaseIds)),
-            static fn (int $id): bool => $id > 0,
-        )));
-
-        if ($ids === []) {
-            return [];
-        }
-
-        return self::query()
-            ->whereIn('r.id', $ids)
-            ->orderBy('r.id')
-            ->get()
-            ->map(static fn (object $row): array => ReleaseSearchIndexDocument::normalize((array) $row))
-            ->all();
-    }
 }

@@ -22,8 +22,6 @@ class AdminTmuxController extends BasePageController
 
         switch ($action) {
             case 'submit':
-                $request->validate(self::backfillValidationRules());
-
                 $data = $request->all();
 
                 // Handle fix_crap checkbox array - convert to comma-separated string
@@ -78,19 +76,5 @@ class AdminTmuxController extends BasePageController
         ]);
 
         return view('admin.site.tmux-edit', $this->viewData);
-    }
-
-    /**
-     * @return array<string, list<string>>
-     */
-    public static function backfillValidationRules(): array
-    {
-        return [
-            'backfillthreads' => ['required', 'integer', 'between:1,8'],
-            'backfill_groups' => ['required', 'integer', 'between:1,16'],
-            'backfill_qty' => ['required', 'integer', 'between:1000,1000000'],
-            'maxmssgs' => ['required', 'integer', 'between:1000,100000'],
-            'back_timer' => ['required', 'integer', 'between:5,3600'],
-        ];
     }
 }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use App\Services\BackgroundWorkPressureGate;
 use App\Services\Nzb\NfoImportService;
 use App\Services\Nzb\NzbUploadManifestService;
 use Illuminate\Console\Command;
@@ -16,16 +15,12 @@ final class ImportNfos extends Command
     protected $signature = 'nntmux:import-nfos
         {--folder= : Import folder path}
         {--delete : Delete NFO files after import}
-        {--delete-failed : Delete NFO files after terminal or failed imports}
-        {--ignore-backpressure : Continue importing during foreground resource pressure}';
+        {--delete-failed : Delete NFO files after terminal or failed imports}';
 
     protected $description = 'Import paired NFO files for previously imported NZB releases';
 
-    public function handle(
-        NzbUploadManifestService $manifests,
-        NfoImportService $importer,
-        BackgroundWorkPressureGate $pressureGate,
-    ): int {
+    public function handle(NzbUploadManifestService $manifests, NfoImportService $importer): int
+    {
         $folderOption = $this->option('folder');
         if (! is_string($folderOption) || trim($folderOption) === '') {
             $this->error('Folder path must not be empty');
@@ -50,10 +45,6 @@ final class ImportNfos extends Command
 
         $imported = $skipped = $failed = 0;
         foreach ($manifestPaths as $manifestPath) {
-            if (! (bool) $this->option('ignore-backpressure')) {
-                $pressureGate->awaitPermission(fn (string $reason) => $this->warn('NFO import paused: '.$reason));
-            }
-
             $result = $importer->importManifest(
                 $manifestPath,
                 (bool) $this->option('delete'),

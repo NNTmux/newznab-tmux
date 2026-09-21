@@ -18,7 +18,6 @@ use App\Support\BookIsbn;
 use App\Support\BookMatchScorer;
 use App\Support\Data\BookParseResult;
 use App\Support\MetadataSearchLookup;
-use App\Support\ReleaseSearchIndexSync;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -487,7 +486,7 @@ class BookService
                 'searchname' => $normalizedSearchName,
                 'isrenamed' => 1,
             ]);
-            ReleaseSearchIndexSync::forIds([(int) $release->id]);
+            Search::updateRelease((int) $release->id);
         }
     }
 
@@ -578,7 +577,7 @@ class BookService
                 'searchname' => $normalizedReleaseName,
                 'isrenamed' => 1,
             ]);
-            ReleaseSearchIndexSync::forIds([(int) $releaseID]);
+            Search::updateRelease((int) $releaseID);
         }
         $this->parsedBookResult = $parsed;
         $this->parsedIsbn = $parsed->isbn;
@@ -591,7 +590,7 @@ class BookService
                     cli()->headerOver('Changing category to misc books: ').cli()->primary($releasename);
                 }
                 Release::query()->where('id', $releaseID)->update(['categories_id' => Category::BOOKS_UNKNOWN]);
-                ReleaseSearchIndexSync::forIds([(int) $releaseID]);
+                Search::updateRelease((int) $releaseID);
 
                 return false;
             }
@@ -601,7 +600,7 @@ class BookService
                     cli()->headerOver('Changing category to magazines: ').cli()->primary($releasename);
                 }
                 Release::query()->where('id', $releaseID)->update(['categories_id' => Category::BOOKS_MAGAZINES]);
-                ReleaseSearchIndexSync::forIds([(int) $releaseID]);
+                Search::updateRelease((int) $releaseID);
 
                 return false;
             }

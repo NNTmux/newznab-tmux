@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use App\Support\ReleaseSearchIndexSync;
+use App\Facades\Search;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -147,7 +147,8 @@ class DeleteReleases extends Command
                     // Delete the main release record
                     DB::delete('DELETE FROM releases WHERE id = ?', [$releaseId]);
 
-                    ReleaseSearchIndexSync::deleteIds([(int) $releaseId]);
+                    // Delete from search indexes
+                    Search::deleteRelease($releaseId);
 
                     $deleted++;
 

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Facades\Search;
-use App\Support\ReleaseSearchIndexSync;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -331,7 +330,9 @@ class Release extends Model
             return;
         }
 
-        ReleaseSearchIndexSync::forIds([$releaseId]);
+        DB::afterCommit(function () use ($releaseId): void {
+            Search::updateRelease($releaseId);
+        });
     }
 
     public static function getTopDownloads(): mixed

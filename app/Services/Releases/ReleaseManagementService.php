@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Releases;
 
+use App\Facades\Search;
 use App\Models\Release;
 use App\Services\Nzb\NzbService;
 use App\Services\ReleaseImageService;
@@ -66,11 +67,13 @@ class ReleaseManagementService
             }
         }
 
-        // Delete from DB.
-        $deleted = Release::whereGuid($identifiers['g'])->delete();
-        if ($deleted > 0 && ! empty($identifiers['i'])) {
-            ReleaseSearchIndexSync::deleteIds([(int) $identifiers['i']]);
+        // Delete from search index
+        if (! empty($identifiers['i'])) {
+            Search::deleteRelease((int) $identifiers['i']);
         }
+
+        // Delete from DB.
+        Release::whereGuid($identifiers['g'])->delete();
     }
 
     /**
@@ -121,12 +124,16 @@ class ReleaseManagementService
         $ids = $rows->pluck('id')->all();
 
         try {
-            $deleted = Release::query()->whereIn('id', $ids)->delete();
-            if ($deleted > 0) {
-                ReleaseSearchIndexSync::deleteIds($ids);
-            }
+            Search::deleteReleases($ids);
+        } catch (Throwable $e) {
+            Log::error('Release batch search cleanup failed', [
+                'release_ids' => $ids,
+                'error' => $e->getMessage(),
+            ]);
+        }
 
-            return $deleted;
+        try {
+            return Release::query()->whereIn('id', $ids)->delete();
         } catch (Throwable $e) {
             Log::error('Release batch database cleanup failed', [
                 'release_ids' => $ids,
@@ -199,7 +206,21 @@ class ReleaseManagementService
      */
     private function syncReleasesToSearchIndex(iterable $releaseIds): void
     {
-        ReleaseSearchIndexSync::forIds($releaseIds);
+        foreach ($releaseIds as $releaseId) {
+            $intId = (int) $releaseId;
+            if ($intId <= 0) {
+                continue;
+            }
+
+            try {
+                Search::updateRelease($intId);
+            } catch (Throwable $e) {
+                Log::error('ReleaseManagementService: Failed to sync release to search index after category change', [
+                    'release_id' => $intId,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
     }
 
     /**
