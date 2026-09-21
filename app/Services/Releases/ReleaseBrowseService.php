@@ -23,7 +23,11 @@ class ReleaseBrowseService
     private const CACHE_VERSION_KEY = 'releases:cache_version';
 
     /** @var array{0: int, 1: int} */
-    private const API_BROWSE_SEARCH_CACHE_TTL = [15, 60];
+    private const API_BROWSE_SEARCH_CACHE_TTL = [60, 300];
+
+    private const API_BROWSE_SEARCH_BLOCK_SIZE = 500;
+
+    private const API_BROWSE_SEARCH_BLOCK_MAX_PAGE_SIZE = 100;
 
     // RAR/ZIP Password indicator.
     public const PASSWD_NONE = 0; // No password.
@@ -382,6 +386,17 @@ class ReleaseBrowseService
             'include_documents' => true,
         ];
 
+        $requestedLimit = max(1, (int) $num);
+        $requestedOffset = max(0, (int) $start);
+        $blockOffset = intdiv($requestedOffset, self::API_BROWSE_SEARCH_BLOCK_SIZE) * self::API_BROWSE_SEARCH_BLOCK_SIZE;
+        $sliceOffset = $requestedOffset - $blockOffset;
+        $useBlockCache = $requestedLimit <= self::API_BROWSE_SEARCH_BLOCK_MAX_PAGE_SIZE
+            && $requestedOffset >= self::API_BROWSE_SEARCH_BLOCK_SIZE
+            && $sliceOffset + $requestedLimit <= self::API_BROWSE_SEARCH_BLOCK_SIZE;
+
+        $searchOffset = $useBlockCache ? $blockOffset : $requestedOffset;
+        $searchLimit = $useBlockCache ? self::API_BROWSE_SEARCH_BLOCK_SIZE : $requestedLimit;
+
         $cacheCriteria = $criteria;
         if (is_array($cacheCriteria['category_ids'])) {
             sort($cacheCriteria['category_ids']);
@@ -390,15 +405,25 @@ class ReleaseBrowseService
 
         $searchCacheKey = 'release-api-browse:'.md5($cacheVersion.serialize([
             'criteria' => $cacheCriteria,
-            'limit' => (int) $num,
-            'offset' => (int) $start,
+            'limit' => $searchLimit,
+            'offset' => $searchOffset,
         ]));
 
-        $filtered = Cache::flexible(
+        $filteredBlock = Cache::flexible(
             $searchCacheKey,
             self::API_BROWSE_SEARCH_CACHE_TTL,
-            fn (): array => Search::searchReleasesFiltered($criteria, (int) $num, (int) $start)
+            fn (): array => Search::searchReleasesFiltered($criteria, $searchLimit, $searchOffset)
         );
+
+        $filtered = $filteredBlock;
+        if ($useBlockCache) {
+            $filtered['ids'] = array_slice($filteredBlock['ids'] ?? [], $sliceOffset, $requestedLimit);
+
+            if (is_array($filteredBlock['documents'] ?? null)) {
+                $filtered['documents'] = array_slice($filteredBlock['documents'], $sliceOffset, $requestedLimit);
+            }
+        }
+
         if ($filtered['ids'] === []) {
             return [];
         }
