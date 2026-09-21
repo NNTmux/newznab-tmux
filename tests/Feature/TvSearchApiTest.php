@@ -152,6 +152,110 @@ final class TvSearchApiTest extends TestCase
     }
 
     #[Test]
+    public function tv_search_filters_name_hits_by_episode_without_a_preflight_query(): void
+    {
+        $mock = Mockery::mock(SearchService::class, [$this->app]);
+        $mock->shouldReceive('searchReleasesByExternalId')->never();
+        $mock->shouldReceive('searchReleases')
+            ->once()
+            ->with(['searchname' => 'Simpsons S06E24'], 1000)
+            ->andReturn([1, 2]);
+        $mock->shouldReceive('searchReleasesWithFuzzy')->never();
+        $mock->shouldReceive('isAvailable')->andReturn(false);
+
+        $this->app->instance(SearchService::class, $mock);
+        DB::flushQueryLog();
+        DB::enableQueryLog();
+
+        $results = (new ReleaseSearchService)->tvSearch(
+            [],
+            '6',
+            '24',
+            '',
+            0,
+            100,
+            'Simpsons',
+            [5030],
+            -1,
+            0,
+            [],
+            'posted_desc'
+        );
+
+        $releaseQueries = collect(DB::getQueryLog())
+            ->pluck('query')
+            ->filter(static fn (string $query): bool => str_contains(strtolower($query), 'from releases r'));
+
+        $this->assertCount(1, $results);
+        $this->assertSame('Simpsons.S06E24.Test', $results[0]->searchname);
+        $this->assertFalse($releaseQueries->contains(
+            static fn (string $query): bool => str_contains(strtolower($query), 'select r.id from releases r inner join tv_episodes'),
+        ));
+    }
+
+    #[Test]
+    public function tv_search_retries_name_hits_without_episode_metadata_when_none_match(): void
+    {
+        $mock = Mockery::mock(SearchService::class, [$this->app]);
+        $mock->shouldReceive('searchReleasesByExternalId')->never();
+        $mock->shouldReceive('searchReleases')->once()->andReturn([1, 2]);
+        $mock->shouldReceive('searchReleasesWithFuzzy')->never();
+        $mock->shouldReceive('isAvailable')->andReturn(false);
+
+        $this->app->instance(SearchService::class, $mock);
+
+        $results = (new ReleaseSearchService)->tvSearch(
+            [],
+            '8',
+            '1',
+            '',
+            0,
+            100,
+            'Simpsons',
+            [5030],
+            -1,
+            0,
+            [],
+            'posted_desc'
+        );
+
+        $this->assertCount(2, $results);
+        $this->assertSame(
+            ['Simpsons.S06E24.Test', 'Simpsons.S07E01.Test'],
+            $results->pluck('searchname')->all(),
+        );
+    }
+
+    #[Test]
+    public function tv_search_does_not_fallback_when_only_the_requested_episode_page_is_empty(): void
+    {
+        $mock = Mockery::mock(SearchService::class, [$this->app]);
+        $mock->shouldReceive('searchReleasesByExternalId')->never();
+        $mock->shouldReceive('searchReleases')->once()->andReturn([1, 2]);
+        $mock->shouldReceive('searchReleasesWithFuzzy')->never();
+        $mock->shouldReceive('isAvailable')->andReturn(false);
+
+        $this->app->instance(SearchService::class, $mock);
+
+        $results = (new ReleaseSearchService)->tvSearch(
+            [],
+            '6',
+            '24',
+            '',
+            1,
+            1,
+            'Simpsons',
+            [5030],
+            -1,
+            0,
+            [],
+            'posted_desc'
+        );
+
+        $this->assertCount(0, $results);
+    }
+
+    #[Test]
     public function tv_search_mysql_fallback_excludes_mid_title_false_positives_for_multi_word_queries(): void
     {
         config(['nntmux.mysql_search_fallback' => true]);

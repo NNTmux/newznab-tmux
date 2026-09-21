@@ -651,6 +651,7 @@ class ReleaseSearchService
         $episodeJoinCondition = '';
         $needsEpisodeJoin = false;
         $needsDatabaseLookup = false;
+        $nameSearchEpisodePredicates = [];
 
         // OPTIMIZATION: Try to find releases using search index external IDs first
         $externalIds = [];
@@ -827,30 +828,16 @@ class ReleaseSearchService
 
             $conditions[] = sprintf('r.id IN (%s)', implode(',', array_map('intval', $searchResult)));
 
-            // Try to add episode conditions if season/episode data is provided and no valid site IDs
-            // This will filter results to only those with matching episode data in tv_episodes table
-            // If this results in no matches, we'll fall back to results without episode conditions
+            // Prefer episode metadata when available, then retry without it only if the
+            // actual result query finds no episode matches.
             if (! $hasValidSiteIds && (! empty($series) || ! empty($airDate))) {
-                $episodeConditions = $this->buildEpisodeJoinPredicates($series, $episode, $airDate);
+                $nameSearchEpisodePredicates = $this->buildEpisodeJoinPredicates($series, $episode, $airDate);
 
-                if (! empty($episodeConditions)) {
-                    // Check if any of the found releases have matching episode data
-                    $checkSql = sprintf(
-                        'SELECT r.id FROM releases r INNER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id WHERE r.id IN (%s) AND %s LIMIT 1',
-                        implode(',', array_map('intval', $searchResult)),
-                        implode(' AND ', $episodeConditions)
-                    );
-                    $hasEpisodeMatches = Release::fromQuery($checkSql);
-
-                    if ($hasEpisodeMatches->isNotEmpty()) {
-                        // Some releases have matching episode data, add the conditions
-                        foreach ($episodeConditions as $cond) {
-                            $conditions[] = $cond;
-                        }
-                        $needsEpisodeJoin = true;
+                if ($nameSearchEpisodePredicates !== []) {
+                    foreach ($nameSearchEpisodePredicates as $predicate) {
+                        $conditions[] = $predicate;
                     }
-                    // If no matches with episode data, don't add episode conditions
-                    // The search will return results based on searchname match only
+                    $needsEpisodeJoin = true;
                 }
             }
         }
@@ -876,10 +863,96 @@ class ReleaseSearchService
         }
 
         $whereSql = 'WHERE '.implode(' AND ', $conditions);
+        $sql = $this->buildTvSearchSql(
+            $whereSql,
+            $needsEpisodeJoin,
+            $videoJoinCondition,
+            $episodeJoinCondition,
+            $orderField,
+            $orderDir,
+            $limit,
+            $offset,
+        );
+        $releases = Release::fromQuery($sql);
 
+        if ($releases->isEmpty() && $nameSearchEpisodePredicates !== []) {
+            $shouldFallbackWithoutEpisodeMetadata = $offset === 0;
+
+            if (! $shouldFallbackWithoutEpisodeMetadata) {
+                $firstPageSql = $this->buildTvSearchSql(
+                    $whereSql,
+                    true,
+                    $videoJoinCondition,
+                    $episodeJoinCondition,
+                    $orderField,
+                    $orderDir,
+                    1,
+                    0,
+                );
+                $shouldFallbackWithoutEpisodeMetadata = Release::fromQuery($firstPageSql)->isEmpty();
+            }
+
+            if ($shouldFallbackWithoutEpisodeMetadata) {
+                $conditions = array_values(array_filter(
+                    $conditions,
+                    static fn (string $condition): bool => ! in_array($condition, $nameSearchEpisodePredicates, true),
+                ));
+                $needsEpisodeJoin = false;
+                $whereSql = 'WHERE '.implode(' AND ', $conditions);
+                $sql = $this->buildTvSearchSql(
+                    $whereSql,
+                    false,
+                    $videoJoinCondition,
+                    $episodeJoinCondition,
+                    $orderField,
+                    $orderDir,
+                    $limit,
+                    $offset,
+                );
+                $releases = Release::fromQuery($sql);
+            }
+        }
+
+        if ($hasStrictTvSelector && $releases->isEmpty()) {
+            $this->logStrictExternalLookupMiss('tvSearch release lookup', $siteIdArr, [
+                'series' => $series,
+                'episode' => $episode,
+                'airDate' => $airDate,
+            ]);
+        }
+
+        if ($releases->isNotEmpty()) {
+            $countSql = sprintf(
+                'SELECT COUNT(*) as count FROM releases r %s %s %s',
+                (! empty($videoJoinCondition) ? 'LEFT JOIN videos v ON r.videos_id = v.id AND v.type = 0' : ''),
+                ($needsEpisodeJoin ? sprintf('INNER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id %s', $episodeJoinCondition) : ''),
+                $whereSql
+            );
+            $countResult = Release::fromQuery($countSql);
+            $releases[0]->_totalrows = $countResult[0]->count ?? 0;
+        }
+
+        if ($shouldCache && $cacheKey !== null) {
+            $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
+            Cache::put($cacheKey, $releases, $expiresAt);
+        }
+
+        return $releases;
+    }
+
+    private function buildTvSearchSql(
+        string $whereSql,
+        bool $needsEpisodeJoin,
+        string $videoJoinCondition,
+        string $episodeJoinCondition,
+        string $orderField,
+        string $orderDir,
+        int $limit,
+        int $offset,
+    ): string {
         $joinType = $needsEpisodeJoin ? 'INNER' : 'LEFT';
+        $limitClause = $limit > 0 ? sprintf(' LIMIT %d OFFSET %d', $limit, $offset) : '';
 
-        // Optimized select list – only fields required by XML (extended) and transformers
         $baseSql = sprintf(
             "SELECT r.id, r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id,
                     r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments,
@@ -899,42 +972,10 @@ class ReleaseSearchService
             $videoJoinCondition,
             $joinType,
             $episodeJoinCondition,
-            $whereSql
+            $whereSql,
         );
 
-        $limitClause = '';
-        if ($limit > 0) {
-            $limitClause = sprintf(' LIMIT %d OFFSET %d', $limit, $offset);
-        }
-
-        $sql = sprintf('%s ORDER BY r.%s %s%s', $baseSql, $orderField, $orderDir, $limitClause);
-        $releases = Release::fromQuery($sql);
-
-        if ($hasStrictTvSelector && $releases->isEmpty()) {
-            $this->logStrictExternalLookupMiss('tvSearch release lookup', $siteIdArr, [
-                'series' => $series,
-                'episode' => $episode,
-                'airDate' => $airDate,
-            ]);
-        }
-
-        if ($releases->isNotEmpty()) {
-            $countSql = sprintf(
-                'SELECT COUNT(*) as count FROM releases r %s %s %s',
-                (! empty($videoJoinCondition) ? 'LEFT JOIN videos v ON r.videos_id = v.id AND v.type = 0' : ''),
-                ($needsEpisodeJoin ? sprintf('%s JOIN tv_episodes tve ON r.tv_episodes_id = tve.id %s', $joinType, $episodeJoinCondition) : ''),
-                $whereSql
-            );
-            $countResult = Release::fromQuery($countSql);
-            $releases[0]->_totalrows = $countResult[0]->count ?? 0;
-        }
-
-        if ($shouldCache && $cacheKey !== null) {
-            $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
-            Cache::put($cacheKey, $releases, $expiresAt);
-        }
-
-        return $releases;
+        return sprintf('%s ORDER BY r.%s %s%s', $baseSql, $orderField, $orderDir, $limitClause);
     }
 
     /**

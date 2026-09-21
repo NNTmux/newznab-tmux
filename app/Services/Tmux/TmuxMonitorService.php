@@ -9,6 +9,7 @@ use App\Models\Collection;
 use App\Models\Release;
 use App\Models\Settings;
 use App\Services\AdditionalProcessing\AdditionalCandidateQuery;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -16,6 +17,8 @@ use Illuminate\Support\Facades\DB;
  */
 class TmuxMonitorService
 {
+    private const int PROC1_CACHE_TTL_SECONDS = 60;
+
     protected Tmux $tmux;
 
     /**
@@ -233,10 +236,10 @@ class TmuxMonitorService
         $this->runVar['counts']['now']['work_available'] = $this->runVar['counts']['now']['work_available'] ?? 0;
 
         try {
-            $dbName = config('nntmux.db_name');
+            $dbName = (string) config('nntmux.db_name');
 
             $proc1Query = $this->tmux->proc_query(1, $dbName, '');
-            $proc1Result = DB::selectOne($proc1Query);
+            $proc1Result = $this->getCachedProc1Result($proc1Query);
 
             if ($proc1Result) {
                 foreach ((array) $proc1Result as $key => $value) {
@@ -273,6 +276,15 @@ class TmuxMonitorService
         } catch (\Exception $e) {
             logger()->error('Error collecting process counts: '.$e->getMessage());
         }
+    }
+
+    protected function getCachedProc1Result(string $query): ?object
+    {
+        return Cache::remember(
+            'tmux:proc1:'.md5($query),
+            self::PROC1_CACHE_TTL_SECONDS,
+            static fn (): ?object => DB::selectOne($query),
+        );
     }
 
     /**
