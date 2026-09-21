@@ -55,35 +55,4 @@ final class SafeBackfillPlanner
 
         return $planned;
     }
-
-    public function targetPost(int $currentFirst, int $articleLimit, int $serverOldest, int $dateTarget = 0): int
-    {
-        return max(
-            $currentFirst - max(1, $articleLimit),
-            $serverOldest,
-            $dateTarget,
-        );
-    }
-
-    /**
-     * @return list<array{first: int, last: int}>
-     */
-    public function ranges(int $currentFirst, int $targetPost, int $maxMessages): array
-    {
-        if ($targetPost >= $currentFirst) {
-            return [];
-        }
-
-        $maxMessages = max(1, $maxMessages);
-        $ranges = [];
-        $last = $currentFirst - 1;
-
-        while ($last >= $targetPost) {
-            $first = max($targetPost, $last - $maxMessages + 1);
-            $ranges[] = ['first' => $first, 'last' => $last];
-            $last = $first - 1;
-        }
-
-        return $ranges;
-    }
 }
