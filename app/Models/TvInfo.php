@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $summary Description/summary of the show.
  * @property string $publisher The channel/network of production/release (ABC, BBC, Showtime, etc.).
  * @property string $localzone The linux tz style identifier
- * @property bool $image Does the video have a cover image?
+ * @property int $image Does the video have a cover image?
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TvInfo whereImage($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TvInfo whereLocalzone($value)

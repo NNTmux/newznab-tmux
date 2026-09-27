@@ -177,7 +177,7 @@ class AdditionalProcessingServiceProvider extends ServiceProvider
         });
 
         $this->app->terminating(function (): void {
-            if ($this->app->bound(AdditionalProcessingOrchestrator::class)) {
+            if ($this->app->resolved(AdditionalProcessingOrchestrator::class)) {
                 $this->app->make(AdditionalProcessingOrchestrator::class)->finish();
             }
         });

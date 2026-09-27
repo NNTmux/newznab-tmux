@@ -6,6 +6,14 @@
                 "artisan",
                 "boost:mcp"
             ]
+        },
+        "newznab-tmux": {
+            "command": "./vendor/bin/sail",
+            "args": [
+                "artisan",
+                "mcp:start",
+                "newznab-tmux"
+            ]
         }
     }
 }

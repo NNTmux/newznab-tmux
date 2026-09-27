@@ -7,7 +7,9 @@ namespace App\Console\Commands;
 use App\Services\NNTP\NNTPService;
 use App\Services\PostProcessService;
 use Illuminate\Console\Command;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'update:postprocess')]
 class UpdatePostProcess extends Command
 {
     /**

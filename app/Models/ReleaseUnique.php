@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\HasCompositePrimaryKey;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -23,10 +24,17 @@ use Illuminate\Database\Eloquent\Model;
  */
 class ReleaseUnique extends Model
 {
+    use HasCompositePrimaryKey;
+
     /**
      * @var string
      */
     protected $table = 'release_unique';
+
+    /**
+     * @var string
+     */
+    protected $primaryKey = 'releases_id';
 
     /**
      * @var bool
@@ -36,15 +44,18 @@ class ReleaseUnique extends Model
     protected $dateFormat = false;
 
     /**
-     * @var bool
-     */
-    public $incrementing = false;
-
-    /**
      * @var list<string>
      */
     protected $fillable = [
         'releases_id',
         'uniqueid',
     ];
+
+    /**
+     * @return non-empty-list<string>
+     */
+    public function compositeKeyColumns(): array
+    {
+        return ['releases_id', 'uniqueid'];
+    }
 }

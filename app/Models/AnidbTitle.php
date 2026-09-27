@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\HasCompositePrimaryKey;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -30,6 +31,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class AnidbTitle extends Model
 {
+    use HasCompositePrimaryKey;
+
     /**
      * @var string
      */
@@ -40,17 +43,20 @@ class AnidbTitle extends Model
     /**
      * @var bool
      */
-    public $incrementing = false;
-
-    /**
-     * @var bool
-     */
     public $timestamps = false;
 
     /**
      * @var array<string>
      */
     protected $guarded = [];
+
+    /**
+     * @return non-empty-list<string>
+     */
+    public function compositeKeyColumns(): array
+    {
+        return ['anidbid', 'type', 'lang', 'title'];
+    }
 
     /**
      * @return HasMany<AnidbInfo, $this>

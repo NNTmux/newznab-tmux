@@ -32,6 +32,7 @@ This project is a fork of [newznab plus](https://github.com/anth0/nnplus) and [n
 - [TV & Movie Processing](#tv--movie-processing)
 - [API](#api)
 - [Docker & Development](#docker--development)
+- [NNTmux MCP Development Server](#nntmux-mcp-development-server)
 - [Troubleshooting](#troubleshooting)
 - [Contributing](#contributing)
 - [License](#license)
@@ -463,6 +464,55 @@ repositories.
 Set `SKILLS_GLOBAL_DIR` or `CODEX_HOME` when using non-default global
 directories. The installer never removes or overwrites unmanaged existing
 skill paths; resolve reported conflicts manually and rerun it.
+
+## NNTmux MCP Development Server
+
+The repository includes a local-only MCP server for NNTmux-aware code inspection,
+change-impact analysis, verification planning, allowlisted checks, and explicit
+runtime status probes. It is a companion to Laravel Boost: use Boost for generic
+Laravel documentation, database schema and read-only queries, logs, browser logs,
+and Tinker. The NNTmux server does not edit files or expose an HTTP endpoint.
+
+Start it from the repository with the host PHP executable:
+
+```bash
+php artisan mcp:start newznab-tmux
+```
+
+The tracked Cursor configuration also registers both Laravel Boost and this
+server through Sail. Once the Docker image and application container are
+available, the MCP client starts the NNTmux server in the same way as Boost:
+
+```bash
+./vendor/bin/sail artisan mcp:start newznab-tmux
+```
+
+Portable JSON-style client configuration:
+
+```json
+{
+  "mcpServers": {
+    "newznab-tmux": {
+      "command": "php",
+      "args": ["artisan", "mcp:start", "newznab-tmux"],
+      "cwd": "/absolute/path/to/newznab-tmux"
+    }
+  }
+}
+```
+
+Codex TOML configuration:
+
+```toml
+[mcp_servers.newznab-tmux]
+command = "php"
+args = ["artisan", "mcp:start", "newznab-tmux"]
+cwd = "/absolute/path/to/newznab-tmux"
+```
+
+Runtime probes are opt-in, and the NNTP probe runs only when `nntp` is explicitly
+requested. Static tools, resources, prompts, and discovery remain available when
+MariaDB, Redis, search, queue, or NNTP services are offline.
 
 ## Troubleshooting
 

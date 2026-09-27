@@ -6,6 +6,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 /**
@@ -36,9 +37,9 @@ class RootCategory extends Model
     protected $guarded = [];
 
     /**
-     * @return HasMany<mixed>
+     * @return HasMany<Category, $this>
      */
-    public function categories(): \Illuminate\Database\Eloquent\Relations\HasMany // @phpstan-ignore class.notFound, missingType.generics, return.phpDocType
+    public function categories(): HasMany
     {
         return $this->hasMany(Category::class, 'root_categories_id');
     }

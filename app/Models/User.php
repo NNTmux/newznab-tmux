@@ -95,6 +95,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string|null $role_name Computed from join with roles table
  * @property int|null $num Computed count value
  * @property string|null $mth Computed month value
+ * @property-read string $full_name Computed via Attribute accessor
  * @property-read bool $is_disabled Computed via Attribute accessor
  * @property bool|null $is_role_expired Computed via Attribute accessor
  * @property int|null $days_until_expiry Computed via Attribute accessor
@@ -822,8 +823,10 @@ final class User extends Authenticatable implements CanResetPasswordContract, Ha
 
     /**
      * Build a query for a verified user resolved by API/RSS token.
+     *
+     * @return Builder<User>
      */
-    public static function verifiedApiTokenQuery(string $token): Builder // @phpstan-ignore missingType.generics
+    public static function verifiedApiTokenQuery(string $token): Builder
     {
         return self::query()
             ->verified()

@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Facades\Search;
+use App\Models\Concerns\HasCompositePrimaryKey;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -40,6 +42,8 @@ use Illuminate\Support\Facades\Log;
  */
 class ReleaseFile extends Model
 {
+    use HasCompositePrimaryKey;
+
     protected $dateFormat = false;
 
     /**
@@ -53,9 +57,17 @@ class ReleaseFile extends Model
     protected $primaryKey = 'releases_id';
 
     /**
-     * @return BelongsTo<mixed>
+     * @return non-empty-list<string>
      */
-    public function release(): \Illuminate\Database\Eloquent\Relations\BelongsTo // @phpstan-ignore class.notFound, missingType.generics, return.phpDocType
+    public function compositeKeyColumns(): array
+    {
+        return ['releases_id', 'name'];
+    }
+
+    /**
+     * @return BelongsTo<Release, $this>
+     */
+    public function release(): BelongsTo
     {
         return $this->belongsTo(Release::class, 'releases_id');
     }

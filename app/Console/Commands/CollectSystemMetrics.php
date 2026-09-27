@@ -6,7 +6,9 @@ namespace App\Console\Commands;
 
 use App\Services\SystemMetricsService;
 use Illuminate\Console\Command;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'metrics:collect')]
 class CollectSystemMetrics extends Command
 {
     /**

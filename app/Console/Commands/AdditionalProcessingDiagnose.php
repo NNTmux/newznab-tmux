@@ -6,7 +6,9 @@ namespace App\Console\Commands;
 
 use App\Services\AdditionalProcessing\AdditionalProcessingDiagnostics;
 use Illuminate\Console\Command;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'nntmux:additional-diagnose')]
 class AdditionalProcessingDiagnose extends Command
 {
     protected $signature = 'nntmux:additional-diagnose

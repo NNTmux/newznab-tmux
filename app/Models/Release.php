@@ -41,7 +41,8 @@ use Illuminate\Support\Facades\DB;
  * @property string|null $se_complete From join
  * @property int|null $files_total_size Computed column
  * @property string|null $group_name From join (group relationship)
- * @property string|null $image From join (video.tvInfo relationship)
+ * @property int|null $image From join (video.tvInfo relationship)
+ * @property int|null $source From join (video relationship)
  * @property string|null $parent_category From join (category.parent relationship)
  * @property string|null $category_ids Computed from category relationship
  * @property string|null $group_names Computed from releaseGroup relationship
@@ -562,7 +563,7 @@ class Release extends Model
             $release->parent_category = $release->category->parent->title ?? null;
             $release->sub_category = $release->category->title ?? null;
             $release->category_name = $release->parent_category.' > '.$release->sub_category;
-            $release->category_ids = $release->category ? ($release->category->parentid.','.$release->category->id) : '';
+            $release->category_ids = $release->category ? ($release->category->root_categories_id.','.$release->category->id) : '';
 
             $release->group_names = $release->releaseGroup->map(function ($relGroup) {
                 return $relGroup->group ? $relGroup->group->name : null;

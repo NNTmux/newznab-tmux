@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\HasCompositePrimaryKey;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -23,15 +24,17 @@ use Illuminate\Database\Eloquent\Model;
  */
 class ParHash extends Model
 {
+    use HasCompositePrimaryKey;
+
     /**
-     * @var bool
+     * @var string
      */
-    public $timestamps = false;
+    protected $primaryKey = 'releases_id';
 
     /**
      * @var bool
      */
-    public $incrementing = false;
+    public $timestamps = false;
 
     protected $dateFormat = false;
 
@@ -39,4 +42,12 @@ class ParHash extends Model
      * @var array<string>
      */
     protected $guarded = [];
+
+    /**
+     * @return non-empty-list<string>
+     */
+    public function compositeKeyColumns(): array
+    {
+        return ['releases_id', 'hash'];
+    }
 }

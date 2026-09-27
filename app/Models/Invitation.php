@@ -67,16 +67,6 @@ class Invitation extends Model // @phpstan-ignore missingType.iterableValue
     ];
 
     /**
-     * @var array<string, mixed>
-     */
-    protected $dates = [ // @phpstan-ignore property.defaultValue
-        'expires_at',
-        'used_at',
-        'created_at',
-        'updated_at',
-    ];
-
-    /**
      * Get the user who created this invitation
      *
      * @return BelongsTo<User, $this>

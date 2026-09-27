@@ -6,7 +6,9 @@ namespace App\Console\Commands;
 
 use App\Services\RegistrationStatusService;
 use Illuminate\Console\Command;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'nntmux:disable-expired-registration-periods')]
 class DisableExpiredRegistrationPeriods extends Command
 {
     /**

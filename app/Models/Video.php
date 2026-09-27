@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\DB;
  * App\Models\Video.
  *
  * @property int $id Show ID to be used in other tables as reference
- * @property bool $type 0 = TV, 1 = Film, 2 = Anime
+ * @property int $type 0 = TV, 1 = Film, 2 = Anime
  * @property string $title Name of the video.
  * @property string $countries_id Two character country code (FK to countries table).
  * @property string $started Date (UTC) of production's first airing.
@@ -28,7 +28,7 @@ use Illuminate\Support\Facades\DB;
  * @property int $tvdb ID number for TVDB site
  * @property int $tvmaze ID number for TVMaze site.
  * @property int $tvrage ID number for TVRage site.
- * @property bool $source Which site did we use for info?
+ * @property int $source Which site did we use for info?
  * @property-read Collection|VideoAlias[] $alias
  * @property-read Collection|TvEpisode[] $episode
  * @property-read Collection|Release[] $release

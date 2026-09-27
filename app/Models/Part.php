@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\HasCompositePrimaryKey;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -29,5 +30,23 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Part extends Model
 {
-    //
+    use HasCompositePrimaryKey;
+
+    /**
+     * @var string
+     */
+    protected $primaryKey = 'binaries_id';
+
+    /**
+     * @var bool
+     */
+    public $timestamps = false;
+
+    /**
+     * @return non-empty-list<string>
+     */
+    public function compositeKeyColumns(): array
+    {
+        return ['binaries_id', 'partnumber'];
+    }
 }

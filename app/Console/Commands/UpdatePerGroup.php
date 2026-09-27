@@ -14,7 +14,9 @@ use App\Services\NNTP\NNTPService;
 use App\Services\ReleaseProcessingService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'group:update-all')]
 class UpdatePerGroup extends Command
 {
     /**

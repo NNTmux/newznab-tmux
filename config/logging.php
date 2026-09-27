@@ -6,6 +6,14 @@ use Monolog\Handler\SyslogUdpHandler;
 return [
 
     'channels' => [
+        'nntmux_mcp' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/nntmux-mcp.log'),
+            'level' => 'info',
+            'days' => 7,
+            'replace_placeholders' => true,
+        ],
+
         'stack' => [
             'driver' => 'stack',
             'name' => 'NNTmux',

@@ -415,30 +415,6 @@ parameters:
 			path: app/Models/RegistrationPeriod.php
 
 		-
-			message: '#^Property App\\Models\\Release\:\:\$image \(string\|null\) does not accept bool\|null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: app/Models/Release.php
-
-		-
-			message: '#^Property App\\Models\\Release\:\:\$source \(int\<0, max\>\|null\) does not accept bool\|null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: app/Models/Release.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\User\:\:\$full_name\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/User.php
-
-		-
-			message: '#^Method App\\Models\\User\:\:findVerifiedByApiToken\(\) should return App\\Models\\User\|null but returns Illuminate\\Database\\Eloquent\\Model\|null\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Models/User.php
-
-		-
 			message: '#^Method App\\Models\\UserActivityStat\:\:getDownloadsPerDay\(\) should return array\<string, mixed\> but returns list\<array\<string, int\|string\>\>\.$#'
 			identifier: return.type
 			count: 1

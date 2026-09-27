@@ -12,7 +12,9 @@ use App\Services\NNTP\NNTPService;
 use App\Services\PostProcessService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'postprocess:guid')]
 class PostProcessGuid extends Command
 {
     /**

@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Cache;
  * App\Models\Predb.
  *
  * @property mixed $release
- * @property mixed $hash
  * @property int $id Primary key
  * @property string $title
  * @property string|null $nfo
@@ -81,14 +80,6 @@ class Predb extends Model
      * @var array<string>
      */
     protected $guarded = [];
-
-    /**
-     * @return HasMany<PredbHash, $this>
-     */
-    public function hash(): HasMany
-    {
-        return $this->hasMany(PredbHash::class, 'predb_id');
-    }
 
     /**
      * @return HasMany<Release, $this>

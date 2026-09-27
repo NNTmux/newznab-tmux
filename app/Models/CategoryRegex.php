@@ -33,5 +33,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class CategoryRegex extends Model
 {
-    //
+    /**
+     * @var bool
+     */
+    public $timestamps = false;
 }

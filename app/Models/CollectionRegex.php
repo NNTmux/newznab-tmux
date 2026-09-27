@@ -31,5 +31,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class CollectionRegex extends Model
 {
-    //
+    /**
+     * @var bool
+     */
+    public $timestamps = false;
 }

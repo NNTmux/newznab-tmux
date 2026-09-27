@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\HasCompositePrimaryKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -28,10 +29,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class DnzbFailure extends Model
 {
+    use HasCompositePrimaryKey;
+
     /**
      * @var string
      */
     protected $dateFormat = false;
+
+    /**
+     * @var string
+     */
+    protected $primaryKey = 'release_id';
 
     /**
      * @var bool
@@ -39,14 +47,17 @@ class DnzbFailure extends Model
     public $timestamps = false;
 
     /**
-     * @var bool
-     */
-    public $incrementing = false;
-
-    /**
      * @var array<string>
      */
     protected $guarded = [];
+
+    /**
+     * @return non-empty-list<string>
+     */
+    public function compositeKeyColumns(): array
+    {
+        return ['release_id', 'users_id'];
+    }
 
     /**
      * @return BelongsTo<Release, $this>

@@ -12,7 +12,7 @@ final class CategoryObserver
 {
     public function updated(Category $category): void
     {
-        if (! $category->isDirty(['title', 'parentid', 'root_categories_id'])) {
+        if (! $category->isDirty(['title', 'root_categories_id'])) {
             return;
         }
 

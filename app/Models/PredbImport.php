@@ -47,5 +47,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class PredbImport extends Model
 {
-    //
+    /**
+     * @var bool
+     */
+    public $timestamps = false;
 }

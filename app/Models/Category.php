@@ -16,15 +16,13 @@ use Illuminate\Support\Facades\DB;
  *
  * @property int $id
  * @property string $title
- * @property int|null $parentid
  * @property int $status
  * @property string|null $description
  * @property bool $disablepreview
  * @property int $minsizetoformrelease
  * @property int $maxsizetoformrelease
  * @property int|null $count Computed count from aggregate queries
- * @property-read Collection|Category[] $children
- * @property-read Category|null $parent
+ * @property-read RootCategory|null $parent
  * @property-read Collection|Release[] $releases
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category whereDescription($value)
@@ -32,7 +30,6 @@ use Illuminate\Support\Facades\DB;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category whereMaxsizetoformrelease($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category whereMinsizetoformrelease($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category whereParentid($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category whereTitle($value)
  *

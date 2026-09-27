@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\HasCompositePrimaryKey;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -25,12 +26,14 @@ use Illuminate\Database\Eloquent\Model;
  */
 class ReleaseRegex extends Model
 {
+    use HasCompositePrimaryKey;
+
     protected $dateFormat = false;
 
     /**
-     * @var bool
+     * @var string
      */
-    public $incrementing = false;
+    protected $primaryKey = 'releases_id';
 
     /**
      * @var bool
@@ -41,4 +44,12 @@ class ReleaseRegex extends Model
      * @var array<string>
      */
     protected $guarded = [];
+
+    /**
+     * @return non-empty-list<string>
+     */
+    public function compositeKeyColumns(): array
+    {
+        return ['releases_id', 'collection_regex_id', 'naming_regex_id'];
+    }
 }

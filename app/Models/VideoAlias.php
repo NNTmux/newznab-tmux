@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\HasCompositePrimaryKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -25,17 +26,27 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class VideoAlias extends Model
 {
+    use HasCompositePrimaryKey;
+
     protected $table = 'videos_aliases';
 
     /**
-     * @var bool
+     * @var string
      */
-    public $incrementing = false;
+    protected $primaryKey = 'videos_id';
 
     /**
      * @var array<string>
      */
     protected $guarded = [];
+
+    /**
+     * @return non-empty-list<string>
+     */
+    public function compositeKeyColumns(): array
+    {
+        return ['videos_id', 'title'];
+    }
 
     /**
      * @return BelongsTo<Video, $this>

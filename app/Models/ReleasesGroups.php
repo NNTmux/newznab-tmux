@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\HasCompositePrimaryKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -44,10 +45,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class ReleasesGroups extends Model
 {
+    use HasCompositePrimaryKey;
+
     /**
-     * @var bool
+     * @var string
      */
-    public $incrementing = false;
+    protected $primaryKey = 'releases_id';
 
     /**
      * @var bool
@@ -57,13 +60,18 @@ class ReleasesGroups extends Model
     /** @phpstan-ignore property.defaultValue */
     public $dateFormat = false;
 
-    /** @phpstan-ignore property.defaultValue */
-    protected $primaryKey = ['releases_id', 'groups_id'];
-
     /**
      * @var array<string>
      */
     protected $guarded = [];
+
+    /**
+     * @return non-empty-list<string>
+     */
+    public function compositeKeyColumns(): array
+    {
+        return ['releases_id', 'groups_id'];
+    }
 
     /**
      * @return BelongsTo<Release, $this>

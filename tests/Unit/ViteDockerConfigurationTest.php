@@ -58,6 +58,24 @@ class ViteDockerConfigurationTest extends TestCase
         $this->assertStringContainsString('alias /var/www/html/storage/app/public/;', $nginxConfig);
     }
 
+    public function test_cursor_registers_nntmux_mcp_through_sail_alongside_boost(): void
+    {
+        $configuration = json_decode(
+            $this->projectFile('.cursor/mcp.json'),
+            true,
+            512,
+            JSON_THROW_ON_ERROR,
+        );
+
+        $this->assertSame('./vendor/bin/sail', $configuration['mcpServers']['laravel-boost']['command']);
+        $this->assertSame(['artisan', 'boost:mcp'], $configuration['mcpServers']['laravel-boost']['args']);
+        $this->assertSame('./vendor/bin/sail', $configuration['mcpServers']['newznab-tmux']['command']);
+        $this->assertSame(
+            ['artisan', 'mcp:start', 'newznab-tmux'],
+            $configuration['mcpServers']['newznab-tmux']['args'],
+        );
+    }
+
     private function projectFile(string $path): string
     {
         return (string) file_get_contents(__DIR__."/../../{$path}");

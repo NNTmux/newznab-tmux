@@ -7,7 +7,9 @@ namespace App\Console\Commands;
 use App\Services\ReleaseProcessingService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'releases:process')]
 class ProcessReleasesCommand extends Command
 {
     /**

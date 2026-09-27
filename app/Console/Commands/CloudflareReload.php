@@ -6,8 +6,10 @@ namespace App\Console\Commands;
 
 use App\Services\Cloudflare\CloudflareIpRangeService;
 use Illuminate\Console\Command;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Throwable;
 
+#[AsCommand(name: 'cloudflare:reload')]
 class CloudflareReload extends Command
 {
     /**
