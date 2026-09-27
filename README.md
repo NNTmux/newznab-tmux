@@ -471,7 +471,24 @@ The repository includes a local-only MCP server for NNTmux-aware code inspection
 change-impact analysis, verification planning, allowlisted checks, and explicit
 runtime status probes. It is a companion to Laravel Boost: use Boost for generic
 Laravel documentation, database schema and read-only queries, logs, browser logs,
-and Tinker. The NNTmux server does not edit files or expose an HTTP endpoint.
+and Tinker. The NNTmux server does not provide a general-purpose file editor or
+expose an HTTP endpoint; source changes remain in the MCP client's workspace.
+
+It exposes the following project-aware capabilities:
+
+- `inspect-code-context` collects bounded source evidence, callers, tests,
+  configuration, project rules, and path history.
+- `inspect-change-impact` relates staged or unstaged changes to affected
+  interfaces, dependants, tests, and verification checks.
+- `plan-verification` builds a scoped host-side verification plan without
+  executing commands.
+- `run-verification` runs allowlisted PHPUnit, Pint, PHPStan, PHP lint,
+  Composer, frontend-build, and diff checks.
+- `probe-runtime` runs only explicitly selected database, Redis, search,
+  queue, disk, or NNTP health probes.
+- Project overview and instruction resources provide bounded repository
+  context, while diagnosis and change-review prompts provide reusable
+  evidence-first workflows.
 
 Start it from the repository with the host PHP executable:
 
@@ -512,7 +529,10 @@ cwd = "/absolute/path/to/newznab-tmux"
 
 Runtime probes are opt-in, and the NNTP probe runs only when `nntp` is explicitly
 requested. Static tools, resources, prompts, and discovery remain available when
-MariaDB, Redis, search, queue, or NNTP services are offline.
+MariaDB, Redis, search, queue, or NNTP services are offline. Source inspection
+is restricted to configured repository roots, process execution uses fixed
+allowlists and timeouts, output is bounded and sanitized, and sensitive values
+are redacted before results are returned.
 
 ## Troubleshooting
 
