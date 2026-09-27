@@ -798,46 +798,80 @@ dialog.app-modal::backdrop {
 .release-row-actions > button {
     @apply inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-lg border px-3 py-2 text-xs font-medium transition-colors;
     border-color: var(--border-default);
-    background-color: var(--surface-card);
-    color: rgb(55 65 81);
 }
 
 .dark .release-row-actions > a,
 .dark .release-row-actions > button {
     border-color: var(--border-default-dark);
-    background-color: var(--surface-card-dark);
-    color: rgb(209 213 219);
 }
 
 .release-row-actions > a.release-row-actions__download {
-    background-color: var(--color-green-700);
+    background-color: var(--color-green-600);
     border-color: transparent;
     color: white;
-}
-
-.release-row-actions > :is(a, button):hover {
-    border-color: var(--color-primary-500);
-    color: var(--color-primary-600);
-}
-
-.dark .release-row-actions > :is(a, button):hover {
-    color: var(--color-primary-300);
 }
 
 .release-row-actions > a.release-row-actions__download:hover {
+    background-color: var(--color-green-700);
+}
+
+.dark .release-row-actions > a.release-row-actions__download {
+    background-color: var(--color-green-700);
+}
+
+.dark .release-row-actions > a.release-row-actions__download:hover {
     background-color: var(--color-green-800);
+}
+
+.release-row-actions > a.release-row-actions__details {
+    background-color: var(--color-primary-600);
     border-color: transparent;
     color: white;
+}
+
+.release-row-actions > a.release-row-actions__details:hover {
+    background-color: var(--color-primary-700);
+}
+
+.dark .release-row-actions > a.release-row-actions__details {
+    background-color: var(--color-primary-700);
+}
+
+.dark .release-row-actions > a.release-row-actions__details:hover {
+    background-color: var(--color-primary-800);
+}
+
+.release-row-actions > button.release-row-actions__basket {
+    @apply border-transparent bg-gray-200 text-gray-700 hover:bg-gray-300;
+}
+
+.dark .release-row-actions > button.release-row-actions__basket {
+    @apply bg-gray-700 text-gray-200 hover:bg-gray-600;
+}
+
+.release-row-actions > a.release-row-actions__movies {
+    @apply border-transparent bg-purple-600 text-white hover:bg-purple-700;
+}
+
+.dark .release-row-actions > a.release-row-actions__movies {
+    @apply bg-purple-700 hover:bg-purple-800;
 }
 
 .release-row-actions--compact {
     flex-wrap: nowrap;
+    gap: 0.25rem;
     margin-top: 0;
 }
 
 .release-row-actions--compact > a,
 .release-row-actions--compact > button {
-    padding: 0.5rem;
+    min-height: 2rem;
+    min-width: 2rem;
+    padding: 0.375rem;
+}
+
+.release-row-actions--compact > .report-trigger {
+    border-color: transparent;
 }
 
 .release-row-actions--compact .report-label {

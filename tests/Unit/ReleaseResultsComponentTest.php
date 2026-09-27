@@ -95,6 +95,25 @@ class ReleaseResultsComponentTest extends TestCase
         $this->assertStringContainsString('<x-report-button', $component);
     }
 
+    public function test_release_actions_keep_their_distinct_visual_roles(): void
+    {
+        $rowActions = (string) file_get_contents(__DIR__.'/../../resources/views/components/release-row-actions.blade.php');
+        $bulkActions = (string) file_get_contents(__DIR__.'/../../resources/views/components/release-bulk-actions.blade.php');
+        $stylesheet = (string) file_get_contents(__DIR__.'/../../resources/css/app.css');
+
+        foreach (['release-row-actions__download', 'release-row-actions__details', 'release-row-actions__basket', 'release-row-actions__movies'] as $actionClass) {
+            $this->assertStringContainsString($actionClass, $rowActions);
+            $this->assertStringContainsString('.'.$actionClass, $stylesheet);
+        }
+
+        $this->assertStringContainsString(':variant="$compact ? \'icon\' : \'button\'"', $rowActions);
+        $this->assertStringContainsString('min-height: 2rem;', $stylesheet);
+        $this->assertStringContainsString('.release-row-actions--compact > .report-trigger', $stylesheet);
+        $this->assertStringContainsString('nzb_multi_operations_download release-bulk-actions__button bg-green-600', $bulkActions);
+        $this->assertStringContainsString('nzb_multi_operations_cart release-bulk-actions__button bg-primary-600', $bulkActions);
+        $this->assertStringContainsString('nzb_multi_operations_delete release-bulk-actions__button bg-red-600', $bulkActions);
+    }
+
     public function test_release_categories_link_to_the_matching_browse_filter(): void
     {
         $releaseResults = (string) file_get_contents(__DIR__.'/../../resources/views/components/release-results.blade.php');
