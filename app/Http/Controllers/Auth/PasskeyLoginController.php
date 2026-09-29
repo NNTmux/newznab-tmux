@@ -123,7 +123,7 @@ final class PasskeyLoginController extends Controller
         session([config('google2fa.session_var') => true]);
         session([config('google2fa.session_var').'.auth.passed_at' => time()]);
 
-        $userIp = config('nntmux:settings.store_user_ip') ? ($request->ip() ?? $request->getClientIp()) : '';
+        $userIp = config('nntmux_settings.store_user_ip') ? ($request->ip() ?? $request->getClientIp()) : '';
         event(new UserLoggedIn($user, $userIp));
         event(new PasskeyUsedToAuthenticateEvent($passkey, $request));
 

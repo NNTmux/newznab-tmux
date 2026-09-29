@@ -103,6 +103,40 @@ class PasskeyAuthenticationTest extends TestCase
         $this->assertNotNull($user->fresh()?->remember_token);
     }
 
+    public function test_passkey_authentication_records_the_client_ip_when_ip_storage_is_enabled(): void
+    {
+        Event::fake([UserLoggedIn::class]);
+        config()->set('nntmux_settings.store_user_ip', true);
+        $user = $this->createUser('passkey-ip-address@example.test');
+
+        $passkey = new Passkey;
+        $passkey->setRawAttributes([
+            'id' => 4,
+            'authenticatable_id' => $user->id,
+            'name' => 'Security key',
+            'credential_id' => 'credential-4',
+            'data' => '{}',
+        ], true);
+        $passkey->setRelation('authenticatable', $user);
+
+        FakeFindPasskeyAction::$passkey = $passkey;
+        config()->set('passkeys.actions.find_passkey', FakeFindPasskeyAction::class);
+
+        $this
+            ->withServerVariables(['REMOTE_ADDR' => '203.0.113.43'])
+            ->withSession(['passkey-authentication-options' => '{}'])
+            ->post(route('passkeys.login'), [
+                'start_authentication_response' => json_encode(['id' => 'credential-4'], JSON_THROW_ON_ERROR),
+                'remember' => false,
+            ])
+            ->assertRedirect('/');
+
+        Event::assertDispatched(
+            UserLoggedIn::class,
+            fn (UserLoggedIn $event): bool => $event->user->is($user) && $event->ip === '203.0.113.43'
+        );
+    }
+
     public function test_unverified_users_cannot_authenticate_with_passkeys(): void
     {
         $user = $this->createUser('unverified@example.test', false);

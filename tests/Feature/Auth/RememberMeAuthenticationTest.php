@@ -184,6 +184,26 @@ class RememberMeAuthenticationTest extends TestCase
         $this->assertAuthenticatedAs($user);
     }
 
+    public function test_password_login_records_the_client_ip_when_ip_storage_is_enabled(): void
+    {
+        Event::fake([UserLoggedIn::class]);
+        config()->set('nntmux_settings.store_user_ip', true);
+        $user = $this->createUser('ip-address@example.test');
+
+        $this
+            ->withServerVariables(['REMOTE_ADDR' => '203.0.113.42'])
+            ->post(route('login'), [
+                'username' => $user->email,
+                'password' => 'password',
+            ])
+            ->assertRedirect('/');
+
+        Event::assertDispatched(
+            UserLoggedIn::class,
+            fn (UserLoggedIn $event): bool => $event->user->is($user) && $event->ip === '203.0.113.42'
+        );
+    }
+
     public function test_two_factor_login_preserves_remember_me_until_otp_success(): void
     {
         Event::fake([UserLoggedIn::class]);

@@ -115,7 +115,7 @@ class LoginController extends Controller
 
             $request->session()->regenerate();
 
-            $userIp = config('nntmux:settings.store_user_ip') ? ($request->ip() ?? $request->getClientIp()) : '';
+            $userIp = config('nntmux_settings.store_user_ip') ? ($request->ip() ?? $request->getClientIp()) : '';
             event(new UserLoggedIn($user, $userIp));
 
             $passwordBreached = $this->isPasswordBreached((string) $request->input('password'));

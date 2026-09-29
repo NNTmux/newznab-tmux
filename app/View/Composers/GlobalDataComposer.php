@@ -87,7 +87,8 @@ class GlobalDataComposer
 
             // Update last login every 3 hours (outside of cache to avoid stale checks)
             if (now()->subHours(3) > $userdata->lastlogin) {
-                event(new UserLoggedIn($userdata));
+                $userIp = config('nntmux_settings.store_user_ip') ? (request()->ip() ?? request()->getClientIp()) : '';
+                event(new UserLoggedIn($userdata, $userIp));
             }
 
             // Cached menu categories per user (depends on their exclusions)
