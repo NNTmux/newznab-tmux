@@ -6,6 +6,7 @@ namespace Tests\Feature;
 
 use App\Enums\ConfigurationDomain;
 use App\Services\Configuration\ConfigurationProvider;
+use App\Support\Configuration\ConfigurationField;
 use App\Support\Configuration\SettingsPageCatalog;
 use App\Support\SizeUnit;
 use BackedEnum;
@@ -62,6 +63,20 @@ final class AdminSettingsControllerTest extends TestCase
         }
     }
 
+    public function test_rich_text_fields_use_the_shared_tinymce_component(): void
+    {
+        $this->get(route('admin.settings.show', ['domain' => 'site']))
+            ->assertOk()
+            ->assertSee('x-data="tinyMceEditor"', false)
+            ->assertSee('id="terms" name="terms"', false)
+            ->assertSee('tinymce-editor', false);
+
+        $this->get(route('admin.settings.show', ['domain' => 'ingestion']))
+            ->assertOk()
+            ->assertDontSee('x-data="tinyMceEditor"', false)
+            ->assertDontSee('tinymce-editor', false);
+    }
+
     public function test_each_domain_accepts_a_complete_valid_atomic_update(): void
     {
         foreach (ConfigurationDomain::cases() as $domain) {
@@ -75,6 +90,125 @@ final class AdminSettingsControllerTest extends TestCase
         }
 
         $this->assertSame('Typed Indexer', DB::table('site_configurations')->value('title'));
+    }
+
+    public function test_every_boolean_setting_can_be_disabled_and_remains_selected_after_reload(): void
+    {
+        foreach (ConfigurationDomain::cases() as $domain) {
+            $booleanFields = array_values(array_filter(
+                $this->catalog->fields($domain),
+                static fn (ConfigurationField $field): bool => $field->control === 'boolean',
+            ));
+
+            if ($booleanFields === []) {
+                continue;
+            }
+
+            $modelClass = $this->catalog->modelClass($domain);
+            /** @var Model $model */
+            $model = new $modelClass;
+            $enabledValues = array_fill_keys(
+                array_map(static fn (ConfigurationField $field): string => $field->column, $booleanFields),
+                1,
+            );
+            DB::table($model->getTable())->where('id', 1)->update($enabledValues);
+
+            $payload = $this->payload($domain);
+            foreach ($booleanFields as $field) {
+                $payload[$field->column] = '0';
+            }
+
+            $this->put(route('admin.settings.update', ['domain' => $domain->value]), $payload)
+                ->assertSessionHasNoErrors()
+                ->assertRedirect(route('admin.settings.show', ['domain' => $domain->value]));
+
+            foreach ($booleanFields as $field) {
+                $this->assertSame(
+                    0,
+                    (int) DB::table($model->getTable())->where('id', 1)->value($field->column),
+                    "{$domain->value}.{$field->column} was not persisted as disabled.",
+                );
+            }
+
+            $markup = $this->get(route('admin.settings.show', ['domain' => $domain->value]))
+                ->assertOk()
+                ->getContent();
+
+            foreach ($booleanFields as $field) {
+                $this->assertMatchesRegularExpression(
+                    '/<select[^>]*id="'.preg_quote($field->column, '/').'"[^>]*>.*?<option value="0" selected>Disabled<\/option>.*?<\/select>/s',
+                    $markup,
+                    "{$domain->value}.{$field->column} did not render Disabled as selected.",
+                );
+            }
+        }
+    }
+
+    public function test_every_enum_setting_persists_an_alternative_and_remains_selected_after_reload(): void
+    {
+        foreach (ConfigurationDomain::cases() as $domain) {
+            $enumFields = array_values(array_filter(
+                $this->catalog->fields($domain),
+                static fn (ConfigurationField $field): bool => $field->control === 'enum',
+            ));
+
+            if ($enumFields === []) {
+                continue;
+            }
+
+            $payload = $this->payload($domain);
+            $expectedValues = [];
+            foreach ($enumFields as $field) {
+                $currentValue = (string) $payload[$field->column];
+                $alternative = array_find(
+                    array_keys($field->options),
+                    static fn (int|string $value): bool => (string) $value !== $currentValue,
+                );
+                $expectedValues[$field->column] = (string) $alternative;
+                $payload[$field->column] = (string) $alternative;
+            }
+
+            $this->put(route('admin.settings.update', ['domain' => $domain->value]), $payload)
+                ->assertSessionHasNoErrors()
+                ->assertRedirect(route('admin.settings.show', ['domain' => $domain->value]));
+
+            $modelClass = $this->catalog->modelClass($domain);
+            /** @var Model $model */
+            $model = new $modelClass;
+            $markup = $this->get(route('admin.settings.show', ['domain' => $domain->value]))
+                ->assertOk()
+                ->getContent();
+
+            foreach ($enumFields as $field) {
+                $expectedValue = $expectedValues[$field->column];
+                $this->assertSame(
+                    $expectedValue,
+                    (string) DB::table($model->getTable())->where('id', 1)->value($field->column),
+                    "{$domain->value}.{$field->column} did not persist its alternative option.",
+                );
+                $this->assertMatchesRegularExpression(
+                    '/<select[^>]*id="'.preg_quote($field->column, '/').'"[^>]*>.*?<option value="'.preg_quote($expectedValue, '/').'" selected>.*?<\/option>.*?<\/select>/s',
+                    $markup,
+                    "{$domain->value}.{$field->column} did not render its alternative option as selected.",
+                );
+            }
+        }
+    }
+
+    public function test_date_setting_persists_and_renders_in_the_native_input_format(): void
+    {
+        $payload = $this->payload(ConfigurationDomain::Ingestion);
+        $payload['safe_backfill_date'] = '2013-04-05';
+
+        $this->put(route('admin.settings.update', ['domain' => 'ingestion']), $payload)
+            ->assertSessionHasNoErrors()
+            ->assertRedirect(route('admin.settings.show', ['domain' => 'ingestion']));
+
+        $this->assertSame('2013-04-05', DB::table('ingestion_configurations')->value('safe_backfill_date'));
+
+        $this->get(route('admin.settings.show', ['domain' => 'ingestion']))
+            ->assertOk()
+            ->assertSee('id="safe_backfill_date" name="safe_backfill_date" type="date" value="2013-04-05"', false);
     }
 
     public function test_validation_rejects_a_domain_without_partial_writes(): void

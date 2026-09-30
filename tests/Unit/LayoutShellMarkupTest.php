@@ -121,6 +121,11 @@ class LayoutShellMarkupTest extends TestCase
         $this->assertStringNotContainsString('Usenet workspace', $this->view('layouts/main.blade.php'));
 
         $settingsForm = $this->view('admin/settings/show.blade.php');
+        $this->assertStringContainsString('<x-admin.card>', $settingsForm);
+        $this->assertStringContainsString('settings-page__domain-nav surface-panel-alt', $settingsForm);
+        $this->assertStringContainsString('settings-page__action-bar surface-panel-alt', $settingsForm);
+        $this->assertStringContainsString('aria-current="page"', $settingsForm);
+        $this->assertStringNotContainsString('max-w-6xl', $settingsForm);
         $this->assertStringContainsString('enctype="multipart/form-data"', $settingsForm);
         $this->assertStringContainsString("\$field->control === 'upload'", $settingsForm);
         $this->assertStringContainsString('name="remove_site_logo"', $settingsForm);
