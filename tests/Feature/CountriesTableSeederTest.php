@@ -34,31 +34,6 @@ final class CountriesTableSeederTest extends TestCase
         }
 
         $pdo = new PDO('sqlite:'.$this->databasePath);
-        $pdo->exec('CREATE TABLE settings (name VARCHAR PRIMARY KEY, value TEXT NULL)');
-
-        $settings = [
-            'categorizeforeign' => '0',
-            'catwebdl' => '0',
-            'delaytime' => '2',
-            'crossposttime' => '2',
-            'maxnzbsprocessed' => '1000',
-            'completionpercent' => '100',
-            'collection_timeout' => '30',
-            'maxsizetoformrelease' => '10737418240',
-            'minsizetoformrelease' => '0',
-            'minfilestoformrelease' => '1',
-            'releaseretentiondays' => '0',
-            'deletepasswordedrelease' => '0',
-            'miscotherretentionhours' => '0',
-            'mischashedretentionhours' => '0',
-            'partretentionhours' => '0',
-            'last_run_time' => '',
-        ];
-
-        $statement = $pdo->prepare('INSERT INTO settings (name, value) VALUES (:name, :value)');
-        foreach ($settings as $name => $value) {
-            $statement->execute(['name' => $name, 'value' => $value]);
-        }
 
         $this->setEnvironmentValue('APP_ENV', 'testing');
         $this->setEnvironmentValue('DB_CONNECTION', 'sqlite');

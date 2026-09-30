@@ -167,10 +167,6 @@ class AdminLogViewerControllerTest extends TestCase
 
     private function createSchema(): void
     {
-        Schema::create('settings', function (Blueprint $table): void {
-            $table->string('name')->primary();
-            $table->text('value')->nullable();
-        });
 
         Schema::create('roles', function (Blueprint $table): void {
             $table->increments('id');

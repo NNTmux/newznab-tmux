@@ -43,7 +43,7 @@ final class NzbCreationClaimPlanMariaDbTest extends TestCase
     {
         if (isset($this->tablePrefix) && preg_match('/^nzb_claim_\d+_[a-f0-9]{8}_$/', $this->tablePrefix) === 1) {
             DB::statement('SET FOREIGN_KEY_CHECKS=0');
-            foreach (['release_nzb_creation_failures', 'releases', 'categories', 'root_categories', 'settings'] as $table) {
+            foreach (['release_nzb_creation_failures', 'releases', 'categories', 'root_categories'] as $table) {
                 DB::statement('DROP TABLE IF EXISTS `'.$this->table($table).'`');
             }
             DB::statement('SET FOREIGN_KEY_CHECKS=1');
@@ -106,7 +106,6 @@ final class NzbCreationClaimPlanMariaDbTest extends TestCase
 
     private function createSchema(): void
     {
-        DB::statement('CREATE TABLE `'.$this->table('settings').'` (name VARCHAR(255) PRIMARY KEY, value TEXT) ENGINE=InnoDB');
         DB::statement('CREATE TABLE `'.$this->table('root_categories').'` (id INT PRIMARY KEY, title VARCHAR(255)) ENGINE=InnoDB');
         DB::statement('CREATE TABLE `'.$this->table('categories').'` (id INT PRIMARY KEY, title VARCHAR(255), root_categories_id INT) ENGINE=InnoDB');
         DB::statement(<<<SQL
@@ -123,11 +122,6 @@ final class NzbCreationClaimPlanMariaDbTest extends TestCase
             last_error TEXT NULL, created_at TIMESTAMP NULL, updated_at TIMESTAMP NULL,
             FOREIGN KEY (releases_id) REFERENCES `'.$this->table('releases').'` (id) ON DELETE CASCADE
         ) ENGINE=InnoDB');
-        DB::table('settings')->insert([
-            ['name' => 'categorizeforeign', 'value' => '0'],
-            ['name' => 'catwebdl', 'value' => '0'],
-            ['name' => 'releaseprocessingtimeout', 'value' => '120'],
-        ]);
         DB::table('root_categories')->insert(['id' => 1, 'title' => 'Other']);
         DB::table('categories')->insert(['id' => 1, 'title' => 'Misc', 'root_categories_id' => 1]);
     }

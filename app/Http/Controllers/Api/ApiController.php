@@ -10,7 +10,6 @@ use App\Http\Controllers\GetNzbController;
 use App\Models\Category;
 use App\Models\Release;
 use App\Models\ReleaseNfo;
-use App\Models\Settings;
 use App\Models\User;
 use App\Services\Api\ApiCapabilitiesService;
 use App\Services\Api\ApiQueryParameters;

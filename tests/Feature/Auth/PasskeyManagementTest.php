@@ -34,7 +34,6 @@ class PasskeyManagementTest extends TestCase
         DB::reconnect();
 
         $this->createSchema();
-        $this->seedSettings();
         app(PermissionRegistrar::class)->forgetCachedPermissions();
         $this->withoutMiddleware(Google2FAMiddleware::class);
 
@@ -81,10 +80,6 @@ class PasskeyManagementTest extends TestCase
 
     private function createSchema(): void
     {
-        Schema::create('settings', function (Blueprint $table): void {
-            $table->string('name')->primary();
-            $table->text('value')->nullable();
-        });
 
         Schema::create('roles', function (Blueprint $table): void {
             $table->increments('id');
@@ -159,16 +154,6 @@ class PasskeyManagementTest extends TestCase
             $table->timestamp('last_used_at')->nullable();
             $table->timestamps();
         });
-    }
-
-    private function seedSettings(): void
-    {
-        DB::table('settings')->insert([
-            ['name' => 'title', 'value' => 'NNTmux Test'],
-            ['name' => 'home_link', 'value' => '/'],
-            ['name' => 'categorizeforeign', 'value' => '0'],
-            ['name' => 'catwebdl', 'value' => '0'],
-        ]);
     }
 
     private function createUser(string $email): User

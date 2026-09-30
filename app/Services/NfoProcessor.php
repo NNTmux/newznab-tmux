@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Models\Settings;
+use App\Services\Configuration\ConfigurationProvider;
 use App\Services\NNTP\NNTPService;
 
 class NfoProcessor
@@ -21,13 +21,13 @@ class NfoProcessor
      */
     public function process(NNTPService $nntp, string $groupID = '', string $guidChar = ''): void
     {
-        if ((int) Settings::settingValue('lookupnfo') === 1) {
+        if ((int) app(ConfigurationProvider::class)->postProcessing()->lookupNfo === 1) {
             $this->nfo->processNfoFiles(
                 $nntp,
                 $groupID,
                 $guidChar,
-                (bool) Settings::settingValue('lookupimdb'),
-                (bool) Settings::settingValue('lookuptv')
+                (bool) app(ConfigurationProvider::class)->metadata()->movieLookup->value,
+                (bool) app(ConfigurationProvider::class)->metadata()->tvLookup->value
             );
         }
     }

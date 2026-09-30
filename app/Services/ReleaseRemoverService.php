@@ -6,7 +6,7 @@ namespace App\Services;
 
 use App\Enums\BlacklistConstants;
 use App\Models\Category;
-use App\Models\Settings;
+use App\Services\Configuration\ConfigurationProvider;
 use App\Services\Nzb\NzbService;
 use App\Services\Releases\ReleaseManagementService;
 use Carbon\Carbon;
@@ -489,7 +489,7 @@ class ReleaseRemoverService
      */
     protected function removeSize(): bool|string
     {
-        $minSize = (int) Settings::settingValue('minsizetoformrelease');
+        $minSize = (int) app(ConfigurationProvider::class)->ingestion()->minSizeToFormRelease;
         if ($minSize === 0) {
             $minSize = 2097152; // Default to 2MB if not set
         }

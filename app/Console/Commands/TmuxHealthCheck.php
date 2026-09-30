@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Enums\TmuxPaneRole;
-use App\Models\Settings;
+use App\Services\Configuration\ConfigurationProvider;
+use App\Services\Configuration\ProcessingRuntimeStateRepository;
 use App\Services\Tmux\TmuxPaneManager;
 use App\Services\Tmux\TmuxSessionManager;
 use Illuminate\Console\Command;
@@ -41,8 +42,7 @@ class TmuxHealthCheck extends Command
     {
         try {
             $this->sessionName = $this->option('session')
-                ?? Settings::settingValue('tmux_session')
-                ?? config('tmux.session.default_name', 'nntmux');
+                ?? app(ConfigurationProvider::class)->tmux()->sessionName;
 
             $this->sessionManager = new TmuxSessionManager($this->sessionName);
             $quiet = $this->output->isQuiet();
@@ -152,7 +152,7 @@ class TmuxHealthCheck extends Command
 
     private function shouldBeRunning(): bool
     {
-        return filter_var(Settings::settingValue('running'), FILTER_VALIDATE_BOOL);
+        return filter_var(app(ProcessingRuntimeStateRepository::class)->isTmuxRunning(), FILTER_VALIDATE_BOOL);
     }
 
     /**

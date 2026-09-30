@@ -53,7 +53,6 @@ final class AdditionalCandidateQueryMariaDbTest extends TestCase
         if (isset($this->tablePrefix) && preg_match('/^phase4_\d+_[a-f0-9]{8}_$/', $this->tablePrefix) === 1) {
             DB::statement('DROP TABLE IF EXISTS `'.$this->tableName('releases').'`');
             DB::statement('DROP TABLE IF EXISTS `'.$this->tableName('categories').'`');
-            DB::statement('DROP TABLE IF EXISTS `'.$this->tableName('settings').'`');
         }
 
         DB::disconnect();
@@ -256,11 +255,9 @@ final class AdditionalCandidateQueryMariaDbTest extends TestCase
 
     private function createSchema(): void
     {
-        $settingsTable = $this->tableName('settings');
         $categoriesTable = $this->tableName('categories');
         $releasesTable = $this->tableName('releases');
 
-        DB::statement("CREATE TABLE `{$settingsTable}` (`name` VARCHAR(255) PRIMARY KEY, `value` TEXT NULL) ENGINE=InnoDB");
         DB::statement("CREATE TABLE `{$categoriesTable}` (id INT UNSIGNED PRIMARY KEY, disablepreview TINYINT(1) NOT NULL DEFAULT 0) ENGINE=InnoDB");
         DB::statement(<<<SQL
             CREATE TABLE `{$releasesTable}` (
@@ -279,11 +276,6 @@ final class AdditionalCandidateQueryMariaDbTest extends TestCase
                 KEY ix_releases_add_pp_claim_queue (passwordstatus, haspreview, nzbstatus, leftguid, postdate DESC, id, additional_pp_claimed_at)
             ) ENGINE=InnoDB
             SQL);
-        DB::table('settings')->insert([
-            ['name' => 'categorizeforeign', 'value' => '0'],
-            ['name' => 'catwebdl', 'value' => '0'],
-            ['name' => 'releaseprocessingtimeout', 'value' => '120'],
-        ]);
         DB::table('categories')->insert(['id' => 1, 'disablepreview' => 0]);
     }
 

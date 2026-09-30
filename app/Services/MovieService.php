@@ -10,7 +10,7 @@ use App\Facades\Search;
 use App\Models\Category;
 use App\Models\MovieInfo;
 use App\Models\Release;
-use App\Models\Settings;
+use App\Services\Configuration\ConfigurationProvider;
 use App\Services\Releases\ReleaseBrowseService;
 use App\Services\TvProcessing\Providers\TraktProvider;
 use App\Support\ReleaseSearchIndexSync;
@@ -97,14 +97,14 @@ class MovieService
             $this->omdbApi = new OMDbAPI($this->omdbapikey);
         }
 
-        $this->lookuplanguage = Settings::settingValue('imdblanguage') !== '' ? (string) Settings::settingValue('imdblanguage') : 'en';
+        $this->lookuplanguage = app(ConfigurationProvider::class)->metadata()->movieLanguage !== '' ? (string) app(ConfigurationProvider::class)->metadata()->movieLanguage : 'en';
         $cacheDir = storage_path('framework/cache/imdb_cache');
         if (! File::isDirectory($cacheDir)) {
             File::makeDirectory($cacheDir, 0777, false, true);
         }
 
-        $this->imdburl = (int) Settings::settingValue('imdburl') !== 0;
-        $this->movieqty = Settings::settingValue('maximdbprocessed') !== '' ? (int) Settings::settingValue('maximdbprocessed') : 100;
+        $this->imdburl = (int) app(ConfigurationProvider::class)->metadata()->imdbAlternateUrl !== 0;
+        $this->movieqty = app(ConfigurationProvider::class)->metadata()->maxMoviesProcessed !== '' ? (int) app(ConfigurationProvider::class)->metadata()->maxMoviesProcessed : 100;
         $this->showPasswords = app(ReleaseBrowseService::class)->showPasswords();
 
         $this->echooutput = config('nntmux.echocli');

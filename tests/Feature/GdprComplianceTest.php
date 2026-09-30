@@ -239,10 +239,6 @@ class GdprComplianceTest extends TestCase
 
     private function createSchema(): void
     {
-        Schema::create('settings', function (Blueprint $table): void {
-            $table->string('name')->primary();
-            $table->text('value')->nullable();
-        });
 
         Schema::create('roles', function (Blueprint $table): void {
             $table->increments('id');
@@ -399,12 +395,6 @@ class GdprComplianceTest extends TestCase
             $table->timestamp('created_at')->nullable();
         });
 
-        DB::table('settings')->insert([
-            ['name' => 'title', 'value' => 'NNTmux Test'],
-            ['name' => 'home_link', 'value' => '/'],
-            ['name' => 'categorizeforeign', 'value' => '0'],
-            ['name' => 'catwebdl', 'value' => '0'],
-        ]);
     }
 
     private function createUser(): User

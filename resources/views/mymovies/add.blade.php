@@ -151,7 +151,7 @@
                                         @endif
                                         <div class="mt-2">
                                             <a class="inline-flex items-center px-2 py-1 text-xs font-medium rounded bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-200" target="_blank"
-                                               href="{{ $site['dereferrer_link'] }}http://www.imdb.com/title/tt{{ $movie['imdbid'] }}" title="View on IMDB">
+                                               href="{{ $site->dereferrerLink }}http://www.imdb.com/title/tt{{ $movie['imdbid'] }}" title="View on IMDB">
                                                 <i class="fa fa-external-link mr-1"></i>IMDB
                                             </a>
                                         </div>
@@ -212,7 +212,7 @@
                             @endif
                             <div class="flex items-center justify-between mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
                                 <a class="inline-flex items-center px-2 py-1 text-xs font-medium rounded bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-200" target="_blank"
-                                   href="{{ $site['dereferrer_link'] }}http://www.imdb.com/title/tt{{ $movie['imdbid'] }}">
+                                   href="{{ $site->dereferrerLink }}http://www.imdb.com/title/tt{{ $movie['imdbid'] }}">
                                     <i class="fa fa-external-link mr-1"></i>IMDB
                                 </a>
                                 <div class="flex gap-2">

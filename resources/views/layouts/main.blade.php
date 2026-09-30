@@ -12,7 +12,7 @@
     {{-- Apply dark mode BEFORE any CSS loads to prevent white flash --}}
     @include('partials.theme-init')
 
-    <title>{{ $meta_title ?? config('app.name') }}@if(isset($meta_title) && $meta_title !== '' && (($site['metatitle'] ?? '') !== '')) - @endif{{ $site['metatitle'] ?? '' }}</title>
+    <title>{{ $meta_title ?? config('app.name') }}@if(isset($meta_title) && $meta_title !== '' && (($site->metaTitle ?? '') !== '')) - @endif{{ $site->metaTitle ?? '' }}</title>
 
     <meta name="keywords" content="{{ $meta_keywords ?? '' }}">
     <meta name="description" content="{{ $meta_description ?? '' }}">
@@ -40,7 +40,7 @@
         @auth
             <aside id="sidebar" class="layout-sidebar fixed inset-y-0 left-0 z-50 hidden h-full w-72 shrink-0 flex-col overflow-y-auto text-white md:static md:z-auto md:flex md:w-64" aria-label="Account navigation">
                 <div class="layout-sidebar__brand flex items-center justify-between gap-3 p-4">
-                    <a href="{{ url($site['home_link'] ?? '/') }}" class="flex min-w-0 items-center gap-3 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400">
+                    <a href="{{ url($site->homeLink ?? '/') }}" class="flex min-w-0 items-center gap-3 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400">
                         <span class="layout-sidebar__logo flex h-11 w-11 shrink-0 items-center justify-center rounded-xl">
                             <x-site-logo :url="$siteLogoUrl ?? null" />
                         </span>

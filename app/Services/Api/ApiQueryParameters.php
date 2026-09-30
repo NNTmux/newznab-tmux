@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Services\Api;
 
 use App\Models\Category;
-use App\Models\Settings;
 use App\Models\UsenetGroup;
+use App\Services\Configuration\ConfigurationProvider;
 use Illuminate\Http\Request;
 
 final class ApiQueryParameters
@@ -36,7 +36,7 @@ final class ApiQueryParameters
 
         if (str_contains($value, (string) Category::TV_HD)
             && ! str_contains($value, (string) Category::TV_WEBDL)
-            && (int) Settings::settingValue('catwebdl') === 0) {
+            && (int) app(ConfigurationProvider::class)->ingestion()->categorizeWebDl === 0) {
             $value .= ','.Category::TV_WEBDL;
         }
 

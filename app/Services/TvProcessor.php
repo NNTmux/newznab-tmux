@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\Release;
-use App\Models\Settings;
+use App\Services\Configuration\ConfigurationProvider;
 use App\Services\TvProcessing\Providers\LocalDbProvider;
 use App\Services\TvProcessing\Providers\TmdbProvider;
 use App\Services\TvProcessing\Providers\TraktProvider;
@@ -51,7 +51,7 @@ class TvProcessor
      */
     public function process(string $groupID = '', string $guidChar = '', int|string|null $processTV = '', string $mode = self::MODE_PIPELINE): void
     {
-        $processTV = (int) (is_numeric($processTV) ? $processTV : Settings::settingValue('lookuptv'));
+        $processTV = (int) (is_numeric($processTV) ? $processTV : app(ConfigurationProvider::class)->metadata()->tvLookup->value);
         if ($processTV <= 0) {
             return;
         }

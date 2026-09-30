@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use App\Models\Settings;
 use App\Services\Backfill\BackfillService;
+use App\Services\Configuration\ConfigurationProvider;
 use App\Services\NNTP\NNTPService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
@@ -48,7 +48,7 @@ class BackfillGroup extends Command
             $nntp = $this->getNntp();
 
             if ($quantity === null) {
-                $value = Settings::settingValue('backfill_qty');
+                $value = app(ConfigurationProvider::class)->ingestion()->backfillQuantity;
                 $quantity = ($type === 1 ? '' : $value);
             }
 

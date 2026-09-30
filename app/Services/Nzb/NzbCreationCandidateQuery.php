@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Nzb;
 
 use App\Models\Release;
-use App\Models\Settings;
+use App\Services\Configuration\ConfigurationProvider;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Facades\DB;
@@ -163,7 +163,7 @@ final class NzbCreationCandidateQuery
 
     private static function claimTtlSeconds(): int
     {
-        $timeout = (int) (Settings::settingValue('releaseprocessingtimeout') ?: 120);
+        $timeout = (int) (app(ConfigurationProvider::class)->postProcessing()->releaseTimeoutSeconds ?: 120);
 
         return max(300, $timeout * 2);
     }

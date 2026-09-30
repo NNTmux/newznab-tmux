@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Admin;
 
-use App\Models\Settings;
+use App\Enums\RegistrationStatus;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateRegistrationStatusRequest extends FormRequest
@@ -24,9 +24,9 @@ class UpdateRegistrationStatusRequest extends FormRequest
                 'required',
                 'integer',
                 'in:'.implode(',', [
-                    Settings::REGISTER_STATUS_OPEN,
-                    Settings::REGISTER_STATUS_INVITE,
-                    Settings::REGISTER_STATUS_CLOSED,
+                    RegistrationStatus::Open->value,
+                    RegistrationStatus::Invite->value,
+                    RegistrationStatus::Closed->value,
                 ]),
             ],
             'note' => ['nullable', 'string', 'max:1000'],

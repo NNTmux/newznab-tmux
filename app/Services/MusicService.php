@@ -11,7 +11,7 @@ use App\Models\Category;
 use App\Models\Genre;
 use App\Models\MusicInfo;
 use App\Models\Release;
-use App\Models\Settings;
+use App\Services\Configuration\ConfigurationProvider;
 use App\Services\Releases\ReleaseBrowseService;
 use App\Support\MetadataSearchLookup;
 use Illuminate\Support\Facades\Cache;
@@ -51,13 +51,13 @@ class MusicService
     {
         $this->echooutput = config('nntmux.echocli');
 
-        $this->pubkey = Settings::settingValue('amazonpubkey');
-        $this->privkey = Settings::settingValue('amazonprivkey');
-        $this->asstag = Settings::settingValue('amazonassociatetag');
-        $this->musicqty = Settings::settingValue('maxmusicprocessed') !== '' ? (int) Settings::settingValue('maxmusicprocessed') : 150;
-        $this->sleeptime = Settings::settingValue('amazonsleep') !== '' ? (int) Settings::settingValue('amazonsleep') : 1000;
+        $this->pubkey = app(ConfigurationProvider::class)->metadata()->amazonPublicKey;
+        $this->privkey = app(ConfigurationProvider::class)->metadata()->amazonPrivateKey;
+        $this->asstag = app(ConfigurationProvider::class)->metadata()->amazonAssociateTag;
+        $this->musicqty = app(ConfigurationProvider::class)->metadata()->maxMusicProcessed !== '' ? (int) app(ConfigurationProvider::class)->metadata()->maxMusicProcessed : 150;
+        $this->sleeptime = app(ConfigurationProvider::class)->metadata()->amazonSleepMilliseconds !== '' ? (int) app(ConfigurationProvider::class)->metadata()->amazonSleepMilliseconds : 1000;
         $this->imgSavePath = config('nntmux_settings.covers_path').'/music/';
-        $this->renamed = (int) Settings::settingValue('lookupmusic') === 2 ? 'AND isrenamed = 1' : '';
+        $this->renamed = (int) app(ConfigurationProvider::class)->metadata()->musicLookup->value === 2 ? 'AND isrenamed = 1' : '';
 
         $this->failCache = [];
     }

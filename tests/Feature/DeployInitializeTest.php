@@ -120,7 +120,7 @@ class DeployInitializeTest extends TestCase
         $command->shouldReceive('createAdministrator')->never();
         $this->assertSame(1, $this->runCommand($command)[0]);
         $this->assertFileDoesNotExist($this->marker());
-        $this->assertTrue(Schema::hasTable('settings'));
+        $this->assertTrue(Schema::hasTable('ingestion_configurations'));
         $retry = $this->command();
         $retry->shouldReceive('call')->never();
         $this->assertSame(1, $this->runCommand($retry)[0]);
@@ -219,9 +219,8 @@ class DeployInitializeTest extends TestCase
     private function expectMigration(DeployInitialize $command, int $status = 0): void
     {
         $command->shouldReceive('call')->once()->with('migrate', ['--force' => true, '--seed' => true, '--no-interaction' => true])->andReturnUsing(function () use ($status): int {
-            Schema::create('settings', function (Blueprint $table): void {
-                $table->string('name');
-                $table->string('value');
+            Schema::create('ingestion_configurations', function (Blueprint $table): void {
+                $table->unsignedTinyInteger('id')->primary();
             });
             Schema::create('users', function (Blueprint $table): void {
                 $table->id();
@@ -229,7 +228,7 @@ class DeployInitializeTest extends TestCase
                 $table->integer('roles_id');
                 $table->timestamp('email_verified_at')->nullable();
             });
-            DB::table('settings')->insert(['name' => 'categorizeforeign', 'value' => '0']);
+            DB::table('ingestion_configurations')->insert(['id' => 1]);
 
             return $status;
         });

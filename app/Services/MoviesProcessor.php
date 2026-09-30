@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Models\Settings;
+use App\Services\Configuration\ConfigurationProvider;
 use GuzzleHttp\Exception\GuzzleException;
 
 class MoviesProcessor
@@ -24,7 +24,7 @@ class MoviesProcessor
      */
     public function process(string $groupID = '', string $guidChar = '', int|string|null $processMovies = ''): void
     {
-        $processMovies = (is_numeric($processMovies) ? $processMovies : Settings::settingValue('lookupimdb'));
+        $processMovies = (is_numeric($processMovies) ? $processMovies : app(ConfigurationProvider::class)->metadata()->movieLookup->value);
         if ($processMovies > 0) {
             (new MovieService)->processMovieReleases($groupID, $guidChar, $processMovies);
         }

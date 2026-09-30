@@ -6,10 +6,10 @@ namespace App\Services\TvProcessing\Providers;
 
 use App\Models\Category;
 use App\Models\Release;
-use App\Models\Settings;
 use App\Models\TvEpisode;
 use App\Models\TvInfo;
 use App\Models\Video;
+use App\Services\Configuration\ConfigurationProvider;
 use App\Services\Releases\ReleaseBrowseService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -81,7 +81,7 @@ abstract class AbstractTvProvider extends BaseVideoProvider
         parent::__construct();
         $this->catWhere = 'categories_id BETWEEN '.Category::TV_ROOT.' AND '.Category::TV_OTHER.' AND categories_id != '.Category::TV_ANIME;
         try {
-            $this->tvqty = Settings::settingValue('maxrageprocessed') !== '' ? (int) Settings::settingValue('maxrageprocessed') : 75;
+            $this->tvqty = app(ConfigurationProvider::class)->metadata()->maxTvProcessed !== '' ? (int) app(ConfigurationProvider::class)->metadata()->maxTvProcessed : 75;
         } catch (QueryException $e) {
             // Table doesn't exist yet (e.g., during migrations or tests)
             $this->tvqty = 75;

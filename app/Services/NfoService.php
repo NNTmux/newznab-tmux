@@ -7,8 +7,8 @@ namespace App\Services;
 use App\Models\Release;
 use App\Models\ReleaseFile;
 use App\Models\ReleaseNfo;
-use App\Models\Settings;
 use App\Models\UsenetGroup;
+use App\Services\Configuration\ConfigurationProvider;
 use App\Services\NNTP\NNTPService;
 use App\Services\Nzb\NzbContentsService;
 use App\Services\Nzb\NzbParserService;
@@ -166,14 +166,14 @@ class NfoService
         $this->tmpPath = rtrim((string) config('nntmux.tmp_unrar_path'), '/\\').'/';
         $this->unrarPath = config('nntmux_settings.unrar_path') ?: false;
         $this->timeoutPath = config('nntmux_settings.timeout_path') ?: false;
-        $this->timeoutSeconds = (int) (Settings::settingValue('timeoutseconds') ?: 60);
+        $this->timeoutSeconds = (int) (app(ConfigurationProvider::class)->postProcessing()->timeoutSeconds ?: 60);
     }
 
     private function getNzbs(): int
     {
         if ($this->nzbs === null) {
             $this->nzbs = (int) $this->rememberNfoSetting('nfo_maxnfoprocessed', function () {
-                $value = Settings::settingValue('maxnfoprocessed');
+                $value = app(ConfigurationProvider::class)->postProcessing()->maxNfoProcessed;
 
                 return $value !== '' ? (int) $value : 100;
             });
@@ -186,7 +186,7 @@ class NfoService
     {
         if ($this->maxRetries === null) {
             $maxRetries = (int) $this->rememberNfoSetting('nfo_maxnforetries', function () {
-                return (int) Settings::settingValue('maxnforetries');
+                return (int) app(ConfigurationProvider::class)->postProcessing()->maxNfoRetries;
             });
             $computed = $maxRetries >= 0 ? -($maxRetries + 1) : self::NFO_UNPROC;
             $this->maxRetries = max($computed, -8);
@@ -199,7 +199,7 @@ class NfoService
     {
         if ($this->maxSize === null) {
             $this->maxSize = (int) $this->rememberNfoSetting('nfo_maxsizetoprocessnfo', function () {
-                return (int) Settings::settingValue('maxsizetoprocessnfo');
+                return (int) app(ConfigurationProvider::class)->postProcessing()->maxSizeToProcessNfo;
             });
         }
 
@@ -210,7 +210,7 @@ class NfoService
     {
         if ($this->minSize === null) {
             $this->minSize = (int) $this->rememberNfoSetting('nfo_minsizetoprocessnfo', function () {
-                return (int) Settings::settingValue('minsizetoprocessnfo');
+                return (int) app(ConfigurationProvider::class)->postProcessing()->minSizeToProcessNfo;
             });
         }
 
@@ -976,9 +976,9 @@ class NfoService
      */
     public static function NfoQueryString(): string
     {
-        $maxSize = (int) Settings::settingValue('maxsizetoprocessnfo');
-        $minSize = (int) Settings::settingValue('minsizetoprocessnfo');
-        $dummy = (int) Settings::settingValue('maxnforetries');
+        $maxSize = (int) app(ConfigurationProvider::class)->postProcessing()->maxSizeToProcessNfo;
+        $minSize = (int) app(ConfigurationProvider::class)->postProcessing()->minSizeToProcessNfo;
+        $dummy = (int) app(ConfigurationProvider::class)->postProcessing()->maxNfoRetries;
         $maxRetries = ($dummy >= 0 ? -($dummy + 1) : self::NFO_UNPROC);
 
         return sprintf(

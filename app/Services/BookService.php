@@ -11,7 +11,7 @@ use App\Facades\Search;
 use App\Models\BookInfo;
 use App\Models\Category;
 use App\Models\Release;
-use App\Models\Settings;
+use App\Services\Configuration\ConfigurationProvider;
 use App\Services\NameFixing\Extractors\ObfuscatedSubjectExtractor;
 use App\Services\Releases\ReleaseBrowseService;
 use App\Support\BookIsbn;
@@ -71,11 +71,11 @@ class BookService
     ) {
         $this->echooutput = config('nntmux.echocli');
 
-        $this->bookqty = Settings::settingValue('maxbooksprocessed') !== '' ? (int) Settings::settingValue('maxbooksprocessed') : 300;
-        $this->sleeptime = Settings::settingValue('amazonsleep') !== '' ? (int) Settings::settingValue('amazonsleep') : 1000;
+        $this->bookqty = app(ConfigurationProvider::class)->metadata()->maxBooksProcessed !== '' ? (int) app(ConfigurationProvider::class)->metadata()->maxBooksProcessed : 300;
+        $this->sleeptime = app(ConfigurationProvider::class)->metadata()->amazonSleepMilliseconds !== '' ? (int) app(ConfigurationProvider::class)->metadata()->amazonSleepMilliseconds : 1000;
         $this->imgSavePath = storage_path('covers/book/');
 
-        $this->renamed = (int) Settings::settingValue('lookupbooks') === 2 ? 'AND isrenamed = 1' : '';
+        $this->renamed = (int) app(ConfigurationProvider::class)->metadata()->bookLookup->value === 2 ? 'AND isrenamed = 1' : '';
 
         $this->parsedIsbn = null;
         $this->parsedBookResult = null;

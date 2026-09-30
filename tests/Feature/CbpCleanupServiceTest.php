@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Enums\CollectionFileCheckStatus;
+use App\Enums\ConfigurationDomain;
 use App\Models\Release;
 use App\Services\CollectionCleanupService;
 use App\Services\Nzb\NzbService;
@@ -10,6 +11,7 @@ use App\Services\ReleaseCleaningService;
 use App\Services\ReleaseCreationService;
 use App\Services\Releases\ReleaseDuplicateFinder;
 use Illuminate\Support\Facades\DB;
+use Tests\Support\ConfigurationTestBuilder;
 use Tests\TestCase;
 
 class CbpCleanupServiceTest extends TestCase
@@ -38,7 +40,7 @@ class CbpCleanupServiceTest extends TestCase
         );
 
         $this->createTables();
-        $this->seedSettings();
+        $this->seedConfiguration();
     }
 
     public function test_retention_cleanup_deletes_parts_binaries_and_collections_without_fk_cascades(): void
@@ -357,24 +359,19 @@ class CbpCleanupServiceTest extends TestCase
         $this->assertSame('name_match_fallback', $reason);
     }
 
-    private function seedSettings(): void
+    private function seedConfiguration(): void
     {
-        $settings = [
-            'partretentionhours' => '1',
-            'nzbsplitlevel' => '1',
-            'check_passworded_rars' => '0',
-            'categorizeforeign' => '1',
-            'catwebdl' => '1',
-        ];
-
-        foreach ($settings as $name => $value) {
-            DB::table('settings')->insert(['name' => $name, 'value' => $value]);
-        }
+        ConfigurationTestBuilder::installDefaults();
+        ConfigurationTestBuilder::update(ConfigurationDomain::Ingestion, [
+            'part_retention_hours' => 1,
+            'nzb_split_level' => 1,
+            'categorize_foreign' => true,
+            'categorize_web_dl' => true,
+        ]);
     }
 
     private function createTables(): void
     {
-        DB::statement('CREATE TABLE settings (name VARCHAR(255) PRIMARY KEY, value TEXT)');
         DB::statement('CREATE TABLE usenet_groups (id INTEGER PRIMARY KEY, name VARCHAR(255))');
         DB::statement('CREATE TABLE categories (id INTEGER PRIMARY KEY, title VARCHAR(255), parent_categories_id INTEGER NULL)');
         DB::statement('CREATE TABLE releases (

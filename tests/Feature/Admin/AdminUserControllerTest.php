@@ -33,7 +33,7 @@ class AdminUserControllerTest extends TestCase
         DB::reconnect();
 
         $this->createSchema();
-        $this->seedSettings();
+        $this->seedReferenceData();
         app(PermissionRegistrar::class)->forgetCachedPermissions();
         $this->withoutMiddleware(Google2FAMiddleware::class);
     }
@@ -227,10 +227,6 @@ class AdminUserControllerTest extends TestCase
 
     private function createSchema(): void
     {
-        Schema::create('settings', function (Blueprint $table): void {
-            $table->string('name')->primary();
-            $table->text('value')->nullable();
-        });
 
         Schema::create('roles', function (Blueprint $table): void {
             $table->increments('id');
@@ -353,14 +349,8 @@ class AdminUserControllerTest extends TestCase
         });
     }
 
-    private function seedSettings(): void
+    private function seedReferenceData(): void
     {
-        DB::table('settings')->insert([
-            ['name' => 'title', 'value' => 'NNTmux Test'],
-            ['name' => 'home_link', 'value' => '/'],
-            ['name' => 'categorizeforeign', 'value' => '0'],
-            ['name' => 'catwebdl', 'value' => '0'],
-        ]);
 
         DB::table('root_categories')->insert([
             'id' => 1,

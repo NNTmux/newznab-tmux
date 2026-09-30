@@ -76,17 +76,17 @@
                                         <!-- External Links -->
                                         <div class="flex items-center gap-2 mb-4 text-xs flex-wrap">
                                             @if($movie->imdbid)
-                                                <a href="{{ $site['dereferrer_link'] }}https://www.imdb.com/title/tt{{ $movie->imdbid }}" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200 transition">
+                                                <a href="{{ $site->dereferrerLink }}https://www.imdb.com/title/tt{{ $movie->imdbid }}" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200 transition">
                                                     <i class="fab fa-imdb mr-1"></i> IMDb
                                                 </a>
                                             @endif
                                             @if($movie->tmdbid)
-                                                <a href="{{ $site['dereferrer_link'] }}https://www.themoviedb.org/movie/{{ $movie->tmdbid }}" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-primary-100 text-primary-800 rounded-lg hover:bg-primary-200 transition dark:bg-primary-900/30 dark:text-primary-200 dark:hover:bg-primary-800/30">
+                                                <a href="{{ $site->dereferrerLink }}https://www.themoviedb.org/movie/{{ $movie->tmdbid }}" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-primary-100 text-primary-800 rounded-lg hover:bg-primary-200 transition dark:bg-primary-900/30 dark:text-primary-200 dark:hover:bg-primary-800/30">
                                                     <i class="fas fa-film mr-1"></i> TMDb
                                                 </a>
                                             @endif
                                             @if($movie->traktid)
-                                                <a href="{{ $site['dereferrer_link'] }}https://trakt.tv/movies/{{ $movie->traktid }}" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-red-100 text-red-800 rounded-lg hover:bg-red-200 transition">
+                                                <a href="{{ $site->dereferrerLink }}https://trakt.tv/movies/{{ $movie->traktid }}" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-red-100 text-red-800 rounded-lg hover:bg-red-200 transition">
                                                     <i class="fas fa-heart mr-1"></i> Trakt
                                                 </a>
                                             @endif

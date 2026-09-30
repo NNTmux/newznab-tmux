@@ -23,15 +23,6 @@ class CartQueryCountTest extends TestCase
         DB::purge();
         DB::reconnect();
 
-        Schema::create('settings', static function (Blueprint $table): void {
-            $table->string('section')->nullable();
-            $table->string('subsection')->nullable();
-            $table->string('name')->primary();
-            $table->text('value')->nullable();
-            $table->text('hint')->nullable();
-            $table->text('setting')->nullable();
-        });
-
         Schema::create('releases', static function (Blueprint $table): void {
             $table->id();
             $table->string('guid')->unique();

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\NNTP;
 
-use App\Models\Settings;
+use App\Services\Configuration\ConfigurationProvider;
 use App\Services\Tmux\Tmux;
 use App\Services\YencService;
 use DariusIII\NetNntp\Client as NntpClient;
@@ -142,7 +142,7 @@ class NNTPService extends NntpClient
         $this->_echo = config('nntmux.echocli');
         $this->_tmux = $tmux ?? new Tmux;
         $this->_yencService = $yencService;
-        $this->_nntpRetries = Settings::settingValue('nntpretries') !== '' ? (int) Settings::settingValue('nntpretries') : 0 + 1;
+        $this->_nntpRetries = app(ConfigurationProvider::class)->ingestion()->nntpRetries !== '' ? (int) app(ConfigurationProvider::class)->ingestion()->nntpRetries : 0 + 1;
 
         $this->initializeConfig();
     }

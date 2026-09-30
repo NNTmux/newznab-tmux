@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Tmux;
 
-use App\Models\Settings;
+use App\Services\Configuration\ConfigurationProvider;
 use Illuminate\Support\Facades\Process;
 
 /**
@@ -29,9 +29,7 @@ class TmuxSessionManager
      */
     public function getSessionName(): string
     {
-        return Settings::settingValue('tmux_session')
-            ?? config('tmux.session.name')
-            ?? config('tmux.session.default_name', 'nntmux');
+        return app(ConfigurationProvider::class)->tmux()->sessionName;
     }
 
     public function sessionName(): string

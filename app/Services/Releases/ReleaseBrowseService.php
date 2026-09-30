@@ -7,8 +7,8 @@ namespace App\Services\Releases;
 use App\Facades\Search;
 use App\Models\Category;
 use App\Models\Release;
-use App\Models\Settings;
 use App\Models\UsenetGroup;
+use App\Services\Configuration\ConfigurationProvider;
 use App\Support\ReleaseSearchIndexDocument;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -505,7 +505,7 @@ class ReleaseBrowseService
      */
     public function showPasswords(): string
     {
-        $show = (int) Settings::settingValue('showpasswordedrelease');
+        $show = (int) app(ConfigurationProvider::class)->ingestion()->showPasswordedReleases;
         $setting = $show;
 
         return match ($setting) {
@@ -519,7 +519,7 @@ class ReleaseBrowseService
      */
     public function passwordAllowRar(): bool
     {
-        return (int) Settings::settingValue('showpasswordedrelease') === 1;
+        return (int) app(ConfigurationProvider::class)->ingestion()->showPasswordedReleases === 1;
     }
 
     /**

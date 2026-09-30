@@ -7,8 +7,8 @@ namespace App\Services\Tmux;
 use App\Models\Category;
 use App\Models\Collection;
 use App\Models\Release;
-use App\Models\Settings;
 use App\Services\AdditionalProcessing\AdditionalCandidateQuery;
+use App\Services\Configuration\ProcessingRuntimeStateRepository;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -34,9 +34,14 @@ class TmuxMonitorService
 
     protected float $lastSlowRefreshAt = 0.0;
 
-    public function __construct()
+    public function __construct(?ProcessingRuntimeStateRepository $runtimeState = null)
     {
         $this->tmux = new Tmux;
+        ($runtimeState ?? app(ProcessingRuntimeStateRepository::class))->updateMonitorPaths([
+            'monitor_path' => config('nntmux_settings.path_to_nzbs'),
+            'monitor_path_a' => config('nntmux_settings.covers_path'),
+            'monitor_path_b' => config('nntmux.tmp_unrar_path'),
+        ]);
     }
 
     /**
@@ -562,7 +567,7 @@ class TmuxMonitorService
      */
     public function shouldContinue(): bool
     {
-        $exitFlag = (int) Settings::settingValue('exit');
+        $exitFlag = (int) app(ProcessingRuntimeStateRepository::class)->stopRequested();
 
         if ($exitFlag === 0) {
             return true;

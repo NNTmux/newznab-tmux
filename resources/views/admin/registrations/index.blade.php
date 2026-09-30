@@ -6,8 +6,8 @@
 
     $statusBadgeClasses = static function (int $status): string {
         return match ($status) {
-            \App\Models\Settings::REGISTER_STATUS_OPEN => 'border border-emerald-500/30 bg-emerald-600 text-white shadow-sm dark:border-emerald-300/20 dark:bg-emerald-500 dark:text-slate-950',
-            \App\Models\Settings::REGISTER_STATUS_INVITE => 'border border-amber-500/30 bg-amber-500 text-slate-950 shadow-sm dark:border-amber-200/20 dark:bg-amber-400 dark:text-slate-950',
+            \App\Enums\RegistrationStatus::Open->value => 'border border-emerald-500/30 bg-emerald-600 text-white shadow-sm dark:border-emerald-300/20 dark:bg-emerald-500 dark:text-slate-950',
+            \App\Enums\RegistrationStatus::Invite->value => 'border border-amber-500/30 bg-amber-500 text-slate-950 shadow-sm dark:border-amber-200/20 dark:bg-amber-400 dark:text-slate-950',
             default => 'border border-rose-500/30 bg-rose-600 text-white shadow-sm dark:border-rose-200/20 dark:bg-rose-500 dark:text-white',
         };
     };

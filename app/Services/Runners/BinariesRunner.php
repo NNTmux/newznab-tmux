@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Runners;
 
-use App\Models\Settings;
+use App\Services\Configuration\ConfigurationProvider;
 use Illuminate\Support\Facades\DB;
 
 class BinariesRunner extends BaseRunner
@@ -18,7 +18,7 @@ class BinariesRunner extends BaseRunner
             )
         );
 
-        $maxProcesses = (int) Settings::settingValue('binarythreads');
+        $maxProcesses = (int) app(ConfigurationProvider::class)->ingestion()->binaryThreads;
 
         $count = count($work);
         if ($count === 0) {
@@ -60,8 +60,8 @@ class BinariesRunner extends BaseRunner
         // update group stats - Updated to use new script location (modernized)
         $this->executeCommand(PHP_BINARY.' app/Services/Tmux/Scripts/update_groups.php');
 
-        $maxHeaders = (int) Settings::settingValue('max_headers_iteration') ?: 1000000;
-        $maxMessages = (int) Settings::settingValue('maxmssgs');
+        $maxHeaders = (int) app(ConfigurationProvider::class)->ingestion()->maxHeadersPerIteration ?: 1000000;
+        $maxMessages = (int) app(ConfigurationProvider::class)->ingestion()->maxMessages;
 
         // Prevent division by zero - ensure maxmssgs is at least 1
         if ($maxMessages < 1) {
@@ -70,7 +70,7 @@ class BinariesRunner extends BaseRunner
             $maxMessages = $defaultMaxMessages;
         }
 
-        $maxProcesses = (int) Settings::settingValue('binarythreads');
+        $maxProcesses = (int) app(ConfigurationProvider::class)->ingestion()->binaryThreads;
 
         $groups = DB::select(
             '

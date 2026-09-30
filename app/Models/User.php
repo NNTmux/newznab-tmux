@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\RegistrationStatus;
 use App\Enums\SignupError;
 use App\Enums\UserRole;
 use App\Jobs\SendAccountExpiredEmail;
 use App\Jobs\SendAccountWillExpireEmail;
 use App\Notifications\VerifyEmailBranded;
 use App\Rules\ValidEmailDomain;
+use App\Services\Configuration\ConfigurationProvider;
 use App\Services\InvitationService;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\MustVerifyEmail as MustVerifyEmailTrait;
@@ -1632,7 +1634,7 @@ final class User extends Authenticatable implements CanResetPasswordContract, Ha
         }
 
         $invitedBy = 0;
-        if (! $forceInviteMode && (int) Settings::settingValue('registerstatus') === Settings::REGISTER_STATUS_INVITE) {
+        if (! $forceInviteMode && app(ConfigurationProvider::class)->registration()->status === RegistrationStatus::Invite) {
             if ($inviteCode === '') {
                 return SignupError::BAD_INVITE_CODE->value;
             }

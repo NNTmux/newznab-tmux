@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Models\Settings;
+use App\Services\Configuration\ConfigurationProvider;
 use App\Services\Runners\BackfillRunner;
 use App\Services\Runners\BinariesRunner;
 use App\Services\Runners\PostProcessRunner;
@@ -33,8 +33,8 @@ class ForkingService
 
     public function __construct()
     {
-        $this->maxRetries = (int) Settings::settingValue('maxnforetries') >= 0
-            ? -((int) Settings::settingValue('maxnforetries') + 1)
+        $this->maxRetries = (int) app(ConfigurationProvider::class)->postProcessing()->maxNfoRetries >= 0
+            ? -((int) app(ConfigurationProvider::class)->postProcessing()->maxNfoRetries + 1)
             : NfoService::NFO_UNPROC;
         $this->maxRetries = max($this->maxRetries, -8);
 
@@ -110,8 +110,8 @@ class ForkingService
     {
         $this->runWithTiming("fixRelNames_{$mode}", fn () => $this->releasesRunner->fixRelNames(
             $mode,
-            (int) Settings::settingValue('fixnamesperrun'),
-            (int) Settings::settingValue('fixnamethreads')
+            (int) app(ConfigurationProvider::class)->postProcessing()->fixNamesPerRun,
+            (int) app(ConfigurationProvider::class)->postProcessing()->fixNameThreads
         ));
     }
 

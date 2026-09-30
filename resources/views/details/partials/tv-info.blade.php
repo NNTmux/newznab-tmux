@@ -27,7 +27,7 @@
                             <div>
                                 <dt class="text-sm font-medium text-gray-600 dark:text-gray-400">TVDB</dt>
                                 <dd class="mt-1">
-                                    <a href="{{ $site['dereferrer_link'] }}https://thetvdb.com/?tab=series&id={{ $showTvdb }}" target="_blank" class="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
+                                    <a href="{{ $site->dereferrerLink }}https://thetvdb.com/?tab=series&id={{ $showTvdb }}" target="_blank" class="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
                                         View on TVDB <i class="fas fa-external-link-alt text-xs"></i>
                                     </a>
                                 </dd>

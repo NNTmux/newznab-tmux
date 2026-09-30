@@ -107,7 +107,7 @@
 
                 <div class="mt-4 flex flex-wrap items-center gap-2" aria-label="External movie links">
                     @if(!empty($result->imdbid))
-                        <a href="{{ ($site['dereferrer_link'] ?? '') }}https://www.imdb.com/title/tt{{ $result->imdbid }}"
+                        <a href="{{ ($site->dereferrerLink ?? '') }}https://www.imdb.com/title/tt{{ $result->imdbid }}"
                            target="_blank"
                            rel="noopener noreferrer"
                            class="movie-source-link movie-source-link--imdb">
@@ -115,7 +115,7 @@
                         </a>
                     @endif
                     @if(!empty($result->tmdbid))
-                        <a href="{{ ($site['dereferrer_link'] ?? '') }}https://www.themoviedb.org/movie/{{ $result->tmdbid }}"
+                        <a href="{{ ($site->dereferrerLink ?? '') }}https://www.themoviedb.org/movie/{{ $result->tmdbid }}"
                            target="_blank"
                            rel="noopener noreferrer"
                            class="movie-source-link movie-source-link--tmdb">
@@ -123,7 +123,7 @@
                         </a>
                     @endif
                     @if(!empty($result->traktid))
-                        <a href="{{ ($site['dereferrer_link'] ?? '') }}https://trakt.tv/movies/{{ $result->traktid }}"
+                        <a href="{{ ($site->dereferrerLink ?? '') }}https://trakt.tv/movies/{{ $result->traktid }}"
                            target="_blank"
                            rel="noopener noreferrer"
                            class="movie-source-link movie-source-link--trakt">

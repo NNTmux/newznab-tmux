@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use App\Models\Settings;
+use App\Services\Configuration\ConfigurationProvider;
+use App\Services\Configuration\ProcessingRuntimeStateRepository;
 use App\Services\Tmux\TmuxSessionManager;
 use Illuminate\Console\Command;
 
@@ -37,8 +38,7 @@ class TmuxStop extends Command
         try {
             // Get session name
             $sessionName = $this->option('session')
-                ?? Settings::settingValue('tmux_session')
-                ?? config('tmux.session.default_name', 'nntmux');
+                ?? app(ConfigurationProvider::class)->tmux()->sessionName;
 
             $this->sessionManager = new TmuxSessionManager($sessionName);
 
@@ -61,11 +61,13 @@ class TmuxStop extends Command
             cli()->header('Stopping Tmux Session');
 
             // Set running flag to 0
-            Settings::query()->where('name', 'running')->update(['value' => 0]);
+            $runtimeState = app(ProcessingRuntimeStateRepository::class);
+            $runtimeState->requestStop();
+            $runtimeState->setTmuxRunning(false);
             $this->info('✅ Running flag cleared');
 
             // Wait for panes to shut down gracefully
-            $delay = (int) (Settings::settingValue('monitor_delay') ?? 10);
+            $delay = app(ConfigurationProvider::class)->tmux()->monitorDelay;
             $this->info("⏳ Waiting {$delay} seconds for panes to shut down gracefully...");
             sleep($delay);
 

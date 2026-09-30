@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Enums\ConfigurationDomain;
 use App\Services\AdditionalProcessing\AdditionalProcessingOrchestrator;
 use App\Services\AdditionalProcessing\DTO\AdditionalBatchResult;
 use App\Services\AdditionalProcessing\DTO\DownloadMetrics;
@@ -19,6 +20,7 @@ use Illuminate\Support\Facades\Schema;
 use Mockery;
 use Mockery\MockInterface;
 use PDO;
+use Tests\Support\ConfigurationTestBuilder;
 use Tests\TestCase;
 
 class PostProcessRunnerAdditionalThreadsTest extends TestCase
@@ -48,9 +50,6 @@ class PostProcessRunnerAdditionalThreadsTest extends TestCase
         }
 
         $pdo = new PDO('sqlite:'.$this->databasePath);
-        $pdo->exec('CREATE TABLE settings (name VARCHAR PRIMARY KEY, value TEXT NULL)');
-        $pdo->exec("INSERT INTO settings (name, value) VALUES ('categorizeforeign', '0'), ('catwebdl', '0'), ('postthreads', '5'), ('releaseprocessingtimeout', '120')");
-
         $this->setEnvironmentValue('APP_ENV', 'testing');
         $this->setEnvironmentValue('DB_CONNECTION', 'sqlite');
         $this->setEnvironmentValue('DB_DATABASE', $this->databasePath);
@@ -323,11 +322,11 @@ class PostProcessRunnerAdditionalThreadsTest extends TestCase
     public function test_additional_diagnostics_reports_stale_claims_and_preflight_warnings_as_json(): void
     {
         config(['nntmux.tmp_unrar_path' => '']);
-        DB::table('settings')->upsert([
-            ['name' => 'postthreads', 'value' => '33'],
-            ['name' => 'maxaddprocessed', 'value' => '25'],
-            ['name' => 'maxpptimeoutcount', 'value' => '3'],
-        ], ['name'], ['value']);
+        ConfigurationTestBuilder::update(ConfigurationDomain::PostProcessing, [
+            'post_threads' => 33,
+            'max_additional_processed' => 25,
+            'max_timeout_count' => 3,
+        ]);
         DB::table('categories')->insert(['id' => 1, 'disablepreview' => 0]);
         DB::table('releases')->insert([
             ...$this->releaseRow(1, 'a'),
@@ -419,19 +418,15 @@ class PostProcessRunnerAdditionalThreadsTest extends TestCase
 
     private function createSchema(): void
     {
-        if (! Schema::hasTable('settings')) {
-            Schema::create('settings', function (Blueprint $table): void {
-                $table->string('name')->primary();
-                $table->text('value')->nullable();
-            });
-        }
-
-        DB::table('settings')->upsert([
-            ['name' => 'categorizeforeign', 'value' => '0'],
-            ['name' => 'catwebdl', 'value' => '0'],
-            ['name' => 'postthreads', 'value' => '5'],
-            ['name' => 'releaseprocessingtimeout', 'value' => '120'],
-        ], ['name'], ['value']);
+        ConfigurationTestBuilder::installDefaults();
+        ConfigurationTestBuilder::update(ConfigurationDomain::Ingestion, [
+            'categorize_foreign' => false,
+            'categorize_web_dl' => false,
+        ]);
+        ConfigurationTestBuilder::update(ConfigurationDomain::PostProcessing, [
+            'post_threads' => 5,
+            'release_timeout_seconds' => 120,
+        ]);
 
         Schema::dropIfExists('releases');
         Schema::dropIfExists('categories');

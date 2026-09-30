@@ -46,13 +46,6 @@ class RememberMeAuthenticationTest extends TestCase
         }
 
         $pdo = new PDO('sqlite:'.$this->databasePath);
-        $pdo->exec('CREATE TABLE settings (name VARCHAR PRIMARY KEY, value TEXT NULL)');
-        $pdo->exec("INSERT INTO settings (name, value) VALUES
-            ('categorizeforeign', '0'),
-            ('catwebdl', '0'),
-            ('innerfileblacklist', ''),
-            ('title', 'NNTmux Test'),
-            ('home_link', '/')");
 
         $this->setEnvironmentValue('APP_ENV', 'testing');
         $this->setEnvironmentValue('DB_CONNECTION', 'sqlite');
@@ -81,7 +74,6 @@ class RememberMeAuthenticationTest extends TestCase
         DB::reconnect();
 
         $this->createSchema();
-        $this->seedSettings();
         app(PermissionRegistrar::class)->forgetCachedPermissions();
         $this->app->instance(PasswordBreachService::class, new class extends PasswordBreachService
         {
@@ -340,15 +332,9 @@ class RememberMeAuthenticationTest extends TestCase
             'users',
             'permissions',
             'roles',
-            'settings',
         ] as $table) {
             Schema::dropIfExists($table);
         }
-
-        Schema::create('settings', function (Blueprint $table): void {
-            $table->string('name')->primary();
-            $table->text('value')->nullable();
-        });
 
         Schema::create('roles', function (Blueprint $table): void {
             $table->increments('id');
@@ -436,17 +422,6 @@ class RememberMeAuthenticationTest extends TestCase
             $table->json('metadata')->nullable();
             $table->timestamp('created_at')->nullable();
         });
-    }
-
-    protected function seedSettings(): void
-    {
-        DB::table('settings')->insert([
-            ['name' => 'title', 'value' => 'NNTmux Test'],
-            ['name' => 'home_link', 'value' => '/'],
-            ['name' => 'categorizeforeign', 'value' => '0'],
-            ['name' => 'catwebdl', 'value' => '0'],
-            ['name' => 'innerfileblacklist', 'value' => ''],
-        ]);
     }
 
     protected function createUser(string $email): User

@@ -39,8 +39,6 @@ class BookServiceObfuscatedNormalizationTest extends TestCase
         }
 
         $pdo = new PDO('sqlite:'.$this->databasePath);
-        $pdo->exec('CREATE TABLE settings (name VARCHAR PRIMARY KEY, value TEXT NULL)');
-        $pdo->exec("INSERT INTO settings (name, value) VALUES ('maxbooksprocessed', '50'), ('amazonsleep', '0'), ('lookupbooks', '1')");
 
         $this->setEnvironmentValue('APP_ENV', 'testing');
         $this->setEnvironmentValue('DB_CONNECTION', 'sqlite');
@@ -55,12 +53,6 @@ class BookServiceObfuscatedNormalizationTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        DB::table('settings')->upsert([
-            ['name' => 'maxbooksprocessed', 'value' => '50'],
-            ['name' => 'amazonsleep', 'value' => '0'],
-            ['name' => 'lookupbooks', 'value' => '1'],
-        ], ['name'], ['value']);
 
         config([
             'database.default' => 'sqlite',
@@ -196,12 +188,6 @@ class BookServiceObfuscatedNormalizationTest extends TestCase
 
     private function createSchema(): void
     {
-        if (! Schema::hasTable('settings')) {
-            Schema::create('settings', function (Blueprint $table): void {
-                $table->string('name')->primary();
-                $table->text('value')->nullable();
-            });
-        }
 
         if (! Schema::hasTable('releases')) {
             Schema::create('releases', function (Blueprint $table): void {

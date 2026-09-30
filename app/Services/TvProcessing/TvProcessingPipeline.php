@@ -6,7 +6,7 @@ namespace App\Services\TvProcessing;
 
 use App\Models\Category;
 use App\Models\Release;
-use App\Models\Settings;
+use App\Services\Configuration\ConfigurationProvider;
 use App\Services\TvProcessing\Pipes\AbstractTvProviderPipe;
 use App\Services\TvProcessing\Pipes\LocalDbPipe;
 use App\Services\TvProcessing\Pipes\ParseInfoPipe;
@@ -54,8 +54,8 @@ class TvProcessingPipeline
         $this->pipes = collect($pipes)
             ->sortBy(fn (AbstractTvProviderPipe $p) => $p->getPriority());
 
-        $this->tvqty = Settings::settingValue('maxrageprocessed') !== ''
-            ? (int) Settings::settingValue('maxrageprocessed')
+        $this->tvqty = app(ConfigurationProvider::class)->metadata()->maxTvProcessed !== ''
+            ? (int) app(ConfigurationProvider::class)->metadata()->maxTvProcessed
             : 75;
 
         $this->echoOutput = $echoOutput;
@@ -107,7 +107,7 @@ class TvProcessingPipeline
      */
     public function process(string $groupID = '', string $guidChar = '', int|string|null $processTV = ''): void
     {
-        $processTV = (int) (is_numeric($processTV) ? $processTV : Settings::settingValue('lookuptv'));
+        $processTV = (int) (is_numeric($processTV) ? $processTV : app(ConfigurationProvider::class)->metadata()->tvLookup->value);
         if ($processTV <= 0) {
             return;
         }

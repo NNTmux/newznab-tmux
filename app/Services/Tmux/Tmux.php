@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace App\Services\Tmux;
 
 use App\Models\Category;
-use App\Models\Settings;
+use App\Services\Configuration\ConfigurationProvider;
+use App\Services\Configuration\ProcessingRuntimeStateRepository;
 use App\Services\NameFixing\NameFixingService;
 use App\Services\NfoService;
 use Illuminate\Support\Carbon;
@@ -16,6 +17,10 @@ use Illuminate\Support\Facades\DB;
  */
 class Tmux
 {
+    private readonly ConfigurationProvider $configuration;
+
+    private readonly ProcessingRuntimeStateRepository $runtimeState;
+
     /**
      * @var \PDO
      */
@@ -26,8 +31,12 @@ class Tmux
     /**
      * Tmux constructor.
      */
-    public function __construct()
-    {
+    public function __construct(
+        ?ConfigurationProvider $configuration = null,
+        ?ProcessingRuntimeStateRepository $runtimeState = null,
+    ) {
+        $this->configuration = $configuration ?? app(ConfigurationProvider::class);
+        $this->runtimeState = $runtimeState ?? app(ProcessingRuntimeStateRepository::class);
         $this->pdo = DB::connection()->getPdo();
     }
 
@@ -128,24 +137,15 @@ class Tmux
      */
     public function getConstantSettings(): array
     {
-        $settings = [
-            'sequential',
-            'tmux_session',
-            'run_ircscraper',
-            'delaytime',
+        $tmux = $this->configuration->tmux(fresh: true);
+
+        return [
+            'sequential' => $tmux->sequentialMode,
+            'tmux_session' => $tmux->sessionName,
+            'run_ircscraper' => $tmux->runIrcScraper,
+            'delaytime' => $this->configuration->ingestion()->collectionDelayHours,
+            'alternate_nntp' => config('nntmux_nntp.use_alternate_nntp_server') ? '1' : '0',
         ];
-
-        $constants = Settings::query()
-            ->whereIn('name', $settings)
-            ->get()
-            ->mapWithKeys(function ($item) {
-                return [$item->name => Settings::convertValue($item->getRawOriginal('value'))];
-            })
-            ->toArray();
-
-        $constants['alternate_nntp'] = config('nntmux_nntp.use_alternate_nntp_server') ? '1' : '0';
-
-        return $constants;
     }
 
     /**
@@ -153,66 +153,54 @@ class Tmux
      */
     public function getMonitorSettings(): array
     {
-        $settingsMap = [
-            'monitor_delay' => 'monitor',
-            'binaries' => 'binaries_run',
-            'backfill' => 'backfill',
-            'backfill_qty' => 'backfill_qty',
-            'nzbs' => 'nzbs',
-            'post' => 'post',
-            'releases' => 'releases_run',
-            'fix_names' => 'fix_names',
-            'seq_timer' => 'seq_timer',
-            'bins_timer' => 'bins_timer',
-            'back_timer' => 'back_timer',
-            'rel_timer' => 'rel_timer',
-            'fix_timer' => 'fix_timer',
-            'post_timer' => 'post_timer',
-            'collections_kill' => 'collections_kill',
-            'postprocess_kill' => 'postprocess_kill',
-            'crap_timer' => 'crap_timer',
-            'fix_crap' => 'fix_crap',
-            'fix_crap_opt' => 'fix_crap_opt',
-            'post_kill_timer' => 'post_kill_timer',
-            'monitor_path' => 'monitor_path',
-            'monitor_path_a' => 'monitor_path_a',
-            'monitor_path_b' => 'monitor_path_b',
-            'progressive' => 'progressive',
-            'backfill_days' => 'backfilldays',
-            'post_amazon' => 'post_amazon',
-            'post_timer_amazon' => 'post_timer_amazon',
-            'post_non' => 'post_non',
-            'post_timer_non' => 'post_timer_non',
-            'colors_start' => 'colors_start',
-            'colors_end' => 'colors_end',
-            'colors_exc' => 'colors_exc',
-            'showquery' => 'show_query',
-            'running' => 'is_running',
-            'lookupbooks' => 'processbooks',
-            'lookupmusic' => 'processmusic',
-            'lookupgames' => 'processgames',
-            'lookupimdb' => 'processmovies',
-            'lookuptv' => 'processtvrage',
-            'lookupanidb' => 'processanime',
-            'lookupnfo' => 'processnfo',
-            'lookuppar2' => 'processpar2',
-            'nzbthreads' => 'nzbthreads',
-            'maxsizetopostprocess' => 'maxsize_pp',
-            'minsizetopostprocess' => 'minsize_pp',
+        $tmux = $this->configuration->tmux(fresh: true);
+        $ingestion = $this->configuration->ingestion(fresh: true);
+        $metadata = $this->configuration->metadata(fresh: true);
+        $postProcessing = $this->configuration->postProcessing(fresh: true);
+
+        return [
+            'monitor' => $tmux->monitorDelay,
+            'binaries_run' => (int) $tmux->binariesEnabled,
+            'backfill' => $tmux->backfillMode,
+            'backfill_qty' => $ingestion->backfillQuantity,
+            'post' => $tmux->postMode,
+            'releases_run' => (int) $tmux->releasesEnabled,
+            'fix_names' => (int) $tmux->fixNamesEnabled,
+            'seq_timer' => $tmux->sequentialTimer,
+            'bins_timer' => $tmux->binariesTimer,
+            'back_timer' => $tmux->backfillTimer,
+            'rel_timer' => $tmux->releaseTimer,
+            'fix_timer' => $tmux->fixTimer,
+            'post_timer' => $tmux->postTimer,
+            'collections_kill' => $tmux->collectionsKillThreshold,
+            'postprocess_kill' => $tmux->postProcessKillThreshold,
+            'crap_timer' => $tmux->cleanupTimer,
+            'fix_crap' => implode(',', $tmux->cleanupRules),
+            'fix_crap_opt' => $tmux->cleanupMode,
+            'post_kill_timer' => $tmux->postKillTimer,
+            ...$this->runtimeState->monitorPaths(),
+            'progressive' => (int) $tmux->progressiveBackfill,
+            'backfilldays' => (string) $ingestion->backfillDaysMode,
+            'post_amazon' => $tmux->postAmazonMode,
+            'post_timer_amazon' => $tmux->postAmazonTimer,
+            'post_non' => $tmux->postNonMode,
+            'post_timer_non' => $tmux->postNonTimer,
+            'colors_start' => $tmux->colorsStart,
+            'colors_end' => $tmux->colorsEnd,
+            'colors_exc' => implode(',', $tmux->colorExclusions),
+            'show_query' => 0,
+            'is_running' => (int) $this->runtimeState->isTmuxRunning(),
+            'processbooks' => $metadata->bookLookup->value,
+            'processmusic' => $metadata->musicLookup->value,
+            'processgames' => $metadata->gameLookup->value,
+            'processmovies' => $metadata->movieLookup->value,
+            'processtvrage' => $metadata->tvLookup->value,
+            'processanime' => $metadata->animeLookup->value,
+            'processnfo' => (int) $postProcessing->lookupNfo,
+            'processpar2' => (int) $postProcessing->lookupPar2,
+            'maxsize_pp' => $postProcessing->maxSizeToPostProcess,
+            'minsize_pp' => $postProcessing->minSizeToPostProcess,
         ];
-
-        return Settings::query()
-            ->whereIn('name', array_keys($settingsMap))
-            ->get()
-            ->mapWithKeys(function ($item) use ($settingsMap) {
-                return [$settingsMap[$item->name] => Settings::convertValue($item->getRawOriginal('value'))];
-            })
-            ->toArray();
-    }
-
-    public function updateItem(mixed $setting, mixed $value): int
-    {
-        return Settings::query()->where('name', '=', $setting)->update(['value' => $value]);
     }
 
     public function microtime_float(): float
@@ -251,8 +239,8 @@ class Tmux
     {
         $path = storage_path('logs');
         $getDate = now()->format('Y_m_d');
-        $logs = Settings::settingValue('write_logs') ?? 0;
-        if ($logs === 1) {
+        $logs = app(ConfigurationProvider::class)->tmux()->writeLogs;
+        if ($logs) {
             return "2>&1 | tee -a $path/$pane-$getDate.log";
         }
 
@@ -301,7 +289,7 @@ class Tmux
         switch ((int) $qry) {
             case 1:
                 $movieLookupSql = imdb_id_needs_lookup_sql('imdbid');
-                $lookupMovies = (int) Settings::settingValue('lookupimdb');
+                $lookupMovies = (int) app(ConfigurationProvider::class)->metadata()->movieLookup->value;
 
                 if ($lookupMovies <= 0) {
                     $movieLookupSql = '0 = 1';
@@ -371,6 +359,8 @@ class Tmux
 					(SELECT COUNT(id) FROM usenet_groups WHERE name IS NOT NULL) AS all_groups';
 
             case 4:
+                $safeBackfillDate = escapeString($this->configuration->ingestion()->safeBackfillDate);
+
                 return sprintf(
                     "
 					SELECT
@@ -379,8 +369,9 @@ class Tmux
 						AND (now() - INTERVAL backfill_target DAY) < first_record_postdate
 					) AS backfill_groups_days,
 					(SELECT COUNT(id) FROM usenet_groups WHERE first_record IS NOT NULL AND backfill = 1 AND (now() - INTERVAL datediff(curdate(),
-					(SELECT VALUE FROM settings WHERE name = 'safebackfilldate')) DAY) < first_record_postdate) AS backfill_groups_date",
-                    escapeString($db_name)
+					%2\$s) DAY) < first_record_postdate) AS backfill_groups_date",
+                    escapeString($db_name),
+                    $safeBackfillDate,
                 );
             case 6:
                 return 'SELECT
@@ -400,12 +391,7 @@ class Tmux
      */
     public function isRunning(): bool
     {
-        $running = Settings::query()->where(['name' => 'running'])->first(['value']);
-        if ($running === null) {
-            throw new \RuntimeException('Tmux\\\'s running flag was not found in the database.'.PHP_EOL.'Please check the tables are correctly setup.'.PHP_EOL);
-        }
-
-        return ! ((int) $running->value === 0);
+        return $this->runtimeState->isTmuxRunning();
     }
 
     /**
@@ -414,8 +400,9 @@ class Tmux
     public function stopIfRunning(): bool
     {
         if ($this->isRunning()) {
-            Settings::query()->where(['name' => 'running'])->update(['value' => 0]);
-            $sleep = Settings::settingValue('monitor_delay');
+            $this->runtimeState->requestStop();
+            $this->runtimeState->setTmuxRunning(false);
+            $sleep = app(ConfigurationProvider::class)->tmux()->monitorDelay;
             cli()->header('Stopping tmux scripts and waiting '.$sleep.' seconds for all panes to shutdown');
             sleep($sleep);
 
@@ -432,7 +419,8 @@ class Tmux
     public function startRunning(): void
     {
         if (! $this->isRunning()) {
-            Settings::query()->where(['name' => 'running'])->update(['value' => 1]);
+            $this->runtimeState->requestStop(false);
+            $this->runtimeState->setTmuxRunning(true);
         }
     }
 

@@ -8,7 +8,7 @@ use App\Models\AnidbInfo;
 use App\Models\AnidbTitle;
 use App\Models\Category;
 use App\Models\Release;
-use App\Models\Settings;
+use App\Services\Configuration\ConfigurationProvider;
 use App\Services\PopulateAniListService as PaList;
 
 class AnimeProcessor
@@ -52,7 +52,7 @@ class AnimeProcessor
         $this->echooutput = $echooutput && (bool) config('nntmux.echocli');
         $this->palist = new PaList;
 
-        $quantity = (int) Settings::settingValue('maxanidbprocessed');
+        $quantity = (int) app(ConfigurationProvider::class)->metadata()->maxAnimeProcessed;
         $this->aniqty = $quantity > 0 ? $quantity : 100;
         $this->status = null;
     }
@@ -67,7 +67,7 @@ class AnimeProcessor
      */
     public function process(string $groupID = '', string $guidChar = ''): void
     {
-        if ((int) Settings::settingValue('lookupanidb') === 0) {
+        if ((int) app(ConfigurationProvider::class)->metadata()->animeLookup->value === 0) {
             return;
         }
 

@@ -41,12 +41,6 @@ final class NfoImportServiceTest extends TestCase
         }
 
         $pdo = new PDO('sqlite:'.$this->databasePath);
-        $pdo->exec('CREATE TABLE settings (name VARCHAR PRIMARY KEY, value TEXT NULL)');
-        $pdo->exec("INSERT INTO settings (name, value) VALUES
-            ('categorizeforeign', '0'),
-            ('catwebdl', '0'),
-            ('innerfileblacklist', ''),
-            ('timeoutseconds', '60')");
 
         $this->setEnvironmentValue('APP_ENV', 'testing');
         $this->setEnvironmentValue('DB_CONNECTION', 'sqlite');
@@ -71,10 +65,6 @@ final class NfoImportServiceTest extends TestCase
         DB::reconnect();
 
         Schema::dropAllTables();
-        Schema::create('settings', function (Blueprint $table): void {
-            $table->string('name')->primary();
-            $table->text('value')->nullable();
-        });
         Schema::create('releases', function (Blueprint $table): void {
             $table->increments('id');
             $table->string('guid')->unique();
@@ -84,9 +74,6 @@ final class NfoImportServiceTest extends TestCase
             $table->unsignedInteger('releases_id')->primary();
             $table->binary('nfo')->nullable();
         });
-        DB::table('settings')->insert([
-            ['name' => 'timeoutseconds', 'value' => '60'],
-        ]);
 
         $this->uploadFolder = sys_get_temp_dir().'/nntmux-nfo-import-'.bin2hex(random_bytes(6));
         (new Filesystem)->makeDirectory($this->uploadFolder, 0775, true);

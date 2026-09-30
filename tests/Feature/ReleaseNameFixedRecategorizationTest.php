@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Enums\ConfigurationDomain;
 use App\Facades\Search;
 use App\Models\Category;
 use App\Models\Release;
@@ -14,6 +15,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use PDO;
+use Tests\Support\ConfigurationTestBuilder;
 use Tests\TestCase;
 
 class ReleaseNameFixedRecategorizationTest extends TestCase
@@ -40,9 +42,6 @@ class ReleaseNameFixedRecategorizationTest extends TestCase
         }
 
         $pdo = new PDO('sqlite:'.$this->databasePath);
-        $pdo->exec('CREATE TABLE settings (name VARCHAR PRIMARY KEY, value TEXT NULL)');
-        $pdo->exec("INSERT INTO settings (name, value) VALUES ('categorizeforeign', '0'), ('catwebdl', '1')");
-
         $this->setEnvironmentValue('APP_ENV', 'testing');
         $this->setEnvironmentValue('DB_CONNECTION', 'sqlite');
         $this->setEnvironmentValue('DB_DATABASE', $this->databasePath);
@@ -56,11 +55,6 @@ class ReleaseNameFixedRecategorizationTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        DB::table('settings')->upsert([
-            ['name' => 'categorizeforeign', 'value' => '0'],
-            ['name' => 'catwebdl', 'value' => '1'],
-        ], ['name'], ['value']);
 
         config([
             'database.default' => 'sqlite',
@@ -308,12 +302,11 @@ class ReleaseNameFixedRecategorizationTest extends TestCase
 
     private function createSchema(): void
     {
-        if (! Schema::hasTable('settings')) {
-            Schema::create('settings', function (Blueprint $table): void {
-                $table->string('name')->primary();
-                $table->text('value')->nullable();
-            });
-        }
+        ConfigurationTestBuilder::installDefaults();
+        ConfigurationTestBuilder::update(ConfigurationDomain::Ingestion, [
+            'categorize_foreign' => false,
+            'categorize_web_dl' => true,
+        ]);
 
         if (! Schema::hasTable('usenet_groups')) {
             Schema::create('usenet_groups', function (Blueprint $table): void {

@@ -33,10 +33,6 @@ final class UserActivityStatsTest extends TestCase
             $table->id();
             $table->dateTime('deleted_at')->nullable();
         });
-        Schema::create('settings', function (Blueprint $table): void {
-            $table->string('name')->primary();
-            $table->text('value')->nullable();
-        });
         Schema::create('user_requests', function (Blueprint $table): void {
             $table->id();
             $table->unsignedBigInteger('users_id');
@@ -64,12 +60,6 @@ final class UserActivityStatsTest extends TestCase
         });
 
         DB::table('users')->insert(['id' => 1]);
-        DB::table('settings')->insert([
-            ['name' => 'categorizeforeign', 'value' => '0'],
-            ['name' => 'catwebdl', 'value' => '0'],
-            ['name' => 'delaytime', 'value' => '0'],
-            ['name' => 'innerfileblacklist', 'value' => ''],
-        ]);
     }
 
     protected function tearDown(): void

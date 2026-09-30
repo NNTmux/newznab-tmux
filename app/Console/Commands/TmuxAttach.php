@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Enums\TmuxPaneRole;
-use App\Models\Settings;
+use App\Services\Configuration\ConfigurationProvider;
 use App\Services\Tmux\TmuxPaneManager;
 use App\Services\Tmux\TmuxSessionManager;
 use Illuminate\Console\Command;
@@ -34,8 +34,7 @@ class TmuxAttach extends Command
     public function handle(): int
     {
         $sessionName = $this->option('session')
-            ?? Settings::settingValue('tmux_session')
-            ?? config('tmux.session.default_name', 'nntmux');
+            ?? app(ConfigurationProvider::class)->tmux()->sessionName;
 
         $sessionManager = new TmuxSessionManager($sessionName);
 

@@ -7,8 +7,8 @@ namespace App\View\Composers;
 use App\Events\UserLoggedIn;
 use App\Models\Category;
 use App\Models\Content;
-use App\Models\Settings;
 use App\Models\User;
+use App\Services\Configuration\ConfigurationProvider;
 use App\Services\SiteLogoService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -30,7 +30,10 @@ class GlobalDataComposer
      */
     private static ?array $resolvedData = null;
 
-    public function __construct(private readonly SiteLogoService $siteLogoService) {}
+    public function __construct(
+        private readonly SiteLogoService $siteLogoService,
+        private readonly ConfigurationProvider $configuration,
+    ) {}
 
     /**
      * Bind data to the view.
@@ -51,19 +54,12 @@ class GlobalDataComposer
      */
     private function resolveData(): array
     {
-        // Cached site settings (shared across all requests)
-        $siteArray = $this->rememberWithCacheFallback('site_settings_array', self::CACHE_TTL, function () {
-            return Settings::query()
-                ->pluck('value', 'name')
-                ->map(fn ($value) => Settings::convertValue($value))
-                ->all();
-        });
-        $siteLogoPath = is_array($siteArray) ? ($siteArray['site_logo'] ?? null) : null;
+        $site = $this->configuration->site();
 
         $viewData = [
             'serverroot' => url('/'),
-            'site' => $siteArray,
-            'siteLogoUrl' => $this->siteLogoService->url($siteLogoPath),
+            'site' => $site,
+            'siteLogoUrl' => $this->siteLogoService->url($site->logoPath),
         ];
 
         // Cached useful links for sidebar

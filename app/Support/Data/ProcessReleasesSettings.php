@@ -4,16 +4,15 @@ declare(strict_types=1);
 
 namespace App\Support\Data;
 
-use App\Models\Settings;
+use App\Models\ProcessingRuntimeState;
+use App\Support\Configuration\IngestionConfigurationData;
 use Spatie\LaravelData\Data;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
 /**
  * Configuration settings for ProcessReleases operations.
  *
- * Hydrate from raw {@see Settings} rows via {@see self::forDatabase()}
- * (renamed from `fromDatabase` to avoid spatie/laravel-data's magical-creation
- * recursion on `self::from()`).
+ * Hydrated from typed ingestion configuration and uncached runtime state.
  */
 #[TypeScript]
 final class ProcessReleasesSettings extends Data
@@ -40,33 +39,25 @@ final class ProcessReleasesSettings extends Data
         }
     }
 
-    /**
-     * Build settings from a raw Settings table array (mixed snake-case keys,
-     * stringly-typed values, possible nulls/empty strings).
-     *
-     * @param  array<string, mixed>  $dbSettings
-     */
-    public static function forDatabase(array $dbSettings): self
-    {
-        $getInt = static fn (string $key, int $default): int => (isset($dbSettings[$key]) && $dbSettings[$key] !== '')
-                ? (int) $dbSettings[$key]
-                : $default;
-
+    public static function fromConfiguration(
+        IngestionConfigurationData $configuration,
+        ProcessingRuntimeState $runtimeState,
+    ): self {
         return new self(
-            collectionDelayTime: $getInt('delaytime', 2),
-            crossPostTime: $getInt('crossposttime', 2),
-            releaseCreationLimit: $getInt('maxnzbsprocessed', 1000),
-            completion: $getInt('completionpercent', 0),
-            collectionTimeout: $getInt('collection_timeout', 48),
-            maxSizeToFormRelease: $getInt('maxsizetoformrelease', 0),
-            minSizeToFormRelease: $getInt('minsizetoformrelease', 0),
-            minFilesToFormRelease: $getInt('minfilestoformrelease', 0),
-            releaseRetentionDays: $getInt('releaseretentiondays', 0),
-            deletePasswordedRelease: ((int) ($dbSettings['deletepasswordedrelease'] ?? 0)) === 1,
-            miscOtherRetentionHours: $getInt('miscotherretentionhours', 0),
-            miscHashedRetentionHours: $getInt('mischashedretentionhours', 0),
-            partRetentionHours: $getInt('partretentionhours', 24),
-            lastRunTime: ! empty($dbSettings['last_run_time']) ? (string) $dbSettings['last_run_time'] : null,
+            collectionDelayTime: $configuration->collectionDelayHours,
+            crossPostTime: $configuration->crossPostHours,
+            releaseCreationLimit: $configuration->maxReleasesCreated,
+            completion: $configuration->completionPercent,
+            collectionTimeout: $configuration->collectionTimeoutHours,
+            maxSizeToFormRelease: $configuration->maxSizeToFormRelease,
+            minSizeToFormRelease: $configuration->minSizeToFormRelease,
+            minFilesToFormRelease: $configuration->minFilesToFormRelease,
+            releaseRetentionDays: $configuration->releaseRetentionDays,
+            deletePasswordedRelease: $configuration->deletePasswordedReleases,
+            miscOtherRetentionHours: $configuration->miscOtherRetentionHours,
+            miscHashedRetentionHours: $configuration->miscHashedRetentionHours,
+            partRetentionHours: $configuration->partRetentionHours,
+            lastRunTime: $runtimeState->last_binary_run_at?->toDateTimeString(),
         );
     }
 

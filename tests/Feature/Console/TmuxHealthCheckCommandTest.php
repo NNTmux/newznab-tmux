@@ -8,6 +8,7 @@ use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Process\PendingProcess;
 use Illuminate\Support\Facades\Process;
 use PDO;
+use Tests\Support\ConfigurationTestBuilder;
 use Tests\TestCase;
 
 class TmuxHealthCheckCommandTest extends TestCase
@@ -34,16 +35,7 @@ class TmuxHealthCheckCommandTest extends TestCase
         }
 
         $pdo = new PDO('sqlite:'.$this->databasePath);
-        $pdo->exec('CREATE TABLE settings (name VARCHAR PRIMARY KEY, value TEXT NULL)');
         $pdo->exec('CREATE TABLE collections (id INTEGER PRIMARY KEY AUTOINCREMENT, dateadded TEXT NULL)');
-        $pdo->exec("INSERT INTO settings (name, value) VALUES
-            ('categorizeforeign', '0'),
-            ('catwebdl', '0'),
-            ('running', '0'),
-            ('sequential', '0'),
-            ('delaytime', '2'),
-            ('monitor_delay', '0'),
-            ('tmux_session', 'test-session')");
 
         $this->setEnvironmentValue('APP_ENV', 'testing');
         $this->setEnvironmentValue('DB_CONNECTION', 'sqlite');
@@ -64,6 +56,8 @@ class TmuxHealthCheckCommandTest extends TestCase
             'database.default' => 'sqlite',
             'database.connections.sqlite.database' => $this->databasePath,
         ]);
+
+        ConfigurationTestBuilder::installDefaults();
 
         Process::preventStrayProcesses();
     }
@@ -95,7 +89,7 @@ class TmuxHealthCheckCommandTest extends TestCase
 
     public function test_missing_session_fails_without_auto_restart_when_engine_should_be_running(): void
     {
-        $this->setSetting('running', '1');
+        ConfigurationTestBuilder::updateRuntime(['tmux_running' => true]);
         $this->fakeMissingSession();
 
         $this->artisan('tmux:health-check --session=test-session')
@@ -108,7 +102,7 @@ class TmuxHealthCheckCommandTest extends TestCase
 
     public function test_missing_session_auto_restarts_when_engine_should_be_running(): void
     {
-        $this->setSetting('running', '1');
+        ConfigurationTestBuilder::updateRuntime(['tmux_running' => true]);
         $this->fakeMissingSessionWithSuccessfulStart();
 
         $this->artisan('tmux:health-check --auto-restart --session=test-session')
@@ -160,11 +154,6 @@ class TmuxHealthCheckCommandTest extends TestCase
     private function isTmuxCommand(PendingProcess $process, string $command): bool
     {
         return is_array($process->command) && in_array($command, $process->command, true);
-    }
-
-    private function setSetting(string $name, string $value): void
-    {
-        $this->app['db']->table('settings')->where('name', $name)->update(['value' => $value]);
     }
 
     private function setEnvironmentValue(string $key, ?string $value): void

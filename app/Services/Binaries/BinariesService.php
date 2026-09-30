@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services\Binaries;
 
-use App\Models\Settings;
 use App\Models\UsenetGroup;
+use App\Services\Configuration\ProcessingRuntimeStateRepository;
 use App\Services\NNTP\NNTPService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -32,6 +32,8 @@ class BinariesService
     private MissedPartHandler $missedPartHandler;
 
     private ?NNTPService $nntp = null;
+
+    private ProcessingRuntimeStateRepository $runtimeState;
 
     // Timing metrics
     private float $timeHeaders = 0;
@@ -70,7 +72,8 @@ class BinariesService
         ?HeaderParser $headerParser = null,
         ?HeaderStorageService $headerStorage = null,
         ?MissedPartHandler $missedPartHandler = null,
-        ?NNTPService $nntp = null
+        ?NNTPService $nntp = null,
+        ?ProcessingRuntimeStateRepository $runtimeState = null,
     ) {
         $this->config = $config ?? BinariesConfig::fromSettings();
         $this->headerParser = $headerParser ?? new HeaderParser;
@@ -81,6 +84,7 @@ class BinariesService
             $this->config->sqlChunkSize
         );
         $this->nntp = $nntp;
+        $this->runtimeState = $runtimeState ?? app(ProcessingRuntimeStateRepository::class);
         $this->startUpdate = Carbon::now();
     }
 
@@ -181,7 +185,7 @@ class BinariesService
      */
     public function logIndexerStart(): void
     {
-        Settings::query()->where('name', '=', 'last_run_time')->update(['value' => now()]);
+        $this->runtimeState->markBinaryRun();
     }
 
     /**

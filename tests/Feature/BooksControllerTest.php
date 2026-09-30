@@ -96,10 +96,6 @@ class BooksControllerTest extends TestCase
 
     private function createSchema(): void
     {
-        Schema::create('settings', function (Blueprint $table): void {
-            $table->string('name')->primary();
-            $table->text('value')->nullable();
-        });
 
         Schema::create('root_categories', function (Blueprint $table): void {
             $table->unsignedInteger('id')->primary();

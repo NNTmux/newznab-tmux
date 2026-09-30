@@ -146,7 +146,7 @@
                                         </span>
                                         <a class="inline-flex items-center px-3 py-1.5 bg-yellow-400 hover:bg-yellow-500 text-gray-900 dark:text-gray-100 text-xs font-semibold rounded-full transition-colors"
                                            target="_blank"
-                                           href="{{ $site['dereferrer_link'] }}http://www.imdb.com/title/tt{{ $movie['imdbid'] }}"
+                                           href="{{ $site->dereferrerLink }}http://www.imdb.com/title/tt{{ $movie['imdbid'] }}"
                                            title="View on IMDB">
                                             <i class="fa fa-external-link mr-1"></i>IMDB
                                         </a>
@@ -196,7 +196,7 @@
                             <div class="flex gap-2">
                                 <a class="inline-flex items-center px-3 py-1.5 bg-yellow-400 hover:bg-yellow-500 text-gray-900 text-xs font-semibold rounded-full transition-colors"
                                    target="_blank"
-                                   href="{{ $site['dereferrer_link'] }}http://www.imdb.com/title/tt{{ $movie['imdbid'] }}">
+                                   href="{{ $site->dereferrerLink }}http://www.imdb.com/title/tt{{ $movie['imdbid'] }}">
                                     <i class="fa fa-external-link mr-1"></i>IMDB
                                 </a>
                                 <span class="text-xs text-gray-500 dark:text-gray-400 flex items-center">

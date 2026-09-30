@@ -7,9 +7,9 @@ namespace App\Services\Nzb;
 use App\Models\Collection;
 use App\Models\Release;
 use App\Models\ReleaseNzbCreationFailure;
-use App\Models\Settings;
 use App\Services\Binaries\BinariesConfig;
 use App\Services\CollectionCleanupService;
+use App\Services\Configuration\ConfigurationProvider;
 use App\Support\Data\NzbCreationResult;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
@@ -67,7 +67,7 @@ class NzbService
     ) {
         $this->binariesConfig = $binariesConfig ?? BinariesConfig::fromSettings();
         try {
-            $nzbSplitLevel = (int) Settings::settingValue('nzbsplitlevel');
+            $nzbSplitLevel = (int) app(ConfigurationProvider::class)->ingestion()->nzbSplitLevel;
         } catch (QueryException $e) {
             // Table doesn't exist yet (e.g., during migrations or tests)
             $nzbSplitLevel = 1;

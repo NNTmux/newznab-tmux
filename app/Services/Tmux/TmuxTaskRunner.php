@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Tmux;
 
 use App\Enums\TmuxPaneRole;
-use App\Models\Settings;
+use App\Services\Configuration\ConfigurationProvider;
 
 /**
  * Service for running tasks in tmux panes
@@ -27,20 +27,7 @@ class TmuxTaskRunner
      */
     protected function getNiceness(): int
     {
-        // Try to get from settings first
-        $niceness = Settings::settingValue('niceness');
-
-        // If empty string or null, try config
-        if (empty($niceness) && $niceness !== 0 && $niceness !== '0') {
-            $niceness = config('nntmux.niceness');
-        }
-
-        // If still empty, use system default
-        if (empty($niceness) && $niceness !== 0 && $niceness !== '0') {
-            $niceness = 10; // Standard nice default
-        }
-
-        return (int) $niceness;
+        return app(ConfigurationProvider::class)->tmux()->niceness;
     }
 
     /**
@@ -133,7 +120,7 @@ class TmuxTaskRunner
      */
     protected function getLogFile(string $paneName): string
     {
-        $logsEnabled = (int) Settings::settingValue('write_logs') === 1;
+        $logsEnabled = (int) app(ConfigurationProvider::class)->tmux()->writeLogs === 1;
 
         if (! $logsEnabled) {
             return '/dev/null';
@@ -155,9 +142,9 @@ class TmuxTaskRunner
      */
     protected function getRandomColor(): int
     {
-        $start = (int) Settings::settingValue('colors_start');
-        $end = (int) Settings::settingValue('colors_end');
-        $exclude = Settings::settingValue('colors_exc') ?? '';
+        $start = (int) app(ConfigurationProvider::class)->tmux()->colorsStart;
+        $end = (int) app(ConfigurationProvider::class)->tmux()->colorsEnd;
+        $exclude = implode(', ', app(ConfigurationProvider::class)->tmux()->colorExclusions);
 
         if (empty($exclude)) {
             return random_int($start, $end);
@@ -560,7 +547,7 @@ class TmuxTaskRunner
         $hasWork = (int) ($runVar['counts']['now']['work_available'] ?? $runVar['counts']['now']['work'] ?? 0) > 0;
         $hasNfo = (int) ($runVar['counts']['now']['processnfo'] ?? 0) > 0;
 
-        $niceness = Settings::settingValue('niceness') ?? 2;
+        $niceness = app(ConfigurationProvider::class)->tmux()->niceness;
         $log = $this->getLogFile('post_additional');
         $sleep = (int) ($runVar['settings']['post_timer'] ?? 300);
 
@@ -741,7 +728,7 @@ class TmuxTaskRunner
             return $this->disablePane($pane, 'Post-process Metadata', 'no music/books/games to process');
         }
 
-        $niceness = Settings::settingValue('niceness') ?? 2;
+        $niceness = app(ConfigurationProvider::class)->tmux()->niceness;
         $log = $this->getLogFile('post_amazon');
         $artisan = PHP_BINARY.' artisan';
         $sleep = (int) ($runVar['settings']['post_timer_amazon'] ?? 300);

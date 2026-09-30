@@ -16,14 +16,6 @@ class BinariesStoreHeadersMixedTest extends TestCase
         DB::reconnect();
 
         // Minimal tables.
-        DB::statement('CREATE TABLE settings (
-            section TEXT NULL,
-            subsection TEXT NULL,
-            name TEXT PRIMARY KEY,
-            value TEXT NULL,
-            hint TEXT NULL,
-            setting TEXT NULL
-        )');
         $defaults = [
             'maxmssgs' => '20000',
             'partrepair' => '1',
@@ -34,7 +26,6 @@ class BinariesStoreHeadersMixedTest extends TestCase
             'partrepairmaxtries' => '3',
         ];
         foreach ($defaults as $k => $v) {
-            DB::table('settings')->insert(['name' => $k, 'value' => $v]);
         }
 
         DB::statement('CREATE TABLE collections (

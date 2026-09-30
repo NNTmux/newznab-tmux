@@ -11,10 +11,10 @@ use App\Models\Release;
 use App\Models\ReleaseComment;
 use App\Models\ReleaseRegex;
 use App\Models\ReleaseReport;
-use App\Models\Settings;
 use App\Models\Video;
 use App\Services\AnidbService;
 use App\Services\BookService;
+use App\Services\Configuration\ConfigurationProvider;
 use App\Services\ConsoleService;
 use App\Services\GamesService;
 use App\Services\MovieService;
@@ -107,10 +107,10 @@ class DetailsController extends BasePageController
                 if (! empty($mov['director'])) {
                     $mov['director'] = makeFieldLinks($mov, 'director', 'movies');
                 }
-                if (Settings::settingValue('trailers_display')) {
+                if (app(ConfigurationProvider::class)->site()->trailersDisplay) {
                     $trailer = empty($mov['trailer']) ? $this->movieService->getTrailer($data['imdbid']) : $mov['trailer'];
                     if ($trailer) {
-                        $mov['trailer'] = sprintf('<iframe width="%d" height="%d" src="%s"></iframe>', Settings::settingValue('trailers_size_x'), Settings::settingValue('trailers_size_y'), e($trailer));
+                        $mov['trailer'] = sprintf('<iframe width="%d" height="%d" src="%s"></iframe>', app(ConfigurationProvider::class)->site()->trailerWidth, app(ConfigurationProvider::class)->site()->trailerHeight, e($trailer));
                     }
                 }
             }

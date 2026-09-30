@@ -92,17 +92,17 @@
                         <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3">External Links</h2>
                         <div class="flex flex-wrap gap-3">
                             @if(!empty($movie['imdbid'] ?? null))
-                                <a href="{{ $site['dereferrer_link'] }}https://www.imdb.com/title/tt{{ $movie['imdbid'] }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200 transition">
+                                <a href="{{ $site->dereferrerLink }}https://www.imdb.com/title/tt{{ $movie['imdbid'] }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200 transition">
                                     <i class="fab fa-imdb mr-2 text-xl"></i> View on IMDb
                                 </a>
                             @endif
                             @if(!empty($movie['tmdbid'] ?? null))
-                                <a href="{{ $site['dereferrer_link'] }}https://www.themoviedb.org/movie/{{ $movie['tmdbid'] }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-800 rounded-lg hover:bg-blue-200 transition">
+                                <a href="{{ $site->dereferrerLink }}https://www.themoviedb.org/movie/{{ $movie['tmdbid'] }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-800 rounded-lg hover:bg-blue-200 transition">
                                     <i class="fas fa-film mr-2"></i> View on TMDb
                                 </a>
                             @endif
                             @if(!empty($movie['traktid'] ?? null))
-                                <a href="{{ $site['dereferrer_link'] }}https://trakt.tv/movies/{{ $movie['traktid'] }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-red-100 text-red-800 rounded-lg hover:bg-red-200 transition">
+                                <a href="{{ $site->dereferrerLink }}https://trakt.tv/movies/{{ $movie['traktid'] }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-red-100 text-red-800 rounded-lg hover:bg-red-200 transition">
                                     <i class="fas fa-heart mr-2"></i> View on Trakt
                                 </a>
                             @endif

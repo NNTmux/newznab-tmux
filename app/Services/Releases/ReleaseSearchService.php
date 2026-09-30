@@ -9,8 +9,8 @@ use App\Facades\Search;
 use App\Models\AnidbInfo;
 use App\Models\Category;
 use App\Models\Release;
-use App\Models\Settings;
 use App\Models\UsenetGroup;
+use App\Services\Configuration\ConfigurationProvider;
 use App\Services\Search\DTO\ReleaseSearchQuery;
 use App\Services\Search\DTO\SearchCursor;
 use App\Support\ReleaseSearchIndexDocument;
@@ -2030,7 +2030,7 @@ class ReleaseSearchService
      */
     public function showPasswords(): string
     {
-        $show = (int) Settings::settingValue('showpasswordedrelease');
+        $show = (int) app(ConfigurationProvider::class)->ingestion()->showPasswordedReleases;
         $setting = $show;
 
         return match ($setting) {
@@ -2044,7 +2044,7 @@ class ReleaseSearchService
      */
     private function passwordAllowRar(): bool
     {
-        return (int) Settings::settingValue('showpasswordedrelease') === 1;
+        return (int) app(ConfigurationProvider::class)->ingestion()->showPasswordedReleases === 1;
     }
 
     /**

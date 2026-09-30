@@ -373,11 +373,6 @@ final class TvSearchApiTest extends TestCase
             $table->unsignedInteger('categories_id');
         });
 
-        Schema::create('settings', function (Blueprint $table): void {
-            $table->string('name')->primary();
-            $table->text('value')->nullable();
-        });
-
         Schema::create('root_categories', function (Blueprint $table): void {
             $table->increments('id');
             $table->string('title')->default('');
@@ -450,15 +445,6 @@ final class TvSearchApiTest extends TestCase
 
     private function seedData(): void
     {
-        DB::table('settings')->insert([
-            ['name' => 'showpasswordedrelease', 'value' => '0'],
-            ['name' => 'strapline', 'value' => 'Test'],
-            ['name' => 'metakeywords', 'value' => 'test'],
-            ['name' => 'registerstatus', 'value' => '0'],
-            ['name' => 'catwebdl', 'value' => '0'],
-            ['name' => 'title', 'value' => 'NNTmux Test'],
-            ['name' => 'home_link', 'value' => '/'],
-        ]);
 
         DB::table('roles')->insert([
             'id' => 1,

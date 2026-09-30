@@ -45,7 +45,7 @@
                         <div>
                             <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">IMDB</dt>
                             <dd class="mt-1">
-                                <a href="{{ $site['dereferrer_link'] }}https://www.imdb.com/title/tt{{ $release->imdbid }}" target="_blank" class="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
+                                <a href="{{ $site->dereferrerLink }}https://www.imdb.com/title/tt{{ $release->imdbid }}" target="_blank" class="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
                                     View on IMDB <i class="fas fa-external-link-alt text-xs"></i>
                                 </a>
                             </dd>

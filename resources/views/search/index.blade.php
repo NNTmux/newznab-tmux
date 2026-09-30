@@ -7,7 +7,7 @@
 @section('content')
 <div class="surface-panel rounded-xl shadow-sm">
     <x-breadcrumb :items="[
-        ['label' => 'Home', 'url' => url($site['home_link'] ?? '/'), 'icon' => 'fas fa-home'],
+        ['label' => 'Home', 'url' => url($site->homeLink ?? '/'), 'icon' => 'fas fa-home'],
         ['label' => 'Search'],
     ]" />
 

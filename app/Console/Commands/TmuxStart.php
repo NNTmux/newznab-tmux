@@ -6,7 +6,8 @@ namespace App\Console\Commands;
 
 use App\Enums\TmuxPaneRole;
 use App\Models\Collection;
-use App\Models\Settings;
+use App\Services\Configuration\ConfigurationProvider;
+use App\Services\Configuration\ProcessingRuntimeStateRepository;
 use App\Services\Tmux\TmuxLayoutBuilder;
 use App\Services\Tmux\TmuxPaneManager;
 use App\Services\Tmux\TmuxSessionManager;
@@ -49,8 +50,7 @@ class TmuxStart extends Command
 
             // Get session name
             $sessionName = $this->option('session')
-                ?? Settings::settingValue('tmux_session')
-                ?? config('tmux.session.default_name', 'nntmux');
+                ?? app(ConfigurationProvider::class)->tmux()->sessionName;
 
             // Initialize services
             $this->sessionManager = new TmuxSessionManager($sessionName);
@@ -84,7 +84,7 @@ class TmuxStart extends Command
             $this->resetOldCollections();
 
             // Get sequential mode
-            $sequential = (int) (Settings::settingValue('sequential') ?? 0);
+            $sequential = app(ConfigurationProvider::class)->tmux()->sequentialMode;
             $this->info("📐 Building layout (mode: {$sequential})");
 
             // Build the tmux layout
@@ -98,7 +98,9 @@ class TmuxStart extends Command
             $this->sessionCreated = true;
 
             // Set running flag
-            Settings::query()->where('name', 'running')->update(['value' => 1]);
+            $runtimeState = app(ProcessingRuntimeStateRepository::class);
+            $runtimeState->requestStop(false);
+            $runtimeState->setTmuxRunning(true);
             $this->info('✅ Running flag set');
 
             // Start monitor in background
@@ -132,7 +134,7 @@ class TmuxStart extends Command
         } catch (\Exception $e) {
             if ($this->sessionCreated && isset($this->sessionManager)) {
                 $this->sessionManager->killSession();
-                Settings::query()->where('name', 'running')->update(['value' => 0]);
+                app(ProcessingRuntimeStateRepository::class)->setTmuxRunning(false);
             }
 
             $this->error('❌ Failed to start tmux: '.$e->getMessage());
@@ -161,7 +163,7 @@ class TmuxStart extends Command
      */
     private function resetOldCollections(): void
     {
-        $delayTime = (int) (Settings::settingValue('delaytime') ?? 2);
+        $delayTime = app(ConfigurationProvider::class)->ingestion()->collectionDelayHours;
 
         try {
             DB::transaction(function () use ($delayTime) {

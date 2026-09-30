@@ -24,7 +24,7 @@
             <div class="min-w-0 max-w-3xl xl:flex-1">
                 <nav aria-label="Breadcrumb" class="mb-2 text-sm text-white/70">
                     <ol class="flex flex-wrap items-center gap-2">
-                        <li><a href="{{ url($site['home_link'] ?? '/') }}" class="rounded hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70">Home</a></li>
+                        <li><a href="{{ url($site->homeLink ?? '/') }}" class="rounded hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70">Home</a></li>
                         <li aria-hidden="true"><i class="fas fa-chevron-right text-[0.65rem]"></i></li>
                         <li aria-current="page" class="font-medium text-white">{{ $currentMovieCategory }}</li>
                     </ol>

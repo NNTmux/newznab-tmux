@@ -27,7 +27,7 @@ final class CbpReleaseEligibilityMariaDbTest extends CbpReleaseEligibilityTest
         DB::purge('mariadb');
         DB::reconnect('mariadb');
 
-        foreach (['settings', 'collections', 'collection_groups', 'binaries', 'parts'] as $table) {
+        foreach (['collections', 'collection_groups', 'binaries', 'parts'] as $table) {
             if (Schema::hasTable($table)) {
                 $this->fail('Refusing to use an occupied CBP integration database.');
             }

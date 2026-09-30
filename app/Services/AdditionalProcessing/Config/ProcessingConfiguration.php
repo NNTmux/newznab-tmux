@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services\AdditionalProcessing\Config;
 
-use App\Models\Settings;
 use App\Services\AdditionalProcessing\AdditionalCandidateQuery;
+use App\Services\Configuration\ConfigurationProvider;
 
 /**
  * Configuration DTO for additional post-processing.
@@ -98,21 +98,21 @@ final readonly class ProcessingConfiguration
     public function __construct()
     {
         $this->echoCLI = (bool) config('nntmux.echocli');
-        $innerFileBlacklistValue = Settings::settingValue('innerfileblacklist');
+        $innerFileBlacklistValue = app(ConfigurationProvider::class)->postProcessing()->innerFileBlacklist;
         $this->innerFileBlacklist = ($innerFileBlacklistValue === '' || $innerFileBlacklistValue === null)
             ? false
             : $innerFileBlacklistValue;
-        $this->maxNestedLevels = (int) Settings::settingValue('maxnestedlevels') ?: 3;
-        $this->extractUsingRarInfo = (int) Settings::settingValue('extractusingrarinfo') !== 0;
+        $this->maxNestedLevels = (int) app(ConfigurationProvider::class)->postProcessing()->maxNestedLevels ?: 3;
+        $this->extractUsingRarInfo = (int) app(ConfigurationProvider::class)->postProcessing()->extractUsingRarInfo !== 0;
         $this->fetchLastFiles = (bool) config('nntmux_settings.fetch_last_file');
         $this->unrarPath = config('nntmux_settings.unrar_path') ?: false;
         $this->unzipPath = config('nntmux_settings.unzip_path') ?: false;
         $this->timeoutPath = config('nntmux_settings.timeout_path') ?: false;
-        $this->timeoutSeconds = (int) Settings::settingValue('timeoutseconds');
-        $this->queryLimit = (int) (Settings::settingValue('maxaddprocessed') ?: 25);
-        $this->segmentsToDownload = (int) (Settings::settingValue('segmentstodownload') ?: 2);
-        $this->maximumRarSegments = (int) (Settings::settingValue('maxpartsprocessed') ?: 3);
-        $this->maximumRarPasswordChecks = max((int) (Settings::settingValue('passchkattempts') ?: 1), 1);
+        $this->timeoutSeconds = (int) app(ConfigurationProvider::class)->postProcessing()->timeoutSeconds;
+        $this->queryLimit = (int) (app(ConfigurationProvider::class)->postProcessing()->maxAdditionalProcessed ?: 25);
+        $this->segmentsToDownload = (int) (app(ConfigurationProvider::class)->postProcessing()->segmentsToDownload ?: 2);
+        $this->maximumRarSegments = (int) (app(ConfigurationProvider::class)->postProcessing()->maxPartsProcessed ?: 3);
+        $this->maximumRarPasswordChecks = max((int) (app(ConfigurationProvider::class)->postProcessing()->passwordCheckAttempts ?: 1), 1);
         // Delegate to AdditionalCandidateQuery so size-filter semantics
         // (explicit '0' means disabled, empty/null means default) are owned
         // in one place and shared between the bucket query and the per-worker
@@ -120,7 +120,7 @@ final readonly class ProcessingConfiguration
         $this->maxSizeBytes = AdditionalCandidateQuery::maxSizeBytes();
         $this->minSizeBytes = AdditionalCandidateQuery::minSizeBytes();
         $this->alternateNNTP = (bool) config('nntmux_nntp.use_alternate_nntp_server');
-        $this->ffmpegDuration = (int) (Settings::settingValue('ffmpeg_duration') ?: 5);
+        $this->ffmpegDuration = (int) (app(ConfigurationProvider::class)->postProcessing()->ffmpegDuration ?: 5);
         $this->addPAR2Files = (bool) config('nntmux_settings.add_par2');
         $this->ffmpegPath = config('nntmux_settings.ffmpeg_path') ?: false;
         $this->mediaInfoPath = config('nntmux_settings.mediainfo_path') ?: false;
@@ -129,11 +129,11 @@ final readonly class ProcessingConfiguration
             $this->processThumbnails = false;
             $this->processVideo = false;
         } else {
-            $this->processAudioSample = (int) Settings::settingValue('saveaudiopreview') !== 0;
-            $this->processThumbnails = (int) Settings::settingValue('processthumbnails') !== 0;
-            $this->processVideo = (int) Settings::settingValue('processvideos') !== 0;
+            $this->processAudioSample = (int) app(ConfigurationProvider::class)->postProcessing()->saveAudioPreview !== 0;
+            $this->processThumbnails = (int) app(ConfigurationProvider::class)->postProcessing()->processThumbnails !== 0;
+            $this->processVideo = (int) app(ConfigurationProvider::class)->postProcessing()->processVideos !== 0;
         }
-        $this->processJPGSample = (int) Settings::settingValue('processjpg') !== 0;
+        $this->processJPGSample = (int) app(ConfigurationProvider::class)->postProcessing()->processJpg !== 0;
         $this->processMediaInfo = (bool) $this->mediaInfoPath;
         $this->processAudioInfo = $this->processMediaInfo;
         $this->processPasswords = config('nntmux_settings.check_passworded_rars') === true
@@ -145,8 +145,8 @@ final readonly class ProcessingConfiguration
         $this->searchEnabled = in_array($this->searchDriver, ['manticore', 'elasticsearch']);
         $this->renameMusicMediaInfo = (bool) config('nntmux.rename_music_mediainfo');
         $this->renamePar2 = (bool) config('nntmux.rename_par2');
-        $this->releaseProcessingTimeout = (int) (Settings::settingValue('releaseprocessingtimeout') ?: 120);
-        $this->maxPpTimeoutCount = (int) (Settings::settingValue('maxpptimeoutcount') ?: 3);
+        $this->releaseProcessingTimeout = (int) (app(ConfigurationProvider::class)->postProcessing()->releaseTimeoutSeconds ?: 120);
+        $this->maxPpTimeoutCount = (int) (app(ConfigurationProvider::class)->postProcessing()->maxTimeoutCount ?: 3);
         // Regex patterns
         $this->audioFileRegex = '\\.(AAC|AIFF|APE|AC3|ASF|DTS|FLAC|MKA|MKS|MP2|MP3|RA|OGG|OGM|W64|WAV|WMA)';
         $this->ignoreBookRegex = '/\\b(epub|lit|mobi|pdf|sipdf|html)\\b.*\\.rar(?!.{20,})/i';
