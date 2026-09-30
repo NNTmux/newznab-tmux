@@ -184,6 +184,53 @@ class RememberMeAuthenticationTest extends TestCase
         $this->assertAuthenticatedAs($user);
     }
 
+    public function test_username_password_login_survives_the_next_request(): void
+    {
+        $user = $this->createUser('next-request@example.test');
+        $previousPasswordHash = Auth::hashPasswordForCookie($user->getAuthPassword());
+
+        $response = $this->post(route('login'), [
+            'username' => $user->username,
+            'password' => 'password',
+        ]);
+
+        $response->assertRedirect('/');
+        $cookie = $response->getCookie(config('session.cookie'), decrypt: false);
+        $this->assertNotNull($cookie);
+        Auth::forgetGuards();
+
+        $this->withUnencryptedCookie($cookie->getName(), $cookie->getValue())
+            ->get('/__remember_me_probe')->assertOk();
+        $this->assertAuthenticatedAs($user);
+
+        $this->withSession(['password_hash_web' => $previousPasswordHash]);
+        session()->save();
+        Auth::forgetGuards();
+        $this->get('/__remember_me_probe')->assertRedirect(route('login'));
+        $this->assertGuest();
+    }
+
+    public function test_password_login_replaces_a_previous_password_hash_in_the_session(): void
+    {
+        $user = $this->createUser('previous-session@example.test');
+        $this->withSession(['password_hash_web' => bcrypt('previous-password')]);
+
+        $response = $this->post(route('login'), [
+            'username' => $user->username,
+            'password' => 'password',
+            'rememberme' => 'on',
+        ]);
+
+        $response->assertRedirect('/');
+        $cookie = $response->getCookie(config('session.cookie'), decrypt: false);
+        $this->assertNotNull($cookie);
+        Auth::forgetGuards();
+
+        $this->withUnencryptedCookie($cookie->getName(), $cookie->getValue())
+            ->get('/__remember_me_probe')->assertOk();
+        $this->assertAuthenticatedAs($user);
+    }
+
     public function test_password_login_records_the_client_ip_when_ip_storage_is_enabled(): void
     {
         Event::fake([UserLoggedIn::class]);
@@ -293,6 +340,14 @@ class RememberMeAuthenticationTest extends TestCase
         $this->assertAuthenticatedAs($user);
         $this->assertTrue((bool) session(config('google2fa.session_var')));
         $this->assertNull(session('2fa:user:id'));
+
+        $cookie = $response->getCookie(config('session.cookie'), decrypt: false);
+        $this->assertNotNull($cookie);
+        Auth::forgetGuards();
+
+        $this->withUnencryptedCookie($cookie->getName(), $cookie->getValue())
+            ->get('/__remember_me_probe')->assertOk();
+        $this->assertAuthenticatedAs($user);
     }
 
     public function test_two_factor_login_with_forged_trusted_device_cookie_still_requires_otp(): void

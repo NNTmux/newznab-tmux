@@ -302,6 +302,11 @@ class LoginController extends Controller
 
     private function rotateSessionTokenForCurrentSession(Request $request, User $user): void
     {
+        $request->session()->put(
+            'password_hash_'.Auth::getDefaultDriver(),
+            Auth::hashPasswordForCookie($user->getAuthPassword())
+        );
+
         $newSessionToken = Str::random(60);
 
         $user->forceFill([
