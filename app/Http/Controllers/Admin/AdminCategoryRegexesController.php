@@ -47,7 +47,7 @@ class AdminCategoryRegexesController extends BasePageController
         $regexes = new RegexService('category_regexes');
 
         // Set the current action.
-        $action = $request->input('action') ?? 'view';
+        $action = $this->formAction($request);
 
         $regex = [
             'id' => '',

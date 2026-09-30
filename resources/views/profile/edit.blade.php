@@ -29,7 +29,7 @@
         @endif
 
         <!-- Form -->
-        <form method="POST" action="{{ route('profileedit') }}" class="p-6 space-y-6">
+        <form id="profile-update-form" method="POST" action="{{ route('profileedit') }}" class="p-6 space-y-6">
             @csrf
             <input type="hidden" name="action" value="submit">
 
@@ -39,6 +39,21 @@
                 <input type="email" name="email" id="email" value="{{ old('email', $user->email) }}"
                     class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 @error('email') border-red-500 dark:border-red-600 @enderror">
                 @error('email')
+                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <!-- Current Password -->
+            <div>
+                <label for="current_password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Current Password (required to set a new password)</label>
+                <div class="relative">
+                    <input type="password" name="current_password" id="current_password" autocomplete="current-password"
+                        class="w-full px-4 py-2 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 @error('current_password') border-red-500 dark:border-red-600 @enderror">
+                    <button type="button" class="password-toggle-btn absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" data-field-id="current_password">
+                        <i class="fas fa-eye" id="current_password-eye"></i>
+                    </button>
+                </div>
+                @error('current_password')
                     <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>
@@ -304,29 +319,28 @@
                 </div>
             </div>
 
+        </form>
+
             <!-- Actions -->
-            <div class="border-t border-gray-200 dark:border-gray-700 pt-6 flex items-center justify-between">
+            <div class="mx-6 mb-6 mt-6 border-t border-gray-200 pt-6 flex items-center justify-between dark:border-gray-700">
                 <a href="{{ route('profile') }}" class="px-6 py-2 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 transition">
                     Cancel
                 </a>
                 <div class="flex space-x-2">
-                    <a href="{{ route('profileedit', ['action' => 'newapikey']) }}"
-                       class="px-6 py-2 text-primary-700 bg-primary-100 rounded-lg hover:bg-primary-200 transition"
-                       x-data="confirmLink"
-                       data-url="{{ route('profileedit', ['action' => 'newapikey']) }}"
-                       data-title="New API Key"
-                       data-message="Are you sure you want to generate a new API key?"
-                       data-confirm-text="Generate"
-                       data-type="warning"
-                       @click.prevent="navigate()">
-                        <i class="fas fa-key mr-2"></i>New API Key
-                    </a>
-                    <button type="submit" class="px-6 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 transition">
+                    <form method="POST" action="{{ route('profileedit') }}">
+                        @csrf
+                        <input type="hidden" name="action" value="newapikey">
+                        <button type="submit"
+                            class="px-6 py-2 text-primary-700 bg-primary-100 rounded-lg hover:bg-primary-200 transition"
+                            data-confirm="Are you sure you want to generate a new API key?">
+                            <i class="fas fa-key mr-2"></i>New API Key
+                        </button>
+                    </form>
+                    <button type="submit" form="profile-update-form" class="px-6 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 transition">
                         <i class="fas fa-save mr-2"></i>Save Changes
                     </button>
                 </div>
             </div>
-        </form>
 
         <!-- 2FA Section (Outside main form) -->
         <div class="p-6 border-t border-gray-200">

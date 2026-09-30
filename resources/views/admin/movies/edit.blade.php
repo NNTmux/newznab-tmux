@@ -242,11 +242,13 @@
                         <a href="{{ url('admin/movie-list') }}" class="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
                             <i class="fas fa-times mr-2"></i>Cancel
                         </a>
-                        <a href="{{ url('admin/movie-edit?id=' . ($movie['imdbid'] ?? $movie->imdbid ?? '') . '&update=1') }}"
+                        <button type="submit"
+                           name="update"
+                           value="1"
                            class="ml-auto px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
                            data-confirm="This will fetch and update movie data from TMDB. Continue?">
                             <i class="fas fa-refresh mr-2"></i>Update from TMDB
-                        </a>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -353,9 +355,14 @@
                                     <a href="{{ url('admin/movie-edit?id=' . $movie->imdbid) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 mr-3">
                                         <i class="fas fa-edit"></i> Edit
                                     </a>
-                                    <a href="{{ url('admin/movie-edit?id=' . $movie->imdbid . '&update=1') }}" class="text-green-600 dark:text-green-400 hover:text-green-900" title="Update from TMDB">
-                                        <i class="fas fa-refresh"></i> Update
-                                    </a>
+                                    <form method="POST" action="{{ route('admin.movie-edit') }}" class="inline">
+                                        @csrf
+                                        <input type="hidden" name="id" value="{{ $movie->imdbid }}">
+                                        <input type="hidden" name="update" value="1">
+                                        <button type="submit" class="text-green-600 dark:text-green-400 hover:text-green-900" title="Update from TMDB">
+                                            <i class="fas fa-refresh"></i> Update
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
                         @endforeach

@@ -165,6 +165,22 @@ class BasePageController extends Controller
         return is_scalar($value) ? (string) $value : $default;
     }
 
+    /**
+     * Resolve a legacy form action while preventing mutation actions on GET requests.
+     *
+     * @param  list<string>  $allowedReadActions
+     */
+    protected function formAction(Request $request, array $allowedReadActions = ['view']): string
+    {
+        $action = $this->scalarInput($request, 'action', 'view');
+
+        if (! $request->isMethod('post') && ! in_array($action, $allowedReadActions, true)) {
+            return 'view';
+        }
+
+        return $action;
+    }
+
     protected function integerInput(Request $request, string $key, int $default = 0): int
     {
         $value = $this->scalarInput($request, $key, (string) $default);

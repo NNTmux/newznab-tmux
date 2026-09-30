@@ -83,25 +83,13 @@ final class PasskeyLoginController extends Controller
 
         $user = $passkey->authenticatable;
 
-        if ($user->trashed()) {
+        if (! $user->isEligibleForAuthentication()) {
             Log::channel('failed_login')->error(
-                'Failed passkey login for deactivated user: '.$user->username.' from IP address: '.$request->ip()
+                'Failed passkey login for ineligible user: '.$user->username.' from IP address: '.$request->ip()
             );
 
-            session()->flash(
-                'authenticatePasskey::message',
-                'This account has been deactivated. Please contact us through contact form to have your account reactivated.'
-            );
-
-            return back();
-        }
-
-        if (! $user->hasVerifiedEmail()) {
-            Log::channel('failed_login')->error(
-                'Failed passkey login for unverified user: '.$user->username.' from IP address: '.$request->ip()
-            );
-
-            session()->flash('authenticatePasskey::message', 'You have not verified your email address!');
+            session()->flash('authenticatePasskey::message', __('passkeys::passkeys.invalid'));
+            session()->flash('authenticatePasskey::reason', 'ineligible_account');
 
             return back();
         }

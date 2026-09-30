@@ -99,12 +99,17 @@
                                    title="Edit Category">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <a href="{{ url('/admin/category-delete?id=' . $category->id) }}"
-                                   data-confirm-delete
-                                   class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
-                                   title="Delete Category">
-                                    <i class="fas fa-trash"></i>
-                                </a>
+                                <form method="POST" action="{{ route('admin.category-delete') }}" class="inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <input type="hidden" name="id" value="{{ $category->id }}">
+                                    <button type="submit"
+                                        data-confirm-delete
+                                        class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
+                                        title="Delete Category">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
                             </div>
                         </td>
                     </tr>
@@ -135,4 +140,3 @@
     </x-admin.card>
 </div>
 @endsection
-

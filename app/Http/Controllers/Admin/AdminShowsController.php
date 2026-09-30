@@ -37,7 +37,7 @@ class AdminShowsController extends BasePageController
     {
         $this->setAdminPrefs();
 
-        $action = $request->input('action', 'view');
+        $action = $this->formAction($request);
 
         if ($action === 'submit') {
             if ($request->has('from') && ! empty($request->input('from'))) {

@@ -49,7 +49,7 @@ class AdminCollectionRegexesController extends BasePageController
         $regex = ['id' => '', 'regex' => '', 'description' => '', 'group_regex' => '', 'ordinal' => '', 'status' => 1];
         $meta_title = $title = 'Collections Regex';
 
-        switch ($request->input('action') ?? 'view') {
+        switch ($this->formAction($request)) {
             case 'submit':
                 if (empty($request->input('group_regex'))) {
                     $error = 'Group regex must not be empty!';

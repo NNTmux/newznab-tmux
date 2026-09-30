@@ -93,7 +93,7 @@ class AdminUserController extends BasePageController
         $meta_title = $title = 'View User';
 
         // set the current action
-        $action = $request->input('action') ?? 'view';
+        $action = $this->formAction($request, ['view', 'add']);
 
         $roleId = null;
         if ($action === 'submit') {

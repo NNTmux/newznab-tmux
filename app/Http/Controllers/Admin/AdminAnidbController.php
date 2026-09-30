@@ -39,7 +39,7 @@ class AdminAnidbController extends BasePageController
         $anidbService = new AnidbService;
 
         // Set the current action.
-        $action = $request->input('action', 'view');
+        $action = $this->formAction($request);
 
         switch ($action) {
             case 'submit':

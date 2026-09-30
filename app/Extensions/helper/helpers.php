@@ -901,30 +901,24 @@ if (! function_exists('streamSslContextOptions')) {
      * Creates an array to be used with stream_context_create() to verify openssl certificates
      * when connecting to a tls or ssl connection when using stream functions (fopen/file_get_contents/etc).
      *
-     * @param  bool  $forceIgnore  Force ignoring of verification (useful for self-signed certs in development).
      * @return array<string, mixed> Stream context options for SSL/TLS connections
      */
-    function streamSslContextOptions(bool $forceIgnore = false): array
+    function streamSslContextOptions(): array
     {
         $cafile = config('nntmux_ssl.ssl_cafile', '');
         $capath = config('nntmux_ssl.ssl_capath', '');
-        $hasCustomCerts = $cafile !== '' || $capath !== '';
 
-        // Base options - either insecure (no certs configured) or configured
         $options = [
-            'verify_peer' => ! $forceIgnore && $hasCustomCerts && config('nntmux_ssl.ssl_verify_peer', false),
-            'verify_peer_name' => ! $forceIgnore && $hasCustomCerts && config('nntmux_ssl.ssl_verify_host', false),
-            'allow_self_signed' => $forceIgnore ? true : config('nntmux_ssl.ssl_allow_self_signed', true),
+            'verify_peer' => config('nntmux_ssl.ssl_verify_peer', true),
+            'verify_peer_name' => config('nntmux_ssl.ssl_verify_host', true),
+            'allow_self_signed' => config('nntmux_ssl.ssl_allow_self_signed', false),
         ];
 
-        // Add certificate paths if configured
-        if ($hasCustomCerts && ! $forceIgnore) {
-            if ($cafile !== '') {
-                $options['cafile'] = $cafile;
-            }
-            if ($capath !== '') {
-                $options['capath'] = $capath;
-            }
+        if ($cafile !== '') {
+            $options['cafile'] = $cafile;
+        }
+        if ($capath !== '') {
+            $options['capath'] = $capath;
         }
 
         // Additional security options for modern TLS

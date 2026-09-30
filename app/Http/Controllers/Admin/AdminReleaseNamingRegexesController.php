@@ -47,7 +47,7 @@ class AdminReleaseNamingRegexesController extends BasePageController
         $regexes = new RegexService('release_naming_regexes');
 
         // Set the current action.
-        $action = $request->input('action') ?? 'view';
+        $action = $this->formAction($request);
         $error = '';
         $regex = ['id' => '', 'group_regex' => '', 'regex' => '', 'description' => '', 'ordinal' => '', 'status' => 1];
         $meta_title = $title = 'Release Naming Regex';

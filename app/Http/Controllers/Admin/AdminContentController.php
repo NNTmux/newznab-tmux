@@ -63,7 +63,7 @@ class AdminContentController extends BasePageController
         $meta_title = 'Content Add';
 
         // Set the current action.
-        $action = $request->input('action') ?? 'view';
+        $action = $this->formAction($request, ['view', 'add']);
 
         $content = [
             'id' => '',

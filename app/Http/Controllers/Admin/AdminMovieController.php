@@ -59,8 +59,8 @@ class AdminMovieController extends BasePageController
 
         $title = 'Movie Add';
 
-        // If no ID provided, show the add form
-        if (! $request->has('id')) {
+        // Only POST submissions may fetch and persist a new movie.
+        if (! $request->isMethod('post') || ! $request->has('id')) {
             return view('admin.movies.add', compact('title'));
         }
 
@@ -136,7 +136,7 @@ class AdminMovieController extends BasePageController
         }
 
         // Handle update from TMDB
-        if ($request->has('update') && (int) $request->input('update') === 1) {
+        if ($request->isMethod('post') && $request->has('update') && (int) $request->input('update') === 1) {
             try {
                 if (! \defined('STDOUT')) {
                     \define('STDOUT', fopen('php://stdout', 'wb'));
@@ -158,7 +158,7 @@ class AdminMovieController extends BasePageController
         }
 
         // Handle form submission
-        $action = $request->input('action') ?? 'view';
+        $action = $this->formAction($request);
 
         if ($action === 'submit') {
             try {

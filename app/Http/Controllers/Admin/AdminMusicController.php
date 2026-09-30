@@ -45,7 +45,7 @@ class AdminMusicController extends BasePageController
         $meta_title = $title = 'Music Edit';
 
         // Set the current action
-        $action = $request->input('action') ?? 'view';
+        $action = $this->formAction($request);
 
         if ($request->has('id')) {
             $id = (int) $request->input('id');

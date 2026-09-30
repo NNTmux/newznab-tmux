@@ -85,14 +85,16 @@
                                            title="View Statistics">
                                             <i class="fas fa-chart-line"></i>
                                         </a>
-                                        <a href="{{ route('admin.promotions.toggle', $promotion->id) }}"
-                                           class="promotion-toggle-btn {{ $promotion->is_active ? 'text-orange-600 dark:text-orange-400 hover:text-orange-900 dark:hover:text-orange-300' : 'text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300' }}"
-                                           title="{{ $promotion->is_active ? 'Deactivate' : 'Activate' }}"
-                                           data-promotion-id="{{ $promotion->id }}"
-                                           data-promotion-name="{{ $promotion->name }}"
-                                           data-promotion-active="{{ $promotion->is_active ? '1' : '0' }}">
-                                            <i class="fas fa-{{ $promotion->is_active ? 'pause' : 'play' }}"></i>
-                                        </a>
+                                        <form action="{{ route('admin.promotions.toggle', $promotion->id) }}" method="POST" class="inline">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit"
+                                                class="{{ $promotion->is_active ? 'text-orange-600 dark:text-orange-400 hover:text-orange-900 dark:hover:text-orange-300' : 'text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300' }}"
+                                                title="{{ $promotion->is_active ? 'Deactivate' : 'Activate' }}"
+                                                data-confirm="Are you sure you want to {{ $promotion->is_active ? 'deactivate' : 'activate' }} the promotion &quot;{{ $promotion->name }}&quot;?">
+                                                <i class="fas fa-{{ $promotion->is_active ? 'pause' : 'play' }}"></i>
+                                            </button>
+                                        </form>
                                         <a href="{{ route('admin.promotions.edit', $promotion->id) }}"
                                            class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
                                            title="Edit">

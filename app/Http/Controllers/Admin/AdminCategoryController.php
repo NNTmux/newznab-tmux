@@ -42,7 +42,7 @@ class AdminCategoryController extends BasePageController
         $this->setAdminPrefs();
 
         // set the current action
-        $action = $request->input('action') ?? 'view';
+        $action = $this->formAction($request);
 
         switch ($action) {
             case 'submit':
@@ -99,7 +99,7 @@ class AdminCategoryController extends BasePageController
         $this->setAdminPrefs();
 
         // set the current action
-        $action = $request->input('action') ?? 'view';
+        $action = $this->formAction($request);
 
         switch ($action) {
             case 'submit':

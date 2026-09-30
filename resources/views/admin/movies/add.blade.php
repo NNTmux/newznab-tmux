@@ -46,7 +46,8 @@
         </div>
 
         <!-- Add Movie Form -->
-        <form method="GET" action="{{ url('admin/movie-add') }}" class="p-6">
+        <form method="POST" action="{{ route('admin.movie-add') }}" class="p-6">
+            @csrf
             <div class="max-w-2xl">
                 <div class="mb-6">
                     <label for="id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">

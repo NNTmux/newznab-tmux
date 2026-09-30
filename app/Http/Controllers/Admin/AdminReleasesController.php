@@ -73,7 +73,7 @@ class AdminReleasesController extends BasePageController
     public function edit(Request $request)
     {
         // Set the current action.
-        $action = ($request->input('action') ?? 'view');
+        $action = $this->formAction($request);
 
         switch ($action) {
             case 'submit':

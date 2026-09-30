@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Process;
 use Throwable;
 
 /**
@@ -651,6 +652,10 @@ class NfoService
      */
     private function extractNfoViaUnrar(string $compressedData, array $nfoFilenames, string $guid): string|false
     {
+        if (! is_string($this->unrarPath)) {
+            return false;
+        }
+
         $uniqueId = uniqid('nfo_', true);
         $archiveFile = $this->tmpPath.'archive_'.$uniqueId.'.rar';
         $extractDir = $this->tmpPath.'extract_'.$uniqueId.'/';
@@ -662,10 +667,32 @@ class NfoService
 
             File::put($archiveFile, $compressedData);
 
-            $killString = $this->getKillString();
-
             foreach ($nfoFilenames as $nfoFilename) {
-                runCmd($killString.$this->unrarPath.'" e -y -c- -inul -p- "'.$archiveFile.'" "'.$nfoFilename.'" "'.$extractDir.'"');
+                $command = [
+                    $this->unrarPath,
+                    'e',
+                    '-y',
+                    '-c-',
+                    '-inul',
+                    '-p-',
+                    '-@',
+                    '-',
+                    $archiveFile,
+                    $nfoFilename,
+                    $extractDir,
+                ];
+
+                if ($this->timeoutPath && $this->timeoutSeconds > 0) {
+                    $command = [
+                        $this->timeoutPath,
+                        '--foreground',
+                        '--signal=KILL',
+                        (string) $this->timeoutSeconds,
+                        ...$command,
+                    ];
+                }
+
+                Process::timeout(1800)->run($command);
 
                 $extractedPath = $extractDir.basename($nfoFilename);
                 if (! File::isFile($extractedPath)) {
@@ -695,18 +722,6 @@ class NfoService
         }
 
         return false;
-    }
-
-    /**
-     * Build the kill/timeout string for wrapping CLI commands.
-     */
-    private function getKillString(): string
-    {
-        if ($this->timeoutPath && $this->timeoutSeconds > 0) {
-            return '"'.$this->timeoutPath.'" --foreground --signal=KILL '.$this->timeoutSeconds.' "';
-        }
-
-        return '"';
     }
 
     /**

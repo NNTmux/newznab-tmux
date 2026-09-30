@@ -50,7 +50,7 @@ class AdminConsoleController extends BasePageController
         $meta_title = $title = 'Console Edit';
 
         // set the current action
-        $action = $request->input('action', 'view');
+        $action = $this->formAction($request);
 
         if ($request->has('id')) {
             $id = $request->input('id');
