@@ -23,6 +23,19 @@ class Google2FAMiddleware
             return $next($request);
         }
 
+        if ($request->routeIs('passkeys.*', 'password.confirm')) {
+            $request->session()->put('url.intended', route('profileedit').'#security');
+        } elseif ($request->isMethod('GET')) {
+            $request->session()->put('url.intended', $request->fullUrl());
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => 'Two-factor authentication required.',
+                'redirect' => route('2fa.verify'),
+            ], 403);
+        }
+
         return $authenticator->makeRequestOneTimePasswordResponse();
     }
 }

@@ -9,6 +9,7 @@ use App\Models\PasswordSecurity;
 use App\Models\TrustedDevice;
 use App\Models\User;
 use App\Services\PasswordBreachService;
+use Illuminate\Auth\Events\OtherDeviceLogout;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Auth;
@@ -17,6 +18,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use PDO;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PragmaRX\Google2FALaravel\Facade as Google2FA;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
@@ -353,6 +355,117 @@ class RememberMeAuthenticationTest extends TestCase
             ->assertSessionMissing('google2fa.auth_passed');
         $this->assertGuest();
         $this->get('/__otp_probe')->assertRedirect(route('login'));
+    }
+
+    public function test_remembered_session_requires_mfa_and_recent_auth_before_managing_passkeys(): void
+    {
+        $user = $this->createUser('remembered-mfa@example.test');
+        $secret = Google2FA::generateSecretKey();
+        PasswordSecurity::query()->create([
+            'user_id' => $user->id, 'google2fa_enable' => true, 'google2fa_secret' => $secret,
+        ]);
+        config(['google2fa.enabled' => true]);
+        $this->post(route('login'), [
+            'username' => $user->email, 'password' => 'password', 'rememberme' => 'on',
+        ])->assertRedirect(route('2fa.verify'));
+        $login = $this->post(route('2fa.post'), ['one_time_password' => Google2FA::getCurrentOtp($secret)]);
+        $recaller = $login->getCookie($this->recallerCookieName(), decrypt: false);
+        $this->assertNotNull($recaller);
+        $this->flushSession();
+        Auth::forgetGuards();
+        $this->withCredentials()->withUnencryptedCookie($this->recallerCookieName(), $recaller->getValue());
+
+        $this->postJson(route('passkeys.register_options'), ['name' => 'Attacker key'])
+            ->assertForbidden()->assertSessionMissing('passkey-registration-options');
+        $this->postJson(route('passkeys.store'), ['name' => 'Attacker key', 'passkey' => '{}'])->assertForbidden();
+        $this->deleteJson(route('passkeys.destroy', ['passkey' => 1]))->assertForbidden();
+        $this->assertAuthenticatedAs($user);
+        $this->get(route('2fa.verify'))->assertOk();
+        $this->post(route('2faVerify'), ['one_time_password' => Google2FA::getCurrentOtp($secret)])
+            ->assertRedirect(route('profileedit').'#security')
+            ->assertSessionHas('google2fa.auth_passed', true)
+            ->assertSessionMissing('2fa:user:id');
+        $this->postJson(route('passkeys.register_options'), ['name' => 'Key'])->assertStatus(423);
+        $this->get(route('password.confirm'))->assertOk()->assertSee('Confirm Password');
+    }
+
+    #[DataProvider('laterChallengeStates')]
+    public function test_authenticated_user_can_complete_a_later_otp_challenge(string $state): void
+    {
+        Event::fake([OtherDeviceLogout::class, UserLoggedIn::class]);
+        config(['google2fa.enabled' => true, 'google2fa.lifetime' => 5, 'google2fa.keep_alive' => false]);
+        $user = $this->createUser('later-otp@example.test');
+        $secret = Google2FA::generateSecretKey();
+        PasswordSecurity::query()->create([
+            'user_id' => $user->id, 'google2fa_enable' => true, 'google2fa_secret' => $secret,
+        ]);
+        $user->forceFill(['session_token' => 'existing-session', 'remember_token' => 'existing-remember'])->save();
+        $this->actingAs($user)->withSession(['session_token_web' => 'existing-session']);
+
+        if ($state === 'expired') {
+            $this->withSession([
+                'google2fa.auth_passed' => true,
+                'google2fa.auth_time' => now()->subMinutes(6)->toIso8601String(),
+            ]);
+        } elseif ($state === 'revoked') {
+            $device = TrustedDevice::issueForUser($user);
+            $this->withCookie('2fa_trusted_device', json_encode([
+                'user_id' => $user->id, 'token' => $device['plain'],
+                'expires_at' => $device['device']->expires_at->getTimestamp(),
+            ], JSON_THROW_ON_ERROR));
+            $this->get('/__otp_probe')->assertOk()->assertSeeText('otp passed');
+            $device['device']->delete();
+        }
+
+        $this->get('/__otp_probe')->assertOk()->assertSee('One Time Password');
+        $this->get(route('2fa.verify'))->assertOk();
+        $this->post(route('2fa.post'), ['one_time_password' => '123456789'])
+            ->assertRedirect(route('2fa.verify'))->assertSessionMissing('2fa:user:id');
+        $this->get('/__otp_probe')->assertSee('One Time Password');
+        $sessionId = session()->getId();
+        $this->post(route('2fa.post'), ['one_time_password' => Google2FA::getCurrentOtp($secret)])
+            ->assertRedirect(url('/__otp_probe'))
+            ->assertCookieMissing($this->recallerCookieName())
+            ->assertSessionHas('google2fa.auth_passed', true)
+            ->assertSessionHas('google2fa.auth_time')
+            ->assertSessionHas('session_token_web', 'existing-session');
+        $this->assertNotSame($sessionId, session()->getId());
+        $this->assertSame('existing-session', $user->fresh()->session_token);
+        $this->assertSame('existing-remember', $user->fresh()->remember_token);
+        Event::assertNotDispatched(OtherDeviceLogout::class);
+        Event::assertNotDispatched(UserLoggedIn::class);
+        $this->get('/__otp_probe')->assertOk()->assertSeeText('otp passed');
+    }
+
+    /** @return array<string, array{string}> */
+    public static function laterChallengeStates(): array
+    {
+        return ['missing' => ['missing'], 'expired' => ['expired'], 'revoked' => ['revoked']];
+    }
+
+    public function test_reverification_uses_the_authenticated_account_over_a_stale_pending_login(): void
+    {
+        $user = $this->createUser('current-otp@example.test');
+        $other = $this->createUser('stale-pending@example.test');
+        $secret = Google2FA::generateSecretKey();
+        $otherSecret = Google2FA::generateSecretKey();
+        foreach ([[$user, $secret], [$other, $otherSecret]] as [$account, $key]) {
+            PasswordSecurity::query()->create([
+                'user_id' => $account->id, 'google2fa_enable' => true, 'google2fa_secret' => $key,
+            ]);
+        }
+        $this->actingAs($user)->withSession(['2fa:user:id' => $other->id]);
+        $this->get(route('2fa.verify'))->assertViewHas('user', fn (User $shown): bool => $shown->is($user));
+        $this->post(route('2fa.post'), ['one_time_password' => Google2FA::getCurrentOtp($secret)])
+            ->assertRedirect('/')->assertSessionMissing('2fa:user:id');
+        $this->assertAuthenticatedAs($user);
+    }
+
+    public function test_guest_without_pending_password_login_cannot_verify_otp(): void
+    {
+        $this->get(route('2fa.verify'))->assertRedirect(route('login'));
+        $this->post(route('2fa.post'), ['one_time_password' => '123456'])->assertRedirect(route('login'));
+        $this->assertGuest();
     }
 
     public function test_two_factor_login_with_valid_trusted_device_logs_in_without_otp(): void

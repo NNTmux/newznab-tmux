@@ -145,4 +145,38 @@ for (const delegated of [false, true]) {
     }
 }
 
-console.log('Frontend motion, privacy, password, theme and cart behavior passed.');
+for (const operation of ['create', 'delete']) {
+    for (const status of [423, 403, 422]) {
+        let factory;
+        let destination;
+        let registrations = 0;
+        const failure = { response: { status, data: { message: 'Authentication required.' } } };
+        if (status === 403) failure.response.data.redirect = '/2fa/verify';
+        loadComponent('components/passkey-manage.js', {
+            Alpine: { data: (_name, callback) => { factory = callback; } },
+            window: {
+                browserSupportsWebAuthn: () => true,
+                location: { assign: url => { destination = url; } },
+                axios: {
+                    post: async () => { throw failure; },
+                    delete: async () => { throw failure; },
+                },
+                startRegistration: async () => { registrations++; },
+                showConfirm: async () => true,
+                navigator: {},
+            },
+        });
+        const component = factory();
+        component.$root = { dataset: { confirmPasswordUrl: '/confirm-password' } };
+        component.init();
+        component.passkeys = [{ id: 1, name: 'Existing key' }];
+        if (operation === 'create') await component.createSecurityKeyPasskey();
+        else await component.deletePasskey(1);
+        assert.equal(destination, status === 423 ? '/confirm-password' : status === 403 ? '/2fa/verify' : undefined);
+        assert.equal(registrations, 0, 'Do not start WebAuthn until server authorization succeeds');
+        assert.equal(component.passkeys.length, 1, 'Keep existing passkeys when authorization fails');
+        assert.equal(component.busy, false);
+    }
+}
+
+console.log('Frontend motion, privacy, password, theme, cart and passkey behavior passed.');

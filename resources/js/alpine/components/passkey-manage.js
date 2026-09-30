@@ -12,6 +12,7 @@ Alpine.data('passkeyManage', () => ({
     optionsUrl: '/passkeys/register-options',
     storeUrl: '/passkeys',
     destroyBaseUrl: '/passkeys',
+    confirmPasswordUrl: '/confirm-password',
 
     init() {
         this.supported = typeof window.browserSupportsWebAuthn === 'function'
@@ -23,6 +24,9 @@ Alpine.data('passkeyManage', () => ({
         // element when using the Alpine CSP build).
         const root = this.$root || this.$el;
         if (root && root.dataset) {
+            if (root.dataset.confirmPasswordUrl) {
+                this.confirmPasswordUrl = root.dataset.confirmPasswordUrl;
+            }
             if (root.dataset.optionsUrl) {
                 this.optionsUrl = root.dataset.optionsUrl;
             }
@@ -237,6 +241,12 @@ Alpine.data('passkeyManage', () => ({
     },
 
     extractErrorMessage(error) {
+        if (error?.response?.status === 423) {
+            window.location.assign(this.confirmPasswordUrl);
+        } else if (error?.response?.status === 403 && error.response.data?.redirect) {
+            window.location.assign(error.response.data.redirect);
+        }
+
         if (error?.response?.data?.message) {
             return error.response.data.message;
         }

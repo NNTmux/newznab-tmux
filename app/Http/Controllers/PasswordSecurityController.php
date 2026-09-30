@@ -17,7 +17,6 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use PragmaRX\Google2FA\Exceptions\IncompatibleWithGoogleAuthenticatorException;
 use PragmaRX\Google2FA\Exceptions\InvalidCharactersException;
@@ -159,15 +158,10 @@ class PasswordSecurityController extends Controller
             'trust_device' => 'nullable|boolean',
         ]);
 
-        // Get the user ID from session
-        if (! $request->session()->has('2fa:user:id')) {
-            return $this->redirectToLoginWithError('The two-factor authentication session has expired. Please login again.');
-        }
+        $authenticatedUser = $request->user();
+        $user = $authenticatedUser ?? User::find($request->session()->get('2fa:user:id'));
 
-        $userId = $request->session()->get('2fa:user:id');
-        $user = User::find($userId);
-
-        if (! $user || ! $user->passwordSecurity) {
+        if (! $user || ! $user->passwordSecurity?->google2fa_enable) {
             $request->session()->forget('2fa:user:id');
 
             return $this->redirectToLoginWithError('User not found or 2FA not configured. Please login again.');
@@ -184,23 +178,21 @@ class PasswordSecurityController extends Controller
                 ->with('error', 'Invalid authentication code. Please try again.');
         }
 
-        // Get the remember me preference from session (defaults to false if not set)
-        $rememberMe = $request->session()->get('2fa:remember', false);
+        $passwordBreached = false;
+        if ($authenticatedUser === null) {
+            $rememberMe = (bool) $request->session()->get('2fa:remember', false);
+            Auth::login($user, $rememberMe);
 
-        // Log the user back in with the remember me preference
-        Auth::login($user, $rememberMe);
+            $passwordBreached = (bool) $request->session()->get('2fa:password_breached', false);
+            $newSessionToken = Str::random(60);
+            $user->forceFill(['session_token' => $newSessionToken])->save();
+            $request->session()->put('session_token_web', $newSessionToken);
+            event(new OtherDeviceLogout(Auth::getDefaultDriver(), $user));
+        }
 
+        $request->session()->regenerate();
         $request->session()->forget('2fa:trusted_device');
         Google2FA::boot($request)->login();
-
-        $passwordBreached = (bool) $request->session()->get('2fa:password_breached', false);
-
-        $newSessionToken = Str::random(60);
-        $user->forceFill([
-            'session_token' => $newSessionToken,
-        ])->save();
-        $request->session()->put('session_token_web', $newSessionToken);
-        event(new OtherDeviceLogout(Auth::getDefaultDriver(), $user));
 
         $request->session()->forget(['2fa:user:id', '2fa:remember', '2fa:password_breached']);
 
@@ -251,17 +243,8 @@ class PasswordSecurityController extends Controller
      */
     public function getVerify2fa(Request $request): mixed
     {
-        // Check if user ID is stored in the session
-        if (! $request->session()->has('2fa:user:id')) {
-            return $this->redirectToLoginWithError('The two-factor authentication session has expired. Please login again.');
-        }
-
-        // Get the user ID from session
-        $userId = $request->session()->get('2fa:user:id');
-
-        // Get the user
-        $user = User::find($userId);
-        if (! $user) {
+        $user = $request->user() ?? User::find($request->session()->get('2fa:user:id'));
+        if (! $user || ! $user->passwordSecurity?->google2fa_enable) {
             $request->session()->forget('2fa:user:id');
 
             return $this->redirectToLoginWithError('User not found. Please login again.');

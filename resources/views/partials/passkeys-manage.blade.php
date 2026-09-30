@@ -13,6 +13,7 @@
     x-data="passkeyManage"
     x-cloak
     data-options-url="{{ route('passkeys.register_options') }}"
+    data-confirm-password-url="{{ route('password.confirm') }}"
     data-store-url="{{ route('passkeys.store') }}"
     data-destroy-base-url="{{ url('passkeys') }}"
     data-passkeys='@json($passkeyPayload)'

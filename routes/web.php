@@ -49,6 +49,7 @@ use App\Http\Controllers\AdultController;
 use App\Http\Controllers\AjaxController;
 use App\Http\Controllers\Api\FileListApiController;
 use App\Http\Controllers\ApiHelpController;
+use App\Http\Controllers\Auth\ConfirmPasswordController;
 use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
@@ -140,12 +141,19 @@ Route::post('contact-us', [ContactUsController::class, 'contact']);
 Route::get('status', [StatusPageController::class, 'showStatusPage'])->name('status');
 
 Route::middleware(['auth', 'isVerified'])->group(function () {
-    Route::post('passkeys/register-options', [PasskeyManagementController::class, 'options'])
-        ->name('passkeys.register_options');
-    Route::post('passkeys', [PasskeyManagementController::class, 'store'])
-        ->name('passkeys.store');
-    Route::delete('passkeys/{passkey}', [PasskeyManagementController::class, 'destroy'])
-        ->name('passkeys.destroy');
+    Route::middleware('2fa')->group(function () {
+        Route::get('confirm-password', [ConfirmPasswordController::class, 'show'])->name('password.confirm');
+        Route::post('confirm-password', [ConfirmPasswordController::class, 'store'])->middleware('throttle:6,1');
+
+        Route::middleware('password.confirm:password.confirm,900')->group(function () {
+            Route::post('passkeys/register-options', [PasskeyManagementController::class, 'options'])
+                ->name('passkeys.register_options');
+            Route::post('passkeys', [PasskeyManagementController::class, 'store'])
+                ->name('passkeys.store');
+            Route::delete('passkeys/{passkey}', [PasskeyManagementController::class, 'destroy'])
+                ->name('passkeys.destroy');
+        });
+    });
 
     Route::match(['GET', 'POST'], 'profile', [ProfileController::class, 'show'])->name('profile');
 
