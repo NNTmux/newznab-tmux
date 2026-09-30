@@ -34,6 +34,6 @@ class CoverBrowseComponentsTest extends TestCase
         $this->assertStringContainsString('nfo-badge', $component);
         $this->assertStringContainsString('add-to-cart', $component);
         $this->assertStringContainsString('chkRelease', $component);
-        $this->assertStringContainsString('Available Releases', $component);
+        $this->assertStringContainsString('Available releases', $component);
     }
 }

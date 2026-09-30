@@ -2,9 +2,13 @@
 
 namespace Tests\Feature;
 
+use App\Http\Controllers\ProfileController;
 use App\Models\Category;
 use App\Models\User;
 use App\Models\UserExcludedCategory;
+use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -69,6 +73,34 @@ final class UserExcludedCategoryTest extends TestCase
     {
         DB::disconnect();
         parent::tearDown();
+    }
+
+    public function test_profile_preferences_save_with_all_password_fields_blank(): void
+    {
+        DB::statement('ALTER TABLE users ADD COLUMN style TEXT');
+        DB::statement('CREATE TABLE password_securities (id INTEGER PRIMARY KEY, user_id INTEGER)');
+        $this->user->setRelation('passkeys', collect());
+        $originalPassword = $this->user->password;
+        $controller = (new \ReflectionClass(ProfileController::class))->newInstanceWithoutConstructor();
+        $controller->userdata = $this->user;
+        $request = Request::create('/profileedit', 'POST', [
+            'action' => 'submit',
+            'current_password' => '',
+            'password' => '',
+            'password_confirmation' => '',
+            'excluded_categories' => [2040],
+        ]);
+        $request->setLaravelSession(app('session.store'));
+        (new ConvertEmptyStringsToNull)->handle($request, fn () => response('ok'));
+        $this->actingAs($this->user);
+
+        $response = $controller->edit($request);
+
+        $this->assertInstanceOf(RedirectResponse::class, $response);
+        $this->assertSame(url('/profile'), $response->getTargetUrl());
+        $this->assertSame('Profile changes saved', session('success'));
+        $this->assertEquals([2040], $this->user->excludedCategories()->pluck('categories_id')->all());
+        $this->assertSame($originalPassword, $this->user->fresh()->password);
     }
 
     private function createTestTables(): void

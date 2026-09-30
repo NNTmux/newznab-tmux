@@ -130,19 +130,13 @@
                                             <i class="fa fa-edit mr-1.5"></i>
                                             <span class="hidden xl:inline">Edit</span>
                                         </a>
-                                        <a class="inline-flex items-center px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 dark:bg-red-700 shadow hover:shadow-md transition-all duration-200 text-sm font-medium"
-                                           href="{{ url("/myshows?action=delete&id={$show['videos_id']}") }}"
-                                           title="Remove from My Shows"
-                                           x-data="confirmLink"
-                                           data-url="{{ url("/myshows?action=delete&id={$show['videos_id']}") }}"
-                                           data-title="Remove Show"
-                                           data-message="Are you sure you want to remove this show from your list?"
-                                           data-confirm-text="Remove"
-                                           data-type="danger"
-                                           @click.prevent="navigate()">
-                                            <i class="fa fa-trash mr-1.5"></i>
-                                            <span class="hidden xl:inline">Delete</span>
-                                        </a>
+                                        <form method="POST" action="{{ url("/myshows?action=delete&id={$show['videos_id']}") }}" x-data="confirmForm" @submit.prevent="submit()" data-title="Remove Show" data-message="Are you sure you want to remove this show from your list?" data-confirm-text="Remove" data-type="danger">
+                                            @csrf
+                                            <button type="submit" class="inline-flex items-center px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 dark:bg-red-700 shadow hover:shadow-md transition-all duration-200 text-sm font-medium" title="Remove from My Shows">
+                                                <i class="fa fa-trash mr-1.5"></i>
+                                                <span class="hidden xl:inline">Delete</span>
+                                            </button>
+                                        </form>
                                     </div>
                                 </td>
                             </tr>
@@ -190,18 +184,12 @@
                                    title="Edit">
                                     <i class="fa fa-edit"></i>
                                 </a>
-                                <a class="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 dark:bg-red-700 text-sm font-medium shadow"
-                                   href="{{ url("/myshows?action=delete&id={$show['videos_id']}") }}"
-                                   title="Remove"
-                                   x-data="confirmLink"
-                                   data-url="{{ url("/myshows?action=delete&id={$show['videos_id']}") }}"
-                                   data-title="Remove Show"
-                                   data-message="Are you sure you want to remove this show from your list?"
-                                   data-confirm-text="Remove"
-                                   data-type="danger"
-                                   @click.prevent="navigate()">
-                                    <i class="fa fa-trash"></i>
-                                </a>
+                                <form method="POST" action="{{ url("/myshows?action=delete&id={$show['videos_id']}") }}" x-data="confirmForm" @submit.prevent="submit()" data-title="Remove Show" data-message="Are you sure you want to remove this show from your list?" data-confirm-text="Remove" data-type="danger">
+                                    @csrf
+                                    <button type="submit" class="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 dark:bg-red-700 text-sm font-medium shadow" title="Remove">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>

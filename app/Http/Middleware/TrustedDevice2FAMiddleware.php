@@ -20,14 +20,7 @@ class TrustedDevice2FAMiddleware
 
         if ($trustedCookie && auth()->check()) {
             try {
-                $cookieData = json_decode($trustedCookie, true);
-
-                if (json_last_error() === JSON_ERROR_NONE &&
-                    isset($cookieData['user_id'], $cookieData['token'], $cookieData['expires_at']) &&
-                    (int) $cookieData['user_id'] === (int) auth()->id() &&
-                    time() <= (int) $cookieData['expires_at'] &&
-                    TrustedDevice::findValidForUser((int) auth()->id(), (string) $cookieData['token']) !== null) {
-
+                if (TrustedDevice::cookieIsValidForUser($trustedCookie, (int) auth()->id())) {
                     session([config('google2fa.session_var') => true]);
                     session([config('google2fa.session_var').'.auth.passed_at' => time()]);
                 }

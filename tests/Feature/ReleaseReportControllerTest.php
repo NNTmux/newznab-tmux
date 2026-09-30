@@ -18,6 +18,10 @@ class ReleaseReportControllerTest extends TestCase
     {
         parent::setUp();
 
+        config(['database.default' => 'testing', 'database.connections.testing.database' => ':memory:']);
+        DB::purge();
+        DB::reconnect();
+
         $this->withoutMiddleware();
         Cache::flush();
 

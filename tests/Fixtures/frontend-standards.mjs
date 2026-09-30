@@ -102,4 +102,47 @@ assert.equal(password.$refs.field.type, 'password');
 assert.equal(password.label(), 'Show password');
 assert.equal(password.$refs.field.value, 'unchanged');
 
-console.log('Frontend motion, privacy, password and theme behavior passed.');
+for (const delegated of [false, true]) {
+    for (const succeeds of [false, true]) {
+        let cartFactory;
+        let clickHandler;
+        let confirmation;
+        let request;
+        let reloads = 0;
+        const toasts = [];
+        loadComponent('components/cart-page.js', {
+            Alpine: { data: (name, callback) => { if (name === 'cartPage') cartFactory = callback; } },
+            document: {
+                querySelector: () => ({ content: 'session-csrf-token' }),
+                querySelectorAll: () => [],
+                getElementById: () => null,
+                addEventListener: (_event, callback) => { clickHandler = callback; },
+            },
+            window: { location: { reload: () => { reloads++; } } },
+            showConfirm: options => { confirmation = options; },
+            showToast: (...args) => { toasts.push(args); },
+            fetch: (url, options) => { request = { url, options }; return Promise.resolve({ ok: succeeds }); },
+        });
+        if (delegated) {
+            clickHandler({
+                preventDefault() {},
+                stopPropagation() {},
+                target: { closest: selector => selector === '.cart-delete-link' ? {
+                    getAttribute: name => name === 'data-delete-url' ? '/cart/delete/test-guid' : 'Test release',
+                } : null },
+            });
+        } else {
+            cartFactory().deleteItem('/cart/delete/test-guid', 'Test release');
+        }
+        assert.equal(request, undefined, 'Wait for confirmation before deleting');
+        confirmation.onConfirm();
+        await new Promise(resolve => setImmediate(resolve));
+        assert.equal(request.url, '/cart/delete/test-guid');
+        assert.equal(request.options.method, 'POST');
+        assert.equal(request.options.headers['X-CSRF-TOKEN'], 'session-csrf-token');
+        assert.equal(reloads, succeeds ? 1 : 0, 'Reload only after a successful delete');
+        if (!succeeds) assert.equal(toasts.at(-1)[1], 'error');
+    }
+}
+
+console.log('Frontend motion, privacy, password, theme and cart behavior passed.');

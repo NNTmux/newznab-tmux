@@ -324,7 +324,7 @@ class ProfileController extends BasePageController
     {
         return [
             'email' => ['nullable', 'string', 'email', 'max:255', 'unique:users,email,'.$userId, new ValidEmailDomain],
-            'current_password' => ['required_with:password', 'current_password'],
+            'current_password' => ['nullable', 'required_with:password', 'current_password'],
             'password' => ['nullable', 'string', 'min:8', 'confirmed', 'regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/'],
         ];
     }

@@ -156,8 +156,8 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
 
     Route::prefix('cart')->group(function () {
         Route::match(['GET', 'POST'], 'index', [CartController::class, 'index'])->name('cart.index');
-        Route::match(['GET', 'POST'], 'add', [CartController::class, 'store'])->name('cart.add');
-        Route::match(['GET', 'POST'], 'delete/{id}', [CartController::class, 'destroy'])->name('cart.delete');
+        Route::post('add', [CartController::class, 'store'])->name('cart.add');
+        Route::post('delete/{id}', [CartController::class, 'destroy'])->name('cart.delete');
     });
 
     Route::match(['GET', 'POST'], 'details/{guid}', [DetailsController::class, 'show'])->name('details');
@@ -213,7 +213,7 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
     Route::get('release-report/check', [ReleaseReportController::class, 'checkReported'])->name('release-report.check');
 
     Route::get('api/release/{guid}/filelist', [FileListApiController::class, 'getFileList'])->name('api.filelist');
-    Route::match(['GET', 'POST'], 'ajax_profile', [AjaxController::class, 'profile'])->name('ajax_profile');
+    Route::post('ajax_profile', [AjaxController::class, 'profile'])->name('ajax_profile');
     Route::match(['GET', 'POST'], '2fa', [PasswordSecurityController::class, 'show2faForm'])->name('2fa');
     Route::get('2fa/enable', [PasswordSecurityController::class, 'showEnable2faForm'])->name('2fa.enable');
     Route::get('2fa/disable', [PasswordSecurityController::class, 'showDisable2faForm'])->name('2fa.disable');

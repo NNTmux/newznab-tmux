@@ -71,7 +71,9 @@ Alpine.data('cartPage', () => ({
             confirmText: 'Remove',
             onConfirm: function() {
                 showToast('Removing item from cart...', 'info');
-                setTimeout(() => { window.location.href = url; }, 500);
+                fetch(url, { method: 'POST', headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content } })
+                    .then(r => { if (r.ok) window.location.reload(); else showToast('Failed to remove item', 'error'); })
+                    .catch(() => showToast('Failed to remove item', 'error'));
             }
         });
     }
@@ -280,11 +282,16 @@ Alpine.data('releaseMultiOps', () => ({
             e.stopPropagation();
             var name = cartDeleteLink.getAttribute('data-release-name');
             var url = cartDeleteLink.getAttribute('data-delete-url');
+            var csrf = document.querySelector('meta[name="csrf-token"]')?.content;
             showConfirm({
                 title: 'Remove from Cart',
                 message: 'Are you sure you want to remove "' + (name || 'this item') + '" from your cart?',
                 type: 'warning', confirmText: 'Remove',
-                onConfirm: function() { showToast('Removing...', 'info'); setTimeout(function() { window.location.href = url; }, 500); }
+                onConfirm: function() {
+                    fetch(url, { method: 'POST', headers: { 'X-CSRF-TOKEN': csrf } })
+                        .then(r => { if (r.ok) window.location.reload(); else showToast('Failed to remove item', 'error'); })
+                        .catch(() => showToast('Failed to remove item', 'error'));
+                }
             });
             return;
         }

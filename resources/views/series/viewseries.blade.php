@@ -117,11 +117,13 @@
                                            href="{{ url('/myshows?action=edit&id=' . $show['id'] . '&from=' . urlencode(request()->fullUrl())) }}">
                                             <i class="fa fa-pencil-alt mr-2"></i>Edit My Shows
                                         </a>
-                                        <a class="px-4 py-2 bg-red-600 dark:bg-red-700 text-white rounded-lg hover:bg-red-700 dark:hover:bg-red-800 inline-flex items-center text-sm font-medium transition"
-                                           title="Remove from My Shows"
-                                           href="{{ url('/myshows?action=delete&id=' . $show['id'] . '&from=' . urlencode(request()->fullUrl())) }}">
-                                            <i class="fa fa-minus mr-2"></i>Remove from My Shows
-                                        </a>
+                                        <form method="POST" action="{{ url('/myshows?action=delete&id=' . $show['id'] . '&from=' . urlencode(request()->fullUrl())) }}">
+                                            @csrf
+                                            <button type="submit" class="px-4 py-2 bg-red-600 dark:bg-red-700 text-white rounded-lg hover:bg-red-700 dark:hover:bg-red-800 inline-flex items-center text-sm font-medium transition"
+                                                title="Remove from My Shows">
+                                                <i class="fa fa-minus mr-2"></i>Remove from My Shows
+                                            </button>
+                                        </form>
                                     @else
                                         <a class="px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-800 inline-flex items-center text-sm font-medium transition"
                                            title="Add to My Shows"

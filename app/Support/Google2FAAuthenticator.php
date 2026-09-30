@@ -112,29 +112,6 @@ class Google2FAAuthenticator extends Authenticator
 
     private function trustedDeviceCookieIsValid(mixed $cookie): bool
     {
-        if (! is_string($cookie) || $cookie === '') {
-            return false;
-        }
-
-        $data = json_decode($cookie, true);
-
-        if (json_last_error() !== JSON_ERROR_NONE || ! is_array($data)) {
-            return false;
-        }
-
-        if (! isset($data['user_id'], $data['token'], $data['expires_at'])) {
-            return false;
-        }
-
-        $user = $this->getUser();
-        if ((int) $data['user_id'] !== (int) $user->id) {
-            return false;
-        }
-
-        if (time() > (int) $data['expires_at']) {
-            return false;
-        }
-
-        return TrustedDevice::findValidForUser((int) $user->id, (string) $data['token']) !== null;
+        return TrustedDevice::cookieIsValidForUser($cookie, (int) $this->getUser()->id);
     }
 }

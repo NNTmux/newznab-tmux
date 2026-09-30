@@ -170,9 +170,12 @@
                                             <a class="btn btn-warning btn-sm" href="{{ url("/mymovies?id=edit&imdb={$movie['imdbid']}") }}" title="Edit Categories">
                                                 <i class="fa fa-edit"></i>
                                             </a>
-                                            <a class="btn btn-danger btn-sm" href="{{ url("/mymovies?id=delete&imdb={$movie['imdbid']}") }}" title="Remove from My Movies">
-                                                <i class="fa fa-trash"></i>
-                                            </a>
+                                            <form method="POST" action="{{ url("/mymovies?id=delete&imdb={$movie['imdbid']}") }}">
+                                                @csrf
+                                                <button type="submit" class="btn btn-danger btn-sm" title="Remove from My Movies">
+                                                    <i class="fa fa-trash"></i>
+                                                </button>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>
@@ -219,9 +222,12 @@
                                     <a class="btn btn-warning btn-sm" href="{{ url("/mymovies?id=edit&imdb={$movie['imdbid']}") }}" title="Edit">
                                         <i class="fa fa-edit"></i>
                                     </a>
-                                    <a class="btn btn-danger btn-sm" href="{{ url("/mymovies?id=delete&imdb={$movie['imdbid']}") }}" title="Remove">
-                                        <i class="fa fa-trash"></i>
-                                    </a>
+                                    <form method="POST" action="{{ url("/mymovies?id=delete&imdb={$movie['imdbid']}") }}">
+                                        @csrf
+                                        <button type="submit" class="btn btn-danger btn-sm" title="Remove">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                         </div>
