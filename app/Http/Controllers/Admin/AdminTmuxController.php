@@ -18,7 +18,7 @@ class AdminTmuxController extends BasePageController
         $this->setAdminPrefs();
 
         // Set the current action.
-        $action = $request->input('action') ?? 'view';
+        $action = $this->formAction($request);
 
         switch ($action) {
             case 'submit':

@@ -48,7 +48,7 @@ class AdminBlacklistController extends BasePageController
         $regex = ['id' => '', 'groupname' => '', 'regex' => '', 'description' => '', 'msgcol' => 1, 'status' => 1, 'optype' => 1];
         $meta_title = $title = 'Binary Black/White list';
 
-        switch ($request->input('action') ?? 'view') {
+        switch ($this->formAction($request, ['view', 'addtest'])) {
             case 'submit':
                 if ($request->input('groupname') === '') {
                     $error = 'Group must be a valid usenet group';

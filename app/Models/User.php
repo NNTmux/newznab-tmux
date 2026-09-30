@@ -408,6 +408,14 @@ final class User extends Authenticatable implements CanResetPasswordContract, Ha
     }
 
     /**
+     * Determine whether this account may start an authenticated web session.
+     */
+    public function isEligibleForAuthentication(): bool
+    {
+        return ! $this->trashed() && ! $this->is_disabled && $this->hasVerifiedEmail();
+    }
+
+    /**
      * Mark the user's email as verified and keep legacy columns in sync.
      */
     public function markEmailAsVerified(): bool

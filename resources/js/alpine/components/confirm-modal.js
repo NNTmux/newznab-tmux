@@ -104,7 +104,7 @@ Alpine.data('confirmModal', () => ({
                     confirmText: 'Delete',
                     onConfirm: function() {
                         if (isAnchor && deleteEl.href) window.location.href = deleteEl.href;
-                        else if (form) form.submit();
+                        else if (form) form.requestSubmit(deleteEl);
                     }
                 });
                 return;
@@ -124,7 +124,7 @@ Alpine.data('confirmModal', () => ({
                     confirmText: 'Confirm',
                     onConfirm: function() {
                         if (isAnchor && confirmEl.href) window.location.href = confirmEl.href;
-                        else if (form) form.submit();
+                        else if (form) form.requestSubmit(confirmEl);
                     }
                 });
                 return;

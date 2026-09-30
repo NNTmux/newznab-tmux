@@ -113,7 +113,7 @@ class ProfileController extends BasePageController
     public function edit(Request $request)
     {
 
-        $action = $request->input('action') ?? 'view';
+        $action = $request->isMethod('post') ? ($request->input('action') ?? 'view') : 'view';
 
         $userid = $this->userdata->id;
         $this->userdata->loadMissing('passkeys');
@@ -140,10 +140,7 @@ class ProfileController extends BasePageController
             case 'clearcookies':
                 return redirect()->to('profileedit');
             case 'submit':
-                $validator = Validator::make($request->all(), [
-                    'email' => ['nullable', 'string', 'email', 'max:255', 'unique:users,email,'.$userid, new ValidEmailDomain],
-                    'password' => ['nullable', 'string', 'min:8', 'confirmed', 'regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/'],
-                ]);
+                $validator = Validator::make($request->all(), $this->profileValidationRules($userid));
 
                 if ($validator->fails()) {
                     $errorStr = implode('', Arr::collapse($validator->errors()->toArray()));
@@ -318,5 +315,17 @@ class ProfileController extends BasePageController
             'theme_preference' => $user->theme_preference,
             'color_scheme' => $user->color_scheme,
         ]);
+    }
+
+    /**
+     * @return array<string, list<mixed>>
+     */
+    protected function profileValidationRules(int $userId): array
+    {
+        return [
+            'email' => ['nullable', 'string', 'email', 'max:255', 'unique:users,email,'.$userId, new ValidEmailDomain],
+            'current_password' => ['required_with:password', 'current_password'],
+            'password' => ['nullable', 'string', 'min:8', 'confirmed', 'regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/'],
+        ];
     }
 }

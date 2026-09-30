@@ -40,7 +40,7 @@ class AdminBookController extends BasePageController
         $meta_title = $title = 'Book Edit';
 
         // set the current action
-        $action = $request->input('action') ?? 'view';
+        $action = $this->formAction($request);
 
         if ($request->has('id')) {
             $id = $request->input('id');

@@ -30,11 +30,16 @@
                     </a>
                 @endif
                 @if(!($isadmin ?? false) && !$publicview)
-                    <a href="{{ url('profile_delete?id=' . $user->id) }}"
-                       class="px-4 py-2 bg-red-600 dark:bg-red-700 text-white text-sm rounded hover:bg-red-700 dark:hover:bg-red-800 transition"
-                       data-confirm="Are you sure you want to delete your account? This action cannot be undone.">
-                        <i class="fa fa-trash mr-1"></i>Delete Account
-                    </a>
+                    <form method="POST" action="{{ route('profile_delete') }}">
+                        @csrf
+                        @method('DELETE')
+                        <input type="hidden" name="id" value="{{ $user->id }}">
+                        <button type="submit"
+                            class="px-4 py-2 bg-red-600 dark:bg-red-700 text-white text-sm rounded hover:bg-red-700 dark:hover:bg-red-800 transition"
+                            data-confirm="Are you sure you want to delete your account? This action cannot be undone.">
+                            <i class="fa fa-trash mr-1"></i>Delete Account
+                        </button>
+                    </form>
                 @endif
             </div>
         </div>

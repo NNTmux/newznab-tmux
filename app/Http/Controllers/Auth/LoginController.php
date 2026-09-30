@@ -104,7 +104,7 @@ class LoginController extends Controller
             /** @var User $user */
             $user = Auth::user();
 
-            if ($user->is_disabled || ! $user->hasVerifiedEmail()) {
+            if (! $user->isEligibleForAuthentication()) {
                 Auth::logout();
                 $this->incrementLoginAttempts($request);
                 Log::channel('failed_login')->error('Failed login attempt by user: '.$request->input('username').' from IP address: '.$request->ip());

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Auth;
 
+use App\Enums\UserRole;
 use App\Events\UserLoggedIn;
 use App\Http\Middleware\Google2FAMiddleware;
 use App\Models\User;
@@ -162,7 +163,40 @@ class PasskeyAuthenticationTest extends TestCase
 
         $response->assertRedirect(route('login'));
         $this->assertGuest();
-        $this->assertSame('You have not verified your email address!', session('authenticatePasskey::message'));
+        $this->assertSame('ineligible_account', session('authenticatePasskey::reason'));
+    }
+
+    public function test_disabled_users_cannot_authenticate_with_passkeys(): void
+    {
+        Event::fake([UserLoggedIn::class]);
+        $user = $this->createUser('disabled@example.test');
+        $user->forceFill(['roles_id' => UserRole::DISABLED->value])->save();
+
+        $passkey = new Passkey;
+        $passkey->setRawAttributes([
+            'id' => 5,
+            'authenticatable_id' => $user->id,
+            'name' => 'Suspended key',
+            'credential_id' => 'credential-5',
+            'data' => '{}',
+        ], true);
+        $passkey->setRelation('authenticatable', $user->fresh());
+
+        FakeFindPasskeyAction::$passkey = $passkey;
+        config()->set('passkeys.actions.find_passkey', FakeFindPasskeyAction::class);
+
+        $response = $this
+            ->from(route('login'))
+            ->withSession(['passkey-authentication-options' => '{}'])
+            ->post(route('passkeys.login'), [
+                'start_authentication_response' => json_encode(['id' => 'credential-5'], JSON_THROW_ON_ERROR),
+            ]);
+
+        $response->assertRedirect(route('login'));
+        $this->assertGuest();
+        $this->assertSame('ineligible_account', session('authenticatePasskey::reason'));
+        Event::assertNotDispatched(UserLoggedIn::class);
+        $this->assertNull($user->fresh()?->session_token);
     }
 
     public function test_passkey_authentication_without_session_options_redirects_with_message(): void

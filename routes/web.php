@@ -197,8 +197,9 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
 
     Route::match(['GET', 'POST'], 'nfo/{id?}', [NfoController::class, 'showNfo'])->name('nfo');
 
-    Route::match(['GET', 'POST'], 'profileedit', [ProfileController::class, 'edit'])->name('profileedit');
-    Route::match(['GET', 'POST'], 'profile_delete', [ProfileController::class, 'destroy'])->name('profile_delete');
+    Route::get('profileedit', [ProfileController::class, 'edit'])->name('profileedit');
+    Route::post('profileedit', [ProfileController::class, 'edit']);
+    Route::delete('profile_delete', [ProfileController::class, 'destroy'])->name('profile_delete');
     Route::post('profile/update-theme', [ProfileController::class, 'updateTheme'])->name('profile.update-theme');
     Route::get('privacy-center', [PrivacyCenterController::class, 'index'])->name('privacy-center.index');
     Route::post('privacy-center/export', [PrivacyCenterController::class, 'requestExport'])->middleware('throttle:3,1')->name('privacy-center.export');
@@ -243,19 +244,25 @@ Route::middleware(['role:Admin', '2fa'])->prefix('admin')->group(function () {
     Route::get('api/user-activity/recent', [AdminPageController::class, 'getRecentActivity'])->name('admin.api.user-activity.recent');
 
     Route::post('anidb-delete/{id}', [AdminAnidbController::class, 'destroy'])->name('admin.anidb-delete');
-    Route::match(['GET', 'POST'], 'anidb-edit/{id}', [AdminAnidbController::class, 'edit'])->name('admin.anidb-edit');
+    Route::get('anidb-edit/{id}', [AdminAnidbController::class, 'edit'])->name('admin.anidb-edit');
+    Route::post('anidb-edit/{id}', [AdminAnidbController::class, 'edit']);
     Route::get('anidb-list', [AdminAnidbController::class, 'index'])->name('admin.anidb-list');
     Route::get('binaryblacklist-list', [AdminBlacklistController::class, 'index'])->name('admin.binaryblacklist-list');
-    Route::match(['GET', 'POST'], 'binaryblacklist-edit', [AdminBlacklistController::class, 'edit'])->name('admin.binaryblacklist-edit');
+    Route::get('binaryblacklist-edit', [AdminBlacklistController::class, 'edit'])->name('admin.binaryblacklist-edit');
+    Route::post('binaryblacklist-edit', [AdminBlacklistController::class, 'edit']);
     Route::get('book-list', [AdminBookController::class, 'index'])->name('admin.book-list');
-    Route::match(['GET', 'POST'], 'book-edit', [AdminBookController::class, 'edit'])->name('admin.book-edit');
+    Route::get('book-edit', [AdminBookController::class, 'edit'])->name('admin.book-edit');
+    Route::post('book-edit', [AdminBookController::class, 'edit']);
     Route::get('category-list', [AdminCategoryController::class, 'index'])->name('admin.category-list');
-    Route::match(['GET', 'POST'], 'category-add', [AdminCategoryController::class, 'create'])->name('admin.category-add');
-    Route::match(['GET', 'POST'], 'category-edit', [AdminCategoryController::class, 'edit'])->name('admin.category-edit');
-    Route::get('category-delete', [AdminCategoryController::class, 'destroy'])->name('admin.category-delete');
+    Route::get('category-add', [AdminCategoryController::class, 'create'])->name('admin.category-add');
+    Route::post('category-add', [AdminCategoryController::class, 'create']);
+    Route::get('category-edit', [AdminCategoryController::class, 'edit'])->name('admin.category-edit');
+    Route::post('category-edit', [AdminCategoryController::class, 'edit']);
+    Route::delete('category-delete', [AdminCategoryController::class, 'destroy'])->name('admin.category-delete');
     Route::get('user-list', [AdminUserController::class, 'index'])->name('admin.user-list');
     Route::post('user-list/bulk', [AdminUserController::class, 'bulkAction'])->name('admin.user-list.bulk');
-    Route::match(['GET', 'POST'], 'user-edit', [AdminUserController::class, 'edit'])->name('admin.user-edit');
+    Route::get('user-edit', [AdminUserController::class, 'edit'])->name('admin.user-edit');
+    Route::post('user-edit', [AdminUserController::class, 'edit']);
     Route::delete('user-passkey/{passkey}', [AdminUserController::class, 'destroyPasskey'])->name('admin.user-passkey.destroy');
     Route::post('user-passkeys/wipe', [AdminUserController::class, 'wipePasskeys'])->name('admin.user-passkeys.wipe');
     Route::post('user-delete', [AdminUserController::class, 'destroy'])->name('admin.user-delete');
@@ -269,7 +276,8 @@ Route::middleware(['role:Admin', '2fa'])->prefix('admin')->group(function () {
     Route::put('registrations/periods/{period}', [AdminRegistrationController::class, 'updatePeriod'])->name('admin.registrations.periods.update');
     Route::post('registrations/periods/{period}/toggle', [AdminRegistrationController::class, 'togglePeriod'])->name('admin.registrations.periods.toggle');
     Route::delete('registrations/periods/{period}', [AdminRegistrationController::class, 'destroyPeriod'])->name('admin.registrations.periods.destroy');
-    Route::match(['GET', 'POST'], 'site-edit', [AdminSiteController::class, 'edit'])->name('admin.site-edit');
+    Route::get('site-edit', [AdminSiteController::class, 'edit'])->name('admin.site-edit');
+    Route::post('site-edit', [AdminSiteController::class, 'edit']);
     Route::get('status/create', [AdminStatusController::class, 'create'])->name('admin.status.create');
     Route::post('status', [AdminStatusController::class, 'store'])->name('admin.status.store');
     Route::get('status', [AdminStatusController::class, 'index'])->name('admin.status.index');
@@ -281,11 +289,14 @@ Route::middleware(['role:Admin', '2fa'])->prefix('admin')->group(function () {
     Route::get('site-stats', [AdminSiteController::class, 'stats'])->name('admin.site-stats');
     Route::get('logs', [AdminLogViewerController::class, 'index'])->name('admin.logs.index');
     Route::get('role-list', [AdminRoleController::class, 'index'])->name('admin.role-list');
-    Route::match(['GET', 'POST'], 'role-add', [AdminRoleController::class, 'create'])->name('admin.role-add');
-    Route::match(['GET', 'POST'], 'role-edit', [AdminRoleController::class, 'edit'])->name('admin.role-edit');
+    Route::get('role-add', [AdminRoleController::class, 'create'])->name('admin.role-add');
+    Route::post('role-add', [AdminRoleController::class, 'create']);
+    Route::get('role-edit', [AdminRoleController::class, 'edit'])->name('admin.role-edit');
+    Route::post('role-edit', [AdminRoleController::class, 'edit']);
     Route::post('role-delete', [AdminRoleController::class, 'destroy'])->name('admin.role-delete');
     Route::get('content-list', [AdminContentController::class, 'index'])->name('admin.content-list');
-    Route::match(['GET', 'POST'], 'content-add', [AdminContentController::class, 'create'])->name('admin.content-add');
+    Route::get('content-add', [AdminContentController::class, 'create'])->name('admin.content-add');
+    Route::post('content-add', [AdminContentController::class, 'create']);
     Route::post('content-reorder', [AdminContentController::class, 'reorder'])->name('admin.content-reorder');
     Route::post('content-toggle-status', [AdminContentController::class, 'toggleStatus'])->name('admin.content-toggle');
     Route::post('content-delete', [AdminContentController::class, 'destroy'])->name('admin.content-delete');
@@ -299,17 +310,21 @@ Route::middleware(['role:Admin', '2fa'])->prefix('admin')->group(function () {
     Route::get('promotions/{id}/statistics', [AdminPromotionController::class, 'showStatistics'])->name('admin.promotions.show-statistics');
     Route::put('promotions/{id}', [AdminPromotionController::class, 'update'])->name('admin.promotions.update');
     Route::delete('promotions/{id}', [AdminPromotionController::class, 'destroy'])->name('admin.promotions.destroy');
-    Route::get('promotions/{id}/toggle', [AdminPromotionController::class, 'toggle'])->name('admin.promotions.toggle');
+    Route::patch('promotions/{id}/toggle', [AdminPromotionController::class, 'toggle'])->name('admin.promotions.toggle');
 
     Route::post('release_naming_regexes-test', [AdminReleaseNamingRegexesController::class, 'testRegex'])->name('admin.release-naming-regexes-test');
     Route::get('release_naming_regexes-list', [AdminReleaseNamingRegexesController::class, 'index'])->name('admin.release_naming_regexes-list');
-    Route::match(['GET', 'POST'], 'release_naming_regexes-edit', [AdminReleaseNamingRegexesController::class, 'edit'])->name('admin.release_naming_regexes-edit');
+    Route::get('release_naming_regexes-edit', [AdminReleaseNamingRegexesController::class, 'edit'])->name('admin.release_naming_regexes-edit');
+    Route::post('release_naming_regexes-edit', [AdminReleaseNamingRegexesController::class, 'edit']);
     Route::get('category_regexes-list', [AdminCategoryRegexesController::class, 'index'])->name('admin.category_regexes-list');
-    Route::match(['GET', 'POST'], 'category_regexes-edit', [AdminCategoryRegexesController::class, 'edit'])->name('admin.category_regexes-edit');
+    Route::get('category_regexes-edit', [AdminCategoryRegexesController::class, 'edit'])->name('admin.category_regexes-edit');
+    Route::post('category_regexes-edit', [AdminCategoryRegexesController::class, 'edit']);
     Route::get('collection_regexes-list', [AdminCollectionRegexesController::class, 'index'])->name('admin.collection_regexes-list');
-    Route::match(['GET', 'POST'], 'collection_regexes-edit', [AdminCollectionRegexesController::class, 'edit'])->name('admin.collection_regexes-edit');
+    Route::get('collection_regexes-edit', [AdminCollectionRegexesController::class, 'edit'])->name('admin.collection_regexes-edit');
+    Route::post('collection_regexes-edit', [AdminCollectionRegexesController::class, 'edit']);
     Route::post('ajax', [AdminAjaxController::class, 'ajaxAction'])->name('admin.ajax');
-    Route::match(['GET', 'POST'], 'tmux-edit', [AdminTmuxController::class, 'edit'])->name('admin.tmux-edit');
+    Route::get('tmux-edit', [AdminTmuxController::class, 'edit'])->name('admin.tmux-edit');
+    Route::post('tmux-edit', [AdminTmuxController::class, 'edit']);
     Route::get('release-list', [AdminReleasesController::class, 'index'])->name('admin.release-list');
     Route::post('release-bulk-category', [AdminReleasesController::class, 'bulkCategory'])->name('admin.release-bulk-category');
     Route::post('release-delete/{id}', [AdminReleasesController::class, 'destroy'])->name('admin.release-delete');
@@ -324,27 +339,36 @@ Route::middleware(['role:Admin', '2fa'])->prefix('admin')->group(function () {
     Route::post('release-reports/bulk', [AdminReleaseReportController::class, 'bulkAction'])->name('admin.release-reports.bulk');
 
     Route::get('show-list', [AdminShowsController::class, 'index'])->name('admin.show-list');
-    Route::match(['GET', 'POST'], 'show-edit', [AdminShowsController::class, 'edit'])->name('admin.show-edit');
-    Route::match(['GET', 'POST'], 'show-add', [AdminShowsController::class, 'create'])->name('admin.show-add');
+    Route::get('show-edit', [AdminShowsController::class, 'edit'])->name('admin.show-edit');
+    Route::post('show-edit', [AdminShowsController::class, 'edit']);
+    Route::get('show-add', [AdminShowsController::class, 'create'])->name('admin.show-add');
+    Route::post('show-add', [AdminShowsController::class, 'create']);
     Route::get('show-add/lookup', [AdminShowsController::class, 'lookup'])->name('admin.show-add.lookup');
-    Route::get('show-remove/{id}', [AdminShowsController::class, 'destroy'])->name('admin.show-remove');
+    Route::post('show-remove/{id}', [AdminShowsController::class, 'destroy'])->name('admin.show-remove');
     Route::get('comments-list', [AdminCommentsController::class, 'index'])->name('admin.comments-list');
     Route::post('comments-delete/{id}', [AdminCommentsController::class, 'destroy'])->name('admin.comments-delete');
     Route::get('console-list', [AdminConsoleController::class, 'index'])->name('admin.console-list');
-    Route::match(['GET', 'POST'], 'console-edit', [AdminConsoleController::class, 'edit'])->name('admin.console-edit');
+    Route::get('console-edit', [AdminConsoleController::class, 'edit'])->name('admin.console-edit');
+    Route::post('console-edit', [AdminConsoleController::class, 'edit']);
     Route::get('failrel-list', [AdminFailedReleasesController::class, 'index'])->name('admin.failrel-list');
     Route::get('game-list', [AdminGameController::class, 'index'])->name('admin.game-list');
-    Route::match(['GET', 'POST'], 'game-edit', [AdminGameController::class, 'edit'])->name('admin.game-edit');
+    Route::get('game-edit', [AdminGameController::class, 'edit'])->name('admin.game-edit');
+    Route::post('game-edit', [AdminGameController::class, 'edit']);
     Route::get('movie-list', [AdminMovieController::class, 'index'])->name('admin.movie-list');
-    Route::match(['GET', 'POST'], 'movie-edit', [AdminMovieController::class, 'edit'])->name('admin.movie-edit');
-    Route::match(['GET', 'POST'], 'movie-add', [AdminMovieController::class, 'create'])->name('admin.movie-add');
+    Route::get('movie-edit', [AdminMovieController::class, 'edit'])->name('admin.movie-edit');
+    Route::post('movie-edit', [AdminMovieController::class, 'edit']);
+    Route::get('movie-add', [AdminMovieController::class, 'create'])->name('admin.movie-add');
+    Route::post('movie-add', [AdminMovieController::class, 'create']);
     Route::get('music-list', [AdminMusicController::class, 'index'])->name('admin.music-list');
-    Route::match(['GET', 'POST'], 'music-edit', [AdminMusicController::class, 'edit'])->name('admin.music-edit');
+    Route::get('music-edit', [AdminMusicController::class, 'edit'])->name('admin.music-edit');
+    Route::post('music-edit', [AdminMusicController::class, 'edit']);
     Route::get('payment-list', [AdminPaymentController::class, 'index'])->name('admin.payment-list');
     Route::get('predb', [AdminPredbController::class, 'index'])->name('admin.predb');
     Route::get('group-list', [AdminGroupController::class, 'index'])->name('admin.group-list');
-    Route::match(['GET', 'POST'], 'group-edit', [AdminGroupController::class, 'edit'])->name('admin.group-edit');
-    Route::match(['GET', 'POST'], 'group-bulk', [AdminGroupController::class, 'createBulk'])->name('admin.group-bulk');
+    Route::get('group-edit', [AdminGroupController::class, 'edit'])->name('admin.group-edit');
+    Route::post('group-edit', [AdminGroupController::class, 'edit']);
+    Route::get('group-bulk', [AdminGroupController::class, 'createBulk'])->name('admin.group-bulk');
+    Route::post('group-bulk', [AdminGroupController::class, 'createBulk']);
     Route::get('group-list-active', [AdminGroupController::class, 'active'])->name('admin.group-list-active');
     Route::get('group-list-inactive', [AdminGroupController::class, 'inactive'])->name('admin.group-list-inactive');
 
@@ -363,7 +387,8 @@ Route::middleware(['role:Admin', '2fa'])->prefix('admin')->group(function () {
 });
 
 Route::middleware('role_or_permission:Admin|Moderator|edit release')->prefix('admin')->group(function () {
-    Route::match(['GET', 'POST'], 'release-edit', [AdminReleasesController::class, 'edit'])->name('admin.release-edit');
+    Route::get('release-edit', [AdminReleasesController::class, 'edit'])->name('admin.release-edit');
+    Route::post('release-edit', [AdminReleasesController::class, 'edit']);
 });
 
 // Redirect btcpay route to btc payment server

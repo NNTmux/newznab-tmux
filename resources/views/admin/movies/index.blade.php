@@ -95,9 +95,14 @@
                             <a href="{{ url('admin/movie-edit?id=' . $movie->imdbid) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 mr-3">
                                 <i class="fas fa-edit"></i> Edit
                             </a>
-                            <a href="{{ url('admin/movie-edit?id=' . $movie->imdbid . '&update=1') }}" class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300" title="Update from TMDB">
-                                <i class="fas fa-sync-alt"></i> Update
-                            </a>
+                            <form method="POST" action="{{ route('admin.movie-edit') }}" class="inline">
+                                @csrf
+                                <input type="hidden" name="id" value="{{ $movie->imdbid }}">
+                                <input type="hidden" name="update" value="1">
+                                <button type="submit" class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300" title="Update from TMDB">
+                                    <i class="fas fa-sync-alt"></i> Update
+                                </button>
+                            </form>
                         </td>
                     </tr>
                 @endforeach
@@ -115,4 +120,3 @@
     </x-admin.card>
 </div>
 @endsection
-

@@ -39,7 +39,7 @@ class AdminSiteController extends BasePageController
         $error = '';
 
         // set the current action
-        $action = $request->input('action') ?? 'view';
+        $action = $this->formAction($request);
 
         switch ($action) {
             case 'submit':

@@ -41,7 +41,7 @@ class AdminRoleController extends BasePageController
     {
         $this->setAdminPrefs();
 
-        switch ($request->input('action') ?? 'view') {
+        switch ($this->formAction($request)) {
             case 'submit':
                 $meta_title = $title = 'Add User Role';
                 $role = Role::create([
@@ -86,7 +86,7 @@ class AdminRoleController extends BasePageController
 
         $roles = Role::pluck('name', 'id')->toArray();
 
-        switch ($request->input('action') ?? 'view') {
+        switch ($this->formAction($request)) {
             case 'submit':
                 $meta_title = $title = 'Update User Role';
                 $role = Role::find($request->input('id'));

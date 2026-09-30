@@ -32,7 +32,7 @@ class AdminGroupController extends BasePageController
     public function createBulk(Request $request): mixed
     {
         // set the current action
-        $action = $request->input('action') ?? 'view';
+        $action = $this->formAction($request);
         $groupmsglist = '';
 
         if ($action === 'submit') {
@@ -59,7 +59,7 @@ class AdminGroupController extends BasePageController
     public function edit(Request $request)
     {
         // Set the current action.
-        $action = $request->input('action') ?? 'view';
+        $action = $this->formAction($request);
 
         $group = [
             'id' => '',

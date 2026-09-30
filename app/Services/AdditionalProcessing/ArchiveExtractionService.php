@@ -11,6 +11,7 @@ use dariusiii\rarinfo\ArchiveInfo;
 use dariusiii\rarinfo\Par2Info;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Process;
 
 /**
  * Service for extracting and processing archive files (RAR, ZIP).
@@ -225,15 +226,20 @@ class ArchiveExtractionService
      */
     private function extractArchive(string $compressedData, array $dataSummary, string $tmpPath): string
     {
-        $killString = $this->config->getKillString();
-
         switch ($dataSummary['main_type']) {
             case ArchiveInfo::TYPE_RAR:
                 if (! $this->config->extractUsingRarInfo && $this->config->unrarPath) {
                     $fileName = $tmpPath.uniqid('', true).'.rar';
                     File::put($fileName, $compressedData);
-                    runCmd($killString.$this->config->unrarPath.'" e -ai -ep -c- -id -inul -kb -or -p- -r -y "'.$fileName.'" "'.$tmpPath.'unrar/"');
-                    File::delete($fileName);
+                    try {
+                        $this->runExternalCommand($this->config->unrarPath, [
+                            'e', '-ai', '-ep', '-c-', '-id', '-inul', '-kb', '-or', '-p-', '-r', '-y', '-@', '-',
+                            $fileName,
+                            $tmpPath.'unrar/',
+                        ]);
+                    } finally {
+                        File::delete($fileName);
+                    }
                 }
 
                 return 'r';
@@ -242,8 +248,17 @@ class ArchiveExtractionService
                 if (! $this->config->extractUsingRarInfo && $this->config->unzipPath) {
                     $fileName = $tmpPath.uniqid('', true).'.zip';
                     File::put($fileName, $compressedData);
-                    runCmd($this->config->unzipPath.' -o "'.$fileName.'" -d "'.$tmpPath.'unzip/"');
-                    File::delete($fileName);
+                    try {
+                        $this->runExternalCommand($this->config->unzipPath, [
+                            '-o',
+                            '-d',
+                            $tmpPath.'unzip/',
+                            '--',
+                            $fileName,
+                        ]);
+                    } finally {
+                        File::delete($fileName);
+                    }
                 }
 
                 return 'z';
@@ -380,8 +395,12 @@ class ArchiveExtractionService
                 $filename,
                 $tmpPath,
                 'rar',
-                fn (string $archiveFile, string $extractDir): string => $this->config->getKillString().
-                    $this->config->unrarPath.'" e -y -c- -inul -p- "'.$archiveFile.'" "'.$filename.'" "'.$extractDir.'"'
+                fn (string $archiveFile, string $extractDir): array => [
+                    'e', '-y', '-c-', '-inul', '-p-', '-@', '-',
+                    $archiveFile,
+                    $filename,
+                    $extractDir,
+                ],
             );
             if ($extracted !== null) {
                 return $extracted;
@@ -394,8 +413,14 @@ class ArchiveExtractionService
                 $filename,
                 $tmpPath,
                 'zip',
-                fn (string $archiveFile, string $extractDir): string => $this->config->unzipPath.
-                    ' -j "'.$archiveFile.'" "'.$filename.'" -d "'.$extractDir.'"'
+                fn (string $archiveFile, string $extractDir): array => [
+                    '-j',
+                    '-d',
+                    $extractDir,
+                    '--',
+                    $archiveFile,
+                    $filename,
+                ],
             );
             if ($extracted !== null) {
                 return $extracted;
@@ -407,6 +432,8 @@ class ArchiveExtractionService
 
     /**
      * Extract a specific file using unrar.
+     *
+     * @param  callable(string, string): list<string>  $commandBuilder
      */
     private function extractFileViaExternalTool(
         string $compressedData,
@@ -415,7 +442,15 @@ class ArchiveExtractionService
         string $archiveExtension,
         callable $commandBuilder
     ): ?string {
+        $extractDir = null;
+        $archiveFile = null;
+
         try {
+            $binary = $archiveExtension === 'rar' ? $this->config->unrarPath : $this->config->unzipPath;
+            if (! is_string($binary)) {
+                return null;
+            }
+
             $extractDir = $tmpPath.'extract_'.uniqid('', true).'/';
             if (! File::isDirectory($extractDir)) {
                 File::makeDirectory($extractDir, 0777, true, true);
@@ -424,37 +459,56 @@ class ArchiveExtractionService
             $archiveFile = $tmpPath.'archive_'.uniqid('', true).'.'.$archiveExtension;
             File::put($archiveFile, $compressedData);
 
-            runCmd($commandBuilder($archiveFile, $extractDir));
-
-            File::delete($archiveFile);
+            $this->runExternalCommand($binary, $commandBuilder($archiveFile, $extractDir));
 
             // Look for extracted file
             $extractedPath = $extractDir.basename($filename);
             if (File::isFile($extractedPath)) {
-                $content = File::get($extractedPath);
-                File::deleteDirectory($extractDir);
-
-                return $content;
+                return File::get($extractedPath);
             }
 
             // Try to find it with glob
             $files = File::allFiles($extractDir);
             foreach ($files as $file) {
                 if (strtolower($file->getFilename()) === strtolower(basename($filename))) {
-                    $content = File::get($file->getPathname());
-                    File::deleteDirectory($extractDir);
-
-                    return $content;
+                    return File::get($file->getPathname());
                 }
             }
-
-            File::deleteDirectory($extractDir);
         } catch (\Throwable $e) {
             if ($this->config->debugMode) {
                 Log::debug('External extraction failed: '.$e->getMessage());
             }
+        } finally {
+            if (is_string($archiveFile)) {
+                File::delete($archiveFile);
+            }
+            if (is_string($extractDir) && File::isDirectory($extractDir)) {
+                File::deleteDirectory($extractDir);
+            }
         }
 
         return null;
+    }
+
+    /**
+     * Run an external extractor without invoking a command shell.
+     *
+     * @param  list<string>  $arguments
+     */
+    private function runExternalCommand(string $binary, array $arguments): void
+    {
+        $command = [$binary, ...$arguments];
+
+        if ($this->config->timeoutPath && $this->config->timeoutSeconds > 0) {
+            $command = [
+                $this->config->timeoutPath,
+                '--foreground',
+                '--signal=KILL',
+                (string) $this->config->timeoutSeconds,
+                ...$command,
+            ];
+        }
+
+        Process::timeout(1800)->run($command);
     }
 }

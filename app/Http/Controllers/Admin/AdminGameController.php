@@ -46,7 +46,7 @@ class AdminGameController extends BasePageController
         $meta_title = $title = 'Game Edit';
 
         // Set the current action.
-        $action = $request->input('action') ?? 'view';
+        $action = $this->formAction($request);
 
         if ($request->has('id')) {
             $id = $request->input('id');
