@@ -290,13 +290,7 @@ class LoginController extends Controller
         }
 
         try {
-            $cookieData = json_decode($trustedCookie, true);
-
-            return json_last_error() === JSON_ERROR_NONE
-                && isset($cookieData['user_id'], $cookieData['token'], $cookieData['expires_at'])
-                && (int) $cookieData['user_id'] === (int) $user->id
-                && time() <= (int) $cookieData['expires_at']
-                && TrustedDevice::findValidForUser((int) $user->id, (string) $cookieData['token']) !== null;
+            return TrustedDevice::cookieIsValidForUser($trustedCookie, (int) $user->id);
         } catch (\Exception $e) {
             Log::error('Login - Error processing trusted device cookie', [
                 'error' => $e->getMessage(),
