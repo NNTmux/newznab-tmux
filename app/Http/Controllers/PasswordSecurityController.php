@@ -190,11 +190,8 @@ class PasswordSecurityController extends Controller
         // Log the user back in with the remember me preference
         Auth::login($user, $rememberMe);
 
-        // Mark the user as having passed 2FA
-        session([config('google2fa.session_var') => true]);
-
-        // Store the timestamp for determining how long the 2FA session is valid
-        session([config('google2fa.session_var').'.auth.passed_at' => time()]);
+        $request->session()->forget('2fa:trusted_device');
+        Google2FA::boot($request)->login();
 
         $passwordBreached = (bool) $request->session()->get('2fa:password_breached', false);
 

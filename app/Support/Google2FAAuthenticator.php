@@ -20,14 +20,23 @@ class Google2FAAuthenticator extends Authenticator
 
         if ($cookie && $this->checkCookieValidity($cookie)) {
             // Force the session to be marked as 2FA authenticated
-            session([config('google2fa.session_var') => true]);
-            session([config('google2fa.session_var').'.auth.passed_at' => time()]);
+            $this->loginFromTrustedDevice();
 
             // Successful authentication with cookie
             return true;
         }
 
+        if ($this->getRequest()->session()->pull('2fa:trusted_device', false)) {
+            $this->logout();
+        }
+
         return parent::isAuthenticated();
+    }
+
+    public function loginFromTrustedDevice(): void
+    {
+        $this->login();
+        $this->getRequest()->session()->put('2fa:trusted_device', true);
     }
 
     /**
@@ -96,8 +105,7 @@ class Google2FAAuthenticator extends Authenticator
         if ($trustedCookie && auth()->check()) {
             try {
                 if ($this->trustedDeviceCookieIsValid($trustedCookie)) {
-                    session([config('google2fa.session_var') => true]);
-                    session([config('google2fa.session_var').'.auth.passed_at' => time()]);
+                    $this->loginFromTrustedDevice();
 
                     return false;
                 }

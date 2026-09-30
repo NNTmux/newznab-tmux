@@ -42,13 +42,15 @@ class FailedReleasesController extends BasePageController
 
     private function resolveUser(Request $request): ?User
     {
-        $sessionUser = $request->user();
-        if ($sessionUser instanceof User) {
-            return $sessionUser;
+        if ($request->has('api_token')) {
+            $token = $request->input('api_token');
+
+            return is_string($token) && $token !== '' ? User::findVerifiedByApiToken($token) : null;
         }
 
-        if ($request->filled('api_token')) {
-            return User::findVerifiedByApiToken((string) $request->input('api_token'));
+        $sessionUser = $request->user();
+        if ($request->isMethod('post') && $sessionUser instanceof User) {
+            return $sessionUser;
         }
 
         return null;

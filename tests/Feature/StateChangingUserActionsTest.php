@@ -122,4 +122,46 @@ class StateChangingUserActionsTest extends TestCase
             $this->assertSame(1, DB::table($table)->where('users_id', 2)->count());
         }
     }
+
+    #[DataProvider('watchlistReturnUrls')]
+    public function test_watchlist_posts_only_redirect_to_same_origin_urls(string $from, ?string $expected): void
+    {
+        DB::statement('CREATE TABLE videos (id INTEGER PRIMARY KEY, title TEXT)');
+        DB::statement('CREATE TABLE movieinfo (imdbid TEXT PRIMARY KEY, title TEXT)');
+        DB::statement('CREATE TABLE user_series (id INTEGER PRIMARY KEY, users_id INTEGER, videos_id INTEGER)');
+        DB::statement('CREATE TABLE user_movies (id INTEGER PRIMARY KEY, users_id INTEGER, imdbid TEXT)');
+        DB::table('user_series')->insert(['users_id' => 1, 'videos_id' => 7]);
+        DB::table('user_movies')->insert(['users_id' => 1, 'imdbid' => '1234567']);
+        $user = User::factory()->make(['id' => 1]);
+        foreach ([
+            [MyShowsController::class, ['action' => 'delete', 'id' => 7], '/myshows'],
+            [MyMoviesController::class, ['id' => 'delete', 'imdb' => '1234567'], '/mymovies'],
+        ] as [$controllerClass, $parameters, $fallback]) {
+            $controller = (new ReflectionClass($controllerClass))->newInstanceWithoutConstructor();
+            $controller->userdata = $user;
+            $request = Request::create('https://indexer.example/watchlist', 'POST', $parameters + ['from' => $from]);
+            $response = $controller->show($request);
+            $this->assertSame($expected ?? url($fallback), $response->getTargetUrl());
+        }
+    }
+
+    /** @return array<string, array{string, string|null}> */
+    public static function watchlistReturnUrls(): array
+    {
+        return [
+            'protocol relative' => ['//external.example/path', null],
+            'backslashes' => ['\\\\external.example/path', null],
+            'mixed slashes' => ['/\\external.example/path', null],
+            'external absolute' => ['https://external.example/path', null],
+            'different scheme' => ['http://indexer.example/path', null],
+            'different port' => ['https://indexer.example:8443/path', null],
+            'credentials' => ['https://user@indexer.example/path', null],
+            'script scheme' => ['javascript:alert(1)', null],
+            'control characters' => ["/\texternal.example", null],
+            'same origin' => ['https://indexer.example/path?q=1#watchlist', 'https://indexer.example/path?q=1#watchlist'],
+            'explicit default port' => ['https://indexer.example:443/path', 'https://indexer.example:443/path'],
+            'local path' => ['/browse?q=1', 'http://localhost/browse?q=1'],
+            'relative path' => ['browse?q=1', 'http://localhost/browse?q=1'],
+        ];
+    }
 }

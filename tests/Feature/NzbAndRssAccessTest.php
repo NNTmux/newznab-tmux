@@ -468,7 +468,7 @@ class NzbAndRssAccessTest extends TestCase
 
         (new TrustedDevice2FAMiddleware)->handle($request, fn () => response('ok'));
 
-        $this->assertFalse((bool) $request->session()->get('google2fa', false));
+        $this->assertFalse((bool) $request->session()->get('google2fa.auth_passed', false));
     }
 
     public function test_stored_trusted_device_cookie_passes_2fa(): void
@@ -500,7 +500,7 @@ class NzbAndRssAccessTest extends TestCase
 
         (new TrustedDevice2FAMiddleware)->handle($request, fn () => response('ok'));
 
-        $this->assertTrue((bool) $request->session()->get('google2fa', false));
+        $this->assertTrue((bool) $request->session()->get('google2fa.auth_passed', false));
     }
 
     #[DataProvider('trustedCookieStates')]
@@ -541,7 +541,7 @@ class NzbAndRssAccessTest extends TestCase
         $this->app->instance('request', $request);
 
         (new TrustedDevice2FAMiddleware)->handle($request, fn () => response('ok'));
-        $this->assertSame($allowed, (bool) $request->session()->get('google2fa', false));
+        $this->assertSame($allowed, (bool) $request->session()->get('google2fa.auth_passed', false));
         $request->session()->forget('google2fa');
 
         $this->partialMock(Google2FAAuthenticator::class, function ($mock) use ($allowed): void {
@@ -550,7 +550,7 @@ class NzbAndRssAccessTest extends TestCase
         });
         $response = (new Google2FAMiddleware)->handle($request, fn () => response('ok'));
         $this->assertSame($allowed ? 200 : 403, $response->getStatusCode());
-        $this->assertSame($allowed, (bool) $request->session()->get('google2fa', false));
+        $this->assertSame($allowed, (bool) $request->session()->get('google2fa.auth_passed', false));
     }
 
     /** @return array<string, array{string, bool}> */
@@ -565,6 +565,35 @@ class NzbAndRssAccessTest extends TestCase
             'forged token' => ['forged token', false],
             'malformed token' => ['malformed token', false],
         ];
+    }
+
+    public function test_revoking_a_trusted_device_invalidates_the_session_it_authenticated(): void
+    {
+        config(['google2fa.enabled' => true]);
+        $user = User::factory()->make(['id' => 42]);
+        $user->setRelation('passwordSecurity', new PasswordSecurity([
+            'google2fa_enable' => true,
+            'google2fa_secret' => 'JBSWY3DPEHPK3PXP',
+        ]));
+        Auth::setUser($user);
+        $issued = TrustedDevice::issueForUser($user);
+        $request = Request::create('/trusted-device-check', 'GET', [], [
+            '2fa_trusted_device' => json_encode([
+                'user_id' => $user->id,
+                'token' => $issued['plain'],
+                'expires_at' => $issued['device']->expires_at->getTimestamp(),
+            ], JSON_THROW_ON_ERROR),
+        ]);
+        $request->setLaravelSession(app('session.store'));
+        $this->app->instance('request', $request);
+        $authenticator = app(Google2FAAuthenticator::class)->boot($request);
+        $this->assertTrue($authenticator->isAuthenticated());
+        $this->assertTrue($request->session()->get('google2fa.auth_passed'));
+
+        $issued['device']->delete();
+
+        $this->assertFalse($authenticator->isAuthenticated());
+        $this->assertFalse($request->session()->has('google2fa.auth_passed'));
     }
 
     private function setEnvironmentValue(string $key, ?string $value): void

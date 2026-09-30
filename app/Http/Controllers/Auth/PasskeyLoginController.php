@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use PragmaRX\Google2FALaravel\Facade as Google2FA;
 use Spatie\LaravelPasskeys\Actions\FindPasskeyToAuthenticateAction;
 use Spatie\LaravelPasskeys\Events\PasskeyUsedToAuthenticateEvent;
 use Spatie\LaravelPasskeys\Http\Requests\AuthenticateUsingPasskeysRequest;
@@ -108,8 +109,8 @@ final class PasskeyLoginController extends Controller
         event(new OtherDeviceLogout(Auth::getDefaultDriver(), $user));
 
         // Passkey auth is treated as sufficient MFA, so skip additional OTP gate.
-        session([config('google2fa.session_var') => true]);
-        session([config('google2fa.session_var').'.auth.passed_at' => time()]);
+        $request->session()->forget('2fa:trusted_device');
+        Google2FA::boot($request)->login();
 
         $userIp = config('nntmux_settings.store_user_ip') ? ($request->ip() ?? $request->getClientIp()) : '';
         event(new UserLoggedIn($user, $userIp));

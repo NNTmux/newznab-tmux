@@ -87,6 +87,8 @@ use App\Http\Controllers\SearchSuggestController;
 use App\Http\Controllers\SeriesController;
 use App\Http\Controllers\StatusPageController;
 use App\Http\Controllers\TermsController;
+use App\Http\Middleware\VerifyFailedReleaseRequest;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Spatie\LaravelPasskeys\Http\Controllers\GeneratePasskeyAuthenticationOptionsController;
 
 // Serve cover images from storage - Must be public (no auth required)
@@ -170,8 +172,8 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
     Route::match(['GET', 'POST'], 'browsegroup', [BrowseGroupController::class, 'show'])->name('browsegroup');
     Route::match(['GET', 'POST'], 'content', [ContentController::class, 'show'])->name('content');
     Route::match(['GET', 'POST'], 'failed', [FailedReleasesController::class, 'failed'])
-        ->middleware('throttle:60,1')
-        ->withoutMiddleware(['auth', 'isVerified'])
+        ->middleware(['throttle:60,1', VerifyFailedReleaseRequest::class])
+        ->withoutMiddleware(['auth', 'isVerified', PreventRequestForgery::class])
         ->name('failed');
 
     Route::middleware('clearance')->group(function () {

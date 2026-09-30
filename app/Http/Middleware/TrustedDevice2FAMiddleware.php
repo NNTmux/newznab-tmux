@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Middleware;
 
 use App\Models\TrustedDevice;
+use App\Support\Google2FAAuthenticator;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -21,8 +22,9 @@ class TrustedDevice2FAMiddleware
         if ($trustedCookie && auth()->check()) {
             try {
                 if (TrustedDevice::cookieIsValidForUser($trustedCookie, (int) auth()->id())) {
-                    session([config('google2fa.session_var') => true]);
-                    session([config('google2fa.session_var').'.auth.passed_at' => time()]);
+                    $authenticator = app(Google2FAAuthenticator::class);
+                    $authenticator->boot($request);
+                    $authenticator->loginFromTrustedDevice();
                 }
             } catch (\Exception $e) {
                 Log::error('TrustedDevice2FAMiddleware - Error processing cookie', [
