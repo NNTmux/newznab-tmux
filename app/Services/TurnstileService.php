@@ -17,11 +17,13 @@ class TurnstileService
         $secret = config('captcha.turnstile.secret');
 
         if (empty($secret)) {
+            Log::error('Turnstile verification failed: missing secret.', self::logContext());
+
             return false;
         }
 
         try {
-            $response = Http::asForm()->post('https://challenges.cloudflare.com/turnstile/v0/siteverify', [
+            $response = Http::asForm()->connectTimeout(5)->timeout(10)->post('https://challenges.cloudflare.com/turnstile/v0/siteverify', [
                 'secret' => $secret,
                 'response' => $token,
                 'remoteip' => $remoteIp ?? request()->ip(),
@@ -29,12 +31,41 @@ class TurnstileService
 
             $result = $response->json();
 
-            return isset($result['success']) && $result['success'] === true;
+            if ($response->successful() && is_array($result) && ($result['success'] ?? null) === true) {
+                return true;
+            }
+
+            $errorCodes = is_array($result) ? ($result['error-codes'] ?? []) : [];
+
+            Log::warning('Turnstile verification failed.', self::logContext() + [
+                'http_status' => $response->status(),
+                'error_codes' => is_array($errorCodes) ? array_values(array_filter($errorCodes, 'is_string')) : [],
+                'reason' => ! $response->successful() ? 'http-error' : (is_array($result) ? 'rejected' : 'invalid-response'),
+                'siteverify_ray' => $response->header('cf-ray'),
+            ]);
+
+            return false;
         } catch (\Exception $e) {
-            Log::error('Turnstile verification failed: '.$e->getMessage());
+            Log::error('Turnstile verification request failed.', self::logContext() + [
+                'exception_class' => $e::class,
+            ]);
 
             return false;
         }
+    }
+
+    /**
+     * Keep credentials, CAPTCHA tokens, and request bodies out of diagnostics.
+     *
+     * @return array<string, mixed>
+     */
+    private static function logContext(): array
+    {
+        return [
+            'route' => request()->route()?->getName(),
+            'cf_ray' => request()->header('CF-Ray'),
+            'ip' => config('nntmux_settings.store_user_ip') ? request()->ip() : null,
+        ];
     }
 
     /**

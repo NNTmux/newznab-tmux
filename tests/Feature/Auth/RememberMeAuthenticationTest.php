@@ -9,12 +9,15 @@ use App\Models\PasswordSecurity;
 use App\Models\TrustedDevice;
 use App\Models\User;
 use App\Services\PasswordBreachService;
+use App\View\Composers\GlobalDataComposer;
 use Illuminate\Auth\Events\OtherDeviceLogout;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use PDO;
@@ -130,6 +133,91 @@ class RememberMeAuthenticationTest extends TestCase
         $response->assertRedirect('/');
         $response->assertCookie($this->recallerCookieName());
         $this->assertAuthenticatedAs($user);
+    }
+
+    public function test_turnstile_failure_is_visible_after_redirect_and_is_logged(): void
+    {
+        $this->enableTurnstile();
+        Event::fake([UserLoggedIn::class]);
+        Log::spy();
+        $user = $this->createUser('captcha-failure@example.test');
+        Http::fake(['challenges.cloudflare.com/*' => Http::response([
+            'success' => false,
+            'error-codes' => ['timeout-or-duplicate'],
+        ])]);
+
+        $message = 'Cloudflare human verification could not be confirmed. Please reload the page, complete the verification, and try again.';
+        $response = $this->withHeader('CF-Ray', 'login-ray')->post(route('login'), [
+            'username' => $user->email,
+            'password' => 'password',
+            'cf-turnstile-response' => 'expired-token',
+        ]);
+
+        $response->assertRedirect(route('login'));
+        $response->assertSessionHasErrors(['cf-turnstile-response' => $message]);
+        $this->assertGuest();
+        Event::assertNotDispatched(UserLoggedIn::class);
+        Log::shouldHaveReceived('warning')->once()->with('Turnstile verification failed.', \Mockery::on(
+            fn (array $context): bool => $context['route'] === 'login.post'
+                && $context['cf_ray'] === 'login-ray'
+                && $context['error_codes'] === ['timeout-or-duplicate']
+        ));
+
+        (new \ReflectionProperty(GlobalDataComposer::class, 'resolvedData'))->setValue(null, null);
+        $this->get(route('login'))->assertOk()
+            ->assertSee($message)
+            ->assertSee('data-prefers-password="1"', false);
+    }
+
+    public function test_missing_or_malformed_turnstile_token_shows_a_clear_message(): void
+    {
+        $this->enableTurnstile();
+        Http::fake();
+
+        foreach ([null, ['invalid-token']] as $token) {
+            $response = $this->post(route('login'), [
+                'username' => 'captcha@example.test',
+                'password' => 'password',
+                'cf-turnstile-response' => $token,
+            ]);
+
+            $response->assertRedirect(route('login'));
+            $response->assertSessionHasErrors([
+                'cf-turnstile-response' => 'Please complete the Cloudflare human verification before signing in.',
+            ]);
+            $this->assertGuest();
+        }
+
+        Http::assertNothingSent();
+    }
+
+    public function test_valid_turnstile_token_allows_password_login(): void
+    {
+        $this->enableTurnstile();
+        Event::fake([UserLoggedIn::class]);
+        $user = $this->createUser('captcha-success@example.test');
+        Http::fake(['challenges.cloudflare.com/*' => Http::response(['success' => true])]);
+
+        $this->post(route('login'), [
+            'username' => $user->email,
+            'password' => 'password',
+            'cf-turnstile-response' => 'valid-token',
+        ])->assertRedirect('/')->assertSessionHasNoErrors();
+
+        $this->assertAuthenticatedAs($user);
+        $this->get('/__remember_me_probe')->assertOk();
+    }
+
+    private function enableTurnstile(): void
+    {
+        config([
+            'captcha.provider' => 'turnstile',
+            'captcha.turnstile.enabled' => true,
+            'captcha.turnstile.sitekey' => 'test-sitekey',
+            'captcha.turnstile.secret' => 'test-secret',
+            'captcha.recaptcha.enabled' => false,
+        ]);
+        Http::preventStrayRequests();
     }
 
     public function test_password_login_with_boolean_remember_me_value_queues_recaller_cookie(): void
