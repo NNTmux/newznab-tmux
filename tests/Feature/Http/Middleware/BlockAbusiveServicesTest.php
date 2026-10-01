@@ -165,6 +165,36 @@ final class BlockAbusiveServicesTest extends TestCase
     }
 
     /**
+     * Test that the ASN lookup uses the free ip-api.com endpoint, which is HTTP only.
+     * The free tier answers HTTPS requests with 403 "SSL unavailable for this endpoint".
+     */
+    public function test_asn_lookup_uses_free_http_endpoint(): void
+    {
+        Http::fake([
+            'https://ip-api.com/*' => Http::response([
+                'status' => 'fail',
+                'message' => 'SSL unavailable for this endpoint, order a key at https://members.ip-api.com/',
+            ], 403),
+            'http://ip-api.com/*' => Http::response([
+                'status' => 'success',
+                'as' => 'AS31898 Oracle Corporation',
+                'org' => 'Oracle Corporation',
+            ], 200),
+        ]);
+
+        $request = Request::create('/api/test', 'GET');
+        $request->headers->set('User-Agent', 'Mozilla/5.0');
+        $request->server->set('REMOTE_ADDR', '129.146.10.50');
+
+        $response = $this->middleware->handle($request, function ($req) {
+            return new Response('OK', 200);
+        });
+
+        $this->assertEquals(403, $response->getStatusCode());
+        Http::assertSent(fn ($request) => str_starts_with($request->url(), 'http://ip-api.com/json/129.146.10.50'));
+    }
+
+    /**
      * Test that non-blocked ASNs pass through.
      */
     public function test_allows_non_blocked_asn(): void
