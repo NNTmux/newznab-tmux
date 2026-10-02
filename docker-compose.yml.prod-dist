@@ -3,7 +3,7 @@ services:
         build:
             context: .
             dockerfile: Dockerfile
-        image: pyrowman/nntmux
+        image: pyrowman/nntmux:latest
         extra_hosts:
             - 'host.docker.internal:host-gateway'
         ports:
@@ -31,7 +31,7 @@ services:
     worker:
         command: >
             sh -c "php artisan tmux-ui:start & php artisan horizon"
-        image: pyrowman/nntmux
+        image: pyrowman/nntmux:latest
         extra_hosts:
             - 'host.docker.internal:host-gateway'
         tty: true
@@ -48,7 +48,7 @@ services:
             webapp:
                 condition: service_healthy
     scheduler:
-        image: pyrowman/nntmux
+        image: pyrowman/nntmux:latest
         extra_hosts:
             - 'host.docker.internal:host-gateway'
         tty: true
@@ -67,7 +67,7 @@ services:
         command: >
             sh -c "while [ true ]; do php artisan schedule:run; sleep 60; done"
     mariadb:
-        image: 'mariadb:12.3'
+        image: 'mariadb:latest'
         ports:
             - '${FORWARD_DB_PORT:-3306}:3306'
         environment:
@@ -94,7 +94,7 @@ services:
             timeout: 5s
             start_period: 15s
     redis:
-        image: 'redis:alpine'
+        image: 'redis:latest'
         ports:
             - '${FORWARD_REDIS_PORT:-6379}:6379'
         environment:
@@ -111,7 +111,7 @@ services:
             retries: 3
             timeout: 5s
     manticore:
-        image: manticoresearch/manticore:28.4.4
+        image: manticoresearch/manticore:latest
         profiles:
             - manticore
         environment:

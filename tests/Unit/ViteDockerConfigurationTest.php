@@ -3,9 +3,50 @@
 namespace Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\Process;
+use Symfony\Component\Yaml\Yaml;
 
 class ViteDockerConfigurationTest extends TestCase
 {
+    public function test_compose_uses_latest_tags_for_services_that_publish_them(): void
+    {
+        foreach (['docker-compose.yml', 'docker-compose.yml.prod-dist'] as $path) {
+            $services = Yaml::parse($this->projectFile($path))['services'];
+
+            $this->assertSame('mariadb:latest', $services['mariadb']['image'], $path);
+            $this->assertSame('redis:latest', $services['redis']['image'], $path);
+            $this->assertSame('manticoresearch/manticore:latest', $services['manticore']['image'], $path);
+        }
+
+        $localServices = Yaml::parse($this->projectFile('docker-compose.yml'))['services'];
+        $this->assertSame(
+            ['CMD', 'mariadb-admin', 'ping', '-p${DB_PASSWORD}'],
+            $localServices['mariadb']['healthcheck']['test'],
+        );
+    }
+
+    public function test_docker_build_targets_always_pull_images_before_building(): void
+    {
+        foreach (['build', 'rebuild', 'update', 'fresh'] as $target) {
+            $process = new Process([
+                'make', '--dry-run', '--no-print-directory', $target,
+                'SAIL=mock-sail', 'DOCKER_COMPOSE=mock-compose',
+            ], __DIR__.'/../..');
+            $process->mustRun();
+
+            $commands = $process->getOutput();
+            $pullPosition = strpos($commands, 'mock-compose pull --ignore-buildable --policy always');
+            $buildCommand = in_array($target, ['rebuild', 'fresh'], true)
+                ? 'mock-sail build --no-cache --pull'
+                : 'mock-sail build --pull';
+            $buildPosition = strpos($commands, $buildCommand);
+
+            $this->assertNotFalse($pullPosition, "{$target} must refresh service images.");
+            $this->assertNotFalse($buildPosition, "{$target} must refresh build base images.");
+            $this->assertLessThan($buildPosition, $pullPosition, "{$target} must pull before building.");
+        }
+    }
+
     public function test_vite_uses_the_docker_published_port_without_fallback(): void
     {
         $viteConfig = $this->projectFile('vite.config.js');
