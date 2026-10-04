@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Facades\Search;
+use App\Support\PredbSearchDocument;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 /**
  * App\Models\Predb.
@@ -141,34 +143,38 @@ class Predb extends Model
     /**
      * Try to match a single release to a PreDB title when the release is created.
      *
-     * @return array<string, mixed>|false Array with title/id from PreDB if found, false if not found.
+     * @return array{title: string, predb_id: int}|false
      */
-    public static function matchPre(string $cleanerName)
+    public static function matchPre(string $cleanerName): array|false
     {
-        if (empty($cleanerName)) {
+        if (trim($cleanerName) === '') {
             return false;
         }
 
-        $titleCheck = self::query()->where('title', $cleanerName)->first(['id']);
+        try {
+            $hit = Search::matchPredbExact($cleanerName);
+        } catch (\Throwable $exception) {
+            Log::warning('PreDB exact lookup failed', ['exception_class' => $exception::class]);
 
-        if ($titleCheck !== null) {
-            return [
-                'title' => $cleanerName,
-                'predb_id' => $titleCheck['id'],
-            ];
+            return false;
         }
 
-        // Check if clean name matches a PreDB filename.
-        $fileCheck = self::query()->where('filename', $cleanerName)->first(['id', 'title']);
-
-        if ($fileCheck !== null) {
-            return [
-                'title' => $fileCheck['title'],
-                'predb_id' => $fileCheck['id'],
-            ];
+        if ($hit === null || $hit['id'] <= 0) {
+            return false;
         }
 
-        return false;
+        $pre = self::query()->find($hit['id'], ['id', 'title', 'filename']);
+        if ($pre === null || $pre->title === '') {
+            return false;
+        }
+
+        $name = PredbSearchDocument::exactValue($cleanerName);
+        if (PredbSearchDocument::exactValue($pre->title) !== $name
+            && PredbSearchDocument::exactValue($pre->filename) !== $name) {
+            return false;
+        }
+
+        return ['title' => $pre->title, 'predb_id' => (int) $pre->id];
     }
 
     /**

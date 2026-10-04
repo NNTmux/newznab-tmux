@@ -18,6 +18,7 @@ use App\Models\SteamApp;
 use App\Models\Video;
 use App\Services\Search\Drivers\ManticoreSearchDriver;
 use App\Services\Search\Support\ReleaseIndexProjection;
+use App\Support\PredbSearchDocument;
 use App\Support\ReleaseSearchIndexDocument;
 use App\Support\SecondaryIndexDocuments;
 use Exception;
@@ -775,6 +776,12 @@ class NntmuxPopulateSearchIndexes extends Command
      */
     private function elasticPredb(): int
     {
+        $indexName = (string) config('search.drivers.elasticsearch.indexes.predb', 'predb');
+        Elasticsearch::indices()->putMapping([
+            'index' => $indexName,
+            'body' => ['properties' => PredbSearchDocument::elasticsearchExactMappings()],
+        ]);
+
         $total = Predb::count();
         if (! $total) {
             $this->warn('PreDB table is empty. Nothing to do.');
@@ -787,16 +794,11 @@ class NntmuxPopulateSearchIndexes extends Command
             ->orderBy('id');
 
         return $this->processElasticData(
-            'predb',
+            $indexName,
             $total,
             $query,
             function ($item) {
-                return [
-                    'id' => $item->id,
-                    'title' => $item->title,
-                    'filename' => $item->filename,
-                    'source' => $item->source,
-                ];
+                return PredbSearchDocument::forElasticsearch($item->getAttributes());
             }
         );
     }

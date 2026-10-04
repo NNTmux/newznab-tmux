@@ -8,6 +8,7 @@ use App\Facades\Elasticsearch;
 use App\Facades\Search;
 use App\Models\UsenetGroup;
 use App\Services\Search\Support\ElasticsearchResponseHelper;
+use App\Support\PredbSearchDocument;
 use Elastic\Elasticsearch\Client as ElasticsearchClient;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -156,11 +157,12 @@ class NntmuxResetDb extends Command
 
                 Elasticsearch::indices()->create($releases_index);
 
-                if (ElasticsearchResponseHelper::boolResponse($client, fn (ElasticsearchClient $elasticClient) => $elasticClient->indices()->exists(['index' => 'predb']))) {
-                    Elasticsearch::indices()->delete(['index' => 'predb']);
+                $predbIndex = (string) config('search.drivers.elasticsearch.indexes.predb', 'predb');
+                if (ElasticsearchResponseHelper::boolResponse($client, fn (ElasticsearchClient $elasticClient) => $elasticClient->indices()->exists(['index' => $predbIndex]))) {
+                    Elasticsearch::indices()->delete(['index' => $predbIndex]);
                 }
                 $predb_index = [
-                    'index' => 'predb',
+                    'index' => $predbIndex,
                     'body' => [
                         'settings' => [
                             'number_of_shards' => 2,
@@ -182,6 +184,7 @@ class NntmuxResetDb extends Command
                                 ],
                                 'filename' => ['type' => 'text'],
                                 'source' => ['type' => 'text'],
+                                ...PredbSearchDocument::elasticsearchExactMappings(),
                             ],
                         ],
                     ],

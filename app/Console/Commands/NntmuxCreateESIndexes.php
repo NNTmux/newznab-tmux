@@ -6,6 +6,7 @@ namespace App\Console\Commands;
 
 use App\Facades\Elasticsearch;
 use App\Services\Search\Support\ElasticsearchResponseHelper;
+use App\Support\PredbSearchDocument;
 use Elastic\Elasticsearch\Client;
 use Illuminate\Console\Command;
 
@@ -184,6 +185,7 @@ class NntmuxCreateESIndexes extends Command
                     ],
                     'filename' => ['type' => 'text'],
                     'source' => ['type' => 'text'],
+                    ...PredbSearchDocument::elasticsearchExactMappings(),
                 ],
             ],
         ]);

@@ -79,15 +79,15 @@ class ReleaseCreationService
 
             if (\is_array($cleanedMeta)) {
                 $properName = $cleanedMeta['properlynamed'] ?? false;
-                $preID = $cleanedMeta['predb'] ?? false;
+                $preID = max(0, (int) ($cleanedMeta['predb'] ?? 0));
                 $cleanedName = $cleanedMeta['cleansubject'] ?? $cleanRelName;
             } else {
                 $properName = true;
-                $preID = false;
+                $preID = 0;
                 $cleanedName = $cleanRelName;
             }
 
-            if ($preID === false && $cleanedName !== '') {
+            if ($preID === 0 && $cleanedName !== '') {
                 $preMatch = Predb::matchPre($cleanedName);
                 if ($preMatch !== false) {
                     $cleanedName = $preMatch['title'];
@@ -97,7 +97,7 @@ class ReleaseCreationService
             }
 
             $searchName = ! empty($cleanedName) ? Utf8::clean($cleanedName) : $cleanRelName;
-            $predbIdInt = $preID === false ? 0 : (int) $preID;
+            $predbIdInt = (int) $preID;
 
             [$dupeCheck, $dupeReason] = $this->releaseDuplicateFinder->findDuplicate(
                 $cleanRelName,

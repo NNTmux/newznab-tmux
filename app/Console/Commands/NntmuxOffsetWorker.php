@@ -8,6 +8,7 @@ use App\Facades\Elasticsearch;
 use App\Facades\Search;
 use App\Models\Predb;
 use App\Services\Search\Support\ReleaseIndexProjection;
+use App\Support\PredbSearchDocument;
 use App\Support\ReleaseSearchIndexDocument;
 use Exception;
 use Illuminate\Console\Command;
@@ -125,6 +126,13 @@ class NntmuxOffsetWorker extends Command
             }
 
         } else { // ElasticSearch
+            if ($index === 'predb') {
+                Elasticsearch::indices()->putMapping([
+                    'index' => $indexName,
+                    'body' => ['properties' => PredbSearchDocument::elasticsearchExactMappings()],
+                ]);
+            }
+
             $query->chunk($batchSize, function ($items) use ($indexName, $transformer, &$processed, &$errors, $workerId) {
                 $this->info("Worker {$workerId}: Processing chunk of {$items->count()} items");
                 $data = ['body' => []];
@@ -196,13 +204,17 @@ class NntmuxOffsetWorker extends Command
                     ]);
             };
         } else { // predb
-            return function ($item) {
-                return [
+            return function ($item) use ($engine): array {
+                $document = [
                     'id' => $item->id,
                     'title' => (string) ($item->title ?? ''),
                     'filename' => (string) ($item->filename ?? ''),
                     'source' => (string) ($item->source ?? ''),
                 ];
+
+                return $engine === 'elastic'
+                    ? PredbSearchDocument::forElasticsearch($document)
+                    : $document;
             };
         }
     }
@@ -215,7 +227,7 @@ class NntmuxOffsetWorker extends Command
         if ($engine === 'manticore') {
             return (string) config("search.drivers.manticore.indexes.{$index}", $index.'_rt');
         } else {
-            return $index;
+            return (string) config("search.drivers.elasticsearch.indexes.{$index}", $index);
         }
     }
 

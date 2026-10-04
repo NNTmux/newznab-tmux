@@ -20,6 +20,7 @@ use App\Services\Search\DTO\SearchPage;
 use App\Services\Search\Support\ManticoreClientFactory;
 use App\Services\Search\Support\ManticoreIndexRegistry;
 use App\Services\Search\Support\ReleaseIndexProjection;
+use App\Support\PredbSearchDocument;
 use App\Support\ReleaseSearchIndexDocument;
 use App\Support\SecondaryIndexDocuments;
 use Illuminate\Support\Facades\Cache;
@@ -1361,7 +1362,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
      * Search predb index.
      *
      * @param  array<string, mixed>|string  $searchTerm  Search term(s)
-     * @return array<string, mixed> Array of predb records
+     * @return list<array{id: int, title: string, filename: string, source: string}>
      */
     public function searchPredb(array|string $searchTerm): array
     {
@@ -1369,7 +1370,53 @@ class ManticoreSearchDriver implements SearchDriverInterface
 
         $result = $this->searchIndexes($this->getPredbIndex(), $searchString, ['title', 'filename'], []); // @phpstan-ignore argument.type
 
-        return $result['data'] ?? [];
+        $hits = [];
+        foreach ($result['data'] ?? [] as $offset => $row) {
+            $id = (int) ($result['id'][$offset] ?? 0);
+            if ($id > 0) {
+                $hits[] = PredbSearchDocument::normalize($row, $id);
+            }
+        }
+
+        return $hits;
+    }
+
+    /** @return array{id: int, title: string, filename: string, source: string}|null */
+    public function matchPredbExact(string $name): ?array
+    {
+        if (preg_match('/[\p{L}\p{N}]/u', $name) !== 1) {
+            return null;
+        }
+
+        $specialCharacters = str_split('\\()|!@~"&/^$=<>[]{}*-?');
+        $literal = str_replace($specialCharacters, array_map(static fn (string $char): string => '\\'.$char, $specialCharacters), $name);
+
+        try {
+            foreach (['title', 'filename'] as $field) {
+                $results = (new Search($this->manticoreSearch))
+                    ->setTable($this->getPredbIndex())
+                    ->search('@'.$field.' "'.$literal.'"')
+                    ->filter($field, '=', $name)
+                    ->option('collation', 'utf8_general_ci')
+                    ->limit(1)
+                    ->get();
+
+                foreach ($results as $doc) {
+                    $hit = PredbSearchDocument::normalize($doc->getData(), (int) $doc->getId());
+                    if ($hit['id'] > 0 && $hit['title'] !== ''
+                        && PredbSearchDocument::exactValue($hit[$field]) === PredbSearchDocument::exactValue($name)) {
+                        return $hit;
+                    }
+                }
+            }
+        } catch (\Throwable $exception) {
+            Log::warning('Manticore PreDB exact lookup failed', [
+                'index' => $this->getPredbIndex(),
+                'exception_class' => $exception::class,
+            ]);
+        }
+
+        return null;
     }
 
     /**
