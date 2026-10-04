@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Log;
  */
 final class HeaderStorageService
 {
-    private const int LOCK_RETRY_MAX = 5;
+    private const int LOCK_RETRY_MAX = 10;
 
     private CollectionHandler $collectionHandler;
 
@@ -134,7 +134,7 @@ final class HeaderStorageService
             }
 
             $this->failedInserts = array_slice($this->failedInserts, 0, $failedInsertCount);
-            usleep((min(500, 20 * $attempt) + random_int(0, 25)) * 1000);
+            usleep((min(2000, 100 * $attempt) + random_int(0, 25)) * 1000);
         } while (true);
     }
 
