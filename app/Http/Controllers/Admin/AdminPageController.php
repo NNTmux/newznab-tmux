@@ -54,6 +54,7 @@ class AdminPageController extends BasePageController
             'meta_description' => 'Admin home page',
             // Lightweight data is rendered server-side; heavy widgets fetch on mount.
             'stats' => $payload['stats'],
+            'dashboardLastRefreshedAt' => Carbon::parse($payload['generated_at'])->format('H:i:s'),
             'registrationStatus' => $payload['registrationStatus'],
             'nextRegistrationPeriod' => $payload['nextRegistrationPeriod'],
             'hasRecentPayments' => ! empty($payload['recent_payments']),

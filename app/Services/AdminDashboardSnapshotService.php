@@ -4,31 +4,31 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Models\DnzbFailure;
 use App\Models\Payment;
 use App\Models\Release;
 use App\Models\ReleaseReport;
 use App\Models\UsenetGroup;
 use App\Models\User;
 use App\Models\UserActivity;
-use App\Support\ApproximateRowCount;
 use Illuminate\Support\Facades\Cache;
 
 /**
  * Builds (and caches) the entire admin dashboard payload in a single
- * Cache::flexible() entry so the controller never blocks on cold queries.
+ * Cache::flexible() entry with deferred rebuilding during the stale window.
  *
- * - Fresh window: 60s
- * - Stale-while-revalidate window: 600s
- * - Warmed every minute by the `admin:warm-dashboard` scheduled command.
+ * - Fresh window: 900s
+ * - Stale grace period: 60s (expires after 960s total)
+ * - Warmed every fifteen minutes by `admin:warm-dashboard`.
  */
 class AdminDashboardSnapshotService
 {
-    public const CACHE_KEY = 'admin:dashboard:snapshot';
+    public const CACHE_KEY = 'admin:dashboard:snapshot:v2';
 
     /**
      * @var array{0: int, 1: int}
      */
-    private const CACHE_TTL = [60, 600];
+    private const CACHE_TTL = [900, 960];
 
     public function __construct(
         private readonly UserStatsService $userStatsService,
@@ -99,18 +99,14 @@ class AdminDashboardSnapshotService
     {
         $today = now()->format('Y-m-d');
 
-        // Approximate counts on huge tables — InnoDB metadata estimates are
-        // good enough for the admin overview tiles.
-        $releasesCount = ApproximateRowCount::for('releases');
-        $usersApproximateCount = ApproximateRowCount::for('users');
-        $groupsCount = ApproximateRowCount::for('usenet_groups');
-        $failedCount = ApproximateRowCount::for('dnzb_failures');
+        $releasesCount = Release::query()->count();
+        $activeUsersCount = User::query()->count();
+        $groupsCount = UsenetGroup::query()->count();
+        $failedCount = DnzbFailure::query()->count();
 
-        // Small / index-friendly aggregates kept exact.
         $activeGroupsCount = UsenetGroup::where('active', 1)->count();
         $reportedCount = ReleaseReport::where('status', 'pending')->count();
         $softDeletedCount = User::onlyTrashed()->count();
-        $activeUsersCount = max($usersApproximateCount - $softDeletedCount, 0);
 
         // Replaces previous whereJsonContains() count which couldn't use an index.
         $permanentlyDeletedCount = UserActivity::query()
