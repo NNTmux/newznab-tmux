@@ -6,11 +6,11 @@ namespace App\Console\Commands;
 
 use App\Enums\TmuxPaneRole;
 use App\Models\Settings;
+use App\Services\Tmux\TmuxCommand;
 use App\Services\Tmux\TmuxPaneManager;
 use App\Services\Tmux\TmuxSessionManager;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Process;
 
 class TmuxHealthCheck extends Command
 {
@@ -21,6 +21,7 @@ class TmuxHealthCheck extends Command
      */
     protected $signature = 'tmux:health-check
                             {--session= : Tmux session name}
+                            {--require-session : Check only whether the exact session exists}
                             {--auto-restart : Automatically restart tmux if monitor pane is dead}';
 
     /**
@@ -42,6 +43,7 @@ class TmuxHealthCheck extends Command
         try {
             $this->sessionName = $this->option('session')
                 ?? Settings::settingValue('tmux_session')
+                ?? config('tmux.session.name')
                 ?? config('tmux.session.default_name', 'nntmux');
 
             $this->sessionManager = new TmuxSessionManager($this->sessionName);
@@ -52,6 +54,10 @@ class TmuxHealthCheck extends Command
             if (! $this->sessionManager->sessionExists()) {
                 if (! $quiet) {
                     $this->warn("⚠️  Tmux session '{$this->sessionName}' does not exist.");
+                }
+
+                if ($this->option('require-session')) {
+                    return Command::FAILURE;
                 }
 
                 if (! $shouldBeRunning) {
@@ -71,8 +77,18 @@ class TmuxHealthCheck extends Command
                 return Command::FAILURE;
             }
 
+            if ($this->option('require-session')) {
+                return Command::SUCCESS;
+            }
+
             if (! $quiet) {
                 $this->info("✅ Tmux session '{$this->sessionName}' exists.");
+            }
+
+            if (! $shouldBeRunning) {
+                $this->logHealthCheck('notice', 'stopped_intentionally');
+
+                return Command::SUCCESS;
             }
 
             $monitorPaneDead = $this->isMonitorPaneDead();
@@ -85,7 +101,7 @@ class TmuxHealthCheck extends Command
                 if ($autoRestart) {
                     $this->logHealthCheck('warning', 'monitor_dead_restart_attempted');
 
-                    return $this->restartTmux();
+                    return $this->restartMonitor();
                 }
 
                 $this->logHealthCheck('warning', 'monitor_dead_unrecovered');
@@ -95,6 +111,15 @@ class TmuxHealthCheck extends Command
 
             if (! $quiet) {
                 $this->info('✅ Monitor pane is alive and running.');
+            }
+
+            $heartbeat = (new TmuxPaneManager($this->sessionName))->heartbeatTime();
+            $maximumAge = max(60, 6 * (int) config('tmux.monitor.delay', 10));
+            if ($heartbeat !== null && time() - $heartbeat > $maximumAge) {
+                $this->logHealthCheck('warning', 'monitor_heartbeat_stale');
+                $this->warn('Monitor heartbeat is stale; its active pane was preserved.');
+
+                return Command::FAILURE;
             }
 
             $this->logHealthCheck('info', 'healthy');
@@ -125,29 +150,17 @@ class TmuxHealthCheck extends Command
             return true;
         }
 
-        $result = Process::timeout(10)->run(
-            ['tmux', 'display-message', '-p', '-t', $monitorPane, '#{pane_dead}']
-        );
+        return ! $paneManager->isAlive($monitorPane);
+    }
 
-        if (! $result->successful()) {
-            return true;
-        }
+    private function restartMonitor(): int
+    {
+        $panes = new TmuxPaneManager($this->sessionName);
+        $pane = $panes->paneForRole(TmuxPaneRole::Monitor, '0.0');
+        $successful = $panes->respawnPane($pane, TmuxCommand::monitor($this->sessionName));
+        $this->logHealthCheck($successful ? 'notice' : 'error', $successful ? 'monitor_restart_succeeded' : 'monitor_restart_failed');
 
-        $paneDeadFlag = trim($result->output());
-
-        if ($paneDeadFlag === '1') {
-            return true;
-        }
-
-        $commandResult = Process::timeout(10)->run(
-            ['tmux', 'display-message', '-p', '-t', $monitorPane, '#{pane_current_command}']
-        );
-
-        if (! $commandResult->successful()) {
-            return true;
-        }
-
-        return false;
+        return $successful ? Command::SUCCESS : Command::FAILURE;
     }
 
     private function shouldBeRunning(): bool
@@ -161,16 +174,6 @@ class TmuxHealthCheck extends Command
     private function restartTmux(): int
     {
         $this->info('🔄 Restarting tmux session...');
-
-        if ($this->sessionManager->sessionExists()) {
-            $this->info('⏹️  Stopping existing session...');
-            $this->call('tmux:stop', [
-                '--session' => $this->sessionName,
-                '--force' => true,
-            ]);
-
-            sleep(2);
-        }
 
         $this->info('▶️  Starting new tmux session...');
         $exitCode = $this->call('tmux:start', [

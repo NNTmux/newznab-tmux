@@ -6,9 +6,9 @@ namespace App\Services\Runners;
 
 use App\Models\Settings;
 use App\Models\UsenetGroup;
-use Illuminate\Support\Facades\Concurrency;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use RuntimeException;
 
 class ReleasesRunner extends BaseRunner
 {
@@ -44,25 +44,25 @@ class ReleasesRunner extends BaseRunner
             foreach ($uGroups as $group) {
                 $commands[] = $this->buildDnrCommand('releases  '.$group['id']);
             }
-            $this->runStreamingCommands($commands, $maxProcesses, 'releases'); // @phpstan-ignore argument.type
+            $this->runStreamingCommands($commands, $maxProcesses, 'releases');
 
             return;
         }
 
         $this->headerStart('releases', $count, $maxProcesses);
 
-        // Process in batches using Laravel's native Concurrency facade
+        // Run bounded batches through the shared worker pool
         $batches = array_chunk($uGroups, max(1, $maxProcesses));
 
         foreach ($batches as $batchIndex => $batch) {
             $tasks = [];
             foreach ($batch as $group) {
                 $command = $this->buildDnrCommand('releases  '.$group['id']);
-                $tasks[$group['id']] = fn () => $this->executeCommand($command);
+                $tasks[$group['id']] = $command;
             }
 
             try {
-                $results = Concurrency::run($tasks, $this->concurrencyTimeout());
+                $results = $this->runParallelCommands($tasks, $maxProcesses);
 
                 foreach ($results as $groupId => $output) {
                     echo $output;
@@ -71,6 +71,7 @@ class ReleasesRunner extends BaseRunner
             } catch (\Throwable $e) {
                 Log::error('Release processing batch failed: '.$e->getMessage());
                 cli()->error('Batch '.($batchIndex + 1).' failed: '.$e->getMessage());
+                throw new RuntimeException('Worker batch failed.', 0, $e);
             }
         }
     }
@@ -93,25 +94,25 @@ class ReleasesRunner extends BaseRunner
             foreach ($groups as $group) {
                 $commands[] = $this->buildDnrCommand('update_per_group  '.$group->id);
             }
-            $this->runStreamingCommands($commands, $maxProcesses, 'update_per_group'); // @phpstan-ignore argument.type
+            $this->runStreamingCommands($commands, $maxProcesses, 'update_per_group');
 
             return;
         }
 
         $this->headerStart('update_per_group', $count, $maxProcesses);
 
-        // Process in batches using Laravel's native Concurrency facade
+        // Run bounded batches through the shared worker pool
         $batches = array_chunk($groups, max(1, $maxProcesses));
 
         foreach ($batches as $batchIndex => $batch) {
             $tasks = [];
             foreach ($batch as $group) {
                 $command = $this->buildDnrCommand('update_per_group  '.$group->id);
-                $tasks[$group->id] = fn () => $this->executeCommand($command);
+                $tasks[$group->id] = $command;
             }
 
             try {
-                $results = Concurrency::run($tasks, $this->concurrencyTimeout());
+                $results = $this->runParallelCommands($tasks, $maxProcesses);
 
                 foreach ($results as $groupId => $output) {
                     echo $output;
@@ -121,6 +122,7 @@ class ReleasesRunner extends BaseRunner
             } catch (\Throwable $e) {
                 Log::error('Update per group batch failed: '.$e->getMessage());
                 cli()->error('Batch '.($batchIndex + 1).' failed: '.$e->getMessage());
+                throw new RuntimeException('Worker batch failed.', 0, $e);
             }
         }
     }
@@ -164,28 +166,28 @@ class ReleasesRunner extends BaseRunner
             $commands = [];
             foreach ($queues as $queue) {
                 // Updated to use new script location (modernized)
-                $commands[] = PHP_BINARY.' app/Services/Tmux/Scripts/groupfixrelnames.php "'.$queue.'" true';
+                $commands[] = [PHP_BINARY, base_path('app/Services/Tmux/Scripts/groupfixrelnames.php'), $queue];
             }
-            $this->runStreamingCommands($commands, $maxThreads, 'fixRelNames_'.$mode); // @phpstan-ignore argument.type
+            $this->runStreamingCommands($commands, $maxThreads, 'fixRelNames_'.$mode);
 
             return;
         }
 
         $this->headerStart('fixRelNames_'.$mode, $count, $maxThreads);
 
-        // Process in batches using Laravel's native Concurrency facade
+        // Run bounded batches through the shared worker pool
         $batches = array_chunk($queues, max(1, $maxThreads), true);
 
         foreach ($batches as $batchIndex => $batch) {
             $tasks = [];
             foreach ($batch as $idx => $queue) {
                 // Updated to use new script location (modernized)
-                $command = PHP_BINARY.' app/Services/Tmux/Scripts/groupfixrelnames.php "'.$queue.'" true';
-                $tasks[$idx] = fn () => $this->executeCommand($command);
+                $command = [PHP_BINARY, base_path('app/Services/Tmux/Scripts/groupfixrelnames.php'), $queue];
+                $tasks[$idx] = $command;
             }
 
             try {
-                $results = Concurrency::run($tasks, $this->concurrencyTimeout());
+                $results = $this->runParallelCommands($tasks, $maxThreads);
 
                 foreach ($results as $taskIdx => $output) {
                     echo $output;
@@ -194,6 +196,7 @@ class ReleasesRunner extends BaseRunner
             } catch (\Throwable $e) {
                 Log::error('Fix rel names batch failed: '.$e->getMessage());
                 cli()->error('Batch '.($batchIndex + 1).' failed: '.$e->getMessage());
+                throw new RuntimeException('Worker batch failed.', 0, $e);
             }
         }
     }

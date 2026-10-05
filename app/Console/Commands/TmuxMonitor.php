@@ -4,14 +4,18 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Enums\TmuxMode;
 use App\Models\Collection;
 use App\Models\Settings;
+use App\Services\Tmux\TmuxCommand;
 use App\Services\Tmux\TmuxMonitorService;
 use App\Services\Tmux\TmuxOutput;
+use App\Services\Tmux\TmuxPaneManager;
 use App\Services\Tmux\TmuxSessionManager;
 use App\Services\Tmux\TmuxTaskRunner;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Process;
 
 class TmuxMonitor extends Command
 {
@@ -22,7 +26,8 @@ class TmuxMonitor extends Command
      */
     protected $signature = 'tmux:monitor
                             {--session= : Tmux session name}
-                            {--reset-collections : Reset old collections before starting}';
+                            {--reset-collections : Reset old collections before starting}
+                            {--ready-channel= : Internal startup acknowledgement channel}';
 
     /**
      * The console command description.
@@ -54,6 +59,7 @@ class TmuxMonitor extends Command
             // Initialize services
             $sessionName = $this->option('session')
                 ?? Settings::settingValue('tmux_session')
+                ?? config('tmux.session.name')
                 ?? config('tmux.session.default_name', 'nntmux');
 
             $this->sessionManager = new TmuxSessionManager($sessionName);
@@ -74,11 +80,24 @@ class TmuxMonitor extends Command
 
             // Initialize monitor
             $runVar = $this->monitor->initializeMonitor();
+            $panes = new TmuxPaneManager($sessionName);
+            if (! $panes->installExitHook() || ! $panes->heartbeat()) {
+                throw new \RuntimeException('Unable to initialize tmux monitor signals.');
+            }
+            if ($channel = $this->option('ready-channel')) {
+                $result = Process::timeout(5)->run(TmuxCommand::arguments(['wait-for', '-S', $channel]));
+                if (! $result->successful()) {
+                    throw new \RuntimeException('Unable to acknowledge tmux monitor readiness.');
+                }
+            }
 
             // Main monitoring loop
             $iteration = 0;
             while ($this->monitor->shouldContinue()) {
                 $iteration++;
+                if (! $this->sessionManager->sessionExists() || ! $panes->heartbeat()) {
+                    throw new \RuntimeException('Tmux monitor session disappeared.');
+                }
 
                 // Collect statistics
                 $runVar = $this->monitor->collectStatistics();
@@ -87,6 +106,7 @@ class TmuxMonitor extends Command
                 $this->tmuxOutput->updateMonitorPane($runVar);
 
                 // Run pane tasks if tmux is running
+                $runVar['settings']['is_running'] = (int) Settings::settingValue('running');
                 if ((int) ($runVar['settings']['is_running'] ?? 0) === 1) {
                     $this->runPaneTasks($runVar);
                 } else {
@@ -97,7 +117,7 @@ class TmuxMonitor extends Command
 
                 // Increment iteration and sleep
                 $this->monitor->incrementIteration();
-                sleep(max(1, (int) config('tmux.monitor.delay', 10)));
+                $panes->waitForExit(max(1, (int) config('tmux.monitor.delay', 10)));
             }
 
             $this->info('🛑 Monitor stopped by exit flag');
@@ -149,103 +169,10 @@ class TmuxMonitor extends Command
      */
     private function runPaneTasks(array $runVar): void
     {
-        $sequential = (int) ($runVar['constants']['sequential'] ?? 0);
-
-        // Always run IRC scraper
-        $this->runIRCScraper($runVar);
-
-        // Run main tasks based on sequential mode
-        if ($sequential === 2) {
-            // Stripped mode - only essential tasks
-            $this->runSequentialTasks($runVar);
-        } elseif ($sequential === 1) {
-            // Basic sequential mode
-            $this->runBasicTasks($runVar);
-        } else {
-            // Full non-sequential mode
-            $this->runFullTasks($runVar);
+        $this->taskRunner->beginCycle();
+        $mode = TmuxMode::tryFrom((int) ($runVar['constants']['sequential'] ?? 0)) ?? TmuxMode::Full;
+        foreach ($mode->tasks() as $task => $role) {
+            $this->taskRunner->runPaneTask($task, ['role' => $role], $runVar);
         }
-    }
-
-    /**
-     * Run IRC scraper
-     *
-     * @param  array<string, mixed>  $runVar
-     */
-    private function runIRCScraper(array $runVar): void
-    {
-        $this->taskRunner->runIRCScraper([
-            'constants' => $runVar['constants'],
-        ]);
-    }
-
-    /**
-     * Run full non-sequential tasks
-     *
-     * @param  array<string, mixed>  $runVar
-     */
-    private function runFullTasks(array $runVar): void
-    {
-        // Update binaries
-        $this->taskRunner->runBinariesUpdate($runVar);
-
-        // Backfill
-        $this->taskRunner->runBackfill($runVar);
-
-        // Update releases
-        $this->taskRunner->runReleasesUpdate($runVar);
-
-        // Post-processing and cleanup tasks
-        $this->runPostProcessingTasks($runVar);
-    }
-
-    /**
-     * Run basic sequential tasks
-     *
-     * @param  array<string, mixed>  $runVar
-     */
-    private function runBasicTasks(array $runVar): void
-    {
-        // Update releases
-        $this->taskRunner->runReleasesUpdate($runVar);
-
-        // Post-processing and cleanup tasks
-        $this->runPostProcessingTasks($runVar);
-    }
-
-    /**
-     * Run stripped sequential tasks
-     *
-     * @param  array<string, mixed>  $runVar
-     */
-    private function runSequentialTasks(array $runVar): void
-    {
-        // Minimal tasks for complete sequential mode
-        // Tasks are handled by the sequential script itself
-    }
-
-    /**
-     * Run post-processing tasks (common to most modes)
-     *
-     * @param  array<string, mixed>  $runVar
-     */
-    private function runPostProcessingTasks(array $runVar): void
-    {
-        $sequential = (int) ($runVar['constants']['sequential'] ?? 0);
-
-        if ($sequential === 2) {
-            // Skip post-processing in complete sequential mode
-            return;
-        }
-
-        // Run utility tasks (window 1)
-        $this->taskRunner->runPaneTask('fixnames', [], $runVar);
-        $this->taskRunner->runPaneTask('removecrap', [], $runVar);
-
-        // Run post-processing tasks (window 2)
-        $this->taskRunner->runPaneTask('ppadditional', [], $runVar);
-        $this->taskRunner->runPaneTask('tv', [], $runVar);
-        $this->taskRunner->runPaneTask('movies', [], $runVar);
-        $this->taskRunner->runPaneTask('amazon', [], $runVar);
     }
 }

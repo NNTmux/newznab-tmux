@@ -12,6 +12,8 @@ return [
     |
     */
 
+    'socket_name' => env('TMUX_SOCKET_NAME', ''),
+
     'config_file' => env('TMUX_CONFIG_FILE', config_path('tmux.conf')),
 
     'session' => [

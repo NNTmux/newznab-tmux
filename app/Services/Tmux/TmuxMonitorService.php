@@ -131,6 +131,9 @@ class TmuxMonitorService
      */
     public function collectStatistics(): array
     {
+        $timer = microtime(true);
+        $this->runVar['settings'] = $this->tmux->getMonitorSettings();
+        $this->runVar['timers']['query']['tmux_time'] = microtime(true) - $timer;
         $now = microtime(true);
         $monitorDelay = max(1, (int) ($this->runVar['settings']['monitor'] ?? 60));
         $slowRefreshDelay = max($monitorDelay, (int) config('tmux.monitor.refresh_interval', 60));
@@ -161,10 +164,6 @@ class TmuxMonitorService
 
     protected function refreshOperationalStatistics(): void
     {
-        $timer = microtime(true);
-        $this->runVar['settings'] = $this->tmux->getMonitorSettings();
-        $this->runVar['timers']['query']['tmux_time'] = microtime(true) - $timer;
-
         $this->getProcessCounts();
     }
 

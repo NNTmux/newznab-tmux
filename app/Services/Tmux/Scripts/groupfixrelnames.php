@@ -28,7 +28,7 @@ switch ($type) {
             exit(1);
         }
 
-        $command = "php {$artisan} releases:fix-names-group standard --guid-char={$guidChar} --limit={$maxPerRun}";
+        $command = [PHP_BINARY, $artisan, 'releases:fix-names-group', 'standard', '--guid-char='.$guidChar, '--limit='.$maxPerRun];
         break;
 
     case 'predbft':
@@ -37,7 +37,7 @@ switch ($type) {
             exit(1);
         }
 
-        $command = "php {$artisan} releases:fix-names-group predbft --limit={$maxPerRun} --thread={$thread} --workers={$workers}";
+        $command = [PHP_BINARY, $artisan, 'releases:fix-names-group', 'predbft', '--limit='.$maxPerRun, '--thread='.$thread, '--workers='.$workers];
         break;
 
     default:
@@ -46,5 +46,12 @@ switch ($type) {
 }
 
 // Execute the command
-passthru($command, $exitCode);
+if (function_exists('pcntl_exec')) {
+    pcntl_exec(PHP_BINARY, array_slice($command, 1));
+    fwrite(STDERR, "Unable to execute Artisan worker.\n");
+    exit(1);
+}
+
+$process = proc_open($command, [STDIN, STDOUT, STDERR], $pipes);
+$exitCode = is_resource($process) ? proc_close($process) : 1;
 exit($exitCode);

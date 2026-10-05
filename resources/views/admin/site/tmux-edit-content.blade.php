@@ -237,7 +237,7 @@
                         <x-form.group label="Postprocess Metadata" for="post_amazon" help="Books, music and games lookups.">
                             <x-select id="post_amazon" name="post_amazon" class="w-full">
                                 @foreach($yesno_ids as $index => $val)
-                                    <option value="{{ $val }}" {{ ($site['post_amazon'] ?? '') == $val ? 'selected' : '' }}>
+                                    <option value="{{ $val }}" {{ (int) ($site['post_amazon'] ?? 0) === $val ? 'selected' : '' }}>
                                         {{ $yesno_names[$index] }}
                                     </option>
                                 @endforeach
@@ -254,7 +254,7 @@
                         <x-form.group label="Postprocess Video Metadata" for="post_non" help="Movies, anime and TV lookups.">
                             <x-select id="post_non" name="post_non" class="w-full">
                                 @foreach($yesno_ids as $index => $val)
-                                    <option value="{{ $val }}" {{ ($site['post_non'] ?? '') == $val ? 'selected' : '' }}>
+                                    <option value="{{ $val }}" {{ (int) ($site['post_non'] ?? 0) === $val ? 'selected' : '' }}>
                                         {{ $yesno_names[$index] }}
                                     </option>
                                 @endforeach

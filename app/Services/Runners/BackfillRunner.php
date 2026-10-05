@@ -35,9 +35,9 @@ class BackfillRunner extends BaseRunner
         if ((bool) config('nntmux.stream_fork_output', false) === true) {
             $commands = [];
             foreach ($work as $group) {
-                $commands[] = PHP_BINARY.' artisan update:backfill '.$group->name.(isset($group->max) ? (' '.$group->max) : '');
+                $commands[] = [PHP_BINARY, base_path('artisan'), 'update:backfill', (string) $group->name, ...(isset($group->max) ? [(string) $group->max] : [])];
             }
-            $this->runStreamingCommands($commands, $maxProcesses, 'backfill'); // @phpstan-ignore argument.type
+            $this->runStreamingCommands($commands, $maxProcesses, 'backfill');
 
             return;
         }
@@ -47,7 +47,7 @@ class BackfillRunner extends BaseRunner
         // Build commands array for parallel execution
         $commands = [];
         foreach ($work as $group) {
-            $commands[$group->name] = PHP_BINARY.' artisan update:backfill '.$group->name.(isset($group->max) ? (' '.$group->max) : '');
+            $commands[$group->name] = [PHP_BINARY, base_path('artisan'), 'update:backfill', (string) $group->name, ...(isset($group->max) ? [(string) $group->max] : [])];
         }
 
         // Process using parallel commands with configurable timeout
@@ -62,7 +62,7 @@ class BackfillRunner extends BaseRunner
     public function safeBackfill(): void
     {
         // make sure short_groups is up-to-date - Updated to use new script location (modernized)
-        $this->executeCommand(PHP_BINARY.' app/Services/Tmux/Scripts/update_groups.php');
+        $this->executeCommand([PHP_BINARY, base_path('artisan'), 'groups:update']);
 
         $backfill_qty = (int) Settings::settingValue('backfill_qty');
         $backfill_order = (int) Settings::settingValue('backfill_order');
@@ -132,7 +132,7 @@ class BackfillRunner extends BaseRunner
             foreach ($queues as $queue) {
                 $commands[] = $this->buildDnrCommand($queue);
             }
-            $this->runStreamingCommands($commands, $threads, 'safe_backfill'); // @phpstan-ignore argument.type
+            $this->runStreamingCommands($commands, $threads, 'safe_backfill');
 
             return;
         }

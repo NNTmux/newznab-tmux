@@ -1,38 +1,17 @@
 #!/usr/bin/env bash
+set -Eeuo pipefail
 
-## This script will install latest tmux from source
-## script is used from https://bogdanvlviv.com/posts/tmux/how-to-install-the-latest-tmux-on-ubuntu-16_04.html with small additions
+# Build in an owned temporary directory; leave unrelated files in /tmp alone.
+build_dir="$(mktemp -d "${TMPDIR:-/tmp}/nntmux-tmux.XXXXXXXX")"
+trap 'rm -rf -- "$build_dir"' EXIT
 
 sudo apt update
+sudo apt install -y git automake build-essential pkg-config libevent-dev \
+    libncurses-dev fonts-powerline powerline bison byacc
 
-sudo apt install -y git
-
-sudo apt install -y automake
-sudo apt install -y build-essential
-sudo apt install -y pkg-config
-sudo apt install -y libevent-dev
-sudo apt install -y libncurses5-dev
-sudo apt install -y fonts-powerline
-sudo apt install -y powerline
-sudo apt install -y bison
-sudo apt install -y byacc
-
-rm -fr /tmp/tmux
-
-git clone https://github.com/tmux/tmux.git /tmp/tmux
-
-cd /tmp/tmux
-
-git fetch --all --tags --prune
-
-git checkout 3.7b
-
+git clone --branch 3.7b --depth 1 https://github.com/tmux/tmux.git "$build_dir/source"
+cd "$build_dir/source"
 sh autogen.sh
-
-./configure && make
-
+./configure
+make
 sudo make install
-
-cd -
-
-rm -fr /tmp/tmux

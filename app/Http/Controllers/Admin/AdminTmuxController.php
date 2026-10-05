@@ -23,6 +23,15 @@ class AdminTmuxController extends BasePageController
         switch ($action) {
             case 'submit':
                 $data = $request->all();
+                $postprocessing = $request->validate([
+                    'post_non' => ['sometimes', 'required', 'boolean'],
+                    'post_amazon' => ['sometimes', 'required', 'boolean'],
+                ]);
+
+                foreach ($postprocessing as $name => $value) {
+                    Settings::query()->updateOrCreate(['name' => $name], ['value' => (int) $value]);
+                    unset($data[$name]);
+                }
 
                 // Handle fix_crap checkbox array - convert to comma-separated string
                 if (isset($data['fix_crap']) && is_array($data['fix_crap'])) {

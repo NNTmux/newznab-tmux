@@ -18,6 +18,8 @@ class TmuxSessionManager
 
     private ?string $lastError = null;
 
+    private ?string $sessionId = null;
+
     public function __construct(?string $sessionName = null)
     {
         $this->sessionName = $sessionName ?? $this->getSessionName();
@@ -45,9 +47,14 @@ class TmuxSessionManager
     public function sessionExists(): bool
     {
         $result = Process::timeout(10)
-            ->run(['tmux', 'has-session', '-t', $this->sessionName]);
+            ->run(TmuxCommand::arguments(['has-session', '-t', $this->sessionId ?? '='.$this->sessionName]));
 
-        return $result->successful();
+        if (! $result->successful()) {
+            return false;
+        }
+        $this->target();
+
+        return true;
     }
 
     /**
@@ -61,7 +68,7 @@ class TmuxSessionManager
             return null;
         }
 
-        $arguments = ['tmux'];
+        $arguments = TmuxCommand::arguments([]);
         if (file_exists($this->configFile)) {
             array_push($arguments, '-f', $this->configFile);
         }
@@ -76,7 +83,10 @@ class TmuxSessionManager
             $this->sessionName,
             '-n',
             $windowName,
-            'true',
+            '-c',
+            base_path(),
+            'sleep',
+            '86400',
         );
 
         $result = Process::timeout(30)->run($arguments);
@@ -95,6 +105,16 @@ class TmuxSessionManager
         }
 
         $this->lastError = null;
+        $this->sessionId = null;
+        $this->resolveTarget($paneId);
+
+        $panes = new TmuxPaneManager($this->sessionName);
+        if (! $panes->releasePlaceholder($paneId)) {
+            $this->killSession();
+            $this->lastError = $panes->lastError();
+
+            return null;
+        }
 
         return $paneId;
     }
@@ -108,7 +128,7 @@ class TmuxSessionManager
             return true;
         }
 
-        $result = Process::timeout(30)->run(['tmux', 'kill-session', '-t', $this->sessionName]);
+        $result = Process::timeout(30)->run(TmuxCommand::arguments(['kill-session', '-t', $this->target()]));
 
         return $result->successful();
     }
@@ -122,7 +142,7 @@ class TmuxSessionManager
             return false;
         }
 
-        passthru('tmux attach-session -t '.escapeshellarg($this->sessionName), $exitCode);
+        passthru(implode(' ', array_map('escapeshellarg', TmuxCommand::arguments(['attach-session', '-t', $this->target()]))), $exitCode);
 
         return $exitCode === 0;
     }
@@ -139,7 +159,7 @@ class TmuxSessionManager
         }
 
         $result = Process::timeout(10)->run(
-            ['tmux', 'list-panes', '-s', '-t', $this->sessionName, '-F', "#{window_index}:#{pane_index}\t#{pane_title}"]
+            TmuxCommand::arguments(['list-panes', '-s', '-t', $this->target(), '-F', "#{window_index}:#{pane_index}\t#{pane_title}"])
         );
 
         if (! $result->successful()) {
@@ -167,7 +187,7 @@ class TmuxSessionManager
     public function getPaneStatus(string $window, string $pane): ?string
     {
         $result = Process::timeout(5)->run(
-            ['tmux', 'display-message', '-p', '-t', "{$this->sessionName}:{$window}.{$pane}", '#{pane_current_command}']
+            TmuxCommand::arguments(['display-message', '-p', '-t', $this->target().":{$window}.{$pane}", '#{pane_current_command}'])
         );
 
         return $result->successful() ? trim($result->output()) : null;
@@ -186,5 +206,24 @@ class TmuxSessionManager
     public function lastError(): ?string
     {
         return $this->lastError;
+    }
+
+    public function target(): string
+    {
+        return $this->sessionId ?? $this->resolveTarget('='.$this->sessionName.':');
+    }
+
+    private function resolveTarget(string $target): string
+    {
+        $result = Process::timeout(10)->run(TmuxCommand::arguments([
+            'display-message', '-p', '-t', $target, '#{session_id}',
+        ]));
+        $id = trim($result->output());
+        if (! $result->successful() || ! preg_match('/^\$[0-9]+$/', $id)) {
+            throw new \RuntimeException("Unable to resolve exact tmux session '{$this->sessionName}'.");
+        }
+        $this->sessionId = $id;
+
+        return $id;
     }
 }

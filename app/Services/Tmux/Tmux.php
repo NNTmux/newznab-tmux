@@ -101,23 +101,14 @@ class Tmux
      */
     public function getListOfPanes(mixed $constants): array
     {
-        $panes = ['zero' => '', 'one' => '', 'two' => ''];
-        switch ($constants['sequential']) {
-            case 0:
-            case 1:
-                $panes_win_1 = shell_exec("echo `tmux list-panes -t {$constants['tmux_session']}:0 -F '#{pane_title}'`");
-                $panes['zero'] = str_replace("\n", '', explode(' ', $panes_win_1));
-                $panes_win_2 = shell_exec("echo `tmux list-panes -t {$constants['tmux_session']}:1 -F '#{pane_title}'`");
-                $panes['one'] = str_replace("\n", '', explode(' ', $panes_win_2));
-                $panes_win_3 = shell_exec("echo `tmux list-panes -t {$constants['tmux_session']}:2 -F '#{pane_title}'`");
-                $panes['two'] = str_replace("\n", '', explode(' ', $panes_win_3));
-                break;
-            case 2:
-                $panes_win_1 = shell_exec("echo `tmux list-panes -t {$constants['tmux_session']}:0 -F '#{pane_title}'`");
-                $panes['zero'] = str_replace("\n", '', explode(' ', $panes_win_1));
-                $panes_win_2 = shell_exec("echo `tmux list-panes -t {$constants['tmux_session']}:1 -F '#{pane_title}'`");
-                $panes['one'] = str_replace("\n", '', explode(' ', $panes_win_2));
-                break;
+        $panes = ['zero' => [], 'one' => [], 'two' => []];
+        $session = new TmuxSessionManager($constants['tmux_session'] ?? null);
+        foreach ($session->listPanes() as $position => $title) {
+            [$window] = explode(':', $position, 2);
+            $key = ['zero', 'one', 'two'][(int) $window] ?? null;
+            if ($key !== null && ((int) ($constants['sequential'] ?? 0) !== 2 || $key !== 'two')) {
+                $panes[$key][] = $title;
+            }
         }
 
         return $panes;
@@ -207,7 +198,7 @@ class Tmux
             ->mapWithKeys(function ($item) use ($settingsMap) {
                 return [$settingsMap[$item->name] => Settings::convertValue($item->getRawOriginal('value'))];
             })
-            ->toArray();
+            ->toArray() + ['show_query' => 0];
     }
 
     public function updateItem(mixed $setting, mixed $value): int

@@ -295,16 +295,22 @@ class ForkingService
 
     /**
      * Execute a shell command.
+     *
+     * @param  string|list<string>  $command
      */
-    protected function executeCommand(string $command): string
+    protected function executeCommand(string|array $command): string
     {
-        $process = Process::fromShellCommandline($command);
+        $process = is_array($command) ? new Process($command, base_path()) : Process::fromShellCommandline($command, base_path());
         $process->setTimeout((int) config('nntmux.multiprocessing_max_child_time', 1800));
         $process->run(function ($type, $buffer) {
             if ($type === Process::ERR) {
                 echo $buffer;
             }
         });
+
+        if (! $process->isSuccessful()) {
+            throw new \RuntimeException('Worker failed with exit code '.$process->getExitCode().'.');
+        }
 
         return $process->getOutput();
     }

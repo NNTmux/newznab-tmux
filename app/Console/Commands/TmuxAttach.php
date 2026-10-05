@@ -35,7 +35,8 @@ class TmuxAttach extends Command
     {
         $sessionName = $this->option('session')
             ?? Settings::settingValue('tmux_session')
-            ?? config('tmux.session.default_name', 'nntmux');
+            ?? config('tmux.session.name')
+                ?? config('tmux.session.default_name', 'nntmux');
 
         $sessionManager = new TmuxSessionManager($sessionName);
 

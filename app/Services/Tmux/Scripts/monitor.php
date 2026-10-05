@@ -13,7 +13,14 @@ $artisan = dirname(__DIR__, 4).'/artisan';
 
 // Pass any arguments to the artisan command
 $args = array_slice($argv ?? [], 1);
-$argString = implode(' ', array_map('escapeshellarg', $args));
+$command = [PHP_BINARY, $artisan, 'tmux:monitor', ...$args];
 
-passthru("php {$artisan} tmux:monitor {$argString}", $exitCode);
+if (function_exists('pcntl_exec')) {
+    pcntl_exec(PHP_BINARY, array_slice($command, 1));
+    fwrite(STDERR, "Unable to execute Artisan worker.\n");
+    exit(1);
+}
+
+$process = proc_open($command, [STDIN, STDOUT, STDERR], $pipes);
+$exitCode = is_resource($process) ? proc_close($process) : 1;
 exit($exitCode);

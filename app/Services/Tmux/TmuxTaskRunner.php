@@ -12,9 +12,17 @@ use App\Models\Settings;
  */
 class TmuxTaskRunner
 {
+    private const string CANCELLATION_TRAPS = "trap 'exit 130' INT; trap 'exit 143' TERM; trap 'exit 129' HUP; ";
+
     protected TmuxPaneManager $paneManager;
 
     protected string $sessionName;
+
+    /** @var array<string, string> */
+    private array $idleReasons = [];
+
+    /** @var array<string, int> */
+    private array $reportedFailures = [];
 
     public function __construct(string $sessionName)
     {
@@ -80,37 +88,76 @@ class TmuxTaskRunner
      */
     protected function disablePane(string $pane, string $taskName, string $reason): bool
     {
+        if ($this->paneManager->isAlive($pane) || ($this->idleReasons[$pane] ?? null) === $reason) {
+            return true;
+        }
         $color = $this->getRandomColor();
         $message = "echo -e \"\033[38;5;{$color}m\n{$taskName} has been disabled: {$reason}\"";
 
-        return $this->paneManager->respawnPane($pane, $message, kill: true);
+        $successful = $this->paneManager->respawnPane($pane, $message);
+        if ($successful) {
+            $this->idleReasons[$pane] = $reason;
+        }
+
+        return $successful;
     }
 
     /**
-     * Build a command with logging
+     * Preserve the worker exit status through cooldown
      *
      * @param  array<string, mixed>  $options
      */
     public function buildCommand(string $baseCommand, array $options = []): string
     {
-        $parts = [$baseCommand];
-
-        // Add sleep timer at the end if specified
+        $command = self::CANCELLATION_TRAPS.'( '.$baseCommand.' ); nntmux_status=$?';
         if (isset($options['sleep'])) {
-            $sleepCommand = $this->buildSleepCommand($options['sleep']);
-            $parts[] = 'date +"%Y-%m-%d %T"';
-            $parts[] = $sleepCommand;
+            $command .= '; date +"%Y-%m-%d %T"; '.$this->buildSleepCommand((int) $options['sleep']);
         }
 
-        // Add logging if enabled
+        return $command.'; exit "$nntmux_status"';
+    }
+
+    public function beginCycle(): void
+    {
+        $this->paneManager->refresh();
+        foreach ($this->paneManager->paneSnapshot() as $pane => $state) {
+            if ($state['dead'] && $state['exit_code'] !== null && $state['exit_code'] !== 0
+                && ($this->reportedFailures[$pane] ?? null) !== $state['pid']) {
+                logger()->warning('Tmux pane worker exited unsuccessfully', [
+                    'pane' => $pane, 'role' => $state['role'], 'exit_code' => $state['exit_code'],
+                ]);
+                $this->reportedFailures[$pane] = $state['pid'];
+            }
+        }
+    }
+
+    /** @param array<string, mixed> $options */
+    private function launch(string $pane, string $command, array $options = []): bool
+    {
+        if ($this->paneManager->isAlive($pane)) {
+            return true;
+        }
+        unset($this->idleReasons[$pane]);
+        $worker = ['bash', '-c', $this->buildCommand($command, $options)];
         if (isset($options['log_pane'])) {
-            $logFile = $this->getLogFile($options['log_pane']);
-            $command = implode('; ', $parts);
-
-            return "{$command} 2>&1 | tee -a {$logFile}";
+            $file = $this->getLogFile($options['log_pane']);
+            if ($file !== '/dev/null') {
+                return $this->paneManager->respawnLoggedPane($pane, $worker, $file);
+            }
         }
 
-        return implode('; ', $parts);
+        return $this->paneManager->respawnPane($pane, $worker);
+    }
+
+    /** @param list<string> $commands */
+    private function batchCommand(array $commands): string
+    {
+        $script = self::CANCELLATION_TRAPS.'nntmux_batch_status=0; ';
+        foreach ($commands as $command) {
+            $script .= '( '.$command.' ); nntmux_child_status=$?; if [ "$nntmux_batch_status" -eq 0 ]; then nntmux_batch_status=$nntmux_child_status; fi; ';
+        }
+
+        return $script.'exit "$nntmux_batch_status"';
     }
 
     /**
@@ -122,7 +169,7 @@ class TmuxTaskRunner
         $sleepScript = base_path('app/Services/Tmux/Scripts/showsleep.php');
 
         if (file_exists($sleepScript)) {
-            return "nice -n{$niceness} php {$sleepScript} {$seconds}";
+            return "nice -n{$niceness} ".escapeshellarg(PHP_BINARY).' '.escapeshellarg($sleepScript)." {$seconds}";
         }
 
         return "sleep {$seconds}";
@@ -194,11 +241,10 @@ class TmuxTaskRunner
         }
 
         $niceness = $this->getNiceness();
-        $artisan = base_path('artisan');
-        $command = "nice -n{$niceness} php {$artisan} irc:scrape";
-        $command = $this->buildCommand($command, ['log_pane' => 'scraper']);
+        $artisan = escapeshellarg(PHP_BINARY).' '.escapeshellarg(base_path('artisan'));
+        $command = "nice -n{$niceness} {$artisan} irc:scrape";
 
-        return $this->paneManager->respawnPane($pane, $command);
+        return $this->launch($pane, $command, ['log_pane' => 'scraper']);
     }
 
     /**
@@ -230,11 +276,10 @@ class TmuxTaskRunner
         }
 
         $niceness = $this->getNiceness();
-        $command = "nice -n{$niceness} ".PHP_BINARY." artisan {$artisanCommand}";
+        $command = "nice -n{$niceness} ".escapeshellarg(PHP_BINARY).' '.escapeshellarg(base_path('artisan'))." {$artisanCommand}";
         $sleep = (int) ($config['settings']['bins_timer'] ?? 60);
-        $command = $this->buildCommand($command, ['log_pane' => 'binaries', 'sleep' => $sleep]);
 
-        return $this->paneManager->respawnPane($pane, $command);
+        return $this->launch($pane, $command, ['log_pane' => 'binaries', 'sleep' => $sleep]);
     }
 
     /**
@@ -277,10 +322,9 @@ class TmuxTaskRunner
             : $baseSleep;
 
         $niceness = $this->getNiceness();
-        $command = "nice -n{$niceness} ".PHP_BINARY." artisan {$artisanCommand}";
-        $command = $this->buildCommand($command, ['log_pane' => 'backfill', 'sleep' => $sleep]);
+        $command = "nice -n{$niceness} ".escapeshellarg(PHP_BINARY).' '.escapeshellarg(base_path('artisan'))." {$artisanCommand}";
 
-        return $this->paneManager->respawnPane($pane, $command);
+        return $this->launch($pane, $command, ['log_pane' => 'backfill', 'sleep' => $sleep]);
     }
 
     /**
@@ -299,11 +343,10 @@ class TmuxTaskRunner
         }
 
         $niceness = $this->getNiceness();
-        $command = "nice -n{$niceness} ".PHP_BINARY.' artisan multiprocessing:releases';
+        $command = "nice -n{$niceness} ".escapeshellarg(PHP_BINARY).' '.escapeshellarg(base_path('artisan')).' multiprocessing:releases';
         $sleep = (int) ($config['settings']['rel_timer'] ?? 60);
-        $command = $this->buildCommand($command, ['log_pane' => 'releases', 'sleep' => $sleep]);
 
-        return $this->paneManager->respawnPane($pane, $command);
+        return $this->launch($pane, $command, ['log_pane' => 'releases', 'sleep' => $sleep]);
     }
 
     /**
@@ -319,6 +362,9 @@ class TmuxTaskRunner
         $sequential = (int) ($runVar['constants']['sequential'] ?? 0);
 
         return match ($taskName) {
+            'binaries' => $this->runBinariesUpdate($runVar),
+            'backfill' => $this->runBackfill($runVar),
+            'releases' => $this->runReleasesUpdate($runVar),
             'main' => $this->runMainTask($sequential, $runVar),
             'fixnames' => $this->runFixNamesTask($runVar),
             'removecrap' => $this->runRemoveCrapTask($runVar),
@@ -385,11 +431,10 @@ class TmuxTaskRunner
         $pane = $this->paneManager->paneForRole(TmuxPaneRole::Sequential, '0.1');
 
         $niceness = $this->getNiceness();
-        $artisan = base_path('artisan');
-        $command = "nice -n{$niceness} php {$artisan} group:update-all";
-        $command = $this->buildCommand($command, ['log_pane' => 'sequential']);
+        $artisan = escapeshellarg(PHP_BINARY).' '.escapeshellarg(base_path('artisan'));
+        $command = "nice -n{$niceness} {$artisan} multiprocessing:update-per-group";
 
-        return $this->paneManager->respawnPane($pane, $command);
+        return $this->launch($pane, $command, ['log_pane' => 'sequential', 'sleep' => (int) ($runVar['settings']['seq_timer'] ?? 60)]);
     }
 
     /**
@@ -411,21 +456,19 @@ class TmuxTaskRunner
             return $this->disablePane($pane, 'Fix Release Names', 'no releases to process');
         }
 
-        $artisan = base_path('artisan');
-        $log = $this->getLogFile('fixnames');
+        $artisan = escapeshellarg(PHP_BINARY).' '.escapeshellarg(base_path('artisan'));
+        $logName = 'fixnames';
 
         // Run multiple fix-names passes
         $commands = [];
         foreach ([3, 5, 7, 9, 11, 13, 15, 17, 19] as $level) {
-            $commands[] = "php {$artisan} releases:fix-names {$level} --update --category=other --set-status --show 2>&1 | tee -a {$log}";
+            $commands[] = "{$artisan} releases:fix-names {$level} --update --category=other --set-status --show";
         }
 
         $sleep = (int) ($runVar['settings']['fix_timer'] ?? 300);
-        $allCommands = implode('; ', $commands);
-        $sleepCommand = $this->buildSleepCommand($sleep);
-        $fullCommand = "{$allCommands}; date +'%Y-%m-%d %T'; {$sleepCommand}";
+        $allCommands = $this->batchCommand($commands);
 
-        return $this->paneManager->respawnPane($pane, $fullCommand);
+        return $this->launch($pane, $allCommands, ['log_pane' => $logName, 'sleep' => $sleep]);
     }
 
     /**
@@ -444,15 +487,14 @@ class TmuxTaskRunner
         }
 
         $niceness = $this->getNiceness();
-        $artisan = base_path('artisan');
+        $artisan = escapeshellarg(PHP_BINARY).' '.escapeshellarg(base_path('artisan'));
         $sleep = (int) ($runVar['settings']['crap_timer'] ?? 300);
 
         // Handle 'All' mode - run all types with 2 hour time limit
         if ($option === 'All') {
-            $command = "nice -n{$niceness} php {$artisan} releases:remove-crap --time=2 --delete";
-            $command = $this->buildCommand($command, ['log_pane' => 'removecrap', 'sleep' => $sleep]);
+            $command = "nice -n{$niceness} {$artisan} releases:remove-crap --time=2 --delete";
 
-            return $this->paneManager->respawnPane($pane, $command);
+            return $this->launch($pane, $command, ['log_pane' => 'removecrap', 'sleep' => $sleep]);
         }
 
         // Handle 'Custom' mode - run all selected types sequentially
@@ -486,24 +528,30 @@ class TmuxTaskRunner
             $time = $isFirstRun ? 'full' : '4';
 
             // Build commands for all enabled types to run sequentially
-            $log = $this->getLogFile('removecrap');
+            $logName = 'removecrap';
             $commands = [];
             foreach ($types as $type) {
-                $commands[] = "echo \"\nRunning removeCrapReleases for {$type}\"; nice -n{$niceness} php {$artisan} releases:remove-crap --type={$type} --time={$time} --delete 2>&1 | tee -a {$log}";
+                $type = escapeshellarg($type);
+                $commands[] = "nice -n{$niceness} {$artisan} releases:remove-crap --type={$type} --time={$time} --delete";
             }
 
             // Join all commands with semicolons and add final timestamp and sleep
-            $allCommands = implode('; ', $commands);
-            $sleepCommand = $this->buildSleepCommand($sleep);
-            $fullCommand = "{$allCommands}; date +'%Y-%m-%d %T'; {$sleepCommand}";
+            $allCommands = $this->batchCommand($commands);
 
-            // Mark that we're not on the first run anymore for next cycle
+            if ($this->paneManager->isAlive($pane)) {
+                return true;
+            }
+            $launched = $this->launch($pane, $allCommands, ['log_pane' => $logName, 'sleep' => $sleep]);
+            if (! $launched) {
+                return false;
+            }
+
             $this->saveCrapState($stateFile, [
                 'first_run' => false,
                 'types' => $types,
             ]);
 
-            return $this->paneManager->respawnPane($pane, $fullCommand);
+            return true;
         }
 
         // Default fallback - disabled
@@ -560,8 +608,8 @@ class TmuxTaskRunner
         $hasWork = (int) ($runVar['counts']['now']['work_available'] ?? $runVar['counts']['now']['work'] ?? 0) > 0;
         $hasNfo = (int) ($runVar['counts']['now']['processnfo'] ?? 0) > 0;
 
-        $niceness = Settings::settingValue('niceness') ?? 2;
-        $log = $this->getLogFile('post_additional');
+        $niceness = $this->getNiceness();
+        $logName = 'post_additional';
         $sleep = (int) ($runVar['settings']['post_timer'] ?? 300);
 
         $commands = [];
@@ -570,20 +618,20 @@ class TmuxTaskRunner
         if ($postSetting === 1) {
             // Post = 1: Additional processing only
             if ($hasWork) {
-                $commands[] = "nice -n{$niceness} ".PHP_BINARY." artisan multiprocessing:postprocess add 2>&1 | tee -a {$log}";
+                $commands[] = "nice -n{$niceness} ".escapeshellarg(PHP_BINARY).' '.escapeshellarg(base_path('artisan')).' multiprocessing:postprocess add';
             }
         } elseif ($postSetting === 2) {
             // Post = 2: NFO processing only
             if ($hasNfo) {
-                $commands[] = "nice -n{$niceness} ".PHP_BINARY." artisan multiprocessing:postprocess nfo 2>&1 | tee -a {$log}";
+                $commands[] = "nice -n{$niceness} ".escapeshellarg(PHP_BINARY).' '.escapeshellarg(base_path('artisan')).' multiprocessing:postprocess nfo';
             }
         } elseif ($postSetting === 3) {
             // Post = 3: Both additional and NFO
             if ($hasWork) {
-                $commands[] = "nice -n{$niceness} ".PHP_BINARY." artisan multiprocessing:postprocess add 2>&1 | tee -a {$log}";
+                $commands[] = "nice -n{$niceness} ".escapeshellarg(PHP_BINARY).' '.escapeshellarg(base_path('artisan')).' multiprocessing:postprocess add';
             }
             if ($hasNfo) {
-                $commands[] = "nice -n{$niceness} ".PHP_BINARY." artisan multiprocessing:postprocess nfo 2>&1 | tee -a {$log}";
+                $commands[] = "nice -n{$niceness} ".escapeshellarg(PHP_BINARY).' '.escapeshellarg(base_path('artisan')).' multiprocessing:postprocess nfo';
             }
         }
 
@@ -600,11 +648,9 @@ class TmuxTaskRunner
         }
 
         // Build the full command with all parts
-        $allCommands = implode('; ', $commands);
-        $sleepCommand = $this->buildSleepCommand($sleep);
-        $fullCommand = "{$allCommands}; date +'%Y-%m-%d %T'; {$sleepCommand}";
+        $allCommands = $this->batchCommand($commands);
 
-        return $this->paneManager->respawnPane($pane, $fullCommand);
+        return $this->launch($pane, $allCommands, ['log_pane' => $logName, 'sleep' => $sleep]);
     }
 
     /**
@@ -618,26 +664,26 @@ class TmuxTaskRunner
         $pane = $this->paneManager->paneForRole(TmuxPaneRole::PostTv, '2.1');
 
         if ($enabled !== 1) {
-            return $this->disablePane($pane, 'Post-process TV/Anime', 'disabled in settings');
+            return $this->disablePane($pane, 'Post-process TV/Anime', 'Postprocess Video Metadata (post_non) is off or missing');
         }
 
         $niceness = $this->getNiceness();
-        $log = $this->getLogFile('post_tv');
-        $artisan = PHP_BINARY.' artisan';
+        $logName = 'post_tv';
+        $artisan = escapeshellarg(PHP_BINARY).' '.escapeshellarg(base_path('artisan'));
         $commands = [];
 
         // TV processing - Check work count before adding to queue
         $processTv = (int) ($runVar['settings']['processtvrage'] ?? 0);
         $hasTvWork = (int) ($runVar['counts']['now']['processtv'] ?? 0) > 0;
         if ($processTv > 0 && $hasTvWork) {
-            $commands[] = "nice -n{$niceness} {$artisan} multiprocessing:postprocess tv 2>&1 | tee -a {$log}";
+            $commands[] = "nice -n{$niceness} {$artisan} multiprocessing:postprocess tv";
         }
 
         // Anime processing
         $processAnime = (int) ($runVar['settings']['processanime'] ?? 0);
         $hasAnimeWork = (int) ($runVar['counts']['now']['processanime'] ?? 0) > 0;
         if ($processAnime > 0 && $hasAnimeWork) {
-            $commands[] = "nice -n{$niceness} {$artisan} multiprocessing:postprocess ani 2>&1 | tee -a {$log}";
+            $commands[] = "nice -n{$niceness} {$artisan} multiprocessing:postprocess ani";
         }
 
         // If no work available for any enabled type, disable the pane
@@ -660,11 +706,9 @@ class TmuxTaskRunner
         }
 
         $sleep = (int) ($runVar['settings']['post_timer_non'] ?? 300);
-        $allCommands = implode('; ', $commands);
-        $sleepCommand = $this->buildSleepCommand($sleep);
-        $fullCommand = "{$allCommands}; date +'%Y-%m-%d %T'; {$sleepCommand}";
+        $allCommands = $this->batchCommand($commands);
 
-        return $this->paneManager->respawnPane($pane, $fullCommand);
+        return $this->launch($pane, $allCommands, ['log_pane' => $logName, 'sleep' => $sleep]);
     }
 
     /**
@@ -678,19 +722,19 @@ class TmuxTaskRunner
         $pane = $this->paneManager->paneForRole(TmuxPaneRole::PostMovies, '2.3');
 
         if ($enabled !== 1) {
-            return $this->disablePane($pane, 'Post-process Movies', 'disabled in settings');
+            return $this->disablePane($pane, 'Post-process Movies', 'Postprocess Video Metadata (post_non) is off or missing');
         }
 
         $niceness = $this->getNiceness();
-        $log = $this->getLogFile('post_movies');
-        $artisan = PHP_BINARY.' artisan';
+        $logName = 'post_movies';
+        $artisan = escapeshellarg(PHP_BINARY).' '.escapeshellarg(base_path('artisan'));
 
         // Movies processing - Uses single-process command
         $processMovies = (int) ($runVar['settings']['processmovies'] ?? 0);
         $hasMoviesWork = (int) ($runVar['counts']['now']['processmovies'] ?? 0) > 0;
 
         if ($processMovies === 0) {
-            return $this->disablePane($pane, 'Post-process Movies', 'disabled in settings');
+            return $this->disablePane($pane, 'Post-process Movies', 'Lookup Movies (lookupimdb) is off or missing');
         }
 
         if (! $hasMoviesWork) {
@@ -698,11 +742,9 @@ class TmuxTaskRunner
         }
 
         $sleep = (int) ($runVar['settings']['post_timer_non'] ?? 300);
-        $command = "nice -n{$niceness} {$artisan} multiprocessing:postprocess mov false 2>&1 | tee -a {$log}";
-        $sleepCommand = $this->buildSleepCommand($sleep);
-        $fullCommand = "{$command}; date +'%Y-%m-%d %T'; {$sleepCommand}";
+        $command = "nice -n{$niceness} {$artisan} multiprocessing:postprocess mov false";
 
-        return $this->paneManager->respawnPane($pane, $fullCommand);
+        return $this->launch($pane, $command, ['log_pane' => $logName, 'sleep' => $sleep]);
     }
 
     /**
@@ -729,7 +771,7 @@ class TmuxTaskRunner
         $pane = $this->paneManager->paneForRole(TmuxPaneRole::PostMetadata, $legacyPane);
 
         if ($enabled !== 1) {
-            return $this->disablePane($pane, 'Post-process Metadata', 'disabled in settings');
+            return $this->disablePane($pane, 'Post-process Metadata', 'Postprocess Metadata (post_amazon) is off or missing');
         }
 
         $hasWork = (int) ($runVar['counts']['now']['processmusic'] ?? 0) > 0
@@ -741,15 +783,13 @@ class TmuxTaskRunner
             return $this->disablePane($pane, 'Post-process Metadata', 'no music/books/games to process');
         }
 
-        $niceness = Settings::settingValue('niceness') ?? 2;
-        $log = $this->getLogFile('post_amazon');
-        $artisan = PHP_BINARY.' artisan';
+        $niceness = $this->getNiceness();
+        $logName = 'post_amazon';
+        $artisan = escapeshellarg(PHP_BINARY).' '.escapeshellarg(base_path('artisan'));
         $sleep = (int) ($runVar['settings']['post_timer_amazon'] ?? 300);
 
-        $command = "nice -n{$niceness} {$artisan} multiprocessing:postprocess ama 2>&1 | tee -a {$log}";
-        $sleepCommand = $this->buildSleepCommand($sleep);
-        $fullCommand = "{$command}; date +'%Y-%m-%d %T'; {$sleepCommand}";
+        $command = "nice -n{$niceness} {$artisan} multiprocessing:postprocess ama";
 
-        return $this->paneManager->respawnPane($pane, $fullCommand);
+        return $this->launch($pane, $command, ['log_pane' => $logName, 'sleep' => $sleep]);
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Tmux;
 
+use App\Enums\TmuxMode;
 use App\Enums\TmuxPaneRole;
 use App\Models\Settings;
 use Illuminate\Support\Facades\Process;
@@ -86,11 +87,18 @@ class TmuxLayoutBuilder
     public function buildLayout(int $sequentialMode): bool
     {
         try {
-            match ($sequentialMode) {
-                1 => $this->buildBasicLayout(),
-                2 => $this->buildStrippedLayout(),
+            $this->expectedRoles = array_values((TmuxMode::tryFrom($sequentialMode) ?? TmuxMode::Full)->tasks());
+            match (TmuxMode::tryFrom($sequentialMode) ?? TmuxMode::Full) {
+                TmuxMode::Basic => $this->buildBasicLayout(),
+                TmuxMode::Stripped => $this->buildStrippedLayout(),
                 default => $this->buildFullLayout(),
             };
+
+            foreach ($this->expectedRoles as $role) {
+                if (! in_array($role, $this->configuredRoles, true)) {
+                    throw new RuntimeException("Scheduled role '{$role->value}' has no pane in this layout.");
+                }
+            }
 
             return true;
         } catch (Throwable $exception) {
@@ -375,8 +383,12 @@ class TmuxLayoutBuilder
                     $this->requireSuccess($this->paneManager->respawnPane($pane, "{$sail} artisan redis:monitor --refresh={$refreshInterval}"), 'respawn Redis pane');
                 } else {
                     // Run directly, potentially with host override
-                    $envPrefix = $connectionInfo['override_host'] ? "REDIS_HOST={$connectionInfo['host']} " : '';
-                    $this->requireSuccess($this->paneManager->respawnPane($pane, "{$envPrefix}php {$artisan} redis:monitor --refresh={$refreshInterval}"), 'respawn Redis pane');
+                    $environment = $connectionInfo['override_host'] ? ['REDIS_HOST' => $connectionInfo['host']] : [];
+                    $this->requireSuccess($this->paneManager->respawnPane(
+                        $pane,
+                        [PHP_BINARY, $artisan, 'redis:monitor', '--refresh='.$refreshInterval],
+                        environment: $environment,
+                    ), 'respawn Redis pane');
                 }
             }
             $windowIndex++;
@@ -443,10 +455,21 @@ class TmuxLayoutBuilder
         return $paneId;
     }
 
+    /** @var list<TmuxPaneRole> */
+    private array $expectedRoles = [];
+
+    /** @var list<TmuxPaneRole> */
+    private array $configuredRoles = [];
+
     private function configurePane(string $paneId, TmuxPaneRole $role, string $title): void
     {
+        if ($role !== TmuxPaneRole::Monitor && in_array($role, array_values(TmuxMode::Full->tasks()), true) && ! in_array($role, $this->expectedRoles, true)) {
+            throw new RuntimeException("Pane role '{$role->value}' is not scheduled in this mode.");
+        }
+        $this->requireSuccess($this->paneManager->retainPane($paneId), "retain {$role->value} pane");
         $this->requireSuccess($this->paneManager->setPaneTitle($paneId, $title), "set title for {$role->value} pane");
         $this->requireSuccess($this->paneManager->setPaneRole($paneId, $role), "tag {$role->value} pane");
+        $this->configuredRoles[] = $role;
     }
 
     private function requireSuccess(bool $successful, string $operation): void

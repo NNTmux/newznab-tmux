@@ -31,9 +31,9 @@ class BinariesRunner extends BaseRunner
         if ((bool) config('nntmux.stream_fork_output', false) === true) {
             $commands = [];
             foreach ($work as $group) {
-                $commands[] = PHP_BINARY.' artisan update:binaries '.$group->name.' '.$group->max;
+                $commands[] = [PHP_BINARY, base_path('artisan'), 'update:binaries', (string) $group->name, (string) $group->max];
             }
-            $this->runStreamingCommands($commands, $maxProcesses, 'binaries'); // @phpstan-ignore argument.type
+            $this->runStreamingCommands($commands, $maxProcesses, 'binaries');
 
             return;
         }
@@ -43,7 +43,7 @@ class BinariesRunner extends BaseRunner
         // Build commands array for parallel execution
         $commands = [];
         foreach ($work as $group) {
-            $commands[$group->name] = PHP_BINARY.' artisan update:binaries '.$group->name.' '.$group->max;
+            $commands[$group->name] = [PHP_BINARY, base_path('artisan'), 'update:binaries', (string) $group->name, (string) $group->max];
         }
 
         // Process using parallel commands with configurable timeout
@@ -58,7 +58,7 @@ class BinariesRunner extends BaseRunner
     public function safeBinaries(): void
     {
         // update group stats - Updated to use new script location (modernized)
-        $this->executeCommand(PHP_BINARY.' app/Services/Tmux/Scripts/update_groups.php');
+        $this->executeCommand([PHP_BINARY, base_path('artisan'), 'groups:update']);
 
         $maxHeaders = (int) Settings::settingValue('max_headers_iteration') ?: 1000000;
         $maxMessages = (int) Settings::settingValue('maxmssgs');
@@ -123,7 +123,7 @@ class BinariesRunner extends BaseRunner
             foreach ($queues as $queue) {
                 $commands[] = $this->buildDnrCommand($queue);
             }
-            $this->runStreamingCommands($commands, $maxProcesses, 'safe_binaries'); // @phpstan-ignore argument.type
+            $this->runStreamingCommands($commands, $maxProcesses, 'safe_binaries');
 
             return;
         }

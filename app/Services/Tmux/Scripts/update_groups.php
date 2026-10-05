@@ -12,5 +12,13 @@
  */
 $artisan = dirname(__DIR__, 4).'/artisan';
 
-passthru("php {$artisan} groups:update", $exitCode);
+$command = [PHP_BINARY, $artisan, 'groups:update'];
+if (function_exists('pcntl_exec')) {
+    pcntl_exec(PHP_BINARY, array_slice($command, 1));
+    fwrite(STDERR, "Unable to execute Artisan worker.\n");
+    exit(1);
+}
+
+$process = proc_open([PHP_BINARY, $artisan, 'groups:update'], [STDIN, STDOUT, STDERR], $pipes);
+$exitCode = is_resource($process) ? proc_close($process) : 1;
 exit($exitCode);

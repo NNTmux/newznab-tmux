@@ -11,10 +11,13 @@ use Symfony\Component\Process\Process;
 
 abstract class BaseRunner
 {
-    public function __construct() {}
+    /** @var array<string|int, array{status: string, exit_code: ?int}> */
+    protected array $workerOutcomes = [];
+
+    private bool $cancellationRequested = false;
 
     /**
-     * Resolve the configured timeout (seconds) for Laravel's Concurrency::run() calls.
+     * Resolve the configured worker timeout in seconds.
      */
     protected function concurrencyTimeout(): int
     {
@@ -23,142 +26,40 @@ abstract class BaseRunner
         return (int) ($configured ?? config('nntmux.multiprocessing_max_child_time', 1800));
     }
 
-    protected function buildDnrCommand(string $args): string
+    /** @return list<string> */
+    protected function buildDnrCommand(string $args): array
     {
-        // Convert legacy command arguments to new artisan commands
-        return $this->convertSwitchToArtisan($args);
+        $parts = explode('  ', trim($args));
+        $command = array_shift($parts);
+        $worker = match ($command) {
+            'backfill' => ['backfill:group', $parts[0] ?? '', $parts[1] ?? '1'],
+            'backfill_all_quantity' => ['backfill:group', $parts[0] ?? '', '1', $parts[1] ?? ''],
+            'backfill_all_quick' => ['backfill:group', $parts[0] ?? '', '1', '10000'],
+            'get_range' => ['articles:get-range', $parts[0] ?? '', $parts[1] ?? '', $parts[2] ?? '0', $parts[3] ?? '0'],
+            'part_repair' => ['binaries:part-repair', $parts[0] ?? ''],
+            'releases' => ['releases:process', ...$parts],
+            'update_group_headers' => ['group:update-headers', $parts[0] ?? ''],
+            'update_per_group' => ['group:update-all', $parts[0] ?? ''],
+            'pp_additional' => ['postprocess:guid', 'additional', ...$parts],
+            'pp_nfo' => ['postprocess:guid', 'nfo', ...$parts],
+            'pp_movie' => ['postprocess:guid', 'movie', ...$parts],
+            'pp_tv' => ['postprocess:guid', 'tv', ...$parts],
+            default => throw new RuntimeException('Unrecognized multiprocessing command.'),
+        };
+
+        return [PHP_BINARY, base_path('artisan'), ...$worker];
     }
 
-    /**
-     * Convert legacy command format to new artisan commands.
-     */
-    private function convertSwitchToArtisan(string $args): string
-    {
-        $parts = array_filter(explode('  ', trim($args)));
-
-        if (empty($parts)) {
-            return '';
-        }
-
-        $command = $parts[0] ?? '';
-
-        switch ($command) {
-            case 'backfill':
-                // backfill  {group}  {type}
-                $group = $parts[1] ?? '';
-                $type = $parts[2] ?? '1';
-
-                return PHP_BINARY.' artisan backfill:group "'.$group.'" '.$type;
-
-            case 'backfill_all_quantity':
-                // backfill_all_quantity  {group}  {quantity}
-                $group = $parts[1] ?? '';
-                $quantity = $parts[2] ?? '';
-
-                return PHP_BINARY.' artisan backfill:group "'.$group.'" 1 '.$quantity;
-
-            case 'backfill_all_quick':
-                // backfill_all_quick  {group}
-                $group = $parts[1] ?? '';
-
-                return PHP_BINARY.' artisan backfill:group "'.$group.'" 1 10000';
-
-            case 'get_range':
-                // get_range  {mode}  {group}  {first}  {last}  {threads}
-                $mode = $parts[1] ?? '';
-                $group = $parts[2] ?? '';
-                $first = $parts[3] ?? '0';
-                $last = $parts[4] ?? '0';
-
-                return PHP_BINARY.' artisan articles:get-range "'.$mode.'" "'.$group.'" '.$first.' '.$last;
-
-            case 'part_repair':
-                // part_repair  {group}
-                $group = $parts[1] ?? '';
-
-                return PHP_BINARY.' artisan binaries:part-repair "'.$group.'"';
-
-            case 'releases':
-                // releases  {groupId}
-                $groupId = $parts[1] ?? '';
-
-                return PHP_BINARY.' artisan releases:process '.($groupId !== '' ? $groupId : '');
-
-            case 'update_group_headers':
-                // update_group_headers  {group}
-                $group = $parts[1] ?? '';
-
-                return PHP_BINARY.' artisan group:update-headers "'.$group.'"';
-
-            case 'update_per_group':
-                // update_per_group  {groupId}
-                $groupId = $parts[1] ?? '';
-
-                return PHP_BINARY.' artisan group:update-all '.$groupId;
-
-            case 'pp_additional':
-                // pp_additional  {guid}
-                $guid = $parts[1] ?? '';
-
-                return PHP_BINARY.' artisan postprocess:guid additional '.$guid;
-
-            case 'pp_nfo':
-                // pp_nfo  {guid}
-                $guid = $parts[1] ?? '';
-
-                return PHP_BINARY.' artisan postprocess:guid nfo '.$guid;
-
-            case 'pp_movie':
-                // pp_movie  {guid}  {renamed}
-                $guid = $parts[1] ?? '';
-                $renamed = $parts[2] ?? '';
-
-                return PHP_BINARY.' artisan postprocess:guid movie '.$guid.($renamed !== '' ? ' '.$renamed : '');
-
-            case 'pp_tv':
-                // pp_tv  {guid}  {renamed}
-                $guid = $parts[1] ?? '';
-                $renamed = $parts[2] ?? '';
-
-                return PHP_BINARY.' artisan postprocess:guid tv '.$guid.($renamed !== '' ? ' '.$renamed : '');
-
-            default:
-                // Log unrecognized command and return empty string
-                if (config('app.debug')) {
-                    Log::warning('Unrecognized multiprocessing command: '.$args);
-                }
-
-                return '';
-        }
-    }
-
-    /**
-     * Public wrapper for buildDnrCommand (used by ForkingService).
-     */
-    public function buildDnrCommandPublic(string $args): string
+    /** @return list<string> */
+    public function buildDnrCommandPublic(string $args): array
     {
         return $this->buildDnrCommand($args);
     }
 
-    protected function executeCommand(string $command): string
+    /** @param string|list<string> $command */
+    protected function executeCommand(string|array $command): string
     {
-        $process = Process::fromShellCommandline($command);
-        $process->setTimeout($this->concurrencyTimeout());
-
-        try {
-            $process->run(function ($type, $buffer) {
-                if ($type === Process::ERR) {
-                    echo $buffer;
-                }
-            });
-        } catch (ProcessTimedOutException $e) {
-            // Rethrow as RuntimeException: Laravel's Concurrency ProcessDriver cannot
-            // reconstruct ProcessTimedOutException (its constructor requires a Process
-            // object), which would otherwise surface as an unrelated TypeError.
-            throw new RuntimeException($e->getMessage());
-        }
-
-        return $process->getOutput();
+        return $this->runWorkerPool([$command], 1, $this->concurrencyTimeout(), false)[0];
     }
 
     protected function headerStart(string $workType, int $count, int $maxProcesses): void
@@ -179,205 +80,147 @@ abstract class BaseRunner
     }
 
     /**
-     * Run multiple commands in parallel using Symfony Process with configurable timeout.
-     * This replaces Laravel Concurrency::run() which has a fixed 60-second timeout.
-     *
-     * @param  array<string|int, callable>  $tasks  Array of callables keyed by identifier
-     * @param  int  $maxProcesses  Maximum concurrent processes
-     * @param  int|null  $timeout  Timeout in seconds (null = use config default)
-     * @return array<string|int, mixed> Results keyed by the same identifiers as $tasks
-     */
-    protected function runParallelProcesses(array $tasks, int $maxProcesses, ?int $timeout = null): array
-    {
-        $maxProcesses = max(1, $maxProcesses);
-        $timeout = $timeout ?? (int) config('nntmux.multiprocessing_max_child_time', 1800);
-        $results = [];
-        $running = [];
-        $queue = $tasks;
-
-        $startNext = function () use (&$queue, &$running): ?string {
-            if (empty($queue)) {
-                return null;
-            }
-            $key = array_key_first($queue);
-            $callable = $queue[$key];
-            unset($queue[$key]);
-
-            // Get the command string from the callable context
-            // We need to execute the callable which returns the command result
-            $running[$key] = [
-                'callable' => $callable,
-                'started' => microtime(true),
-            ];
-
-            return (string) $key;
-        };
-
-        // For small batch sizes, run synchronously to avoid overhead
-        if (count($tasks) <= 1 || $maxProcesses <= 1) {
-            foreach ($tasks as $key => $callable) {
-                try {
-                    $results[$key] = $callable();
-                } catch (\Throwable $e) {
-                    Log::error("Task {$key} failed: ".$e->getMessage());
-                    $results[$key] = '';
-                }
-            }
-
-            return $results;
-        }
-
-        // For parallel execution, we need to use Process directly
-        // Convert callables to commands and run them in parallel
-        $commands = [];
-        $taskMapping = [];
-
-        foreach ($tasks as $key => $callable) {
-            // We need to extract the command from the callable
-            // This is a bit tricky, but we can use reflection or run the callable
-            // For now, let's store the callable and run them in batches
-            $commands[$key] = $callable;
-        }
-
-        // Process in batches
-        $batches = array_chunk($commands, $maxProcesses, true);
-
-        foreach ($batches as $batch) {
-            $batchProcesses = [];
-
-            foreach ($batch as $key => $callable) {
-                try {
-                    $results[$key] = $callable();
-                } catch (\Throwable $e) {
-                    Log::error("Task {$key} failed: ".$e->getMessage());
-                    $results[$key] = '';
-                }
-            }
-        }
-
-        return $results;
-    }
-
-    /**
-     * Run multiple commands in parallel with real process forking and configurable timeout.
-     *
-     * @param  array<string|int, string>  $commands  Array of shell commands keyed by identifier
-     * @param  int  $maxProcesses  Maximum concurrent processes
-     * @param  int|null  $timeout  Timeout in seconds (null = use config default)
-     * @return array<string|int, string> Command outputs keyed by the same identifiers
+     * @param  array<string|int, string|list<string>>  $commands
+     * @return array<string|int, string>
      */
     protected function runParallelCommands(array $commands, int $maxProcesses, ?int $timeout = null): array
     {
-        $maxProcesses = max(1, $maxProcesses);
-        $timeout = $timeout ?? (int) config('nntmux.multiprocessing_max_child_time', 1800);
-        $results = [];
-        $running = [];
+        return $this->runWorkerPool($commands, $maxProcesses, $timeout ?? $this->concurrencyTimeout(), false);
+    }
+
+    /** @param array<string|int, string|list<string>> $commands */
+    protected function runStreamingCommands(array $commands, int $maxProcesses, string $desc): void
+    {
+        $this->headerStart('postprocess: '.$desc, count($commands), max(1, $maxProcesses));
+        $this->runWorkerPool($commands, $maxProcesses, $this->concurrencyTimeout(), true);
+    }
+
+    /** @param string|list<string> $command */
+    private function workerProcess(string|array $command): Process
+    {
+        return is_array($command) ? new Process($command, base_path()) : Process::fromShellCommandline($command, base_path());
+    }
+
+    /**
+     * @param  array<string|int, string|list<string>>  $commands
+     * @return array<string|int, string>
+     */
+    private function runWorkerPool(array $commands, int $maxProcesses, int $timeout, bool $stream): array
+    {
         $queue = $commands;
-
-        $startNext = function () use (&$queue, &$running, $timeout) {
-            if (empty($queue)) {
-                return;
+        $running = [];
+        $results = [];
+        $this->workerOutcomes = [];
+        $this->cancellationRequested = false;
+        $handlers = [];
+        $async = false;
+        if (function_exists('pcntl_signal')) {
+            $async = pcntl_async_signals(true);
+            foreach ([SIGTERM, SIGINT, SIGHUP] as $signal) {
+                $handlers[$signal] = pcntl_signal_get_handler($signal);
+                pcntl_signal($signal, function (): void {
+                    $this->cancellationRequested = true;
+                });
             }
-            $key = array_key_first($queue);
-            $cmd = $queue[$key];
-            unset($queue[$key]);
-
-            $proc = Process::fromShellCommandline($cmd);
-            $proc->setTimeout($timeout);
-            $proc->start();
-            $running[$key] = $proc;
-        };
-
-        // Prime initial processes
-        for ($i = 0; $i < $maxProcesses && ! empty($queue); $i++) {
-            $startNext();
         }
 
-        // Event loop
-        while (! empty($running)) {
-            foreach ($running as $key => $proc) {
-                if (! $proc->isRunning()) {
-                    $results[$key] = $proc->getOutput();
-                    // Output errors if any
-                    $err = $proc->getErrorOutput();
-                    if ($err !== '') {
-                        echo $err;
+        try {
+            while ($queue !== [] || $running !== []) {
+                if ($this->isCancellationRequested()) {
+                    break;
+                }
+                while (! $this->isCancellationRequested() && count($running) < max(1, $maxProcesses) && $queue !== []) {
+                    $key = array_key_first($queue);
+                    $process = $this->workerProcess($queue[$key]);
+                    unset($queue[$key]);
+                    $process->setTimeout($timeout);
+                    $running[$key] = $process;
+                    try {
+                        $process->start($stream ? static function (string $type, string $buffer): void {
+                            echo $buffer;
+                        } : null);
+                    } catch (\Throwable) {
+                        $this->recordWorkerOutcome($key, 'failure', null);
+                        unset($running[$key]);
                     }
+                }
+                foreach ($running as $key => $process) {
+                    $status = null;
+                    try {
+                        if ($process->isRunning()) {
+                            $process->checkTimeout();
+
+                            continue;
+                        }
+                        $status = $process->isSuccessful() ? 'success' : 'failure';
+                    } catch (ProcessTimedOutException) {
+                        $status = 'timeout';
+                    }
+                    $results[$key] = $process->getOutput();
+                    if (! $stream) {
+                        echo $process->getErrorOutput();
+                    }
+                    $this->recordWorkerOutcome($key, $status, $process->getExitCode());
                     unset($running[$key]);
-                    // Start next from queue if available
-                    if (! empty($queue)) {
-                        $startNext();
+                }
+                usleep(50000);
+            }
+        } finally {
+            foreach ($running as $process) {
+                if ($process->isRunning()) {
+                    try {
+                        $process->signal(SIGTERM);
+                    } catch (RuntimeException) {
+                        // The owned worker may exit between the state query and signal.
                     }
                 }
             }
-            usleep(50000); // 50ms
+            $deadline = microtime(true) + 3;
+            do {
+                $active = array_filter($running, static fn (Process $process): bool => $process->isRunning());
+                if ($active === []) {
+                    break;
+                }
+                usleep(50000);
+            } while (microtime(true) < $deadline);
+            foreach ($running as $key => $process) {
+                if ($process->isStarted()) {
+                    $process->stop(0);
+                }
+                $this->recordWorkerOutcome($key, 'cancellation', $process->getExitCode());
+            }
+            foreach ($queue as $key => $command) {
+                $this->recordWorkerOutcome($key, 'cancellation', null);
+            }
+            foreach ($handlers as $signal => $handler) {
+                pcntl_signal($signal, $handler);
+            }
+            if ($handlers !== []) {
+                pcntl_async_signals($async);
+            }
+        }
+
+        $failed = array_filter($this->workerOutcomes, static fn (array $outcome): bool => $outcome['status'] !== 'success');
+        if ($failed !== []) {
+            throw new RuntimeException('Worker batch did not succeed: '.implode(', ', array_map(
+                static fn (string|int $key, array $outcome): string => $key.' '.$outcome['status'].($outcome['status'] === 'timeout' ? ' exceeded the timeout' : '').' (exit '.($outcome['exit_code'] ?? 'none').')',
+                array_keys($failed), array_values($failed),
+            )));
         }
 
         return $results;
     }
 
-    /**
-     * Run multiple shell commands concurrently and stream their output in real-time.
-     * Uses Symfony Process start() with a small event loop to enforce max concurrency.
-     *
-     * @param  array<string, mixed>  $commands
-     */
-    protected function runStreamingCommands(array $commands, int $maxProcesses, string $desc): void
+    private function isCancellationRequested(): bool
     {
-        $maxProcesses = max(1, (int) $maxProcesses);
-        $running = [];
-        $queue = $commands;
-        $total = \count($commands);
-        $started = 0;
-        $finished = 0;
+        return $this->cancellationRequested;
+    }
 
-        $this->headerStart('postprocess: '.$desc, $total, $maxProcesses);
-
-        $startNext = function () use (&$queue, &$running, &$started) {
-            if (empty($queue)) {
-                return;
-            }
-            $cmd = array_shift($queue);
-            $proc = Process::fromShellCommandline($cmd);
-            $proc->setTimeout((int) config('nntmux.multiprocessing_max_child_time', 1800));
-            $proc->start(function ($type, $buffer) {
-                // Stream both STDOUT and STDERR
-                echo $buffer;
-            });
-            $running[spl_object_id($proc)] = $proc;
-            $started++;
-        };
-
-        // Prime initial processes
-        for ($i = 0; $i < $maxProcesses && ! empty($queue); $i++) {
-            $startNext();
-        }
-
-        // Event loop
-        while (! empty($running)) {
-            foreach ($running as $key => $proc) {
-                if (! $proc->isRunning()) {
-                    // Print any remaining buffered output
-                    $out = $proc->getIncrementalOutput();
-                    $err = $proc->getIncrementalErrorOutput();
-                    if ($out !== '') {
-                        echo $out;
-                    }
-                    if ($err !== '') {
-                        echo $err;
-                    }
-                    unset($running[$key]);
-                    $finished++;
-                    if (config('nntmux.echocli')) {
-                        cli()->primary('Finished task #'.($total - $finished + 1).' for '.$desc);
-                    }
-                    // Start next from queue if available
-                    if (! empty($queue)) {
-                        $startNext();
-                    }
-                }
-            }
-            usleep(100000); // 100ms
+    private function recordWorkerOutcome(string|int $key, string $status, ?int $exitCode): void
+    {
+        $this->workerOutcomes[$key] = ['status' => $status, 'exit_code' => $exitCode];
+        if ($status !== 'success') {
+            Log::error('Multiprocessing worker did not succeed', ['worker' => $key, 'outcome' => $status, 'exit_code' => $exitCode]);
         }
     }
 }

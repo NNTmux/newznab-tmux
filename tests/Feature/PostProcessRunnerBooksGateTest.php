@@ -102,13 +102,14 @@ class PostProcessRunnerBooksGateTest extends TestCase
 
         $runner = new class extends PostProcessRunner
         {
+            /** @var list<string|list<string>> */
             public array $captured = [];
 
             public function headerNone(): void {}
 
             protected function headerStart(string $workType, int $count, int $maxProcesses): void {}
 
-            protected function executeCommand(string $command): string
+            protected function executeCommand(string|array $command): string
             {
                 $this->captured[] = $command;
 
@@ -119,7 +120,7 @@ class PostProcessRunnerBooksGateTest extends TestCase
         $runner->processBooks();
 
         $this->assertCount(1, $runner->captured);
-        $this->assertStringContainsString('artisan postprocess:guid books a', $runner->captured[0]);
+        $this->assertSame([PHP_BINARY, base_path('artisan'), 'postprocess:guid', 'books', 'a'], $runner->captured[0]);
     }
 
     public function test_renamed_only_mode_skips_unrenamed_pending_books(): void
@@ -143,13 +144,14 @@ class PostProcessRunnerBooksGateTest extends TestCase
 
         $runner = new class extends PostProcessRunner
         {
+            /** @var list<string|list<string>> */
             public array $captured = [];
 
             public function headerNone(): void {}
 
             protected function headerStart(string $workType, int $count, int $maxProcesses): void {}
 
-            protected function executeCommand(string $command): string
+            protected function executeCommand(string|array $command): string
             {
                 $this->captured[] = $command;
 

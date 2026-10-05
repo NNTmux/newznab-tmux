@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Enums\TmuxMode;
+use App\Enums\TmuxPaneRole;
 use App\Models\Settings;
+use App\Services\Tmux\TmuxPaneManager;
 use App\Services\Tmux\TmuxSessionManager;
 use Illuminate\Console\Command;
 
@@ -17,7 +20,8 @@ class TmuxStop extends Command
      */
     protected $signature = 'tmux:stop
                             {--session= : Tmux session name}
-                            {--force : Force stop without confirmation}';
+                            {--force : Stop without confirmation}
+                            {--timeout=5 : Maximum seconds for interrupted workers to clean up before closing the session}';
 
     /**
      * The console command description.
@@ -38,12 +42,14 @@ class TmuxStop extends Command
             // Get session name
             $sessionName = $this->option('session')
                 ?? Settings::settingValue('tmux_session')
+                ?? config('tmux.session.name')
                 ?? config('tmux.session.default_name', 'nntmux');
 
             $this->sessionManager = new TmuxSessionManager($sessionName);
 
             // Check if session exists
             if (! $this->sessionManager->sessionExists()) {
+                Settings::query()->where('name', 'running')->update(['value' => 0]);
                 $this->warn("⚠️  Session '{$sessionName}' is not running");
 
                 return Command::SUCCESS;
@@ -61,13 +67,36 @@ class TmuxStop extends Command
             cli()->header('Stopping Tmux Session');
 
             // Set running flag to 0
-            Settings::query()->where('name', 'running')->update(['value' => 0]);
+            Settings::query()->updateOrCreate(['name' => 'running'], ['value' => 0]);
             $this->info('✅ Running flag cleared');
 
-            // Wait for panes to shut down gracefully
-            $delay = (int) (Settings::settingValue('monitor_delay') ?? 10);
-            $this->info("⏳ Waiting {$delay} seconds for panes to shut down gracefully...");
-            sleep($delay);
+            Settings::query()->updateOrCreate(['name' => 'exit'], ['value' => 1]);
+            $panes = new TmuxPaneManager($sessionName);
+            $workerRoles = array_merge(array_values(TmuxMode::Full->tasks()), [TmuxPaneRole::Sequential, TmuxPaneRole::Monitor]);
+            $timeout = max(0, (int) $this->option('timeout'));
+            $deadline = microtime(true) + $timeout;
+            $interrupted = [];
+            $this->info('Interrupting processing and cleaning up workers...');
+            do {
+                $panes->refresh();
+                $active = array_filter($panes->paneSnapshot(), static fn (array $state): bool => ! $state['dead']
+                    && in_array(TmuxPaneRole::tryFrom($state['role']), $workerRoles, true));
+                if ($active === []) {
+                    break;
+                }
+                foreach (array_keys($active) as $pane) {
+                    if (! isset($interrupted[$pane])) {
+                        $panes->sendKeys($pane, 'C-c', enter: false);
+                        $interrupted[$pane] = true;
+                    }
+                }
+                if (microtime(true) >= $deadline) {
+                    $this->warn('Cleanup timeout reached; closing the processing session.');
+
+                    break;
+                }
+                usleep(250000);
+            } while (true);
 
             // Kill the session
             if ($this->sessionManager->killSession()) {
