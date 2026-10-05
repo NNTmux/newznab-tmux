@@ -294,4 +294,78 @@ SH;
             ];
         });
     }
+
+    /** @return array<string, array{string, int, int, string}> */
+    public static function enabledPostProcessingModes(): array
+    {
+        return [
+            'movies enabled' => ['movies', 1, 1, 'mov'],
+            'movies NFO mode' => ['movies', 2, 1, 'mov'],
+            'movies all mode' => ['movies', 3, 1, 'mov'],
+            'renamed movies all mode' => ['movies', 3, 2, 'mov'],
+            'TV NFO mode' => ['tv', 2, 1, 'tv'],
+            'TV all mode' => ['tv', 3, 1, 'tv'],
+            'metadata NFO mode' => ['amazon', 2, 1, 'ama'],
+            'metadata all mode' => ['amazon', 3, 1, 'ama'],
+        ];
+    }
+
+    #[DataProvider('enabledPostProcessingModes')]
+    public function test_nonzero_modes_run_enabled_post_processing_panes(string $task, int $paneMode, int $lookupMode, string $type): void
+    {
+        Process::fake(function (PendingProcess $process) {
+            if (is_array($process->command) && in_array('list-panes', $process->command, true)) {
+                return Process::result("%9\tpost_movies\n%10\tpost_tv\n%11\tpost_metadata\n");
+            }
+
+            return Process::result();
+        });
+
+        $this->assertTrue((new TmuxTaskRunner('test-session'))->runPaneTask($task, [], [
+            'settings' => [
+                'post_non' => $paneMode,
+                'post_amazon' => $paneMode,
+                'processmovies' => $lookupMode,
+                'processtvrage' => $lookupMode,
+            ],
+            'counts' => ['now' => ['processmovies' => 5, 'processtv' => 5, 'processmusic' => 5]],
+        ]));
+
+        Process::assertRan(fn (PendingProcess $process): bool => is_array($process->command)
+            && in_array('respawn-pane', $process->command, true)
+            && str_contains((string) end($process->command), 'multiprocessing:postprocess '.$type));
+    }
+
+    /** @return array<string, array{int, int, int, string}> */
+    public static function inactiveMovieProcessing(): array
+    {
+        return [
+            'pane switch disabled' => [0, 1, 5, 'TV, Anime and Movie Panes is disabled'],
+            'lookup disabled' => [3, 0, 5, 'Process Movies is disabled'],
+            'no eligible work' => [3, 1, 0, 'no work available'],
+        ];
+    }
+
+    #[DataProvider('inactiveMovieProcessing')]
+    public function test_inactive_movie_panes_explain_which_setting_or_work_is_missing(int $paneMode, int $lookupMode, int $count, string $reason): void
+    {
+        Process::fake(function (PendingProcess $process) {
+            if (is_array($process->command) && in_array('list-panes', $process->command, true)) {
+                return Process::result("%9\tpost_movies\n");
+            }
+
+            return Process::result();
+        });
+
+        $this->assertTrue((new TmuxTaskRunner('test-session'))->runPaneTask('movies', [], [
+            'settings' => ['post_non' => $paneMode, 'processmovies' => $lookupMode],
+            'counts' => ['now' => ['processmovies' => $count]],
+        ]));
+
+        Process::assertRan(fn (PendingProcess $process): bool => is_array($process->command)
+            && in_array('respawn-pane', $process->command, true)
+            && str_contains((string) end($process->command), $reason));
+        Process::assertNotRan(fn (PendingProcess $process): bool => is_array($process->command)
+            && str_contains((string) end($process->command), 'multiprocessing:postprocess mov'));
+    }
 }

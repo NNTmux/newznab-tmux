@@ -11,11 +11,12 @@ use App\Enums\TmuxSequentialMode;
 use App\Models\IngestionConfiguration;
 use App\Models\RegistrationConfiguration;
 use App\Models\TmuxConfiguration;
+use App\Services\Configuration\ConfigurationProvider;
+use App\Services\MusicService;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use RuntimeException;
@@ -47,7 +48,9 @@ final class SettingsMigrationTest extends TestCase
             'lookuplanguage' => 'fr',
             'minsizetoformrelease' => '1048576',
             'maxsizetoformrelease' => '2147483648',
-            'amazonprivkey' => 'top-secret',
+            'amazonpubkey' => 'obsolete-public-key',
+            'amazonprivkey' => 'obsolete-private-key',
+            'amazonassociatetag' => 'obsolete-tag',
             'vnstat_args' => 'NULL',
             'fix_crap' => 'blacklist,codec',
             'colors_start' => '1',
@@ -70,14 +73,17 @@ final class SettingsMigrationTest extends TestCase
         $this->assertSame([4, 8], DB::table('tmux_color_exclusions')->orderBy('color')->pluck('color')->map(static fn ($value): int => (int) $value)->all());
         $this->assertSame(1, (int) DB::table('processing_runtime_states')->value('tmux_running'));
 
-        $encrypted = (string) DB::table('metadata_configurations')->value('amazon_private_key');
-        $this->assertNotSame('top-secret', $encrypted);
-        $this->assertSame('top-secret', Crypt::decryptString($encrypted));
+        foreach (['amazon_public_key', 'amazon_private_key', 'amazon_associate_tag'] as $column) {
+            $this->assertFalse(Schema::hasColumn('metadata_configurations', $column));
+        }
+        $this->removeAmazonCredentialsMigration()->up();
 
         $migration->down();
         $this->assertTrue(Schema::hasTable('settings'));
         $this->assertSame('Migrated Indexer', DB::table('settings')->where('name', 'title')->value('value'));
-        $this->assertSame('top-secret', DB::table('settings')->where('name', 'amazonprivkey')->value('value'));
+        foreach (['amazonpubkey', 'amazonprivkey', 'amazonassociatetag'] as $key) {
+            $this->assertFalse(DB::table('settings')->where('name', $key)->exists());
+        }
         $this->assertFalse(DB::table('settings')->where('name', 'unknown_plugin_key')->exists());
     }
 
@@ -140,6 +146,53 @@ final class SettingsMigrationTest extends TestCase
         DB::table('tmux_cleanup_rules')->insert(['tmux_configuration_id' => 1, 'rule' => 'codec']);
         $this->expectException(UniqueConstraintViolationException::class);
         DB::table('tmux_cleanup_rules')->insert(['tmux_configuration_id' => 1, 'rule' => 'codec']);
+    }
+
+    public function test_existing_amazon_credentials_are_dropped_without_changing_active_metadata_settings(): void
+    {
+        $this->migration()->up();
+        Schema::table('metadata_configurations', function (Blueprint $table): void {
+            $table->text('amazon_public_key')->nullable();
+            $table->text('amazon_private_key')->nullable();
+            $table->text('amazon_associate_tag')->nullable();
+        });
+        DB::table('metadata_configurations')->where('id', 1)->update([
+            'amazon_public_key' => 'obsolete-public-key',
+            'amazon_private_key' => 'obsolete-private-key',
+            'amazon_associate_tag' => 'obsolete-tag',
+            'movie_language' => 'fr',
+            'max_music_processed' => 42,
+            'amazon_sleep_milliseconds' => 1500,
+        ]);
+        $before = (array) DB::table('metadata_configurations')->where('id', 1)->first();
+        $columns = ['amazon_public_key', 'amazon_private_key', 'amazon_associate_tag'];
+        $expected = array_diff_key($before, array_flip($columns));
+        $migration = $this->removeAmazonCredentialsMigration();
+
+        $migration->up();
+
+        foreach ($columns as $column) {
+            $this->assertFalse(Schema::hasColumn('metadata_configurations', $column));
+        }
+        $this->assertSame($expected, (array) DB::table('metadata_configurations')->where('id', 1)->first());
+        $metadata = app(ConfigurationProvider::class)->metadata(fresh: true);
+        $this->assertSame(42, $metadata->maxMusicProcessed);
+        $this->assertSame(1500, $metadata->amazonSleepMilliseconds);
+        $this->assertSame(42, app(MusicService::class)->musicqty);
+
+        $migration->down();
+
+        foreach ($columns as $column) {
+            $this->assertTrue(Schema::hasColumn('metadata_configurations', $column));
+            $this->assertNull(DB::table('metadata_configurations')->value($column));
+        }
+        $migration->up();
+        $this->assertSame($expected, (array) DB::table('metadata_configurations')->where('id', 1)->first());
+    }
+
+    private function removeAmazonCredentialsMigration(): Migration
+    {
+        return require database_path('migrations/2026_10_05_211849_remove_amazon_credentials_from_metadata_configurations.php');
     }
 
     /** @param  array<string, string|null>  $values */

@@ -24,15 +24,12 @@ final readonly class MetadataConfigurationData
         public int $maxMoviesProcessed,
         public int $maxMusicProcessed,
         public int $maxTvProcessed,
-        public ?string $amazonPublicKey,
-        public ?string $amazonPrivateKey,
-        public ?string $amazonAssociateTag,
         public int $amazonSleepMilliseconds,
     ) {}
 
     public static function defaults(): self
     {
-        return new self(LookupMode::Disabled, LookupMode::All, LookupMode::All, LookupMode::All, LookupMode::All, LookupMode::All, 'en', false, 100, 300, 150, 100, 150, 75, null, null, null, 1000);
+        return new self(LookupMode::Disabled, LookupMode::All, LookupMode::All, LookupMode::All, LookupMode::All, LookupMode::All, 'en', false, 100, 300, 150, 100, 150, 75, 1000);
     }
 
     public static function fromModel(MetadataConfiguration $model): self
@@ -52,9 +49,6 @@ final readonly class MetadataConfigurationData
             (int) $model->max_movies_processed,
             (int) $model->max_music_processed,
             (int) $model->max_tv_processed,
-            $model->amazon_public_key === null ? null : (string) $model->amazon_public_key,
-            $model->amazon_private_key === null ? null : (string) $model->amazon_private_key,
-            $model->amazon_associate_tag === null ? null : (string) $model->amazon_associate_tag,
             (int) $model->amazon_sleep_milliseconds,
         );
     }

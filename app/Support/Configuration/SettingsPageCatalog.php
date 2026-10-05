@@ -18,13 +18,19 @@ use Illuminate\Support\Str;
 
 final class SettingsPageCatalog
 {
+    /** @var list<string> */
+    public const array MOVIE_PROCESSING_COLUMNS = ['movie_lookup', 'max_movies_processed'];
+
+    /** @var list<string> */
+    public const array VIDEO_PANE_COLUMNS = ['post_non_mode'];
+
     /** @var array<string, list<string>> */
     private const array COLUMNS = [
         'site' => ['title', 'home_link', 'site_logo', 'strapline', 'meta_title', 'meta_description', 'meta_keywords', 'footer', 'dereferrer_link', 'terms', 'trailers_display', 'trailers_size_x', 'trailers_size_y'],
         'registration' => ['status'],
         'ingestion' => ['binary_threads', 'backfill_threads', 'release_threads', 'collection_delay_hours', 'collection_timeout_hours', 'cross_post_hours', 'completion_percent', 'grab_status', 'max_headers_per_iteration', 'max_messages', 'max_releases_created', 'nntp_retries', 'nzb_split_level', 'part_retention_hours', 'release_retention_days', 'misc_other_retention_hours', 'misc_hashed_retention_hours', 'min_files_to_form_release', 'min_size_to_form_release', 'max_size_to_form_release', 'new_group_scan_method', 'new_group_days_to_scan', 'new_group_messages_to_scan', 'safe_backfill_date', 'disable_backfill_group', 'part_repair', 'safe_part_repair', 'max_part_repair', 'part_repair_max_tries', 'categorize_foreign', 'categorize_web_dl', 'show_passworded_releases', 'delete_passworded_releases', 'backfill_days_mode', 'backfill_order', 'backfill_quantity'],
         'post-processing' => ['post_threads', 'post_threads_amazon', 'post_threads_non', 'nfo_threads', 'fix_name_threads', 'timeout_seconds', 'release_timeout_seconds', 'max_timeout_count', 'max_additional_processed', 'max_parts_processed', 'password_check_attempts', 'fix_names_per_run', 'max_nested_levels', 'extract_using_rar_info', 'segments_to_download', 'ffmpeg_duration', 'inner_file_blacklist', 'process_jpg', 'process_thumbnails', 'process_videos', 'save_audio_preview', 'min_size_to_post_process', 'max_size_to_post_process', 'min_size_to_process_nfo', 'max_size_to_process_nfo', 'max_nfo_processed', 'max_nfo_retries', 'lookup_nfo', 'lookup_par2'],
-        'metadata' => ['anime_lookup', 'book_lookup', 'game_lookup', 'movie_lookup', 'music_lookup', 'tv_lookup', 'movie_language', 'imdb_alternate_url', 'max_anime_processed', 'max_books_processed', 'max_games_processed', 'max_movies_processed', 'max_music_processed', 'max_tv_processed', 'amazon_public_key', 'amazon_private_key', 'amazon_associate_tag', 'amazon_sleep_milliseconds'],
+        'metadata' => ['anime_lookup', 'book_lookup', 'game_lookup', 'movie_lookup', 'music_lookup', 'tv_lookup', 'movie_language', 'imdb_alternate_url', 'max_anime_processed', 'max_books_processed', 'max_games_processed', 'max_movies_processed', 'max_music_processed', 'max_tv_processed', 'amazon_sleep_milliseconds'],
         'tmux' => ['session_name', 'monitor_delay', 'niceness', 'sequential_mode', 'sequential_timer', 'binaries_enabled', 'binaries_timer', 'binaries_kill_timer', 'backfill_mode', 'backfill_groups', 'backfill_timer', 'progressive_backfill', 'releases_enabled', 'release_timer', 'post_mode', 'post_timer', 'post_kill_timer', 'post_amazon_mode', 'post_amazon_timer', 'post_non_mode', 'post_non_timer', 'fix_names_enabled', 'fix_timer', 'cleanup_mode', 'cleanup_timer', 'run_irc_scraper', 'console_enabled', 'htop_enabled', 'mytop_enabled', 'nmon_enabled', 'vnstat_enabled', 'vnstat_args', 'tcp_track_enabled', 'tcp_track_args', 'bwmng_enabled', 'redis_enabled', 'redis_args', 'write_logs', 'collections_kill_threshold', 'post_process_kill_threshold', 'colors_start', 'colors_end', 'cleanup_rules', 'color_exclusions'],
     ];
 
@@ -38,10 +44,7 @@ final class SettingsPageCatalog
     private const array TEXTAREAS = ['meta_description', 'meta_keywords', 'footer', 'terms'];
 
     /** @var list<string> */
-    private const array NULLABLE = ['site_logo', 'amazon_public_key', 'amazon_private_key', 'amazon_associate_tag', 'vnstat_args', 'tcp_track_args', 'redis_args'];
-
-    /** @var list<string> */
-    private const array SECRETS = ['amazon_public_key', 'amazon_private_key', 'amazon_associate_tag'];
+    private const array NULLABLE = ['site_logo', 'vnstat_args', 'tcp_track_args', 'redis_args'];
 
     /** @var list<string> */
     private const array POSITIVE_INTEGERS = [
@@ -61,6 +64,22 @@ final class SettingsPageCatalog
     public function fields(ConfigurationDomain $domain): array
     {
         return array_map(fn (string $column): ConfigurationField => $this->field($domain, $column), self::COLUMNS[$domain->value]);
+    }
+
+    /** @return list<ConfigurationField> */
+    public function fieldsForPage(ConfigurationDomain $domain): array
+    {
+        $fields = $this->fields($domain);
+
+        if ($domain === ConfigurationDomain::PostProcessing) {
+            return [
+                ...array_map(fn (string $column): ConfigurationField => $this->field(ConfigurationDomain::Tmux, $column), self::VIDEO_PANE_COLUMNS),
+                ...array_map(fn (string $column): ConfigurationField => $this->field(ConfigurationDomain::Metadata, $column), self::MOVIE_PROCESSING_COLUMNS),
+                ...$fields,
+            ];
+        }
+
+        return $fields;
     }
 
     /** @return list<string> */
@@ -87,7 +106,12 @@ final class SettingsPageCatalog
 
     private function field(ConfigurationDomain $domain, string $column): ConfigurationField
     {
-        $label = Str::headline($column);
+        $label = match ($column) {
+            'movie_lookup' => 'Process Movies',
+            'post_non_mode' => 'TV, Anime and Movie Panes',
+            'post_amazon_mode' => 'Book, Music, Console and Game Panes',
+            default => Str::headline($column),
+        };
         $guidance = match ($domain) {
             ConfigurationDomain::Site, ConfigurationDomain::Registration, ConfigurationDomain::Metadata => 'Takes effect immediately.',
             ConfigurationDomain::Tmux => 'The monitor reloads this value on its next cycle; layout changes require a tmux restart.',
@@ -127,10 +151,6 @@ final class SettingsPageCatalog
 
         if ($column === 'inner_file_blacklist') {
             return new ConfigurationField($column, $label, 'Regular expression used to reject unsafe inner filenames.', 'regex', ['required', 'string', 'max:2000'], guidance: $guidance);
-        }
-
-        if (in_array($column, self::SECRETS, true)) {
-            return new ConfigurationField($column, $label, 'Stored encrypted. Leave blank to preserve the current value.', 'secret', ['nullable', 'string', 'max:2000'], sensitive: true, guidance: $guidance);
         }
 
         if (in_array($column, self::TEXTAREAS, true)) {
@@ -178,7 +198,8 @@ final class SettingsPageCatalog
             'backfill_order' => [1 => 'Newest', 2 => 'Oldest', 3 => 'Alphabetical', 4 => 'Alphabetical reverse', 5 => 'Most posts', 6 => 'Fewest posts'],
             'sequential_mode' => [0 => 'Full', 1 => 'Basic', 2 => 'Stripped'],
             'backfill_mode' => [0 => 'Disabled', 1 => 'All', 4 => 'Safe'],
-            'post_mode', 'post_amazon_mode', 'post_non_mode' => [0 => 'Disabled', 1 => 'Additional', 2 => 'NFO', 3 => 'All'],
+            'post_non_mode', 'post_amazon_mode' => [0 => 'Disabled', 1 => 'Enabled'],
+            'post_mode' => [0 => 'Disabled', 1 => 'Additional', 2 => 'NFO', 3 => 'All'],
             default => [],
         };
     }
@@ -197,6 +218,10 @@ final class SettingsPageCatalog
             'completion_percent' => 'Minimum completion percentage retained during release processing.',
             'monitor_delay' => 'Seconds between tmux monitor refresh cycles.',
             'movie_language' => 'ISO language code used for movie metadata lookup.',
+            'movie_lookup' => 'Choose which releases receive movie metadata processing.',
+            'max_movies_processed' => 'Maximum movies processed per run.',
+            'post_non_mode' => 'Enable the tmux TV, anime and movie panes. Movie Lookup must also be enabled for the Movies pane to process releases.',
+            'post_amazon_mode' => 'Enable the tmux book, music, console and game panes. Each metadata lookup must also be enabled.',
             default => 'Controls '.Str::lower(Str::headline($column)).'.',
         };
     }

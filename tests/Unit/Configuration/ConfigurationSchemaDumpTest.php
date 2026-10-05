@@ -24,6 +24,9 @@ final class ConfigurationSchemaDumpTest extends TestCase
         $schema = (string) file_get_contents(__DIR__.'/../../../database/schema/'.$filename);
 
         $this->assertStringNotContainsString('CREATE TABLE `settings`', $schema);
+        foreach (['amazon_public_key', 'amazon_private_key', 'amazon_associate_tag'] as $column) {
+            $this->assertStringNotContainsString('`'.$column.'`', $schema);
+        }
         $this->assertStringContainsString('CREATE TABLE `site_configurations`', $schema);
         $this->assertStringContainsString('`trailers_display` tinyint(1)', $schema);
         $this->assertStringContainsString('`max_messages` bigint unsigned', $schema);

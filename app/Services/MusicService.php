@@ -26,12 +26,6 @@ class MusicService
 
     public bool $echooutput;
 
-    public ?string $pubkey;
-
-    public ?string $privkey;
-
-    public ?string $asstag;
-
     public int $musicqty;
 
     public int $sleeptime;
@@ -51,9 +45,6 @@ class MusicService
     {
         $this->echooutput = config('nntmux.echocli');
 
-        $this->pubkey = app(ConfigurationProvider::class)->metadata()->amazonPublicKey;
-        $this->privkey = app(ConfigurationProvider::class)->metadata()->amazonPrivateKey;
-        $this->asstag = app(ConfigurationProvider::class)->metadata()->amazonAssociateTag;
         $this->musicqty = app(ConfigurationProvider::class)->metadata()->maxMusicProcessed !== '' ? (int) app(ConfigurationProvider::class)->metadata()->maxMusicProcessed : 150;
         $this->sleeptime = app(ConfigurationProvider::class)->metadata()->amazonSleepMilliseconds !== '' ? (int) app(ConfigurationProvider::class)->metadata()->amazonSleepMilliseconds : 1000;
         $this->imgSavePath = config('nntmux_settings.covers_path').'/music/';

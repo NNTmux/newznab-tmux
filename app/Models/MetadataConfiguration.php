@@ -23,9 +23,6 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $max_movies_processed
  * @property int $max_music_processed
  * @property int $max_tv_processed
- * @property string|null $amazon_public_key
- * @property string|null $amazon_private_key
- * @property string|null $amazon_associate_tag
  * @property int $amazon_sleep_milliseconds
  */
 final class MetadataConfiguration extends Model
@@ -44,9 +41,6 @@ final class MetadataConfiguration extends Model
             'music_lookup' => LookupMode::class,
             'tv_lookup' => LookupMode::class,
             'imdb_alternate_url' => 'boolean',
-            'amazon_public_key' => 'encrypted',
-            'amazon_private_key' => 'encrypted',
-            'amazon_associate_tag' => 'encrypted',
         ];
     }
 }

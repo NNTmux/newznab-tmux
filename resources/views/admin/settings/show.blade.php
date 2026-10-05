@@ -46,7 +46,7 @@
                 <div class="grid grid-cols-1 gap-6 p-4 sm:p-6 md:grid-cols-2">
                     @foreach ($fields as $field)
                         @php
-                            $storedValue = $configuration->getAttribute($field->column);
+                            $storedValue = $configurationValues[$field->column] ?? null;
                             if ($storedValue instanceof \BackedEnum) {
                                 $storedValue = $storedValue->value;
                             }

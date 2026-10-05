@@ -5,7 +5,6 @@ declare(strict_types=1);
 use Database\Support\LegacySettingsManifest;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
@@ -27,14 +26,6 @@ return new class extends Migration
 
         $now = now();
         foreach ($domains as $table => $attributes) {
-            if ($table === 'metadata_configurations') {
-                foreach (['amazon_public_key', 'amazon_private_key', 'amazon_associate_tag'] as $secret) {
-                    if ($attributes[$secret] !== null) {
-                        $attributes[$secret] = Crypt::encryptString((string) $attributes[$secret]);
-                    }
-                }
-            }
-
             DB::table($table)->insert(['id' => 1, ...$attributes, 'created_at' => $now, 'updated_at' => $now]);
         }
 
@@ -70,10 +61,6 @@ return new class extends Migration
             $configuration = (array) DB::table($table)->where('id', 1)->first();
             foreach ($definitions as $column => $definition) {
                 $value = $configuration[$column] ?? $definition['default'];
-                if ($table === 'metadata_configurations' && in_array($column, ['amazon_public_key', 'amazon_private_key', 'amazon_associate_tag'], true) && $value !== null) {
-                    $value = Crypt::decryptString((string) $value);
-                }
-
                 $rows[$definition['keys'][0]] = $this->legacyValue($value, $definition['type']);
             }
         }
@@ -415,9 +402,6 @@ return new class extends Migration
             foreach (['max_anime_processed', 'max_books_processed', 'max_games_processed', 'max_movies_processed', 'max_music_processed', 'max_tv_processed', 'amazon_sleep_milliseconds'] as $column) {
                 $table->unsignedInteger($column)->default(0);
             }
-            $table->text('amazon_public_key')->nullable();
-            $table->text('amazon_private_key')->nullable();
-            $table->text('amazon_associate_tag')->nullable();
             $table->timestamps();
         });
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Enums\ConfigurationDomain;
+use App\Enums\LookupMode;
 use App\Services\Configuration\ConfigurationProvider;
 use App\Support\Configuration\ConfigurationField;
 use App\Support\Configuration\SettingsPageCatalog;
@@ -224,23 +225,128 @@ final class AdminSettingsControllerTest extends TestCase
         $this->assertSame(20000, (int) DB::table('ingestion_configurations')->value('max_messages'));
     }
 
-    public function test_secret_blank_preserves_and_explicit_clear_removes_encrypted_value(): void
+    public function test_post_processing_movie_controls_save_and_stay_in_sync_with_metadata(): void
     {
+        $provider = app(ConfigurationProvider::class);
+        $provider->metadata();
+        $originalLanguage = $provider->metadata()->movieLanguage;
+
+        foreach (LookupMode::cases() as $mode) {
+            $payload = $this->payload(ConfigurationDomain::PostProcessing);
+            $payload['movie_lookup'] = $mode->value;
+            $payload['max_movies_processed'] = 45;
+            $payload['post_threads'] = 3;
+            $payload['post_non_mode'] = 1;
+
+            $this->put(route('admin.settings.update', ['domain' => 'post-processing']), $payload)
+                ->assertSessionHasNoErrors()
+                ->assertRedirect(route('admin.settings.show', ['domain' => 'post-processing']));
+
+            $this->assertSame($mode, $provider->metadata()->movieLookup);
+            $this->assertSame(45, $provider->metadata()->maxMoviesProcessed);
+            $this->assertSame($originalLanguage, $provider->metadata()->movieLanguage);
+            $this->assertSame(3, $provider->postProcessing()->postThreads);
+            $this->assertSame(1, $provider->tmux()->postNonMode);
+
+            foreach (['post-processing', 'metadata'] as $domain) {
+                $markup = $this->get(route('admin.settings.show', ['domain' => $domain]))
+                    ->assertOk()
+                    ->assertSee('Process Movies')
+                    ->assertSee('id="max_movies_processed" name="max_movies_processed" type="number" value="45"', false)
+                    ->getContent();
+                $this->assertMatchesRegularExpression(
+                    '/<select[^>]*id="movie_lookup"[^>]*>.*?<option value="'.$mode->value.'" selected>/s',
+                    $markup,
+                );
+            }
+        }
+
         $payload = $this->payload(ConfigurationDomain::Metadata);
-        $payload['amazon_private_key'] = 'secret-value';
+        $payload['movie_lookup'] = LookupMode::All->value;
+        $payload['max_movies_processed'] = 60;
         $this->put(route('admin.settings.update', ['domain' => 'metadata']), $payload)->assertSessionHasNoErrors();
+        $this->get(route('admin.settings.show', ['domain' => 'post-processing']))
+            ->assertOk()
+            ->assertSee('id="max_movies_processed" name="max_movies_processed" type="number" value="60"', false);
+    }
 
-        $encrypted = (string) DB::table('metadata_configurations')->value('amazon_private_key');
-        $this->assertNotSame('secret-value', $encrypted);
+    public function test_invalid_movie_controls_do_not_save_either_configuration_domain(): void
+    {
+        $payload = $this->payload(ConfigurationDomain::PostProcessing);
+        $payload['movie_lookup'] = 3;
+        $payload['max_movies_processed'] = 0;
+        $payload['post_threads'] = 4;
+        $payload['post_non_mode'] = 1;
 
+        $this->from(route('admin.settings.show', ['domain' => 'post-processing']))
+            ->put(route('admin.settings.update', ['domain' => 'post-processing']), $payload)
+            ->assertSessionHasErrors(['movie_lookup', 'max_movies_processed']);
+
+        $this->assertSame(1, (int) DB::table('post_processing_configurations')->value('post_threads'));
+        $this->assertSame(1, (int) DB::table('metadata_configurations')->value('movie_lookup'));
+        $this->assertSame(100, (int) DB::table('metadata_configurations')->value('max_movies_processed'));
+        $this->assertSame(0, (int) DB::table('tmux_configurations')->value('post_non_mode'));
+    }
+
+    public function test_post_processing_updates_without_movie_controls_preserve_their_values(): void
+    {
+        DB::table('metadata_configurations')->where('id', 1)->update([
+            'movie_lookup' => LookupMode::Renamed->value,
+            'max_movies_processed' => 65,
+        ]);
+        $payload = $this->payload(ConfigurationDomain::PostProcessing);
+        $payload['post_threads'] = 2;
+
+        $this->put(route('admin.settings.update', ['domain' => 'post-processing']), $payload)
+            ->assertSessionHasNoErrors();
+
+        $this->assertSame(2, (int) DB::table('post_processing_configurations')->value('post_threads'));
+        $this->assertSame(LookupMode::Renamed, app(ConfigurationProvider::class)->metadata(fresh: true)->movieLookup);
+        $this->assertSame(65, app(ConfigurationProvider::class)->metadata(fresh: true)->maxMoviesProcessed);
+    }
+
+    public function test_legacy_nonzero_pane_modes_render_enabled_and_save_as_switches(): void
+    {
+        DB::table('tmux_configurations')->where('id', 1)->update([
+            'post_non_mode' => 3,
+            'post_amazon_mode' => 2,
+        ]);
+
+        $markup = $this->get(route('admin.settings.show', ['domain' => 'tmux']))->assertOk()->getContent();
+        foreach (['post_non_mode', 'post_amazon_mode'] as $column) {
+            $this->assertMatchesRegularExpression('/<select[^>]*id="'.$column.'"[^>]*>.*?<option value="1" selected>Enabled<\/option>/s', $markup);
+        }
+
+        $payload = $this->payload(ConfigurationDomain::Tmux);
+        $payload['post_non_mode'] = 1;
+        $payload['post_amazon_mode'] = 1;
+        $this->put(route('admin.settings.update', ['domain' => 'tmux']), $payload)->assertSessionHasNoErrors();
+
+        $this->assertSame(1, app(ConfigurationProvider::class)->tmux(fresh: true)->postNonMode);
+        $this->assertSame(1, app(ConfigurationProvider::class)->tmux(fresh: true)->postAmazonMode);
+    }
+
+    public function test_metadata_settings_omit_and_ignore_retired_amazon_credentials(): void
+    {
+        $columns = ['amazon_public_key', 'amazon_private_key', 'amazon_associate_tag'];
+        $response = $this->get(route('admin.settings.show', ['domain' => 'metadata']))->assertOk();
         $payload = $this->payload(ConfigurationDomain::Metadata);
-        $payload['amazon_private_key'] = '';
-        $this->put(route('admin.settings.update', ['domain' => 'metadata']), $payload)->assertSessionHasNoErrors();
-        $this->assertSame($encrypted, DB::table('metadata_configurations')->value('amazon_private_key'));
+        foreach ($columns as $column) {
+            $response->assertDontSee($column);
+            $this->assertNotContains($column, $this->catalog->writableColumns(ConfigurationDomain::Metadata));
+            $payload[$column] = 'obsolete-value';
+            $payload['clear_'.$column] = '1';
+        }
+        $payload['movie_language'] = 'de';
 
-        $payload['clear_amazon_private_key'] = '1';
-        $this->put(route('admin.settings.update', ['domain' => 'metadata']), $payload)->assertSessionHasNoErrors();
-        $this->assertNull(DB::table('metadata_configurations')->value('amazon_private_key'));
+        $this->put(route('admin.settings.update', ['domain' => 'metadata']), $payload)
+            ->assertSessionHasNoErrors()
+            ->assertRedirect(route('admin.settings.show', ['domain' => 'metadata']));
+
+        $this->assertSame('de', app(ConfigurationProvider::class)->metadata(fresh: true)->movieLanguage);
+        foreach ($columns as $column) {
+            $this->assertFalse(Schema::hasColumn('metadata_configurations', $column));
+        }
     }
 
     public function test_logo_size_conversion_normalized_sets_and_cache_invalidation(): void

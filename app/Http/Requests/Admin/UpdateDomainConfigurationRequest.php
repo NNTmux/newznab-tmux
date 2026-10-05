@@ -23,8 +23,11 @@ final class UpdateDomainConfigurationRequest extends FormRequest
         $domain = ConfigurationDomain::from((string) $this->route('domain'));
         $rules = [];
 
-        foreach (app(SettingsPageCatalog::class)->fields($domain) as $field) {
+        foreach (app(SettingsPageCatalog::class)->fieldsForPage($domain) as $field) {
             $rules[$field->column] = $field->rules;
+            if ($domain === ConfigurationDomain::PostProcessing && in_array($field->column, [...SettingsPageCatalog::MOVIE_PROCESSING_COLUMNS, ...SettingsPageCatalog::VIDEO_PANE_COLUMNS], true)) {
+                array_unshift($rules[$field->column], 'sometimes');
+            }
             if ($field->control === 'bytes') {
                 $rules[$field->column.'_unit'] = ['required', 'in:'.implode(',', SizeUnit::UNITS)];
             }

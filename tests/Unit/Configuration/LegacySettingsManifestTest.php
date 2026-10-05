@@ -24,8 +24,15 @@ final class LegacySettingsManifestTest extends TestCase
     {
         $classified = LegacySettingsManifest::classifiedKeys();
 
-        foreach (['amazonpubkey', 'amazonprivkey', 'amazonassociatetag', 'amazonsleep', 'extractusingrarinfo', 'imdburl', 'imdblanguage', 'lookuplanguage', 'lookuppar2', 'write_logs', 'deletepasswordedrelease'] as $key) {
+        foreach (['amazonsleep', 'extractusingrarinfo', 'imdburl', 'imdblanguage', 'lookuplanguage', 'lookuppar2', 'write_logs', 'deletepasswordedrelease'] as $key) {
             $this->assertContains($key, $classified);
+        }
+    }
+
+    public function test_amazon_credentials_are_retired(): void
+    {
+        foreach (['amazonpubkey', 'amazonprivkey', 'amazonassociatetag'] as $key) {
+            $this->assertContains($key, LegacySettingsManifest::RETIRED);
         }
     }
 

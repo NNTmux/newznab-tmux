@@ -150,9 +150,6 @@ final class LegacySettingsManifest
             'max_movies_processed' => ['keys' => ['maximdbprocessed'], 'type' => 'int', 'default' => 100, 'min' => 1],
             'max_music_processed' => ['keys' => ['maxmusicprocessed'], 'type' => 'int', 'default' => 150, 'min' => 1],
             'max_tv_processed' => ['keys' => ['maxrageprocessed'], 'type' => 'int', 'default' => 75, 'min' => 1],
-            'amazon_public_key' => ['keys' => ['amazonpubkey'], 'type' => 'nullable_string', 'default' => null],
-            'amazon_private_key' => ['keys' => ['amazonprivkey'], 'type' => 'nullable_string', 'default' => null],
-            'amazon_associate_tag' => ['keys' => ['amazonassociatetag'], 'type' => 'nullable_string', 'default' => null],
             'amazon_sleep_milliseconds' => ['keys' => ['amazonsleep'], 'type' => 'int', 'default' => 1000, 'min' => 0],
         ],
         'tmux_configurations' => [
@@ -216,6 +213,7 @@ final class LegacySettingsManifest
 
     /** @var list<string> */
     public const array RETIRED = [
+        'amazonpubkey', 'amazonprivkey', 'amazonassociatetag',
         'addpar2', 'alternate_nntp', 'banned', 'checkpasswordedrar', 'colors', 'currentppticket',
         'debuginfo', 'end', 'ffmpeg_image_time', 'lastpretime', 'lookupxxx', 'maxxxxprocessed',
         'nextppticket', 'nfos', 'nzbpath', 'nzbthreads', 'partsdeletechunks', 'postdelay', 'processupdate',

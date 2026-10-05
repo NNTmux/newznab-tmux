@@ -604,8 +604,8 @@ class TmuxTaskRunner
         $enabled = (int) ($runVar['settings']['post_non'] ?? 0);
         $pane = $this->paneManager->paneForRole(TmuxPaneRole::PostTv, '2.1');
 
-        if ($enabled !== 1) {
-            return $this->disablePane($pane, 'Post-process TV/Anime', 'disabled in settings');
+        if ($enabled <= 0) {
+            return $this->disablePane($pane, 'Post-process TV/Anime', 'TV, Anime and Movie Panes is disabled in Post Processing settings');
         }
 
         $niceness = $this->getNiceness();
@@ -664,20 +664,20 @@ class TmuxTaskRunner
         $enabled = (int) ($runVar['settings']['post_non'] ?? 0);
         $pane = $this->paneManager->paneForRole(TmuxPaneRole::PostMovies, '2.3');
 
-        if ($enabled !== 1) {
-            return $this->disablePane($pane, 'Post-process Movies', 'disabled in settings');
+        if ($enabled <= 0) {
+            return $this->disablePane($pane, 'Post-process Movies', 'TV, Anime and Movie Panes is disabled in Post Processing settings');
         }
 
         $niceness = $this->getNiceness();
         $log = $this->getLogFile('post_movies');
         $artisan = PHP_BINARY.' artisan';
 
-        // Movies processing - Uses single-process command
+        // Movies processing
         $processMovies = (int) ($runVar['settings']['processmovies'] ?? 0);
         $hasMoviesWork = (int) ($runVar['counts']['now']['processmovies'] ?? 0) > 0;
 
         if ($processMovies === 0) {
-            return $this->disablePane($pane, 'Post-process Movies', 'disabled in settings');
+            return $this->disablePane($pane, 'Post-process Movies', 'Process Movies is disabled in Post Processing settings');
         }
 
         if (! $hasMoviesWork) {
@@ -715,8 +715,8 @@ class TmuxTaskRunner
         $legacyPane = (int) ($runVar['constants']['sequential'] ?? 0) === 2 ? '1.1' : '2.2';
         $pane = $this->paneManager->paneForRole(TmuxPaneRole::PostMetadata, $legacyPane);
 
-        if ($enabled !== 1) {
-            return $this->disablePane($pane, 'Post-process Metadata', 'disabled in settings');
+        if ($enabled <= 0) {
+            return $this->disablePane($pane, 'Post-process Metadata', 'Book, Music, Console and Game Panes is disabled in Tmux settings');
         }
 
         $hasWork = (int) ($runVar['counts']['now']['processmusic'] ?? 0) > 0

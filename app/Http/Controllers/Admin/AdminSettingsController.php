@@ -35,13 +35,28 @@ final class AdminSettingsController extends BasePageController
         $configurationDomain = ConfigurationDomain::from($domain);
         $modelClass = $this->catalog->modelClass($configurationDomain);
         $model = $modelClass::query()->findOrFail(1);
+        $configurationValues = $model->attributesToArray();
+
+        if ($configurationDomain === ConfigurationDomain::PostProcessing) {
+            $metadata = $this->configurationProvider->metadata(fresh: true);
+            $configurationValues['movie_lookup'] = $metadata->movieLookup->value;
+            $configurationValues['max_movies_processed'] = $metadata->maxMoviesProcessed;
+            $configurationValues['post_non_mode'] = $this->configurationProvider->tmux(fresh: true)->postNonMode;
+        }
+
+        foreach (['post_non_mode', 'post_amazon_mode'] as $column) {
+            if (array_key_exists($column, $configurationValues)) {
+                $configurationValues[$column] = (int) $configurationValues[$column] > 0 ? 1 : 0;
+            }
+        }
 
         return view('admin.settings.show', [
             ...$this->viewData,
             'domain' => $configurationDomain,
             'domains' => ConfigurationDomain::cases(),
-            'fields' => $this->catalog->fields($configurationDomain),
+            'fields' => $this->catalog->fieldsForPage($configurationDomain),
             'configuration' => $model,
+            'configurationValues' => $configurationValues,
             'sizeUnits' => SizeUnit::UNITS,
             'sizeValues' => $this->sizeValues($configurationDomain, $model->getAttributes()),
             'selectedCleanupRules' => $model instanceof TmuxConfiguration ? $model->cleanupRules()->pluck('rule')->all() : [],
@@ -70,7 +85,13 @@ final class AdminSettingsController extends BasePageController
             ? $this->configurationProvider->site(fresh: true)->logoPath
             : null;
 
-        foreach ($this->catalog->fields($configurationDomain) as $field) {
+        foreach ($this->catalog->fieldsForPage($configurationDomain) as $field) {
+            if ($configurationDomain === ConfigurationDomain::PostProcessing
+                && in_array($field->column, [...SettingsPageCatalog::MOVIE_PROCESSING_COLUMNS, ...SettingsPageCatalog::VIDEO_PANE_COLUMNS], true)
+                && ! $request->exists($field->column)) {
+                continue;
+            }
+
             if (in_array($field->column, ['cleanup_rules', 'color_exclusions', 'site_logo'], true)) {
                 continue;
             }
@@ -106,12 +127,26 @@ final class AdminSettingsController extends BasePageController
 
         try {
             DB::transaction(function () use ($configurationDomain, $attributes, $request): void {
+                $movieAttributes = $configurationDomain === ConfigurationDomain::PostProcessing
+                    ? array_intersect_key($attributes, array_flip(SettingsPageCatalog::MOVIE_PROCESSING_COLUMNS))
+                    : [];
+                $tmuxAttributes = $configurationDomain === ConfigurationDomain::PostProcessing
+                    ? array_intersect_key($attributes, array_flip(SettingsPageCatalog::VIDEO_PANE_COLUMNS))
+                    : [];
                 $this->repository->update(
                     $configurationDomain,
-                    $attributes,
+                    array_diff_key($attributes, $movieAttributes, $tmuxAttributes),
                     $configurationDomain === ConfigurationDomain::Tmux ? array_values($request->validated('cleanup_rules', [])) : null,
                     $configurationDomain === ConfigurationDomain::Tmux ? $request->colorExclusions() : null,
                 );
+
+                if ($movieAttributes !== []) {
+                    $this->repository->update(ConfigurationDomain::Metadata, $movieAttributes);
+                }
+
+                if ($tmuxAttributes !== []) {
+                    $this->repository->update(ConfigurationDomain::Tmux, $tmuxAttributes);
+                }
             });
         } catch (Throwable $throwable) {
             if ($storedLogoPath !== null) {

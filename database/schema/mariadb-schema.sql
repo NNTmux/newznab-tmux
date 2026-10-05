@@ -1623,7 +1623,7 @@ CREATE TABLE `metadata_configurations` (
   `movie_lookup` tinyint unsigned NOT NULL DEFAULT 0, `music_lookup` tinyint unsigned NOT NULL DEFAULT 0, `tv_lookup` tinyint unsigned NOT NULL DEFAULT 0, `movie_language` varchar(8) NOT NULL DEFAULT 'en',
   `imdb_alternate_url` tinyint(1) NOT NULL DEFAULT 0, `max_anime_processed` int unsigned NOT NULL DEFAULT 0, `max_books_processed` int unsigned NOT NULL DEFAULT 0,
   `max_games_processed` int unsigned NOT NULL DEFAULT 0, `max_movies_processed` int unsigned NOT NULL DEFAULT 0, `max_music_processed` int unsigned NOT NULL DEFAULT 0,
-  `max_tv_processed` int unsigned NOT NULL DEFAULT 0, `amazon_public_key` text DEFAULT NULL, `amazon_private_key` text DEFAULT NULL, `amazon_associate_tag` text DEFAULT NULL,
+  `max_tv_processed` int unsigned NOT NULL DEFAULT 0,
   `amazon_sleep_milliseconds` int unsigned NOT NULL DEFAULT 0, `created_at` timestamp NULL DEFAULT NULL, `updated_at` timestamp NULL DEFAULT NULL, PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 DROP TABLE IF EXISTS `tmux_configurations`;
