@@ -369,6 +369,9 @@ class BinariesService
         // Handle part repair tracking
         if ($addToPartRepair) {
             $this->handlePartRepairTracking($headersNotInserted);
+        } elseif ($type === 'backfill' && $this->config->partRepair && $headersNotInserted !== []) {
+            // Headers lost to a storage rollback during backfill get repaired too.
+            $this->missedPartHandler->addMissingParts($headersNotInserted, $this->groupMySQL['id']);
         }
 
         $this->outputHeaderDuration();

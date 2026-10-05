@@ -52,7 +52,7 @@ Alpine.data('adminDashboard', () => ({
         this._scheduleRefresh();
     },
     _scheduleRefresh() {
-        const interval = Number.parseInt(this.$el.dataset.refreshInterval ?? '', 10) || (60 * 1000);
+        const interval = Number.parseInt(this.$el.dataset.refreshInterval ?? '', 10) || (15 * 60 * 1000);
         this._refreshInterval = window.setInterval(() => this._loadDashboardData(), interval);
         this._visibilityHandler = () => {
             if (!document.hidden && Date.now() - this._lastRefreshAt >= interval) {
@@ -141,14 +141,7 @@ Alpine.data('adminDashboard', () => ({
         if (message) message.textContent = String(reg.message ?? '');
     },
     _renderLastRefresh(timeText) {
-        // "Last dashboard refresh" reflects when the JS last successfully
-        // fetched data — drive it from the browser clock so the indicator
-        // always advances on a successful tick, even if the server snapshot
-        // happened to be served from cache (Cache::flexible) with an older
-        // `generated_at`. The server timestamp (when supplied) is used as a
-        // fallback only — see AdminPageController::getDashboardData().
-        const clientNow = new Date().toLocaleTimeString();
-        this._setStatText('last-refresh', clientNow || timeText || '');
+        this._setStatText('last-refresh', timeText ?? '');
     },
     _renderUserStats(stats) {
         if (!stats) return;

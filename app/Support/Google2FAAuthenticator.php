@@ -20,14 +20,23 @@ class Google2FAAuthenticator extends Authenticator
 
         if ($cookie && $this->checkCookieValidity($cookie)) {
             // Force the session to be marked as 2FA authenticated
-            session([config('google2fa.session_var') => true]);
-            session([config('google2fa.session_var').'.auth.passed_at' => time()]);
+            $this->loginFromTrustedDevice();
 
             // Successful authentication with cookie
             return true;
         }
 
+        if ($this->getRequest()->session()->pull('2fa:trusted_device', false)) {
+            $this->logout();
+        }
+
         return parent::isAuthenticated();
+    }
+
+    public function loginFromTrustedDevice(): void
+    {
+        $this->login();
+        $this->getRequest()->session()->put('2fa:trusted_device', true);
     }
 
     /**
@@ -96,8 +105,7 @@ class Google2FAAuthenticator extends Authenticator
         if ($trustedCookie && auth()->check()) {
             try {
                 if ($this->trustedDeviceCookieIsValid($trustedCookie)) {
-                    session([config('google2fa.session_var') => true]);
-                    session([config('google2fa.session_var').'.auth.passed_at' => time()]);
+                    $this->loginFromTrustedDevice();
 
                     return false;
                 }
@@ -112,29 +120,6 @@ class Google2FAAuthenticator extends Authenticator
 
     private function trustedDeviceCookieIsValid(mixed $cookie): bool
     {
-        if (! is_string($cookie) || $cookie === '') {
-            return false;
-        }
-
-        $data = json_decode($cookie, true);
-
-        if (json_last_error() !== JSON_ERROR_NONE || ! is_array($data)) {
-            return false;
-        }
-
-        if (! isset($data['user_id'], $data['token'], $data['expires_at'])) {
-            return false;
-        }
-
-        $user = $this->getUser();
-        if ((int) $data['user_id'] !== (int) $user->id) {
-            return false;
-        }
-
-        if (time() > (int) $data['expires_at']) {
-            return false;
-        }
-
-        return TrustedDevice::findValidForUser((int) $user->id, (string) $data['token']) !== null;
+        return TrustedDevice::cookieIsValidForUser($cookie, (int) $this->getUser()->id);
     }
 }

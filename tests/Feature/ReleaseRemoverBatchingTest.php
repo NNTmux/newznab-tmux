@@ -22,8 +22,17 @@ class ReleaseRemoverBatchingTest extends TestCase
 {
     private string $databasePath;
 
+    /**
+     * @var array<string, string|false>
+     */
+    private array $originalEnvironment = [];
+
     public function createApplication()
     {
+        foreach (['APP_ENV', 'DB_CONNECTION', 'DB_DATABASE'] as $key) {
+            $this->originalEnvironment[$key] = getenv($key);
+        }
+
         $this->databasePath = sys_get_temp_dir().'/nntmux-release-remover-test.sqlite';
         if (file_exists($this->databasePath)) {
             unlink($this->databasePath);
@@ -91,6 +100,16 @@ class ReleaseRemoverBatchingTest extends TestCase
 
         if (file_exists($this->databasePath)) {
             unlink($this->databasePath);
+        }
+
+        foreach ($this->originalEnvironment as $key => $value) {
+            if ($value === false) {
+                putenv($key);
+                unset($_ENV[$key], $_SERVER[$key]);
+            } else {
+                putenv($key.'='.$value);
+                $_ENV[$key] = $_SERVER[$key] = $value;
+            }
         }
     }
 

@@ -5,9 +5,13 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Facades\Search;
+use App\Models\User;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class FailedReleasesControllerSecurityTest extends TestCase
@@ -25,6 +29,13 @@ class FailedReleasesControllerSecurityTest extends TestCase
         DB::purge();
         DB::reconnect();
         $this->createSchema();
+        $this->app->instance(PreventRequestForgery::class, new class(app(), app('encrypter')) extends PreventRequestForgery
+        {
+            protected function runningUnitTests(): bool
+            {
+                return false;
+            }
+        });
     }
 
     public function test_failed_callback_rejects_userid_without_session_or_api_token(): void
@@ -34,11 +45,11 @@ class FailedReleasesControllerSecurityTest extends TestCase
         $this->get(route('failed', [
             'guid' => 'failed-guid',
             'userid' => 1,
-        ]))->assertStatus(401)
-            ->assertHeader('X-DNZB-RCode', 401);
+        ]))->assertStatus(405);
     }
 
-    public function test_failed_callback_uses_api_token_user_and_preserves_token_for_alternate_download(): void
+    #[DataProvider('downloaderMethods')]
+    public function test_failed_callback_uses_api_token_user_and_preserves_token_for_alternate_download(string $method, bool $withSession): void
     {
         $this->createUser(1, 'rss-token');
         $this->createUser(999, 'other-token');
@@ -48,7 +59,10 @@ class FailedReleasesControllerSecurityTest extends TestCase
             ->once()
             ->with('Show.Name.1080p', 10)
             ->andReturn([20]);
-        $response = $this->get(route('failed', [
+        if ($withSession) {
+            $this->actingAs(User::findOrFail(999));
+        }
+        $response = $this->{$method}(route('failed', [
             'guid' => 'failed-guid',
             'userid' => 999,
             'api_token' => 'rss-token',
@@ -67,6 +81,59 @@ class FailedReleasesControllerSecurityTest extends TestCase
             'release_id' => 10,
             'users_id' => 999,
         ]);
+    }
+
+    /** @return array<string, array{string, bool}> */
+    public static function downloaderMethods(): array
+    {
+        return [
+            'GET without session' => ['get', false],
+            'POST without session' => ['post', false],
+            'GET with another user session' => ['get', true],
+            'POST with another user session' => ['post', true],
+        ];
+    }
+
+    public function test_browser_get_cannot_record_a_failure_even_when_signed_in(): void
+    {
+        $this->createUser(1, 'rss-token');
+        $this->createRelease(10, 'failed-guid', 'Show.Name.1080p.WEB-DL-GROUP', 5000, '2026-06-11 00:00:00');
+        $this->actingAs(User::findOrFail(1))
+            ->get(route('failed', ['guid' => 'failed-guid']))->assertStatus(405);
+        $this->assertDatabaseCount('dnzb_failures', 0);
+    }
+
+    public function test_browser_post_requires_csrf_before_recording_a_failure(): void
+    {
+        $this->createUser(1, 'rss-token');
+        $this->createRelease(10, 'failed-guid', 'Show.Name.1080p.WEB-DL-GROUP', 5000, '2026-06-11 00:00:00');
+        $this->actingAs(User::findOrFail(1))->withSession(['_token' => 'csrf-token']);
+        $this->post(route('failed'), ['guid' => 'failed-guid'])->assertStatus(419);
+        $this->assertDatabaseCount('dnzb_failures', 0);
+        $this->post(route('failed'), ['guid' => 'failed-guid', '_token' => 'wrong-token'])->assertStatus(419);
+        $this->assertDatabaseCount('dnzb_failures', 0);
+
+        Search::shouldReceive('searchReleases')->once()->andReturn([]);
+        $this->post(route('failed'), ['guid' => 'failed-guid', '_token' => 'csrf-token'])
+            ->assertStatus(404);
+        $this->assertDatabaseHas('dnzb_failures', ['release_id' => 10, 'users_id' => 1, 'failed' => 1]);
+    }
+
+    #[DataProvider('invalidTokens')]
+    public function test_invalid_api_tokens_cannot_fall_back_to_a_browser_session(mixed $token): void
+    {
+        $this->createUser(1, 'rss-token');
+        $this->createRelease(10, 'failed-guid', 'Show.Name.1080p.WEB-DL-GROUP', 5000, '2026-06-11 00:00:00');
+        $this->actingAs(User::findOrFail(1))->post(route('failed'), [
+            'guid' => 'failed-guid', 'api_token' => $token,
+        ])->assertStatus(401);
+        $this->assertDatabaseCount('dnzb_failures', 0);
+    }
+
+    /** @return array<string, array{mixed}> */
+    public static function invalidTokens(): array
+    {
+        return ['invalid' => ['invalid'], 'empty' => [''], 'array' => [['rss-token']]];
     }
 
     private function createSchema(): void
@@ -101,6 +168,7 @@ class FailedReleasesControllerSecurityTest extends TestCase
 
     private function createUser(int $id, string $apiToken): void
     {
+        Cache::put(User::categoryExclusionCacheKey($id), []);
         DB::table('users')->insert([
             'id' => $id,
             'username' => 'user'.$id,

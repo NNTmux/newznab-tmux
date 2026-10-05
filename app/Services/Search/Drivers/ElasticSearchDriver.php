@@ -18,6 +18,7 @@ use App\Services\Search\DTO\SearchPage;
 use App\Services\Search\Support\ElasticsearchClientFactory;
 use App\Services\Search\Support\ElasticsearchResponseHelper;
 use App\Services\Search\Support\ReleaseIndexProjection;
+use App\Support\PredbSearchDocument;
 use App\Support\ReleaseSearchIndexDocument;
 use App\Support\SecondaryIndexDocuments;
 use Elastic\Elasticsearch\Client;
@@ -828,13 +829,56 @@ class ElasticSearchDriver implements SearchDriverInterface
      * Search the predb index.
      *
      * @param  array<string, mixed>|string  $searchTerm  Search term(s)
-     * @return array<string, mixed> Array of predb records
+     * @return list<array{id: int, title: string, filename: string, source: string}>
      */
     public function searchPredb(array|string $searchTerm): array
     {
         $result = $this->predbIndexSearch($searchTerm);
 
-        return is_array($result) ? $result : $result->toArray();
+        $hits = [];
+        foreach (is_array($result) ? $result : $result->toArray() as $row) {
+            if (is_array($row) && (int) ($row['id'] ?? 0) > 0) {
+                $hits[] = PredbSearchDocument::normalize($row, (int) $row['id']);
+            }
+        }
+
+        return $hits;
+    }
+
+    /** @return array{id: int, title: string, filename: string, source: string}|null */
+    public function matchPredbExact(string $name): ?array
+    {
+        if (trim($name) === '') {
+            return null;
+        }
+
+        try {
+            foreach (['title', 'filename'] as $field) {
+                $response = $this->getClient()->search([
+                    'index' => $this->getPredbIndex(),
+                    'body' => [
+                        'query' => ['term' => [$field.'_exact' => PredbSearchDocument::exactValue($name)]],
+                        'size' => 1,
+                        '_source' => ['title', 'filename', 'source'],
+                    ],
+                ]);
+
+                foreach ($response['hits']['hits'] ?? [] as $doc) {
+                    $hit = PredbSearchDocument::normalize($doc['_source'] ?? [], (int) ($doc['_id'] ?? 0));
+                    if ($hit['id'] > 0 && $hit['title'] !== ''
+                        && PredbSearchDocument::exactValue($hit[$field]) === PredbSearchDocument::exactValue($name)) {
+                        return $hit;
+                    }
+                }
+            }
+        } catch (\Throwable $exception) {
+            Log::warning('Elasticsearch PreDB exact lookup failed', [
+                'index' => $this->getPredbIndex(),
+                'exception_class' => $exception::class,
+            ]);
+        }
+
+        return null;
     }
 
     /**
@@ -1017,7 +1061,7 @@ class ElasticSearchDriver implements SearchDriverInterface
             return [];
         }
 
-        $cacheKey = $this->buildCacheKey('predb_search', [$keywords]); // @phpstan-ignore argument.type
+        $cacheKey = $this->buildCacheKey('predb_search_v2', [$keywords]); // @phpstan-ignore argument.type
         $cached = Cache::get($cacheKey);
         if ($cached !== null) {
             return $cached;
@@ -1138,12 +1182,7 @@ class ElasticSearchDriver implements SearchDriverInterface
 
         try {
             $data = [
-                'body' => [
-                    'id' => $parameters['id'],
-                    'title' => $parameters['title'] ?? '',
-                    'source' => $parameters['source'] ?? '',
-                    'filename' => $parameters['filename'] ?? '',
-                ],
+                'body' => PredbSearchDocument::forElasticsearch($parameters),
                 'index' => $this->getPredbIndex(),
                 'id' => $parameters['id'],
             ];
@@ -1182,12 +1221,7 @@ class ElasticSearchDriver implements SearchDriverInterface
         try {
             $data = [
                 'body' => [
-                    'doc' => [
-                        'id' => $parameters['id'],
-                        'title' => $parameters['title'] ?? '',
-                        'filename' => $parameters['filename'] ?? '',
-                        'source' => $parameters['source'] ?? '',
-                    ],
+                    'doc' => PredbSearchDocument::forElasticsearch($parameters),
                     'doc_as_upsert' => true,
                 ],
                 'index' => $this->getPredbIndex(),
@@ -1412,12 +1446,7 @@ class ElasticSearchDriver implements SearchDriverInterface
                 ],
             ];
 
-            $params['body'][] = [
-                'id' => $predb['id'],
-                'title' => (string) ($predb['title'] ?? ''),
-                'filename' => (string) ($predb['filename'] ?? ''),
-                'source' => (string) ($predb['source'] ?? ''),
-            ];
+            $params['body'][] = PredbSearchDocument::forElasticsearch($predb);
 
             $success++;
         }
@@ -1766,7 +1795,9 @@ class ElasticSearchDriver implements SearchDriverInterface
 
             foreach ($results['hits']['hits'] ?? [] as $result) {
                 if ($fullResults) {
-                    $searchResult[] = $result['_source'];
+                    $searchResult[] = ($search['index'] ?? '') === $this->getPredbIndex()
+                        ? PredbSearchDocument::normalize($result['_source'] ?? [], (int) ($result['_id'] ?? 0))
+                        : $result['_source'];
                 } else {
                     $searchResult[] = $result['_source']['id'] ?? $result['_id'];
                 }
@@ -1791,7 +1822,9 @@ class ElasticSearchDriver implements SearchDriverInterface
 
                 foreach ($results['hits']['hits'] ?? [] as $result) {
                     if ($fullResults) {
-                        $searchResult[] = $result['_source'];
+                        $searchResult[] = ($search['index'] ?? '') === $this->getPredbIndex()
+                            ? PredbSearchDocument::normalize($result['_source'] ?? [], (int) ($result['_id'] ?? 0))
+                            : $result['_source'];
                     } else {
                         $searchResult[] = $result['_source']['id'] ?? $result['_id'];
                     }

@@ -9,14 +9,19 @@ use App\Models\PasswordSecurity;
 use App\Models\TrustedDevice;
 use App\Models\User;
 use App\Services\PasswordBreachService;
+use App\View\Composers\GlobalDataComposer;
+use Illuminate\Auth\Events\OtherDeviceLogout;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use PDO;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PragmaRX\Google2FALaravel\Facade as Google2FA;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
@@ -74,6 +79,12 @@ class RememberMeAuthenticationTest extends TestCase
         DB::reconnect();
 
         $this->createSchema();
+        Schema::create('content', function (Blueprint $table): void {
+            $table->increments('id');
+            $table->integer('status');
+            $table->integer('contenttype');
+            $table->integer('ordinal')->nullable();
+        });
         app(PermissionRegistrar::class)->forgetCachedPermissions();
         $this->app->instance(PasswordBreachService::class, new class extends PasswordBreachService
         {
@@ -84,6 +95,7 @@ class RememberMeAuthenticationTest extends TestCase
         });
 
         Route::middleware(['web', 'auth'])->get('__remember_me_probe', fn () => response('ok', 200));
+        Route::middleware(['web', 'auth', '2fa'])->get('__otp_probe', fn () => response('otp passed'));
     }
 
     protected function tearDown(): void
@@ -113,6 +125,91 @@ class RememberMeAuthenticationTest extends TestCase
         $response->assertRedirect('/');
         $response->assertCookie($this->recallerCookieName());
         $this->assertAuthenticatedAs($user);
+    }
+
+    public function test_turnstile_failure_is_visible_after_redirect_and_is_logged(): void
+    {
+        $this->enableTurnstile();
+        Event::fake([UserLoggedIn::class]);
+        Log::spy();
+        $user = $this->createUser('captcha-failure@example.test');
+        Http::fake(['challenges.cloudflare.com/*' => Http::response([
+            'success' => false,
+            'error-codes' => ['timeout-or-duplicate'],
+        ])]);
+
+        $message = 'Cloudflare human verification could not be confirmed. Please reload the page, complete the verification, and try again.';
+        $response = $this->withHeader('CF-Ray', 'login-ray')->post(route('login'), [
+            'username' => $user->email,
+            'password' => 'password',
+            'cf-turnstile-response' => 'expired-token',
+        ]);
+
+        $response->assertRedirect(route('login'));
+        $response->assertSessionHasErrors(['cf-turnstile-response' => $message]);
+        $this->assertGuest();
+        Event::assertNotDispatched(UserLoggedIn::class);
+        Log::shouldHaveReceived('warning')->once()->with('Turnstile verification failed.', \Mockery::on(
+            fn (array $context): bool => $context['route'] === 'login.post'
+                && $context['cf_ray'] === 'login-ray'
+                && $context['error_codes'] === ['timeout-or-duplicate']
+        ));
+
+        (new \ReflectionProperty(GlobalDataComposer::class, 'resolvedData'))->setValue(null, null);
+        $this->get(route('login'))->assertOk()
+            ->assertSee($message)
+            ->assertSee('data-prefers-password="1"', false);
+    }
+
+    public function test_missing_or_malformed_turnstile_token_shows_a_clear_message(): void
+    {
+        $this->enableTurnstile();
+        Http::fake();
+
+        foreach ([null, ['invalid-token']] as $token) {
+            $response = $this->post(route('login'), [
+                'username' => 'captcha@example.test',
+                'password' => 'password',
+                'cf-turnstile-response' => $token,
+            ]);
+
+            $response->assertRedirect(route('login'));
+            $response->assertSessionHasErrors([
+                'cf-turnstile-response' => 'Please complete the Cloudflare human verification before signing in.',
+            ]);
+            $this->assertGuest();
+        }
+
+        Http::assertNothingSent();
+    }
+
+    public function test_valid_turnstile_token_allows_password_login(): void
+    {
+        $this->enableTurnstile();
+        Event::fake([UserLoggedIn::class]);
+        $user = $this->createUser('captcha-success@example.test');
+        Http::fake(['challenges.cloudflare.com/*' => Http::response(['success' => true])]);
+
+        $this->post(route('login'), [
+            'username' => $user->email,
+            'password' => 'password',
+            'cf-turnstile-response' => 'valid-token',
+        ])->assertRedirect('/')->assertSessionHasNoErrors();
+
+        $this->assertAuthenticatedAs($user);
+        $this->get('/__remember_me_probe')->assertOk();
+    }
+
+    private function enableTurnstile(): void
+    {
+        config([
+            'captcha.provider' => 'turnstile',
+            'captcha.turnstile.enabled' => true,
+            'captcha.turnstile.sitekey' => 'test-sitekey',
+            'captcha.turnstile.secret' => 'test-secret',
+            'captcha.recaptcha.enabled' => false,
+        ]);
+        Http::preventStrayRequests();
     }
 
     public function test_password_login_with_boolean_remember_me_value_queues_recaller_cookie(): void
@@ -176,6 +273,53 @@ class RememberMeAuthenticationTest extends TestCase
         $this->assertAuthenticatedAs($user);
     }
 
+    public function test_username_password_login_survives_the_next_request(): void
+    {
+        $user = $this->createUser('next-request@example.test');
+        $previousPasswordHash = Auth::hashPasswordForCookie($user->getAuthPassword());
+
+        $response = $this->post(route('login'), [
+            'username' => $user->username,
+            'password' => 'password',
+        ]);
+
+        $response->assertRedirect('/');
+        $cookie = $response->getCookie(config('session.cookie'), decrypt: false);
+        $this->assertNotNull($cookie);
+        Auth::forgetGuards();
+
+        $this->withUnencryptedCookie($cookie->getName(), $cookie->getValue())
+            ->get('/__remember_me_probe')->assertOk();
+        $this->assertAuthenticatedAs($user);
+
+        $this->withSession(['password_hash_web' => $previousPasswordHash]);
+        session()->save();
+        Auth::forgetGuards();
+        $this->get('/__remember_me_probe')->assertRedirect(route('login'));
+        $this->assertGuest();
+    }
+
+    public function test_password_login_replaces_a_previous_password_hash_in_the_session(): void
+    {
+        $user = $this->createUser('previous-session@example.test');
+        $this->withSession(['password_hash_web' => bcrypt('previous-password')]);
+
+        $response = $this->post(route('login'), [
+            'username' => $user->username,
+            'password' => 'password',
+            'rememberme' => 'on',
+        ]);
+
+        $response->assertRedirect('/');
+        $cookie = $response->getCookie(config('session.cookie'), decrypt: false);
+        $this->assertNotNull($cookie);
+        Auth::forgetGuards();
+
+        $this->withUnencryptedCookie($cookie->getName(), $cookie->getValue())
+            ->get('/__remember_me_probe')->assertOk();
+        $this->assertAuthenticatedAs($user);
+    }
+
     public function test_password_login_records_the_client_ip_when_ip_storage_is_enabled(): void
     {
         Event::fake([UserLoggedIn::class]);
@@ -218,7 +362,7 @@ class RememberMeAuthenticationTest extends TestCase
         $this->assertGuest();
         $this->assertTrue((bool) session('2fa:remember'));
         $this->assertSame($user->id, session('2fa:user:id'));
-        $this->assertFalse((bool) session(config('google2fa.session_var')));
+        $this->assertFalse((bool) session(config('google2fa.session_var').'.auth_passed'));
 
         $verifyResponse = $this->post(route('2fa.post'), [
             'one_time_password' => Google2FA::getCurrentOtp($secret),
@@ -227,7 +371,7 @@ class RememberMeAuthenticationTest extends TestCase
         $verifyResponse->assertRedirect('/');
         $verifyResponse->assertCookie($this->recallerCookieName());
         $this->assertAuthenticatedAs($user);
-        $this->assertTrue((bool) session(config('google2fa.session_var')));
+        $this->assertTrue((bool) session(config('google2fa.session_var').'.auth_passed'));
         $this->assertNull(session('2fa:remember'));
         $this->assertNull(session('2fa:user:id'));
         $this->assertNull(session('2fa:password_breached'));
@@ -235,6 +379,7 @@ class RememberMeAuthenticationTest extends TestCase
 
     public function test_two_factor_login_without_remember_me_does_not_queue_recaller_cookie_after_otp_success(): void
     {
+        config(['google2fa.enabled' => true, 'google2fa.lifetime' => 5]);
         Event::fake([UserLoggedIn::class]);
         $user = $this->createUser('session-2fa@example.test');
         $secret = Google2FA::generateSecretKey();
@@ -249,13 +394,158 @@ class RememberMeAuthenticationTest extends TestCase
             'password' => 'password',
         ])->assertRedirect(route('2fa.verify'));
 
+        $this->get(route('2fa.verify'))->assertOk();
+        $this->withSession(['url.intended' => '/__otp_probe']);
         $verifyResponse = $this->post(route('2fa.post'), [
             'one_time_password' => Google2FA::getCurrentOtp($secret),
+            'trust_device' => false,
         ]);
 
-        $verifyResponse->assertRedirect('/');
+        $verifyResponse->assertRedirect('/__otp_probe');
         $verifyResponse->assertCookieMissing($this->recallerCookieName());
+        $verifyResponse->assertCookieMissing('2fa_trusted_device');
+        $verifyResponse->assertSessionMissing('2fa:user:id');
+        $verifyResponse->assertSessionHas('google2fa.auth_passed', true);
+        $verifyResponse->assertSessionHas('google2fa.auth_time');
+        $cookie = $verifyResponse->getCookie(config('session.cookie'), decrypt: false);
+        $this->assertNotNull($cookie);
+        Auth::forgetGuards();
+        $this->withUnencryptedCookie($cookie->getName(), $cookie->getValue())
+            ->get('/__otp_probe')->assertOk()->assertSeeText('otp passed');
+        $this->get('/__otp_probe')->assertOk();
         $this->assertAuthenticatedAs($user);
+    }
+
+    public function test_invalid_otp_keeps_the_pending_login_and_does_not_authenticate(): void
+    {
+        config(['google2fa.enabled' => true]);
+        Event::fake([UserLoggedIn::class]);
+        $user = $this->createUser('invalid-otp@example.test');
+        $secret = Google2FA::generateSecretKey();
+        PasswordSecurity::query()->create([
+            'user_id' => $user->id,
+            'google2fa_enable' => true,
+            'google2fa_secret' => $secret,
+        ]);
+        $this->post(route('login'), ['username' => $user->email, 'password' => 'password'])
+            ->assertRedirect(route('2fa.verify'));
+        $this->post(route('2fa.post'), ['one_time_password' => '123456789'])
+            ->assertRedirect(route('2fa.verify'))
+            ->assertSessionHas('2fa:user:id', $user->id)
+            ->assertSessionMissing('google2fa.auth_passed');
+        $this->assertGuest();
+        $this->get('/__otp_probe')->assertRedirect(route('login'));
+    }
+
+    public function test_remembered_session_requires_mfa_and_recent_auth_before_managing_passkeys(): void
+    {
+        $user = $this->createUser('remembered-mfa@example.test');
+        $secret = Google2FA::generateSecretKey();
+        PasswordSecurity::query()->create([
+            'user_id' => $user->id, 'google2fa_enable' => true, 'google2fa_secret' => $secret,
+        ]);
+        config(['google2fa.enabled' => true]);
+        $this->post(route('login'), [
+            'username' => $user->email, 'password' => 'password', 'rememberme' => 'on',
+        ])->assertRedirect(route('2fa.verify'));
+        $login = $this->post(route('2fa.post'), ['one_time_password' => Google2FA::getCurrentOtp($secret)]);
+        $recaller = $login->getCookie($this->recallerCookieName(), decrypt: false);
+        $this->assertNotNull($recaller);
+        $this->flushSession();
+        Auth::forgetGuards();
+        $this->withCredentials()->withUnencryptedCookie($this->recallerCookieName(), $recaller->getValue());
+
+        $this->postJson(route('passkeys.register_options'), ['name' => 'Attacker key'])
+            ->assertForbidden()->assertSessionMissing('passkey-registration-options');
+        $this->postJson(route('passkeys.store'), ['name' => 'Attacker key', 'passkey' => '{}'])->assertForbidden();
+        $this->deleteJson(route('passkeys.destroy', ['passkey' => 1]))->assertForbidden();
+        $this->assertAuthenticatedAs($user);
+        $this->get(route('2fa.verify'))->assertOk();
+        $this->post(route('2faVerify'), ['one_time_password' => Google2FA::getCurrentOtp($secret)])
+            ->assertRedirect(route('profileedit').'#security')
+            ->assertSessionHas('google2fa.auth_passed', true)
+            ->assertSessionMissing('2fa:user:id');
+        $this->postJson(route('passkeys.register_options'), ['name' => 'Key'])->assertStatus(423);
+        $this->get(route('password.confirm'))->assertOk()->assertSee('Confirm Password');
+    }
+
+    #[DataProvider('laterChallengeStates')]
+    public function test_authenticated_user_can_complete_a_later_otp_challenge(string $state): void
+    {
+        Event::fake([OtherDeviceLogout::class, UserLoggedIn::class]);
+        config(['google2fa.enabled' => true, 'google2fa.lifetime' => 5, 'google2fa.keep_alive' => false]);
+        $user = $this->createUser('later-otp@example.test');
+        $secret = Google2FA::generateSecretKey();
+        PasswordSecurity::query()->create([
+            'user_id' => $user->id, 'google2fa_enable' => true, 'google2fa_secret' => $secret,
+        ]);
+        $user->forceFill(['session_token' => 'existing-session', 'remember_token' => 'existing-remember'])->save();
+        $this->actingAs($user)->withSession(['session_token_web' => 'existing-session']);
+
+        if ($state === 'expired') {
+            $this->withSession([
+                'google2fa.auth_passed' => true,
+                'google2fa.auth_time' => now()->subMinutes(6)->toIso8601String(),
+            ]);
+        } elseif ($state === 'revoked') {
+            $device = TrustedDevice::issueForUser($user);
+            $this->withCookie('2fa_trusted_device', json_encode([
+                'user_id' => $user->id, 'token' => $device['plain'],
+                'expires_at' => $device['device']->expires_at->getTimestamp(),
+            ], JSON_THROW_ON_ERROR));
+            $this->get('/__otp_probe')->assertOk()->assertSeeText('otp passed');
+            $device['device']->delete();
+        }
+
+        $this->get('/__otp_probe')->assertOk()->assertSee('One Time Password');
+        $this->get(route('2fa.verify'))->assertOk();
+        $this->post(route('2fa.post'), ['one_time_password' => '123456789'])
+            ->assertRedirect(route('2fa.verify'))->assertSessionMissing('2fa:user:id');
+        $this->get('/__otp_probe')->assertSee('One Time Password');
+        $sessionId = session()->getId();
+        $this->post(route('2fa.post'), ['one_time_password' => Google2FA::getCurrentOtp($secret)])
+            ->assertRedirect(url('/__otp_probe'))
+            ->assertCookieMissing($this->recallerCookieName())
+            ->assertSessionHas('google2fa.auth_passed', true)
+            ->assertSessionHas('google2fa.auth_time')
+            ->assertSessionHas('session_token_web', 'existing-session');
+        $this->assertNotSame($sessionId, session()->getId());
+        $this->assertSame('existing-session', $user->fresh()->session_token);
+        $this->assertSame('existing-remember', $user->fresh()->remember_token);
+        Event::assertNotDispatched(OtherDeviceLogout::class);
+        Event::assertNotDispatched(UserLoggedIn::class);
+        $this->get('/__otp_probe')->assertOk()->assertSeeText('otp passed');
+    }
+
+    /** @return array<string, array{string}> */
+    public static function laterChallengeStates(): array
+    {
+        return ['missing' => ['missing'], 'expired' => ['expired'], 'revoked' => ['revoked']];
+    }
+
+    public function test_reverification_uses_the_authenticated_account_over_a_stale_pending_login(): void
+    {
+        $user = $this->createUser('current-otp@example.test');
+        $other = $this->createUser('stale-pending@example.test');
+        $secret = Google2FA::generateSecretKey();
+        $otherSecret = Google2FA::generateSecretKey();
+        foreach ([[$user, $secret], [$other, $otherSecret]] as [$account, $key]) {
+            PasswordSecurity::query()->create([
+                'user_id' => $account->id, 'google2fa_enable' => true, 'google2fa_secret' => $key,
+            ]);
+        }
+        $this->actingAs($user)->withSession(['2fa:user:id' => $other->id]);
+        $this->get(route('2fa.verify'))->assertViewHas('user', fn (User $shown): bool => $shown->is($user));
+        $this->post(route('2fa.post'), ['one_time_password' => Google2FA::getCurrentOtp($secret)])
+            ->assertRedirect('/')->assertSessionMissing('2fa:user:id');
+        $this->assertAuthenticatedAs($user);
+    }
+
+    public function test_guest_without_pending_password_login_cannot_verify_otp(): void
+    {
+        $this->get(route('2fa.verify'))->assertRedirect(route('login'));
+        $this->post(route('2fa.post'), ['one_time_password' => '123456'])->assertRedirect(route('login'));
+        $this->assertGuest();
     }
 
     public function test_two_factor_login_with_valid_trusted_device_logs_in_without_otp(): void
@@ -283,8 +573,16 @@ class RememberMeAuthenticationTest extends TestCase
 
         $response->assertRedirect('/');
         $this->assertAuthenticatedAs($user);
-        $this->assertTrue((bool) session(config('google2fa.session_var')));
+        $this->assertTrue((bool) session(config('google2fa.session_var').'.auth_passed'));
         $this->assertNull(session('2fa:user:id'));
+
+        $cookie = $response->getCookie(config('session.cookie'), decrypt: false);
+        $this->assertNotNull($cookie);
+        Auth::forgetGuards();
+
+        $this->withUnencryptedCookie($cookie->getName(), $cookie->getValue())
+            ->get('/__remember_me_probe')->assertOk();
+        $this->assertAuthenticatedAs($user);
     }
 
     public function test_two_factor_login_with_forged_trusted_device_cookie_still_requires_otp(): void
@@ -312,7 +610,7 @@ class RememberMeAuthenticationTest extends TestCase
         $response->assertRedirect(route('2fa.verify'));
         $this->assertGuest();
         $this->assertSame($user->id, session('2fa:user:id'));
-        $this->assertFalse((bool) session(config('google2fa.session_var')));
+        $this->assertFalse((bool) session(config('google2fa.session_var').'.auth_passed'));
     }
 
     private function recallerCookieName(): string

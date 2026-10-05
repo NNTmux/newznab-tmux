@@ -49,6 +49,7 @@ use App\Http\Controllers\AdultController;
 use App\Http\Controllers\AjaxController;
 use App\Http\Controllers\Api\FileListApiController;
 use App\Http\Controllers\ApiHelpController;
+use App\Http\Controllers\Auth\ConfirmPasswordController;
 use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
@@ -87,6 +88,8 @@ use App\Http\Controllers\SearchSuggestController;
 use App\Http\Controllers\SeriesController;
 use App\Http\Controllers\StatusPageController;
 use App\Http\Controllers\TermsController;
+use App\Http\Middleware\VerifyFailedReleaseRequest;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Spatie\LaravelPasskeys\Http\Controllers\GeneratePasskeyAuthenticationOptionsController;
 
 // Serve cover images from storage - Must be public (no auth required)
@@ -138,12 +141,19 @@ Route::post('contact-us', [ContactUsController::class, 'contact']);
 Route::get('status', [StatusPageController::class, 'showStatusPage'])->name('status');
 
 Route::middleware(['auth', 'isVerified'])->group(function () {
-    Route::post('passkeys/register-options', [PasskeyManagementController::class, 'options'])
-        ->name('passkeys.register_options');
-    Route::post('passkeys', [PasskeyManagementController::class, 'store'])
-        ->name('passkeys.store');
-    Route::delete('passkeys/{passkey}', [PasskeyManagementController::class, 'destroy'])
-        ->name('passkeys.destroy');
+    Route::middleware('2fa')->group(function () {
+        Route::get('confirm-password', [ConfirmPasswordController::class, 'show'])->name('password.confirm');
+        Route::post('confirm-password', [ConfirmPasswordController::class, 'store'])->middleware('throttle:6,1');
+
+        Route::middleware('password.confirm:password.confirm,900')->group(function () {
+            Route::post('passkeys/register-options', [PasskeyManagementController::class, 'options'])
+                ->name('passkeys.register_options');
+            Route::post('passkeys', [PasskeyManagementController::class, 'store'])
+                ->name('passkeys.store');
+            Route::delete('passkeys/{passkey}', [PasskeyManagementController::class, 'destroy'])
+                ->name('passkeys.destroy');
+        });
+    });
 
     Route::match(['GET', 'POST'], 'profile', [ProfileController::class, 'show'])->name('profile');
 
@@ -156,8 +166,8 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
 
     Route::prefix('cart')->group(function () {
         Route::match(['GET', 'POST'], 'index', [CartController::class, 'index'])->name('cart.index');
-        Route::match(['GET', 'POST'], 'add', [CartController::class, 'store'])->name('cart.add');
-        Route::match(['GET', 'POST'], 'delete/{id}', [CartController::class, 'destroy'])->name('cart.delete');
+        Route::post('add', [CartController::class, 'store'])->name('cart.add');
+        Route::post('delete/{id}', [CartController::class, 'destroy'])->name('cart.delete');
     });
 
     Route::match(['GET', 'POST'], 'details/{guid}', [DetailsController::class, 'show'])->name('details');
@@ -170,8 +180,8 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
     Route::match(['GET', 'POST'], 'browsegroup', [BrowseGroupController::class, 'show'])->name('browsegroup');
     Route::match(['GET', 'POST'], 'content', [ContentController::class, 'show'])->name('content');
     Route::match(['GET', 'POST'], 'failed', [FailedReleasesController::class, 'failed'])
-        ->middleware('throttle:60,1')
-        ->withoutMiddleware(['auth', 'isVerified'])
+        ->middleware(['throttle:60,1', VerifyFailedReleaseRequest::class])
+        ->withoutMiddleware(['auth', 'isVerified', PreventRequestForgery::class])
         ->name('failed');
 
     Route::middleware('clearance')->group(function () {
@@ -213,7 +223,7 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
     Route::get('release-report/check', [ReleaseReportController::class, 'checkReported'])->name('release-report.check');
 
     Route::get('api/release/{guid}/filelist', [FileListApiController::class, 'getFileList'])->name('api.filelist');
-    Route::match(['GET', 'POST'], 'ajax_profile', [AjaxController::class, 'profile'])->name('ajax_profile');
+    Route::post('ajax_profile', [AjaxController::class, 'profile'])->name('ajax_profile');
     Route::match(['GET', 'POST'], '2fa', [PasswordSecurityController::class, 'show2faForm'])->name('2fa');
     Route::get('2fa/enable', [PasswordSecurityController::class, 'showEnable2faForm'])->name('2fa.enable');
     Route::get('2fa/disable', [PasswordSecurityController::class, 'showDisable2faForm'])->name('2fa.disable');

@@ -136,9 +136,12 @@ interface SearchServiceInterface
      * Search the predb index.
      *
      * @param  array<string, mixed>|string  $searchTerm  Search term(s)
-     * @return array<string, mixed> Array of predb records
+     * @return list<array{id: int, title: string, filename: string, source: string}>
      */
     public function searchPredb(array|string $searchTerm): array;
+
+    /** @return array{id: int, title: string, filename: string, source: string}|null */
+    public function matchPredbExact(string $name): ?array;
 
     /**
      * Get autocomplete suggestions for a search query.

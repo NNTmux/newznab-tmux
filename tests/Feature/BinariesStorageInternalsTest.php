@@ -364,11 +364,41 @@ class BinariesStorageInternalsTest extends TestCase
         $this->assertSame(1, DB::table('missed_parts')->where('groups_id', 2)->count());
     }
 
+    public function test_backfill_rollback_queues_failed_articles_for_part_repair(): void
+    {
+        $this->createHeaderStorageTables();
+        $this->createMissedPartsTable();
+        DB::statement("CREATE TRIGGER reject_parts BEFORE INSERT ON parts BEGIN SELECT RAISE(ABORT, 'test storage failure'); END");
+        $nntp = Mockery::mock(NNTPService::class);
+        $nntp->shouldReceive('getXOVER')->once()->andReturn([
+            $this->rawHeader(1301, 'Backfill.Release (1/2)'),
+            $this->rawHeader(1302, 'Backfill.Release (2/2)'),
+        ]);
+        $config = new BinariesConfig(headerChunkSize: 2, sqlChunkSize: 2);
+        $service = new BinariesService(
+            $config,
+            new HeaderParser(new class extends BlacklistService
+            {
+                public function isBlackListed(array $msg, string $groupName): bool
+                {
+                    return false;
+                }
+            }),
+            new HeaderStorageService($this->deterministicCollectionHandler(), config: $config),
+            nntp: $nntp,
+        );
+
+        $service->scan(['id' => 1, 'name' => 'alt.test'], 1301, 1303, 'backfill');
+
+        // Rolled-back articles are queued; 1303 was never returned by the server, so it is not.
+        $this->assertSame([1301, 1302], DB::table('missed_parts')->orderBy('numberid')->pluck('numberid')->all());
+    }
+
     /** @return iterable<string, array{int}> */
     public static function lockFailures(): iterable
     {
         yield 'eventual success' => [1];
-        yield 'retry limit exhausted' => [5];
+        yield 'retry limit exhausted' => [10];
     }
 
     #[DataProvider('lockFailures')]
@@ -388,7 +418,7 @@ class BinariesStorageInternalsTest extends TestCase
 
         $failed = $service->store([$invalid, $this->parsedHeader(1201, 1)], ['id' => 1, 'name' => 'alt.test'], false);
 
-        $this->assertSame(min($failures + 1, 5), $attempts);
+        $this->assertSame(min($failures + 1, 10), $attempts);
         $this->assertSame($failures === 1 ? [1200] : [1200, 1201], $failed);
         $this->assertSame($failures === 1 ? 1 : 0, DB::table('parts')->count());
         $this->assertSame(0, DB::transactionLevel());
@@ -396,7 +426,7 @@ class BinariesStorageInternalsTest extends TestCase
             Log::shouldNotHaveReceived('error');
         } else {
             Log::shouldHaveReceived('error')->once()->with('Binary header storage chunk rolled back', Mockery::on(
-                static fn (array $context): bool => $context['attempts'] === 5 && $context['reason'] === 'Lock retries exhausted'
+                static fn (array $context): bool => $context['attempts'] === 10 && $context['reason'] === 'Lock retries exhausted'
             ));
         }
     }

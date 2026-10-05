@@ -111,10 +111,13 @@
                                                        class="px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 text-sm" title="Edit this show">
                                                         <i class="fa fa-edit"></i>
                                                     </a>
-                                                    <a href="{{ url('/myshows?action=delete&id=' . $sData['id'] . '&from=' . urlencode(request()->fullUrl())) }}"
-                                                       class="px-2 py-1 bg-red-600 dark:bg-red-700 text-white rounded hover:bg-red-700 dark:hover:bg-red-800 text-sm" title="Remove from My Shows">
-                                                        <i class="fa fa-trash"></i>
-                                                    </a>
+                                                    <form method="POST" action="{{ url('/myshows?action=delete&id=' . $sData['id'] . '&from=' . urlencode(request()->fullUrl())) }}">
+                                                        @csrf
+                                                        <button type="submit"
+                                                            class="px-2 py-1 bg-red-600 dark:bg-red-700 text-white rounded hover:bg-red-700 dark:hover:bg-red-800 text-sm" title="Remove from My Shows">
+                                                            <i class="fa fa-trash"></i>
+                                                        </button>
+                                                    </form>
                                                 </div>
                                             @else
                                                 <a href="{{ url('/myshows?action=add&id=' . $sData['id'] . '&from=' . urlencode(request()->fullUrl())) }}"
@@ -175,8 +178,11 @@
                                         <div class="flex gap-1 shrink-0">
                                             <a href="{{ url('/myshows?action=edit&id=' . $sData['id'] . '&from=' . urlencode(request()->fullUrl())) }}"
                                                class="px-2 py-1 bg-yellow-500 text-white rounded text-xs" title="Edit"><i class="fa fa-edit"></i></a>
-                                            <a href="{{ url('/myshows?action=delete&id=' . $sData['id'] . '&from=' . urlencode(request()->fullUrl())) }}"
-                                               class="px-2 py-1 bg-red-600 text-white rounded text-xs" title="Remove"><i class="fa fa-trash"></i></a>
+                                            <form method="POST" action="{{ url('/myshows?action=delete&id=' . $sData['id'] . '&from=' . urlencode(request()->fullUrl())) }}">
+                                                @csrf
+                                                <button type="submit"
+                                                    class="px-2 py-1 bg-red-600 text-white rounded text-xs" title="Remove"><i class="fa fa-trash"></i></button>
+                                            </form>
                                         </div>
                                     @else
                                         <a href="{{ url('/myshows?action=add&id=' . $sData['id'] . '&from=' . urlencode(request()->fullUrl())) }}"

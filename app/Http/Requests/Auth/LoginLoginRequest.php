@@ -9,6 +9,8 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class LoginLoginRequest extends FormRequest
 {
+    protected $redirectRoute = 'login';
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -17,5 +19,15 @@ class LoginLoginRequest extends FormRequest
     public function rules(): array
     {
         return CaptchaHelper::getValidationRules();
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'cf-turnstile-response.required' => 'Please complete the Cloudflare human verification before signing in.',
+        ];
     }
 }

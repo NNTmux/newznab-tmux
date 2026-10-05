@@ -1291,11 +1291,11 @@ class NameFixingService
 
             $bestMatch = $this->findBestPredbMatch($cleanedFileName);
 
-            if ($bestMatch !== null) {
+            if ($bestMatch !== null && (int) ($bestMatch['id'] ?? 0) > 0) {
                 if (strcasecmp((string) $bestMatch['title'], (string) $release->searchname) !== 0) {
-                    $this->updateService->updateRelease($release, $bestMatch['title'], 'file matched source: '.($bestMatch['source'] ?? ''), $echo, 'PreDB file match, ', $nameStatus, $show);
+                    $this->updateService->updateRelease($release, $bestMatch['title'], 'file matched source: '.($bestMatch['source'] ?? ''), $echo, 'PreDB file match, ', $nameStatus, $show, (int) $bestMatch['id']);
                 } elseif ($echo) {
-                    $this->updateService->attachPredbId((int) $release->releases_id, (int) ($bestMatch['id'] ?? 0));
+                    $this->updateService->attachPredbId((int) $release->releases_id, (int) $bestMatch['id']);
                 }
                 $matching++;
 

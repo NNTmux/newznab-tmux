@@ -27,6 +27,9 @@ class StateChangingRequestMethodTest extends TestCase
     public static function mutationRouteProvider(): array
     {
         return [
+            'invitation creation' => ['ajax_profile', 'POST'],
+            'cart addition' => ['cart.add', 'POST'],
+            'cart deletion' => ['cart.delete', 'POST'],
             'profile deletion' => ['profile_delete', 'DELETE'],
             'category deletion' => ['admin.category-delete', 'DELETE'],
             'promotion toggle' => ['admin.promotions.toggle', 'PATCH'],

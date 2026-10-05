@@ -2,7 +2,6 @@
 
 @section('content')
 @php
-    $dashboardLastRefreshedAt = now()->format('H:i:s');
     $dashboardStatusBadgeClasses = static function (int $status): string {
         return match ($status) {
             \App\Enums\RegistrationStatus::Open->value => 'border border-emerald-500/30 bg-emerald-600 text-white shadow-sm dark:border-emerald-300/20 dark:bg-emerald-500 dark:text-slate-950',
@@ -16,7 +15,7 @@
      id="adminDashboard"
      class="admin-dashboard-page"
      data-data-url="{{ route('admin.api.dashboard-data') }}"
-     data-refresh-interval="{{ 60 * 1000 }}">
+     data-refresh-interval="{{ 15 * 60 * 1000 }}">
     <div class="admin-dashboard-page__content space-y-6" data-dashboard-content>
     <x-admin.page-header title="Admin Dashboard" icon="fas fa-gauge-high" subtitle="Monitor index health, users, releases, and site activity from one workspace." class="admin-dashboard-page__hero">
         <x-slot:actions>
@@ -24,7 +23,7 @@
                 <p class="font-medium text-gray-700 dark:text-gray-200">
                     <i class="fas fa-sync-alt mr-1"></i> Last dashboard refresh: <span data-stat="last-refresh">{{ $dashboardLastRefreshedAt }}</span>
                 </p>
-                <p class="mt-1 text-xs text-green-600 dark:text-green-400">Auto-refreshes every minute</p>
+                <p class="mt-1 text-xs text-green-600 dark:text-green-400">Auto-refreshes every 15 minutes</p>
             </div>
         </x-slot:actions>
     </x-admin.page-header>

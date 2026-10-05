@@ -434,14 +434,14 @@ class IRCScraper extends IRCClient
         DB::update($query);
 
         // Look up the predb row ID by title for indexing backends.
-        $predbId = Predb::query()->where('title', $this->_curPre['title'])->value('id');
+        $pre = Predb::query()->where('title', $this->_curPre['title'])->first(['id', 'title', 'filename', 'source']);
 
-        if (! empty($predbId)) {
+        if ($pre !== null) {
             $parameters = [
-                'id' => $predbId,
-                'title' => $this->_curPre['title'],
-                'filename' => $this->_curPre['filename'] ?? null,
-                'source' => $this->_curPre['source'] ?? null,
+                'id' => (int) $pre->id,
+                'title' => $pre->title,
+                'filename' => $pre->filename,
+                'source' => $pre->source,
             ];
 
             Search::updatePreDb($parameters);

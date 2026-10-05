@@ -11,12 +11,16 @@ use Spatie\TypeScriptTransformer\Writers\TypeDefinitionWriter;
 
 return [
     /*
-     * The paths where typescript-transformer will look for PHP classes
-     * to transform, this will be the `app` path by default.
+     * Discover exported DTOs and enums without autoloading optional development
+     * integrations, whose dependencies are absent from production builds.
      */
 
     'auto_discover_types' => [
-        app_path(),
+        app_path('Data'),
+        app_path('Enums'),
+        app_path('Support/Data'),
+        app_path('Services/AdditionalProcessing/Enums'),
+        app_path('Services/NameFixing/Data'),
     ],
 
     /*

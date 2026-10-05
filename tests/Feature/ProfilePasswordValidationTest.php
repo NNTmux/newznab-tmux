@@ -6,6 +6,8 @@ namespace Tests\Feature;
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Auth\GenericUser;
+use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -59,6 +61,21 @@ class ProfilePasswordValidationTest extends TestCase
         ], $this->profileValidationRules());
 
         $this->assertTrue($validator->passes());
+    }
+
+    public function test_preferences_accept_blank_password_fields_after_request_normalization(): void
+    {
+        $request = Request::create('/profileedit', 'POST', [
+            'current_password' => '',
+            'password' => '',
+            'password_confirmation' => '',
+            'theme_preference' => 'dark',
+        ]);
+        (new ConvertEmptyStringsToNull)->handle($request, fn () => response('ok'));
+
+        $validator = Validator::make($request->all(), $this->profileValidationRules());
+
+        $this->assertTrue($validator->passes(), $validator->errors()->toJson());
     }
 
     /**

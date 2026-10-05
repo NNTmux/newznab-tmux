@@ -29,6 +29,8 @@ class MyMoviesController extends BasePageController
     public function show(Request $request): mixed
     {
         $action = $this->scalarInput($request, 'id');
+        abort_if(in_array($action, ['delete', 'doadd', 'doedit'], true) && ! $request->isMethod('post'), 405);
+
         $imdbid = $this->scalarInput($request, 'imdb');
         $from = $this->localReturnUrl($request, '/mymovies');
 

@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static bool isFuzzyEnabled()
  * @method static array getFuzzyConfig()
  * @method static array searchPredb(array|string $searchTerm)
+ * @method static array{id: int, title: string, filename: string, source: string}|null matchPredbExact(string $name)
  * @method static array autocomplete(string $query, ?string $index = null)
  * @method static array suggest(string $query, ?string $index = null)
  * @method static bool isAvailable()

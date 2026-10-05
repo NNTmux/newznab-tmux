@@ -95,6 +95,26 @@ class TrustedDevice extends Model
         return $device;
     }
 
+    public static function cookieIsValidForUser(mixed $cookie, int $userId): bool
+    {
+        if (! is_string($cookie) || $cookie === '') {
+            return false;
+        }
+
+        $data = json_decode($cookie, true);
+        if (! is_array($data) ||
+            ! isset($data['user_id'], $data['token'], $data['expires_at']) ||
+            ! is_numeric($data['user_id']) ||
+            ! is_string($data['token']) ||
+            ! is_numeric($data['expires_at']) ||
+            (int) $data['user_id'] !== $userId ||
+            time() > (int) $data['expires_at']) {
+            return false;
+        }
+
+        return self::findValidForUser($userId, $data['token']) !== null;
+    }
+
     public static function hashToken(string $plainToken): string
     {
         return hash_hmac('sha256', $plainToken, (string) config('app.key'));

@@ -24,6 +24,8 @@ class MyShowsController extends BasePageController
     public function show(Request $request): mixed
     {
         $action = $this->scalarInput($request, 'action');
+        abort_if(in_array($action, ['delete', 'doadd', 'doedit'], true) && ! $request->isMethod('post'), 405);
+
         $videoId = $this->scalarInput($request, 'id');
         $from = $this->localReturnUrl($request, '/myshows');
 

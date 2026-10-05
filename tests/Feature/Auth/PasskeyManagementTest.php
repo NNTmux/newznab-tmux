@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Auth;
 
-use App\Http\Middleware\Google2FAMiddleware;
+use App\Models\PasswordSecurity;
+use App\Models\TrustedDevice;
 use App\Models\User;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PragmaRX\Google2FALaravel\Facade as Google2FA;
 use Spatie\LaravelPasskeys\Actions\GeneratePasskeyRegisterOptionsAction;
 use Spatie\LaravelPasskeys\Actions\StorePasskeyAction;
 use Spatie\LaravelPasskeys\Models\Concerns\HasPasskeys;
@@ -22,12 +25,16 @@ class PasskeyManagementTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->withCredentials();
 
         config([
             'database.default' => 'sqlite',
             'database.connections.sqlite.database' => ':memory:',
             'app.key' => 'base64:'.base64_encode(random_bytes(32)),
             'session.driver' => 'array',
+            'google2fa.enabled' => true,
+            'google2fa.lifetime' => 5,
+            'google2fa.keep_alive' => false,
         ]);
 
         DB::purge();
@@ -35,7 +42,6 @@ class PasskeyManagementTest extends TestCase
 
         $this->createSchema();
         app(PermissionRegistrar::class)->forgetCachedPermissions();
-        $this->withoutMiddleware(Google2FAMiddleware::class);
 
         config()->set('passkeys.actions.generate_passkey_register_options', FakeGeneratePasskeyRegisterOptionsAction::class);
         config()->set('passkeys.actions.store_passkey', FakeStorePasskeyAction::class);
@@ -44,6 +50,12 @@ class PasskeyManagementTest extends TestCase
     public function test_verified_user_can_generate_options_store_and_delete_a_passkey(): void
     {
         $user = $this->createUser('passkey-manage@example.test');
+        $this->enableMfa($user);
+        $this->actingAs($user)->withSession([
+            'google2fa.auth_passed' => true,
+            'google2fa.auth_time' => now()->toIso8601String(),
+            'auth.password_confirmed_at' => time(),
+        ]);
 
         $optionsResponse = $this
             ->actingAs($user)
@@ -76,10 +88,147 @@ class PasskeyManagementTest extends TestCase
     {
         $this->post(route('passkeys.register_options'), ['name' => 'Guest key'])->assertRedirect(route('login'));
         $this->post(route('passkeys.store'), ['name' => 'Guest key', 'passkey' => '{}'])->assertRedirect(route('login'));
+        $this->delete(route('passkeys.destroy', ['passkey' => 1]))->assertRedirect(route('login'));
+    }
+
+    #[DataProvider('mfaStates')]
+    public function test_passkey_management_requires_completed_mfa(string $state): void
+    {
+        $user = $this->createUser('mfa-gate@example.test');
+        $this->enableMfa($user);
+        $this->actingAs($user);
+        $passkeyId = DB::table('passkeys')->insertGetId([
+            'authenticatable_id' => $user->id,
+            'name' => 'Existing key',
+            'credential_id' => 'existing-key',
+            'data' => '{}',
+        ]);
+
+        if ($state === 'revoked') {
+            $device = TrustedDevice::issueForUser($user);
+            $this->withCookie('2fa_trusted_device', json_encode([
+                'user_id' => $user->id,
+                'token' => $device['plain'],
+                'expires_at' => $device['device']->expires_at->getTimestamp(),
+            ], JSON_THROW_ON_ERROR));
+            $device['device']->delete();
+        }
+
+        foreach (['options', 'store', 'destroy'] as $operation) {
+            $this->withSession([
+                'auth.password_confirmed_at' => time(),
+                'google2fa.auth_passed' => $state !== 'missing',
+                'google2fa.auth_time' => ($state === 'expired' ? now()->subMinutes(6) : now())->toIso8601String(),
+                '2fa:trusted_device' => $state === 'revoked',
+                'passkey-registration-options' => '{}',
+            ]);
+            $response = match ($operation) {
+                'options' => $this->postJson(route('passkeys.register_options'), ['name' => 'Attacker key']),
+                'store' => $this->postJson(route('passkeys.store'), ['name' => 'Attacker key', 'passkey' => '{}']),
+                'destroy' => $this->deleteJson(route('passkeys.destroy', ['passkey' => $passkeyId])),
+            };
+            $response->assertForbidden()->assertJsonPath('redirect', route('2fa.verify'));
+            $response->assertSessionHas('passkey-registration-options', '{}');
+            $this->assertDatabaseCount('passkeys', 1);
+            $this->assertDatabaseHas('passkeys', ['id' => $passkeyId]);
+        }
+    }
+
+    /** @return array<string, array{string}> */
+    public static function mfaStates(): array
+    {
+        return ['missing' => ['missing'], 'expired' => ['expired'], 'revoked' => ['revoked']];
+    }
+
+    #[DataProvider('confirmationTimes')]
+    public function test_passkey_management_requires_recent_password_confirmation(?int $age): void
+    {
+        $user = $this->createUser('recent-auth@example.test');
+        $this->enableMfa($user);
+        $this->actingAs($user)->withSession([
+            'google2fa.auth_passed' => true,
+            'google2fa.auth_time' => now()->toIso8601String(),
+            'auth.password_confirmed_at' => $age === null ? 0 : time() - $age,
+        ]);
+
+        $this->postJson(route('passkeys.register_options'), ['name' => 'Key'])->assertStatus(423);
+        $this->postJson(route('passkeys.store'), ['name' => 'Key', 'passkey' => '{}'])->assertStatus(423);
+        $this->deleteJson(route('passkeys.destroy', ['passkey' => 1]))->assertStatus(423);
+        $this->assertDatabaseCount('passkeys', 0);
+    }
+
+    /** @return array<string, array{int|null}> */
+    public static function confirmationTimes(): array
+    {
+        return ['missing' => [null], 'expired' => [901]];
+    }
+
+    public function test_password_confirmation_unlocks_management_without_mfa_for_an_account_with_no_otp(): void
+    {
+        $user = $this->createUser('password-confirm@example.test');
+        $this->actingAs($user);
+        $this->postJson(route('passkeys.register_options'), ['name' => 'Key'])->assertStatus(423);
+        $this->post(route('password.confirm'), ['password' => 'wrong'])
+            ->assertSessionHasErrors('password')->assertSessionMissing('auth.password_confirmed_at');
+        $this->post(route('password.confirm'), ['password' => 'password'])
+            ->assertRedirect(route('profileedit').'#security')->assertSessionHas('auth.password_confirmed_at');
+        $this->postJson(route('passkeys.register_options'), ['name' => 'Key'])->assertOk();
+    }
+
+    public function test_password_confirmation_cannot_bypass_mfa(): void
+    {
+        $user = $this->createUser('confirm-mfa@example.test');
+        $this->enableMfa($user);
+        $this->actingAs($user)->postJson(route('password.confirm'), ['password' => 'password'])
+            ->assertForbidden()->assertSessionMissing('auth.password_confirmed_at');
+    }
+
+    public function test_trusted_device_does_not_replace_recent_password_confirmation(): void
+    {
+        $user = $this->createUser('trusted-confirm@example.test');
+        $this->enableMfa($user);
+        $device = TrustedDevice::issueForUser($user);
+        $this->actingAs($user)->withCookie('2fa_trusted_device', json_encode([
+            'user_id' => $user->id,
+            'token' => $device['plain'],
+            'expires_at' => $device['device']->expires_at->getTimestamp(),
+        ], JSON_THROW_ON_ERROR));
+
+        $this->postJson(route('passkeys.register_options'), ['name' => 'Key'])->assertStatus(423);
+        $this->post(route('password.confirm'), ['password' => 'password'])
+            ->assertRedirect(route('profileedit').'#security');
+        $this->postJson(route('passkeys.register_options'), ['name' => 'Key'])->assertOk();
+    }
+
+    private function enableMfa(User $user): void
+    {
+        PasswordSecurity::query()->create([
+            'user_id' => $user->id,
+            'google2fa_enable' => true,
+            'google2fa_secret' => Google2FA::generateSecretKey(),
+        ]);
     }
 
     private function createSchema(): void
     {
+        Schema::create('password_securities', function (Blueprint $table): void {
+            $table->id();
+            $table->unsignedInteger('user_id');
+            $table->boolean('google2fa_enable');
+            $table->string('google2fa_secret');
+            $table->timestamps();
+        });
+
+        Schema::create('trusted_devices', function (Blueprint $table): void {
+            $table->id();
+            $table->unsignedInteger('user_id');
+            $table->string('token_hash', 64)->unique();
+            $table->timestamp('expires_at');
+            $table->timestamp('last_used_at')->nullable();
+            $table->string('ip_address', 45)->nullable();
+            $table->string('user_agent', 500)->nullable();
+            $table->timestamps();
+        });
 
         Schema::create('roles', function (Blueprint $table): void {
             $table->increments('id');

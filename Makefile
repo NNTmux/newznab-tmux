@@ -66,16 +66,16 @@ restart: ## Restart all services
 recreate: check-env ## Force-recreate containers without rebuilding
 	@$(SAIL) up -d --force-recreate --remove-orphans
 .PHONY: build
-build: check-env ## Build the app image (cached layers OK)
-	@$(SAIL) build
+build: check-env pull ## Pull latest service and base images, then build (cached layers OK)
+	@$(SAIL) build --pull
 .PHONY: rebuild
 rebuild: check-env pull ## Rebuild from scratch with fresh base images and recreate
 	@$(SAIL) build --no-cache --pull
 	@$(SAIL) up -d --force-recreate --remove-orphans
 	@echo "$(GREEN)✔ Rebuild complete.$(RESET)"
 .PHONY: pull
-pull: check-env ## Pull latest enabled-profile base images (skips buildable)
-	@$(DOCKER_COMPOSE) pull --ignore-buildable
+pull: check-env ## Always pull latest service images for configured tags (skips buildable)
+	@$(DOCKER_COMPOSE) pull --ignore-buildable --policy always
 .PHONY: update
 update: check-env pull ## Infra-only: pull base images, rebuild with --pull, restart
 	@$(SAIL) build --pull
@@ -93,7 +93,7 @@ upgrade: update fix-permissions composer-install npm-build ## Full app upgrade: 
 fresh: check-env ## Destroy ALL volumes, rebuild, and start clean (DATA LOSS!)
 	$(call confirm,This will destroy all Docker volumes (database, redis, search index). Continue?)
 	@$(SAIL) down -v
-	@$(DOCKER_COMPOSE) pull --ignore-buildable
+	@$(DOCKER_COMPOSE) pull --ignore-buildable --policy always
 	@$(SAIL) build --no-cache --pull
 	@$(SAIL) up -d --force-recreate --remove-orphans
 	@echo "$(GREEN)✔ Fresh environment is up. Run 'make artisan cmd=nntmux:install' to initialise.$(RESET)"

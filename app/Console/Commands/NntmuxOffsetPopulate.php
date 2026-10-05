@@ -10,6 +10,7 @@ use App\Models\Predb;
 use App\Models\Release;
 use App\Services\Search\Drivers\ManticoreSearchDriver;
 use App\Services\Search\Support\ElasticsearchResponseHelper;
+use App\Support\PredbSearchDocument;
 use Elastic\Elasticsearch\Client as ElasticsearchClient;
 use Exception;
 use Illuminate\Console\Command;
@@ -261,6 +262,7 @@ class NntmuxOffsetPopulate extends Command
 
         if ($engine === 'elastic') {
             try {
+                $index = (string) config('search.drivers.elasticsearch.indexes.'.$index, $index);
                 // Wait a moment for ElasticSearch to refresh
                 sleep(2);
 
@@ -315,6 +317,8 @@ class NntmuxOffsetPopulate extends Command
             Search::truncateIndex([$indexName]);
             $this->info("Truncated ManticoreSearch index: {$indexName}");
         } else {
+            $logicalIndex = $index;
+            $index = (string) config('search.drivers.elasticsearch.indexes.'.$logicalIndex, $logicalIndex);
             // For ElasticSearch, just clear the data instead of recreating the index
             try {
                 /** @var ElasticsearchClient $client */
@@ -345,7 +349,7 @@ class NntmuxOffsetPopulate extends Command
                     }
                 } else {
                     $this->info("ElasticSearch index '{$index}' does not exist. Creating optimized index...");
-                    $this->createOptimizedElasticIndex($index);
+                    $this->createOptimizedElasticIndex($index, $logicalIndex);
                 }
             } catch (Exception $e) {
                 $this->warn("Could not clear ElasticSearch index: {$e->getMessage()}");
@@ -357,7 +361,7 @@ class NntmuxOffsetPopulate extends Command
                 } catch (Exception $e) {
                     // Index might not exist, that's okay
                 }
-                $this->createOptimizedElasticIndex($index);
+                $this->createOptimizedElasticIndex($index, $logicalIndex);
             }
         }
     }
@@ -365,7 +369,7 @@ class NntmuxOffsetPopulate extends Command
     /**
      * Create optimized ElasticSearch index
      */
-    private function createOptimizedElasticIndex(string $indexName): void
+    private function createOptimizedElasticIndex(string $indexName, string $logicalIndex): void
     {
         $settings = [
             'index' => $indexName,
@@ -380,7 +384,7 @@ class NntmuxOffsetPopulate extends Command
                         'flush_threshold_size' => '1gb',
                     ],
                 ],
-                'mappings' => $this->getIndexMappings($indexName),
+                'mappings' => $this->getIndexMappings($logicalIndex),
             ],
         ];
 
@@ -428,6 +432,7 @@ class NntmuxOffsetPopulate extends Command
                     'title' => ['type' => 'text', 'analyzer' => 'standard'],
                     'filename' => ['type' => 'text', 'analyzer' => 'standard'],
                     'source' => ['type' => 'keyword'],
+                    ...PredbSearchDocument::elasticsearchExactMappings(),
                 ],
             ];
         }
