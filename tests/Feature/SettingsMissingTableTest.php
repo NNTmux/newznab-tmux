@@ -4,31 +4,26 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use App\Models\Settings;
+use App\Enums\ConfigurationDomain;
+use App\Services\Configuration\ConfigurationProvider;
+use App\Services\Configuration\DomainConfigurationRepository;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use PDO;
+use RuntimeException;
 use Tests\TestCase;
 
-/**
- * On a fresh install the settings table does not exist yet, while console boot
- * eagerly builds commands whose service constructors read settings. The model
- * must degrade to null instead of crashing (see NNTmux/newznab-tmux#1866).
- */
 final class SettingsMissingTableTest extends TestCase
 {
     private string $databasePath = '';
 
-    /**
-     * @var array<string, string|false>
-     */
+    /** @var array<string, string|false> */
     private array $originalEnvironment = [];
 
     public function createApplication()
     {
-        $this->databasePath = sys_get_temp_dir().'/nntmux-settings-missing-table-test.sqlite';
-
+        $this->databasePath = sys_get_temp_dir().'/nntmux-typed-configuration-missing-table-test.sqlite';
         $this->originalEnvironment = [
             'APP_ENV' => getenv('APP_ENV'),
             'DB_CONNECTION' => getenv('DB_CONNECTION'),
@@ -38,8 +33,6 @@ final class SettingsMissingTableTest extends TestCase
         if (file_exists($this->databasePath)) {
             unlink($this->databasePath);
         }
-
-        // Deliberately create an empty database file: no settings table.
         new PDO('sqlite:'.$this->databasePath);
 
         $this->setEnvironmentValue('APP_ENV', 'testing');
@@ -47,20 +40,9 @@ final class SettingsMissingTableTest extends TestCase
         $this->setEnvironmentValue('DB_DATABASE', $this->databasePath);
 
         $app = require __DIR__.'/../../bootstrap/app.php';
-
         $app->make(Kernel::class)->bootstrap();
 
         return $app;
-    }
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        config([
-            'database.default' => 'sqlite',
-            'database.connections.sqlite.database' => $this->databasePath,
-        ]);
     }
 
     protected function tearDown(): void
@@ -68,7 +50,6 @@ final class SettingsMissingTableTest extends TestCase
         if ($this->databasePath !== '' && file_exists($this->databasePath)) {
             unlink($this->databasePath);
         }
-
         parent::tearDown();
 
         foreach ($this->originalEnvironment as $key => $value) {
@@ -76,38 +57,36 @@ final class SettingsMissingTableTest extends TestCase
         }
     }
 
-    public function test_setting_value_returns_null_when_settings_table_is_missing(): void
+    public function test_reads_return_definition_defaults_when_domain_tables_are_missing(): void
     {
-        $this->assertNull(Settings::settingValue('categorizeforeign'));
+        $site = app(ConfigurationProvider::class)->site();
+
+        $this->assertSame('NNTmux', $site->title);
+        $this->assertSame('/', $site->homeLink);
     }
 
-    public function test_setting_value_returns_converted_value_when_table_exists(): void
+    public function test_mutation_fails_clearly_when_domain_table_is_missing(): void
     {
-        $pdo = new PDO('sqlite:'.$this->databasePath);
-        $pdo->exec('CREATE TABLE settings (name VARCHAR PRIMARY KEY, value TEXT NULL)');
-        $pdo->exec("INSERT INTO settings (name, value) VALUES ('delaytime', '42')");
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Site configuration table is not available');
 
-        $this->assertSame(42, Settings::settingValue('delaytime'));
+        app(DomainConfigurationRepository::class)->update(ConfigurationDomain::Site, ['title' => 'Unavailable']);
     }
 
-    public function test_setting_value_rethrows_unrelated_query_errors(): void
+    public function test_reads_do_not_mask_unrelated_query_errors(): void
     {
         $pdo = new PDO('sqlite:'.$this->databasePath);
-        $pdo->exec('CREATE TABLE settings (name VARCHAR PRIMARY KEY, value TEXT NULL)');
-        $pdo->exec("INSERT INTO settings (name, value) VALUES ('delaytime', '5')");
+        $pdo->exec('CREATE TABLE site_configurations (id INTEGER PRIMARY KEY, title TEXT, home_link TEXT, site_logo TEXT NULL, strapline TEXT, meta_title TEXT, meta_description TEXT, meta_keywords TEXT, footer TEXT, dereferrer_link TEXT, terms TEXT, trailers_display INTEGER, trailers_size_x INTEGER, trailers_size_y INTEGER, created_at TEXT NULL, updated_at TEXT NULL)');
+        $pdo->exec("INSERT INTO site_configurations VALUES (1, 'Test', '/', NULL, '', '', '', '', '', '', '', 1, 480, 345, NULL, NULL)");
 
-        // A locked database must not be masked as a missing table.
-        // Keep the default 60s sqlite busy timeout from slowing the suite down.
         DB::connection()->getPdo()->setAttribute(PDO::ATTR_TIMEOUT, 1);
-
         $locker = new PDO('sqlite:'.$this->databasePath);
         $locker->exec('BEGIN EXCLUSIVE TRANSACTION');
-        $locker->exec("INSERT INTO settings (name, value) VALUES ('lockholder', '1')");
+        $locker->exec("UPDATE site_configurations SET title = 'Locked' WHERE id = 1");
 
         try {
             $this->expectException(QueryException::class);
-
-            Settings::settingValue('delaytime');
+            app(ConfigurationProvider::class)->site(fresh: true);
         } finally {
             $locker->exec('ROLLBACK');
         }

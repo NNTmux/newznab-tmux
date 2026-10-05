@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services\Categorization;
 
-use App\Models\Settings;
 use App\Models\UsenetGroup;
 use App\Services\Categorization\Pipes\AbstractCategorizationPipe;
 use App\Services\Categorization\Pipes\CategorizationPassable;
+use App\Services\Configuration\ConfigurationProvider;
 use App\Services\NameFixing\Extractors\ObfuscatedSubjectExtractor;
 use App\Services\NameFixing\NzbSplitUnwrapper;
 use Illuminate\Pipeline\Pipeline;
@@ -48,8 +48,8 @@ class CategorizationPipeline
         $this->pipes = collect($pipes)
             ->sortBy(fn (AbstractCategorizationPipe $p) => $p->getPriority());
 
-        $this->categorizeForeign = (bool) Settings::settingValue('categorizeforeign');
-        $this->catWebDL = (bool) Settings::settingValue('catwebdl');
+        $this->categorizeForeign = (bool) app(ConfigurationProvider::class)->ingestion()->categorizeForeign;
+        $this->catWebDL = (bool) app(ConfigurationProvider::class)->ingestion()->categorizeWebDl;
         $this->nzbSplitUnwrapper = $nzbSplitUnwrapper ?? new NzbSplitUnwrapper;
         $this->obfuscatedSubjectExtractor = $obfuscatedSubjectExtractor ?? new ObfuscatedSubjectExtractor;
     }

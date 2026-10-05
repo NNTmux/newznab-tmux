@@ -12,10 +12,9 @@ use App\Services\Tmux\TmuxLayoutBuilder;
 use App\Services\Tmux\TmuxPaneManager;
 use App\Services\Tmux\TmuxSessionManager;
 use App\Services\Tmux\TmuxTaskRunner;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Symfony\Component\Process\Process;
+use Tests\Support\ConfigurationTestBuilder;
 use Tests\TestCase;
 
 class TmuxRuntimeTest extends TestCase
@@ -247,11 +246,7 @@ class TmuxRuntimeTest extends TestCase
         }
         config(['database.default' => 'sqlite', 'database.connections.sqlite.database' => ':memory:']);
         DB::purge('sqlite');
-        Schema::create('settings', function (Blueprint $table): void {
-            $table->string('name')->primary();
-            $table->text('value')->nullable();
-        });
-        DB::table('settings')->insert(['name' => 'running', 'value' => '1']);
+        ConfigurationTestBuilder::updateRuntime(['tmux_running' => true]);
         $keeper = new TmuxSessionManager('unrelated');
         $this->assertNotNull($keeper->createSession());
         $session = new TmuxSessionManager('draining');
@@ -297,8 +292,8 @@ PHP;
         $this->assertStringNotContainsString('late worker', $output);
         $this->assertSame(1, substr_count($output, 'child='));
         $this->assertFalse(posix_kill($childPid, 0), 'The owned child process must be gone when stop returns.');
-        $this->assertSame(0, (int) DB::table('settings')->where('name', 'running')->value('value'));
-        $this->assertSame(1, (int) DB::table('settings')->where('name', 'exit')->value('value'));
+        $this->assertSame(0, (int) DB::table('processing_runtime_states')->value('tmux_running'));
+        $this->assertSame(1, (int) DB::table('processing_runtime_states')->value('stop_requested'));
         $this->assertFalse($session->sessionExists());
         $this->assertTrue($keeper->sessionExists());
     }

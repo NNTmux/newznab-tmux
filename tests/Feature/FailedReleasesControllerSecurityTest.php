@@ -29,7 +29,6 @@ class FailedReleasesControllerSecurityTest extends TestCase
         DB::purge();
         DB::reconnect();
         $this->createSchema();
-        $this->seedSettings();
         $this->app->instance(PreventRequestForgery::class, new class(app(), app('encrypter')) extends PreventRequestForgery
         {
             protected function runningUnitTests(): bool
@@ -139,10 +138,6 @@ class FailedReleasesControllerSecurityTest extends TestCase
 
     private function createSchema(): void
     {
-        Schema::create('settings', function (Blueprint $table): void {
-            $table->string('name')->primary();
-            $table->text('value')->nullable();
-        });
         Schema::create('users', function (Blueprint $table): void {
             $table->increments('id');
             $table->string('username');
@@ -169,15 +164,6 @@ class FailedReleasesControllerSecurityTest extends TestCase
             $table->unsignedInteger('users_id');
             $table->boolean('failed')->default(true);
         });
-    }
-
-    private function seedSettings(): void
-    {
-        DB::table('settings')->insert([
-            ['name' => 'innerfileblacklist', 'value' => ''],
-            ['name' => 'categorizeforeign', 'value' => '0'],
-            ['name' => 'catwebdl', 'value' => '0'],
-        ]);
     }
 
     private function createUser(int $id, string $apiToken): void

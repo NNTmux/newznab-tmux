@@ -85,7 +85,7 @@
                                 {{ ucfirst($userTheme) }}
                             </span>
                         </button>
-                        <a href="{{ url($site['home_link'] ?? '/') }}" class="touch-target inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-white/75 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400" title="Back to site" aria-label="View site">
+                        <a href="{{ url($site->homeLink ?? '/') }}" class="touch-target inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-white/75 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400" title="Back to site" aria-label="View site">
                             <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i><span class="hidden lg:inline">View site</span>
                         </a>
                         <a href="{{ route('logout') }}"

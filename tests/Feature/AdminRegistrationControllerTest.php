@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Enums\RegistrationStatus;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Middleware\Google2FAMiddleware;
 use App\Models\RegistrationStatusHistory;
-use App\Models\Settings;
 use App\Models\User;
 use App\Services\RegistrationFailureLogService;
 use App\View\Composers\GlobalDataComposer;
@@ -45,7 +45,7 @@ class AdminRegistrationControllerTest extends TestCase
         Queue::fake();
 
         $this->createSchema();
-        $this->seedSettings();
+        $this->seedConfigurationAndCategories();
         $this->resetGlobalComposerState();
         app(PermissionRegistrar::class)->forgetCachedPermissions();
         $this->withoutMiddleware(Google2FAMiddleware::class);
@@ -99,8 +99,8 @@ class AdminRegistrationControllerTest extends TestCase
 
         DB::table('registration_status_history')->insert([
             'action' => RegistrationStatusHistory::ACTION_MANUAL_STATUS_CHANGED,
-            'old_status' => Settings::REGISTER_STATUS_OPEN,
-            'new_status' => Settings::REGISTER_STATUS_INVITE,
+            'old_status' => RegistrationStatus::Open->value,
+            'new_status' => RegistrationStatus::Invite->value,
             'changed_by' => $admin->id,
             'description' => 'Manual registration status changed from Open to Invite.',
             'metadata' => json_encode(['note' => 'Temporary slowdown']),
@@ -130,15 +130,15 @@ class AdminRegistrationControllerTest extends TestCase
 
         $this->actingAs($authenticatedAdmin)
             ->post(route('admin.registrations.update-status'), [
-                'registerstatus' => Settings::REGISTER_STATUS_CLOSED,
+                'registerstatus' => RegistrationStatus::Closed->value,
                 'note' => 'Closing signups for maintenance.',
             ])
             ->assertRedirect(route('admin.registrations.index'))
             ->assertSessionHas('success', 'Manual registration status updated successfully.');
 
         $this->assertSame(
-            Settings::REGISTER_STATUS_CLOSED,
-            (int) DB::table('settings')->where('name', 'registerstatus')->value('value')
+            RegistrationStatus::Closed->value,
+            (int) DB::table('registration_configurations')->where('id', 1)->value('status')
         );
 
         $history = DB::table('registration_status_history')
@@ -147,17 +147,15 @@ class AdminRegistrationControllerTest extends TestCase
             ->first();
 
         $this->assertNotNull($history);
-        $this->assertSame(Settings::REGISTER_STATUS_OPEN, $history->old_status);
-        $this->assertSame(Settings::REGISTER_STATUS_CLOSED, $history->new_status);
+        $this->assertSame(RegistrationStatus::Open->value, $history->old_status);
+        $this->assertSame(RegistrationStatus::Closed->value, $history->new_status);
         $this->assertSame($admin->id, $history->changed_by);
         $this->assertStringContainsString('maintenance', (string) $history->metadata);
     }
 
     public function test_admin_can_manage_scheduled_periods_and_api_capabilities_follow_effective_status(): void
     {
-        DB::table('settings')
-            ->where('name', 'registerstatus')
-            ->update(['value' => (string) Settings::REGISTER_STATUS_CLOSED]);
+        DB::table('registration_configurations')->where('id', 1)->update(['status' => RegistrationStatus::Closed->value]);
 
         $admin = $this->createUserWithRole('Admin');
         /** @var Authenticatable $authenticatedAdmin */
@@ -313,9 +311,10 @@ class AdminRegistrationControllerTest extends TestCase
 
     private function createSchema(): void
     {
-        Schema::create('settings', function (Blueprint $table): void {
-            $table->string('name')->primary();
-            $table->text('value')->nullable();
+        Schema::create('registration_configurations', function (Blueprint $table): void {
+            $table->unsignedTinyInteger('id')->primary();
+            $table->unsignedTinyInteger('status');
+            $table->timestamps();
         });
 
         Schema::create('roles', function (Blueprint $table): void {
@@ -441,12 +440,13 @@ class AdminRegistrationControllerTest extends TestCase
         });
     }
 
-    private function seedSettings(): void
+    private function seedConfigurationAndCategories(): void
     {
-        DB::table('settings')->insert([
-            ['name' => 'registerstatus', 'value' => (string) Settings::REGISTER_STATUS_OPEN],
-            ['name' => 'title', 'value' => 'NNTmux Test'],
-            ['name' => 'home_link', 'value' => '/'],
+        DB::table('registration_configurations')->insert([
+            'id' => 1,
+            'status' => RegistrationStatus::Open->value,
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
 
         DB::table('root_categories')->insert([

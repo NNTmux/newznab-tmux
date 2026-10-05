@@ -47,11 +47,6 @@ class ApiRequestMatrixTest extends TestCase
         }
 
         $pdo = new PDO('sqlite:'.$this->databasePath);
-        $pdo->exec('CREATE TABLE settings (name VARCHAR PRIMARY KEY, value TEXT NULL)');
-        $pdo->exec("INSERT INTO settings (name, value) VALUES
-            ('categorizeforeign', '0'),
-            ('catwebdl', '0'),
-            ('innerfileblacklist', '')");
 
         $this->setEnvironmentValue('APP_ENV', 'testing');
         $this->setEnvironmentValue('DB_CONNECTION', 'sqlite');
@@ -905,11 +900,6 @@ class ApiRequestMatrixTest extends TestCase
             $table->primary(['permission_id', 'role_id']);
         });
 
-        Schema::create('settings', function (Blueprint $table): void {
-            $table->string('name')->primary();
-            $table->text('value')->nullable();
-        });
-
         Schema::create('root_categories', function (Blueprint $table): void {
             $table->increments('id');
             $table->string('title')->default('');
@@ -1046,16 +1036,6 @@ class ApiRequestMatrixTest extends TestCase
 
     private function seedData(): void
     {
-        DB::table('settings')->insert([
-            ['name' => 'strapline', 'value' => 'Test strapline'],
-            ['name' => 'metakeywords', 'value' => 'test,api'],
-            ['name' => 'registerstatus', 'value' => '0'],
-            ['name' => 'categorizeforeign', 'value' => '0'],
-            ['name' => 'catwebdl', 'value' => '0'],
-            ['name' => 'innerfileblacklist', 'value' => ''],
-            ['name' => 'title', 'value' => 'NNTmux Test'],
-            ['name' => 'home_link', 'value' => '/'],
-        ]);
 
         DB::table('roles')->insert([
             [

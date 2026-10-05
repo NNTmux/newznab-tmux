@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Models\Settings;
+use App\Services\Configuration\ConfigurationProvider;
 
 class MusicProcessor
 {
@@ -18,7 +18,7 @@ class MusicProcessor
 
     public function process(string $groupID = '', string $guidChar = ''): void
     {
-        if ((int) Settings::settingValue('lookupmusic') !== 0) {
+        if ((int) app(ConfigurationProvider::class)->metadata()->musicLookup->value !== 0) {
             (new MusicService)->processMusicReleases(false, $groupID, $guidChar);
         }
     }

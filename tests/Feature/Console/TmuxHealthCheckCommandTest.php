@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Console;
 
+use App\Enums\ConfigurationDomain;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Process\PendingProcess;
 use Illuminate\Support\Facades\Process;
 use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Tests\Support\ConfigurationTestBuilder;
 use Tests\TestCase;
 
 class TmuxHealthCheckCommandTest extends TestCase
@@ -35,16 +37,7 @@ class TmuxHealthCheckCommandTest extends TestCase
         }
 
         $pdo = new PDO('sqlite:'.$this->databasePath);
-        $pdo->exec('CREATE TABLE settings (name VARCHAR PRIMARY KEY, value TEXT NULL)');
         $pdo->exec('CREATE TABLE collections (id INTEGER PRIMARY KEY AUTOINCREMENT, dateadded TEXT NULL)');
-        $pdo->exec("INSERT INTO settings (name, value) VALUES
-            ('categorizeforeign', '0'),
-            ('catwebdl', '0'),
-            ('running', '0'),
-            ('sequential', '0'),
-            ('delaytime', '2'),
-            ('monitor_delay', '0'),
-            ('tmux_session', 'test-session')");
 
         $this->setEnvironmentValue('APP_ENV', 'testing');
         $this->setEnvironmentValue('DB_CONNECTION', 'sqlite');
@@ -67,6 +60,8 @@ class TmuxHealthCheckCommandTest extends TestCase
         ]);
 
         config(['tmux.socket_name' => '']);
+        ConfigurationTestBuilder::installDefaults();
+
         Process::preventStrayProcesses();
     }
 
@@ -83,6 +78,32 @@ class TmuxHealthCheckCommandTest extends TestCase
         }
     }
 
+    public function test_health_check_uses_the_configured_session_when_no_override_is_given(): void
+    {
+        ConfigurationTestBuilder::update(ConfigurationDomain::Tmux, ['session_name' => 'configured-session']);
+        $this->fakeMissingSession();
+
+        $this->artisan('tmux:health-check')
+            ->expectsOutputToContain("Tmux session 'configured-session' does not exist.")
+            ->assertExitCode(0);
+
+        Process::assertRan(fn (PendingProcess $process): bool => $this->isTmuxCommand($process, 'has-session')
+            && in_array('=configured-session', $process->command, true));
+    }
+
+    public function test_stop_clears_runtime_running_state_when_session_is_missing(): void
+    {
+        ConfigurationTestBuilder::updateRuntime(['tmux_running' => true]);
+        $this->fakeMissingSession();
+
+        $command = $this->artisan('tmux:stop --session=custom-session --force');
+        $command->assertExitCode(0);
+        $command->run();
+
+        $this->assertSame(0, (int) $this->app['db']->table('processing_runtime_states')->value('tmux_running'));
+        Process::assertNotRan(fn (PendingProcess $process): bool => $this->isTmuxCommand($process, 'kill-session'));
+    }
+
     public function test_missing_session_succeeds_when_engine_is_stopped(): void
     {
         $this->fakeMissingSession();
@@ -97,7 +118,7 @@ class TmuxHealthCheckCommandTest extends TestCase
 
     public function test_missing_session_fails_without_auto_restart_when_engine_should_be_running(): void
     {
-        $this->setSetting('running', '1');
+        ConfigurationTestBuilder::updateRuntime(['tmux_running' => true]);
         $this->fakeMissingSession();
 
         $this->artisan('tmux:health-check --session=test-session')
@@ -110,7 +131,7 @@ class TmuxHealthCheckCommandTest extends TestCase
 
     public function test_missing_session_auto_restarts_when_engine_should_be_running(): void
     {
-        $this->setSetting('running', '1');
+        ConfigurationTestBuilder::updateRuntime(['tmux_running' => true]);
         $this->fakeMissingSessionWithSuccessfulStart();
 
         $this->artisan('tmux:health-check --auto-restart --session=test-session')
@@ -133,7 +154,7 @@ class TmuxHealthCheckCommandTest extends TestCase
 
     public function test_dead_monitor_restarts_only_its_pane_in_the_custom_session(): void
     {
-        $this->setSetting('running', '1');
+        ConfigurationTestBuilder::updateRuntime(['tmux_running' => true]);
         $this->fakeExistingMonitor(dead: true);
         $this->artisan('tmux:health-check --auto-restart --session=custom-session')->assertExitCode(0);
         Process::assertRan(fn (PendingProcess $process): bool => is_array($process->command)
@@ -147,7 +168,7 @@ class TmuxHealthCheckCommandTest extends TestCase
 
     public function test_stale_heartbeat_reports_failure_without_killing_an_active_monitor(): void
     {
-        $this->setSetting('running', '1');
+        ConfigurationTestBuilder::updateRuntime(['tmux_running' => true]);
         $this->fakeExistingMonitor(dead: false, heartbeat: time() - 3600);
         $this->artisan('tmux:health-check --auto-restart --session=custom-session')->assertExitCode(1);
         Process::assertNotRan(fn (PendingProcess $process): bool => $this->isTmuxCommand($process, 'respawn-pane') || $this->isTmuxCommand($process, 'kill-session'));
@@ -162,7 +183,7 @@ class TmuxHealthCheckCommandTest extends TestCase
     #[DataProvider('stopConfirmationModes')]
     public function test_stop_interrupts_workers_and_closes_session_when_cleanup_timeout_expires(bool $force): void
     {
-        $this->setSetting('running', '1');
+        ConfigurationTestBuilder::updateRuntime(['tmux_running' => true]);
         $this->fakeExistingMonitor(dead: false);
         $command = $this->artisan('tmux:stop --session=custom-session --timeout=0'.($force ? ' --force' : ''));
         if (! $force) {
@@ -170,8 +191,8 @@ class TmuxHealthCheckCommandTest extends TestCase
         }
         $command->assertExitCode(0);
         $command->run();
-        $this->assertSame('0', (string) $this->app['db']->table('settings')->where('name', 'running')->value('value'));
-        $this->assertSame('1', (string) $this->app['db']->table('settings')->where('name', 'exit')->value('value'));
+        $this->assertSame('0', (string) $this->app['db']->table('processing_runtime_states')->value('tmux_running'));
+        $this->assertSame('1', (string) $this->app['db']->table('processing_runtime_states')->value('stop_requested'));
         Process::assertRanTimes(fn (PendingProcess $process): bool => $this->isTmuxCommand($process, 'kill-session'), 1);
         Process::assertRanTimes(fn (PendingProcess $process): bool => $this->isTmuxCommand($process, 'send-keys'), 2);
     }
@@ -189,8 +210,8 @@ class TmuxHealthCheckCommandTest extends TestCase
         Process::fake(function (PendingProcess $process) use (&$snapshots) {
             if ($this->isTmuxCommand($process, 'list-panes')) {
                 $snapshots++;
-                $this->assertSame('0', (string) $this->app['db']->table('settings')->where('name', 'running')->value('value'));
-                $this->assertSame('1', (string) $this->app['db']->table('settings')->where('name', 'exit')->value('value'));
+                $this->assertSame('0', (string) $this->app['db']->table('processing_runtime_states')->value('tmux_running'));
+                $this->assertSame('1', (string) $this->app['db']->table('processing_runtime_states')->value('stop_requested'));
 
                 return Process::result("%9\tmonitor\t".($snapshots >= 3 ? '1' : '0')."\t0\t123\t0\t@1\n"
                     ."%10\tpost_additional\t".($snapshots >= 2 ? '1' : '0')."\t0\t456\t0\t@2\n"
@@ -306,11 +327,6 @@ class TmuxHealthCheckCommandTest extends TestCase
     private function isTmuxCommand(PendingProcess $process, string $command): bool
     {
         return is_array($process->command) && in_array($command, $process->command, true);
-    }
-
-    private function setSetting(string $name, string $value): void
-    {
-        $this->app['db']->table('settings')->where('name', $name)->update(['value' => $value]);
     }
 
     private function setEnvironmentValue(string $key, ?string $value): void

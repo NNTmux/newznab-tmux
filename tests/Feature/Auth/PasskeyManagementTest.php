@@ -41,7 +41,6 @@ class PasskeyManagementTest extends TestCase
         DB::reconnect();
 
         $this->createSchema();
-        $this->seedSettings();
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         config()->set('passkeys.actions.generate_passkey_register_options', FakeGeneratePasskeyRegisterOptionsAction::class);
@@ -231,11 +230,6 @@ class PasskeyManagementTest extends TestCase
             $table->timestamps();
         });
 
-        Schema::create('settings', function (Blueprint $table): void {
-            $table->string('name')->primary();
-            $table->text('value')->nullable();
-        });
-
         Schema::create('roles', function (Blueprint $table): void {
             $table->increments('id');
             $table->string('name');
@@ -309,16 +303,6 @@ class PasskeyManagementTest extends TestCase
             $table->timestamp('last_used_at')->nullable();
             $table->timestamps();
         });
-    }
-
-    private function seedSettings(): void
-    {
-        DB::table('settings')->insert([
-            ['name' => 'title', 'value' => 'NNTmux Test'],
-            ['name' => 'home_link', 'value' => '/'],
-            ['name' => 'categorizeforeign', 'value' => '0'],
-            ['name' => 'catwebdl', 'value' => '0'],
-        ]);
     }
 
     private function createUser(string $email): User

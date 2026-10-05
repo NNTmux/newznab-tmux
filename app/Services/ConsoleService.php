@@ -11,7 +11,7 @@ use App\Models\Category;
 use App\Models\ConsoleInfo;
 use App\Models\Genre;
 use App\Models\Release;
-use App\Models\Settings;
+use App\Services\Configuration\ConfigurationProvider;
 use App\Services\IGDB\Exceptions\IgdbHttpException;
 use App\Support\MetadataSearchLookup;
 use Illuminate\Database\Eloquent\Model;
@@ -59,10 +59,10 @@ class ConsoleService
         $this->imageService = $imageService ?? new ReleaseImageService;
         $this->igdbService = $igdbService ?? new IGDBService;
 
-        $this->gameQty = (Settings::settingValue('maxgamesprocessed') !== '') ? (int) Settings::settingValue('maxgamesprocessed') : 150;
-        $this->lookupThrottleMs = (Settings::settingValue('amazonsleep') !== '') ? (int) Settings::settingValue('amazonsleep') : 1000;
+        $this->gameQty = (app(ConfigurationProvider::class)->metadata()->maxGamesProcessed !== '') ? (int) app(ConfigurationProvider::class)->metadata()->maxGamesProcessed : 150;
+        $this->lookupThrottleMs = (app(ConfigurationProvider::class)->metadata()->amazonSleepMilliseconds !== '') ? (int) app(ConfigurationProvider::class)->metadata()->amazonSleepMilliseconds : 1000;
         $this->imgSavePath = config('nntmux_settings.covers_path').'/console/';
-        $this->renamed = (int) Settings::settingValue('lookupgames') === 2;
+        $this->renamed = (int) app(ConfigurationProvider::class)->metadata()->gameLookup->value === 2;
 
         $this->failCache = [];
     }

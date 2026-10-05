@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Runners;
 
-use App\Models\Settings;
+use App\Services\Configuration\ConfigurationProvider;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -22,7 +22,7 @@ class BackfillRunner extends BaseRunner
         $select .= ' FROM usenet_groups WHERE backfill = 1';
         $work = DB::select($select);
 
-        $maxProcesses = (int) Settings::settingValue('backfillthreads');
+        $maxProcesses = (int) app(ConfigurationProvider::class)->ingestion()->backfillThreads;
 
         $count = count($work);
         if ($count === 0) {
@@ -64,11 +64,11 @@ class BackfillRunner extends BaseRunner
         // make sure short_groups is up-to-date - Updated to use new script location (modernized)
         $this->executeCommand([PHP_BINARY, base_path('artisan'), 'groups:update']);
 
-        $backfill_qty = (int) Settings::settingValue('backfill_qty');
-        $backfill_order = (int) Settings::settingValue('backfill_order');
-        $backfill_days = (int) Settings::settingValue('backfill_days');
-        $maxMessages = (int) Settings::settingValue('maxmssgs');
-        $threads = (int) Settings::settingValue('backfillthreads');
+        $backfill_qty = (int) app(ConfigurationProvider::class)->ingestion()->backfillQuantity;
+        $backfill_order = (int) app(ConfigurationProvider::class)->ingestion()->backfillOrder;
+        $backfill_days = (int) app(ConfigurationProvider::class)->ingestion()->backfillDaysMode;
+        $maxMessages = (int) app(ConfigurationProvider::class)->ingestion()->maxMessages;
+        $threads = (int) app(ConfigurationProvider::class)->ingestion()->backfillThreads;
 
         $orderby = match ($backfill_order) {
             1 => 'ORDER BY first_record_postdate DESC',
@@ -83,7 +83,7 @@ class BackfillRunner extends BaseRunner
         if ($backfill_days === 1) {
             $backfilldays = 'g.backfill_target';
         } elseif ($backfill_days === 2) {
-            $backfilldays = (string) now()->diffInDays(Carbon::createFromFormat('Y-m-d', Settings::settingValue('safebackfilldate')), true);
+            $backfilldays = (string) now()->diffInDays(Carbon::createFromFormat('Y-m-d', app(ConfigurationProvider::class)->ingestion()->safeBackfillDate), true);
         }
 
         $sql = 'SELECT g.name,

@@ -147,12 +147,12 @@
                                 </label>
                                 <div class="flex flex-wrap gap-2">
                                     @if(!empty($anilistId))
-                                        <a href="{{ $site['dereferrer_link'] ?? '' }}https://anilist.co/anime/{{ $anilistId }}" target="_blank" class="inline-flex items-center px-3 py-2 bg-blue-100 text-blue-800 rounded-lg hover:bg-blue-200 transition text-sm">
+                                        <a href="{{ $site->dereferrerLink ?? '' }}https://anilist.co/anime/{{ $anilistId }}" target="_blank" class="inline-flex items-center px-3 py-2 bg-blue-100 text-blue-800 rounded-lg hover:bg-blue-200 transition text-sm">
                                             <i class="fas fa-external-link-alt mr-2"></i> AniList
                                         </a>
                                     @endif
                                     @if(!empty($malId))
-                                        <a href="{{ $site['dereferrer_link'] ?? '' }}https://myanimelist.net/anime/{{ $malId }}" target="_blank" class="inline-flex items-center px-3 py-2 bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200 transition text-sm">
+                                        <a href="{{ $site->dereferrerLink ?? '' }}https://myanimelist.net/anime/{{ $malId }}" target="_blank" class="inline-flex items-center px-3 py-2 bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200 transition text-sm">
                                             <i class="fas fa-external-link-alt mr-2"></i> MyAnimeList
                                         </a>
                                     @endif

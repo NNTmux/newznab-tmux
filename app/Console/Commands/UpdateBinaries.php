@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use App\Models\Settings;
 use App\Models\UsenetGroup;
 use App\Services\Binaries\BinariesService;
+use App\Services\Configuration\ConfigurationProvider;
 use App\Services\NNTP\NNTPService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
@@ -43,7 +43,7 @@ class UpdateBinaries extends Command
 
         $maxHeaders = is_numeric($max) && $max > 0
             ? (int) $max
-            : ((int) Settings::settingValue('max_headers_iteration') ?: 1000000);
+            : ((int) app(ConfigurationProvider::class)->ingestion()->maxHeadersPerIteration ?: 1000000);
 
         $startTime = now()->toImmutable();
 

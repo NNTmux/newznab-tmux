@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Enums\ConfigurationDomain;
 use App\Services\Tmux\Tmux;
 use App\Services\Tmux\TmuxMonitorService;
 use App\Services\Tmux\TmuxOutput;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Process;
-use Illuminate\Support\Facades\Schema;
 use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Tests\Support\ConfigurationTestBuilder;
 use Tests\TestCase;
 
 class TmuxMonitorOutputTest extends TestCase
@@ -27,13 +27,9 @@ class TmuxMonitorOutputTest extends TestCase
             'nntmux_nntp.use_alternate_nntp_server' => false,
         ]);
         DB::purge('sqlite');
-        Schema::create('settings', function (Blueprint $table): void {
-            $table->string('name')->primary();
-            $table->text('value')->nullable();
-        });
-        foreach (['running' => '1', 'post' => '3', 'sequential' => '0', 'delaytime' => '2', 'monitor_delay' => '1', 'backfill_days' => '0'] as $name => $value) {
-            DB::table('settings')->insert(['name' => $name, 'value' => $value]);
-        }
+        ConfigurationTestBuilder::updateRuntime(['tmux_running' => true]);
+        ConfigurationTestBuilder::update(ConfigurationDomain::Tmux, ['post_mode' => 3, 'monitor_delay' => 1]);
+        ConfigurationTestBuilder::update(ConfigurationDomain::Ingestion, ['collection_delay_hours' => 2]);
         Process::fake(['git *' => Process::result('test')]);
     }
 
@@ -56,12 +52,8 @@ class TmuxMonitorOutputTest extends TestCase
 
     public function test_lookup_switches_refresh_each_cycle_without_waiting_for_statistics_interval(): void
     {
-        DB::table('settings')->where('name', 'monitor_delay')->update(['value' => '300']);
-        DB::table('settings')->insert([
-            ['name' => 'post_non', 'value' => '0'],
-            ['name' => 'post_amazon', 'value' => '0'],
-            ['name' => 'lookupimdb', 'value' => '0'],
-        ]);
+        ConfigurationTestBuilder::update(ConfigurationDomain::Tmux, ['monitor_delay' => 300, 'post_non_mode' => 0, 'post_amazon_mode' => 0]);
+        ConfigurationTestBuilder::update(ConfigurationDomain::Metadata, ['movie_lookup' => 0]);
         $monitor = new class extends TmuxMonitorService
         {
             public int $operationalRefreshes = 0;
@@ -83,7 +75,8 @@ class TmuxMonitorOutputTest extends TestCase
         $monitor->initializeMonitor();
         $this->assertSame(0, $monitor->collectStatistics()['settings']['post_non']);
 
-        DB::table('settings')->whereIn('name', ['post_non', 'post_amazon', 'lookupimdb'])->update(['value' => '1']);
+        DB::table('tmux_configurations')->update(['post_non_mode' => 1, 'post_amazon_mode' => 1]);
+        DB::table('metadata_configurations')->update(['movie_lookup' => 1]);
         $updated = $monitor->collectStatistics();
 
         $this->assertSame(1, $updated['settings']['post_non']);
@@ -92,31 +85,28 @@ class TmuxMonitorOutputTest extends TestCase
         $this->assertSame(1, $monitor->operationalRefreshes);
         $this->assertSame(1, $monitor->slowRefreshes);
 
-        DB::table('settings')->whereIn('name', ['post_non', 'post_amazon'])->update(['value' => '0']);
+        DB::table('tmux_configurations')->update(['post_non_mode' => 0, 'post_amazon_mode' => 0]);
         $disabled = $monitor->collectStatistics();
         $this->assertSame(0, $disabled['settings']['post_non']);
         $this->assertSame(0, $disabled['settings']['post_amazon']);
     }
 
     #[DataProvider('querySettings')]
-    public function test_explicit_query_setting_is_respected(string $value, bool $visible): void
+    public function test_retired_query_setting_is_ignored(string $value): void
     {
+        DB::statement('CREATE TABLE settings (name TEXT PRIMARY KEY, value TEXT)');
         DB::table('settings')->insert(['name' => 'showquery', 'value' => $value]);
 
         $display = $this->renderMonitor();
 
-        if ($visible) {
-            $this->assertStringContainsString('Query Block', $display);
-        } else {
-            $this->assertStringNotContainsString('Query Block', $display);
-        }
+        $this->assertStringNotContainsString('Query Block', $display);
     }
 
-    /** @return iterable<string, array{string, bool}> */
+    /** @return iterable<string, array{string}> */
     public static function querySettings(): iterable
     {
-        yield 'enabled' => ['1', true];
-        yield 'disabled' => ['0', false];
+        yield 'enabled' => ['1'];
+        yield 'disabled' => ['0'];
     }
 
     private function renderMonitor(bool $omitQuerySetting = false): string

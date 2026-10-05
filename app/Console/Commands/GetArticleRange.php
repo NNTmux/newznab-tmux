@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use App\Models\Settings;
 use App\Models\UsenetGroup;
 use App\Services\Binaries\BinariesService;
+use App\Services\Configuration\ConfigurationProvider;
 use App\Services\NNTP\NNTPService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -69,7 +69,7 @@ class GetArticleRange extends Command
                 $groupMySQL,
                 $firstArticle,
                 $lastArticle,
-                ((int) Settings::settingValue('safepartrepair') === 1 ? 'update' : 'backfill')
+                ((int) app(ConfigurationProvider::class)->ingestion()->safePartRepair === 1 ? 'update' : 'backfill')
             );
 
             if (empty($return)) {

@@ -46,14 +46,6 @@ class NzbCreationReliabilityTest extends TestCase
         }
 
         $pdo = new PDO('sqlite:'.$this->databasePath);
-        $pdo->exec('CREATE TABLE settings (name VARCHAR PRIMARY KEY, value TEXT NULL)');
-        $pdo->exec(
-            'INSERT INTO settings (name, value) VALUES '.
-            "('categorizeforeign', '0'), ".
-            "('catwebdl', '0'), ".
-            "('innerfileblacklist', '')"
-        );
-
         $this->setEnvironmentValue('APP_ENV', 'testing');
         $this->setEnvironmentValue('DB_CONNECTION', 'sqlite');
         $this->setEnvironmentValue('DB_DATABASE', $this->databasePath);
@@ -77,7 +69,6 @@ class NzbCreationReliabilityTest extends TestCase
         DB::connection()->getPdo()->sqliteCreateFunction('UNIX_TIMESTAMP', static fn (?string $value): int => strtotime((string) $value));
 
         $this->createSchema();
-        $this->seedSettings();
         NzbCreationCandidateQuery::flushCapabilityCache();
     }
 
@@ -394,26 +385,11 @@ class NzbCreationReliabilityTest extends TestCase
         ]);
     }
 
-    private function seedSettings(): void
-    {
-        foreach ([
-            'categorizeforeign' => '0',
-            'catwebdl' => '0',
-            'releaseprocessingtimeout' => '120',
-            'maxnzbsprocessed' => '1000',
-            'nzbsplitlevel' => '1',
-        ] as $name => $value) {
-            DB::table('settings')->insert(['name' => $name, 'value' => $value]);
-        }
-    }
-
     private function createSchema(): void
     {
-        foreach (['parts', 'binaries', 'collections', 'release_nzb_creation_failures', 'releases', 'categories', 'root_categories', 'usenet_groups', 'settings'] as $table) {
+        foreach (['parts', 'binaries', 'collections', 'release_nzb_creation_failures', 'releases', 'categories', 'root_categories', 'usenet_groups'] as $table) {
             DB::statement("DROP TABLE IF EXISTS {$table}");
         }
-
-        DB::statement('CREATE TABLE settings (name VARCHAR(255) PRIMARY KEY, value TEXT)');
         DB::statement('CREATE TABLE root_categories (id INTEGER PRIMARY KEY, title VARCHAR(255), status INTEGER DEFAULT 1, disablepreview INTEGER DEFAULT 0)');
         DB::statement('CREATE TABLE categories (id INTEGER PRIMARY KEY, title VARCHAR(255), root_categories_id INTEGER NULL)');
         DB::statement('CREATE TABLE releases (

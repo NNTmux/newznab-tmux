@@ -19,8 +19,6 @@ class ReleaseResultsViewTest extends TestCase
     {
         $this->databasePath = tempnam(sys_get_temp_dir(), 'release-views-');
         $pdo = new PDO('sqlite:'.$this->databasePath);
-        $pdo->exec('CREATE TABLE settings (name VARCHAR PRIMARY KEY, value TEXT NULL)');
-        $pdo->exec("INSERT INTO settings VALUES ('categorizeforeign', '0'), ('catwebdl', '0')");
 
         $app = require __DIR__.'/../../bootstrap/app.php';
         $app->afterBootstrapping(LoadConfiguration::class, function (Application $app): void {

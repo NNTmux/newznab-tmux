@@ -8,8 +8,8 @@ use App\Data\Api\CategoryData;
 use App\Models\Category;
 use App\Models\Genre;
 use App\Models\RootCategory;
-use App\Models\Settings;
 use App\Models\UsenetGroup;
+use App\Services\Configuration\ConfigurationProvider;
 use App\Services\RegistrationStatusService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -25,9 +25,9 @@ final readonly class ApiCapabilitiesService
         $data = Cache::remember('api_v1_server_menu', 600, static fn (): array => [
             'server' => [
                 'title' => config('app.name'),
-                'strapline' => Settings::settingValue('strapline'),
+                'strapline' => app(ConfigurationProvider::class)->site()->strapline,
                 'email' => config('mail.from.address'),
-                'meta' => Settings::settingValue('metakeywords'),
+                'meta' => app(ConfigurationProvider::class)->site()->metaKeywords,
                 'url' => url('/'),
                 'image' => url('/').'/assets/images/tmux_logo.png',
             ],
@@ -58,7 +58,7 @@ final readonly class ApiCapabilitiesService
             return [
                 'server' => [
                     'title' => config('app.name'),
-                    'strapline' => Settings::settingValue('strapline'),
+                    'strapline' => app(ConfigurationProvider::class)->site()->strapline,
                     'email' => config('mail.from.address'),
                     'url' => url('/'),
                 ],

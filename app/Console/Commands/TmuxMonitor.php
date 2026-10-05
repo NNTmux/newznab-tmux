@@ -6,7 +6,8 @@ namespace App\Console\Commands;
 
 use App\Enums\TmuxMode;
 use App\Models\Collection;
-use App\Models\Settings;
+use App\Services\Configuration\ConfigurationProvider;
+use App\Services\Configuration\ProcessingRuntimeStateRepository;
 use App\Services\Tmux\TmuxCommand;
 use App\Services\Tmux\TmuxMonitorService;
 use App\Services\Tmux\TmuxOutput;
@@ -58,9 +59,7 @@ class TmuxMonitor extends Command
 
             // Initialize services
             $sessionName = $this->option('session')
-                ?? Settings::settingValue('tmux_session')
-                ?? config('tmux.session.name')
-                ?? config('tmux.session.default_name', 'nntmux');
+                ?? app(ConfigurationProvider::class)->tmux()->sessionName;
 
             $this->sessionManager = new TmuxSessionManager($sessionName);
             $this->monitor = new TmuxMonitorService;
@@ -106,7 +105,7 @@ class TmuxMonitor extends Command
                 $this->tmuxOutput->updateMonitorPane($runVar);
 
                 // Run pane tasks if tmux is running
-                $runVar['settings']['is_running'] = (int) Settings::settingValue('running');
+                $runVar['settings']['is_running'] = (int) app(ProcessingRuntimeStateRepository::class)->isTmuxRunning();
                 if ((int) ($runVar['settings']['is_running'] ?? 0) === 1) {
                     $this->runPaneTasks($runVar);
                 } else {
@@ -140,7 +139,7 @@ class TmuxMonitor extends Command
      */
     private function resetOldCollections(): void
     {
-        $delayTime = (int) (Settings::settingValue('delaytime') ?? 2);
+        $delayTime = app(ConfigurationProvider::class)->ingestion()->collectionDelayHours;
 
         cli()->header('Resetting expired collections...');
 

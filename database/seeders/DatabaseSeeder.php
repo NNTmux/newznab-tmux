@@ -23,7 +23,7 @@ class DatabaseSeeder extends Seeder
         $this->call(GenresTableSeeder::class);
         $this->call(GroupsTableSeeder::class);
         $this->call(ReleaseNamingRegexesTableSeeder::class);
-        $this->call(SettingsTableSeeder::class);
+        $this->call(ConfigurationSeeder::class);
         $this->call(RolesAndPermissionsSeeder::class);
     }
 }

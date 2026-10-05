@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Models\Release;
-use App\Models\Settings;
+use App\Services\Configuration\ConfigurationProvider;
 use App\Services\Search\Drivers\ManticoreSearchDriver;
 use App\Support\ReleaseSearchIndexDocument;
 use Illuminate\Console\Command;
@@ -79,7 +79,7 @@ class NntmuxSearchDiag extends Command
             return self::FAILURE;
         }
 
-        $showPasswords = (int) Settings::settingValue('showpasswordedrelease') === 1;
+        $showPasswords = (int) app(ConfigurationProvider::class)->ingestion()->showPasswordedReleases === 1;
         $verbose = (bool) $this->option('show-fields');
 
         foreach ($releaseIds as $rid) {

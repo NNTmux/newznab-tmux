@@ -4,25 +4,33 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Enums\ConfigurationDomain;
+use App\Enums\RegistrationStatus;
 use App\Models\RegistrationPeriod;
 use App\Models\RegistrationStatusHistory;
-use App\Models\Settings;
 use App\Models\User;
+use App\Services\Configuration\ConfigurationProvider;
+use App\Services\Configuration\DomainConfigurationRepository;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 
 class RegistrationStatusService
 {
+    public function __construct(
+        private readonly ConfigurationProvider $configuration,
+        private readonly DomainConfigurationRepository $repository,
+    ) {}
+
     /**
      * @return array<int, string>
      */
     public function statusOptions(): array
     {
         return [
-            Settings::REGISTER_STATUS_OPEN => 'Open',
-            Settings::REGISTER_STATUS_INVITE => 'Invite',
-            Settings::REGISTER_STATUS_CLOSED => 'Closed',
+            RegistrationStatus::Open->value => RegistrationStatus::Open->label(),
+            RegistrationStatus::Invite->value => RegistrationStatus::Invite->label(),
+            RegistrationStatus::Closed->value => RegistrationStatus::Closed->label(),
         ];
     }
 
@@ -33,10 +41,10 @@ class RegistrationStatusService
 
     public function getManualStatus(): int
     {
-        $manualStatus = (int) (Settings::settingValue('registerstatus') ?? Settings::REGISTER_STATUS_OPEN);
+        $manualStatus = $this->configuration->registration()->status->value;
 
         if (! array_key_exists($manualStatus, $this->statusOptions())) {
-            return Settings::REGISTER_STATUS_OPEN;
+            return RegistrationStatus::Open->value;
         }
 
         return $manualStatus;
@@ -85,12 +93,12 @@ class RegistrationStatusService
 
         $manualStatus = $this->getManualStatus();
         $activePeriod = $this->getActivePeriod($at);
-        $scheduledOverrideActive = $activePeriod !== null && $manualStatus !== Settings::REGISTER_STATUS_OPEN;
-        $effectiveStatus = $activePeriod !== null ? Settings::REGISTER_STATUS_OPEN : $manualStatus;
+        $scheduledOverrideActive = $activePeriod !== null && $manualStatus !== RegistrationStatus::Open->value;
+        $effectiveStatus = $activePeriod !== null ? RegistrationStatus::Open->value : $manualStatus;
         $reason = match (true) {
             $scheduledOverrideActive => 'scheduled_open_period',
-            $effectiveStatus === Settings::REGISTER_STATUS_OPEN => 'manual_open',
-            $effectiveStatus === Settings::REGISTER_STATUS_INVITE => 'manual_invite',
+            $effectiveStatus === RegistrationStatus::Open->value => 'manual_open',
+            $effectiveStatus === RegistrationStatus::Invite->value => 'manual_invite',
             default => 'manual_closed',
         };
 
@@ -103,10 +111,10 @@ class RegistrationStatusService
             'scheduled_override_active' => $scheduledOverrideActive,
             'reason' => $reason,
             'message' => $this->buildMessage($effectiveStatus, $activePeriod, $scheduledOverrideActive),
-            'available' => $effectiveStatus !== Settings::REGISTER_STATUS_CLOSED,
-            'is_open' => $effectiveStatus === Settings::REGISTER_STATUS_OPEN,
-            'is_invite_only' => $effectiveStatus === Settings::REGISTER_STATUS_INVITE,
-            'is_closed' => $effectiveStatus === Settings::REGISTER_STATUS_CLOSED,
+            'available' => $effectiveStatus !== RegistrationStatus::Closed->value,
+            'is_open' => $effectiveStatus === RegistrationStatus::Open->value,
+            'is_invite_only' => $effectiveStatus === RegistrationStatus::Invite->value,
+            'is_closed' => $effectiveStatus === RegistrationStatus::Closed->value,
         ];
     }
 
@@ -114,9 +122,7 @@ class RegistrationStatusService
     {
         $oldStatus = $this->getManualStatus();
 
-        Settings::settingsUpdate([
-            'registerstatus' => $newStatus,
-        ]);
+        $this->repository->update(ConfigurationDomain::Registration, ['status' => $newStatus]);
 
         $this->forgetDashboardSnapshot();
 
@@ -317,8 +323,8 @@ class RegistrationStatusService
         }
 
         return match ($effectiveStatus) {
-            Settings::REGISTER_STATUS_OPEN => 'Registrations are currently open.',
-            Settings::REGISTER_STATUS_INVITE => 'Registrations are currently invite only.',
+            RegistrationStatus::Open->value => 'Registrations are currently open.',
+            RegistrationStatus::Invite->value => 'Registrations are currently invite only.',
             default => 'Registrations are currently closed.',
         };
     }

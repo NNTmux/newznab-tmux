@@ -23,7 +23,7 @@ const IMPACT_BADGE_CLASSES = {
     minor: 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200',
 };
 const SYSTEM_SERVICE_SLUGS = ['database', 'redis', 'queue', 'disk'];
-// Mirror of \App\Models\Settings::REGISTER_STATUS_*.
+// Mirror of \App\Enums\RegistrationStatus values.
 const REGISTRATION_BADGE_BASE = 'inline-flex items-center justify-center rounded-full px-3 py-1.5 text-sm font-semibold ';
 const REGISTRATION_BADGE_CLASSES = {
     0: 'border border-emerald-500/30 bg-emerald-600 text-white shadow-sm dark:border-emerald-300/20 dark:bg-emerald-500 dark:text-slate-950',

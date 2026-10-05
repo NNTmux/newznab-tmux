@@ -18,13 +18,6 @@ final class AdminAnidbControllerTest extends TestCase
     {
         parent::setUp();
 
-        if (! Schema::hasTable('settings')) {
-            Schema::create('settings', static function (Blueprint $table): void {
-                $table->string('name')->primary();
-                $table->text('value')->nullable();
-            });
-        }
-
         $this->setGlobalViewData([
             'serverroot' => 'http://localhost',
             'site' => ['dereferrer_link' => ''],
@@ -42,7 +35,6 @@ final class AdminAnidbControllerTest extends TestCase
         $this->setGlobalViewData(null);
         Schema::dropIfExists('anidb_info');
         Schema::dropIfExists('anidb_titles');
-        Schema::dropIfExists('settings');
 
         parent::tearDown();
     }

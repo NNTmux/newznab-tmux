@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use App\Models\Settings;
 use App\Models\UsenetGroup;
 use App\Services\AdditionalProcessing\AdditionalProcessingOrchestrator;
 use App\Services\Backfill\BackfillService;
 use App\Services\Binaries\BinariesService;
+use App\Services\Configuration\ConfigurationProvider;
 use App\Services\NfoService;
 use App\Services\NNTP\NNTPService;
 use App\Services\ReleaseProcessingService;
@@ -91,8 +91,8 @@ class UpdatePerGroup extends Command
                 $nntp,
                 $groupId,
                 '',
-                (bool) Settings::settingValue('lookupimdb'),
-                (bool) Settings::settingValue('lookuptv')
+                (bool) app(ConfigurationProvider::class)->metadata()->movieLookup->value,
+                (bool) app(ConfigurationProvider::class)->metadata()->tvLookup->value
             );
 
             $this->info("Completed all processing for group: {$groupMySQL['name']}");

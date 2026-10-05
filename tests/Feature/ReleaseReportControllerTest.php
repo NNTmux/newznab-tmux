@@ -25,14 +25,8 @@ class ReleaseReportControllerTest extends TestCase
         $this->withoutMiddleware();
         Cache::flush();
 
-        Schema::dropIfExists('settings');
         Schema::dropIfExists('release_reports');
         Schema::dropIfExists('releases');
-
-        Schema::create('settings', function (Blueprint $table): void {
-            $table->string('name')->primary();
-            $table->text('value')->nullable();
-        });
 
         Schema::create('releases', function (Blueprint $table): void {
             $table->increments('id');

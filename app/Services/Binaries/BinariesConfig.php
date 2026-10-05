@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Binaries;
 
-use App\Models\Settings;
+use App\Services\Configuration\ConfigurationProvider;
 
 /**
  * Configuration DTO for Binaries processing.
@@ -39,27 +39,22 @@ final readonly class BinariesConfig
      */
     public static function fromSettings(): self
     {
+        $configuration = app(ConfigurationProvider::class)->ingestion();
+
         return new self(
-            messageBuffer: self::getSettingInt('maxmssgs', 20000),
+            messageBuffer: $configuration->maxMessages,
             compressedHeaders: (bool) config('nntmux_nntp.compressed_headers'),
-            partRepair: self::getSettingInt('partrepair', 1) === 1,
-            newGroupScanByDays: self::getSettingInt('newgroupscanmethod', 0) === 1,
-            newGroupMessagesToScan: self::getSettingInt('newgroupmsgstoscan', 50000),
-            newGroupDaysToScan: self::getSettingInt('newgroupdaystoscan', 3),
-            partRepairLimit: self::getSettingInt('maxpartrepair', 15000),
-            partRepairMaxTries: self::getSettingInt('partrepairmaxtries', 3),
+            partRepair: $configuration->partRepair,
+            newGroupScanByDays: $configuration->newGroupScanMethod === 1,
+            newGroupMessagesToScan: $configuration->newGroupMessagesToScan,
+            newGroupDaysToScan: $configuration->newGroupDaysToScan,
+            partRepairLimit: $configuration->maxPartRepair,
+            partRepairMaxTries: $configuration->partRepairMaxTries,
             echoCli: (bool) config('nntmux.echocli'),
             headerChunkSize: max(50, min(2000, (int) config('nntmux.cbp.header_chunk_size', 500))),
             sqlChunkSize: max(50, min(1000, (int) config('nntmux.cbp.sql_chunk_size', 500))),
             reconcileBatchSize: max(50, min(2000, (int) config('nntmux.cbp.reconcile_batch_size', 500))),
             nzbStreamRows: max(500, min(20000, (int) config('nntmux.cbp.nzb_stream_rows', 5000))),
         );
-    }
-
-    private static function getSettingInt(string $key, int $default): int
-    {
-        $value = Settings::settingValue($key);
-
-        return $value !== '' ? (int) $value : $default;
     }
 }

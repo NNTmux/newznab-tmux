@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services\AdditionalProcessing;
 
 use App\Models\Release;
-use App\Models\Settings;
+use App\Services\Configuration\ConfigurationProvider;
 use App\Services\Runners\PostProcessRunner;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
@@ -59,7 +59,7 @@ final class AdditionalCandidateQuery
      */
     public static function minSizeBytes(): int
     {
-        $value = Settings::settingValue('minsizetopostprocess');
+        $value = app(ConfigurationProvider::class)->postProcessing()->minSizeToPostProcess;
         if ($value === '' || $value === null) {
             return self::DEFAULT_MIN_SIZE_BYTES;
         }
@@ -75,7 +75,7 @@ final class AdditionalCandidateQuery
      */
     public static function maxSizeBytes(): int
     {
-        $value = Settings::settingValue('maxsizetopostprocess');
+        $value = app(ConfigurationProvider::class)->postProcessing()->maxSizeToPostProcess;
         if ($value === '' || $value === null) {
             return self::DEFAULT_MAX_SIZE_BYTES;
         }
@@ -392,7 +392,7 @@ final class AdditionalCandidateQuery
 
     public static function claimTtlSeconds(): int
     {
-        $timeout = (int) (Settings::settingValue('releaseprocessingtimeout') ?: 120);
+        $timeout = (int) (app(ConfigurationProvider::class)->postProcessing()->releaseTimeoutSeconds ?: 120);
 
         return max(300, $timeout * 2);
     }

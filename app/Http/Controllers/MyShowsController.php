@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\Category;
-use App\Models\Settings;
 use App\Models\UserSerie;
 use App\Models\Video;
+use App\Services\Configuration\ConfigurationProvider;
 use App\Services\Releases\ReleaseBrowseService;
 use Illuminate\Http\Request;
 
@@ -184,7 +184,7 @@ class MyShowsController extends BasePageController
     {
         $categories = [];
         foreach (Category::getChildren(Category::TV_ROOT) as $category) {
-            if ($excludeDisabledWebdl && (int) $category['id'] === Category::TV_WEBDL && (int) Settings::settingValue('catwebdl') === 0) {
+            if ($excludeDisabledWebdl && (int) $category['id'] === Category::TV_WEBDL && (int) app(ConfigurationProvider::class)->ingestion()->categorizeWebDl === 0) {
                 continue;
             }
 

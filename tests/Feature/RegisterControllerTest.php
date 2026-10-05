@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Enums\ConfigurationDomain;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Models\User;
 use App\Rules\ValidEmailDomain;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Mockery;
+use Tests\Support\ConfigurationTestBuilder;
 use Tests\TestCase;
 
 class RegisterControllerTest extends TestCase
@@ -49,12 +51,6 @@ class RegisterControllerTest extends TestCase
 
         Schema::dropIfExists('users');
         Schema::dropIfExists('roles');
-        Schema::dropIfExists('settings');
-
-        Schema::create('settings', function (Blueprint $table): void {
-            $table->string('name')->primary();
-            $table->text('value')->nullable();
-        });
 
         Schema::create('roles', function (Blueprint $table): void {
             $table->increments('id');
@@ -121,10 +117,8 @@ class RegisterControllerTest extends TestCase
             $table->timestamps();
         });
 
-        DB::table('settings')->insert([
-            'name' => 'registerstatus',
-            'value' => '0',
-        ]);
+        ConfigurationTestBuilder::installDefaults();
+        ConfigurationTestBuilder::update(ConfigurationDomain::Registration, ['status' => 0]);
 
         DB::table('roles')->insert([
             'id' => 1,
@@ -252,9 +246,7 @@ class RegisterControllerTest extends TestCase
 
     public function test_invite_only_registration_with_valid_invitation_succeeds(): void
     {
-        DB::table('settings')
-            ->where('name', 'registerstatus')
-            ->update(['value' => '1']);
+        ConfigurationTestBuilder::update(ConfigurationDomain::Registration, ['status' => 1]);
 
         DB::table('invitations')->insert([
             'token' => 'valid-token',
@@ -294,9 +286,7 @@ class RegisterControllerTest extends TestCase
 
     public function test_closed_registration_rejects_even_valid_invitation(): void
     {
-        DB::table('settings')
-            ->where('name', 'registerstatus')
-            ->update(['value' => '2']);
+        ConfigurationTestBuilder::update(ConfigurationDomain::Registration, ['status' => 2]);
 
         DB::table('invitations')->insert([
             'token' => 'closed-token',
@@ -326,9 +316,7 @@ class RegisterControllerTest extends TestCase
 
     public function test_scheduled_open_period_allows_registration_when_manual_status_is_closed(): void
     {
-        DB::table('settings')
-            ->where('name', 'registerstatus')
-            ->update(['value' => '2']);
+        ConfigurationTestBuilder::update(ConfigurationDomain::Registration, ['status' => 2]);
 
         DB::table('registration_periods')->insert([
             'name' => 'Weekend Open',

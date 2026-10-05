@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Enums\ConfigurationDomain;
 use App\Models\Category;
 use App\Services\Runners\PostProcessRunner;
 use Illuminate\Contracts\Console\Kernel;
@@ -11,6 +12,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use PDO;
+use Tests\Support\ConfigurationTestBuilder;
 use Tests\TestCase;
 
 class PostProcessRunnerBooksGateTest extends TestCase
@@ -37,9 +39,6 @@ class PostProcessRunnerBooksGateTest extends TestCase
         }
 
         $pdo = new PDO('sqlite:'.$this->databasePath);
-        $pdo->exec('CREATE TABLE settings (name VARCHAR PRIMARY KEY, value TEXT NULL)');
-        $pdo->exec("INSERT INTO settings (name, value) VALUES ('lookupbooks', '1'), ('postthreadsnon', '1')");
-
         $this->setEnvironmentValue('APP_ENV', 'testing');
         $this->setEnvironmentValue('DB_CONNECTION', 'sqlite');
         $this->setEnvironmentValue('DB_DATABASE', $this->databasePath);
@@ -53,11 +52,6 @@ class PostProcessRunnerBooksGateTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        DB::table('settings')->upsert([
-            ['name' => 'lookupbooks', 'value' => '1'],
-            ['name' => 'postthreadsnon', 'value' => '1'],
-        ], ['name'], ['value']);
 
         config([
             'database.default' => 'sqlite',
@@ -125,7 +119,7 @@ class PostProcessRunnerBooksGateTest extends TestCase
 
     public function test_renamed_only_mode_skips_unrenamed_pending_books(): void
     {
-        DB::table('settings')->where('name', 'lookupbooks')->update(['value' => '2']);
+        ConfigurationTestBuilder::update(ConfigurationDomain::Metadata, ['book_lookup' => 2]);
         DB::table('releases')->insert([
             'id' => 2,
             'name' => 'A Plain Unrenamed Book',
@@ -180,12 +174,9 @@ class PostProcessRunnerBooksGateTest extends TestCase
 
     private function createSchema(): void
     {
-        if (! Schema::hasTable('settings')) {
-            Schema::create('settings', function (Blueprint $table): void {
-                $table->string('name')->primary();
-                $table->text('value')->nullable();
-            });
-        }
+        ConfigurationTestBuilder::installDefaults();
+        ConfigurationTestBuilder::update(ConfigurationDomain::Metadata, ['book_lookup' => 1]);
+        ConfigurationTestBuilder::update(ConfigurationDomain::PostProcessing, ['post_threads_non' => 1]);
 
         if (! Schema::hasTable('releases')) {
             Schema::create('releases', function (Blueprint $table): void {

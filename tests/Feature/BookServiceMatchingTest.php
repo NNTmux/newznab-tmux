@@ -46,8 +46,6 @@ class BookServiceMatchingTest extends TestCase
         }
 
         $pdo = new PDO('sqlite:'.$this->databasePath);
-        $pdo->exec('CREATE TABLE settings (name VARCHAR PRIMARY KEY, value TEXT NULL)');
-        $pdo->exec("INSERT INTO settings (name, value) VALUES ('maxbooksprocessed', '50'), ('amazonsleep', '0'), ('lookupbooks', '1')");
 
         $this->setEnvironmentValue('APP_ENV', 'testing');
         $this->setEnvironmentValue('DB_CONNECTION', 'sqlite');

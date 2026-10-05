@@ -186,10 +186,6 @@ final class MovieSearchApiTest extends TestCase
 
     private function createSchema(): void
     {
-        Schema::create('settings', function (Blueprint $table): void {
-            $table->string('name')->primary();
-            $table->text('value')->nullable();
-        });
 
         Schema::create('root_categories', function (Blueprint $table): void {
             $table->increments('id');
@@ -243,10 +239,6 @@ final class MovieSearchApiTest extends TestCase
 
     private function seedData(): void
     {
-        DB::table('settings')->insert([
-            ['name' => 'showpasswordedrelease', 'value' => '0'],
-            ['name' => 'catwebdl', 'value' => '0'],
-        ]);
 
         DB::table('root_categories')->insert([
             'id' => 2000,

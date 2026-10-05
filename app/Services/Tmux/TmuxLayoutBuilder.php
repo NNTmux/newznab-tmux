@@ -6,7 +6,7 @@ namespace App\Services\Tmux;
 
 use App\Enums\TmuxMode;
 use App\Enums\TmuxPaneRole;
-use App\Models\Settings;
+use App\Services\Configuration\ConfigurationProvider;
 use Illuminate\Support\Facades\Process;
 use RuntimeException;
 use Throwable;
@@ -313,52 +313,52 @@ class TmuxLayoutBuilder
         $windowIndex = 4;
 
         // htop
-        if ((int) Settings::settingValue('htop') === 1 && $this->commandExists('htop')) {
+        if ((int) app(ConfigurationProvider::class)->tmux()->htopEnabled === 1 && $this->commandExists('htop')) {
             $pane = $this->createWindowPane($windowIndex, $this->getPaneDisplayName('htop'), TmuxPaneRole::Htop, $this->getPaneDisplayName('htop'));
             $this->requireSuccess($this->paneManager->respawnPane($pane, 'htop'), 'respawn htop pane');
             $windowIndex++;
         }
 
         // nmon
-        if ((int) Settings::settingValue('nmon') === 1 && $this->commandExists('nmon')) {
+        if ((int) app(ConfigurationProvider::class)->tmux()->nmonEnabled === 1 && $this->commandExists('nmon')) {
             $pane = $this->createWindowPane($windowIndex, $this->getPaneDisplayName('nmon'), TmuxPaneRole::Nmon, $this->getPaneDisplayName('nmon'));
             $this->requireSuccess($this->paneManager->respawnPane($pane, 'nmon -t'), 'respawn nmon pane');
             $windowIndex++;
         }
 
         // vnstat
-        if ((int) Settings::settingValue('vnstat') === 1 && $this->commandExists('vnstat')) {
-            $vnstatArgs = Settings::settingValue('vnstat_args') ?? '';
+        if ((int) app(ConfigurationProvider::class)->tmux()->vnstatEnabled === 1 && $this->commandExists('vnstat')) {
+            $vnstatArgs = app(ConfigurationProvider::class)->tmux()->vnstatArgs ?? '';
             $pane = $this->createWindowPane($windowIndex, $this->getPaneDisplayName('vnstat'), TmuxPaneRole::Vnstat, $this->getPaneDisplayName('vnstat'));
             $this->requireSuccess($this->paneManager->respawnPane($pane, "watch -n10 'vnstat {$vnstatArgs}'"), 'respawn vnstat pane');
             $windowIndex++;
         }
 
         // tcptrack
-        if ((int) Settings::settingValue('tcptrack') === 1 && $this->commandExists('tcptrack')) {
-            $tcptrackArgs = Settings::settingValue('tcptrack_args') ?? '';
+        if ((int) app(ConfigurationProvider::class)->tmux()->tcpTrackEnabled === 1 && $this->commandExists('tcptrack')) {
+            $tcptrackArgs = app(ConfigurationProvider::class)->tmux()->tcpTrackArgs ?? '';
             $pane = $this->createWindowPane($windowIndex, $this->getPaneDisplayName('tcptrack'), TmuxPaneRole::Tcptrack, $this->getPaneDisplayName('tcptrack'));
             $this->requireSuccess($this->paneManager->respawnPane($pane, "tcptrack {$tcptrackArgs}"), 'respawn tcptrack pane');
             $windowIndex++;
         }
 
         // bwm-ng
-        if ((int) Settings::settingValue('bwmng') === 1 && $this->commandExists('bwm-ng')) {
+        if ((int) app(ConfigurationProvider::class)->tmux()->bwmngEnabled === 1 && $this->commandExists('bwm-ng')) {
             $pane = $this->createWindowPane($windowIndex, $this->getPaneDisplayName('bwm-ng'), TmuxPaneRole::BandwidthMonitor, $this->getPaneDisplayName('bwm-ng'));
             $this->requireSuccess($this->paneManager->respawnPane($pane, 'bwm-ng'), 'respawn bwm-ng pane');
             $windowIndex++;
         }
 
         // mytop
-        if ((int) Settings::settingValue('mytop') === 1 && $this->commandExists('mytop')) {
+        if ((int) app(ConfigurationProvider::class)->tmux()->mytopEnabled === 1 && $this->commandExists('mytop')) {
             $pane = $this->createWindowPane($windowIndex, $this->getPaneDisplayName('mytop'), TmuxPaneRole::Mytop, $this->getPaneDisplayName('mytop'));
             $this->requireSuccess($this->paneManager->respawnPane($pane, 'mytop -u'), 'respawn mytop pane');
             $windowIndex++;
         }
 
         // redis monitoring
-        if ((int) Settings::settingValue('redis') === 1) {
-            $redisArgs = Settings::settingValue('redis_args') ?? '';
+        if ((int) app(ConfigurationProvider::class)->tmux()->redisEnabled === 1) {
+            $redisArgs = app(ConfigurationProvider::class)->tmux()->redisArgs ?? '';
             $refreshInterval = 30;
 
             $pane = $this->createWindowPane($windowIndex, $this->getPaneDisplayName('redis'), TmuxPaneRole::Redis, $this->getPaneDisplayName('redis'));
@@ -395,7 +395,7 @@ class TmuxLayoutBuilder
         }
 
         // bash console
-        if ((int) Settings::settingValue('console') === 1) {
+        if ((int) app(ConfigurationProvider::class)->tmux()->consoleEnabled === 1) {
             $pane = $this->createWindowPane($windowIndex, $this->getPaneDisplayName('bash'), TmuxPaneRole::Console, $this->getPaneDisplayName('bash'));
             $this->requireSuccess($this->paneManager->respawnPane($pane, 'bash -i'), 'respawn console pane');
         }

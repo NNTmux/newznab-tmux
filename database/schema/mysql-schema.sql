@@ -1578,15 +1578,78 @@ CREATE TABLE `service_statuses` (
   KEY `service_statuses_probe_identifier_index` (`probe_identifier`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `settings`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `settings` (
-  `name` varchar(25) NOT NULL DEFAULT '',
-  `value` varchar(1000) NOT NULL DEFAULT '',
-  PRIMARY KEY (`name`)
+DROP TABLE IF EXISTS `site_configurations`;
+CREATE TABLE `site_configurations` (
+  `id` tinyint unsigned NOT NULL,
+  `title` varchar(255) NOT NULL DEFAULT 'NNTmux', `home_link` varchar(255) NOT NULL DEFAULT '/', `site_logo` varchar(255) DEFAULT NULL,
+  `strapline` varchar(255) NOT NULL DEFAULT '', `meta_title` varchar(255) NOT NULL DEFAULT '', `meta_description` text NOT NULL,
+  `meta_keywords` text NOT NULL, `footer` text NOT NULL, `dereferrer_link` varchar(1000) NOT NULL DEFAULT '', `terms` longtext NOT NULL,
+  `trailers_display` tinyint(1) NOT NULL DEFAULT 1, `trailers_size_x` smallint unsigned NOT NULL DEFAULT 480, `trailers_size_y` smallint unsigned NOT NULL DEFAULT 345,
+  `created_at` timestamp NULL DEFAULT NULL, `updated_at` timestamp NULL DEFAULT NULL, PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `registration_configurations`;
+CREATE TABLE `registration_configurations` (`id` tinyint unsigned NOT NULL, `status` tinyint unsigned NOT NULL DEFAULT 0, `created_at` timestamp NULL DEFAULT NULL, `updated_at` timestamp NULL DEFAULT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+DROP TABLE IF EXISTS `ingestion_configurations`;
+CREATE TABLE `ingestion_configurations` (
+  `id` tinyint unsigned NOT NULL, `binary_threads` smallint unsigned NOT NULL DEFAULT 1, `backfill_threads` smallint unsigned NOT NULL DEFAULT 1, `release_threads` smallint unsigned NOT NULL DEFAULT 1,
+  `collection_delay_hours` int unsigned NOT NULL DEFAULT 0, `collection_timeout_hours` int unsigned NOT NULL DEFAULT 0, `cross_post_hours` int unsigned NOT NULL DEFAULT 0, `completion_percent` int unsigned NOT NULL DEFAULT 0,
+  `grab_status` tinyint(1) NOT NULL DEFAULT 0, `max_headers_per_iteration` bigint unsigned NOT NULL DEFAULT 0, `max_messages` bigint unsigned NOT NULL DEFAULT 0, `max_releases_created` bigint unsigned NOT NULL DEFAULT 0,
+  `nntp_retries` int unsigned NOT NULL DEFAULT 0, `nzb_split_level` int unsigned NOT NULL DEFAULT 0, `part_retention_hours` int unsigned NOT NULL DEFAULT 0, `release_retention_days` int unsigned NOT NULL DEFAULT 0,
+  `misc_other_retention_hours` int unsigned NOT NULL DEFAULT 0, `misc_hashed_retention_hours` int unsigned NOT NULL DEFAULT 0, `min_files_to_form_release` int unsigned NOT NULL DEFAULT 0,
+  `min_size_to_form_release` bigint unsigned NOT NULL DEFAULT 0, `max_size_to_form_release` bigint unsigned NOT NULL DEFAULT 0, `new_group_scan_method` int unsigned NOT NULL DEFAULT 0,
+  `new_group_days_to_scan` int unsigned NOT NULL DEFAULT 0, `new_group_messages_to_scan` bigint unsigned NOT NULL DEFAULT 0, `safe_backfill_date` date NOT NULL,
+  `disable_backfill_group` tinyint(1) NOT NULL DEFAULT 0, `part_repair` tinyint(1) NOT NULL DEFAULT 0, `safe_part_repair` tinyint(1) NOT NULL DEFAULT 0,
+  `max_part_repair` bigint unsigned NOT NULL DEFAULT 0, `part_repair_max_tries` int unsigned NOT NULL DEFAULT 0, `categorize_foreign` tinyint(1) NOT NULL DEFAULT 0,
+  `categorize_web_dl` tinyint(1) NOT NULL DEFAULT 0, `show_passworded_releases` tinyint(1) NOT NULL DEFAULT 0, `delete_passworded_releases` tinyint(1) NOT NULL DEFAULT 0,
+  `backfill_days_mode` int unsigned NOT NULL DEFAULT 0, `backfill_order` int unsigned NOT NULL DEFAULT 0, `backfill_quantity` bigint unsigned NOT NULL DEFAULT 0,
+  `created_at` timestamp NULL DEFAULT NULL, `updated_at` timestamp NULL DEFAULT NULL, PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+DROP TABLE IF EXISTS `post_processing_configurations`;
+CREATE TABLE `post_processing_configurations` (
+  `id` tinyint unsigned NOT NULL, `post_threads` smallint unsigned NOT NULL DEFAULT 1, `post_threads_amazon` smallint unsigned NOT NULL DEFAULT 1, `post_threads_non` smallint unsigned NOT NULL DEFAULT 1,
+  `nfo_threads` smallint unsigned NOT NULL DEFAULT 1, `fix_name_threads` smallint unsigned NOT NULL DEFAULT 1, `timeout_seconds` int unsigned NOT NULL DEFAULT 0, `release_timeout_seconds` int unsigned NOT NULL DEFAULT 0,
+  `max_timeout_count` smallint unsigned NOT NULL DEFAULT 1, `max_additional_processed` int unsigned NOT NULL DEFAULT 0, `max_parts_processed` smallint unsigned NOT NULL DEFAULT 1,
+  `password_check_attempts` smallint unsigned NOT NULL DEFAULT 1, `fix_names_per_run` int unsigned NOT NULL DEFAULT 0, `max_nested_levels` smallint unsigned NOT NULL DEFAULT 1,
+  `extract_using_rar_info` tinyint(1) NOT NULL DEFAULT 0, `segments_to_download` smallint unsigned NOT NULL DEFAULT 1, `ffmpeg_duration` int unsigned NOT NULL DEFAULT 0,
+  `inner_file_blacklist` text NOT NULL, `process_jpg` tinyint(1) NOT NULL DEFAULT 0, `process_thumbnails` tinyint(1) NOT NULL DEFAULT 0, `process_videos` tinyint(1) NOT NULL DEFAULT 0,
+  `save_audio_preview` tinyint(1) NOT NULL DEFAULT 0, `min_size_to_post_process` bigint unsigned NOT NULL DEFAULT 0, `max_size_to_post_process` bigint unsigned NOT NULL DEFAULT 0,
+  `min_size_to_process_nfo` bigint unsigned NOT NULL DEFAULT 0, `max_size_to_process_nfo` bigint unsigned NOT NULL DEFAULT 0, `max_nfo_processed` int unsigned NOT NULL DEFAULT 0,
+  `max_nfo_retries` int unsigned NOT NULL DEFAULT 0, `lookup_nfo` tinyint(1) NOT NULL DEFAULT 0, `lookup_par2` tinyint(1) NOT NULL DEFAULT 0,
+  `created_at` timestamp NULL DEFAULT NULL, `updated_at` timestamp NULL DEFAULT NULL, PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+DROP TABLE IF EXISTS `metadata_configurations`;
+CREATE TABLE `metadata_configurations` (
+  `id` tinyint unsigned NOT NULL, `anime_lookup` tinyint unsigned NOT NULL DEFAULT 0, `book_lookup` tinyint unsigned NOT NULL DEFAULT 0, `game_lookup` tinyint unsigned NOT NULL DEFAULT 0,
+  `movie_lookup` tinyint unsigned NOT NULL DEFAULT 0, `music_lookup` tinyint unsigned NOT NULL DEFAULT 0, `tv_lookup` tinyint unsigned NOT NULL DEFAULT 0, `movie_language` varchar(8) NOT NULL DEFAULT 'en',
+  `imdb_alternate_url` tinyint(1) NOT NULL DEFAULT 0, `max_anime_processed` int unsigned NOT NULL DEFAULT 0, `max_books_processed` int unsigned NOT NULL DEFAULT 0,
+  `max_games_processed` int unsigned NOT NULL DEFAULT 0, `max_movies_processed` int unsigned NOT NULL DEFAULT 0, `max_music_processed` int unsigned NOT NULL DEFAULT 0,
+  `max_tv_processed` int unsigned NOT NULL DEFAULT 0,
+  `amazon_sleep_milliseconds` int unsigned NOT NULL DEFAULT 0, `created_at` timestamp NULL DEFAULT NULL, `updated_at` timestamp NULL DEFAULT NULL, PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+DROP TABLE IF EXISTS `tmux_configurations`;
+CREATE TABLE `tmux_configurations` (
+  `id` tinyint unsigned NOT NULL, `session_name` varchar(255) NOT NULL DEFAULT 'nntmux', `monitor_delay` int unsigned NOT NULL DEFAULT 30, `niceness` smallint NOT NULL DEFAULT 19,
+  `sequential_mode` tinyint unsigned NOT NULL DEFAULT 0, `sequential_timer` int unsigned NOT NULL DEFAULT 0, `binaries_enabled` tinyint(1) NOT NULL DEFAULT 0,
+  `binaries_timer` int unsigned NOT NULL DEFAULT 0, `binaries_kill_timer` int unsigned NOT NULL DEFAULT 0, `backfill_mode` tinyint unsigned NOT NULL DEFAULT 0,
+  `backfill_groups` int unsigned NOT NULL DEFAULT 0, `backfill_timer` int unsigned NOT NULL DEFAULT 0, `progressive_backfill` tinyint(1) NOT NULL DEFAULT 0,
+  `releases_enabled` tinyint(1) NOT NULL DEFAULT 0, `release_timer` int unsigned NOT NULL DEFAULT 0, `post_mode` tinyint unsigned NOT NULL DEFAULT 0,
+  `post_timer` int unsigned NOT NULL DEFAULT 0, `post_kill_timer` int unsigned NOT NULL DEFAULT 0, `post_amazon_mode` tinyint unsigned NOT NULL DEFAULT 0,
+  `post_amazon_timer` int unsigned NOT NULL DEFAULT 0, `post_non_mode` tinyint unsigned NOT NULL DEFAULT 0, `post_non_timer` int unsigned NOT NULL DEFAULT 0,
+  `fix_names_enabled` tinyint(1) NOT NULL DEFAULT 0, `fix_timer` int unsigned NOT NULL DEFAULT 0, `cleanup_mode` varchar(255) NOT NULL DEFAULT 'Disabled',
+  `cleanup_timer` int unsigned NOT NULL DEFAULT 0, `run_irc_scraper` tinyint(1) NOT NULL DEFAULT 0, `console_enabled` tinyint(1) NOT NULL DEFAULT 0,
+  `htop_enabled` tinyint(1) NOT NULL DEFAULT 0, `mytop_enabled` tinyint(1) NOT NULL DEFAULT 0, `nmon_enabled` tinyint(1) NOT NULL DEFAULT 0,
+  `vnstat_enabled` tinyint(1) NOT NULL DEFAULT 0, `vnstat_args` varchar(1000) DEFAULT NULL, `tcp_track_enabled` tinyint(1) NOT NULL DEFAULT 0,
+  `tcp_track_args` varchar(1000) DEFAULT NULL, `bwmng_enabled` tinyint(1) NOT NULL DEFAULT 0, `redis_enabled` tinyint(1) NOT NULL DEFAULT 0,
+  `redis_args` varchar(1000) DEFAULT NULL, `write_logs` tinyint(1) NOT NULL DEFAULT 0, `collections_kill_threshold` int unsigned NOT NULL DEFAULT 0,
+  `post_process_kill_threshold` int unsigned NOT NULL DEFAULT 0, `colors_start` tinyint unsigned NOT NULL DEFAULT 1, `colors_end` tinyint unsigned NOT NULL DEFAULT 250,
+  `created_at` timestamp NULL DEFAULT NULL, `updated_at` timestamp NULL DEFAULT NULL, PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+DROP TABLE IF EXISTS `processing_runtime_states`;
+CREATE TABLE `processing_runtime_states` (`id` tinyint unsigned NOT NULL, `tmux_running` tinyint(1) NOT NULL DEFAULT 0, `stop_requested` tinyint(1) NOT NULL DEFAULT 0, `last_binary_run_at` datetime DEFAULT NULL, `monitor_path` varchar(1000) DEFAULT NULL, `monitor_path_a` varchar(1000) DEFAULT NULL, `monitor_path_b` varchar(1000) DEFAULT NULL, `created_at` timestamp NULL DEFAULT NULL, `updated_at` timestamp NULL DEFAULT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+DROP TABLE IF EXISTS `tmux_cleanup_rules`;
+CREATE TABLE `tmux_cleanup_rules` (`id` bigint unsigned NOT NULL AUTO_INCREMENT, `tmux_configuration_id` tinyint unsigned NOT NULL DEFAULT 1, `rule` varchar(32) NOT NULL, PRIMARY KEY (`id`), UNIQUE KEY `tmux_cleanup_rules_tmux_configuration_id_rule_unique` (`tmux_configuration_id`,`rule`), CONSTRAINT `tmux_cleanup_rules_tmux_configuration_id_foreign` FOREIGN KEY (`tmux_configuration_id`) REFERENCES `tmux_configurations` (`id`) ON DELETE CASCADE) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+DROP TABLE IF EXISTS `tmux_color_exclusions`;
+CREATE TABLE `tmux_color_exclusions` (`id` bigint unsigned NOT NULL AUTO_INCREMENT, `tmux_configuration_id` tinyint unsigned NOT NULL DEFAULT 1, `color` tinyint unsigned NOT NULL, PRIMARY KEY (`id`), UNIQUE KEY `tmux_color_exclusions_tmux_configuration_id_color_unique` (`tmux_configuration_id`,`color`), CONSTRAINT `tmux_color_exclusions_tmux_configuration_id_foreign` FOREIGN KEY (`tmux_configuration_id`) REFERENCES `tmux_configurations` (`id`) ON DELETE CASCADE) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 DROP TABLE IF EXISTS `short_groups`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -2284,3 +2347,4 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (221,'2026_08_03_00
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (222,'2026_08_04_082439_add_fix_release_name_query_indexes',37);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (223,'2026_08_10_192527_convert_size_settings_to_bytes',38);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (224,'2026_08_13_001652_normalize_and_optimize_releases_table',39);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (225,'2026_09_30_000000_replace_settings_with_typed_domain_configuration',40);

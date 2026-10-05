@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\Category;
-use App\Models\Settings;
 use App\Models\UserMovie;
+use App\Services\Configuration\ConfigurationProvider;
 use App\Services\MovieBrowseService;
 use App\Services\MovieService;
 use Illuminate\Http\Request;
@@ -201,7 +201,7 @@ class MyMoviesController extends BasePageController
     {
         $categories = [];
         foreach (Category::getChildren(Category::MOVIE_ROOT) as $category) {
-            if ($excludeDisabledWebdl && (int) $category['id'] === Category::MOVIE_WEBDL && (int) Settings::settingValue('catwebdl') === 0) {
+            if ($excludeDisabledWebdl && (int) $category['id'] === Category::MOVIE_WEBDL && (int) app(ConfigurationProvider::class)->ingestion()->categorizeWebDl === 0) {
                 continue;
             }
 

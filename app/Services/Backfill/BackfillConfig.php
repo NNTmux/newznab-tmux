@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Backfill;
 
-use App\Models\Settings;
+use App\Services\Configuration\ConfigurationProvider;
 
 /**
  * Configuration DTO for Backfill processing.
@@ -25,26 +25,14 @@ final readonly class BackfillConfig
      */
     public static function fromSettings(): self
     {
+        $configuration = app(ConfigurationProvider::class)->ingestion();
+
         return new self(
             compressedHeaders: (bool) config('nntmux_nntp.compressed_headers'),
             echoCli: (bool) config('nntmux.echocli'),
-            safeBackFillDate: self::getSettingString('safebackfilldate', '2012-08-14'),
-            safePartRepair: self::getSettingInt('safepartrepair', 0) === 1 ? 'update' : 'backfill',
-            disableBackfillGroup: self::getSettingInt('disablebackfillgroup', 0) === 1,
+            safeBackFillDate: $configuration->safeBackfillDate,
+            safePartRepair: $configuration->safePartRepair ? 'update' : 'backfill',
+            disableBackfillGroup: $configuration->disableBackfillGroup,
         );
-    }
-
-    private static function getSettingString(string $key, string $default): string
-    {
-        $value = Settings::settingValue($key);
-
-        return $value !== '' ? (string) $value : $default;
-    }
-
-    private static function getSettingInt(string $key, int $default): int
-    {
-        $value = Settings::settingValue($key);
-
-        return $value !== '' ? (int) $value : $default;
     }
 }

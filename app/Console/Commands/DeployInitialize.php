@@ -56,8 +56,8 @@ class DeployInitialize extends Command
 
             $this->createAdministrator();
             $admin = DB::table('users')->where('username', config('nntmux.admin_username'))->first();
-            if ($admin === null || (int) $admin->roles_id !== 2 || $admin->email_verified_at === null || ! DB::table('settings')->where('name', 'categorizeforeign')->exists()) {
-                throw new RuntimeException('Administrator or settings verification failed.');
+            if ($admin === null || (int) $admin->roles_id !== 2 || $admin->email_verified_at === null || ! DB::table('ingestion_configurations')->where('id', 1)->exists()) {
+                throw new RuntimeException('Administrator or configuration verification failed.');
             }
 
             $searchCommand = config('search.default') === 'elasticsearch' ? 'nntmux:create-es-indexes' : 'manticore:create-indexes';

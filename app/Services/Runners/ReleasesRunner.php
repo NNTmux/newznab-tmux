@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services\Runners;
 
-use App\Models\Settings;
 use App\Models\UsenetGroup;
+use App\Services\Configuration\ConfigurationProvider;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use RuntimeException;
@@ -15,7 +15,7 @@ class ReleasesRunner extends BaseRunner
     public function releases(): void
     {
         $groups = DB::select('SELECT id, name FROM usenet_groups WHERE (active = 1 OR backfill = 1)');
-        $maxProcesses = (int) Settings::settingValue('releasethreads');
+        $maxProcesses = (int) app(ConfigurationProvider::class)->ingestion()->releaseThreads;
 
         $uGroups = [];
         foreach ($groups as $group) {
@@ -79,7 +79,7 @@ class ReleasesRunner extends BaseRunner
     public function updatePerGroup(): void
     {
         $groups = DB::select('SELECT id , name FROM usenet_groups WHERE (active = 1 OR backfill = 1)');
-        $maxProcesses = (int) Settings::settingValue('releasethreads');
+        $maxProcesses = (int) app(ConfigurationProvider::class)->ingestion()->releaseThreads;
 
         $count = count($groups);
         if ($count === 0) {

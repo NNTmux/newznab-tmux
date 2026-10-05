@@ -10,10 +10,11 @@ use App\Models\Collection;
 use App\Models\MusicInfo;
 use App\Models\Release;
 use App\Models\ReleaseNzbCreationFailure;
-use App\Models\Settings;
 use App\Models\UsenetGroup;
 use App\Services\Binaries\BinariesConfig;
 use App\Services\Categorization\CategorizationService;
+use App\Services\Configuration\ConfigurationProvider;
+use App\Services\Configuration\ProcessingRuntimeStateRepository;
 use App\Services\NNTP\NNTPService;
 use App\Services\Nzb\NzbCreationCandidateQuery;
 use App\Services\Nzb\NzbService;
@@ -115,20 +116,10 @@ final class ReleaseProcessingService
      */
     private function loadSettings(): ProcessReleasesSettings
     {
-        $settingKeys = [
-            'delaytime', 'crossposttime', 'maxnzbsprocessed', 'completionpercent',
-            'collection_timeout', 'maxsizetoformrelease', 'minsizetoformrelease',
-            'minfilestoformrelease', 'releaseretentiondays', 'deletepasswordedrelease',
-            'miscotherretentionhours', 'mischashedretentionhours', 'partretentionhours',
-            'last_run_time',
-        ];
-
-        $dbSettings = [];
-        foreach ($settingKeys as $key) {
-            $dbSettings[$key] = Settings::settingValue($key);
-        }
-
-        return ProcessReleasesSettings::forDatabase($dbSettings);
+        return ProcessReleasesSettings::fromConfiguration(
+            app(ConfigurationProvider::class)->ingestion(),
+            app(ProcessingRuntimeStateRepository::class)->state(),
+        );
     }
 
     /**

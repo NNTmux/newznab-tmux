@@ -33,7 +33,7 @@ class BrowseGroupController extends BasePageController
         $content = view('browsegroup.index', [
             'results' => $groupList,
             'search' => $search,
-            'site' => $this->settings,
+            'site' => $this->siteConfiguration,
         ])->render();
 
         // Prepare view data for main layout

@@ -42,12 +42,6 @@ class AdminGroupControllerTest extends TestCase
         }
 
         $pdo = new PDO('sqlite:'.$this->databasePath);
-        $pdo->exec('CREATE TABLE settings (name VARCHAR PRIMARY KEY, value TEXT NULL)');
-        $pdo->exec("INSERT INTO settings (name, value) VALUES
-            ('categorizeforeign', '0'),
-            ('catwebdl', '0'),
-            ('title', 'NNTmux Test'),
-            ('home_link', '/')");
 
         $this->setEnvironmentValue('APP_ENV', 'testing');
         $this->setEnvironmentValue('DB_CONNECTION', 'sqlite');
@@ -75,7 +69,6 @@ class AdminGroupControllerTest extends TestCase
         Cache::flush();
 
         $this->createSchema();
-        $this->seedSettings();
         $this->resetGlobalComposerState();
     }
 
@@ -211,12 +204,6 @@ class AdminGroupControllerTest extends TestCase
 
     private function createSchema(): void
     {
-        if (! Schema::hasTable('settings')) {
-            Schema::create('settings', function (Blueprint $table): void {
-                $table->string('name')->primary();
-                $table->text('value')->nullable();
-            });
-        }
 
         if (! Schema::hasTable('content')) {
             Schema::create('content', function (Blueprint $table): void {
@@ -253,16 +240,6 @@ class AdminGroupControllerTest extends TestCase
             $table->unsignedBigInteger('minfilestoformrelease')->nullable();
             $table->integer('backfill_target')->default(1);
         });
-    }
-
-    private function seedSettings(): void
-    {
-        DB::table('settings')->upsert([
-            ['name' => 'title', 'value' => 'NNTmux Test'],
-            ['name' => 'home_link', 'value' => '/'],
-            ['name' => 'categorizeforeign', 'value' => '0'],
-            ['name' => 'catwebdl', 'value' => '0'],
-        ], ['name'], ['value']);
     }
 
     private function resetGlobalComposerState(): void

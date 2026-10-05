@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Models\Settings;
 use App\Services\Binaries\BinariesConfig;
+use App\Services\Configuration\ConfigurationProvider;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -54,14 +54,14 @@ class CollectionCleanupService
             echo cli()->header('Process Releases -> Delete finished collections.'.PHP_EOL).
                 cli()->primary(sprintf(
                     'Deleting collections/binaries/parts older than %d hours.',
-                    Settings::settingValue('partretentionhours')
+                    app(ConfigurationProvider::class)->ingestion()->partRetentionHours
                 ), true);
         }
 
         // Batch-delete old collections using select-then-delete so we can
         // explicitly remove parts/binaries/collections even when FK cascades
         // are not present in the runtime schema.
-        $cutoff = now()->subHours(Settings::settingValue('partretentionhours'));
+        $cutoff = now()->subHours(app(ConfigurationProvider::class)->ingestion()->partRetentionHours);
         $batchDeleted = 0;
         do {
             $ids = DB::table('collections')

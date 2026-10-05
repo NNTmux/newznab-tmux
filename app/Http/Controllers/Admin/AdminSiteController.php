@@ -8,197 +8,22 @@ use App\Http\Controllers\BasePageController;
 use App\Models\GrabStat;
 use App\Models\ReleaseStat;
 use App\Models\RoleStat;
-use App\Models\Settings;
 use App\Models\SignupStat;
-use App\Services\SiteLogoService;
-use App\Support\SizeUnit;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rules\File;
-use Illuminate\View\View;
-use Throwable;
 
-class AdminSiteController extends BasePageController
+final class AdminSiteController extends BasePageController
 {
-    public function __construct(private readonly SiteLogoService $siteLogoService)
-    {
-        parent::__construct();
-    }
-
-    /**
-     * @return RedirectResponse|View
-     *
-     * @throws \Exception
-     */
-    public function edit(Request $request)
-    {
-
-        $meta_title = $title = 'Site Edit';
-        $error = '';
-
-        // set the current action
-        $action = $this->formAction($request);
-
-        switch ($action) {
-            case 'submit':
-                $request->validate([
-                    'site_logo' => [
-                        'nullable',
-                        File::image()
-                            ->types(['png', 'jpg', 'jpeg', 'webp'])
-                            ->max('2mb'),
-                    ],
-                    'remove_site_logo' => ['nullable', 'boolean'],
-                ]);
-
-                $data = $request->except(['site_logo', 'remove_site_logo']);
-                $currentLogo = Settings::settingValue('site_logo');
-                $currentLogoPath = is_string($currentLogo) ? $currentLogo : null;
-                $storedLogoPath = null;
-                $uploadedLogo = $request->file('site_logo');
-
-                if ($uploadedLogo instanceof UploadedFile) {
-                    $storedLogoPath = $this->siteLogoService->store($uploadedLogo);
-                    $data['site_logo'] = $storedLogoPath;
-                } elseif ($request->boolean('remove_site_logo')) {
-                    $data['site_logo'] = '';
-                }
-
-                foreach (SizeUnit::SITE_SIZE_SETTINGS as $sizeKey) {
-                    $data[$sizeKey] = SizeUnit::toBytes($data[$sizeKey] ?? null, $data[$sizeKey.'_unit'] ?? 'MB');
-                    unset($data[$sizeKey.'_unit']);
-                }
-
-                try {
-                    DB::transaction(function () use ($data): void {
-                        if (array_key_exists('site_logo', $data)) {
-                            Settings::query()->updateOrCreate(
-                                ['name' => 'site_logo'],
-                                ['value' => $data['site_logo']],
-                            );
-                        }
-
-                        Settings::settingsUpdate($data);
-                    });
-                } catch (Throwable $throwable) {
-                    if ($storedLogoPath !== null) {
-                        $this->siteLogoService->delete($storedLogoPath);
-                    }
-
-                    throw $throwable;
-                }
-
-                if (array_key_exists('site_logo', $data) && $currentLogoPath !== $data['site_logo']) {
-                    $this->siteLogoService->delete($currentLogoPath);
-                }
-
-                return redirect()->to('admin/site-edit')->with('success', 'Settings updated successfully');
-
-            case 'view':
-            default:
-                break;
-        }
-
-        $compress_headers_warning = ! str_contains(config('settings.nntp_server'), 'astra') ? 'compress_headers_warning' : '';
-
-        $sizeFields = [];
-        foreach (SizeUnit::SITE_SIZE_SETTINGS as $sizeKey) {
-            $sizeFields[$sizeKey] = SizeUnit::fromBytes($this->viewData['site'][$sizeKey] ?? 0);
-        }
-
-        $this->viewData = array_merge($this->viewData, [
-            'error' => $error,
-            'sizeFields' => $sizeFields,
-            'sizeUnits' => SizeUnit::UNITS,
-            'yesno' => [
-                'ids' => [1, 0],
-                'names' => ['Yes', 'No'],
-            ],
-            'passwd' => [
-                'ids' => [1, 0],
-                'names' => ['Deep (requires unrar)', 'None'],
-            ],
-            'langlist' => [
-                'ids' => [0, 2, 3, 1],
-                'names' => ['English', 'Danish', 'French', 'German'],
-            ],
-            'imdblang' => [
-                'ids' => ['en', 'da', 'nl', 'fi', 'fr', 'de', 'it', 'tlh', 'no', 'po', 'ru', 'es', 'sv'],
-                'names' => ['English', 'Danish', 'Dutch', 'Finnish', 'French', 'German', 'Italian', 'Klingon', 'Norwegian', 'Polish', 'Russian', 'Spanish', 'Swedish'],
-            ],
-            'newgroupscan_names' => ['Days', 'Posts'],
-            'registerstatus' => [
-                'ids' => [Settings::REGISTER_STATUS_OPEN, Settings::REGISTER_STATUS_INVITE, Settings::REGISTER_STATUS_CLOSED],
-                'names' => ['Open', 'Invite', 'Closed'],
-            ],
-            'passworded' => [
-                'ids' => [0, 1],
-                'names' => ['Hide passworded', 'Show everything'],
-            ],
-            'lookuplanguage' => [
-                'iso' => ['en', 'de', 'es', 'fr', 'it', 'nl', 'pt', 'sv'],
-                'names' => ['English', 'Deutsch', 'Español', 'Français', 'Italiano', 'Nederlands', 'Português', 'Svenska'],
-            ],
-            'imdb_urls' => [
-                'ids' => [0, 1],
-                'names' => ['imdb.com', 'akas.imdb.com'],
-            ],
-            'lookupbooks' => [
-                'ids' => [0, 1, 2],
-                'names' => ['Disabled', 'Lookup All Books', 'Lookup Renamed Books'],
-            ],
-            'lookupgames' => [
-                'ids' => [0, 1, 2],
-                'names' => ['Disabled', 'Lookup All Consoles', 'Lookup Renamed Consoles'],
-            ],
-            'lookupmusic' => [
-                'ids' => [0, 1, 2],
-                'names' => ['Disabled', 'Lookup All Music', 'Lookup Renamed Music'],
-            ],
-            'lookupmovies' => [
-                'ids' => [0, 1, 2],
-                'names' => ['Disabled', 'Lookup All Movies', 'Lookup Renamed Movies'],
-            ],
-            'lookuptv' => [
-                'ids' => [0, 1, 2],
-                'names' => ['Disabled', 'Lookup All TV', 'Lookup Renamed TV'],
-            ],
-            'lookup_reqids' => [
-                'ids' => [0, 1, 2],
-                'names' => ['Disabled', 'Lookup Request IDs', 'Lookup Request IDs Threaded'],
-            ],
-            'compress_headers_warning' => $compress_headers_warning,
-            'title' => $title,
-            'meta_title' => $meta_title,
-        ]);
-
-        return view('admin.site.edit', $this->viewData);
-    }
-
-    /**
-     * @throws \Exception
-     */
+    /** @throws \Exception */
     public function stats(): mixed
     {
-
-        $meta_title = $title = 'Site Stats';
-
-        $topGrabs = GrabStat::getTopGrabbers();
-        $recent = ReleaseStat::getRecentlyAdded();
-        $usersByMonth = SignupStat::getUsersByMonth();
-        $usersByRole = RoleStat::getUsersByRole();
-
         $this->viewData = array_merge($this->viewData, [
-            'topgrabs' => $topGrabs,
-            'recent' => $recent,
-            'usersbymonth' => $usersByMonth,
-            'usersbyrole' => $usersByRole,
+            'topgrabs' => GrabStat::getTopGrabbers(),
+            'recent' => ReleaseStat::getRecentlyAdded(),
+            'usersbymonth' => SignupStat::getUsersByMonth(),
+            'usersbyrole' => RoleStat::getUsersByRole(),
             'totusers' => 0,
             'totrusers' => 0,
-            'title' => $title,
-            'meta_title' => $meta_title,
+            'title' => 'Site Stats',
+            'meta_title' => 'Site Stats',
         ]);
 
         return view('admin.site.stats', $this->viewData);

@@ -8,10 +8,10 @@ use App\Enums\NzbImportStatus;
 use App\Models\Category;
 use App\Models\Predb;
 use App\Models\Release;
-use App\Models\Settings;
 use App\Models\UsenetGroup;
 use App\Services\BlacklistService;
 use App\Services\Categorization\CategorizationService;
+use App\Services\Configuration\ConfigurationProvider;
 use App\Services\ReleaseCleaningService;
 use App\Services\Releases\ReleaseDuplicateFinder;
 use App\Support\Utf8;
@@ -77,7 +77,7 @@ class NzbImportService
         $this->nzb = app(NzbService::class);
         $this->releaseCleaner = new ReleaseCleaningService;
         $this->releaseDuplicateFinder = app(ReleaseDuplicateFinder::class);
-        $this->crossPostt = Settings::settingValue('crossposttime') !== '' ? Settings::settingValue('crossposttime') : 2;
+        $this->crossPostt = app(ConfigurationProvider::class)->ingestion()->crossPostHours !== '' ? app(ConfigurationProvider::class)->ingestion()->crossPostHours : 2;
 
         // Set properties from options
         $this->browser = isset($options['Browser']) ? (bool) $options['Browser'] : false;

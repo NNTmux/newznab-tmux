@@ -21,8 +21,6 @@ final class ReleaseFactoryInvariantsTest extends TestCase
             unlink($this->databasePath);
         }
         $pdo = new PDO('sqlite:'.$this->databasePath);
-        $pdo->exec('CREATE TABLE settings (name VARCHAR PRIMARY KEY, value TEXT NULL)');
-        $pdo->exec("INSERT INTO settings VALUES ('categorizeforeign', '0'), ('catwebdl', '0')");
         putenv('APP_ENV=testing');
         putenv('DB_CONNECTION=sqlite');
         putenv('DB_DATABASE='.$this->databasePath);

@@ -2,12 +2,12 @@
 
 @section('content')
 <div class="max-w-4xl mx-auto px-4 py-3">
-    <x-page-header :title="'Invitation to join ' . $site['title']" eyebrow="Welcome" description="Review this invitation and create your account securely." icon="fas fa-envelope-open" />
+    <x-page-header :title="'Invitation to join ' . $site->title" eyebrow="Welcome" description="Review this invitation and create your account securely." icon="fas fa-envelope-open" />
 
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm dark:bg-gray-800">
         <div class="bg-gray-50 dark:bg-gray-900 px-6 py-4 border-b border-gray-200 dark:border-gray-700 rounded-t-lg dark:bg-gray-700 dark:border-gray-600">
             <h5 class="text-lg font-semibold text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
-                <i class="fa fa-envelope-open mr-2"></i>Invitation to Join {{ $site['title'] }}
+                <i class="fa fa-envelope-open mr-2"></i>Invitation to Join {{ $site->title }}
             </h5>
         </div>
         <div class="p-6">
@@ -18,7 +18,7 @@
                         <div>
                             <h6 class="font-semibold mb-2">You've been invited!</h6>
                             <p class="mb-0">
-                                <strong>{{ $preview['inviter_name'] ?? 'Someone' }}</strong> has invited you to join <strong>{{ $site['title'] }}</strong>.
+                                <strong>{{ $preview['inviter_name'] ?? 'Someone' }}</strong> has invited you to join <strong>{{ $site->title }}</strong>.
                             </p>
                         </div>
                     </div>
@@ -99,7 +99,7 @@
                                 <li>Click the "Accept Invitation" button below</li>
                                 <li>Fill out the registration form with your details</li>
                                 <li>Verify your email address when prompted</li>
-                                <li>Start exploring {{ $site['title'] }}!</li>
+                                <li>Start exploring {{ $site->title }}!</li>
                             </ol>
                         </div>
                     </div>

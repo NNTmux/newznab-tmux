@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Tmux;
 
 use App\Enums\TmuxPaneRole;
-use App\Models\Settings;
+use App\Services\Configuration\ConfigurationProvider;
 
 /**
  * Service for running tasks in tmux panes
@@ -35,20 +35,7 @@ class TmuxTaskRunner
      */
     protected function getNiceness(): int
     {
-        // Try to get from settings first
-        $niceness = Settings::settingValue('niceness');
-
-        // If empty string or null, try config
-        if (empty($niceness) && $niceness !== 0 && $niceness !== '0') {
-            $niceness = config('nntmux.niceness');
-        }
-
-        // If still empty, use system default
-        if (empty($niceness) && $niceness !== 0 && $niceness !== '0') {
-            $niceness = 10; // Standard nice default
-        }
-
-        return (int) $niceness;
+        return app(ConfigurationProvider::class)->tmux()->niceness;
     }
 
     /**
@@ -180,7 +167,7 @@ class TmuxTaskRunner
      */
     protected function getLogFile(string $paneName): string
     {
-        $logsEnabled = (int) Settings::settingValue('write_logs') === 1;
+        $logsEnabled = (int) app(ConfigurationProvider::class)->tmux()->writeLogs === 1;
 
         if (! $logsEnabled) {
             return '/dev/null';
@@ -202,9 +189,9 @@ class TmuxTaskRunner
      */
     protected function getRandomColor(): int
     {
-        $start = (int) Settings::settingValue('colors_start');
-        $end = (int) Settings::settingValue('colors_end');
-        $exclude = Settings::settingValue('colors_exc') ?? '';
+        $start = (int) app(ConfigurationProvider::class)->tmux()->colorsStart;
+        $end = (int) app(ConfigurationProvider::class)->tmux()->colorsEnd;
+        $exclude = implode(', ', app(ConfigurationProvider::class)->tmux()->colorExclusions);
 
         if (empty($exclude)) {
             return random_int($start, $end);
@@ -663,8 +650,8 @@ class TmuxTaskRunner
         $enabled = (int) ($runVar['settings']['post_non'] ?? 0);
         $pane = $this->paneManager->paneForRole(TmuxPaneRole::PostTv, '2.1');
 
-        if ($enabled !== 1) {
-            return $this->disablePane($pane, 'Post-process TV/Anime', 'Postprocess Video Metadata (post_non) is off or missing');
+        if ($enabled <= 0) {
+            return $this->disablePane($pane, 'Post-process TV/Anime', 'TV, Anime and Movie Panes is disabled in Post Processing settings');
         }
 
         $niceness = $this->getNiceness();
@@ -721,20 +708,20 @@ class TmuxTaskRunner
         $enabled = (int) ($runVar['settings']['post_non'] ?? 0);
         $pane = $this->paneManager->paneForRole(TmuxPaneRole::PostMovies, '2.3');
 
-        if ($enabled !== 1) {
-            return $this->disablePane($pane, 'Post-process Movies', 'Postprocess Video Metadata (post_non) is off or missing');
+        if ($enabled <= 0) {
+            return $this->disablePane($pane, 'Post-process Movies', 'TV, Anime and Movie Panes is disabled in Post Processing settings');
         }
 
         $niceness = $this->getNiceness();
         $logName = 'post_movies';
         $artisan = escapeshellarg(PHP_BINARY).' '.escapeshellarg(base_path('artisan'));
 
-        // Movies processing - Uses single-process command
+        // Movies processing
         $processMovies = (int) ($runVar['settings']['processmovies'] ?? 0);
         $hasMoviesWork = (int) ($runVar['counts']['now']['processmovies'] ?? 0) > 0;
 
         if ($processMovies === 0) {
-            return $this->disablePane($pane, 'Post-process Movies', 'Lookup Movies (lookupimdb) is off or missing');
+            return $this->disablePane($pane, 'Post-process Movies', 'Process Movies is disabled in Post Processing settings');
         }
 
         if (! $hasMoviesWork) {
@@ -770,8 +757,8 @@ class TmuxTaskRunner
         $legacyPane = (int) ($runVar['constants']['sequential'] ?? 0) === 2 ? '1.1' : '2.2';
         $pane = $this->paneManager->paneForRole(TmuxPaneRole::PostMetadata, $legacyPane);
 
-        if ($enabled !== 1) {
-            return $this->disablePane($pane, 'Post-process Metadata', 'Postprocess Metadata (post_amazon) is off or missing');
+        if ($enabled <= 0) {
+            return $this->disablePane($pane, 'Post-process Metadata', 'Book, Music, Console and Game Panes is disabled in Tmux settings');
         }
 
         $hasWork = (int) ($runVar['counts']['now']['processmusic'] ?? 0) > 0

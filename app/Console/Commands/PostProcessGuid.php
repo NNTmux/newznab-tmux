@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use App\Models\Settings;
 use App\Services\AdditionalProcessing\AdditionalProcessingOrchestrator;
 use App\Services\AdditionalProcessing\DTO\AdditionalBatchResult;
+use App\Services\Configuration\ConfigurationProvider;
 use App\Services\NfoService;
 use App\Services\NNTP\NNTPService;
 use App\Services\PostProcessService;
@@ -157,8 +157,8 @@ class PostProcessGuid extends Command
             $nntp,
             '',
             $guid,
-            (bool) Settings::settingValue('lookupimdb'),
-            (bool) Settings::settingValue('lookuptv')
+            (bool) app(ConfigurationProvider::class)->metadata()->movieLookup->value,
+            (bool) app(ConfigurationProvider::class)->metadata()->tvLookup->value
         );
     }
 

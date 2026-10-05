@@ -34,12 +34,6 @@ abstract class ImdbScraperTestCase extends TestCase
         }
 
         $pdo = new PDO('sqlite:'.$this->databasePath);
-        $pdo->exec('CREATE TABLE settings (name VARCHAR PRIMARY KEY, value TEXT NULL)');
-        $pdo->exec("INSERT INTO settings (name, value) VALUES
-            ('categorizeforeign', '0'),
-            ('catwebdl', '0'),
-            ('title', 'NNTmux Test'),
-            ('home_link', '/')");
 
         $this->setEnvironmentValue('APP_ENV', 'testing');
         $this->setEnvironmentValue('DB_CONNECTION', 'sqlite');

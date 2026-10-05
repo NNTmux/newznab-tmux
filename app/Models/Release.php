@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Facades\Search;
+use App\Services\Configuration\ConfigurationProvider;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -269,7 +270,7 @@ class Release extends Model
      */
     public static function updateGrab(string $guid): void
     {
-        $updateGrabs = ((int) Settings::settingValue('grabstatus') !== 0);
+        $updateGrabs = ((int) app(ConfigurationProvider::class)->ingestion()->grabStatus !== 0);
         if ($updateGrabs) {
             $id = self::whereGuid($guid)->value('id');
             self::whereGuid($guid)->increment('grabs');
@@ -291,7 +292,7 @@ class Release extends Model
         if ($guids === []) {
             return;
         }
-        $updateGrabs = ((int) Settings::settingValue('grabstatus') !== 0);
+        $updateGrabs = ((int) app(ConfigurationProvider::class)->ingestion()->grabStatus !== 0);
         if ($updateGrabs) {
             $ids = self::query()->whereIn('guid', $guids)->pluck('id');
             self::query()->whereIn('guid', $guids)->increment('grabs');

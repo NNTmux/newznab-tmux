@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\AdditionalProcessing;
 
-use App\Models\Settings;
+use App\Services\Configuration\ConfigurationProvider;
 use App\Services\Runners\PostProcessRunner;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -34,9 +34,10 @@ final class AdditionalProcessingDiagnostics
     public function inspect(): array
     {
         $warnings = [];
-        $releaseTimeout = $this->setting('releaseprocessingtimeout', 120);
-        $threads = max(1, $this->setting('postthreads', 1));
-        $batchSize = max(1, $this->setting('maxaddprocessed', 25));
+        $configuration = app(ConfigurationProvider::class)->postProcessing();
+        $releaseTimeout = $configuration->releaseTimeoutSeconds;
+        $threads = max(1, $configuration->postThreads);
+        $batchSize = max(1, $configuration->maxAdditionalProcessed);
         $childTimeout = (int) (config('nntmux.concurrency_timeout')
             ?? config('nntmux.multiprocessing_max_child_time', 1800));
         $claimTtl = AdditionalCandidateQuery::claimTtlSeconds();
@@ -81,7 +82,7 @@ final class AdditionalProcessingDiagnostics
                 'postthreads' => $threads,
                 'maxaddprocessed' => $batchSize,
                 'releaseprocessingtimeout' => $releaseTimeout,
-                'maxpptimeoutcount' => $this->setting('maxpptimeoutcount', 3),
+                'maxpptimeoutcount' => $configuration->maxTimeoutCount,
                 'worker_max_batches' => PostProcessRunner::ADDITIONAL_WORKER_MAX_BATCHES,
                 'multiprocessing_child_timeout' => $childTimeout,
             ],
@@ -232,13 +233,6 @@ final class AdditionalProcessingDiagnostics
         }
 
         return is_writable($candidate);
-    }
-
-    private function setting(string $name, int $default): int
-    {
-        $value = Settings::settingValue($name);
-
-        return $value === null || $value === '' ? $default : (int) $value;
     }
 
     /**

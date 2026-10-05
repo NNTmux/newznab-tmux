@@ -43,7 +43,6 @@ class PasswordResetSecurityTest extends TestCase
         PasswordRule::defaults(fn () => PasswordRule::min(8));
 
         $this->createSchema();
-        $this->seedSettings();
     }
 
     public function test_password_reset_link_request_sends_tokenized_link_and_clears_legacy_guid(): void
@@ -171,10 +170,6 @@ class PasswordResetSecurityTest extends TestCase
 
     protected function createSchema(): void
     {
-        Schema::create('settings', function (Blueprint $table): void {
-            $table->string('name')->primary();
-            $table->text('value')->nullable();
-        });
 
         Schema::create('roles', function (Blueprint $table): void {
             $table->increments('id');
@@ -248,16 +243,6 @@ class PasswordResetSecurityTest extends TestCase
             $table->json('metadata')->nullable();
             $table->timestamp('created_at')->nullable();
         });
-    }
-
-    protected function seedSettings(): void
-    {
-        DB::table('settings')->insert([
-            ['name' => 'title', 'value' => 'NNTmux Test'],
-            ['name' => 'home_link', 'value' => '/'],
-            ['name' => 'categorizeforeign', 'value' => '0'],
-            ['name' => 'catwebdl', 'value' => '0'],
-        ]);
     }
 
     /**

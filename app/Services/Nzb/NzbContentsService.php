@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Nzb;
 
 use App\Models\Release;
-use App\Models\Settings;
+use App\Services\Configuration\ConfigurationProvider;
 use App\Services\NfoService;
 use App\Services\NNTP\NNTPService;
 use App\Services\PostProcessService;
@@ -45,7 +45,7 @@ class NzbContentsService
         $this->nntp = $nntp ?? new NNTPService;
         $this->nfo = $nfo ?? new NfoService;
         $this->postProcessService = $postProcessService ?? app(PostProcessService::class);
-        $this->lookupPar2 = (int) Settings::settingValue('lookuppar2') === 1;
+        $this->lookupPar2 = (int) app(ConfigurationProvider::class)->postProcessing()->lookupPar2 === 1;
         $this->alternateNntp = (bool) config('nntmux_nntp.use_alternate_nntp_server');
     }
 

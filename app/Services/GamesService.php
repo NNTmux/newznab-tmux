@@ -11,7 +11,7 @@ use App\Models\Category;
 use App\Models\GamesInfo;
 use App\Models\Genre;
 use App\Models\Release;
-use App\Models\Settings;
+use App\Services\Configuration\ConfigurationProvider;
 use App\Services\IGDB\Exceptions\IgdbHttpException;
 use App\Services\Releases\ReleaseBrowseService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -87,9 +87,9 @@ class GamesService
         $this->titleParser = $titleParser ?? new GamesTitleParser;
         $this->imageService = $imageService ?? new ReleaseImageService;
 
-        $this->gameQty = Settings::settingValue('maxgamesprocessed') !== '' ? (int) Settings::settingValue('maxgamesprocessed') : 150;
+        $this->gameQty = app(ConfigurationProvider::class)->metadata()->maxGamesProcessed !== '' ? (int) app(ConfigurationProvider::class)->metadata()->maxGamesProcessed : 150;
         $this->imgSavePath = config('nntmux_settings.covers_path').'/games/';
-        $this->renamed = (int) Settings::settingValue('lookupgames') === 2 ? 'AND isrenamed = 1' : '';
+        $this->renamed = (int) app(ConfigurationProvider::class)->metadata()->gameLookup->value === 2 ? 'AND isrenamed = 1' : '';
         $this->matchPercentage = 60;
         $this->maxHitRequest = false;
         $this->catWhere = 'AND categories_id = '.Category::PC_GAMES.' ';
@@ -763,7 +763,7 @@ class GamesService
             $query->where('groups_id', $groupID);
         }
 
-        if ((int) Settings::settingValue('lookupgames') === 2) {
+        if ((int) app(ConfigurationProvider::class)->metadata()->gameLookup->value === 2) {
             $query->where('isrenamed', '=', 1);
         }
 

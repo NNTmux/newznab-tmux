@@ -21,8 +21,6 @@ final class ReleasesNormalizeGuidsTest extends TestCase
             unlink($this->databasePath);
         }
         $pdo = new PDO('sqlite:'.$this->databasePath);
-        $pdo->exec('CREATE TABLE settings (name VARCHAR PRIMARY KEY, value TEXT NULL)');
-        $pdo->exec("INSERT INTO settings VALUES ('categorizeforeign', '0'), ('catwebdl', '0')");
         $this->setEnvironmentValue('APP_ENV', 'testing');
         $this->setEnvironmentValue('DB_CONNECTION', 'sqlite');
         $this->setEnvironmentValue('DB_DATABASE', $this->databasePath);

@@ -140,7 +140,7 @@
                                     @if(!empty($show['tvdb']) && $show['tvdb'] > 0)
                                         <a class="px-4 py-2 bg-blue-100 text-blue-800 rounded-lg hover:bg-blue-200 inline-flex items-center text-sm font-medium transition"
                                            target="_blank"
-                                           href="{{ $site['dereferrer_link'] }}http://thetvdb.com/?tab=series&id={{ $show['tvdb'] }}"
+                                           href="{{ $site->dereferrerLink }}http://thetvdb.com/?tab=series&id={{ $show['tvdb'] }}"
                                            title="View at TheTVDB">
                                             <i class="fa fa-database mr-2"></i> TheTVDB
                                         </a>
@@ -149,7 +149,7 @@
                                     @if(!empty($show['tvmaze']) && $show['tvmaze'] > 0)
                                         <a class="px-4 py-2 bg-purple-100 text-purple-800 rounded-lg hover:bg-purple-200 inline-flex items-center text-sm font-medium transition"
                                            target="_blank"
-                                           href="{{ $site['dereferrer_link'] }}http://tvmaze.com/shows/{{ $show['tvmaze'] }}"
+                                           href="{{ $site->dereferrerLink }}http://tvmaze.com/shows/{{ $show['tvmaze'] }}"
                                            title="View at TVMaze">
                                             <i class="fa fa-tv mr-2"></i> TVMaze
                                         </a>
@@ -158,7 +158,7 @@
                                     @if(!empty($show['trakt']) && $show['trakt'] > 0)
                                         <a class="px-4 py-2 bg-red-100 text-red-800 rounded-lg hover:bg-red-200 inline-flex items-center text-sm font-medium transition"
                                            target="_blank"
-                                           href="{{ $site['dereferrer_link'] }}http://www.trakt.tv/shows/{{ $show['trakt'] }}"
+                                           href="{{ $site->dereferrerLink }}http://www.trakt.tv/shows/{{ $show['trakt'] }}"
                                            title="View at TraktTv">
                                             <i class="fa fa-heart mr-2"></i> Trakt
                                         </a>
@@ -167,7 +167,7 @@
                                     @if(!empty($show['tvrage']) && $show['tvrage'] > 0)
                                         <a class="px-4 py-2 bg-orange-100 text-orange-800 rounded-lg hover:bg-orange-200 inline-flex items-center text-sm font-medium transition"
                                            target="_blank"
-                                           href="{{ $site['dereferrer_link'] }}http://www.tvrage.com/shows/id-{{ $show['tvrage'] }}"
+                                           href="{{ $site->dereferrerLink }}http://www.tvrage.com/shows/id-{{ $show['tvrage'] }}"
                                            title="View at TV Rage">
                                             <i class="fa fa-external-link-alt mr-2"></i> TV Rage
                                         </a>
@@ -176,7 +176,7 @@
                                     @if(!empty($show['imdb']) && $show['imdb'] > 0)
                                         <a class="px-4 py-2 bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200 inline-flex items-center text-sm font-medium transition"
                                            target="_blank"
-                                           href="{{ $site['dereferrer_link'] }}https://www.imdb.com/title/tt{{ $show['imdb'] }}"
+                                           href="{{ $site->dereferrerLink }}https://www.imdb.com/title/tt{{ $show['imdb'] }}"
                                            title="View at IMDb">
                                             <i class="fa fa-film mr-2"></i> IMDb
                                         </a>
@@ -185,7 +185,7 @@
                                     @if(!empty($show['tmdb']) && $show['tmdb'] > 0)
                                         <a class="px-4 py-2 bg-cyan-100 text-cyan-800 rounded-lg hover:bg-cyan-200 inline-flex items-center text-sm font-medium transition"
                                            target="_blank"
-                                           href="{{ $site['dereferrer_link'] }}https://www.themoviedb.org/tv/{{ $show['tmdb'] }}"
+                                           href="{{ $site->dereferrerLink }}https://www.themoviedb.org/tv/{{ $show['tmdb'] }}"
                                            title="View at TMDb">
                                             <i class="fa fa-video mr-2"></i> TMDb
                                         </a>

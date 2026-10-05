@@ -6,7 +6,8 @@ namespace App\Console\Commands;
 
 use App\Enums\TmuxMode;
 use App\Enums\TmuxPaneRole;
-use App\Models\Settings;
+use App\Services\Configuration\ConfigurationProvider;
+use App\Services\Configuration\ProcessingRuntimeStateRepository;
 use App\Services\Tmux\TmuxPaneManager;
 use App\Services\Tmux\TmuxSessionManager;
 use Illuminate\Console\Command;
@@ -41,15 +42,13 @@ class TmuxStop extends Command
         try {
             // Get session name
             $sessionName = $this->option('session')
-                ?? Settings::settingValue('tmux_session')
-                ?? config('tmux.session.name')
-                ?? config('tmux.session.default_name', 'nntmux');
+                ?? app(ConfigurationProvider::class)->tmux()->sessionName;
 
             $this->sessionManager = new TmuxSessionManager($sessionName);
 
             // Check if session exists
             if (! $this->sessionManager->sessionExists()) {
-                Settings::query()->where('name', 'running')->update(['value' => 0]);
+                app(ProcessingRuntimeStateRepository::class)->setTmuxRunning(false);
                 $this->warn("⚠️  Session '{$sessionName}' is not running");
 
                 return Command::SUCCESS;
@@ -67,10 +66,11 @@ class TmuxStop extends Command
             cli()->header('Stopping Tmux Session');
 
             // Set running flag to 0
-            Settings::query()->updateOrCreate(['name' => 'running'], ['value' => 0]);
+            $runtimeState = app(ProcessingRuntimeStateRepository::class);
+            $runtimeState->requestStop();
+            $runtimeState->setTmuxRunning(false);
             $this->info('✅ Running flag cleared');
 
-            Settings::query()->updateOrCreate(['name' => 'exit'], ['value' => 1]);
             $panes = new TmuxPaneManager($sessionName);
             $workerRoles = array_merge(array_values(TmuxMode::Full->tasks()), [TmuxPaneRole::Sequential, TmuxPaneRole::Monitor]);
             $timeout = max(0, (int) $this->option('timeout'));

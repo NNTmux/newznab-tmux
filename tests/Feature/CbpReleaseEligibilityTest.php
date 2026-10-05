@@ -38,7 +38,7 @@ class CbpReleaseEligibilityTest extends TestCase
     protected function tearDown(): void
     {
         if ($this->ownsTables) {
-            foreach (['parts', 'binaries', 'collection_groups', 'collections', 'settings'] as $table) {
+            foreach (['parts', 'binaries', 'collection_groups', 'collections'] as $table) {
                 Schema::dropIfExists($table);
             }
         }
@@ -187,14 +187,6 @@ class CbpReleaseEligibilityTest extends TestCase
     private function createTables(): void
     {
         $this->ownsTables = true;
-        Schema::create('settings', function (Blueprint $table): void {
-            $table->string('name')->primary();
-            $table->string('value')->nullable();
-        });
-        DB::table('settings')->insert([
-            ['name' => 'delaytime', 'value' => '2'],
-            ['name' => 'collection_timeout', 'value' => '48'],
-        ]);
         Schema::create('collections', function (Blueprint $table): void {
             $table->increments('id');
             $table->string('subject')->default('');

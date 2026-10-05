@@ -38,8 +38,6 @@ class SeriesReleaseServiceTest extends TestCase
         }
 
         $pdo = new PDO('sqlite:'.$this->databasePath);
-        $pdo->exec('CREATE TABLE settings (name VARCHAR PRIMARY KEY, value TEXT NULL)');
-        $pdo->exec("INSERT INTO settings (name, value) VALUES ('showpasswordedrelease', '0'), ('categorizeforeign', '0'), ('catwebdl', '0')");
 
         $this->setEnvironmentValue('APP_ENV', 'testing');
         $this->setEnvironmentValue('DB_CONNECTION', 'sqlite');
@@ -101,12 +99,6 @@ class SeriesReleaseServiceTest extends TestCase
 
     private function createSchema(): void
     {
-        if (! Schema::hasTable('settings')) {
-            Schema::create('settings', function (Blueprint $table): void {
-                $table->string('name')->primary();
-                $table->text('value')->nullable();
-            });
-        }
 
         Schema::create('root_categories', function (Blueprint $table): void {
             $table->increments('id');
