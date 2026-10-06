@@ -128,6 +128,53 @@ run_installer
 [[ $status == 0 ]] || fail "Second dry run failed: $output"
 assert_contains "$output" 'already includes the Grafana proxy' 'Include is not idempotent'
 
+# ── Root written differently: symlinked path, trailing slash, conf.d ──
+setup
+rm "$root/etc/nginx/sites-enabled/nntmux"
+mkdir -p "$root/etc/nginx/conf.d"
+ln -s "$app" "$case_dir/app-link"
+cat >"$root/etc/nginx/conf.d/nntmux.conf" <<NGINX
+server {
+    listen 443 ssl;
+    root "$case_dir/app-link/public/";
+    location / { try_files \$uri /index.php?\$query_string; }
+}
+NGINX
+run_installer
+[[ $status == 0 ]] || fail "conf.d dry run failed: $output"
+assert_contains "$output" "Adding the Grafana proxy to nginx site /etc/nginx/conf.d/nntmux.conf" 'Symlinked/trailing-slash root not matched'
+[[ $(grep -c 'nntmux-grafana.conf;' "$dry/etc/nginx/conf.d/nntmux.conf") == 1 ]] || fail 'Include missing in conf.d site'
+
+# ── HTTP and HTTPS in separate files: both are edited ────────
+setup
+cat >"$root/etc/nginx/sites-available/nntmux-ssl" <<NGINX
+server {
+    listen 443 ssl;
+    root $app/public;
+}
+NGINX
+ln -s "$root/etc/nginx/sites-available/nntmux-ssl" "$root/etc/nginx/sites-enabled/nntmux-ssl"
+run_installer
+[[ $status == 0 ]] || fail "Two-file dry run failed: $output"
+[[ $(grep -c 'nntmux-grafana.conf;' "$dry/etc/nginx/sites-available/nntmux-ssl") == 1 ]] || fail 'Second site not edited'
+[[ $(grep -c 'nntmux-grafana.conf;' "$dry/etc/nginx/sites-available/nntmux") == 1 ]] || fail 'First site not edited'
+assert_contains "$(cat "$dry/etc/nntmux-monitoring/install.state")" 'nginx_site=/etc/nginx/sites-available/nntmux /etc/nginx/sites-available/nntmux-ssl' 'Both sites recorded for uninstall'
+
+# ── No matching root: show what was found, change nothing ────
+setup
+sed -i "s|root $app/public;|root /srv/other/public;|" "$root/etc/nginx/sites-available/nntmux"
+run_installer
+[[ $status == 0 ]] || fail "Unmatched site must not abort: $output"
+assert_contains "$output" 'Roots found in the nginx config:' 'Missing diagnostics'
+assert_contains "$output" 'root /srv/other/public;' 'Seen roots not listed'
+[[ ! -e $dry/etc/nginx/sites-available/nntmux ]] || fail 'Unmatched site was edited'
+# An explicit --nginx-site still needs a matching root.
+cp "$root/etc/nginx/sites-available/nntmux" "$case_dir/explicit.conf"
+sed -i "s|root /srv/other/public;|root $app/public;|" "$case_dir/explicit.conf"
+rm -rf "$dry" && mkdir -p "$dry"
+run_installer --nginx-site="$case_dir/explicit.conf"
+assert_contains "$output" "Adding the Grafana proxy to nginx site $case_dir/explicit.conf" '--nginx-site ignored'
+
 # ── Existing exporter behind basic auth ──────────────────────
 setup
 printf 'LISTEN 0 4096 192.0.2.10:9100 0.0.0.0:* users:(("node_exporter",pid=812,fd=3))\n' >"$fixtures/ss.txt"

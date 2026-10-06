@@ -24,6 +24,7 @@ Usage: sudo scripts/install-monitoring.sh [options]
   --web-server=auto|nginx|apache  Web server to configure (default: auto)
   --skip-webserver                Do not touch the web server; print the snippet instead
   --web-user=USER                 User PHP-FPM runs as; may read the JWT key (default: detected)
+  --nginx-site=FILE               nginx config file holding the NNTmux server block (default: detected)
   --grafana-version=VERSION       Grafana apt version (default: 13.2.3)
   --retention=DURATION            Prometheus retention (default: 30d)
   --grafana-port=PORT             Grafana port on 127.0.0.1 (default: 3000)
@@ -104,6 +105,7 @@ APP_PATH=$(cd -- "$script_dir/.." && pwd)
 WEB_SERVER=auto
 SKIP_WEBSERVER=0
 WEB_USER=
+NGINX_SITE=
 GRAFANA_VERSION=$GRAFANA_VERSION_DEFAULT
 RETENTION=30d
 GRAFANA_PORT=3000
@@ -125,6 +127,7 @@ for argument in "$@"; do
         --web-server=*) WEB_SERVER=${argument#*=} ;;
         --skip-webserver) SKIP_WEBSERVER=1 ;;
         --web-user=*) WEB_USER=${argument#*=} ;;
+        --nginx-site=*) NGINX_SITE=${argument#*=} ;;
         --grafana-version=*) GRAFANA_VERSION=${argument#*=} ;;
         --retention=*) RETENTION=${argument#*=} ;;
         --grafana-port=*) GRAFANA_PORT=${argument#*=} ;;
@@ -567,13 +570,23 @@ APACHE
 
 # Insert the include into every server block whose root is the NNTmux public dir.
 # Prints the new file to stdout; idempotent when the include is already present.
+# $2: newline-separated root values, exactly as written in that file, that resolve to the app.
 nginx_add_include() {
-    local site=$1
-    awk -v public="$APP_PATH/public" -v include_line="    include snippets/nntmux-grafana.conf; $MARKER" '
+    local site=$1 roots=$2
+    awk -v roots="$roots" -v include_line="    include snippets/nntmux-grafana.conf; $MARKER" '
+        BEGIN { root_count = split(roots, wanted, "\n") }
+        function root_matches(line,   value, r) {
+            if (line !~ /^[[:space:]]*root[[:space:]]/) return 0
+            value = line
+            sub(/^[[:space:]]*root[[:space:]]+/, "", value)
+            sub(/[[:space:]]*;.*$/, "", value)
+            for (r = 1; r <= root_count; r++) if (value == wanted[r]) return 1
+            return 0
+        }
         function flush(   i, has_root, has_include) {
             has_root = 0; has_include = 0
             for (i = 1; i <= n; i++) {
-                if (block[i] ~ /^[[:space:]]*root[[:space:]]/ && index(block[i], public)) has_root = i
+                if (root_matches(block[i])) has_root = i
                 if (index(block[i], "nntmux-grafana.conf")) has_include = 1
             }
             for (i = 1; i <= n; i++) {
@@ -602,14 +615,50 @@ nginx_remove_include() {
     grep -vF "nntmux-grafana.conf; $MARKER" "$1"
 }
 
-nginx_site_for_app() {
+# Config files nginx actually loads (nginx -T), else the usual Ubuntu locations.
+nginx_config_files() {
+    if [[ -n $NGINX_SITE ]]; then
+        printf '%s\n' "$NGINX_SITE"
+        return
+    fi
+    local files=''
+    if [[ -z $FIXTURES ]] && command -v nginx >/dev/null 2>&1; then
+        files=$(nginx -T 2>/dev/null | sed -n 's/^# configuration file \(.*\):$/\1/p' || true)
+    fi
+    if [[ -z $files ]]; then
+        files=$(ls -1 "$ROOT"/etc/nginx/nginx.conf "$ROOT"/etc/nginx/conf.d/*.conf "$ROOT"/etc/nginx/sites-enabled/* 2>/dev/null || true)
+    fi
+    printf '%s\n' "$files"
+}
+
+# Normalize a root value: drop quotes and trailing slashes, resolve symlinks.
+normalize_root() {
+    local value=${1//\"/}
+    value=${value//\'/}
+    while [[ $value == */ && $value != / ]]; do value=${value%/}; done
+    realpath -m -- "$value" 2>/dev/null || printf '%s' "$value"
+}
+
+# Prints "file<TAB>root-as-written" for every root directive that resolves to the app's public dir.
+nginx_sites_for_app() {
+    local app_public file value
+    app_public=$(normalize_root "$APP_PATH/public")
+    while IFS= read -r file; do
+        [[ -n $file && -f $file ]] || continue
+        while IFS= read -r value; do
+            if [[ $(normalize_root "$value") == "$app_public" ]]; then
+                printf '%s\t%s\n' "$(readlink -f -- "$file")" "$value"
+            fi
+        done < <(sed -nE 's/^[[:space:]]*root[[:space:]]+([^;]+);.*/\1/p' "$file" | sed -E 's/[[:space:]]+$//')
+    done < <(nginx_config_files)
+}
+
+nginx_roots_seen() {
     local file
-    for file in "$ROOT"/etc/nginx/sites-enabled/*; do
-        [[ -e $file ]] || continue
-        if grep -qE "^[[:space:]]*root[[:space:]]+\"?$APP_PATH/public\"?;" "$file"; then
-            readlink -f -- "$file"
-        fi
-    done
+    while IFS= read -r file; do
+        [[ -n $file && -f $file ]] || continue
+        grep -HnE '^[[:space:]]*root[[:space:]]' "$file" 2>/dev/null | sed "s|^|    |" || true
+    done < <(nginx_config_files)
 }
 
 # ── Install steps ────────────────────────────────────────────
@@ -816,41 +865,52 @@ configure_nginx() {
     install_file "$WORK_DIR/nntmux-grafana-map.conf" /etc/nginx/conf.d/nntmux-grafana-map.conf 0644 root:root
     install_file "$WORK_DIR/nntmux-grafana.conf" /etc/nginx/snippets/nntmux-grafana.conf 0644 root:root
 
-    local -a sites
-    mapfile -t sites < <(nginx_site_for_app | sort -u)
-    if ((${#sites[@]} != 1)); then
-        warn "Could not find exactly one nginx site with 'root $APP_PATH/public;' (found ${#sites[@]})."
-        echo "  Add this line inside the NNTmux server block(s), then run: nginx -t && systemctl reload nginx"
+    local matches site target roots
+    matches=$(nginx_sites_for_app | sort -u)
+    if [[ -z $matches ]]; then
+        warn "No nginx server block has a root that resolves to $APP_PATH/public."
+        echo "  Roots found in the nginx config:"
+        nginx_roots_seen | head -n 20
+        echo "  Re-run with --nginx-site=/etc/nginx/sites-available/<your site>, or add this line inside"
+        echo "  the NNTmux server block(s) yourself, then run: nginx -t && systemctl reload nginx"
         echo "    include snippets/nntmux-grafana.conf; $MARKER"
         return
     fi
 
-    local site=${sites[0]} target=${sites[0]#"$ROOT"}
-    nginx_add_include "$site" >"$WORK_DIR/site"
-    if cmp -s "$site" "$WORK_DIR/site"; then
-        info "nginx site $target already includes the Grafana proxy"
-    else
-        info "Adding the Grafana proxy to nginx site $target"
-        if ((!DRY_RUN)); then
-            mkdir -p /var/backups/nntmux-monitoring
-            cp -p "$site" "/var/backups/nntmux-monitoring/$(basename "$site").$(date +%Y%m%d%H%M%S)"
-            cat "$WORK_DIR/site" >"$site"
+    local -a edited=()
+    while IFS= read -r site; do
+        roots=$(awk -F'\t' -v f="$site" '$1 == f {print $2}' <<<"$matches")
+        target=${site#"$ROOT"}
+        nginx_add_include "$site" "$roots" >"$WORK_DIR/site"
+        if cmp -s "$site" "$WORK_DIR/site"; then
+            info "nginx site $target already includes the Grafana proxy"
         else
-            mkdir -p -- "$DRY_DIR$(dirname -- "$target")"
-            cp -- "$WORK_DIR/site" "$DRY_DIR$target"
-            echo "  would update $target"
+            info "Adding the Grafana proxy to nginx site $target"
+            if ((!DRY_RUN)); then
+                mkdir -p /var/backups/nntmux-monitoring
+                cp -p "$site" "/var/backups/nntmux-monitoring/$(basename "$site").$(date +%Y%m%d%H%M%S)"
+                cat "$WORK_DIR/site" >"$site"
+            else
+                mkdir -p -- "$DRY_DIR$(dirname -- "$target")"
+                cp -- "$WORK_DIR/site" "$DRY_DIR$target"
+                echo "  would update $target"
+            fi
         fi
-    fi
+        edited+=("$site")
+    done < <(cut -f1 <<<"$matches" | sort -u)
+
     if ((!DRY_RUN)); then
         if ! nginx -t 2>"$WORK_DIR/nginx-test"; then
             cat "$WORK_DIR/nginx-test" >&2
-            nginx_remove_include "$site" >"$WORK_DIR/site.restored" && cat "$WORK_DIR/site.restored" >"$site"
+            for site in "${edited[@]}"; do
+                nginx_remove_include "$site" >"$WORK_DIR/site.restored" && cat "$WORK_DIR/site.restored" >"$site"
+            done
             rm -f /etc/nginx/snippets/nntmux-grafana.conf /etc/nginx/conf.d/nntmux-grafana-map.conf
             die "nginx -t failed; the NNTmux site was restored."
         fi
         systemctl reload nginx
     fi
-    echo "$target" >"$WORK_DIR/nginx-site"
+    printf '%s\n' "${edited[@]#"$ROOT"}" | paste -sd' ' >"$WORK_DIR/nginx-site"
 }
 
 configure_apache() {
@@ -994,10 +1054,12 @@ uninstall() {
 
     if [[ $web_server == nginx ]]; then
         info "Removing the Grafana proxy from nginx"
-        if [[ -n $nginx_site && -f $nginx_site ]]; then
-            nginx_remove_include "$nginx_site" >"$WORK_DIR/site"
-            ((DRY_RUN)) || cat "$WORK_DIR/site" >"$nginx_site"
-        fi
+        local site
+        for site in $nginx_site; do
+            [[ -f $site ]] || continue
+            nginx_remove_include "$site" >"$WORK_DIR/site"
+            ((DRY_RUN)) || cat "$WORK_DIR/site" >"$site"
+        done
         run rm -f /etc/nginx/snippets/nntmux-grafana.conf /etc/nginx/conf.d/nntmux-grafana-map.conf
         if ((!DRY_RUN)); then nginx -t && systemctl reload nginx; fi
     elif [[ $web_server == apache ]]; then
