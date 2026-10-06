@@ -13,7 +13,7 @@ final class TmuxCommand
     {
         $socket = config('tmux.socket_name', '');
 
-        return array_merge(['tmux'], $socket === '' ? [] : ['-L', $socket], $arguments);
+        return array_merge(['tmux', '-u'], $socket === '' ? [] : ['-L', $socket], $arguments);
     }
 
     /** @return list<string> */

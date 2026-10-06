@@ -48,7 +48,17 @@ class TmuxPaneManagementTest extends TestCase
     {
         config(['tmux' => []]);
 
-        $this->assertSame(['tmux', 'attach-session', '-t', '=nntmux'], TmuxCommand::arguments(['attach-session', '-t', '=nntmux']));
+        $this->assertSame(['tmux', '-u', 'attach-session', '-t', '=nntmux'], TmuxCommand::arguments(['attach-session', '-t', '=nntmux']));
+    }
+
+    public function test_configured_socket_forces_utf8_before_the_tmux_command(): void
+    {
+        config(['tmux.socket_name' => 'nntmux-test']);
+
+        $this->assertSame(
+            ['tmux', '-u', '-L', 'nntmux-test', 'list-panes', '-t', '=nntmux'],
+            TmuxCommand::arguments(['list-panes', '-t', '=nntmux']),
+        );
     }
 
     /** @param array<string, int> $settings */
@@ -134,6 +144,7 @@ class TmuxPaneManagementTest extends TestCase
         Process::assertRan(function (PendingProcess $process): bool {
             return $process->command === [
                 'tmux',
+                '-u',
                 'set-option',
                 '-p',
                 '-t',
@@ -157,6 +168,7 @@ SH;
         Process::assertRan(function (PendingProcess $process) use ($command): bool {
             return $process->command === [
                 'tmux',
+                '-u',
                 'respawn-pane',
                 '-k',
                 '-t',
@@ -467,6 +479,7 @@ SH;
         Process::assertRan(function (PendingProcess $process): bool {
             return $process->command === [
                 'tmux',
+                '-u',
                 'respawn-pane',
                 '-t',
                 '%9',

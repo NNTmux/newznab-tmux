@@ -8,6 +8,14 @@ use Symfony\Component\Yaml\Yaml;
 
 class ViteDockerConfigurationTest extends TestCase
 {
+    public function test_production_image_sets_a_utf8_locale(): void
+    {
+        $dockerfile = $this->projectFile('Dockerfile');
+
+        $this->assertSame(1, preg_match('/^FROM[^\r\n]+ AS production\R(.*)\z/sm', $dockerfile, $matches));
+        $this->assertMatchesRegularExpression('/^ENV LANG=C\.UTF-8$/m', $matches[1]);
+    }
+
     public function test_compose_uses_latest_tags_for_services_that_publish_them(): void
     {
         foreach (['docker-compose.yml', 'docker-compose.yml.prod-dist'] as $path) {

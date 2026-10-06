@@ -24,6 +24,7 @@ RUN composer dump-autoload --no-dev --no-scripts --optimize \
     && rm -rf node_modules /tmp/build.sqlite bootstrap/cache/*.php
 
 FROM dunglas/frankenphp:1-php8.5-bookworm AS production
+ENV LANG=C.UTF-8
 WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates curl unzip tmux unrar-free lame ffmpeg mediainfo jpegoptim webp \
