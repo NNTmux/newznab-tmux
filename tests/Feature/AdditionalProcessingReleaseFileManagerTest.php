@@ -14,6 +14,7 @@ use App\Services\NameFixing\NameFixingService;
 use App\Services\NfoService;
 use App\Services\Nzb\NzbService;
 use App\Services\ReleaseImageService;
+use App\Services\Releases\ReleaseBrowseService;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Blueprint;
@@ -237,6 +238,27 @@ class AdditionalProcessingReleaseFileManagerTest extends TestCase
         $manager->finalizeRelease($context, false);
 
         $this->assertSame(1024, DB::table('release_files')->value('size'));
+    }
+
+    public function test_encrypted_file_marks_release_passworded(): void
+    {
+        DB::table('releases')->insert($this->releaseRow());
+
+        $manager = $this->makeManager();
+
+        // RarInfo and ZipInfo report encrypted files as 'pass' => 1, not true.
+        foreach ([1, true] as $pass) {
+            $context = new ReleaseProcessingContext(Release::query()->findOrFail(1));
+
+            $this->assertFalse($manager->addFileInfo([
+                'name' => 'Example.Show.S01E01.mkv',
+                'size' => 1024,
+                'pass' => $pass,
+            ], $context, '\\.(?:par2|sfv|nzb)'));
+
+            $this->assertTrue($context->releaseHasPassword);
+            $this->assertSame(ReleaseBrowseService::PASSWD_RAR, $context->passwordStatus);
+        }
     }
 
     public function test_invalid_release_file_sizes_are_rejected(): void

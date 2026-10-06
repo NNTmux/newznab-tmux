@@ -85,7 +85,7 @@ class ReleaseFileManager
         }
 
         // Check for password
-        if (isset($file['pass']) && $file['pass'] === true) {
+        if (! empty($file['pass'])) {
             $context->releaseHasPassword = true;
             $context->passwordStatus = ReleaseBrowseService::PASSWD_RAR;
 
