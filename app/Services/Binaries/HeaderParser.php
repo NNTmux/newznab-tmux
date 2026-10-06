@@ -139,34 +139,39 @@ final class HeaderParser
     /**
      * Extract highest and lowest article info from headers.
      *
+     * Only numbers inside the requested range count: a malformed overview line can
+     * carry a bogus number, and saving it as last_record makes the group re-scan
+     * from article 0.
+     *
      * @param  array<int, array<string, mixed>>  $headers
      * @return array<string, mixed>
      */
-    public function getArticleRange(array $headers): array
+    public function getArticleRange(array $headers, ?int $first = null, ?int $last = null): array
     {
         $result = [];
-        $count = \count($headers);
+        $low = $high = null;
 
-        if ($count === 0) {
-            return $result;
-        }
-
-        // Find first valid article
-        for ($i = 0; $i < $count; $i++) {
-            if (isset($headers[$i]['Number'])) {
-                $result['firstArticleNumber'] = $headers[$i]['Number'];
-                $result['firstArticleDate'] = $headers[$i]['Date'] ?? null;
-                break;
+        foreach ($headers as $header) {
+            if (! isset($header['Number']) || ! is_numeric($header['Number'])) {
+                continue;
+            }
+            $number = (int) $header['Number'];
+            if (($first !== null && $number < $first) || ($last !== null && $number > $last)) {
+                continue;
+            }
+            if ($low === null || $number < (int) $low['Number']) {
+                $low = $header;
+            }
+            if ($high === null || $number > (int) $high['Number']) {
+                $high = $header;
             }
         }
 
-        // Find last valid article
-        for ($i = $count - 1; $i >= 0; $i--) {
-            if (isset($headers[$i]['Number'])) {
-                $result['lastArticleNumber'] = $headers[$i]['Number'];
-                $result['lastArticleDate'] = $headers[$i]['Date'] ?? null;
-                break;
-            }
+        if ($low !== null) {
+            $result['firstArticleNumber'] = $low['Number'];
+            $result['firstArticleDate'] = $low['Date'] ?? null;
+            $result['lastArticleNumber'] = $high['Number'];
+            $result['lastArticleDate'] = $high['Date'] ?? null;
         }
 
         return $result;

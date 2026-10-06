@@ -297,7 +297,7 @@ class BinariesService
         }
 
         // Extract article range info
-        $returnArray = $this->headerParser->getArticleRange($headers);
+        $returnArray = $this->headerParser->getArticleRange($headers, (int) $this->first, (int) $this->last);
 
         // Parse and store one bounded chunk at a time. The previous flow built
         // a second full-size parsed header array before storage, doubling peak
