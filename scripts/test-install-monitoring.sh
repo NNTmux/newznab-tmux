@@ -88,6 +88,9 @@ run_installer
 [[ $status == 0 ]] || fail "Dry run with an existing node_exporter failed ($status): $output"
 assert_contains "$output" 'reused, scraping http://127.0.0.1:9100' 'Existing exporter not reported'
 assert_contains "$output" '--no-install-recommends prometheus prometheus-pushgateway prometheus-mysqld-exporter prometheus-redis-exporter' 'Unexpected package list'
+state_line=$(grep -n 'would write /etc/nntmux-monitoring/install.state' <<<"$output" | head -n1 | cut -d: -f1)
+apt_line=$(grep -n 'apt-get install' <<<"$output" | head -n1 | cut -d: -f1)
+(( state_line < apt_line )) || fail 'install.state must be written before apt installs anything'
 assert_not_contains "$output" 'prometheus-node-exporter' 'Existing node_exporter would be replaced'
 [[ ! -e $dry/etc/default/prometheus-node-exporter ]] || fail 'Existing node_exporter would be reconfigured'
 prometheus_yml=$(cat "$dry/etc/prometheus/prometheus.yml")
@@ -208,6 +211,20 @@ printf 'LISTEN 0 4096 127.0.0.1:9100 0.0.0.0:* users:(("prometheus-node",pid=9,f
 run_installer
 [[ $status == 0 ]] || fail "Re-run over our own install failed: $output"
 assert_contains "$output" 'node_exporter    ours' 'Own exporter misdetected'
+
+# ── Resume a run that died before writing install.state ──────
+setup
+printf '# Managed by NNTmux scripts/install-monitoring.sh\nARGS=""\n' >"$root/etc/default/prometheus" 2>/dev/null || { mkdir -p "$root/etc/default"; printf '# Managed by NNTmux scripts/install-monitoring.sh\nARGS=""\n' >"$root/etc/default/prometheus"; }
+printf 'grafana\nprometheus\nprometheus-pushgateway\nprometheus-redis-exporter\nprometheus-node-exporter\n' >"$fixtures/packages.txt"
+# The node_exporter package is running (e.g. it feeds a NAS), so it must not be adopted.
+printf 'prometheus-node-exporter.service\n' >>"$fixtures/units.txt"
+printf 'LISTEN 0 4096 *:9100 *:* users:(("prometheus-node",pid=5,fd=3))\n' >"$fixtures/ss.txt"
+fake_http 'http://127.0.0.1:9100/metrics' 200 'node_exporter_build_info 1'
+run_installer
+[[ $status == 0 ]] || fail "Interrupted install was not resumed: $output"
+assert_contains "$output" 'Resuming an interrupted install; adopting: grafana prometheus prometheus-pushgateway prometheus-redis-exporter' 'Wrong packages adopted'
+assert_contains "$output" 'node_exporter    existing' 'Running node_exporter must stay foreign'
+assert_not_contains "$(cat "$dry/etc/nntmux-monitoring/install.state")" 'prometheus-node-exporter' 'Running node_exporter recorded as ours'
 
 # ── Conflicts abort before anything is changed ───────────────
 setup

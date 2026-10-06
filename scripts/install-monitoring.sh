@@ -25,6 +25,9 @@ Usage: sudo scripts/install-monitoring.sh [options]
   --skip-webserver                Do not touch the web server; print the snippet instead
   --web-user=USER                 User PHP-FPM runs as; may read the JWT key (default: detected)
   --nginx-site=FILE               nginx config file holding the NNTmux server block (default: detected)
+  --db-admin-user=USER            MariaDB account allowed to create the exporter user (default: tries root via
+                                  socket, /etc/mysql/debian.cnf, then DB_USERNAME from .env)
+  --db-admin-password-file=FILE   File holding the password for --db-admin-user
   --grafana-version=VERSION       Grafana apt version (default: 13.2.3)
   --retention=DURATION            Prometheus retention (default: 30d)
   --grafana-port=PORT             Grafana port on 127.0.0.1 (default: 3000)
@@ -106,6 +109,8 @@ WEB_SERVER=auto
 SKIP_WEBSERVER=0
 WEB_USER=
 NGINX_SITE=
+DB_ADMIN_USER=
+DB_ADMIN_PASSWORD_FILE=
 GRAFANA_VERSION=$GRAFANA_VERSION_DEFAULT
 RETENTION=30d
 GRAFANA_PORT=3000
@@ -128,6 +133,8 @@ for argument in "$@"; do
         --skip-webserver) SKIP_WEBSERVER=1 ;;
         --web-user=*) WEB_USER=${argument#*=} ;;
         --nginx-site=*) NGINX_SITE=${argument#*=} ;;
+        --db-admin-user=*) DB_ADMIN_USER=${argument#*=} ;;
+        --db-admin-password-file=*) DB_ADMIN_PASSWORD_FILE=${argument#*=} ;;
         --grafana-version=*) GRAFANA_VERSION=${argument#*=} ;;
         --retention=*) RETENTION=${argument#*=} ;;
         --grafana-port=*) GRAFANA_PORT=${argument#*=} ;;
@@ -195,6 +202,8 @@ APP_URL=${APP_URL%/}
 [[ -n $APP_URL ]] || APP_URL=http://localhost
 DB_HOST=$(env_value DB_HOST)
 DB_PORT=$(env_value DB_PORT)
+DB_USERNAME=$(env_value DB_USERNAME)
+DB_PASSWORD=$(env_value DB_PASSWORD)
 REDIS_HOST=$(env_value REDIS_HOST)
 REDIS_PORT=$(env_value REDIS_PORT)
 REDIS_PASSWORD=$(env_value REDIS_PASSWORD)
@@ -215,7 +224,33 @@ STATE_FILE=$ROOT$STATE_DIR/install.state
 
 state_get() { grep -E "^$1=" "$STATE_FILE" 2>/dev/null | tail -n1 | cut -d= -f2- || true; }
 
-installed_by_us() { [[ " $(state_get packages) " == *" $1 "* ]]; }
+ADOPTED_PACKAGES=''
+installed_by_us() { [[ " $(state_get packages) $ADOPTED_PACKAGES " == *" $1 "* ]]; }
+
+service_for_package() {
+    case $1 in
+        grafana) echo grafana-server ;;
+        *) echo "$1" ;;
+    esac
+}
+
+# A run that died before writing install.state (older versions only wrote it at the
+# end) leaves packages installed but never started, plus our marker in
+# /etc/default/prometheus. Adopt exactly those: a running service, such as a
+# node_exporter that also feeds a NAS, is never claimed.
+adopt_partial_install() {
+    [[ -f $STATE_FILE ]] && return
+    grep -q 'Managed by NNTmux scripts/install-monitoring.sh' "$ROOT/etc/default/prometheus" 2>/dev/null || return 0
+    local package active
+    active=$(sys_active_units)
+    for package in grafana prometheus prometheus-pushgateway prometheus-node-exporter prometheus-mysqld-exporter prometheus-redis-exporter prometheus-elasticsearch-exporter; do
+        if sys_package_installed "$package" && ! grep -qx "$(service_for_package "$package").service" <<<"$active"; then
+            ADOPTED_PACKAGES+=" $package"
+        fi
+    done
+    [[ -n $ADOPTED_PACKAGES ]] && info "Resuming an interrupted install; adopting:$ADOPTED_PACKAGES"
+    return 0
+}
 
 # ── Detection ────────────────────────────────────────────────
 # Per exporter: process name pattern, default port, Ubuntu package, metric proving identity.
@@ -693,6 +728,12 @@ install_packages() {
         [[ ${DETECTED[$name]} == absent || ${DETECTED[$name]} == ours ]] && packages+=("${EXPORTER_PACKAGE[$name]}")
     done
 
+    # Record what is about to be installed before apt runs, so a run that fails
+    # halfway can be re-run (or uninstalled) instead of mistaking its own
+    # packages for a foreign install.
+    INSTALLED_PACKAGES=$(printf '%s\n' "$(state_get packages)" "$ADOPTED_PACKAGES" "${packages[@]}" grafana | tr ' ' '\n' | sed '/^$/d' | sort -u | tr '\n' ' ')
+    save_state "$INSTALLED_PACKAGES" "$(state_get web_server)" "$(state_get nginx_site)"
+
     info "Installing ${packages[*]}"
     block_service_starts
     apt_install "${packages[@]}"
@@ -712,9 +753,6 @@ install_packages() {
     run apt-mark hold grafana
     unblock_service_starts
 
-    packages+=(grafana)
-    INSTALLED_PACKAGES="$(state_get packages) ${packages[*]}"
-    INSTALLED_PACKAGES=$(tr ' ' '\n' <<<"$INSTALLED_PACKAGES" | sed '/^$/d' | sort -u | tr '\n' ' ')
 }
 
 write_defaults_file() {
@@ -764,17 +802,61 @@ configure_exporters() {
     fi
 }
 
-configure_mysqld_exporter() {
-    local socket='' password=''
-    if loopback_host "$DB_HOST"; then
-        info "Creating MariaDB user prometheus@localhost (unix_socket, PROCESS/REPLICATION CLIENT, performance_schema read)"
-        if ((!DRY_RUN)); then
-            socket=$(mariadb -NBe 'SELECT @@socket' 2>/dev/null || true)
+# Writes a private MariaDB option file; quoting keeps passwords with special characters intact.
+write_db_admin_cnf() {
+    local file=$1 user=$2 password=$3
+    password=${password//\\/\\\\}
+    password=${password//\"/\\\"}
+    (umask 077 && printf '[client]\nuser="%s"\npassword="%s"\n' "$user" "$password" >"$file")
+}
+
+# Runs SQL as the first MariaDB account that can: --db-admin-user, root via the unix
+# socket (Ubuntu default), /etc/mysql/debian.cnf, then DB_USERNAME from .env.
+# Prints the working client options on success.
+mariadb_admin() {
+    local sql=$1 candidate
+    local -a candidates=()
+    if [[ -n $DB_ADMIN_USER ]]; then
+        [[ -n $DB_ADMIN_PASSWORD_FILE && -r $DB_ADMIN_PASSWORD_FILE ]] || die "--db-admin-user needs a readable --db-admin-password-file."
+        write_db_admin_cnf "$WORK_DIR/db-admin-flag.cnf" "$DB_ADMIN_USER" "$(head -n1 "$DB_ADMIN_PASSWORD_FILE")"
+        candidates+=("--defaults-extra-file=$WORK_DIR/db-admin-flag.cnf")
+    else
+        candidates+=("")
+        [[ -r /etc/mysql/debian.cnf ]] && candidates+=("--defaults-file=/etc/mysql/debian.cnf")
+        if [[ -n $DB_USERNAME ]]; then
+            write_db_admin_cnf "$WORK_DIR/db-admin-env.cnf" "$DB_USERNAME" "$DB_PASSWORD"
+            candidates+=("--defaults-extra-file=$WORK_DIR/db-admin-env.cnf")
         fi
-        socket=${socket:-/run/mysqld/mysqld.sock}
-        run mariadb -e "CREATE USER IF NOT EXISTS 'prometheus'@'localhost' IDENTIFIED VIA unix_socket WITH MAX_USER_CONNECTIONS 3;
+    fi
+    for candidate in "${candidates[@]}"; do
+        # shellcheck disable=SC2086 # empty candidate = plain socket login
+        if mariadb $candidate -NBe "$sql" >/dev/null 2>"$WORK_DIR/mariadb-error"; then
+            printf '%s' "$candidate"
+            return 0
+        fi
+    done
+    return 1
+}
+
+configure_mysqld_exporter() {
+    local socket='' password='' admin_options
+    if loopback_host "$DB_HOST"; then
+        local sql="CREATE USER IF NOT EXISTS 'prometheus'@'localhost' IDENTIFIED VIA unix_socket WITH MAX_USER_CONNECTIONS 3;
 GRANT PROCESS, REPLICATION CLIENT ON *.* TO 'prometheus'@'localhost';
 GRANT SELECT ON performance_schema.* TO 'prometheus'@'localhost';"
+        info "Creating MariaDB user prometheus@localhost (unix_socket, PROCESS/REPLICATION CLIENT, performance_schema read)"
+        if ((DRY_RUN)); then
+            echo "  would run as a MariaDB admin (--db-admin-user, root via socket, debian.cnf or DB_USERNAME): $sql"
+        elif admin_options=$(mariadb_admin "$sql"); then
+            # shellcheck disable=SC2086
+            socket=$(mariadb $admin_options -NBe 'SELECT @@socket' 2>/dev/null || true)
+        else
+            warn "Could not create the MariaDB exporter user ($(grep -m1 '^ERROR' "$WORK_DIR/mariadb-error" || tail -n1 "$WORK_DIR/mariadb-error"))."
+            echo "  Run this as a MariaDB admin (the exporter starts reporting once it exists):"
+            printf '%s\n' "$sql" | sed 's/^/    /'
+            echo "  or re-run with --db-admin-user=root --db-admin-password-file=/path/to/password-file"
+        fi
+        socket=${socket:-/run/mysqld/mysqld.sock}
         printf '[client]\nuser=prometheus\nsocket=%s\n' "$socket" >"$WORK_DIR/mysqld-exporter.cnf"
     else
         warn "DB_HOST=$DB_HOST is remote; create the exporter user there yourself:"
@@ -1007,13 +1089,6 @@ STATE
     install_file "$WORK_DIR/install.state" "$STATE_DIR/install.state" 0644 root:root
 }
 
-service_for_package() {
-    case $1 in
-        grafana) echo grafana-server ;;
-        *) echo "$1" ;;
-    esac
-}
-
 start_services() {
     local package service
     info "Starting services"
@@ -1090,7 +1165,11 @@ uninstall() {
             /etc/grafana/provisioning/datasources/nntmux-prometheus.yml /etc/grafana/provisioning/dashboards/nntmux.yml
         run rmdir --ignore-fail-on-non-empty /etc/prometheus /etc/grafana/provisioning/datasources /etc/grafana/provisioning/dashboards /etc/grafana/provisioning /etc/grafana /etc/grafana/dashboards
         if loopback_host "$DB_HOST" && [[ " $packages " == *' prometheus-mysqld-exporter '* ]]; then
-            run mariadb -e "DROP USER IF EXISTS 'prometheus'@'localhost';"
+            if ((DRY_RUN)); then
+                echo "  would drop MariaDB user prometheus@localhost"
+            elif ! mariadb_admin "DROP USER IF EXISTS 'prometheus'@'localhost';" >/dev/null; then
+                warn "Could not drop MariaDB user prometheus@localhost; remove it manually."
+            fi
         fi
         run rm -rf "$STATE_DIR"
     fi
@@ -1126,6 +1205,7 @@ main() {
         warn "Not Ubuntu 22.04/24.04 (${os_id:-unknown} ${os_version}); continuing because of --dry-run."
     fi
 
+    adopt_partial_install
     run_detection
     check_core_component Prometheus prometheus "$PROMETHEUS_PORT"
     check_core_component Pushgateway prometheus-pushgateway "$PUSHGATEWAY_PORT"
