@@ -119,6 +119,10 @@ site="$dry/etc/nginx/sites-available/nntmux"
 [[ $(grep -c 'include snippets/nntmux-grafana.conf;' "$site") == 1 ]] || fail 'Include must be added to exactly one server block'
 awk '/listen 80;/,/^}/' "$site" | grep -q nntmux-grafana && fail 'Include added to the redirect-only block'
 assert_contains "$(cat "$dry/etc/nginx/snippets/nntmux-grafana.conf")" 'proxy_pass http://127.0.0.1:3000;' 'nginx proxy target'
+snippet=$(cat "$dry/etc/nginx/snippets/nntmux-grafana.conf")
+assert_contains "$snippet" 'add_header X-Frame-Options SAMEORIGIN always;' 'Grafana location must not inherit the site add_header CSP'
+assert_not_contains "$snippet" 'NGINX_HEADERS_MORE' 'Placeholder left in snippet'
+assert_not_contains "$snippet" 'more_clear_headers' 'headers-more line without headers-more'
 env=$(cat "$dry$app/.env")
 assert_contains "$env" 'MONITORING_ENABLED=true' '.env not enabled'
 assert_not_contains "$env" 'MONITORING_ENABLED=false' '.env kept the old value'
@@ -182,7 +186,7 @@ assert_contains "$output" "Adding the Grafana proxy to nginx site $case_dir/expl
 # ── MariaDB exporter uses the database user from .env ────────
 setup
 cat >>"$app/.env" <<'ENV'
-DB_USERNAME=nntmux
+DB_USERNAME = nntmux
 DB_PASSWORD="p@ss\"#w;rd" # Laravel-style escaped quote
 DB_PORT=3306
 ENV
@@ -292,6 +296,14 @@ run_installer
 apache_conf=$(cat "$dry/etc/apache2/conf-available/nntmux-grafana.conf")
 assert_contains "$apache_conf" 'ProxyPass http://127.0.0.1:3000/grafana/ upgrade=websocket' 'Apache ProxyPass'
 assert_contains "$output" 'would run: a2enconf -q nntmux-grafana' 'Apache conf not enabled'
+assert_contains "$apache_conf" 'Header always unset Content-Security-Policy' 'Apache must drop a site-wide CSP for Grafana'
+
+# ── headers-more: its CSP is cleared explicitly ──────────────
+setup
+touch "$fixtures/nginx-headers-more"
+run_installer
+[[ $status == 0 ]] || fail "headers-more dry run failed: $output"
+assert_contains "$(cat "$dry/etc/nginx/snippets/nntmux-grafana.conf")" '    more_clear_headers Content-Security-Policy;' 'more_clear_headers missing'
 
 # ── --detect needs no root and changes nothing ───────────────
 setup

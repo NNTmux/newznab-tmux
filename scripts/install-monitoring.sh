@@ -204,8 +204,10 @@ fi
 # escapes, single quotes are literal, and unquoted values end at #.
 env_value() {
     local line value
-    line=$(grep -E "^$1=" "$ENV_FILE" | tail -n1 || true)
+    # phpdotenv also accepts "export KEY=…" and spaces around "=".
+    line=$(grep -E "^[[:space:]]*(export[[:space:]]+)?$1[[:space:]]*=" "$ENV_FILE" | tail -n1 || true)
     value=${line#*=}
+    value=${value#"${value%%[![:space:]]*}"}
     if [[ $value == \"* ]]; then
         value=${value#\"}
         value=${value%\"*}
@@ -607,6 +609,12 @@ NGINX
     cat >"$snippet_out" <<NGINX
 $MARKER: Grafana reverse proxy. Grafana authenticates the NNTmux JWT itself.
 location ^~ /grafana/ {
+    # Declaring add_header here stops nginx inheriting the site's own add_header
+    # lines; a site-wide Content-Security-Policy would block Grafana's inline
+    # boot scripts and leave it on its loading screen.
+    add_header X-Frame-Options SAMEORIGIN always;
+    add_header X-Content-Type-Options nosniff always;
+NGINX_HEADERS_MORE
     proxy_pass http://127.0.0.1:$GRAFANA_PORT;
     proxy_http_version 1.1;
     proxy_set_header Host \$host;
@@ -618,6 +626,24 @@ location ^~ /grafana/ {
 NGINX
 }
 
+# headers-more (more_set_headers) is not reset by add_header, so clear its CSP explicitly.
+nginx_uses_headers_more() {
+    if [[ -n $FIXTURES ]]; then
+        [[ -f $FIXTURES/nginx-headers-more ]]
+        return
+    fi
+    nginx -T 2>/dev/null | grep -Eq '^[[:space:]]*more_set_headers[[:space:]]'
+}
+
+finish_nginx_snippet() {
+    local snippet=$1 line=''
+    if nginx_uses_headers_more; then
+        line='    more_clear_headers Content-Security-Policy;'
+    fi
+    awk -v line="$line" '$0 == "NGINX_HEADERS_MORE" { if (line != "") print line; next } { print }' "$snippet" >"$snippet.tmp"
+    mv "$snippet.tmp" "$snippet"
+}
+
 render_apache_conf() {
     cat >"$1" <<APACHE
 $MARKER: Grafana reverse proxy. Grafana authenticates the NNTmux JWT itself.
@@ -626,6 +652,10 @@ $MARKER: Grafana reverse proxy. Grafana authenticates the NNTmux JWT itself.
     ProxyPassReverse http://127.0.0.1:$GRAFANA_PORT/grafana/
     ProxyPreserveHost On
     RequestHeader set X-Forwarded-Proto expr=%{REQUEST_SCHEME}
+    # A site-wide Content-Security-Policy would block Grafana's inline boot scripts.
+    Header always unset Content-Security-Policy
+    Header unset Content-Security-Policy
+    Header always set X-Frame-Options SAMEORIGIN
 </Location>
 APACHE
 }
@@ -910,6 +940,9 @@ configure_mysqld_exporter() {
         configure_mysqld_exporter_with_app_user
         return
     fi
+    if [[ -z $DB_ADMIN_USER ]]; then
+        warn "DB_USERNAME is empty or missing in $ENV_FILE, so the exporter cannot reuse the NNTmux database user; trying a dedicated MariaDB user instead."
+    fi
     configure_mysqld_exporter_with_dedicated_user
 }
 
@@ -1022,6 +1055,7 @@ configure_grafana() {
 
 configure_nginx() {
     render_nginx_snippets "$WORK_DIR/nntmux-grafana-map.conf" "$WORK_DIR/nntmux-grafana.conf"
+    finish_nginx_snippet "$WORK_DIR/nntmux-grafana.conf"
     install_file "$WORK_DIR/nntmux-grafana-map.conf" /etc/nginx/conf.d/nntmux-grafana-map.conf 0644 root:root
     install_file "$WORK_DIR/nntmux-grafana.conf" /etc/nginx/snippets/nntmux-grafana.conf 0644 root:root
 
@@ -1093,6 +1127,7 @@ configure_web_server() {
     if ((SKIP_WEBSERVER)) || [[ $WEB_SERVER == none ]]; then
         [[ $WEB_SERVER == none ]] && warn "Neither nginx nor apache2 is running."
         render_nginx_snippets "$WORK_DIR/map.conf" "$WORK_DIR/location.conf"
+        finish_nginx_snippet "$WORK_DIR/location.conf"
         info "Web server not configured. Proxy /grafana/ to http://127.0.0.1:$GRAFANA_PORT, e.g. for nginx:"
         cat "$WORK_DIR/location.conf"
         return
