@@ -1,0 +1,101 @@
+# Prometheus + Grafana for the Sail dev stack. Overlay on docker-compose.yml:
+#
+#   php artisan monitoring:install --sail   # keys + .env
+#   make monitoring-up                       # docker compose -f docker-compose.yml -f docker-compose.monitoring.yml up -d
+#
+# Grafana is reached through the app's nginx at /grafana/ (docker/8.5/nginx.conf)
+# and only trusts JWTs signed by the app. Ubuntu hosts use scripts/install-monitoring.sh.
+services:
+  prometheus:
+    image: 'prom/prometheus:v3.15.0'
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=15d'
+    ports:
+      - '127.0.0.1:${FORWARD_PROMETHEUS_PORT:-9090}:9090'
+    volumes:
+      - './docker/monitoring/prometheus/prometheus.dev.yml:/etc/prometheus/prometheus.yml:ro'
+      - 'sail-prometheus:/prometheus'
+    networks:
+      - sail
+  pushgateway:
+    image: 'prom/pushgateway:v1.11.3'
+    networks:
+      - sail
+  grafana:
+    image: 'grafana/grafana:13.2.3'
+    environment:
+      PROMETHEUS_URL: 'http://prometheus:9090'
+      # Template form: works whatever APP_URL looks like; the path is what matters behind the proxy.
+      GF_SERVER_ROOT_URL: '%(protocol)s://%(domain)s/grafana/'
+      GF_SERVER_SERVE_FROM_SUB_PATH: 'true'
+      # NNTmux usernames become Grafana logins; keep the built-in admin out of their way.
+      GF_SECURITY_ADMIN_USER: nntmux-grafana-admin
+      GF_SECURITY_ALLOW_EMBEDDING: 'true'
+      GF_SECURITY_COOKIE_SAMESITE: lax
+      GF_AUTH_DISABLE_LOGIN_FORM: 'true'
+      GF_AUTH_BASIC_ENABLED: 'false'
+      GF_AUTH_ANONYMOUS_ENABLED: 'false'
+      GF_USERS_ALLOW_SIGN_UP: 'false'
+      GF_AUTH_JWT_ENABLED: 'true'
+      GF_AUTH_JWT_URL_LOGIN: 'true'
+      GF_AUTH_JWT_HEADER_NAME: X-JWT-Assertion
+      GF_AUTH_JWT_KEY_FILE: /etc/grafana/nntmux-jwt/grafana-jwt.pub
+      GF_AUTH_JWT_USERNAME_CLAIM: sub
+      GF_AUTH_JWT_EMAIL_CLAIM: email
+      GF_AUTH_JWT_EXPECT_CLAIMS: '{"iss": "nntmux", "aud": "grafana"}'
+      GF_AUTH_JWT_AUTO_SIGN_UP: 'true'
+      GF_AUTH_JWT_ROLE_ATTRIBUTE_PATH: role
+      GF_AUTH_JWT_ROLE_ATTRIBUTE_STRICT: 'true'
+      GF_LIVE_MAX_CONNECTIONS: '0'
+      GF_ANALYTICS_REPORTING_ENABLED: 'false'
+      GF_ANALYTICS_CHECK_FOR_UPDATES: 'false'
+      GF_ANALYTICS_CHECK_FOR_PLUGIN_UPDATES: 'false'
+      GF_NEWS_NEWS_FEED_ENABLED: 'false'
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /etc/grafana/dashboards/nntmux/nntmux-host.json
+    volumes:
+      - './docker/monitoring/grafana/provisioning:/etc/grafana/provisioning:ro'
+      - './docker/monitoring/grafana/dashboards:/etc/grafana/dashboards/nntmux:ro'
+      - './storage/app/monitoring/public:/etc/grafana/nntmux-jwt:ro'
+      - 'sail-grafana:/var/lib/grafana'
+    networks:
+      - sail
+  # On WSL2 / Docker Desktop this measures the Docker VM, not Windows.
+  node-exporter:
+    image: 'prom/node-exporter:v1.12.1'
+    pid: host
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--path.rootfs=/host/root'
+    volumes:
+      - '/proc:/host/proc:ro'
+      - '/sys:/host/sys:ro'
+      - '/:/host/root:ro'
+    networks:
+      - sail
+  mysqld-exporter:
+    image: 'prom/mysqld-exporter:v0.20.0'
+    command:
+      - '--mysqld.address=mariadb:3306'
+      - '--mysqld.username=root'
+    environment:
+      MYSQLD_EXPORTER_PASSWORD: '${DB_PASSWORD}'
+    networks:
+      - sail
+    depends_on:
+      - mariadb
+  redis-exporter:
+    image: 'oliver006/redis_exporter:v1.93.0'
+    environment:
+      REDIS_ADDR: 'redis://redis:6379'
+    networks:
+      - sail
+    depends_on:
+      - redis
+volumes:
+  sail-prometheus:
+    driver: local
+  sail-grafana:
+    driver: local

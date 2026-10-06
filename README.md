@@ -31,6 +31,7 @@ This project is a fork of [newznab plus](https://github.com/anth0/nnplus) and [n
 - [IRC Pre Channels](#irc-pre-channels)
 - [TV & Movie Processing](#tv--movie-processing)
 - [API](#api)
+- [Monitoring (Prometheus + Grafana)](#monitoring-prometheus--grafana)
 - [Docker & Development](#docker--development)
 - [NNTmux MCP Development Server](#nntmux-mcp-development-server)
 - [Troubleshooting](#troubleshooting)
@@ -399,6 +400,40 @@ GET /api?t=getnzb&id=     # Download NZB
 Users obtain API keys from their profile page. Configure per-user rate limits in the admin panel.
 
 For detailed API documentation, see the [NNTmux API v2 Wiki](https://github.com/NNTmux/newznab-tmux/wiki/NNTmux-API-version-2).
+
+## Monitoring (Prometheus + Grafana)
+
+**Admin → System → Monitoring** embeds Grafana dashboards for the host (CPU, memory, disk, network), services (MariaDB, Redis, Manticore/Elasticsearch) and processing (post-processing backlogs, binary tables, Horizon queues, NNTP connections, service status). With monitoring enabled, the System Resources widget on `/admin/index` shows Grafana panels instead of the built-in CPU/RAM charts.
+
+### Ubuntu 22.04 / 24.04 (nginx or Apache)
+
+```bash
+php artisan monitoring:install                  # checks prerequisites, shows what is already installed
+sudo scripts/install-monitoring.sh --dry-run    # preview every file and command
+sudo scripts/install-monitoring.sh              # install (safe to re-run)
+```
+
+The installer:
+
+- installs Prometheus, the Pushgateway, node/mysqld/redis (or Elasticsearch) exporters and Grafana, all listening on 127.0.0.1 only;
+- **reuses exporters that are already running** (for example a node_exporter that also feeds another Prometheus or a NAS) and never reconfigures, restarts or removes them. If such an exporter needs credentials, pass `--node-exporter-url`, `--node-exporter-scheme`, `--node-exporter-basic-auth-file` or `--node-exporter-insecure-tls`;
+- refuses to take over a Prometheus, Pushgateway or Grafana it did not install;
+- proxies `/grafana/` through your nginx site or an Apache conf. Grafana has no login form: the admin pages sign a short-lived JWT for admins who passed 2FA;
+- writes `MONITORING_*` / `GRAFANA_*` into `.env`.
+
+NNTmux metrics are pushed every minute by `monitoring:export-metrics`, so the Laravel scheduler must be running. Processing counts come from the tmux monitor and stop updating while it isn't running. Remove everything the installer added with `sudo scripts/install-monitoring.sh --uninstall` (add `--purge` to drop packages and data).
+
+On hosts managed by the Ansible playbooks, rerun the installer after an Ansible reinstall: the `tls` role re-renders the nginx site and drops the `/grafana/` include.
+
+### Sail
+
+```bash
+php artisan monitoring:install --sail   # JWT keypair in storage/app/monitoring + .env
+make build                              # app image with the /grafana/ proxy
+make monitoring-up                      # docker-compose.monitoring.yml overlay
+```
+
+Stop it with `make monitoring-down` (before `make down`). On WSL2/Docker Desktop, host metrics describe the Docker VM. See [docker/monitoring/README.md](docker/monitoring/README.md) for the dashboard files.
 
 ## Docker & Development
 

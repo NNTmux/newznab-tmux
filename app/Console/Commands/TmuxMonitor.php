@@ -8,6 +8,7 @@ use App\Enums\TmuxMode;
 use App\Models\Collection;
 use App\Services\Configuration\ConfigurationProvider;
 use App\Services\Configuration\ProcessingRuntimeStateRepository;
+use App\Services\Monitoring\TmuxMetricsSnapshot;
 use App\Services\Tmux\TmuxCommand;
 use App\Services\Tmux\TmuxMonitorService;
 use App\Services\Tmux\TmuxOutput;
@@ -106,6 +107,7 @@ class TmuxMonitor extends Command
 
                 // Run pane tasks if tmux is running
                 $runVar['settings']['is_running'] = (int) app(ProcessingRuntimeStateRepository::class)->isTmuxRunning();
+                $this->publishMetricsSnapshot($runVar);
                 if ((int) ($runVar['settings']['is_running'] ?? 0) === 1) {
                     $this->runPaneTasks($runVar);
                 } else {
@@ -158,6 +160,25 @@ class TmuxMonitor extends Command
 
         } catch (\Exception $e) {
             $this->error('Failed to reset collections: '.$e->getMessage());
+        }
+    }
+
+    /**
+     * Hand the latest statistics to the Prometheus exporter. Monitoring must
+     * never interrupt processing, so failures are only reported.
+     *
+     * @param  array<string, mixed>  $runVar
+     */
+    private function publishMetricsSnapshot(array $runVar): void
+    {
+        if (! config('monitoring.enabled')) {
+            return;
+        }
+
+        try {
+            app(TmuxMetricsSnapshot::class)->publish($runVar);
+        } catch (\Throwable $e) {
+            report($e);
         }
     }
 

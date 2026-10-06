@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Services\Monitoring\GrafanaEmbedService;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Vite;
@@ -47,6 +48,11 @@ class ContentSecurityPolicy
             ? ''
             : ' '.$viteDevServerSources['asset'].' '.$viteDevServerSources['websocket'];
 
+        // Grafana embeds (admin Monitoring page) are same-origin under /grafana by default;
+        // only an absolute GRAFANA_URL on another origin needs to be allowed explicitly.
+        $grafanaOrigin = GrafanaEmbedService::frameOrigin(config('monitoring.grafana.url'), config('app.url'));
+        $grafanaFrameSource = $grafanaOrigin === null ? '' : ' '.$grafanaOrigin;
+
         // Build CSP directives for non-Turnstile pages
         // 'strict-dynamic' propagates trust from nonce-validated scripts to
         // dynamically loaded scripts (e.g. TinyMCE loaded via createElement).
@@ -65,8 +71,8 @@ class ContentSecurityPolicy
             "font-src 'self' https://fonts.gstatic.com https://fonts.bunny.net https://cdnjs.cloudflare.com/ https://cdn.tiny.cloud data:{$viteAssetSource}",
             "img-src 'self' data: https: blob:{$viteAssetSource}",
             "connect-src 'self' https://www.google.com https://cdn.tiny.cloud https://sp.tinymce.com{$viteConnectSources}",
-            "frame-src 'self' https://www.google.com https://www.gstatic.com https://challenges.cloudflare.com https://cdn.tiny.cloud data: blob:",
-            "child-src 'self' https://www.google.com https://challenges.cloudflare.com https://cdn.tiny.cloud blob:",
+            "frame-src 'self' https://www.google.com https://www.gstatic.com https://challenges.cloudflare.com https://cdn.tiny.cloud data: blob:{$grafanaFrameSource}",
+            "child-src 'self' https://www.google.com https://challenges.cloudflare.com https://cdn.tiny.cloud blob:{$grafanaFrameSource}",
             "worker-src 'self' blob:",
             "object-src 'none'",
             "base-uri 'self'",

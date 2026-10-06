@@ -9,6 +9,7 @@ use App\Models\Release;
 use App\Models\Settings;
 use App\Models\User;
 use App\Services\AdminDashboardSnapshotService;
+use App\Services\Monitoring\GrafanaEmbedService;
 use App\Services\RegistrationStatusService;
 use App\Services\SiteStatusService;
 use App\Services\SystemMetricsService;
@@ -203,7 +204,7 @@ class AdminDashboardUserCountTest extends TestCase
         ]);
         $controller->shouldReceive('setAdminPrefs')->once();
 
-        $view = $controller->index();
+        $view = $controller->index(app(GrafanaEmbedService::class));
         $data = $controller->getDashboardData()->getData(true);
 
         $this->assertSame($snapshotTime, $view->getData()['dashboardLastRefreshedAt']);

@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\BasePageController;
 use App\Services\AdminDashboardSnapshotService;
+use App\Services\Monitoring\GrafanaEmbedService;
 use App\Services\RegistrationStatusService;
 use App\Services\SiteStatusService;
 use App\Services\SystemMetricsService;
@@ -43,7 +44,7 @@ class AdminPageController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index(): mixed
+    public function index(GrafanaEmbedService $grafana): mixed
     {
         $this->setAdminPrefs();
 
@@ -58,6 +59,8 @@ class AdminPageController extends BasePageController
             'registrationStatus' => $payload['registrationStatus'],
             'nextRegistrationPeriod' => $payload['nextRegistrationPeriod'],
             'hasRecentPayments' => ! empty($payload['recent_payments']),
+            // Grafana panels replace the Chart.js CPU/RAM history when monitoring is set up.
+            'grafanaPanels' => $grafana->dashboardPanels(),
         ]));
     }
 

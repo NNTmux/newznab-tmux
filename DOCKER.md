@@ -156,6 +156,16 @@ Run `make` or `make help` to see all targets, grouped by section.
 | `make images`       | Show images used by each service                                 |
 | `make health`       | Healthcheck status per service                                   |
 
+### Monitoring
+
+Prometheus, Grafana, the Pushgateway and exporters from `docker-compose.monitoring.yml`. Run `php artisan monitoring:install --sail` once first; Grafana is then embedded at **Admin → System → Monitoring** (proxied at `/grafana/`).
+
+| Target                 | Description                                                    |
+|------------------------|----------------------------------------------------------------|
+| `make monitoring-up`   | Start the monitoring containers                                |
+| `make monitoring-down` | Stop and remove them (run before `make down`; volumes are kept)|
+| `make monitoring-logs` | Follow their logs                                              |
+
 ### Cleanup
 
 | Target        | Description                                                   |
@@ -206,6 +216,7 @@ Sail creates a Docker network called `sail` with these default port mappings:
 | Elasticsearch  | 9200           | 9200                                     |
 | Mailpit SMTP   | 1025           | `FORWARD_MAILPIT_PORT` (1025)            |
 | Mailpit Web    | 8025           | `FORWARD_MAILPIT_DASHBOARD_PORT` (8025)  |
+| Prometheus     | 9090           | `FORWARD_PROMETHEUS_PORT` (9090), 127.0.0.1 only, monitoring overlay |
 
 If a port is already in use on your host, change the corresponding
 `FORWARD_*` / `APP_PORT` variable in `.env`.

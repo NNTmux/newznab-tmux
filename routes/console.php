@@ -41,6 +41,8 @@ Schedule::command('nntmux:populate-steam-apps')->monthly();
 Schedule::command('metrics:collect')->everyFiveMinutes()->withoutOverlapping();
 // Cleanup old system metrics daily (keep last 60 days)
 Schedule::command('metrics:collect --cleanup')->dailyAt('03:00');
+// Push NNTmux application metrics to the Prometheus Pushgateway (see config/monitoring.php)
+Schedule::command('monitoring:export-metrics')->everyMinute()->withoutOverlapping()->when(static fn (): bool => (bool) config('monitoring.enabled'));
 // Cleanup old user activity stats weekly (keep last 90 days)
 Schedule::call(function () {
     UserActivityStat::cleanupOldStats(90);

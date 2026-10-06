@@ -1,0 +1,33 @@
+# Prometheus config for the Sail overlay docker-compose.monitoring.yml.
+# Ubuntu hosts get a generated /etc/prometheus/prometheus.yml from
+# scripts/install-monitoring.sh instead (targets differ per host).
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: node
+    static_configs:
+      - targets: ['node-exporter:9100']
+
+  - job_name: mariadb
+    static_configs:
+      - targets: ['mysqld-exporter:9104']
+
+  - job_name: redis
+    static_configs:
+      - targets: ['redis-exporter:9121']
+
+  - job_name: manticore
+    static_configs:
+      - targets: ['manticore:9308']
+
+  # NNTmux application metrics pushed every minute by `monitoring:export-metrics`.
+  - job_name: pushgateway
+    honor_labels: true
+    static_configs:
+      - targets: ['pushgateway:9091']

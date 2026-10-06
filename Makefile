@@ -232,6 +232,25 @@ fix-perms: fix-permissions ## Alias for 'fix-permissions'
 git-safe-directory: ## Register /var/www/html as a git safe.directory inside the container
 	@$(DOCKER_COMPOSE) exec -u root laravel.test git config --system --add safe.directory /var/www/html >/dev/null 2>&1 || true
 	@$(DOCKER_COMPOSE) exec laravel.test git config --global --add safe.directory /var/www/html >/dev/null 2>&1 || true
+# ── Monitoring ───────────────────────────────────────────────
+MONITORING_SERVICES := prometheus pushgateway grafana node-exporter mysqld-exporter redis-exporter
+# docker-compose.monitoring.yml is an overlay; ./sail only loads docker-compose.yml.
+comma               := ,
+MONITORING_COMPOSE  := $(DOCKER_COMPOSE) -f docker-compose.yml -f docker-compose.monitoring.yml $(foreach profile,$(subst $(comma), ,$(COMPOSE_PROFILES)),--profile $(profile))
+.PHONY: monitoring-up
+monitoring-up: check-env ## Start Prometheus, Grafana and exporters (run `artisan monitoring:install --sail` first)
+	@if [ ! -f storage/app/monitoring/public/grafana-jwt.pub ]; then \
+		echo "$(RED)✘ No Grafana JWT key. Run: php artisan monitoring:install --sail$(RESET)"; \
+		exit 1; \
+	fi
+	@$(MONITORING_COMPOSE) up -d
+	@echo "$(GREEN)✔ Monitoring started. Open /admin/monitoring (Prometheus: http://127.0.0.1:$(or $(FORWARD_PROMETHEUS_PORT),9090)).$(RESET)"
+.PHONY: monitoring-down
+monitoring-down: ## Stop and remove the monitoring containers (run before `make down`; data volumes are kept)
+	@$(MONITORING_COMPOSE) rm --stop --force $(MONITORING_SERVICES)
+.PHONY: monitoring-logs
+monitoring-logs: ## Follow logs of the monitoring containers
+	@$(MONITORING_COMPOSE) logs -f --tail=100 $(MONITORING_SERVICES)
 # ── Logs & Status ────────────────────────────────────────────
 .PHONY: logs
 logs: ## Tail logs (usage: make logs [SERVICE=mariadb])

@@ -35,6 +35,14 @@ use App\Observers\RootCategoryObserver;
 use App\Observers\SteamAppObserver;
 use App\Observers\UsenetGroupObserver;
 use App\Observers\VideoObserver;
+use App\Services\Monitoring\Collectors\ApplicationCollector;
+use App\Services\Monitoring\Collectors\FailedJobsCollector;
+use App\Services\Monitoring\Collectors\HorizonCollector;
+use App\Services\Monitoring\Collectors\MetricsCollector;
+use App\Services\Monitoring\Collectors\ServiceStatusCollector;
+use App\Services\Monitoring\Collectors\TmuxSnapshotCollector;
+use App\Services\Monitoring\Prometheus\TextFormatter;
+use App\Services\Monitoring\PrometheusMetricsExporter;
 use App\Services\Yenc\DecoderFactory;
 use App\Services\YencService;
 use App\View\Composers\AdminDataComposer;
@@ -108,5 +116,18 @@ class AppServiceProvider extends ServiceProvider
 
             return new YencService($decoder);
         });
+
+        $this->app->tag([
+            ApplicationCollector::class,
+            TmuxSnapshotCollector::class,
+            HorizonCollector::class,
+            FailedJobsCollector::class,
+            ServiceStatusCollector::class,
+        ], MetricsCollector::TAG);
+
+        $this->app->bind(PrometheusMetricsExporter::class, static fn (Application $app): PrometheusMetricsExporter => new PrometheusMetricsExporter(
+            $app->tagged(MetricsCollector::TAG),
+            $app->make(TextFormatter::class),
+        ));
     }
 }

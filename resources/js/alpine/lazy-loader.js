@@ -59,6 +59,8 @@ const lazyComponentMap = {
     'tinyMceEditor':   () => import('./components/admin/features.js'),  // same file
     'verifyUser':      () => import('./components/admin/verify-user.js'),
     'adminLogViewer':  () => import('./components/admin/log-viewer.js'),
+    'adminMonitoring': () => import('./components/admin/monitoring.js'),
+    'grafanaPanels':   () => import('./components/admin/monitoring.js'),   // same file
     'tmuxEdit':        () => import('./components/admin/features.js'),  // same file
 };
 

@@ -26,6 +26,7 @@ use App\Http\Controllers\Admin\AdminGameController;
 use App\Http\Controllers\Admin\AdminGroupController;
 use App\Http\Controllers\Admin\AdminInvitationController;
 use App\Http\Controllers\Admin\AdminLogViewerController;
+use App\Http\Controllers\Admin\AdminMonitoringController;
 use App\Http\Controllers\Admin\AdminMovieController;
 use App\Http\Controllers\Admin\AdminMusicController;
 use App\Http\Controllers\Admin\AdminPageController;
@@ -306,6 +307,8 @@ Route::middleware(['role:Admin', '2fa'])->prefix('admin')->group(function () {
     Route::get('logs/download', [AdminLogViewerController::class, 'download'])->name('admin.logs.download');
     Route::post('logs/truncate', [AdminLogViewerController::class, 'truncate'])->name('admin.logs.truncate');
     Route::delete('logs', [AdminLogViewerController::class, 'destroy'])->name('admin.logs.destroy');
+    Route::get('monitoring', [AdminMonitoringController::class, 'index'])->name('admin.monitoring');
+    Route::get('monitoring/grafana-token', [AdminMonitoringController::class, 'token'])->name('admin.monitoring.token');
     Route::get('role-list', [AdminRoleController::class, 'index'])->name('admin.role-list');
     Route::get('role-add', [AdminRoleController::class, 'create'])->name('admin.role-add');
     Route::post('role-add', [AdminRoleController::class, 'create']);

@@ -1,0 +1,15 @@
+# Shared by Sail (docker-compose.monitoring.yml) and scripts/install-monitoring.sh.
+# PROMETHEUS_URL comes from the Grafana environment (Sail service env, or
+# /etc/default/grafana-server on Ubuntu hosts).
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    uid: nntmux-prometheus
+    type: prometheus
+    access: proxy
+    url: ${PROMETHEUS_URL}
+    isDefault: true
+    editable: false
+    jsonData:
+      timeInterval: 15s

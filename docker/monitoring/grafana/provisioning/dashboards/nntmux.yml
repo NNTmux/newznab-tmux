@@ -1,0 +1,15 @@
+# Loads the NNTmux dashboards from disk. The dashboard UIDs and panel ids are a
+# contract with config/monitoring.php, so UI edits are disabled; change the
+# JSON in docker/monitoring/grafana/dashboards instead.
+apiVersion: 1
+
+providers:
+  - name: nntmux
+    folder: NNTmux
+    type: file
+    disableDeletion: true
+    allowUiUpdates: false
+    updateIntervalSeconds: 60
+    options:
+      path: /etc/grafana/dashboards/nntmux
+      foldersFromFilesStructure: false

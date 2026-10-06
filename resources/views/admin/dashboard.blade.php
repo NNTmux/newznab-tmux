@@ -339,6 +339,9 @@
         </div>
     </div>
 
+    @if(!empty($grafanaPanels))
+        @include('admin.partials.grafana-panels')
+    @else
     <!-- System Metrics (CPU & RAM) — deferred -->
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700"
          data-widget="system-metrics">
@@ -433,6 +436,7 @@
             </div>
         </div>
     </div>
+    @endif
 
     <!-- Quick Actions -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">

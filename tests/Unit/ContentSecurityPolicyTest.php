@@ -124,4 +124,37 @@ class ContentSecurityPolicyTest extends TestCase
             (string) $response->headers->get('Content-Security-Policy'),
         );
     }
+
+    public function test_cross_origin_grafana_is_allowed_as_a_frame_source(): void
+    {
+        config()->set('app.url', 'https://nntmux.example');
+        config()->set('monitoring.grafana.url', 'https://grafana.example:3000/grafana');
+
+        $response = (new ContentSecurityPolicy)->handle(
+            Request::create('/admin/monitoring'),
+            static fn (): Response => new Response,
+        );
+
+        $csp = (string) $response->headers->get('Content-Security-Policy');
+
+        $this->assertStringContainsString('data: blob: https://grafana.example:3000;', $csp);
+        $this->assertStringContainsString('https://cdn.tiny.cloud blob: https://grafana.example:3000;', $csp);
+        $this->assertStringContainsString("frame-ancestors 'self'", $csp);
+    }
+
+    public function test_same_origin_grafana_path_adds_no_frame_source(): void
+    {
+        config()->set('app.url', 'https://nntmux.example');
+        config()->set('monitoring.grafana.url', '/grafana');
+
+        $response = (new ContentSecurityPolicy)->handle(
+            Request::create('/admin/monitoring'),
+            static fn (): Response => new Response,
+        );
+
+        $this->assertStringContainsString(
+            "frame-src 'self' https://www.google.com https://www.gstatic.com https://challenges.cloudflare.com https://cdn.tiny.cloud data: blob:;",
+            (string) $response->headers->get('Content-Security-Policy'),
+        );
+    }
 }
