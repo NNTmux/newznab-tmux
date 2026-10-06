@@ -25,8 +25,8 @@ Usage: sudo scripts/install-monitoring.sh [options]
   --skip-webserver                Do not touch the web server; print the snippet instead
   --web-user=USER                 User PHP-FPM runs as; may read the JWT key (default: detected)
   --nginx-site=FILE               nginx config file holding the NNTmux server block (default: detected)
-  --db-admin-user=USER            MariaDB account allowed to create the exporter user (default: tries root via
-                                  socket, /etc/mysql/debian.cnf, then DB_USERNAME from .env)
+  --db-admin-user=USER            Create a dedicated, least-privilege MariaDB user for the exporter with this
+                                  admin account (default: the exporter uses DB_USERNAME from .env)
   --db-admin-password-file=FILE   File holding the password for --db-admin-user
   --grafana-version=VERSION       Grafana apt version (default: 13.2.3)
   --retention=DURATION            Prometheus retention (default: 30d)
@@ -80,7 +80,19 @@ sys_docker_ps() {
 
 sys_package_installed() {
     if [[ -n $FIXTURES ]]; then grep -qx "$1" "$FIXTURES/packages.txt" 2>/dev/null; return; fi
-    dpkg-query -W -f='${Status}' "$1" 2>/dev/null | grep -q 'install ok installed'
+    # "hold ok installed" counts too: this script holds grafana.
+    dpkg-query -W -f='${Status}' "$1" 2>/dev/null | grep -q ' ok installed$'
+}
+
+# Whether apt's history shows this script's own install command for the package.
+sys_installed_by_this_script() {
+    local history
+    if [[ -n $FIXTURES ]]; then
+        history=$(cat "$FIXTURES/apt-history.txt" 2>/dev/null || true)
+    else
+        history=$(zcat -f /var/log/apt/history.log* 2>/dev/null || true)
+    fi
+    grep '^Commandline: apt-get install -y -q --no-install-recommends ' <<<"$history" | grep -qE "[[:space:]]$1(=[^[:space:]]+)?([[:space:]]|$)"
 }
 
 # Prints the HTTP status code (000 on connection/TLS failure); body goes to $2.
@@ -188,13 +200,25 @@ if ((DRY_RUN)); then
 fi
 
 # ── .env ─────────────────────────────────────────────────────
+# Reads a key from .env the way Laravel (phpdotenv) does: double quotes allow \" and \\
+# escapes, single quotes are literal, and unquoted values end at #.
 env_value() {
-    local line
+    local line value
     line=$(grep -E "^$1=" "$ENV_FILE" | tail -n1 || true)
-    line=${line#*=}
-    line=${line%\"}
-    line=${line#\"}
-    printf '%s' "$line"
+    value=${line#*=}
+    if [[ $value == \"* ]]; then
+        value=${value#\"}
+        value=${value%\"*}
+        value=${value//\\\"/\"}
+        value=${value//\\\\/\\}
+    elif [[ $value == \'* ]]; then
+        value=${value#\'}
+        value=${value%\'*}
+    else
+        value=${value%%#*}
+        value=${value%"${value##*[![:space:]]}"}
+    fi
+    printf '%s' "$value"
 }
 
 APP_URL=$(env_value APP_URL)
@@ -204,6 +228,7 @@ DB_HOST=$(env_value DB_HOST)
 DB_PORT=$(env_value DB_PORT)
 DB_USERNAME=$(env_value DB_USERNAME)
 DB_PASSWORD=$(env_value DB_PASSWORD)
+DB_SOCKET=$(env_value DB_SOCKET)
 REDIS_HOST=$(env_value REDIS_HOST)
 REDIS_PORT=$(env_value REDIS_PORT)
 REDIS_PASSWORD=$(env_value REDIS_PASSWORD)
@@ -235,16 +260,18 @@ service_for_package() {
 }
 
 # A run that died before writing install.state (older versions only wrote it at the
-# end) leaves packages installed but never started, plus our marker in
-# /etc/default/prometheus. Adopt exactly those: a running service, such as a
-# node_exporter that also feeds a NAS, is never claimed.
+# end) leaves its packages installed plus our marker in /etc/default/prometheus.
+# Adopt a package when it never started, or when apt's history shows this script's
+# own install command for it. A running service installed some other way, such as
+# a node_exporter that also feeds a NAS, is never claimed.
 adopt_partial_install() {
     [[ -f $STATE_FILE ]] && return
     grep -q 'Managed by NNTmux scripts/install-monitoring.sh' "$ROOT/etc/default/prometheus" 2>/dev/null || return 0
     local package active
     active=$(sys_active_units)
     for package in grafana prometheus prometheus-pushgateway prometheus-node-exporter prometheus-mysqld-exporter prometheus-redis-exporter prometheus-elasticsearch-exporter; do
-        if sys_package_installed "$package" && ! grep -qx "$(service_for_package "$package").service" <<<"$active"; then
+        sys_package_installed "$package" || continue
+        if ! grep -qx "$(service_for_package "$package").service" <<<"$active" || sys_installed_by_this_script "$package"; then
             ADOPTED_PACKAGES+=" $package"
         fi
     done
@@ -738,7 +765,7 @@ install_packages() {
     block_service_starts
     apt_install "${packages[@]}"
 
-    if ! installed_by_us grafana; then
+    if [[ ! -f $ROOT/etc/apt/sources.list.d/grafana.list ]]; then
         info "Adding the Grafana apt repository"
         apt_install apt-transport-https gnupg ca-certificates curl
         run install -d -m 0755 /etc/apt/keyrings
@@ -838,8 +865,59 @@ mariadb_admin() {
     return 1
 }
 
+# Quote a value for mysqld_exporter's my.cnf parser (go-ini), which treats # and ;
+# as comments: backticks keep the value raw, """ is the fallback.
+exporter_cnf_quote() {
+    if [[ $1 != *'`'* ]]; then
+        # shellcheck disable=SC2016 # literal backticks are go-ini's raw-value quotes
+        printf '`%s`' "$1"
+    elif [[ $1 != *'"""'* ]]; then
+        printf '"""%s"""' "$1"
+    else
+        die "DB_PASSWORD contains both a backtick and \"\"\"; use --db-admin-user to create a dedicated exporter user instead."
+    fi
+}
+
+# Default: the exporter logs in as the NNTmux database user from .env, the same way
+# Laravel does. Without PROCESS/replication rights only the global status and
+# variables collectors run, which is all the dashboards use.
+configure_mysqld_exporter_with_app_user() {
+    local connection
+    if [[ -n $DB_SOCKET ]]; then
+        connection="socket=$DB_SOCKET"
+    elif [[ -z $DB_HOST || $DB_HOST == localhost ]]; then
+        # PDO uses the socket for "localhost", so the grant is for user@localhost.
+        connection="socket=/run/mysqld/mysqld.sock"
+    else
+        connection=$(printf 'host=%s\nport=%s' "$DB_HOST" "${DB_PORT:-3306}")
+    fi
+    info "MariaDB exporter will log in as DB_USERNAME=$DB_USERNAME from .env (global status and variables only)"
+    printf '[client]\nuser=%s\npassword=%s\n%s\n' "$DB_USERNAME" "$(exporter_cnf_quote "$DB_PASSWORD")" "$connection" >"$WORK_DIR/mysqld-exporter.cnf"
+    MYSQLD_EXPORTER_USER=app
+
+    if ((!DRY_RUN)); then
+        write_db_admin_cnf "$WORK_DIR/db-app.cnf" "$DB_USERNAME" "$DB_PASSWORD"
+        printf '%s\n' "$connection" >>"$WORK_DIR/db-app.cnf"
+        mariadb --defaults-extra-file="$WORK_DIR/db-app.cnf" -NBe 'SELECT 1' >/dev/null 2>"$WORK_DIR/mariadb-error" \
+            || warn "DB_USERNAME=$DB_USERNAME could not log in ($(grep -m1 '^ERROR' "$WORK_DIR/mariadb-error" || tail -n1 "$WORK_DIR/mariadb-error")); the MariaDB panels stay empty until it can."
+    fi
+    install_file "$WORK_DIR/mysqld-exporter.cnf" /etc/prometheus/mysqld-exporter.cnf 0640 root:prometheus
+    write_defaults_file prometheus-mysqld-exporter "ARGS=\"--web.listen-address=127.0.0.1:9104 --config.my-cnf=/etc/prometheus/mysqld-exporter.cnf --no-collect.slave_status --no-collect.info_schema.innodb_cmp --no-collect.info_schema.innodb_cmpmem --no-collect.info_schema.query_response_time\""
+}
+
 configure_mysqld_exporter() {
+    if [[ -z $DB_ADMIN_USER && -n $DB_USERNAME ]]; then
+        configure_mysqld_exporter_with_app_user
+        return
+    fi
+    configure_mysqld_exporter_with_dedicated_user
+}
+
+# With --db-admin-user (or no DB_USERNAME in .env): a dedicated prometheus@localhost
+# account with PROCESS/REPLICATION CLIENT and read access to performance_schema only.
+configure_mysqld_exporter_with_dedicated_user() {
     local socket='' password='' admin_options
+    MYSQLD_EXPORTER_USER=dedicated
     if loopback_host "$DB_HOST"; then
         local sql="CREATE USER IF NOT EXISTS 'prometheus'@'localhost' IDENTIFIED VIA unix_socket WITH MAX_USER_CONNECTIONS 3;
 GRANT PROCESS, REPLICATION CLIENT ON *.* TO 'prometheus'@'localhost';
@@ -1082,6 +1160,7 @@ save_state() {
 packages=$installed
 web_server=$web_server
 nginx_site=$nginx_site
+mysqld_exporter_user=${MYSQLD_EXPORTER_USER:-$(state_get mysqld_exporter_user)}
 grafana_port=$GRAFANA_PORT
 prometheus_port=$PROMETHEUS_PORT
 pushgateway_port=$PUSHGATEWAY_PORT
@@ -1164,7 +1243,7 @@ uninstall() {
             /etc/grafana/nntmux-jwt.pub /etc/grafana/grafana.ini /etc/grafana/grafana.ini.nntmux-orig \
             /etc/grafana/provisioning/datasources/nntmux-prometheus.yml /etc/grafana/provisioning/dashboards/nntmux.yml
         run rmdir --ignore-fail-on-non-empty /etc/prometheus /etc/grafana/provisioning/datasources /etc/grafana/provisioning/dashboards /etc/grafana/provisioning /etc/grafana /etc/grafana/dashboards
-        if loopback_host "$DB_HOST" && [[ " $packages " == *' prometheus-mysqld-exporter '* ]]; then
+        if loopback_host "$DB_HOST" && [[ $(state_get mysqld_exporter_user) == dedicated ]]; then
             if ((DRY_RUN)); then
                 echo "  would drop MariaDB user prometheus@localhost"
             elif ! mariadb_admin "DROP USER IF EXISTS 'prometheus'@'localhost';" >/dev/null; then

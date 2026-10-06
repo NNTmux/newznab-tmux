@@ -92,6 +92,7 @@ state_line=$(grep -n 'would write /etc/nntmux-monitoring/install.state' <<<"$out
 apt_line=$(grep -n 'apt-get install' <<<"$output" | head -n1 | cut -d: -f1)
 (( state_line < apt_line )) || fail 'install.state must be written before apt installs anything'
 assert_not_contains "$output" 'prometheus-node-exporter' 'Existing node_exporter would be replaced'
+assert_contains "$output" 'Adding the Grafana apt repository' 'Fresh install must add the Grafana repository'
 [[ ! -e $dry/etc/default/prometheus-node-exporter ]] || fail 'Existing node_exporter would be reconfigured'
 prometheus_yml=$(cat "$dry/etc/prometheus/prometheus.yml")
 assert_contains "$prometheus_yml" "job_name: node
@@ -178,6 +179,31 @@ rm -rf "$dry" && mkdir -p "$dry"
 run_installer --nginx-site="$case_dir/explicit.conf"
 assert_contains "$output" "Adding the Grafana proxy to nginx site $case_dir/explicit.conf" '--nginx-site ignored'
 
+# ── MariaDB exporter uses the database user from .env ────────
+setup
+cat >>"$app/.env" <<'ENV'
+DB_USERNAME=nntmux
+DB_PASSWORD="p@ss\"#w;rd" # Laravel-style escaped quote
+DB_PORT=3306
+ENV
+run_installer
+[[ $status == 0 ]] || fail "Dry run with .env DB user failed: $output"
+assert_contains "$output" 'MariaDB exporter will log in as DB_USERNAME=nntmux from .env' 'App DB user not used'
+assert_not_contains "$output" 'CREATE USER' 'No MariaDB user should be created by default'
+exporter_cnf=$(cat "$dry/etc/prometheus/mysqld-exporter.cnf")
+assert_contains "$exporter_cnf" 'user=nntmux' 'Exporter user'
+# shellcheck disable=SC2016 # literal backticks
+assert_contains "$exporter_cnf" 'password=`p@ss"#w;rd`' 'Password must be raw-quoted for go-ini'
+assert_contains "$exporter_cnf" 'host=127.0.0.1
+port=3306' 'Exporter must connect like Laravel (TCP for 127.0.0.1)'
+assert_contains "$(cat "$dry/etc/default/prometheus-mysqld-exporter")" '--no-collect.slave_status' 'Privileged collectors must be off'
+assert_contains "$(cat "$dry/etc/nntmux-monitoring/install.state")" 'mysqld_exporter_user=app' 'State must record the app user'
+printf 'adminpass\n' >"$case_dir/db-pass"
+rm -rf "$dry" && mkdir -p "$dry"
+run_installer --db-admin-user=root --db-admin-password-file="$case_dir/db-pass"
+assert_contains "$output" "would run as a MariaDB admin" '--db-admin-user should create a dedicated user'
+assert_contains "$(cat "$dry/etc/nntmux-monitoring/install.state")" 'mysqld_exporter_user=dedicated' 'State must record the dedicated user'
+
 # ── Existing exporter behind basic auth ──────────────────────
 setup
 printf 'LISTEN 0 4096 192.0.2.10:9100 0.0.0.0:* users:(("node_exporter",pid=812,fd=3))\n' >"$fixtures/ss.txt"
@@ -225,6 +251,24 @@ run_installer
 assert_contains "$output" 'Resuming an interrupted install; adopting: grafana prometheus prometheus-pushgateway prometheus-redis-exporter' 'Wrong packages adopted'
 assert_contains "$output" 'node_exporter    existing' 'Running node_exporter must stay foreign'
 assert_not_contains "$(cat "$dry/etc/nntmux-monitoring/install.state")" 'prometheus-node-exporter' 'Running node_exporter recorded as ours'
+
+# ── A running Grafana that this script installed is adopted ──
+setup
+mkdir -p "$root/etc/default"
+printf '# Managed by NNTmux scripts/install-monitoring.sh\nARGS=""\n' >"$root/etc/default/prometheus"
+printf 'grafana\nprometheus\nprometheus-pushgateway\n' >"$fixtures/packages.txt"
+printf 'grafana-server.service\n' >>"$fixtures/units.txt"
+printf 'LISTEN 0 4096 *:3000 *:* users:(("grafana",pid=1592931,fd=74))\n' >"$fixtures/ss.txt"
+printf 'Start-Date: 2026-10-07\nCommandline: apt-get install -y -q --no-install-recommends prometheus prometheus-pushgateway\nCommandline: apt-get install -y -q --no-install-recommends grafana=13.2.3\n' >"$fixtures/apt-history.txt"
+run_installer
+[[ $status == 0 ]] || fail "Running Grafana from an interrupted run was not adopted: $output"
+assert_contains "$output" 'adopting: grafana prometheus prometheus-pushgateway' 'Grafana not adopted'
+# Same running Grafana, but installed some other way: never taken over.
+: >"$fixtures/apt-history.txt"
+rm -rf "$dry" && mkdir -p "$dry"
+run_installer
+[[ $status == 1 ]] || fail 'A running Grafana installed by someone else must not be taken over'
+assert_contains "$output" 'Grafana is already installed but not by this script' 'Foreign running Grafana message'
 
 # ── Conflicts abort before anything is changed ───────────────
 setup

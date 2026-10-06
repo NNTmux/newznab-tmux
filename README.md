@@ -418,7 +418,7 @@ The installer:
 - installs Prometheus, the Pushgateway, node/mysqld/redis (or Elasticsearch) exporters and Grafana, all listening on 127.0.0.1 only;
 - **reuses exporters that are already running** (for example a node_exporter that also feeds another Prometheus or a NAS) and never reconfigures, restarts or removes them. If such an exporter needs credentials, pass `--node-exporter-url`, `--node-exporter-scheme`, `--node-exporter-basic-auth-file` or `--node-exporter-insecure-tls`;
 - refuses to take over a Prometheus, Pushgateway or Grafana it did not install;
-- creates a MariaDB `prometheus@localhost` user (unix_socket auth, `PROCESS`/`REPLICATION CLIENT` and read access to `performance_schema` only). It tries root over the socket, `/etc/mysql/debian.cnf` and `DB_USERNAME` from `.env`; if your root uses a password, pass `--db-admin-user=root --db-admin-password-file=/root/db-pass`. If none of them can, it prints the SQL to run yourself and carries on;
+- points the MariaDB exporter at the database user from `.env` (`DB_USERNAME`/`DB_PASSWORD`, connecting the way Laravel does). It only reads global status and variables, so no root password or extra grants are needed. Pass `--db-admin-user=root --db-admin-password-file=FILE` to create a dedicated least-privilege `prometheus@localhost` user instead;
 - proxies `/grafana/` through your nginx site or an Apache conf. Grafana has no login form: the admin pages sign a short-lived JWT for admins who passed 2FA;
 - writes `MONITORING_*` / `GRAFANA_*` into `.env`.
 
