@@ -33,6 +33,36 @@ class IsbnDbServiceTest extends TestCase
         $this->assertFalse($service->isConfigured());
     }
 
+    public function test_search_404_is_cached_as_a_miss_without_cooling_down_the_provider(): void
+    {
+        $mock = new MockHandler([new Response(404), new Response(200, [], '{"data":[]}')]);
+        $service = new IsbnDbService(
+            new Client(['handler' => HandlerStack::create($mock), 'base_uri' => 'https://api2.isbndb.com']),
+            'test-key'
+        );
+
+        $this->assertSame([], $service->searchBooks('Missing Book'));
+        $this->assertSame([], $service->searchBooks('Missing Book'));
+        $this->assertFalse(Cache::has(IsbnDbService::COOLDOWN_CACHE_KEY));
+        $this->assertSame([], $service->searchBooks('Another Book'));
+        $this->assertCount(0, $mock);
+    }
+
+    public function test_isbn_404_is_cached_as_a_miss_without_cooling_down_the_provider(): void
+    {
+        $mock = new MockHandler([new Response(404), new Response(200, [], '{"data":[]}')]);
+        $service = new IsbnDbService(
+            new Client(['handler' => HandlerStack::create($mock), 'base_uri' => 'https://api2.isbndb.com']),
+            'test-key'
+        );
+
+        $this->assertNull($service->findByIsbn('9780132350884'));
+        $this->assertNull($service->findByIsbn('9780132350884'));
+        $this->assertFalse(Cache::has(IsbnDbService::COOLDOWN_CACHE_KEY));
+        $this->assertSame([], $service->searchBooks('Another Book'));
+        $this->assertCount(0, $mock);
+    }
+
     public function test_search_book_maps_response_to_internal_shape(): void
     {
         $mock = new MockHandler([

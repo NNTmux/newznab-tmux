@@ -117,11 +117,13 @@ class BookServiceObfuscatedNormalizationTest extends TestCase
 
         $service = app(BookService::class);
         $service->processBookReleases();
+        $service->processBookReleases();
 
         $release = Release::query()->findOrFail(1);
 
         $this->assertSame("Woman's Day New Zealand - Issue 45 April 27 2026", $release->searchname);
         $this->assertSame(123, (int) $release->bookinfo_id);
+        $this->assertNotNull($release->book_name_normalized_at);
         $this->assertSame(1, (int) $release->isrenamed);
     }
 
@@ -164,11 +166,13 @@ class BookServiceObfuscatedNormalizationTest extends TestCase
 
         $service = app(BookService::class);
         $service->processBookReleases();
+        $service->processBookReleases();
 
         $release = Release::query()->findOrFail(2);
 
         $this->assertSame('MCN - April 22, 2026', $release->searchname);
         $this->assertSame(-2, (int) $release->bookinfo_id);
+        $this->assertNotNull($release->book_name_normalized_at);
         $this->assertSame(1, (int) $release->isrenamed);
     }
 
@@ -208,6 +212,9 @@ class BookServiceObfuscatedNormalizationTest extends TestCase
                 $table->integer('musicinfo_id')->nullable();
                 $table->integer('consoleinfo_id')->nullable();
                 $table->integer('bookinfo_id')->nullable();
+                $table->unsignedTinyInteger('book_lookup_attempts')->default(0);
+                $table->dateTime('book_lookup_retry_at')->nullable();
+                $table->dateTime('book_name_normalized_at')->nullable();
                 $table->integer('anidbid')->nullable();
                 $table->unsignedInteger('predb_id')->default(0);
                 $table->tinyInteger('iscategorized')->default(0);

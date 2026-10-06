@@ -7,6 +7,7 @@ namespace App\Console\Commands;
 use App\Facades\Search;
 use App\Models\Category;
 use App\Models\Release;
+use App\Services\BookProcessingCandidateQuery;
 use App\Services\NameFixing\Extractors\ObfuscatedSubjectExtractor;
 use Illuminate\Console\Command;
 
@@ -16,9 +17,9 @@ class RequeueFailedBooks extends Command
                             {--dry-run : Preview affected releases without writing changes}
                             {--limit=0 : Max releases to inspect (0 = no limit)}
                             {--only-obfuscated : Only requeue rows with obfuscated subject that can be normalized}
-                            {--normalize-obfuscated-all : Normalize obfuscated names across all book/audiobook releases, not just bookinfo_id=-2}';
+                            {--normalize-obfuscated-all : Normalize obfuscated names across all book/audiobook releases, not just failed rows}';
 
-    protected $description = 'Requeue failed book metadata rows (bookinfo_id = -2) and normalize obfuscated search names.';
+    protected $description = 'Requeue unmatched or retry-exhausted books (bookinfo_id = -2 or -3) and normalize obfuscated search names.';
 
     public function handle(ObfuscatedSubjectExtractor $extractor): int
     {
@@ -44,7 +45,7 @@ class RequeueFailedBooks extends Command
                     ->orWhere('name', 'like', 'N_NZB_%');
             });
         } else {
-            $query->where('bookinfo_id', -2);
+            $query->whereIn('bookinfo_id', [-2, BookProcessingCandidateQuery::EXHAUSTED]);
         }
 
         if ($limit > 0) {
@@ -55,7 +56,7 @@ class RequeueFailedBooks extends Command
         $total = $releases->count();
 
         if ($total === 0) {
-            $this->info('No failed book releases found (bookinfo_id = -2).');
+            $this->info('No failed book releases found (bookinfo_id = -2 or -3).');
 
             return self::SUCCESS;
         }
@@ -80,13 +81,17 @@ class RequeueFailedBooks extends Command
             }
 
             $updates = [];
-            $shouldRequeue = (int) $release->bookinfo_id === -2;
+            $shouldRequeue = in_array((int) $release->bookinfo_id, [-2, BookProcessingCandidateQuery::EXHAUSTED], true);
             if ($shouldRequeue) {
                 $updates['bookinfo_id'] = null;
+                $updates['book_lookup_attempts'] = 0;
+                $updates['book_lookup_retry_at'] = null;
+                $updates['book_name_normalized_at'] = null;
             }
             if ($normalized !== null && $normalized !== $release->searchname) {
                 $updates['searchname'] = $normalized;
                 $updates['isrenamed'] = 1;
+                $updates['book_name_normalized_at'] = now();
             }
 
             if ($updates === []) {

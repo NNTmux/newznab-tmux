@@ -91,6 +91,12 @@ class IsbnDbService
 
         $response = $this->request('/books/'.rawurlencode($query), $requestQuery);
 
+        if ($response === null) {
+            Cache::put($cacheKey, [], now()->addHours(6));
+
+            return [];
+        }
+
         $books = $response['data'] ?? null;
         if (! is_array($books)) {
             Cache::put(self::COOLDOWN_CACHE_KEY, true, now()->addMinutes(5));
@@ -131,11 +137,19 @@ class IsbnDbService
 
         $cacheKey = 'isbndb_isbn_'.$isbn;
         $cached = Cache::get($cacheKey);
+        if ($cached === false) {
+            return null;
+        }
         if (is_array($cached)) {
             return $cached;
         }
 
         $response = $this->request('/book/'.rawurlencode($isbn));
+        if ($response === null) {
+            Cache::put($cacheKey, false, now()->addHours(6));
+
+            return null;
+        }
         $bookRaw = $response['book'] ?? null;
         if (! is_array($bookRaw) || $bookRaw === []) {
             Cache::put(self::COOLDOWN_CACHE_KEY, true, now()->addMinutes(5));

@@ -30,6 +30,8 @@ class BookService
 {
     private const FAILURE_CACHE_VERSION = 2;
 
+    private int $providerRetryAfter = 300;
+
     public bool $echooutput;
 
     public int $bookqty;
@@ -38,7 +40,7 @@ class BookService
 
     public string $imgSavePath;
 
-    public string $renamed;
+    private int $lookupMode;
 
     public ?string $parsedIsbn;
 
@@ -75,7 +77,7 @@ class BookService
         $this->sleeptime = app(ConfigurationProvider::class)->metadata()->amazonSleepMilliseconds !== '' ? (int) app(ConfigurationProvider::class)->metadata()->amazonSleepMilliseconds : 1000;
         $this->imgSavePath = storage_path('covers/book/');
 
-        $this->renamed = (int) app(ConfigurationProvider::class)->metadata()->bookLookup->value === 2 ? 'AND isrenamed = 1' : '';
+        $this->lookupMode = (int) app(ConfigurationProvider::class)->metadata()->bookLookup->value;
 
         $this->parsedIsbn = null;
         $this->parsedBookResult = null;
@@ -413,11 +415,8 @@ class BookService
         $this->normalizeBookSearchNames($groupID, $guidChar);
 
         $query = Release::query()
-            ->whereNull('bookinfo_id')
-            ->where(static function ($builder): void {
-                $builder->whereBetween('categories_id', [Category::BOOKS_ROOT, Category::BOOKS_UNKNOWN])
-                    ->orWhere('categories_id', Category::MUSIC_AUDIOBOOK);
-            })
+            ->whereRaw(BookProcessingCandidateQuery::categoryCondition())
+            ->whereRaw(BookProcessingCandidateQuery::metadataCondition($this->lookupMode))
             ->orderByDesc('postdate')
             ->limit($this->bookqty);
 
@@ -427,10 +426,6 @@ class BookService
 
         if ($groupID !== '') {
             $query->where('groups_id', $groupID);
-        }
-
-        if ($this->renamed !== '') {
-            $query->where('isrenamed', 1);
         }
 
         $this->processBookReleasesHelper(
@@ -448,19 +443,8 @@ class BookService
     {
         $query = Release::query()
             ->select(['id', 'name', 'searchname', 'categories_id', 'isrenamed'])
-            ->where(static function ($builder): void {
-                $builder->whereBetween('categories_id', [Category::BOOKS_ROOT, Category::BOOKS_UNKNOWN])
-                    ->orWhere('categories_id', Category::MUSIC_AUDIOBOOK);
-            })
-            ->where(function ($builder): void {
-                if ($this->renamed === '') {
-                    $builder->where('isrenamed', 0);
-                }
-                $builder->orWhere('searchname', 'like', 'N:/NZB%')
-                    ->orWhere('searchname', 'like', 'N_NZB_%')
-                    ->orWhere('name', 'like', 'N:/NZB%')
-                    ->orWhere('name', 'like', 'N_NZB_%');
-            })
+            ->whereRaw(BookProcessingCandidateQuery::categoryCondition())
+            ->whereRaw(BookProcessingCandidateQuery::normalizationCondition($this->lookupMode))
             ->orderByDesc('postdate')
             ->limit($this->bookqty);
 
@@ -478,15 +462,17 @@ class BookService
             $parsed = $this->parseReleaseName($sourceName, $releaseType);
             $normalizedSearchName = $this->determineReadableBookSearchName($sourceName, $parsed);
 
-            if ($normalizedSearchName === null || $normalizedSearchName === $release->searchname) {
-                continue;
+            $updates = ['book_name_normalized_at' => now()];
+            $nameChanged = $normalizedSearchName !== null && $normalizedSearchName !== $release->searchname;
+            if ($nameChanged) {
+                $updates['searchname'] = $normalizedSearchName;
+                $updates['isrenamed'] = 1;
             }
 
-            Release::query()->where('id', (int) $release->id)->update([
-                'searchname' => $normalizedSearchName,
-                'isrenamed' => 1,
-            ]);
-            Search::updateRelease((int) $release->id);
+            Release::query()->where('id', (int) $release->id)->update($updates);
+            if ($nameChanged) {
+                Search::updateRelease((int) $release->id);
+            }
         }
     }
 
@@ -543,14 +529,12 @@ class BookService
                         $bookId = $bookCheck['id'];
                     }
 
-                    // Update release.
-                    Release::query()->where('id', $arr['id'])->update(['bookinfo_id' => $bookId]);
                 } else { // Could not parse release title.
-                    Release::query()->where('id', $arr['id'])->update(['bookinfo_id' => $bookId]);
                     if ($this->echooutput) {
                         echo '.';
                     }
                 }
+                $this->recordLookupOutcome((int) $arr['id'], $bookId === null ? null : (int) $bookId);
                 // Sleep to avoid flooding external book metadata providers.
                 $diff = floor((now()->timestamp - $startTime) * 1000000);
                 if ($this->sleeptime * 1000 - $diff > 0 && $usedExternalApi === true) {
@@ -560,6 +544,33 @@ class BookService
         } elseif ($this->echooutput) {
             cli()->header('No book releases to process for categories id '.$categoryID);
         }
+    }
+
+    private function recordLookupOutcome(int $releaseId, ?int $bookId): void
+    {
+        DB::transaction(function () use ($releaseId, $bookId): void {
+            $release = Release::query()->where('id', $releaseId)
+                ->whereRaw(BookProcessingCandidateQuery::metadataCondition($this->lookupMode))
+                ->lockForUpdate()->first(['id', 'book_lookup_attempts']);
+            if ($release === null) {
+                return;
+            }
+
+            $updates = ['bookinfo_id' => $bookId, 'book_lookup_retry_at' => null];
+            if ($bookId === null) {
+                $failures = (int) $release->book_lookup_attempts + 1;
+                $updates['book_lookup_attempts'] = $failures;
+                if ($failures >= BookProcessingCandidateQuery::MAX_FAILURES) {
+                    $updates['bookinfo_id'] = BookProcessingCandidateQuery::EXHAUSTED;
+                } else {
+                    $updates['book_lookup_retry_at'] = now()->addSeconds(
+                        BookProcessingCandidateQuery::retryDelay($failures, $this->providerRetryAfter)
+                    );
+                }
+            }
+
+            Release::query()->where('id', $releaseId)->update($updates);
+        });
     }
 
     /**
@@ -800,6 +811,7 @@ class BookService
      */
     public function updateBookInfo(string $bookInfo = '', ?string $isbn = null): ?int
     {
+        $this->providerRetryAfter = 300;
         $bookInfo = trim($bookInfo);
         if ($bookInfo === '') {
             return -2;
@@ -848,6 +860,7 @@ class BookService
                 }
             } catch (BookProviderException $exception) {
                 $hadProviderFailure = true;
+                $this->providerRetryAfter = max($this->providerRetryAfter, $exception->retryAfterSeconds ?? 0);
                 $this->logProviderFailure($exception, $bookInfo);
             }
         }
@@ -886,6 +899,7 @@ class BookService
                 }
             } catch (BookProviderException $exception) {
                 $hadProviderFailure = true;
+                $this->providerRetryAfter = max($this->providerRetryAfter, $exception->retryAfterSeconds ?? 0);
                 $this->logProviderFailure($exception, $bookInfo);
             }
         }
@@ -919,6 +933,7 @@ class BookService
                 }
             } catch (BookProviderException $exception) {
                 $hadProviderFailure = true;
+                $this->providerRetryAfter = max($this->providerRetryAfter, $exception->retryAfterSeconds ?? 0);
                 $this->logProviderFailure($exception, $bookInfo);
             }
         }

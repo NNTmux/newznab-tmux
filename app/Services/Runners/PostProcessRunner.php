@@ -7,6 +7,7 @@ namespace App\Services\Runners;
 use App\Models\Category;
 use App\Services\AdditionalProcessing\AdditionalCandidateQuery;
 use App\Services\AdditionalProcessing\AdditionalProcessingOrchestrator;
+use App\Services\BookProcessingCandidateQuery;
 use App\Services\Configuration\ConfigurationProvider;
 use App\Services\NfoService;
 use App\Services\TempWorkspaceService;
@@ -157,22 +158,14 @@ class PostProcessRunner extends BaseRunner
     private function getBooksBuckets(): array
     {
         $bucketExpr = $this->guidBucketExpression();
-        $pendingCondition = $this->bookPendingCondition();
+        $workCondition = BookProcessingCandidateQuery::workCondition(
+            (int) app(ConfigurationProvider::class)->metadata()->bookLookup->value
+        );
 
         return DB::select('
             SELECT DISTINCT '.$bucketExpr.' AS id
             FROM releases
-            WHERE (
-                categories_id BETWEEN '.Category::BOOKS_ROOT.' AND '.Category::BOOKS_UNKNOWN.'
-                OR categories_id = '.Category::MUSIC_AUDIOBOOK.'
-            )
-            AND (
-                '.$pendingCondition.'
-                OR searchname LIKE "N:/NZB%"
-                OR searchname LIKE "N_NZB_%"
-                OR name LIKE "N:/NZB%"
-                OR name LIKE "N_NZB_%"
-            )
+            WHERE '.$workCondition.'
             LIMIT 16');
     }
 
@@ -604,56 +597,10 @@ class PostProcessRunner extends BaseRunner
             return;
         }
 
-        $pendingCondition = $this->bookPendingCondition();
-
-        $checkSql = '
-            SELECT id
-            FROM releases
-            WHERE (
-                categories_id BETWEEN 7000 AND 7999
-                OR categories_id = 3030
-            )
-            AND (
-                '.$pendingCondition.'
-                OR searchname LIKE "N:/NZB%"
-                OR searchname LIKE "N_NZB_%"
-                OR name LIKE "N:/NZB%"
-                OR name LIKE "N_NZB_%"
-            )
-            LIMIT 1';
-        if (count(DB::select($checkSql)) === 0) {
-            $this->headerNone();
-
-            return;
-        }
-
-        $bucketExpr = $this->guidBucketExpression();
-        $sql = '
-            SELECT DISTINCT '.$bucketExpr.' AS id
-            FROM releases
-            WHERE (
-                categories_id BETWEEN 7000 AND 7999
-                OR categories_id = 3030
-            )
-            AND (
-                '.$pendingCondition.'
-                OR searchname LIKE "N:/NZB%"
-                OR searchname LIKE "N_NZB_%"
-                OR name LIKE "N:/NZB%"
-                OR name LIKE "N_NZB_%"
-            )
-            LIMIT 16';
-        $queue = DB::select($sql);
+        $queue = $this->getBooksBuckets();
 
         $maxProcesses = (int) app(ConfigurationProvider::class)->postProcessing()->postThreadsAmazon;
         $this->runPostProcess($queue, $maxProcesses, 'books', 'books postprocessing');
-    }
-
-    private function bookPendingCondition(): string
-    {
-        return (int) app(ConfigurationProvider::class)->metadata()->bookLookup->value === 2
-            ? '(bookinfo_id IS NULL AND isrenamed = 1)'
-            : 'bookinfo_id IS NULL';
     }
 
     public function processMusic(): void

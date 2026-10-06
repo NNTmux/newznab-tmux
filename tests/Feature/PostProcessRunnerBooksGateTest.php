@@ -192,6 +192,9 @@ class PostProcessRunnerBooksGateTest extends TestCase
                 $table->string('fromname')->nullable();
                 $table->integer('categories_id')->default(Category::OTHER_MISC);
                 $table->integer('bookinfo_id')->nullable();
+                $table->unsignedTinyInteger('book_lookup_attempts')->default(0);
+                $table->dateTime('book_lookup_retry_at')->nullable();
+                $table->dateTime('book_name_normalized_at')->nullable();
                 $table->tinyInteger('isrenamed')->default(0);
             });
         }

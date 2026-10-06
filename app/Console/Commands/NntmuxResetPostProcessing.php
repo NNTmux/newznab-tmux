@@ -80,6 +80,9 @@ class NntmuxResetPostProcessing extends Command
                             'movieinfo_id' => null,
                             'musicinfo_id' => null,
                             'bookinfo_id' => null,
+                            'book_lookup_attempts' => 0,
+                            'book_lookup_retry_at' => null,
+                            'book_name_normalized_at' => null,
                             'videos_id' => 0,
                             'tv_episodes_id' => 0,
                             'passwordstatus' => -1,
@@ -291,6 +294,9 @@ class NntmuxResetPostProcessing extends Command
                 Release::query()->where('id', $releases->id)->update(
                     [
                         'bookinfo_id' => null,
+                        'book_lookup_attempts' => 0,
+                        'book_lookup_retry_at' => null,
+                        'book_name_normalized_at' => null,
                     ]);
                 $bar->advance();
             }
