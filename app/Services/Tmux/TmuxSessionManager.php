@@ -157,7 +157,7 @@ class TmuxSessionManager
         }
 
         $result = Process::timeout(10)->run(
-            TmuxCommand::arguments(['list-panes', '-s', '-t', $this->target(), '-F', "#{window_index}:#{pane_index}\t#{pane_title}"])
+            TmuxCommand::arguments(['list-panes', '-s', '-t', $this->target(), '-F', "#{window_index}:#{pane_index}|#{pane_title}"])
         );
 
         if (! $result->successful()) {
@@ -172,7 +172,7 @@ class TmuxSessionManager
                 continue;
             }
 
-            [$position, $title] = array_pad(explode("\t", $line, 2), 2, '');
+            [$position, $title] = array_pad(preg_split('/[|\t]/', $line, 2), 2, '');
             $panes[$position] = $title;
         }
 

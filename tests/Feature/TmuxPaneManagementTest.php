@@ -44,6 +44,17 @@ class TmuxPaneManagementTest extends TestCase
         );
     }
 
+    public function test_roles_resolve_from_pipe_separated_output(): void
+    {
+        // tmux 3.3 prints tabs in -F formats as underscores, so formats use '|'.
+        Process::fake(fn (PendingProcess $process) => in_array('display-message', $process->command, true) ? Process::result('$1') : Process::result("%12|monitor|0|0|100|0|@1\n%27|post_movies|0|0|200|0|@2\n"));
+
+        $manager = new TmuxPaneManager('test session');
+
+        $this->assertSame('%12', $manager->paneForRole(TmuxPaneRole::Monitor));
+        $this->assertSame('%27', $manager->paneForRole(TmuxPaneRole::PostMovies));
+    }
+
     public function test_unconfigured_socket_uses_the_same_server_as_plain_tmux_attach(): void
     {
         config(['tmux' => []]);

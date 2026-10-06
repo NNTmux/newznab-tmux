@@ -319,9 +319,9 @@ class TmuxPaneManager
     private function tagLegacyPane(TmuxPaneRole $role, string $legacyTarget): string
     {
         $result = Process::timeout(5)->run(
-            TmuxCommand::arguments(['display-message', '-p', '-t', $this->target($legacyTarget), "#{pane_id}\t#{".self::ROLE_OPTION.'}'])
+            TmuxCommand::arguments(['display-message', '-p', '-t', $this->target($legacyTarget), "#{pane_id}|#{".self::ROLE_OPTION.'}'])
         );
-        [$paneId, $existingRole] = array_pad(explode("\t", trim($result->output()), 2), 2, '');
+        [$paneId, $existingRole] = array_pad(preg_split('/[|\t]/', trim($result->output()), 2), 2, '');
 
         if (! $result->successful() || ! preg_match('/^%[0-9]+$/', $paneId)) {
             throw new RuntimeException(
@@ -415,14 +415,14 @@ class TmuxPaneManager
         }
         $result = Process::timeout(10)->run(TmuxCommand::arguments([
             'list-panes', '-s', '-t', $this->sessionManager->target(), '-F',
-            "#{pane_id}\t#{".self::ROLE_OPTION."}\t#{pane_dead}\t#{pane_dead_status}\t#{pane_pid}\t#{pane_pipe}\t#{window_id}",
+            "#{pane_id}|#{".self::ROLE_OPTION."}|#{pane_dead}|#{pane_dead_status}|#{pane_pid}|#{pane_pipe}|#{window_id}",
         ]));
         if (! $result->successful()) {
             throw new RuntimeException("Unable to list panes for tmux session '{$this->sessionName}'.");
         }
         $panes = [];
         foreach (preg_split('/\R/', trim($result->output())) ?: [] as $line) {
-            [$id, $role, $dead, $status, $pid, $pipe, $window] = array_pad(explode("\t", $line), 7, '');
+            [$id, $role, $dead, $status, $pid, $pipe, $window] = array_pad(preg_split('/[|\t]/', $line), 7, '');
             if (! preg_match('/^%[0-9]+$/', $id)) {
                 continue;
             }
