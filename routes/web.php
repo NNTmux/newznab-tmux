@@ -299,6 +299,13 @@ Route::middleware(['role:Admin', '2fa'])->prefix('admin')->group(function () {
     Route::post('status/service/{service}/update', [AdminStatusController::class, 'updateService'])->name('admin.status.update-service')->whereNumber('service');
     Route::get('site-stats', [AdminSiteController::class, 'stats'])->name('admin.site-stats');
     Route::get('logs', [AdminLogViewerController::class, 'index'])->name('admin.logs.index');
+    Route::get('logs/files', [AdminLogViewerController::class, 'files'])->name('admin.logs.files');
+    Route::get('logs/entries', [AdminLogViewerController::class, 'entries'])->name('admin.logs.entries');
+    Route::get('logs/entry', [AdminLogViewerController::class, 'entry'])->name('admin.logs.entry');
+    Route::get('logs/search', [AdminLogViewerController::class, 'search'])->name('admin.logs.search');
+    Route::get('logs/download', [AdminLogViewerController::class, 'download'])->name('admin.logs.download');
+    Route::post('logs/truncate', [AdminLogViewerController::class, 'truncate'])->name('admin.logs.truncate');
+    Route::delete('logs', [AdminLogViewerController::class, 'destroy'])->name('admin.logs.destroy');
     Route::get('role-list', [AdminRoleController::class, 'index'])->name('admin.role-list');
     Route::get('role-add', [AdminRoleController::class, 'create'])->name('admin.role-add');
     Route::post('role-add', [AdminRoleController::class, 'create']);

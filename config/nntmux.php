@@ -98,4 +98,23 @@ return [
         'skip_free_space_check' => (bool) env('RELEASES_OPTIMIZE_SKIP_FREE_SPACE_CHECK', false),
         'chunk_size' => (int) env('RELEASES_OPTIMIZE_CHUNK_SIZE', 5000),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Admin log viewer
+    |--------------------------------------------------------------------------
+    |
+    | Search shells out to GNU grep when available (set the binary to an empty
+    | string to force the slower pure-PHP scanner). The timeout applies per
+    | search request; the browser fans a search out over several requests.
+    |
+    */
+    'log_viewer' => [
+        'path' => storage_path('logs'),
+        'grep_binary' => (string) env('LOG_VIEWER_GREP_BINARY', 'grep'),
+        'search_timeout' => (int) env('LOG_VIEWER_SEARCH_TIMEOUT', 20),
+        'max_results_per_file' => 100,
+        'max_files_per_search' => 25,
+        'delete_guard_minutes' => 10,
+    ],
 ];

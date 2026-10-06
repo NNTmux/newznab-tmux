@@ -16,11 +16,11 @@ class AdminLogViewerRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $file = $this->input('file');
-        $search = $this->input('search');
+        $query = $this->input('q', $this->input('search'));
 
         $this->merge([
             'file' => is_string($file) ? trim($file) : $file,
-            'search' => is_string($search) ? trim($search) : $search,
+            'q' => is_string($query) ? trim($query) : $query,
         ]);
     }
 
@@ -31,9 +31,7 @@ class AdminLogViewerRequest extends FormRequest
     {
         return [
             'file' => ['nullable', 'string', 'max:255'],
-            'search' => ['nullable', 'string', 'max:255'],
-            'lines' => ['nullable', 'integer', 'in:100,200,500,1000'],
-            'page' => ['nullable', 'integer', 'min:1'],
+            'q' => ['nullable', 'string', 'max:255'],
         ];
     }
 }

@@ -181,6 +181,16 @@ return [
             'locking' => false,
         ],
 
+        'admin' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/admin.log'),
+            'level' => 'info',
+            'days' => 30,
+            'bubble' => true,
+            'permission' => 0775,
+            'locking' => false,
+        ],
+
         'flare' => [
             'driver' => 'flare',
         ],

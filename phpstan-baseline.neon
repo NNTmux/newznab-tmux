@@ -728,12 +728,6 @@ parameters:
 			path: app/Services/ImdbScraper.php
 
 		-
-			message: '#^Method App\\Services\\LogViewerService\:\:searchLog\(\) return type with generic class Illuminate\\Pagination\\LengthAwarePaginator does not specify its types\: TKey, TValue$#'
-			identifier: missingType.generics
-			count: 1
-			path: app/Services/LogViewerService.php
-
-		-
 			message: '#^Strict comparison using \!\=\= between non\-empty\-array\<mixed, mixed\> and array\{\} will always evaluate to true\.$#'
 			identifier: notIdentical.alwaysTrue
 			count: 1
