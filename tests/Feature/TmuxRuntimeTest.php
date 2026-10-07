@@ -178,8 +178,11 @@ class TmuxRuntimeTest extends TestCase
         $runner->beginCycle();
         $this->assertTrue($runner->runPaneTask('ppadditional', [], ['settings' => ['post' => 3], 'counts' => ['now' => ['work_available' => 0, 'processnfo' => 0]]]));
         $this->assertFalse($panes->respawnPane($id, [PHP_BINARY, '-r', 'exit(0);']));
-        $this->await(static fn (): bool => file_get_contents($marker) === 'finished');
-        $panes->refresh();
+        $this->await(function () use ($panes, $id, $marker): bool {
+            $panes->refresh();
+
+            return $panes->paneSnapshot()[$id]['dead'] && file_get_contents($marker) === 'finished';
+        });
         $this->assertSame(0, $panes->paneSnapshot()[$id]['exit_code']);
     }
 
