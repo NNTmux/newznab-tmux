@@ -3,8 +3,8 @@
 #   php artisan monitoring:install --sail   # keys + .env
 #   make up                                  # includes this overlay while MONITORING_ENABLED=true
 #
-# Grafana is reached through the app's nginx at /grafana/ (docker/8.5/nginx.conf)
-# and only trusts JWTs signed by the app. Ubuntu hosts use scripts/install-monitoring.sh.
+# Grafana is reached through the app's nginx at /grafana/ (docker/8.5/nginx.conf),
+# which checks the Laravel session and passes Grafana a JWT signed by the app. Ubuntu hosts use scripts/install-monitoring.sh.
 services:
   prometheus:
     image: 'prom/prometheus:v3.15.0'
@@ -39,7 +39,8 @@ services:
       GF_AUTH_ANONYMOUS_ENABLED: 'false'
       GF_USERS_ALLOW_SIGN_UP: 'false'
       GF_AUTH_JWT_ENABLED: 'true'
-      GF_AUTH_JWT_URL_LOGIN: 'true'
+      # The JWT only ever arrives as a header added by nginx, never in a URL.
+      GF_AUTH_JWT_URL_LOGIN: 'false'
       GF_AUTH_JWT_HEADER_NAME: X-JWT-Assertion
       GF_AUTH_JWT_KEY_FILE: /etc/grafana/nntmux-jwt/grafana-jwt.pub
       GF_AUTH_JWT_USERNAME_CLAIM: sub

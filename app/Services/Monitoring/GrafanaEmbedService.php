@@ -7,16 +7,44 @@ namespace App\Services\Monitoring;
 /**
  * Builds Grafana dashboard and panel URLs for the admin pages.
  *
- * URLs never contain the auth token or theme; the Alpine components append
- * both client-side so tokens stay out of server-rendered HTML.
+ * URLs never contain the auth token (see config monitoring.grafana.auth); the
+ * Alpine components only append the theme.
  */
 class GrafanaEmbedService
 {
+    public const string AUTH_PROXY = 'proxy';
+
+    public const string AUTH_COOKIE = 'cookie';
+
     public function __construct(private readonly GrafanaJwtIssuer $issuer) {}
 
     public function isEnabled(): bool
     {
         return (bool) config('monitoring.enabled') && $this->issuer->hasUsableKey();
+    }
+
+    public function authMode(): string
+    {
+        return config('monitoring.grafana.auth') === self::AUTH_COOKIE ? self::AUTH_COOKIE : self::AUTH_PROXY;
+    }
+
+    /**
+     * Endpoint the embeds call to set and refresh the login cookie; null in
+     * proxy mode, where nginx authenticates every Grafana request itself.
+     */
+    public function tokenUrl(): ?string
+    {
+        return $this->authMode() === self::AUTH_COOKIE ? route('admin.monitoring.token') : null;
+    }
+
+    /**
+     * Path the login cookie is scoped to, so it is only sent to Grafana.
+     */
+    public function cookiePath(): string
+    {
+        $path = parse_url($this->baseUrl(), PHP_URL_PATH);
+
+        return rtrim(is_string($path) ? $path : '', '/').'/';
     }
 
     /**

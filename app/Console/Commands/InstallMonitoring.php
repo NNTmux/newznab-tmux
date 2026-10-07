@@ -110,6 +110,8 @@ class InstallMonitoring extends Command
         $this->setEnvironmentValues([
             'MONITORING_ENABLED' => 'true',
             'GRAFANA_URL' => '/grafana',
+            // docker/8.5/nginx.conf authenticates /grafana/ with auth_request.
+            'GRAFANA_AUTH' => 'proxy',
             'GRAFANA_JWT_PRIVATE_KEY_PATH' => $this->projectRelativePath($privateKey),
             'MONITORING_PUSHGATEWAY_URL' => 'http://pushgateway:9091',
         ]);

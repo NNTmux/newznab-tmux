@@ -12,6 +12,7 @@ use App\Http\Middleware\NoCacheForAuthenticatedUsers;
 use App\Http\Middleware\ThrottleApiRequestsByToken;
 use App\Http\Middleware\TrustedDevice2FAMiddleware;
 use App\Http\Middleware\TrustProxies as AppTrustProxies;
+use App\Services\Monitoring\GrafanaJwtIssuer;
 use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -51,6 +52,11 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->validateCsrfTokens(except: [
             'btcpay/webhook',
+        ]);
+
+        // Read by the web server, not Laravel (Grafana cookie-mode login).
+        $middleware->encryptCookies(except: [
+            GrafanaJwtIssuer::COOKIE,
         ]);
 
         $middleware->prepend(DegradeWhenRedisUnreachable::class);

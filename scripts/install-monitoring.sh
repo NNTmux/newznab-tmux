@@ -25,6 +25,8 @@ Usage: sudo scripts/install-monitoring.sh [options]
   --skip-webserver                Do not touch the web server; print the snippet instead
   --web-user=USER                 User PHP-FPM runs as; may read the JWT key (default: detected)
   --nginx-site=FILE               nginx config file holding the NNTmux server block (default: detected)
+  --fastcgi-pass=ADDRESS          PHP-FPM address for the nginx Grafana login check, as in the site's
+                                  fastcgi_pass (default: detected from the site)
   --db-admin-user=USER            Create a dedicated, least-privilege MariaDB user for the exporter with this
                                   admin account (default: the exporter uses DB_USERNAME from .env)
   --db-admin-password-file=FILE   File holding the password for --db-admin-user
@@ -95,6 +97,24 @@ sys_installed_by_this_script() {
     grep '^Commandline: apt-get install -y -q --no-install-recommends ' <<<"$history" | grep -qE "[[:space:]]$1(=[^[:space:]]+)?([[:space:]]|$)"
 }
 
+# Installed version of a package, else apt's candidate (empty if unknown).
+sys_package_version() {
+    if [[ -n $FIXTURES ]]; then
+        awk -v p="$1" '$1 == p { print $2 }' "$FIXTURES/versions.txt" 2>/dev/null || true
+        return
+    fi
+    local version
+    version=$(dpkg-query -W -f='${Version}' "$1" 2>/dev/null || true)
+    [[ -n $version ]] || version=$(apt-cache policy "$1" 2>/dev/null | awk '/Candidate:/ { print $2 }' || true)
+    [[ $version == '(none)' ]] && version=
+    printf '%s' "$version"
+}
+
+sys_nginx_has_auth_request() {
+    if [[ -n $FIXTURES ]]; then [[ ! -f $FIXTURES/nginx-no-auth-request ]]; return; fi
+    nginx -V 2>&1 | grep -q -- '--with-http_auth_request_module'
+}
+
 # Prints the HTTP status code (000 on connection/TLS failure); body goes to $2.
 sys_http_get() {
     local url=$1 body=$2
@@ -121,6 +141,9 @@ WEB_SERVER=auto
 SKIP_WEBSERVER=0
 WEB_USER=
 NGINX_SITE=
+FASTCGI_PASS=
+# proxy (nginx auth_request) or cookie; chosen in choose_grafana_auth.
+GRAFANA_AUTH=
 DB_ADMIN_USER=
 DB_ADMIN_PASSWORD_FILE=
 GRAFANA_VERSION=$GRAFANA_VERSION_DEFAULT
@@ -145,6 +168,7 @@ for argument in "$@"; do
         --skip-webserver) SKIP_WEBSERVER=1 ;;
         --web-user=*) WEB_USER=${argument#*=} ;;
         --nginx-site=*) NGINX_SITE=${argument#*=} ;;
+        --fastcgi-pass=*) FASTCGI_PASS=${argument#*=} ;;
         --db-admin-user=*) DB_ADMIN_USER=${argument#*=} ;;
         --db-admin-password-file=*) DB_ADMIN_PASSWORD_FILE=${argument#*=} ;;
         --grafana-version=*) GRAFANA_VERSION=${argument#*=} ;;
@@ -570,7 +594,9 @@ enabled = false
 
 [auth.jwt]
 enabled = true
-url_login = true
+; Never from a URL: the web server adds the header (nginx auth_request, or the
+; HttpOnly nntmux_grafana_jwt cookie on Apache), so tokens stay out of logs.
+url_login = false
 header_name = X-JWT-Assertion
 key_file = /etc/grafana/nntmux-jwt.pub
 username_claim = sub
@@ -606,10 +632,23 @@ map \$http_upgrade \$nntmux_grafana_connection {
     '' close;
 }
 NGINX
-    cat >"$snippet_out" <<NGINX
-$MARKER: Grafana reverse proxy. Grafana authenticates the NNTmux JWT itself.
+    local auth_lines jwt_source=\$cookie_nntmux_grafana_jwt
+    if [[ $GRAFANA_AUTH == proxy ]]; then
+        auth_lines=$'    auth_request /_nntmux/grafana-auth;\n    auth_request_set $nntmux_grafana_jwt $upstream_http_x_nntmux_grafana_jwt;'
+        jwt_source=\$nntmux_grafana_jwt
+    fi
+    {
+        if [[ $GRAFANA_AUTH == proxy ]]; then
+            echo "$MARKER: Grafana reverse proxy. Every request is checked against the NNTmux"
+            echo "# session (/_nntmux/grafana-auth); Grafana gets the login JWT as a header."
+        else
+            echo "$MARKER: Grafana reverse proxy. NNTmux sets a short-lived login JWT in the"
+            echo "# HttpOnly nntmux_grafana_jwt cookie; Grafana gets it as a header."
+        fi
+        cat <<NGINX
 location ^~ /grafana/ {
-    # Declaring add_header here stops nginx inheriting the site's own add_header
+${auth_lines:+$auth_lines
+}    # Declaring add_header here stops nginx inheriting the site's own add_header
     # lines; a site-wide Content-Security-Policy would block Grafana's inline
     # boot scripts and leave it on its loading screen.
     add_header X-Frame-Options SAMEORIGIN always;
@@ -622,8 +661,49 @@ NGINX_HEADERS_MORE
     proxy_set_header X-Forwarded-Proto \$scheme;
     proxy_set_header Upgrade \$http_upgrade;
     proxy_set_header Connection \$nntmux_grafana_connection;
+    # Also replaces any X-JWT-Assertion sent by the client.
+    proxy_set_header X-JWT-Assertion $jwt_source;
+NGINX
+        if [[ $GRAFANA_AUTH == proxy ]]; then
+            cat <<NGINX
+
+    # Grafana's static assets need no login; skip the PHP round trip.
+    location ^~ /grafana/public/ {
+        auth_request off;
+        proxy_pass http://127.0.0.1:$GRAFANA_PORT;
+    }
+}
+
+location = /_nntmux/grafana-auth {
+    internal;
+    fastcgi_pass $FASTCGI_PASS;
+    fastcgi_pass_request_body off;
+    fastcgi_param SCRIPT_FILENAME \$document_root/index.php;
+    fastcgi_param SCRIPT_NAME /index.php;
+    fastcgi_param DOCUMENT_ROOT \$document_root;
+    # Subrequests report the original method and URI; Laravel must see this route.
+    fastcgi_param REQUEST_METHOD GET;
+    fastcgi_param REQUEST_URI /admin/monitoring/grafana-auth;
+    fastcgi_param QUERY_STRING "";
+    fastcgi_param CONTENT_TYPE "";
+    fastcgi_param CONTENT_LENGTH "";
+    fastcgi_param SERVER_PROTOCOL \$server_protocol;
+    fastcgi_param SERVER_NAME \$server_name;
+    fastcgi_param SERVER_PORT \$server_port;
+    fastcgi_param REMOTE_ADDR \$remote_addr;
+    fastcgi_param REMOTE_PORT \$remote_port;
+    fastcgi_param HTTPS \$https if_not_empty;
+    fastcgi_param GATEWAY_INTERFACE CGI/1.1;
+    # JSON answers make Laravel return 401/403 instead of a login redirect.
+    fastcgi_param HTTP_ACCEPT application/json;
+    fastcgi_param HTTP_X_REQUESTED_WITH XMLHttpRequest;
+    fastcgi_param NNTMUX_GRAFANA_AUTH_REQUEST 1;
 }
 NGINX
+        else
+            echo '}'
+        fi
+    } >"$snippet_out"
 }
 
 # headers-more (more_set_headers) is not reset by add_header, so clear its CSP explicitly.
@@ -646,12 +726,17 @@ finish_nginx_snippet() {
 
 render_apache_conf() {
     cat >"$1" <<APACHE
-$MARKER: Grafana reverse proxy. Grafana authenticates the NNTmux JWT itself.
+$MARKER: Grafana reverse proxy. NNTmux sets a short-lived login JWT in the
+# HttpOnly nntmux_grafana_jwt cookie (path /grafana/); Grafana gets it as a header.
+SetEnvIf Cookie "(^|; *)nntmux_grafana_jwt=([A-Za-z0-9._-]+)" NNTMUX_GRAFANA_JWT=\$2
 <Location /grafana/>
     ProxyPass http://127.0.0.1:$GRAFANA_PORT/grafana/ upgrade=websocket
     ProxyPassReverse http://127.0.0.1:$GRAFANA_PORT/grafana/
     ProxyPreserveHost On
     RequestHeader set X-Forwarded-Proto expr=%{REQUEST_SCHEME}
+    # Also drops any X-JWT-Assertion sent by the client.
+    RequestHeader unset X-JWT-Assertion
+    RequestHeader set X-JWT-Assertion "%{NNTMUX_GRAFANA_JWT}e" env=NNTMUX_GRAFANA_JWT
     # A site-wide Content-Security-Policy would block Grafana's inline boot scripts.
     Header always unset Content-Security-Policy
     Header unset Content-Security-Policy
@@ -843,13 +928,18 @@ configure_exporters() {
     fi
 
     if [[ ${DETECTED[search]} == absent || ${DETECTED[search]} == ours ]]; then
-        local es_credentials=''
+        local es_credentials='' es_env='' es_version
         if [[ -n $ES_USER ]]; then
-            # The Ubuntu builds only take the URI as a flag, so credentials end up in the process list.
-            es_credentials="$ES_USER:$ES_PASS@"
-            warn "ELASTICSEARCH_USER is set: its credentials are passed to elasticsearch_exporter via --es.uri and are visible to local users in the process list."
+            es_version=$(sys_package_version prometheus-elasticsearch-exporter)
+            if es_exporter_reads_env_credentials "$es_version"; then
+                # Environment, not argv: /proc/<pid>/environ is only readable by the exporter's user.
+                es_env=$'\n'"ES_USERNAME=$(systemd_env_quote "$ES_USER")"$'\n'"ES_PASSWORD=$(systemd_env_quote "$ES_PASS")"
+            else
+                es_credentials="$ES_USER:$ES_PASS@"
+                warn "prometheus-elasticsearch-exporter ${es_version:-(unknown version)} predates ES_USERNAME/ES_PASSWORD (1.3.0): ELASTICSEARCH_USER's credentials are passed via --es.uri and are visible to local users in the process list. Use an Elasticsearch account that can only read cluster monitoring data."
+            fi
         fi
-        write_defaults_file prometheus-elasticsearch-exporter "ARGS=\"--web.listen-address=127.0.0.1:9114 --es.uri=${ES_SCHEME:-http}://$es_credentials${ES_HOST:-127.0.0.1}:${ES_PORT:-9200}\"" 0640
+        write_defaults_file prometheus-elasticsearch-exporter "ARGS=\"--web.listen-address=127.0.0.1:9114 --es.uri=${ES_SCHEME:-http}://$es_credentials${ES_HOST:-127.0.0.1}:${ES_PORT:-9200}\"$es_env" 0640
         TARGET[search]=127.0.0.1:9114
     fi
 
@@ -857,6 +947,21 @@ configure_exporters() {
         cut -d: -f2- "$NODE_BASIC_AUTH_FILE" >"$WORK_DIR/node-exporter.password"
         install_file "$WORK_DIR/node-exporter.password" /etc/prometheus/node-exporter.password 0640 root:prometheus
     fi
+}
+
+# elasticsearch_exporter reads ES_USERNAME/ES_PASSWORD since 1.3.0 (Ubuntu 24.04 ships 1.7.0, 22.04 ships 1.1.0).
+es_exporter_reads_env_credentials() {
+    local version=${1#*:}
+    version=${version%%[+~-]*}
+    [[ -n $version ]] && [[ $(printf '%s\n' 1.3.0 "$version" | sort -V | head -n1) == 1.3.0 ]]
+}
+
+# Double-quoted value for a systemd EnvironmentFile, which also expands $VAR.
+systemd_env_quote() {
+    local value=${1//\\/\\\\}
+    value=${value//\"/\\\"}
+    value=${value//\$/\\\$}
+    printf '"%s"' "${value//\`/\\\`}"
 }
 
 # Writes a private MariaDB option file; quoting keeps passwords with special characters intact.
@@ -1123,12 +1228,56 @@ configure_apache() {
     fi
 }
 
+# PHP-FPM address(es) used by the NNTmux nginx site(s); printed only when there is exactly one.
+detect_fastcgi_pass() {
+    local files targets
+    files=$(nginx_sites_for_app | cut -f1 | sort -u)
+    [[ -n $files ]] || return 0
+    targets=$(while IFS= read -r file; do
+        sed -nE '/^[[:space:]]*#/d; s/^(.*[[:space:];{])?fastcgi_pass[[:space:]]+([^;]+);.*/\2/p' "$file"
+    done <<<"$files" | sed -E 's/[[:space:]]+$//' | sort -u)
+    if [[ -n $targets && $(wc -l <<<"$targets") -eq 1 ]]; then
+        printf '%s' "$targets"
+    elif [[ -n $targets ]]; then
+        warn "The NNTmux nginx site uses several fastcgi_pass targets: $(paste -sd' ' <<<"$targets")"
+    fi
+}
+
+# proxy: nginx asks Laravel (auth_request) on every Grafana request, so logout or
+# losing the Admin role takes effect at once. cookie: Apache, or nginx without
+# auth_request / a known PHP-FPM address; the JWT lives in a short-lived HttpOnly cookie.
+choose_grafana_auth() {
+    GRAFANA_AUTH=cookie
+    if [[ $WEB_SERVER == apache ]]; then
+        info "Grafana logins: short-lived HttpOnly cookie (Apache has no auth_request)"
+        return
+    fi
+    if ! sys_nginx_has_auth_request; then
+        warn "nginx lacks the auth_request module; Grafana logins fall back to a short-lived HttpOnly cookie."
+        return
+    fi
+    [[ -n $FASTCGI_PASS ]] || FASTCGI_PASS=$(detect_fastcgi_pass)
+    if [[ -z $FASTCGI_PASS ]]; then
+        warn "Could not find the PHP-FPM address (fastcgi_pass) of the NNTmux nginx site; Grafana logins fall back to a short-lived HttpOnly cookie. Re-run with --fastcgi-pass=unix:/run/php/php8.5-fpm.sock (or similar) to check the session on every request instead."
+        return
+    fi
+    GRAFANA_AUTH=proxy
+    info "Grafana logins: nginx auth_request checks the NNTmux session on every request (PHP-FPM at $FASTCGI_PASS)"
+}
+
 configure_web_server() {
+    choose_grafana_auth
     if ((SKIP_WEBSERVER)) || [[ $WEB_SERVER == none ]]; then
         [[ $WEB_SERVER == none ]] && warn "Neither nginx nor apache2 is running."
-        render_nginx_snippets "$WORK_DIR/map.conf" "$WORK_DIR/location.conf"
-        finish_nginx_snippet "$WORK_DIR/location.conf"
-        info "Web server not configured. Proxy /grafana/ to http://127.0.0.1:$GRAFANA_PORT, e.g. for nginx:"
+        if [[ $WEB_SERVER == apache ]]; then
+            render_apache_conf "$WORK_DIR/location.conf"
+            info "Web server not configured. Add this to Apache (needs proxy, proxy_http, proxy_wstunnel, headers):"
+        else
+            render_nginx_snippets "$WORK_DIR/map.conf" "$WORK_DIR/location.conf"
+            finish_nginx_snippet "$WORK_DIR/location.conf"
+            info "Web server not configured. Add this map to the http block and the rest to the NNTmux server block:"
+            cat "$WORK_DIR/map.conf"
+        fi
         cat "$WORK_DIR/location.conf"
         return
     fi
@@ -1156,6 +1305,7 @@ update_app_env() {
     env_set MONITORING_ENABLED "$enabled"
     if [[ $enabled == true ]]; then
         env_set GRAFANA_URL /grafana
+        [[ -n $GRAFANA_AUTH ]] && env_set GRAFANA_AUTH "$GRAFANA_AUTH"
         env_set GRAFANA_JWT_PRIVATE_KEY_PATH "$STATE_DIR/grafana-jwt.key"
         env_set MONITORING_PUSHGATEWAY_URL "http://127.0.0.1:$PUSHGATEWAY_PORT"
     fi

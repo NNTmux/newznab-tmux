@@ -11,12 +11,17 @@ use RuntimeException;
 /**
  * Signs short-lived RS256 tokens that Grafana's [auth.jwt] provider accepts.
  *
- * Grafana keeps no session for JWT logins: its frontend re-sends the token
- * from the iframe URL on every API call, so the admin page refreshes the
- * token (and the iframes) before it expires.
+ * Grafana keeps no session for JWT logins, so the token has to arrive as the
+ * X-JWT-Assertion header on every request. The web server adds it: from the
+ * nginx auth_request response in proxy mode, or from the COOKIE in cookie mode.
  */
 class GrafanaJwtIssuer
 {
+    /**
+     * Cookie-mode cookie; the installer's Apache config reads it by this name.
+     */
+    public const string COOKIE = 'nntmux_grafana_jwt';
+
     /**
      * @return array{token: string, expires_at: int, ttl: int}
      */

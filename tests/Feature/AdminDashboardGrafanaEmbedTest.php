@@ -18,11 +18,22 @@ class AdminDashboardGrafanaEmbedTest extends TestCase
         ])->render();
 
         $this->assertStringContainsString('x-data="grafanaPanels"', $html);
-        $this->assertStringContainsString('data-token-url="'.route('admin.monitoring.token').'"', $html);
+        // Proxy mode: no token endpoint, nginx authenticates every Grafana request.
+        $this->assertStringNotContainsString('data-token-url', $html);
         $this->assertSame(2, substr_count($html, '<iframe'));
         $this->assertStringContainsString('data-src-base="/grafana/d-solo/nntmux-host/nntmux-host?orgId=1&amp;panelId=1"', $html);
         $this->assertStringContainsString('href="'.route('admin.monitoring').'"', $html);
         $this->assertStringNotContainsString('auth_token', $html);
+    }
+
+    public function test_panels_partial_passes_the_token_endpoint_in_cookie_mode(): void
+    {
+        $html = view('admin.partials.grafana-panels', [
+            'grafanaPanels' => [['title' => 'CPU usage', 'url' => '/grafana/d-solo/nntmux-host/nntmux-host?orgId=1&panelId=1']],
+            'grafanaTokenUrl' => route('admin.monitoring.token'),
+        ])->render();
+
+        $this->assertStringContainsString('data-token-url="'.route('admin.monitoring.token').'"', $html);
     }
 
     public function test_dashboard_keeps_the_chart_js_system_resources_as_the_fallback(): void

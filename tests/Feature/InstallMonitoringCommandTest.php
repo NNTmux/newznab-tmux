@@ -62,6 +62,7 @@ class InstallMonitoringCommandTest extends TestCase
         $this->assertStringNotContainsString('MONITORING_ENABLED=false', $env);
         $this->assertStringContainsString('GRAFANA_JWT_PRIVATE_KEY_PATH='.$privateKey."\n", $env);
         $this->assertStringContainsString("MONITORING_PUSHGATEWAY_URL=http://pushgateway:9091\n", $env);
+        $this->assertStringContainsString("GRAFANA_AUTH=proxy\n", $env);
         $this->assertStringContainsString("APP_NAME=NNTmux\n", $env);
     }
 

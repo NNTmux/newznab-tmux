@@ -111,6 +111,7 @@ assert_contains "$grafana_ini" 'cookie_secure = true' 'Grafana cookie_secure'
 assert_contains "$grafana_ini" 'expect_claims = {"iss": "nntmux", "aud": "grafana"}' 'Grafana JWT claims'
 assert_contains "$grafana_ini" 'disable_login_form = true' 'Grafana login form'
 assert_contains "$grafana_ini" 'admin_user = nntmux-grafana-admin' 'Grafana built-in admin must not be called admin'
+assert_contains "$grafana_ini" 'url_login = false' 'Grafana must never take the JWT from a URL'
 assert_contains "$(cat "$dry/etc/default/prometheus-redis-exporter")" 'REDIS_PASSWORD=redis-secret' 'Redis password'
 assert_contains "$(cat "$dry/etc/default/prometheus")" '--web.listen-address=127.0.0.1:9090' 'Prometheus not on loopback'
 [[ -f $dry/etc/grafana/dashboards/nntmux/nntmux-host.json ]] || fail 'Dashboards not provisioned'
@@ -123,11 +124,22 @@ snippet=$(cat "$dry/etc/nginx/snippets/nntmux-grafana.conf")
 assert_contains "$snippet" 'add_header X-Frame-Options SAMEORIGIN always;' 'Grafana location must not inherit the site add_header CSP'
 assert_not_contains "$snippet" 'NGINX_HEADERS_MORE' 'Placeholder left in snippet'
 assert_not_contains "$snippet" 'more_clear_headers' 'headers-more line without headers-more'
+# Proxy mode: nginx checks the Laravel session on every request and injects the JWT.
+assert_contains "$output" 'PHP-FPM at unix:/run/php/php8.5-fpm.sock' 'fastcgi_pass not detected'
+assert_contains "$snippet" '    auth_request /_nntmux/grafana-auth;
+    auth_request_set $nntmux_grafana_jwt $upstream_http_x_nntmux_grafana_jwt;' 'auth_request missing'
+assert_contains "$snippet" 'proxy_set_header X-JWT-Assertion $nntmux_grafana_jwt;' 'JWT header not injected'
+assert_contains "$snippet" "location = /_nntmux/grafana-auth {
+    internal;
+    fastcgi_pass unix:/run/php/php8.5-fpm.sock;" 'Internal auth location'
+assert_contains "$snippet" 'fastcgi_param REQUEST_URI /admin/monitoring/grafana-auth;' 'Auth subrequest must hit the Laravel route'
+assert_contains "$snippet" 'fastcgi_param NNTMUX_GRAFANA_AUTH_REQUEST 1;' 'Auth subrequest marker'
 env=$(cat "$dry$app/.env")
 assert_contains "$env" 'MONITORING_ENABLED=true' '.env not enabled'
 assert_not_contains "$env" 'MONITORING_ENABLED=false' '.env kept the old value'
 assert_contains "$env" 'GRAFANA_JWT_PRIVATE_KEY_PATH=/etc/nntmux-monitoring/grafana-jwt.key' '.env key path'
 assert_contains "$env" 'MONITORING_PUSHGATEWAY_URL=http://127.0.0.1:9091' '.env pushgateway'
+assert_contains "$env" 'GRAFANA_AUTH=proxy' '.env auth mode'
 
 # Re-running against an already edited site changes nothing.
 cp "$site" "$root/etc/nginx/sites-available/nntmux"
@@ -152,6 +164,24 @@ run_installer
 [[ $status == 0 ]] || fail "conf.d dry run failed: $output"
 assert_contains "$output" "Adding the Grafana proxy to nginx site /etc/nginx/conf.d/nntmux.conf" 'Symlinked/trailing-slash root not matched'
 [[ $(grep -c 'nntmux-grafana.conf;' "$dry/etc/nginx/conf.d/nntmux.conf") == 1 ]] || fail 'Include missing in conf.d site'
+# No PHP location in the site: fall back to the cookie instead of guessing PHP-FPM.
+assert_contains "$output" 'Re-run with --fastcgi-pass=' 'Missing fastcgi_pass hint'
+snippet=$(cat "$dry/etc/nginx/snippets/nntmux-grafana.conf")
+assert_contains "$snippet" 'proxy_set_header X-JWT-Assertion $cookie_nntmux_grafana_jwt;' 'Cookie mode header'
+assert_not_contains "$snippet" 'auth_request' 'Cookie mode must not use auth_request'
+assert_contains "$(cat "$dry$app/.env")" 'GRAFANA_AUTH=cookie' '.env cookie mode'
+rm -rf "$dry" && mkdir -p "$dry"
+run_installer --fastcgi-pass=127.0.0.1:9000
+assert_contains "$(cat "$dry/etc/nginx/snippets/nntmux-grafana.conf")" 'fastcgi_pass 127.0.0.1:9000;' '--fastcgi-pass ignored'
+assert_contains "$(cat "$dry$app/.env")" 'GRAFANA_AUTH=proxy' '--fastcgi-pass must enable proxy mode'
+
+# ── nginx without auth_request: cookie mode ──────────────────
+setup
+touch "$fixtures/nginx-no-auth-request"
+run_installer
+[[ $status == 0 ]] || fail "Dry run without auth_request failed: $output"
+assert_contains "$output" 'nginx lacks the auth_request module' 'Missing auth_request warning'
+assert_not_contains "$(cat "$dry/etc/nginx/snippets/nntmux-grafana.conf")" 'auth_request' 'auth_request used without the module'
 
 # ── HTTP and HTTPS in separate files: both are edited ────────
 setup
@@ -297,6 +327,30 @@ apache_conf=$(cat "$dry/etc/apache2/conf-available/nntmux-grafana.conf")
 assert_contains "$apache_conf" 'ProxyPass http://127.0.0.1:3000/grafana/ upgrade=websocket' 'Apache ProxyPass'
 assert_contains "$output" 'would run: a2enconf -q nntmux-grafana' 'Apache conf not enabled'
 assert_contains "$apache_conf" 'Header always unset Content-Security-Policy' 'Apache must drop a site-wide CSP for Grafana'
+assert_contains "$apache_conf" 'SetEnvIf Cookie "(^|; *)nntmux_grafana_jwt=([A-Za-z0-9._-]+)" NNTMUX_GRAFANA_JWT=$2' 'Apache must read the JWT cookie'
+assert_contains "$apache_conf" '    RequestHeader unset X-JWT-Assertion
+    RequestHeader set X-JWT-Assertion "%{NNTMUX_GRAFANA_JWT}e" env=NNTMUX_GRAFANA_JWT' 'Apache must pass the JWT cookie as the header'
+assert_contains "$(cat "$dry$app/.env")" 'GRAFANA_AUTH=cookie' 'Apache uses cookie mode'
+
+# ── Elasticsearch credentials stay out of the process list ───
+setup
+sed -i 's/^SEARCH_DRIVER=manticore/SEARCH_DRIVER=elasticsearch/' "$app/.env"
+printf 'ELASTICSEARCH_USER=monitor\nELASTICSEARCH_PASS="pa$s\\"word"\n' >>"$app/.env"
+printf 'prometheus-elasticsearch-exporter 1.7.0-1ubuntu0.3\n' >"$fixtures/versions.txt"
+run_installer
+[[ $status == 0 ]] || fail "Elasticsearch dry run failed: $output"
+es_defaults=$(cat "$dry/etc/default/prometheus-elasticsearch-exporter")
+assert_contains "$es_defaults" 'ARGS="--web.listen-address=127.0.0.1:9114 --es.uri=http://127.0.0.1:9200"' 'Credentials must not be in --es.uri'
+assert_contains "$es_defaults" 'ES_USERNAME="monitor"' 'ES_USERNAME'
+assert_contains "$es_defaults" 'ES_PASSWORD="pa\$s\"word"' 'ES_PASSWORD must be quoted for systemd'
+assert_contains "$output" 'would write /etc/default/prometheus-elasticsearch-exporter (0640 root:prometheus)' 'ES defaults file must be private'
+assert_not_contains "$output" 'visible to local users' 'No process-list warning on 1.3.0+'
+# Ubuntu 22.04's 1.1.0 only takes the URI.
+printf 'prometheus-elasticsearch-exporter 1.1.0+ds-2\n' >"$fixtures/versions.txt"
+rm -rf "$dry" && mkdir -p "$dry"
+run_installer
+assert_contains "$(cat "$dry/etc/default/prometheus-elasticsearch-exporter")" '--es.uri=http://monitor:' 'Old exporter needs the URI credentials'
+assert_contains "$output" 'visible to local users in the process list' 'Old exporter warning'
 
 # ── headers-more: its CSP is cleared explicitly ──────────────
 setup

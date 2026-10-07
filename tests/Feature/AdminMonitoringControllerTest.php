@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Http\Controllers\Admin\AdminMonitoringController;
 use App\Http\Middleware\Google2FAMiddleware;
 use App\Models\User;
+use App\Services\Monitoring\GrafanaJwtIssuer;
 use App\View\Composers\GlobalDataComposer;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Schema\Blueprint;
@@ -45,6 +47,7 @@ class AdminMonitoringControllerTest extends TestCase
             'app.key' => 'base64:'.base64_encode(random_bytes(32)),
             'monitoring.enabled' => true,
             'monitoring.grafana.url' => '/grafana',
+            'monitoring.grafana.auth' => 'proxy',
             'monitoring.grafana.jwt.private_key_path' => $this->keyDirectory.'/grafana-jwt.key',
             'monitoring.grafana.jwt.ttl' => 900,
         ]);
@@ -77,12 +80,23 @@ class AdminMonitoringControllerTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('x-data="adminMonitoring"', false);
-        $response->assertSee('data-token-url="'.route('admin.monitoring.token').'"', false);
+        // Proxy mode: nginx authenticates every Grafana request, the page fetches nothing.
+        $response->assertDontSee('data-token-url', false);
         foreach (config('monitoring.grafana.dashboards') as $dashboard) {
             $response->assertSee('/grafana/d/'.$dashboard['uid'].'/', false);
         }
         $response->assertDontSee('auth_token', false);
         $response->assertSee('href="'.route('admin.monitoring').'"', false);
+    }
+
+    public function test_cookie_mode_page_points_the_embeds_at_the_token_endpoint(): void
+    {
+        config(['monitoring.grafana.auth' => 'cookie']);
+
+        $this->actingAs($this->admin())
+            ->get(route('admin.monitoring'))
+            ->assertOk()
+            ->assertSee('data-token-url="'.route('admin.monitoring.token').'"', false);
     }
 
     public function test_page_explains_setup_when_monitoring_is_disabled(): void
@@ -107,48 +121,128 @@ class AdminMonitoringControllerTest extends TestCase
             ->assertSee('GRAFANA_JWT_PRIVATE_KEY_PATH');
     }
 
-    public function test_token_endpoint_returns_a_signed_viewer_token(): void
+    public function test_nginx_auth_request_gets_a_signed_viewer_token_in_a_header(): void
     {
+        $admin = $this->admin();
+
+        $response = $this->actingAs($admin)->asNginxAuthRequest()->getJson(route('admin.monitoring.grafana-auth'));
+
+        $response->assertNoContent();
+        $this->assertStringContainsString('no-store', (string) $response->headers->get('Cache-Control'));
+        $claims = $this->verifiedClaims((string) $response->headers->get(AdminMonitoringController::AUTH_REQUEST_HEADER));
+        $this->assertSame($admin->username, $claims['sub']);
+        $this->assertSame('Viewer', $claims['role']);
+    }
+
+    public function test_auth_request_endpoint_only_answers_nginx(): void
+    {
+        $response = $this->actingAs($this->admin())->getJson(route('admin.monitoring.grafana-auth'));
+
+        $response->assertNotFound();
+        $response->assertHeaderMissing(AdminMonitoringController::AUTH_REQUEST_HEADER);
+    }
+
+    public function test_auth_request_is_denied_without_an_admin_session(): void
+    {
+        /** @var Authenticatable $user */
+        $user = $this->createUserWithRole('User');
+
+        $this->actingAs($user)->asNginxAuthRequest()->getJson(route('admin.monitoring.grafana-auth'))
+            ->assertForbidden()
+            ->assertHeaderMissing(AdminMonitoringController::AUTH_REQUEST_HEADER);
+
+        $this->app['auth']->forgetGuards();
+        $guest = $this->asNginxAuthRequest()->getJson(route('admin.monitoring.grafana-auth'));
+        // nginx only accepts 2xx, 401 and 403; a login redirect would surface as a 500.
+        $this->assertContains($guest->status(), [401, 403]);
+        $guest->assertHeaderMissing(AdminMonitoringController::AUTH_REQUEST_HEADER);
+    }
+
+    public function test_auth_request_is_not_found_when_monitoring_is_disabled(): void
+    {
+        config(['monitoring.enabled' => false]);
+
+        $this->actingAs($this->admin())->asNginxAuthRequest()->getJson(route('admin.monitoring.grafana-auth'))
+            ->assertNotFound()
+            ->assertHeaderMissing(AdminMonitoringController::AUTH_REQUEST_HEADER);
+    }
+
+    public function test_cookie_mode_token_endpoint_sets_an_http_only_cookie_scoped_to_grafana(): void
+    {
+        config(['monitoring.grafana.auth' => 'cookie']);
         $admin = $this->admin();
 
         $response = $this->actingAs($admin)->getJson(route('admin.monitoring.token'));
 
         $response->assertOk();
+        $response->assertJsonMissingPath('token');
         $this->assertStringContainsString('no-store', (string) $response->headers->get('Cache-Control'));
-        [$header, $payload, $signature] = explode('.', (string) $response->json('token'));
-        $this->assertSame(1, openssl_verify("{$header}.{$payload}", $this->base64UrlDecode($signature), $this->publicKey, OPENSSL_ALGO_SHA256));
-        $claims = json_decode($this->base64UrlDecode($payload), true);
-        $this->assertSame($admin->username, $claims['sub']);
-        $this->assertSame('Viewer', $claims['role']);
-        $this->assertSame($claims['exp'], $response->json('expires_at'));
         $this->assertSame(900, $response->json('ttl'));
+        $cookie = $response->getCookie(GrafanaJwtIssuer::COOKIE, decrypt: false);
+        $this->assertNotNull($cookie);
+        $this->assertTrue($cookie->isHttpOnly());
+        $this->assertSame('/grafana/', $cookie->getPath());
+        $this->assertSame('strict', $cookie->getSameSite());
+        $this->assertSame($response->json('expires_at'), $cookie->getExpiresTime());
+        // Stored raw (not Laravel-encrypted): the web server hands it to Grafana as is.
+        $claims = $this->verifiedClaims((string) $cookie->getValue());
+        $this->assertSame($admin->username, $claims['sub']);
+        $this->assertSame($claims['exp'], $response->json('expires_at'));
     }
 
-    public function test_token_endpoint_is_not_found_when_monitoring_is_disabled(): void
+    public function test_token_endpoint_is_not_found_in_proxy_mode_or_when_disabled(): void
     {
-        config(['monitoring.enabled' => false]);
-
         $this->actingAs($this->admin())
             ->getJson(route('admin.monitoring.token'))
             ->assertNotFound()
-            ->assertJsonMissingPath('token');
+            ->assertCookieMissing(GrafanaJwtIssuer::COOKIE);
+
+        config(['monitoring.grafana.auth' => 'cookie', 'monitoring.enabled' => false]);
+
+        $this->getJson(route('admin.monitoring.token'))
+            ->assertNotFound()
+            ->assertCookieMissing(GrafanaJwtIssuer::COOKIE);
     }
 
     public function test_non_admins_are_forbidden(): void
     {
+        config(['monitoring.grafana.auth' => 'cookie']);
         /** @var Authenticatable $user */
         $user = $this->createUserWithRole('User');
 
         $this->actingAs($user)->get(route('admin.monitoring'))->assertForbidden();
-        $this->actingAs($user)->getJson(route('admin.monitoring.token'))->assertForbidden();
+        $this->actingAs($user)->getJson(route('admin.monitoring.token'))
+            ->assertForbidden()
+            ->assertCookieMissing(GrafanaJwtIssuer::COOKIE);
     }
 
     public function test_guests_cannot_get_a_token(): void
     {
+        config(['monitoring.grafana.auth' => 'cookie']);
+
         $response = $this->getJson(route('admin.monitoring.token'));
 
         $this->assertContains($response->status(), [401, 403]);
-        $response->assertJsonMissingPath('token');
+        $response->assertCookieMissing(GrafanaJwtIssuer::COOKIE);
+    }
+
+    /**
+     * Same FastCGI parameter the nginx internal auth location sets.
+     */
+    private function asNginxAuthRequest(): static
+    {
+        return $this->withServerVariables([AdminMonitoringController::AUTH_REQUEST_PARAM => '1']);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function verifiedClaims(string $token): array
+    {
+        [$header, $payload, $signature] = explode('.', $token);
+        $this->assertSame(1, openssl_verify("{$header}.{$payload}", $this->base64UrlDecode($signature), $this->publicKey, OPENSSL_ALGO_SHA256));
+
+        return json_decode($this->base64UrlDecode($payload), true);
     }
 
     private function admin(): User

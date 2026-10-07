@@ -20,6 +20,14 @@ return [
     'grafana' => [
         // Relative path (same origin, recommended) or absolute URL.
         'url' => rtrim((string) env('GRAFANA_URL', '/grafana'), '/'),
+        /*
+         * How the login JWT reaches Grafana; it never appears in a URL.
+         * proxy:  nginx auth_request asks Laravel on every /grafana/ request and
+         *         injects the JWT header itself (installer on nginx, Sail).
+         * cookie: Laravel sets the JWT as an HttpOnly cookie scoped to /grafana/
+         *         and the web server copies it into the header (Apache).
+         */
+        'auth' => env('GRAFANA_AUTH', 'proxy') === 'cookie' ? 'cookie' : 'proxy',
         'org_id' => 1,
         'default_range' => 'now-6h',
         'default_refresh' => '1m',
@@ -29,7 +37,7 @@ return [
             'private_key_path' => (static function (string $path): string {
                 return $path === '' || str_starts_with($path, '/') ? $path : base_path($path);
             })((string) env('GRAFANA_JWT_PRIVATE_KEY_PATH', '')),
-            'ttl' => max(60, (int) env('GRAFANA_JWT_TTL', 900)),
+            'ttl' => max(60, (int) env('GRAFANA_JWT_TTL', 300)),
             // Must match [auth.jwt] expect_claims in grafana.ini.
             'issuer' => 'nntmux',
             'audience' => 'grafana',

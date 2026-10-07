@@ -61,6 +61,7 @@ class AdminPageController extends BasePageController
             'hasRecentPayments' => ! empty($payload['recent_payments']),
             // Grafana panels replace the Chart.js CPU/RAM history when monitoring is set up.
             'grafanaPanels' => $grafana->dashboardPanels(),
+            'grafanaTokenUrl' => $grafana->tokenUrl(),
         ]));
     }
 

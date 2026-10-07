@@ -309,6 +309,7 @@ Route::middleware(['role:Admin', '2fa'])->prefix('admin')->group(function () {
     Route::delete('logs', [AdminLogViewerController::class, 'destroy'])->name('admin.logs.destroy');
     Route::get('monitoring', [AdminMonitoringController::class, 'index'])->name('admin.monitoring');
     Route::get('monitoring/grafana-token', [AdminMonitoringController::class, 'token'])->name('admin.monitoring.token');
+    Route::get('monitoring/grafana-auth', [AdminMonitoringController::class, 'authorizeGrafana'])->name('admin.monitoring.grafana-auth');
     Route::get('role-list', [AdminRoleController::class, 'index'])->name('admin.role-list');
     Route::get('role-add', [AdminRoleController::class, 'create'])->name('admin.role-add');
     Route::post('role-add', [AdminRoleController::class, 'create']);

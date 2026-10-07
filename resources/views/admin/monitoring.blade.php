@@ -7,7 +7,7 @@
 
         @if($enabled)
             <div x-data="adminMonitoring"
-                 data-token-url="{{ route('admin.monitoring.token') }}"
+                 @if($tokenUrl) data-token-url="{{ $tokenUrl }}" @endif
                  data-default-tab="{{ array_key_first($dashboards) }}"
                  data-default-range="{{ $defaultRange }}"
                  data-default-refresh="{{ $defaultRefresh }}"
