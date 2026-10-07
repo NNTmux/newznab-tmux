@@ -149,7 +149,12 @@ find app -name "*.php" | xargs php -l  # PHP syntax lint on all changed files
 
 Auto-runs: PHP lint, Composer lock validation, Pint formatting. Commit limits: 200 char subject, 72 char body.
 
-When completing a task, stage newly created project files with Git. Do not stage temporary files or planning documents.
+## Git (agents never commit or push)
+
+- **Never run `git commit` or `git push`** (including `--amend`, tags, or force pushes), even when a task looks finished. The maintainer reviews, commits, and pushes.
+- When completing a task, **stage every project file you created or modified** with `git add <path>` (list paths explicitly; no `git add -A` / `git add .`).
+- Never stage temporary files you created (scratch scripts, debug output, logs, planning documents), and do not stage unrelated pre-existing changes.
+- Only commit or push when the user explicitly asks in that conversation; that approval covers that one request only.
 
 ## Key Directories
 
