@@ -18,19 +18,27 @@ class ViteDockerConfigurationTest extends TestCase
 
     public function test_compose_uses_latest_tags_for_services_that_publish_them(): void
     {
-        foreach (['docker-compose.yml', 'docker-compose.yml.prod-dist'] as $path) {
-            $services = Yaml::parse($this->projectFile($path))['services'];
+        $this->assertServicesUseLatestTags('docker-compose.yml.prod-dist');
+    }
 
-            $this->assertSame('mariadb:latest', $services['mariadb']['image'], $path);
-            $this->assertSame('redis:latest', $services['redis']['image'], $path);
-            $this->assertSame('manticoresearch/manticore:latest', $services['manticore']['image'], $path);
+    /**
+     * docker-compose.yml is the developer's local Sail file and is gitignored, so it only exists outside CI.
+     */
+    public function test_local_sail_compose_file_matches_the_expected_configuration(): void
+    {
+        if (! file_exists(__DIR__.'/../../docker-compose.yml')) {
+            $this->markTestSkipped('docker-compose.yml is a gitignored local Sail file.');
         }
 
-        $localServices = Yaml::parse($this->projectFile('docker-compose.yml'))['services'];
+        $this->assertServicesUseLatestTags('docker-compose.yml');
+
+        $composeConfig = $this->projectFile('docker-compose.yml');
+        $localServices = Yaml::parse($composeConfig)['services'];
         $this->assertSame(
             ['CMD', 'mariadb-admin', 'ping', '-p${DB_PASSWORD}'],
             $localServices['mariadb']['healthcheck']['test'],
         );
+        $this->assertStringContainsString("'\${VITE_PORT:-5173}:\${VITE_PORT:-5173}'", $composeConfig);
     }
 
     public function test_docker_build_targets_always_pull_images_before_building(): void
@@ -58,7 +66,6 @@ class ViteDockerConfigurationTest extends TestCase
     public function test_vite_uses_the_docker_published_port_without_fallback(): void
     {
         $viteConfig = $this->projectFile('vite.config.js');
-        $composeConfig = $this->projectFile('docker-compose.yml');
 
         $this->assertStringContainsString("loadEnv(mode, process.cwd(), '')", $viteConfig);
         $this->assertStringContainsString("environment.VITE_PORT || '5173'", $viteConfig);
@@ -66,7 +73,6 @@ class ViteDockerConfigurationTest extends TestCase
         $this->assertStringContainsString("host: '0.0.0.0'", $viteConfig);
         $this->assertStringContainsString('strictPort: true', $viteConfig);
         $this->assertStringContainsString('origin: `http://${viteDevServerHost}:${vitePort}`', $viteConfig);
-        $this->assertStringContainsString("'\${VITE_PORT:-5173}:\${VITE_PORT:-5173}'", $composeConfig);
         $this->assertStringContainsString('VITE_DEV_SERVER_HOST=localhost', $this->projectFile('.env.example'));
     }
 
@@ -123,6 +129,15 @@ class ViteDockerConfigurationTest extends TestCase
             ['artisan', 'mcp:start', 'newznab-tmux'],
             $configuration['mcpServers']['newznab-tmux']['args'],
         );
+    }
+
+    private function assertServicesUseLatestTags(string $path): void
+    {
+        $services = Yaml::parse($this->projectFile($path))['services'];
+
+        $this->assertSame('mariadb:latest', $services['mariadb']['image'], $path);
+        $this->assertSame('redis:latest', $services['redis']['image'], $path);
+        $this->assertSame('manticoresearch/manticore:latest', $services['manticore']['image'], $path);
     }
 
     private function projectFile(string $path): string

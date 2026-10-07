@@ -174,7 +174,7 @@ final class PredbMatchingTest extends TestCase
     public function test_filename_match_saves_association_with_real_update_service(bool $rename, bool $output): void
     {
         config(['nntmux.echocli' => $output]);
-        foreach (['videos_id', 'tv_episodes_id', 'imdbid', 'musicinfo_id', 'consoleinfo_id', 'bookinfo_id', 'anidbid'] as $column) {
+        foreach (['videos_id', 'tv_episodes_id', 'imdbid', 'musicinfo_id', 'consoleinfo_id', 'bookinfo_id', 'book_lookup_attempts', 'book_lookup_retry_at', 'book_name_normalized_at', 'anidbid'] as $column) {
             DB::statement('ALTER TABLE releases ADD COLUMN '.$column.' TEXT');
         }
         DB::table('releases')->insert(['id' => 42, 'searchname' => $rename ? 'Old.Title' : 'Canonical.Scene-GROUP', 'predb_id' => 0, 'categories_id' => 7010, 'groups_id' => 1]);
