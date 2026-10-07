@@ -1,7 +1,7 @@
 # Prometheus + Grafana for the Sail dev stack. Overlay on docker-compose.yml:
 #
 #   php artisan monitoring:install --sail   # keys + .env
-#   make monitoring-up                       # docker compose -f docker-compose.yml -f docker-compose.monitoring.yml up -d
+#   make up                                  # includes this overlay while MONITORING_ENABLED=true
 #
 # Grafana is reached through the app's nginx at /grafana/ (docker/8.5/nginx.conf)
 # and only trusts JWTs signed by the app. Ubuntu hosts use scripts/install-monitoring.sh.

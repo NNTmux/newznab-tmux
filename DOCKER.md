@@ -158,12 +158,12 @@ Run `make` or `make help` to see all targets, grouped by section.
 
 ### Monitoring
 
-Prometheus, Grafana, the Pushgateway and exporters from `docker-compose.monitoring.yml`. Run `php artisan monitoring:install --sail` once first; Grafana is then embedded at **Admin → System → Monitoring** (proxied at `/grafana/`).
+Prometheus, Grafana, the Pushgateway and exporters from `docker-compose.monitoring.yml`. Run `php artisan monitoring:install --sail` once (it sets `MONITORING_ENABLED=true`); from then on `make up`, `make down` and the other lifecycle targets include them. Grafana is embedded at **Admin → System → Monitoring** (proxied at `/grafana/`).
 
 | Target                 | Description                                                    |
 |------------------------|----------------------------------------------------------------|
-| `make monitoring-up`   | Start the monitoring containers                                |
-| `make monitoring-down` | Stop and remove them (run before `make down`; volumes are kept)|
+| `make monitoring-up`   | Start only the monitoring containers                           |
+| `make monitoring-down` | Stop and remove only them (volumes are kept)                   |
 | `make monitoring-logs` | Follow their logs                                              |
 
 ### Cleanup

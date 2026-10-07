@@ -3,7 +3,7 @@
 Shared configuration for both ways of running NNTmux monitoring:
 
 - **Ubuntu hosts:** `php artisan monitoring:install`, then the `sudo scripts/install-monitoring.sh …` command it prints.
-- **Sail:** `php artisan monitoring:install --sail`, then `make build && make monitoring-up` (adds the `docker-compose.monitoring.yml` overlay).
+- **Sail:** `php artisan monitoring:install --sail`, then `make build && make up`. While `MONITORING_ENABLED=true` the Makefile adds the `docker-compose.monitoring.yml` overlay to `make up` / `make down`.
 
 | Path | Used by |
 |---|---|

@@ -71,7 +71,7 @@
                                  :message="$monitoringConfigured ? 'MONITORING_ENABLED is set, but the Grafana JWT private key (GRAFANA_JWT_PRIVATE_KEY_PATH) is missing or unreadable.' : 'Install Prometheus and Grafana to see host, service and processing dashboards here.'">
                 <div class="mx-auto max-w-2xl space-y-3 text-left text-sm text-gray-600 dark:text-gray-400">
                     <p><strong>Ubuntu server:</strong> run <code>php artisan monitoring:install</code>, then the <code>sudo scripts/install-monitoring.sh</code> command it prints. An existing node_exporter is detected and reused.</p>
-                    <p><strong>Sail:</strong> run <code>php artisan monitoring:install --sail</code>, then <code>make build &amp;&amp; make monitoring-up</code>.</p>
+                    <p><strong>Sail:</strong> run <code>php artisan monitoring:install --sail</code>, then <code>make build &amp;&amp; make up</code>.</p>
                     <p class="pt-2">
                         <a href="{{ url(config('pulse.path', 'pulse')) }}" class="font-semibold text-blue-600 hover:underline dark:text-blue-400">Pulse</a>
                         and

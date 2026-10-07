@@ -18,6 +18,15 @@
 # so the correct search engine container starts automatically.
 -include .env
 export COMPOSE_PROFILES ?= $(SEARCH_DRIVER)
+# Once `php artisan monitoring:install --sail` has set MONITORING_ENABLED=true and
+# created the Grafana key, every compose call (./sail reads COMPOSE_FILE from the
+# environment) includes the monitoring overlay, so `make up` / `make down` start
+# and stop it with the rest of the stack.
+MONITORING_KEY := storage/app/monitoring/public/grafana-jwt.pub
+MONITORING_ON  := $(and $(filter true "true" 1,$(MONITORING_ENABLED)),$(wildcard $(MONITORING_KEY)))
+ifneq ($(MONITORING_ON),)
+export COMPOSE_FILE := docker-compose.yml:docker-compose.monitoring.yml
+endif
 SAIL           := ./sail
 DOCKER_COMPOSE := docker compose
 # Optional parameters with safe defaults
@@ -49,6 +58,9 @@ check-env: ## Verify .env exists before running docker targets
 	@if [ ! -f .env ]; then \
 		echo "$(RED)✘ .env not found. Run: cp .env.example .env$(RESET)"; \
 		exit 1; \
+	fi
+	@if [ -n "$(filter true "true" 1,$(MONITORING_ENABLED))" ] && [ ! -f $(MONITORING_KEY) ]; then \
+		echo "$(YELLOW)⚠  MONITORING_ENABLED=true but $(MONITORING_KEY) is missing; monitoring stays off. Run: php artisan monitoring:install --sail$(RESET)"; \
 	fi
 # ── Lifecycle ────────────────────────────────────────────────
 .PHONY: up
@@ -238,7 +250,7 @@ MONITORING_SERVICES := prometheus pushgateway grafana node-exporter mysqld-expor
 comma               := ,
 MONITORING_COMPOSE  := $(DOCKER_COMPOSE) -f docker-compose.yml -f docker-compose.monitoring.yml $(foreach profile,$(subst $(comma), ,$(COMPOSE_PROFILES)),--profile $(profile))
 .PHONY: monitoring-up
-monitoring-up: check-env ## Start Prometheus, Grafana and exporters (run `artisan monitoring:install --sail` first)
+monitoring-up: check-env ## Start only the monitoring containers (`make up` includes them once enabled)
 	@if [ ! -f storage/app/monitoring/public/grafana-jwt.pub ]; then \
 		echo "$(RED)✘ No Grafana JWT key. Run: php artisan monitoring:install --sail$(RESET)"; \
 		exit 1; \
@@ -246,7 +258,7 @@ monitoring-up: check-env ## Start Prometheus, Grafana and exporters (run `artisa
 	@$(MONITORING_COMPOSE) up -d
 	@echo "$(GREEN)✔ Monitoring started. Open /admin/monitoring (Prometheus: http://127.0.0.1:$(or $(FORWARD_PROMETHEUS_PORT),9090)).$(RESET)"
 .PHONY: monitoring-down
-monitoring-down: ## Stop and remove the monitoring containers (run before `make down`; data volumes are kept)
+monitoring-down: ## Stop and remove only the monitoring containers (data volumes are kept)
 	@$(MONITORING_COMPOSE) rm --stop --force $(MONITORING_SERVICES)
 .PHONY: monitoring-logs
 monitoring-logs: ## Follow logs of the monitoring containers

@@ -429,12 +429,12 @@ On hosts managed by the Ansible playbooks, rerun the installer after an Ansible 
 ### Sail
 
 ```bash
-php artisan monitoring:install --sail   # JWT keypair in storage/app/monitoring + .env
+php artisan monitoring:install --sail   # JWT keypair in storage/app/monitoring + MONITORING_ENABLED=true
 make build                              # app image with the /grafana/ proxy
-make monitoring-up                      # docker-compose.monitoring.yml overlay
+make up                                 # starts the stack including docker-compose.monitoring.yml
 ```
 
-Stop it with `make monitoring-down` (before `make down`). On WSL2/Docker Desktop, host metrics describe the Docker VM. See [docker/monitoring/README.md](docker/monitoring/README.md) for the dashboard files.
+From then on `make up` / `make down` / `make restart` include the monitoring containers (the Makefile adds the overlay while `MONITORING_ENABLED=true`). `make monitoring-up` / `make monitoring-down` manage them on their own. On WSL2/Docker Desktop, host metrics describe the Docker VM. See [docker/monitoring/README.md](docker/monitoring/README.md) for the dashboard files.
 
 ## Docker & Development
 
