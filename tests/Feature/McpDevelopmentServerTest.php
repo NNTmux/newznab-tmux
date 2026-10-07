@@ -22,7 +22,9 @@ use App\Mcp\Tools\InspectCodeContextTool;
 use App\Mcp\Tools\PlanVerificationTool;
 use App\Mcp\Tools\ProbeRuntimeTool;
 use App\Mcp\Tools\RunVerificationTool;
+use App\Services\Mcp\ProcessRunner;
 use App\Services\Mcp\RuntimeProbeRunner;
+use App\Services\Mcp\SensitiveValueRedactor;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Mockery;
 use ReflectionClass;
@@ -105,6 +107,31 @@ class McpDevelopmentServerTest extends TestCase
 
     public function test_context_results_report_truncation(): void
     {
+        $this->app->instance(ProcessRunner::class, new class extends ProcessRunner
+        {
+            public function __construct()
+            {
+                parent::__construct(new SensitiveValueRedactor);
+            }
+
+            /**
+             * Return canned search hits so the test does not depend on ripgrep being installed.
+             */
+            public function run(array $command, int $timeoutSeconds, array $environment = []): array
+            {
+                $isSourceSearch = $command[0] === 'rg' && in_array('--line-number', $command, true);
+
+                return [
+                    'command' => $command,
+                    'exit_code' => 0,
+                    'duration_ms' => 0,
+                    'status' => 'passed',
+                    'output' => $isSourceSearch ? "app/First.php:3:class First\napp/Second.php:5:class Second" : '',
+                    'truncated' => false,
+                ];
+            }
+        });
+
         NewznabTmuxServer::tool(InspectCodeContextTool::class, [
             'query' => 'class',
             'kind' => 'symbol',
