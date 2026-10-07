@@ -23,6 +23,7 @@ final readonly class AdditionalWorkPlan
         public bool $bookFlood = false,
         public int $duplicateMessageIdCount = 0,
         public array $unsupportedReasons = [],
+        public string $probeMessageId = '',
     ) {}
 
     public function hasCompressedFile(): bool
