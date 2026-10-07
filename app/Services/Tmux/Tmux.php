@@ -419,17 +419,19 @@ class Tmux
     }
 
     /**
-     * @return array<string, mixed>
+     * Count the active ingestion tables directly; InnoDB row estimates can stay
+     * stale and legacy multigroup tables are no longer used by ingestion.
+     *
+     * @return list<object{name: string, row_count: int}>
      */
     public function cbpmTableQuery(): array
     {
-        return DB::select(
-            "
-			SELECT TABLE_NAME AS name, TABLE_ROWS AS row_count
-      		FROM information_schema.TABLES
-      		WHERE TABLE_SCHEMA = (SELECT DATABASE())
-			AND TABLE_NAME REGEXP {escapeString('^(multigroup_)?(collections|binaries|parts|missed_parts)(_[0-9]+)?$')}
-			ORDER BY TABLE_NAME ASC"
-        );
+        $counts = [];
+
+        foreach (['binaries', 'parts', 'missed_parts'] as $table) {
+            $counts[] = (object) ['name' => $table, 'row_count' => DB::table($table)->count()];
+        }
+
+        return $counts;
     }
 }

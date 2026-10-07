@@ -302,7 +302,7 @@ class TmuxMonitorService
             $this->runVar['counts']['now']['collections_table'] = Collection::query()->count();
             $this->runVar['counts']['now']['releases'] = Release::query()->count();
 
-            foreach ($this->aggregateTableRowEstimates($this->tmux->cbpmTableQuery()) as $key => $count) {
+            foreach ($this->aggregateTableRowCounts($this->tmux->cbpmTableQuery()) as $key => $count) {
                 $this->runVar['counts']['now'][$key] = $count;
             }
 
@@ -329,7 +329,7 @@ class TmuxMonitorService
      * @param  array<array-key, mixed>  $tables
      * @return array{binaries_table: int, parts_table: int, missed_parts_table: int}
      */
-    protected function aggregateTableRowEstimates(array $tables): array
+    protected function aggregateTableRowCounts(array $tables): array
     {
         $counts = [
             'binaries_table' => 0,

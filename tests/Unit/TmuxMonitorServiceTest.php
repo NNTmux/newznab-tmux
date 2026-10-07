@@ -72,16 +72,16 @@ class TmuxMonitorServiceTest extends TestCase
         ];
     }
 
-    public function test_collection_table_estimates_do_not_contribute_to_release_total(): void
+    public function test_collection_table_counts_do_not_contribute_to_release_total(): void
     {
         $reflection = new ReflectionClass(TmuxMonitorService::class);
         $monitor = $reflection->newInstanceWithoutConstructor();
-        $aggregate = new ReflectionMethod(TmuxMonitorService::class, 'aggregateTableRowEstimates');
+        $aggregate = new ReflectionMethod(TmuxMonitorService::class, 'aggregateTableRowCounts');
 
         $counts = $aggregate->invoke($monitor, [
             (object) ['name' => 'collections', 'row_count' => 242650],
             (object) ['name' => 'binaries', 'row_count' => 120],
-            (object) ['name' => 'multigroup_parts_1', 'row_count' => 80],
+            (object) ['name' => 'parts', 'row_count' => 80],
             (object) ['name' => 'missed_parts', 'row_count' => 5],
         ]);
 
