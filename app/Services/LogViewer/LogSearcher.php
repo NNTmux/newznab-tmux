@@ -168,7 +168,7 @@ class LogSearcher
                 $previous = $entry;
                 $cursor = $entry->offset;
 
-                if ($query->levels !== [] && ! in_array($entry->level, $query->levels, true)) {
+                if (! $query->acceptsEntry($entry)) {
                     continue;
                 }
 

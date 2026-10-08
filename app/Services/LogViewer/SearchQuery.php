@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services\LogViewer;
 
+use Carbon\CarbonImmutable;
+
 /**
- * A log search: an optional term (plain or PCRE), case sensitivity, and a level filter.
+ * A log search: an optional term (plain or PCRE), case sensitivity, and level / channel / time filters.
  *
  * Matching is byte-wise (no `/u`), mirroring `grep` under `LC_ALL=C`, so both search engines
  * agree on what matches and case folding is ASCII-only.
@@ -25,12 +27,16 @@ final readonly class SearchQuery
 
     /**
      * @param  list<string>  $levels  lowercase Monolog level names
+     * @param  list<string>  $channels  Monolog channel names
      */
     public function __construct(
         public string $term,
         public bool $regex = false,
         public bool $caseSensitive = false,
         public array $levels = [],
+        public array $channels = [],
+        public ?CarbonImmutable $from = null,
+        public ?CarbonImmutable $to = null,
     ) {}
 
     public static function isValidRegex(string $term): bool
@@ -78,6 +84,36 @@ final readonly class SearchQuery
         $arguments[] = $this->term;
 
         return $arguments;
+    }
+
+    public function hasTimeRange(): bool
+    {
+        return $this->from !== null || $this->to !== null;
+    }
+
+    /**
+     * Whether an entry passes the level, channel and time filters (the term is matched separately).
+     * Entries without a timestamp never match a time range.
+     */
+    public function acceptsEntry(LogEntry $entry): bool
+    {
+        if ($this->levels !== [] && ! in_array($entry->level, $this->levels, true)) {
+            return false;
+        }
+
+        if ($this->channels !== [] && ! in_array($entry->channel, $this->channels, true)) {
+            return false;
+        }
+
+        if (! $this->hasTimeRange()) {
+            return true;
+        }
+
+        $loggedAt = $entry->loggedAt();
+
+        return $loggedAt !== null
+            && ($this->from === null || $loggedAt >= $this->from->getTimestamp())
+            && ($this->to === null || $loggedAt <= $this->to->getTimestamp());
     }
 
     public function needsPcreGrep(): bool

@@ -166,6 +166,89 @@ class LogReader
     }
 
     /**
+     * Complete entries from `$from` forward, oldest first, for incremental indexing.
+     *
+     * A structured entry is complete once the next header has been read; its trailing entry (and a final
+     * line still missing its newline) is held back unless `$flushTail` is set, because a running process
+     * may still be appending to it. Reading stops at the first entry boundary past `$budget` bytes.
+     *
+     * Yields `[entry, raw first line, lines consumed through the end of the entry]` and returns where the
+     * next call should resume: a byte offset at an entry boundary and the number of lines before it.
+     *
+     * @return Generator<int, array{LogEntry, string, int}, mixed, array{offset: int, line: int}>
+     */
+    public function entriesForward(LogFile $file, int $from, int $startLine, int $budget, bool $flushTail): Generator
+    {
+        $handle = $this->open($file);
+
+        try {
+            $size = $this->size($handle);
+            $position = min(max($from, 0), $size);
+            $line = $startLine;
+            fseek($handle, $position);
+
+            /** @var array{offset: int, line: int, first: string, body: list<string>, bytes: int, truncated: bool, structured: bool}|null $pending */
+            $pending = null;
+
+            while ($position < $size) {
+                [$raw, $complete, $terminated] = $this->readForwardLine($handle, $this->maxEntryBytes);
+
+                if ($raw === null || (! $terminated && ! $flushTail)) {
+                    break;
+                }
+
+                $next = (int) ftell($handle);
+                $text = rtrim($raw, "\r");
+                $isHeader = $file->structured && $this->parser->isHeader($text);
+
+                if (! $file->structured || $isHeader) {
+                    if ($pending !== null) {
+                        yield [$this->finishPending($pending, $position), $pending['first'], $line];
+                        $pending = null;
+                    }
+
+                    if ($position - $from >= $budget) {
+                        return ['offset' => $position, 'line' => $line];
+                    }
+                }
+
+                $line++;
+
+                if (! $file->structured) {
+                    if (trim($text) !== '') {
+                        yield [$this->parser->make($position, $next, $text, '', ! $complete, false, $line), $text, $line];
+                    }
+                } elseif ($pending === null) {
+                    // A header starts an entry; continuation lines before the first header form an orphan block.
+                    $pending = ['offset' => $position, 'line' => $line, 'first' => $text, 'body' => [], 'bytes' => 0, 'truncated' => ! $complete, 'structured' => $isHeader];
+                } elseif ($this->maxEntryBytes < $pending['bytes'] + strlen($text) + 1) {
+                    $pending['truncated'] = true;
+                } else {
+                    $pending['body'][] = $text;
+                    $pending['bytes'] += strlen($text) + 1;
+                    $pending['truncated'] = $pending['truncated'] || ! $complete;
+                }
+
+                $position = $next;
+            }
+
+            if ($pending === null) {
+                return ['offset' => $position, 'line' => $line];
+            }
+
+            if ($flushTail && $position >= $size) {
+                yield [$this->finishPending($pending, $position), $pending['first'], $line];
+
+                return ['offset' => $position, 'line' => $line];
+            }
+
+            return ['offset' => $pending['offset'], 'line' => $pending['line'] - 1];
+        } finally {
+            fclose($handle);
+        }
+    }
+
+    /**
      * @return resource
      */
     public function open(LogFile $file)
@@ -370,6 +453,45 @@ class LogReader
         }
 
         return [$line, false];
+    }
+
+    /**
+     * Like {@see readLine()}, but also reports whether the line was terminated by a newline.
+     *
+     * @param  resource  $handle
+     * @return array{string|null, bool, bool} the line (null at EOF), whether it fit within the cap, and whether it ended with a newline
+     */
+    private function readForwardLine($handle, int $maxBytes): array
+    {
+        $line = fgets($handle, $maxBytes + 1);
+
+        if ($line === false) {
+            return [null, true, false];
+        }
+
+        if (str_ends_with($line, "\n")) {
+            return [substr($line, 0, -1), true, true];
+        }
+
+        if (feof($handle)) {
+            return [$line, true, false];
+        }
+
+        while (($rest = fgets($handle, 65_536)) !== false) {
+            if (str_ends_with($rest, "\n")) {
+                return [$line, false, true];
+            }
+        }
+
+        return [$line, false, false];
+    }
+
+    /**
+     * @param  array{offset: int, line: int, first: string, body: list<string>, bytes: int, truncated: bool, structured: bool}  $pending
+     */
+    private function finishPending(array $pending, int $end): LogEntry
+    {
+        return $this->parser->make($pending['offset'], $end, $pending['first'], implode("\n", $pending['body']), $pending['truncated'], $pending['structured'], $pending['line']);
     }
 
     /**

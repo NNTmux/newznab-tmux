@@ -5,15 +5,17 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\BasePageController;
+use App\Http\Requests\Admin\AdminLogFacetsRequest;
 use App\Http\Requests\Admin\AdminLogFileRequest;
 use App\Http\Requests\Admin\AdminLogSearchRequest;
 use App\Http\Requests\Admin\AdminLogViewerRequest;
+use App\Services\LogViewer\Index\LogIndexer;
+use App\Services\LogViewer\Index\LogSearchCoordinator;
 use App\Services\LogViewer\LogEntry;
 use App\Services\LogViewer\LogEntryParser;
 use App\Services\LogViewer\LogFile;
 use App\Services\LogViewer\LogFileRepository;
 use App\Services\LogViewer\LogReader;
-use App\Services\LogViewer\LogSearcher;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -26,7 +28,7 @@ class AdminLogViewerController extends BasePageController
 {
     private const int JSON_OPTIONS = JSON_INVALID_UTF8_SUBSTITUTE | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
 
-    public function index(AdminLogViewerRequest $request, LogFileRepository $logs, LogSearcher $searcher): View|RedirectResponse
+    public function index(AdminLogViewerRequest $request, LogFileRepository $logs, LogSearchCoordinator $searcher): View|RedirectResponse
     {
         $this->setAdminPrefs();
 
@@ -38,7 +40,7 @@ class AdminLogViewerController extends BasePageController
                 ->with('error', 'Selected log file is not available.');
         }
 
-        $files = $this->fileList($logs);
+        $files = $this->fileList($logs, $searcher);
 
         return view('admin.logs.index', [
             'files' => $files,
@@ -49,6 +51,7 @@ class AdminLogViewerController extends BasePageController
             'limitOptions' => AdminLogFileRequest::LIMIT_OPTIONS,
             'defaultLimit' => AdminLogFileRequest::DEFAULT_LIMIT,
             'maxFilesPerSearch' => (int) config('nntmux.log_viewer.max_files_per_search', 25),
+            'indexEnabled' => (bool) config('nntmux.log_viewer.index.enabled', true),
             'title' => 'Log Viewer',
             'page_title' => 'Log Viewer',
             'meta_title' => 'Log Viewer',
@@ -56,10 +59,10 @@ class AdminLogViewerController extends BasePageController
         ]);
     }
 
-    public function files(LogFileRepository $logs, LogSearcher $searcher): JsonResponse
+    public function files(LogFileRepository $logs, LogSearchCoordinator $searcher): JsonResponse
     {
         return $this->json([
-            'files' => $this->fileList($logs),
+            'files' => $this->fileList($logs, $searcher),
             'engine' => $searcher->engine(),
         ]);
     }
@@ -107,22 +110,21 @@ class AdminLogViewerController extends BasePageController
         return $this->json(['entry' => $entry->toArray()]);
     }
 
-    public function search(AdminLogSearchRequest $request, LogFileRepository $logs, LogSearcher $searcher): JsonResponse
+    public function search(AdminLogSearchRequest $request, LogFileRepository $logs, LogSearchCoordinator $searcher): JsonResponse
     {
-        $files = [];
-
-        foreach ((array) $request->validated('files') as $path) {
-            $files[] = $logs->find((string) $path) ?? abort(404, 'Log file not found.');
-        }
-
         $before = $request->validated('before');
 
         return $this->json($searcher->search(
             $request->searchQuery(),
-            $files,
+            $this->requestedFiles($request, $logs),
             $before === null ? null : (int) $before,
             max(1, (int) config('nntmux.log_viewer.max_results_per_file', 100)),
         ));
+    }
+
+    public function facets(AdminLogFacetsRequest $request, LogFileRepository $logs, LogSearchCoordinator $searcher): JsonResponse
+    {
+        return $this->json($searcher->facets($request->searchQuery(), $this->requestedFiles($request, $logs)));
     }
 
     public function download(AdminLogFileRequest $request, LogFileRepository $logs): BinaryFileResponse
@@ -136,9 +138,10 @@ class AdminLogViewerController extends BasePageController
         ]);
     }
 
-    public function truncate(AdminLogFileRequest $request, LogFileRepository $logs): JsonResponse
+    public function truncate(AdminLogFileRequest $request, LogFileRepository $logs, LogIndexer $indexer): JsonResponse
     {
         $file = $this->resolve($request, $logs);
+        $indexer->forget($file);
 
         try {
             $logs->truncate($file);
@@ -154,7 +157,7 @@ class AdminLogViewerController extends BasePageController
         ]);
     }
 
-    public function destroy(AdminLogFileRequest $request, LogFileRepository $logs): JsonResponse
+    public function destroy(AdminLogFileRequest $request, LogFileRepository $logs, LogIndexer $indexer): JsonResponse
     {
         $file = $this->resolve($request, $logs);
         $guardMinutes = $this->guardMinutes();
@@ -164,6 +167,8 @@ class AdminLogViewerController extends BasePageController
                 'message' => "This log was written to in the last {$guardMinutes} minutes and is probably still open by a running process. Truncate it instead.",
             ], 409);
         }
+
+        $indexer->forget($file);
 
         try {
             $logs->delete($file);
@@ -182,13 +187,32 @@ class AdminLogViewerController extends BasePageController
     }
 
     /**
+     * @return list<LogFile>
+     */
+    private function requestedFiles(AdminLogSearchRequest $request, LogFileRepository $logs): array
+    {
+        $files = [];
+
+        foreach ((array) $request->validated('files') as $path) {
+            $files[] = $logs->find((string) $path) ?? abort(404, 'Log file not found.');
+        }
+
+        return $files;
+    }
+
+    /**
      * @return list<array<string, mixed>>
      */
-    private function fileList(LogFileRepository $logs): array
+    private function fileList(LogFileRepository $logs, LogSearchCoordinator $searcher): array
     {
         $guardMinutes = $this->guardMinutes();
+        $files = $logs->all();
+        $status = $searcher->fileStatus($files);
 
-        return array_map(static fn (LogFile $file): array => $file->toArray($guardMinutes), $logs->all());
+        return array_map(
+            static fn (LogFile $file): array => [...$file->toArray($guardMinutes), 'index' => $status[$file->path] ?? null],
+            $files,
+        );
     }
 
     private function guardMinutes(): int

@@ -35,6 +35,7 @@ use App\Observers\RootCategoryObserver;
 use App\Observers\SteamAppObserver;
 use App\Observers\UsenetGroupObserver;
 use App\Observers\VideoObserver;
+use App\Services\LogViewer\Index\LogIndex;
 use App\Services\Monitoring\Collectors\ApplicationCollector;
 use App\Services\Monitoring\Collectors\FailedJobsCollector;
 use App\Services\Monitoring\Collectors\HorizonCollector;
@@ -43,6 +44,7 @@ use App\Services\Monitoring\Collectors\ServiceStatusCollector;
 use App\Services\Monitoring\Collectors\TmuxSnapshotCollector;
 use App\Services\Monitoring\Prometheus\TextFormatter;
 use App\Services\Monitoring\PrometheusMetricsExporter;
+use App\Services\Search\Support\ManticoreClientFactory;
 use App\Services\Yenc\DecoderFactory;
 use App\Services\YencService;
 use App\View\Composers\AdminDataComposer;
@@ -128,6 +130,12 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(PrometheusMetricsExporter::class, static fn (Application $app): PrometheusMetricsExporter => new PrometheusMetricsExporter(
             $app->tagged(MetricsCollector::TAG),
             $app->make(TextFormatter::class),
+        ));
+
+        $this->app->singleton(LogIndex::class, static fn (Application $app): LogIndex => new LogIndex(
+            ManticoreClientFactory::make((array) $app['config']->get('search.drivers.manticore', [])),
+            (string) $app['config']->get('nntmux.log_viewer.index.table', 'app_logs_rt'),
+            (bool) $app['config']->get('nntmux.log_viewer.index.enabled', true),
         ));
     }
 }

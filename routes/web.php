@@ -304,6 +304,7 @@ Route::middleware(['role:Admin', '2fa'])->prefix('admin')->group(function () {
     Route::get('logs/entries', [AdminLogViewerController::class, 'entries'])->name('admin.logs.entries');
     Route::get('logs/entry', [AdminLogViewerController::class, 'entry'])->name('admin.logs.entry');
     Route::get('logs/search', [AdminLogViewerController::class, 'search'])->name('admin.logs.search');
+    Route::get('logs/facets', [AdminLogViewerController::class, 'facets'])->name('admin.logs.facets');
     Route::get('logs/download', [AdminLogViewerController::class, 'download'])->name('admin.logs.download');
     Route::post('logs/truncate', [AdminLogViewerController::class, 'truncate'])->name('admin.logs.truncate');
     Route::delete('logs', [AdminLogViewerController::class, 'destroy'])->name('admin.logs.destroy');

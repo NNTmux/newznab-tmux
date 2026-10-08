@@ -188,6 +188,77 @@ class LogReaderTest extends TestCase
         $this->assertNull($this->reader()->entryAt($file, $file->size));
     }
 
+    #[Test]
+    public function entries_forward_holds_back_the_open_tail_and_resumes_from_it(): void
+    {
+        $file = $this->logFile('app.log', self::STACK_TRACE_LOG);
+        $reader = $this->reader();
+
+        $first = $reader->entriesForward($file, 0, 0, PHP_INT_MAX, false);
+        $entries = iterator_to_array($first, false);
+        $resume = $first->getReturn();
+
+        $this->assertSame(['first', 'boom'], array_map(static fn (array $item): string => $item[0]->message, $entries));
+        $this->assertSame("#0 /app/Foo.php(12): bar()\n#1 {main}", $entries[1][0]->body);
+        $this->assertSame('[2026-10-01 10:01:00] local.ERROR: boom', $entries[1][1]);
+        $this->assertSame([1, 2], [$entries[0][0]->lineNumber, $entries[1][0]->lineNumber]);
+        $this->assertSame([1, 4], [$entries[0][2], $entries[1][2]]);
+        $this->assertSame(['offset' => strpos(self::STACK_TRACE_LOG, '[2026-10-01 10:02:00]'), 'line' => 4], $resume);
+
+        $tail = $reader->entriesForward($file, $resume['offset'], $resume['line'], PHP_INT_MAX, true);
+        $remaining = iterator_to_array($tail, false);
+
+        $this->assertSame(['third'], array_map(static fn (array $item): string => $item[0]->message, $remaining));
+        $this->assertSame(5, $remaining[0][0]->lineNumber);
+        $this->assertSame(['offset' => strlen(self::STACK_TRACE_LOG), 'line' => 5], $tail->getReturn());
+    }
+
+    #[Test]
+    public function entries_forward_stops_at_an_entry_boundary_once_the_budget_is_spent(): void
+    {
+        $file = $this->logFile('app.log', self::STACK_TRACE_LOG);
+
+        $entries = $this->reader()->entriesForward($file, 0, 0, 1, true);
+
+        $this->assertSame(['first'], array_map(static fn (array $item): string => $item[0]->message, iterator_to_array($entries, false)));
+        $this->assertSame(['offset' => strpos(self::STACK_TRACE_LOG, '[2026-10-01 10:01:00]'), 'line' => 1], $entries->getReturn());
+    }
+
+    #[Test]
+    public function entries_forward_waits_for_a_line_still_being_written_in_plain_files(): void
+    {
+        $file = $this->logFile('horizon.log', "  2026-10-05 21:53:20 Job A DONE\n\n  2026-10-05 21:53:21 Job B RUN", false);
+        $reader = $this->reader();
+
+        $live = $reader->entriesForward($file, 0, 0, PHP_INT_MAX, false);
+        $this->assertSame(['  2026-10-05 21:53:20 Job A DONE'], array_map(static fn (array $item): string => $item[0]->message, iterator_to_array($live, false)));
+        $this->assertSame(['offset' => 34, 'line' => 2], $live->getReturn());
+
+        $flushed = $reader->entriesForward($file, 0, 0, PHP_INT_MAX, true);
+        $entries = iterator_to_array($flushed, false);
+
+        $this->assertSame([null, null], [$entries[0][0]->level, $entries[1][0]->level]);
+        $this->assertSame('2026-10-05 21:53:21', $entries[1][0]->timestamp);
+        $this->assertSame(3, $entries[1][0]->lineNumber);
+        $this->assertSame(['offset' => $file->size, 'line' => 3], $flushed->getReturn());
+    }
+
+    #[Test]
+    public function entries_forward_caps_oversized_bodies_and_keeps_orphan_blocks(): void
+    {
+        $contents = "orphan continuation\n[2026-10-01 10:00:00] local.ERROR: big\n".str_repeat("#0 frame\n", 10)."[2026-10-01 10:01:00] local.INFO: next\n";
+        $file = $this->logFile('app.log', $contents);
+        $reader = new LogReader(new LogEntryParser, chunkSize: 64, maxEntryBytes: 60);
+
+        $entries = iterator_to_array($reader->entriesForward($file, 0, 0, PHP_INT_MAX, true), false);
+
+        $this->assertSame(['orphan continuation', 'big', 'next'], array_map(static fn (array $item): string => $item[0]->message, $entries));
+        $this->assertNull($entries[0][0]->level);
+        $this->assertSame(implode("\n", array_fill(0, 6, '#0 frame')), $entries[1][0]->body);
+        $this->assertTrue($entries[1][0]->truncated);
+        $this->assertSame(13, $entries[2][0]->lineNumber);
+    }
+
     private function reader(): LogReader
     {
         return new LogReader(new LogEntryParser, chunkSize: 64);

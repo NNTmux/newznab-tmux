@@ -24,6 +24,20 @@ final readonly class LogEntry
     ) {}
 
     /**
+     * The entry's timestamp as Unix seconds (read in the application timezone), or null when it has none.
+     */
+    public function loggedAt(): ?int
+    {
+        if ($this->timestamp === null) {
+            return null;
+        }
+
+        $seconds = strtotime($this->timestamp);
+
+        return $seconds === false ? null : $seconds;
+    }
+
+    /**
      * @return array{
      *     offset: int,
      *     end: int,

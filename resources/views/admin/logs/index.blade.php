@@ -15,15 +15,17 @@
      data-initial-file="{{ $initialFile }}"
      data-initial-query="{{ $initialQuery }}"
      data-engine="{{ $engine }}"
+     data-index-enabled="{{ $indexEnabled ? '1' : '0' }}"
      data-files-url="{{ route('admin.logs.files') }}"
      data-entries-url="{{ route('admin.logs.entries') }}"
      data-entry-url="{{ route('admin.logs.entry') }}"
      data-search-url="{{ route('admin.logs.search') }}"
+     data-facets-url="{{ route('admin.logs.facets') }}"
      data-download-url="{{ route('admin.logs.download') }}"
      data-truncate-url="{{ route('admin.logs.truncate') }}"
      data-destroy-url="{{ route('admin.logs.destroy') }}">
     <x-admin.card>
-        <x-admin.page-header :title="$title" icon="fas fa-file-lines" subtitle="Browse entries in storage/logs and search one file or every log at once. Press / to search." />
+        <x-admin.page-header :title="$title" icon="fas fa-file-lines" subtitle="Browse entries in storage/logs and search one file or every log at once, by text, level, channel or time. Press / to search." />
 
         <noscript>
             <div class="px-6 py-4 text-sm text-amber-800 bg-amber-50 dark:bg-amber-900/30 dark:text-amber-200">The log viewer requires JavaScript.</div>
@@ -70,6 +72,7 @@
                                         <span class="flex items-center gap-2">
                                             <span x-show="file.active" class="h-2 w-2 shrink-0 rounded-full bg-green-500" title="Written to recently"></span>
                                             <span class="truncate text-sm font-medium" x-text="file.name"></span>
+                                            <i x-show="hasIndexState(file)" class="fas fa-bolt ml-auto shrink-0 text-[10px]" :class="indexStateClass(file)" :title="indexStateTitle(file)" aria-hidden="true"></i>
                                         </span>
                                         <span class="mt-0.5 flex justify-between gap-2 text-xs text-gray-500 dark:text-gray-400">
                                             <span class="truncate" x-text="fileDirectory(file)"></span>
@@ -139,7 +142,7 @@
                             </div>
                         </div>
 
-                        <div class="flex flex-wrap items-center gap-1.5">
+                        <div class="flex flex-wrap items-center gap-1.5" :title="countsTitle()">
                             <template x-for="level in levelOptions" :key="level">
                                 <button type="button"
                                         class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold uppercase tracking-wide transition"
@@ -147,10 +150,47 @@
                                         :aria-pressed="isLevelActive(level)"
                                         @click="toggleLevel(level)">
                                     <span x-text="level"></span>
-                                    <span class="rounded-full bg-black/10 px-1.5 text-[10px] dark:bg-white/10" x-show="levelCount(level) > 0" x-text="levelCount(level)"></span>
+                                    <span class="rounded-full bg-black/10 px-1.5 text-[10px] dark:bg-white/10" x-show="levelCount(level) > 0" x-text="levelCountLabel(level)"></span>
                                 </button>
                             </template>
                             <button type="button" x-show="hasLevels()" x-cloak class="ml-1 text-xs font-semibold text-blue-600 hover:underline dark:text-blue-400" @click="clearLevels()">Clear levels</button>
+                        </div>
+
+                        <div x-show="hasChannelOptions()" x-cloak class="flex flex-wrap items-center gap-1.5" :title="countsTitle()">
+                            <span class="mr-1 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Channels</span>
+                            <template x-for="channel in channelOptions()" :key="channel">
+                                <button type="button"
+                                        class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-mono text-xs transition"
+                                        :class="channelChipClass(channel)"
+                                        :aria-pressed="isChannelActive(channel)"
+                                        @click="toggleChannel(channel)">
+                                    <span x-text="channel"></span>
+                                    <span class="rounded-full bg-black/10 px-1.5 text-[10px] dark:bg-white/10" x-show="channelCount(channel) > 0" x-text="channelCountLabel(channel)"></span>
+                                </button>
+                            </template>
+                            <button type="button" x-show="hasChannels()" x-cloak class="ml-1 text-xs font-semibold text-blue-600 hover:underline dark:text-blue-400" @click="clearChannels()">Clear channels</button>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                            <label class="flex items-center gap-1.5">
+                                <span>From</span>
+                                <input type="datetime-local"
+                                       step="60"
+                                       x-model="from"
+                                       @change="onRangeChange()"
+                                       aria-label="Entries logged from"
+                                       class="rounded-lg border border-gray-300 bg-white px-2 py-1 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100">
+                            </label>
+                            <label class="flex items-center gap-1.5">
+                                <span>To</span>
+                                <input type="datetime-local"
+                                       step="60"
+                                       x-model="to"
+                                       @change="onRangeChange()"
+                                       aria-label="Entries logged until"
+                                       class="rounded-lg border border-gray-300 bg-white px-2 py-1 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100">
+                            </label>
+                            <button type="button" x-show="hasTimeRange()" x-cloak class="text-xs font-semibold text-blue-600 hover:underline dark:text-blue-400" @click="clearRange()">Clear time range</button>
                         </div>
 
                         <p x-show="searchError" x-cloak class="text-sm text-red-600 dark:text-red-400" x-text="searchError"></p>
@@ -250,6 +290,7 @@
                                         @click="toggleGroup(group.path)">
                                     <i class="fas w-3 text-xs text-gray-500" :class="groupChevronClass(group)" aria-hidden="true"></i>
                                     <span class="min-w-0 flex-1 truncate font-mono text-sm font-semibold text-gray-900 dark:text-gray-100" x-text="group.path"></span>
+                                    <span x-show="hasEngine(group)" class="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide" :class="engineBadgeClass(group)" :title="engineTitle(group)" x-text="engineLabel(group)"></span>
                                     <span x-show="group.timedOut" class="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800 dark:bg-amber-900/50 dark:text-amber-200" title="The search timed out; results may be incomplete">timed out</span>
                                     <span x-show="group.error" class="rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-800 dark:bg-red-900/50 dark:text-red-200" :title="group.error">error</span>
                                     <span class="shrink-0 text-xs text-gray-600 dark:text-gray-400" x-text="groupCountLabel(group)"></span>

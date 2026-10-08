@@ -110,6 +110,11 @@ return [
     | string to force the slower pure-PHP scanner). The timeout applies per
     | search request; the browser fans a search out over several requests.
     |
+    | When the index is enabled, `nntmux:index-logs` (scheduled every minute)
+    | tails every log into a Manticore RT table. Searches over files that are
+    | caught up use that table; regex searches, files still being indexed and
+    | Manticore outages fall back to grep per file.
+    |
     */
     'log_viewer' => [
         'path' => storage_path('logs'),
@@ -118,5 +123,13 @@ return [
         'max_results_per_file' => 100,
         'max_files_per_search' => 25,
         'delete_guard_minutes' => 10,
+        'index' => [
+            'enabled' => (bool) env('LOG_VIEWER_INDEX_ENABLED', true),
+            'table' => (string) env('LOG_VIEWER_INDEX_TABLE', 'app_logs_rt'),
+            'batch_size' => (int) env('LOG_VIEWER_INDEX_BATCH_SIZE', 1000),
+            'max_bytes_per_run' => (int) env('LOG_VIEWER_INDEX_MAX_BYTES_PER_RUN', 268_435_456),
+            'max_bytes_per_file' => (int) env('LOG_VIEWER_INDEX_MAX_BYTES_PER_FILE', 67_108_864),
+            'lag_tolerance_bytes' => (int) env('LOG_VIEWER_INDEX_LAG_TOLERANCE_BYTES', 1_048_576),
+        ],
     ],
 ];

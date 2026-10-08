@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Http\Middleware\Google2FAMiddleware;
+use App\Models\LogIndexFile;
 use App\Models\User;
+use App\Services\LogViewer\Index\LogIndex;
+use App\Services\LogViewer\Index\LogIndexer;
 use App\View\Composers\GlobalDataComposer;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Schema\Blueprint;
@@ -20,6 +23,7 @@ use Monolog\Handler\TestHandler;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
+use Tests\Support\FakeLogIndex;
 use Tests\TestCase;
 
 class AdminLogViewerControllerTest extends TestCase
@@ -97,6 +101,7 @@ class AdminLogViewerControllerTest extends TestCase
             'entries' => ['GET', 'admin.logs.entries'],
             'entry' => ['GET', 'admin.logs.entry'],
             'search' => ['GET', 'admin.logs.search'],
+            'facets' => ['GET', 'admin.logs.facets'],
             'download' => ['GET', 'admin.logs.download'],
             'truncate' => ['POST', 'admin.logs.truncate'],
             'destroy' => ['DELETE', 'admin.logs.destroy'],
@@ -317,6 +322,131 @@ class AdminLogViewerControllerTest extends TestCase
         $this->assertStringStartsWith('bad ', (string) $response->json('entries.0.message'));
     }
 
+    public function test_search_uses_the_log_index_for_caught_up_files_and_grep_for_the_rest(): void
+    {
+        $index = $this->enableIndex();
+        $this->createLogFile('application.log', self::APPLICATION_LOG, time() - 600);
+        $this->createLogFile('payments.log', ['[2026-03-10 11:00:00] local.ERROR: payment declined']);
+        app(LogIndexer::class)->run(['application.log']);
+
+        $response = $this->actingAs($this->admin())->getJson(route('admin.logs.search', [
+            'q' => 'PAYMENT',
+            'files' => ['application.log', 'payments.log'],
+        ]));
+
+        $response->assertOk();
+        $response->assertJsonPath('engine', 'mixed');
+        $this->assertSame(['manticore', 'grep'], array_column($response->json('results'), 'engine'));
+        $this->assertSame(['payment failed'], array_column($response->json('results.0.entries'), 'message'));
+        $this->assertSame("#0 /app/Payments.php(12): charge()\n#1 {main}", $response->json('results.0.entries.0.body'));
+        $this->assertSame(['payment declined'], array_column($response->json('results.1.entries'), 'message'));
+        $this->assertNotSame([], $index->queries);
+    }
+
+    public function test_regex_searches_and_index_failures_fall_back_to_grep(): void
+    {
+        $index = $this->enableIndex();
+        $this->createLogFile('application.log', self::APPLICATION_LOG, time() - 600);
+        app(LogIndexer::class)->run();
+        $admin = $this->admin();
+
+        $regex = $this->actingAs($admin)->getJson(route('admin.logs.search', ['q' => 'pay\w+ failed', 'regex' => 1, 'files' => ['application.log']]));
+        $regex->assertOk()->assertJsonPath('results.0.engine', 'grep');
+        $this->assertSame(['payment failed'], array_column($regex->json('results.0.entries'), 'message'));
+
+        $index->failing = true;
+        $failing = $this->actingAs($admin)->getJson(route('admin.logs.search', ['q' => 'payment', 'files' => ['application.log']]));
+        $failing->assertOk()->assertJsonPath('results.0.engine', 'grep');
+        $this->assertSame(['payment failed'], array_column($failing->json('results.0.entries'), 'message'));
+    }
+
+    public function test_grep_searches_filter_by_channel_and_time_range(): void
+    {
+        $this->createLogFile('application.log', [
+            '[2026-03-10 09:00:00] security.WARNING: login throttled',
+            '[2026-03-10 09:30:00] local.WARNING: disk almost full',
+            '[2026-03-10 10:00:00] security.WARNING: login throttled again',
+        ]);
+        $admin = $this->admin();
+
+        $byChannel = $this->actingAs($admin)->getJson(route('admin.logs.search', ['channels' => ['security'], 'files' => ['application.log']]));
+        $this->assertSame(['login throttled again', 'login throttled'], array_column($byChannel->json('results.0.entries'), 'message'));
+
+        $byTime = $this->actingAs($admin)->getJson(route('admin.logs.search', ['from' => '2026-03-10T09:15', 'to' => '2026-03-10T09:30', 'files' => ['application.log']]));
+        $this->assertSame(['disk almost full'], array_column($byTime->json('results.0.entries'), 'message'));
+
+        $this->actingAs($admin)
+            ->getJson(route('admin.logs.search', ['from' => '2026-03-10T10:00', 'to' => '2026-03-10T09:00', 'channels' => ['bad channel'], 'files' => ['application.log']]))
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['to', 'channels.0']);
+    }
+
+    public function test_facets_come_from_the_index_and_are_unavailable_without_it(): void
+    {
+        $this->createLogFile('application.log', self::APPLICATION_LOG, time() - 600);
+        $admin = $this->admin();
+
+        $this->actingAs($admin)
+            ->getJson(route('admin.logs.facets', ['files' => ['application.log']]))
+            ->assertOk()
+            ->assertExactJson(['available' => false]);
+
+        $this->enableIndex();
+        app(LogIndexer::class)->run();
+
+        $this->actingAs($admin)
+            ->getJson(route('admin.logs.facets', ['files' => ['application.log'], 'levels' => ['error']]))
+            ->assertOk()
+            ->assertJsonPath('available', true)
+            ->assertJsonPath('partial', false)
+            ->assertJsonPath('levels', ['info' => 1, 'error' => 1, 'warning' => 1])
+            ->assertJsonPath('channels', ['local' => 3]);
+
+        $this->actingAs($admin)
+            ->getJson(route('admin.logs.facets', ['files' => ['application.log'], 'q' => 'pay.*', 'regex' => 1]))
+            ->assertExactJson(['available' => false]);
+    }
+
+    public function test_files_endpoint_reports_index_progress_when_the_index_is_available(): void
+    {
+        $this->createLogFile('application.log', self::APPLICATION_LOG, time() - 600);
+        $admin = $this->admin();
+
+        $this->actingAs($admin)->getJson(route('admin.logs.files'))->assertJsonPath('files.0.index', null);
+
+        $this->enableIndex();
+        app(LogIndexer::class)->run();
+
+        $this->actingAs($admin)
+            ->getJson(route('admin.logs.files'))
+            ->assertJsonPath('files.0.index.state', 'indexed')
+            ->assertJsonPath('engine', 'manticore');
+    }
+
+    public function test_truncating_a_file_removes_it_from_the_index(): void
+    {
+        $index = $this->enableIndex();
+        $this->createLogFile('application.log', self::APPLICATION_LOG, time() - 600);
+        app(LogIndexer::class)->run();
+        $fileId = LogIndexFile::query()->sole()->id;
+
+        $this->actingAs($this->admin())
+            ->postJson(route('admin.logs.truncate'), ['file' => 'application.log'])
+            ->assertOk();
+
+        $this->assertSame([$fileId], $index->purged);
+        $this->assertSame(0, LogIndexFile::query()->count());
+    }
+
+    private function enableIndex(): FakeLogIndex
+    {
+        config(['nntmux.log_viewer.index.enabled' => true]);
+        $index = new FakeLogIndex;
+        $this->app->instance(LogIndex::class, $index);
+
+        return $index;
+    }
+
     private function admin(): Authenticatable
     {
         /** @var Authenticatable $admin */
@@ -430,6 +560,8 @@ class AdminLogViewerControllerTest extends TestCase
             $table->json('metadata')->nullable();
             $table->timestamp('created_at')->nullable();
         });
+
+        (require database_path('migrations/2026_10_08_224008_create_log_index_files_table.php'))->up();
     }
 
     private function createUserWithRole(string $roleName): User

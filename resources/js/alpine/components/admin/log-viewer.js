@@ -4,6 +4,8 @@
  * Browsing a file pages backwards through entries via a byte cursor (`before`).
  * Searching fans out over batches of files (big files alone, small files packed together),
  * three requests at a time; a newer search aborts every in-flight request of the previous one.
+ * When the Manticore log index is available the server answers caught-up files from it (and the
+ * rest with grep); level / channel counts then come from the index via the facets endpoint.
  */
 import Alpine from '@alpinejs/csp';
 
@@ -12,6 +14,7 @@ const SEARCH_CONCURRENCY = 3;
 const BATCH_BYTES = 16 * 1024 * 1024;
 const AUTO_OPEN_GROUPS = 3;
 const MIN_QUERY_LENGTH = 2;
+const MAX_FACET_FILES = 200;
 
 const LEVEL_BADGES = {
     debug: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200',
@@ -52,7 +55,14 @@ Alpine.data('adminLogViewer', () => ({
     caseSensitive: false,
     scope: 'file',
     levels: [],
+    channels: [],
+    from: '',
+    to: '',
     limit: 100,
+
+    // Index facets ({ levels, channels, partial } or null when unavailable)
+    indexEnabled: false,
+    facets: null,
 
     // Browse mode
     entries: [],
@@ -80,6 +90,8 @@ Alpine.data('adminLogViewer', () => ({
     _browseGeneration: 0,
     _searchAbort: null,
     _browseAbort: null,
+    _facetsAbort: null,
+    _facetsGeneration: 0,
     _debounce: null,
     _groupIndex: {},
 
@@ -91,6 +103,7 @@ Alpine.data('adminLogViewer', () => ({
             entries: data.entriesUrl,
             entry: data.entryUrl,
             search: data.searchUrl,
+            facets: data.facetsUrl,
             download: data.downloadUrl,
             truncate: data.truncateUrl,
             destroy: data.destroyUrl,
@@ -101,6 +114,7 @@ Alpine.data('adminLogViewer', () => ({
         this.limit = Number.parseInt(data.defaultLimit ?? '100', 10) || 100;
         this.maxFilesPerSearch = Number.parseInt(data.maxFilesPerSearch ?? '25', 10) || 25;
         this.engine = data.engine || 'php';
+        this.indexEnabled = data.indexEnabled === '1';
 
         const params = new URLSearchParams(window.location.search);
         this.selectedPath = params.get('file') || data.initialFile || (this.files[0]?.path ?? '');
@@ -109,6 +123,9 @@ Alpine.data('adminLogViewer', () => ({
         this.caseSensitive = params.get('case') === '1';
         this.scope = params.get('scope') === 'all' ? 'all' : 'file';
         this.levels = params.getAll('levels[]').filter(level => this.levelOptions.includes(level));
+        this.channels = params.getAll('channels[]').filter(channel => channel !== '');
+        this.from = params.get('from') ?? '';
+        this.to = params.get('to') ?? '';
 
         this.refresh();
     },
@@ -149,6 +166,9 @@ Alpine.data('adminLogViewer', () => ({
         this.selectedPath = path;
         this.startBefore = null;
         this.anchorOffset = null;
+        if (this.scope === 'file') {
+            this.loadFacets();
+        }
         if (this.scope === 'file' && this.mode === 'search') {
             this.runSearch();
         } else if (this.mode !== 'search') {
@@ -196,6 +216,32 @@ Alpine.data('adminLogViewer', () => ({
 
     fileMeta(file) {
         return `${file.human_size} · ${this.relativeTime(file.modified_at)}`;
+    },
+
+    hasIndexState(file) {
+        return Boolean(file.index);
+    },
+
+    indexStateClass(file) {
+        const state = file.index?.state;
+        if (state === 'indexed') return 'text-emerald-500';
+        if (state === 'partial') return 'text-amber-500';
+        return 'text-gray-300 dark:text-gray-600';
+    },
+
+    indexStateTitle(file) {
+        const index = file.index;
+        if (!index) {
+            return '';
+        }
+        if (index.state === 'indexed') {
+            return `Indexed ${this.relativeTime(index.indexed_at)}; searches use the log index`;
+        }
+        if (index.state === 'partial') {
+            const percent = file.size > 0 ? Math.floor((index.indexed_bytes / file.size) * 100) : 0;
+            return `Indexing (${percent}%); searches scan this file with grep until it catches up`;
+        }
+        return 'Not indexed yet; searches scan this file with grep';
     },
 
     isAllScope() {
@@ -299,10 +345,92 @@ Alpine.data('adminLogViewer', () => ({
     },
 
     levelCount(level) {
+        if (this.facets) {
+            return this.facets.levels[level] ?? 0;
+        }
         const entries = this.mode === 'search'
             ? this.groups.flatMap(group => group.entries)
             : this.entries;
         return entries.filter(entry => entry.level === level).length;
+    },
+
+    levelCountLabel(level) {
+        return this.levelCount(level).toLocaleString();
+    },
+
+    countsTitle() {
+        if (!this.facets) {
+            return 'Counts of the entries loaded on this page';
+        }
+        return this.facets.partial
+            ? 'Counts from the log index; some files are still being indexed'
+            : 'Counts from the log index across the selected files';
+    },
+
+    // ----------------------------------------------------------------- channels
+
+    channelOptions() {
+        const counted = Object.keys(this.facets?.channels ?? {});
+        const selected = this.channels.filter(channel => !counted.includes(channel));
+        return [...counted, ...selected];
+    },
+
+    hasChannelOptions() {
+        return this.channelOptions().length > 0;
+    },
+
+    toggleChannel(channel) {
+        this.channels = this.channels.includes(channel)
+            ? this.channels.filter(item => item !== channel)
+            : [...this.channels, channel];
+        this.refresh();
+    },
+
+    clearChannels() {
+        this.channels = [];
+        this.refresh();
+    },
+
+    isChannelActive(channel) {
+        return this.channels.includes(channel);
+    },
+
+    hasChannels() {
+        return this.channels.length > 0;
+    },
+
+    channelChipClass(channel) {
+        return this.channels.includes(channel)
+            ? 'bg-indigo-100 text-indigo-800 ring-2 ring-offset-1 ring-blue-500 dark:bg-indigo-900/60 dark:text-indigo-200 dark:ring-offset-gray-900'
+            : 'bg-white text-gray-600 border border-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700';
+    },
+
+    channelCount(channel) {
+        return this.facets?.channels?.[channel] ?? 0;
+    },
+
+    channelCountLabel(channel) {
+        return this.channelCount(channel).toLocaleString();
+    },
+
+    // ----------------------------------------------------------------- time range
+
+    hasTimeRange() {
+        return this.from !== '' || this.to !== '';
+    },
+
+    onRangeChange() {
+        this.refresh();
+    },
+
+    clearRange() {
+        this.from = '';
+        this.to = '';
+        this.refresh();
+    },
+
+    hasFilterOnlySearch() {
+        return this.channels.length > 0 || this.hasTimeRange() || (this.scope === 'all' && this.levels.length > 0);
     },
 
     onLimitChange() {
@@ -316,10 +444,11 @@ Alpine.data('adminLogViewer', () => ({
      */
     refresh() {
         this.syncUrl();
+        this.loadFacets();
         const term = this.query.trim();
-        const levelOnlyAcrossFiles = term === '' && this.scope === 'all' && this.levels.length > 0;
+        const filterOnly = term === '' && this.hasFilterOnlySearch();
 
-        if (term.length >= MIN_QUERY_LENGTH || levelOnlyAcrossFiles) {
+        if (term.length >= MIN_QUERY_LENGTH || filterOnly) {
             this.runSearch();
             return;
         }
@@ -328,6 +457,38 @@ Alpine.data('adminLogViewer', () => ({
         this.mode = 'browse';
         this.searchError = term.length > 0 ? `Type at least ${MIN_QUERY_LENGTH} characters to search.` : '';
         this.loadEntries();
+    },
+
+    // ----------------------------------------------------------------- facets
+
+    async loadFacets() {
+        this._facetsAbort?.abort();
+        const generation = ++this._facetsGeneration;
+        const targets = this._targets();
+
+        if (!this.indexEnabled || !this._urls.facets || targets.length === 0 || targets.length > MAX_FACET_FILES) {
+            this.facets = null;
+            return;
+        }
+
+        this._facetsAbort = new AbortController();
+        const params = this._searchParams(targets.map(file => file.path));
+        if (this.query.trim().length < MIN_QUERY_LENGTH) {
+            params.delete('q');
+        }
+
+        try {
+            const payload = await this._fetchJson(this._urls.facets, params, this._facetsAbort.signal);
+            if (generation === this._facetsGeneration) {
+                this.facets = payload.available
+                    ? { levels: payload.levels ?? {}, channels: payload.channels ?? {}, partial: Boolean(payload.partial) }
+                    : null;
+            }
+        } catch (error) {
+            if (error.name !== 'AbortError' && generation === this._facetsGeneration) {
+                this.facets = null;
+            }
+        }
     },
 
     // ----------------------------------------------------------------- browse
@@ -423,9 +584,7 @@ Alpine.data('adminLogViewer', () => ({
         const controller = new AbortController();
         this._searchAbort = controller;
 
-        const targets = this.scope === 'all'
-            ? this.files.filter(file => !this.excluded[file.path])
-            : this.files.filter(file => file.path === this.selectedPath);
+        const targets = this._targets();
 
         this.mode = 'search';
         this.searchError = '';
@@ -438,6 +597,8 @@ Alpine.data('adminLogViewer', () => ({
                 name: file.name,
                 humanSize: file.human_size,
                 status: 'pending',
+                engine: '',
+                estimate: false,
                 total: 0,
                 hasMore: false,
                 before: null,
@@ -528,9 +689,11 @@ Alpine.data('adminLogViewer', () => ({
         group.timedOut = Boolean(result.timed_out);
         group.hasMore = Boolean(result.has_more);
         group.before = result.before ?? null;
+        group.engine = result.engine ?? group.engine;
 
         if (!append) {
             group.total = result.total_matches ?? 0;
+            group.estimate = Boolean(result.total_is_estimate);
             this.progress.matches += group.total;
             const openGroups = this.groups.filter(item => item.open).length;
             if (!hadEntries && entries.length > 0 && (openGroups < AUTO_OPEN_GROUPS || this.groups.length === 1)) {
@@ -591,8 +754,31 @@ Alpine.data('adminLogViewer', () => ({
     },
 
     groupCountLabel(group) {
-        const count = group.total.toLocaleString();
+        const count = `${group.estimate ? '≈ ' : ''}${group.total.toLocaleString()}`;
+        if (group.engine === 'manticore') {
+            return `${count} matching entr${group.total === 1 ? 'y' : 'ies'}`;
+        }
         return `${count} matching line${group.total === 1 ? '' : 's'}`;
+    },
+
+    hasEngine(group) {
+        return group.engine !== '';
+    },
+
+    engineLabel(group) {
+        return group.engine === 'manticore' ? 'index' : group.engine;
+    },
+
+    engineTitle(group) {
+        return group.engine === 'manticore'
+            ? 'Answered from the Manticore log index'
+            : `Scanned with ${group.engine} (regex search, file not indexed yet, or index unavailable)`;
+    },
+
+    engineBadgeClass(group) {
+        return group.engine === 'manticore'
+            ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-200'
+            : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-200';
     },
 
     groupShownLabel(group) {
@@ -660,8 +846,21 @@ Alpine.data('adminLogViewer', () => ({
         params.set('regex', this.regex ? '1' : '0');
         params.set('case', this.caseSensitive ? '1' : '0');
         this.levels.forEach(level => params.append('levels[]', level));
+        this.channels.forEach(channel => params.append('channels[]', channel));
+        if (this.from !== '') {
+            params.set('from', this.from);
+        }
+        if (this.to !== '') {
+            params.set('to', this.to);
+        }
         paths.forEach(path => params.append('files[]', path));
         return params;
+    },
+
+    _targets() {
+        return this.scope === 'all'
+            ? this.files.filter(file => !this.excluded[file.path])
+            : this.files.filter(file => file.path === this.selectedPath);
     },
 
     _cancelSearch() {
@@ -680,6 +879,9 @@ Alpine.data('adminLogViewer', () => ({
     },
 
     _rerunIfSearching() {
+        if (this.scope === 'all') {
+            this.loadFacets();
+        }
         if (this.mode === 'search' && this.scope === 'all') {
             this.runSearch();
         }
@@ -772,7 +974,11 @@ Alpine.data('adminLogViewer', () => ({
         this.startBefore = entry.end;
         this.anchorOffset = entry.offset;
         this.levels = [];
+        this.channels = [];
+        this.from = '';
+        this.to = '';
         this.syncUrl();
+        this.loadFacets();
         this.loadEntries();
     },
 
@@ -886,6 +1092,9 @@ Alpine.data('adminLogViewer', () => ({
         if (this.caseSensitive) params.set('case', '1');
         if (this.scope === 'all') params.set('scope', 'all');
         this.levels.forEach(level => params.append('levels[]', level));
+        this.channels.forEach(channel => params.append('channels[]', channel));
+        if (this.from !== '') params.set('from', this.from);
+        if (this.to !== '') params.set('to', this.to);
         const search = params.toString();
         window.history.replaceState(null, '', `${window.location.pathname}${search ? `?${search}` : ''}`);
     },
