@@ -323,6 +323,30 @@
         </div>
 
         <h4 class="text-lg font-semibold mt-6 mb-3 text-gray-900 dark:text-gray-100 flex items-center">
+            <i class="fa fa-filter mr-2 text-gray-600 dark:text-gray-400"></i>HTTP QUERY Method
+        </h4>
+        <p class="text-gray-700 dark:text-gray-300 mb-4">
+            <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">search</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">tv</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">movies</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">audio</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">books</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">anime</code> and <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">details</code>
+            also accept the HTTP <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">QUERY</code> method (RFC 10008), which sends the same parameters as a JSON body instead of the URL.
+            Results, quotas and errors are the same as with <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">GET</code>.
+        </p>
+        <div class="surface-panel-alt rounded-lg border shadow-sm mb-4">
+            <div class="p-6">
+                <h5 class="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">QUERY request example</h5>
+                <pre class="bg-gray-100 dark:bg-gray-800 p-3 rounded text-xs text-gray-800 dark:text-gray-200 overflow-x-auto"><code>curl -X QUERY {{ url('/api/v2/search') }} \
+  -H 'Content-Type: application/json' \
+  -d '{"api_token":"&lt;your api_token&gt;","id":"ubuntu","cat":[2000,5030],"limit":50}'</code></pre>
+                <ul class="list-disc pl-5 mt-3 text-sm text-gray-700 dark:text-gray-300 space-y-1">
+                    <li><code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">Content-Type</code> must be <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">application/json</code>; the body must be a JSON object of at most 8,192 bytes.</li>
+                    <li>Values are strings or numbers; <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">cat</code> may also be a list. An empty string behaves like an empty URL parameter.</li>
+                    <li>Do not send the same parameter in both the URL and the body.</li>
+                    <li>Cursors work across <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">GET</code> and <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">QUERY</code> when the filters are the same.</li>
+                    <li><code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">getnzb</code> and <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">nzbadd</code> do not accept <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">QUERY</code>.</li>
+                </ul>
+            </div>
+        </div>
+
+        <h4 class="text-lg font-semibold mt-6 mb-3 text-gray-900 dark:text-gray-100 flex items-center">
             <i class="fa fa-file-code mr-2 text-gray-600 dark:text-gray-400"></i>Output Format
         </h4>
         <div class="surface-panel-alt rounded-lg border shadow-sm mb-4">

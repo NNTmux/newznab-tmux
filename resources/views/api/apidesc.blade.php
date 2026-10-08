@@ -337,6 +337,27 @@
             </div>
         </div>
         <h4 class="text-lg font-semibold mt-6 mb-3 text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
+            <i class="fa fa-filter mr-2 text-gray-600 dark:text-gray-400"></i>HTTP QUERY Method
+        </h4>
+        <p class="text-gray-700 dark:text-gray-300 mb-4">
+            The API also accepts the HTTP <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">QUERY</code> method (RFC 10008), which sends the same parameters as a JSON body instead of the URL.
+            Only read-only functions are available over QUERY: <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">search</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">tvsearch</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">movie</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">music</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">book</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">anime</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">details</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">caps</code> and <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">nfo</code> (and their short aliases).
+            <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">get</code> and <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">nzbadd</code> return error 203; keep using <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">GET</code>/<code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">POST</code> for them.
+        </p>
+        <div class="surface-panel-alt rounded-lg border shadow-sm mb-4">
+            <div class="p-6">
+                <h5 class="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">QUERY request example</h5>
+                <pre class="bg-gray-100 dark:bg-gray-800 p-3 rounded text-xs text-gray-800 dark:text-gray-200 overflow-x-auto"><code>curl -X QUERY {{ url('/api/v1/api') }} \
+  -H 'Content-Type: application/json' \
+  -d '{"t":"search","apikey":"&lt;your api key&gt;","q":"linux","cat":[2000,5030]}'</code></pre>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mt-2 mb-0">
+                    <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">Content-Type</code> must be <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">application/json</code> and the body a JSON object of at most 8,192 bytes with string or number values (<code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">cat</code> may be a list).
+                    Do not send the same parameter in both the URL and the body.
+                </p>
+            </div>
+        </div>
+
+        <h4 class="text-lg font-semibold mt-6 mb-3 text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
             <i class="fa fa-file-code mr-2 text-gray-600 dark:text-gray-400"></i>Output Format
         </h4>
         <p class="text-gray-700 dark:text-gray-300 mb-4 dark:text-gray-300">Select your preferred output format (not applicable to functions which return an NZB/NFO file).</p>

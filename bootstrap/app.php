@@ -3,6 +3,7 @@
 use App\Http\Middleware\BlockAbusiveServices;
 use App\Http\Middleware\ClearanceMiddleware;
 use App\Http\Middleware\ContentSecurityPolicy;
+use App\Http\Middleware\DecorateHttpQueryResponses;
 use App\Http\Middleware\DegradeWhenRedisUnreachable;
 use App\Http\Middleware\EnforceSessionToken;
 use App\Http\Middleware\ForceJsonOnAPI;
@@ -12,6 +13,7 @@ use App\Http\Middleware\NoCacheForAuthenticatedUsers;
 use App\Http\Middleware\ThrottleApiRequestsByToken;
 use App\Http\Middleware\TrustedDevice2FAMiddleware;
 use App\Http\Middleware\TrustProxies as AppTrustProxies;
+use App\Http\Middleware\ValidateHttpQueryInput;
 use App\Services\Monitoring\GrafanaJwtIssuer;
 use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
 use Illuminate\Foundation\Application;
@@ -60,6 +62,8 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->prepend(DegradeWhenRedisUnreachable::class);
+        // Prepended last so it is outermost and decorates every QUERY response.
+        $middleware->prepend(DecorateHttpQueryResponses::class);
 
         $middleware->append([
             PreventRequestsDuringMaintenance::class,
@@ -87,6 +91,7 @@ return Application::configure(basePath: dirname(__DIR__))
             '2fa' => Google2FAMiddleware::class,
             'bindings' => SubstituteBindings::class,
             'clearance' => ClearanceMiddleware::class,
+            'acceptQuery' => ValidateHttpQueryInput::class,
             'apiRateLimit' => ThrottleApiRequestsByToken::class,
             'isVerified' => EnsureEmailIsVerified::class,
             'permission' => PermissionMiddleware::class,

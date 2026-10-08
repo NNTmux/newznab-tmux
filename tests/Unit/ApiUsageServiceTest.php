@@ -60,8 +60,51 @@ final class ApiUsageServiceTest extends TestCase
         );
         $this->assertDatabaseHas('user_requests', [
             'users_id' => 1,
-            'request' => '/api/v2/search?api_token=secret&id=test',
+            'request' => '/api/v2/search?id=test',
         ]);
+    }
+
+    public function test_audit_entry_redacts_credentials_from_url_and_body_and_drops_unknown_fields(): void
+    {
+        $request = Request::create('/api/v2/search?api_token=url-secret&apikey=other-secret', 'QUERY', [], [], [], [
+            'CONTENT_TYPE' => 'application/json',
+        ], (string) json_encode(['id' => 'ubuntu', 'cat' => [2000, 5030], 'password' => 'hunter2']));
+
+        $entry = (new ApiUsageService)->auditEntry($request);
+
+        $this->assertSame('/api/v2/search?cat=2000%2C5030&id=ubuntu', $entry);
+    }
+
+    public function test_audit_entry_is_truncated_to_the_column_length(): void
+    {
+        $parameters = [];
+        foreach (['q', 'id', 'imdbid', 'tmdbid', 'traktid', 'tvdbid'] as $key) {
+            $parameters[$key] = str_repeat('a', 100);
+        }
+        $request = Request::create('/api/v1/api', 'GET', $parameters);
+
+        $entry = (new ApiUsageService)->auditEntry($request);
+
+        $this->assertSame(255, mb_strlen($entry));
+        $this->assertStringNotContainsString(str_repeat('a', 65), $entry);
+    }
+
+    public function test_audit_entry_skips_legacy_array_values_without_a_type_error(): void
+    {
+        $request = Request::create('/api/v1/api?t=search&o[]=json&q=test', 'GET');
+
+        $entry = (new ApiUsageService)->auditEntry($request);
+
+        $this->assertSame('/api/v1/api?q=test&t=search', $entry);
+    }
+
+    public function test_audit_entry_keeps_empty_parameters_visible(): void
+    {
+        $request = Request::create('/api/v2/search', 'GET', ['id' => null, 't' => 'search']);
+
+        $entry = (new ApiUsageService)->auditEntry($request);
+
+        $this->assertSame('/api/v2/search?id=&t=search', $entry);
     }
 
     public function test_legacy_audit_job_persists_queued_requests_and_coalesces_user_updates(): void

@@ -91,6 +91,7 @@ PHPUnit only (no Pest). Create tests: `php artisan make:test --phpunit {name}`
 ### API (`app/Http/Controllers/Api/`)
 - v1: XML (newznab compat) - `ApiController.php`
 - v2: JSON REST - `ApiV2Controller.php`
+- HTTP `QUERY` (RFC 10008) is accepted on v1 `/api/v1/api` and the v2 read endpoints (`search`, `tv`, `movies`, `audio`, `books`, `anime`, `details`); never on `getnzb`/`nzbadd`. Route middleware `acceptQuery:v1|v2` (`ValidateHttpQueryInput`) enforces the JSON body contract and normalizes input via `App\Services\Api\ApiInputCanonicalizer`, which the v2 cursor hash and `ApiUsageService` audit also use. The global outermost `DecorateHttpQueryResponses` sets `Cache-Control: private, no-store` and `Accept-Query`. v1 limits QUERY to `ApiController::QUERY_SAFE_FUNCTIONS`. QUERY body size is bounded in `docker/8.5/nginx.conf`. Client docs: `docs/nntmux_api_v2.md`. Run `php artisan route:cache` after deploy
 - RSS feeds are separate from `/api`: edit `routes/rss.php` + `App\Http\Controllers\RssController`; `/rss/*` is mounted from `bootstrap/app.php` and `RssController::userCheck()` validates `api_token`
 
 ### Config

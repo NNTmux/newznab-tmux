@@ -1063,14 +1063,26 @@ if (! function_exists('apiErrorDetails')) {
     }
 }
 
+if (! function_exists('apiErrorSafeText')) {
+    /**
+     * Strip control characters (including CR/LF) so API error text can be
+     * reflected into an XML attribute and a response header safely.
+     */
+    function apiErrorSafeText(string $text): string
+    {
+        return preg_replace('/[\x00-\x1F\x7F]+/', ' ', $text) ?? '';
+    }
+}
+
 if (! function_exists('apiJsonError')) {
     function apiJsonError(int $errorCode = 900, string $errorText = ''): mixed
     {
         $error = apiErrorDetails($errorCode, $errorText);
+        $message = apiErrorSafeText($error['message']);
 
         return response()
-            ->json(['error' => $error['message']], $error['status'])
-            ->header('X-NNTmux', 'API ERROR ['.$error['code'].'] '.$error['message']);
+            ->json(['error' => $message], $error['status'])
+            ->header('X-NNTmux', 'API ERROR ['.$error['code'].'] '.$message);
     }
 }
 
@@ -1078,11 +1090,11 @@ if (! function_exists('showApiError')) {
     function showApiError(int $errorCode = 900, string $errorText = ''): mixed
     {
         $error = apiErrorDetails($errorCode, $errorText);
-        $errorText = $error['message'];
+        $errorText = apiErrorSafeText($error['message']);
 
         $response =
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n".
-            '<error code="'.$errorCode.'" description="'.$errorText."\"/>\n";
+            '<error code="'.$errorCode.'" description="'.htmlspecialchars($errorText, ENT_XML1 | ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')."\"/>\n";
 
         return response($response, $error['status'])->header('Content-type', 'text/xml')->header('Content-Length', (string) strlen($response))->header('X-NNTmux', 'API ERROR ['.$errorCode.'] '.$errorText)->header('HTTP/1.1', $error['header']);
     }

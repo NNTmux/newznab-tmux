@@ -7,6 +7,8 @@ namespace Tests\Feature;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Controllers\Api\ApiV2Controller;
 use App\Models\Category;
+use App\Services\Api\ApiUsageService;
+use App\Services\Nzb\NzbService;
 use App\Services\Releases\ReleaseBrowseService;
 use App\Services\Releases\ReleaseSearchService;
 use Illuminate\Contracts\Console\Kernel;
@@ -19,8 +21,10 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Illuminate\Testing\TestResponse;
 use Mockery;
 use PDO;
+use PHPUnit\Framework\Attributes\DataProvider;
 use ReflectionClass;
 use Tests\TestCase;
 
@@ -843,6 +847,375 @@ class ApiRequestMatrixTest extends TestCase
             ->assertJsonPath('error', 'Insufficient privileges/not authorized');
     }
 
+    public function test_v2_query_search_passes_the_same_arguments_as_the_equivalent_get(): void
+    {
+        $token = $this->apiToken();
+        $search = $this->bindSearchMocks();
+        $search->shouldReceive('apiSearch')
+            ->once()
+            ->with('ubuntu', -1, 0, 100, -1, [5030], ['2000', '5030'], 0, 'posted_desc', null)
+            ->andReturn(collect([$this->releaseRow(1)]));
+
+        $query = $this->queryJson('/api/v2/search', ['api_token' => $token, 'id' => 'ubuntu', 'cat' => [2000, 5030]]);
+        // Same canonical filters hit the same row-cache entry, so the mock is not called again.
+        $get = $this->getJson('/api/v2/search?api_token='.$token.'&id=ubuntu&cat=2000,5030');
+
+        $query->assertOk()->assertJsonPath('results.0.title', 'Ubuntu.Movie.Release');
+        $get->assertOk();
+        $this->assertSame($get->json('results'), $query->json('results'));
+        $this->assertSame('/api/v2/search?cat=2000%2C5030&id=ubuntu', DB::table('user_requests')->value('request'));
+    }
+
+    public function test_v1_query_search_returns_xml(): void
+    {
+        $search = $this->bindSearchMocks();
+        $search->shouldReceive('apiSearch')
+            ->once()
+            ->with('ubuntu', -1, 0, 100, -1, [5030], [-1], 0, 'posted_desc')
+            ->andReturn(collect());
+
+        $response = $this->queryJson('/api/v1/api', ['t' => 'search', 'apikey' => $this->apiToken(), 'q' => 'ubuntu']);
+
+        $response->assertOk();
+        $this->assertStringContainsString('xml', (string) $response->headers->get('Content-Type'));
+        $this->assertSame(1, DB::table('user_requests')->count());
+    }
+
+    public function test_legacy_post_and_head_requests_are_unchanged(): void
+    {
+        $post = $this->post('/api/v1/api', ['t' => 'caps']);
+
+        $post->assertOk()->assertHeader('Accept-Query', 'application/json');
+        $this->assertStringNotContainsString('no-store', (string) $post->headers->get('Cache-Control'));
+
+        $this->call('HEAD', '/api/v2/capabilities')->assertOk();
+    }
+
+    public function test_v2_query_rejects_missing_and_invalid_tokens_in_the_body(): void
+    {
+        $this->queryJson('/api/v2/search', ['id' => 'ubuntu'])
+            ->assertBadRequest()
+            ->assertJsonPath('error', 'Missing parameter (api_token)');
+
+        $this->queryJson('/api/v2/search', ['api_token' => 'invalid-token', 'id' => 'ubuntu'])
+            ->assertUnauthorized()
+            ->assertJsonPath('error', 'Incorrect user credentials');
+    }
+
+    public function test_v2_query_is_rejected_once_the_daily_quota_is_exhausted(): void
+    {
+        DB::table('roles')->where('id', 1)->update(['apirequests' => 0]);
+        DB::table('user_requests')->insert([
+            'users_id' => (int) DB::table('users')->value('id'),
+            'request' => '/api/v2/search?id=earlier',
+            'timestamp' => now(),
+        ]);
+
+        $this->queryJson('/api/v2/search', ['api_token' => $this->apiToken(), 'id' => 'ubuntu'])
+            ->assertTooManyRequests()
+            ->assertJsonPath('error', 'Request limit reached');
+    }
+
+    public function test_v2_query_rate_limit_reads_the_body_token_and_429_is_not_cacheable(): void
+    {
+        DB::table('users')->update(['rate_limit' => 1]);
+        $this->bindSearchMocks()->shouldReceive('apiSearch')->once()->andReturn(collect());
+        $body = ['api_token' => $this->apiToken(), 'id' => 'ubuntu'];
+
+        $this->queryJson('/api/v2/search', $body)->assertOk();
+        $limited = $this->queryJson('/api/v2/search', $body);
+
+        $limited->assertTooManyRequests()->assertHeader('X-RateLimit-Remaining', '0');
+        $this->assertNotCacheable($limited);
+    }
+
+    public function test_query_requires_exactly_application_json(): void
+    {
+        $uri = '/api/v2/search';
+        $body = (string) json_encode(['api_token' => $this->apiToken(), 'id' => 'ubuntu']);
+
+        $this->queryRaw($uri, $body, 'application/vnd.api+json')->assertStatus(415);
+        $this->queryRaw($uri, 'id=ubuntu', 'application/x-www-form-urlencoded')->assertStatus(415);
+        $this->queryRaw($uri, $body, 'application/json; charset=latin1')->assertStatus(415);
+        $this->assertSame(0, DB::table('user_requests')->count());
+    }
+
+    public function test_query_body_over_the_configured_limit_is_rejected(): void
+    {
+        config(['nntmux.api.query_max_body_bytes' => 64]);
+
+        $this->queryJson('/api/v2/search', ['api_token' => $this->apiToken(), 'id' => str_repeat('a', 64)])
+            ->assertStatus(413)
+            ->assertJsonPath('error', 'QUERY body exceeds the maximum size');
+    }
+
+    /**
+     * @return array<string, array{0: string, 1: string}>
+     */
+    public static function invalidQueryBodies(): array
+    {
+        return [
+            'malformed JSON' => ['{"id":', 'QUERY body must be valid JSON without nested values'],
+            'JSON array' => ['["ubuntu"]', 'QUERY body must be a JSON object'],
+            'nested object' => ['{"id":{"a":1}}', 'Parameter id has an unsupported type'],
+            'deeply nested' => ['{"cat":[[2000]]}', 'QUERY body must be valid JSON without nested values'],
+            'JSON null' => ['{"id":null}', 'Parameter id has an unsupported type'],
+            'boolean' => ['{"id":true}', 'Parameter id has an unsupported type'],
+            'cat as object' => ['{"cat":{"0":2000,"1":5030}}', 'Parameter cat has an unsupported type'],
+            'list for a scalar parameter' => ['{"id":["a","b"]}', 'Parameter id has an unsupported type'],
+        ];
+    }
+
+    #[DataProvider('invalidQueryBodies')]
+    public function test_query_rejects_invalid_bodies(string $body, string $error): void
+    {
+        $this->queryRaw('/api/v2/search?api_token='.$this->apiToken(), $body)
+            ->assertBadRequest()
+            ->assertJsonPath('error', $error);
+
+        $this->assertSame(0, DB::table('user_requests')->count());
+    }
+
+    public function test_query_rejects_nested_url_parameters(): void
+    {
+        $this->queryJson('/api/v2/search?group[a]=x', ['api_token' => $this->apiToken(), 'id' => 'ubuntu'])
+            ->assertBadRequest()
+            ->assertJsonPath('error', 'Parameter group has an unsupported type');
+    }
+
+    public function test_query_rejects_a_parameter_sent_in_both_url_and_body(): void
+    {
+        $this->queryJson('/api/v2/search?id=debian', ['api_token' => $this->apiToken(), 'id' => 'ubuntu'])
+            ->assertBadRequest()
+            ->assertJsonPath('error', 'Parameter id must not be sent in both the URL and the body');
+    }
+
+    public function test_query_rejects_hostile_field_names_with_a_fixed_well_formed_xml_error(): void
+    {
+        $response = $this->queryRaw('/api/v1/api', (string) json_encode([
+            't' => 'search',
+            "<a\"\r\n>" => 1,
+        ]));
+
+        $response->assertBadRequest();
+        $xml = simplexml_load_string((string) $response->getContent());
+        $this->assertNotFalse($xml);
+        $this->assertSame('201', (string) $xml['code']);
+        $this->assertSame('Parameter names may only contain letters, digits and underscores (max 32)', (string) $xml['description']);
+    }
+
+    public function test_query_rejects_more_than_64_parameters(): void
+    {
+        $body = ['api_token' => $this->apiToken()];
+        for ($i = 0; $i < 64; $i++) {
+            $body['p'.$i] = 'x';
+        }
+
+        $this->queryJson('/api/v2/search', $body)
+            ->assertBadRequest()
+            ->assertJsonPath('error', 'QUERY requests accept at most 64 parameters');
+    }
+
+    public function test_query_empty_values_behave_like_empty_get_parameters(): void
+    {
+        $token = $this->apiToken();
+        $this->bindSearchMocks()->shouldReceive('apiSearch')
+            ->once()
+            ->with(null, -1, 0, 100, -1, [5030], [-1], 0, 'posted_desc', null)
+            ->andReturn(collect());
+
+        $this->getJson('/api/v2/search?api_token='.$token.'&id=')->assertOk();
+        $this->queryJson('/api/v2/search', ['api_token' => $token, 'id' => ''])->assertOk();
+        $this->queryJson('/api/v2/search?id=', ['api_token' => $token])->assertOk();
+    }
+
+    public function test_v1_query_refuses_side_effecting_functions_before_recording_usage(): void
+    {
+        foreach (['get', 'g', 'nzbadd'] as $function) {
+            $response = $this->queryJson('/api/v1/api', ['t' => $function, 'apikey' => $this->apiToken(), 'id' => 'release-guid']);
+
+            $response->assertBadRequest();
+            $response->assertSee('<error code="203" description="Function not available via QUERY"/>', false);
+        }
+
+        $this->assertSame(0, DB::table('user_requests')->count());
+        $this->assertSame(0, DB::table('user_downloads')->count());
+    }
+
+    public function test_v2_getnzb_does_not_accept_query(): void
+    {
+        $response = $this->queryJson('/api/v2/getnzb', ['api_token' => $this->apiToken(), 'id' => 'release-guid']);
+
+        $response->assertMethodNotAllowed();
+        $this->assertNotCacheable($response);
+        $this->assertSame(0, DB::table('user_downloads')->count());
+    }
+
+    public function test_accept_query_is_advertised_on_get_and_query_responses(): void
+    {
+        $get = $this->getJson('/api/v2/search?api_token=invalid-token&id=test');
+        $query = $this->queryJson('/api/v2/search', ['api_token' => 'invalid-token', 'id' => 'test']);
+
+        $get->assertHeader('Accept-Query', 'application/json');
+        $query->assertHeader('Accept-Query', 'application/json');
+        $this->assertStringNotContainsString('no-store', (string) $get->headers->get('Cache-Control'));
+        $this->assertNotCacheable($query);
+        $this->getJson('/api/v2/capabilities')->assertHeaderMissing('Accept-Query');
+    }
+
+    public function test_options_lists_allowed_methods_and_accept_query(): void
+    {
+        $v2 = $this->call('OPTIONS', '/api/v2/search');
+        $v1 = $this->call('OPTIONS', '/api/v1/api');
+
+        $v2->assertNoContent()->assertHeader('Accept-Query', 'application/json');
+        $this->assertEqualsCanonicalizing(['GET', 'HEAD', 'QUERY', 'OPTIONS'], explode(', ', (string) $v2->headers->get('Allow')));
+        $this->assertEqualsCanonicalizing(['GET', 'HEAD', 'POST', 'QUERY', 'OPTIONS'], explode(', ', (string) $v1->headers->get('Allow')));
+    }
+
+    public function test_cors_preflight_allows_query_with_a_json_content_type(): void
+    {
+        $response = $this->call('OPTIONS', '/api/v2/search', [], [], [], [
+            'HTTP_ORIGIN' => 'https://client.example',
+            'HTTP_ACCESS_CONTROL_REQUEST_METHOD' => 'QUERY',
+            'HTTP_ACCESS_CONTROL_REQUEST_HEADERS' => 'content-type',
+        ]);
+
+        $response->assertNoContent()->assertHeader('Access-Control-Allow-Origin', '*');
+        $this->assertStringContainsString('QUERY', (string) $response->headers->get('Access-Control-Allow-Methods'));
+        $this->assertStringContainsString('content-type', strtolower((string) $response->headers->get('Access-Control-Allow-Headers')));
+    }
+
+    public function test_cors_exposes_query_headers_to_browser_clients(): void
+    {
+        $response = $this->queryJson('/api/v2/search', ['api_token' => 'invalid-token'], ['Origin' => 'https://client.example']);
+
+        $response->assertHeader('Access-Control-Allow-Origin', '*');
+        $this->assertEqualsCanonicalizing(
+            ['accept-query', 'allow'],
+            array_map('trim', explode(',', strtolower((string) $response->headers->get('Access-Control-Expose-Headers'))))
+        );
+    }
+
+    public function test_search_cursor_is_shared_by_equivalent_get_and_query_filters_only(): void
+    {
+        $token = $this->apiToken();
+        $this->bindSearchMocks()->shouldReceive('apiSearch')->andReturn(collect([$this->releaseRow(3)]));
+
+        $cursor = (string) $this->getJson('/api/v2/search?api_token='.$token.'&id=ubuntu&cat=2000,5030&limit=1&cursor=')
+            ->assertOk()
+            ->json('pagination.next_cursor');
+        $this->assertNotSame('', $cursor);
+
+        $equivalent = [
+            'QUERY list' => fn (): TestResponse => $this->queryJson('/api/v2/search', ['api_token' => $token, 'id' => 'ubuntu', 'cat' => [2000, 5030], 'limit' => 1, 'cursor' => $cursor]),
+            'QUERY csv' => fn (): TestResponse => $this->queryJson('/api/v2/search', ['api_token' => $token, 'id' => 'ubuntu', 'cat' => '2000, 5030', 'limit' => '1', 'cursor' => $cursor]),
+            'GET cat[]' => fn (): TestResponse => $this->getJson('/api/v2/search?api_token='.$token.'&id=ubuntu&cat[]=2000&cat[]=5030&limit=1&cursor='.urlencode($cursor)),
+        ];
+        foreach ($equivalent as $label => $request) {
+            $this->assertSame(200, $request()->status(), $label);
+        }
+
+        $this->queryJson('/api/v2/search', ['api_token' => $token, 'id' => 'debian', 'cat' => [2000, 5030], 'limit' => 1, 'cursor' => $cursor])
+            ->assertBadRequest()
+            ->assertJsonPath('error', 'Search cursor does not match this query or index generation.');
+        $this->queryJson('/api/v2/movies', ['api_token' => $token, 'id' => 'ubuntu', 'cat' => [2000, 5030], 'limit' => 1, 'cursor' => $cursor])
+            ->assertBadRequest()
+            ->assertJsonPath('error', 'Search cursor does not match this query or index generation.');
+    }
+
+    public function test_query_api_hits_and_downloads_from_query_links_are_registered(): void
+    {
+        $token = $this->apiToken();
+        $userId = (int) DB::table('users')->value('id');
+        $nzbFolder = sys_get_temp_dir().'/nntmux-api-matrix-nzbs-'.bin2hex(random_bytes(6));
+        config(['nntmux_settings.path_to_nzbs' => $nzbFolder]);
+        $nzbFile = app(NzbService::class)->getNzbPath('release-guid', 0, true);
+        file_put_contents($nzbFile, (string) gzencode('<?xml version="1.0" encoding="UTF-8"?><nzb xmlns="http://www.newzbin.com/DTD/2003/nzb"></nzb>'));
+
+        try {
+            // Two API hits over QUERY: a v1 search and a v2 details lookup.
+            $this->bindSearchMocks()->shouldReceive('apiSearch')->once()->andReturn(collect());
+            $this->queryJson('/api/v1/api', ['t' => 'search', 'apikey' => $token, 'q' => 'ubuntu'])->assertOk();
+            $link = (string) $this->queryJson('/api/v2/details', ['api_token' => $token, 'id' => 'release-guid'])
+                ->assertOk()
+                ->json('link');
+
+            // The download link returned by the QUERY response registers a grab.
+            $download = $this->get($link);
+            $download->assertOk()->assertHeader('Content-Type', 'application/x-nzb');
+            $download->streamedContent();
+        } finally {
+            (new Filesystem)->deleteDirectory($nzbFolder);
+        }
+
+        $this->assertSame(['/api/v1/api?q=ubuntu&t=search', '/api/v2/details?id=release-guid'],
+            DB::table('user_requests')->where('users_id', $userId)->orderBy('id')->pluck('request')->all());
+        $this->assertSame(1, DB::table('user_downloads')->where(['users_id' => $userId, 'releases_id' => 1])->count());
+        $this->assertSame(1, (int) DB::table('users')->where('id', $userId)->value('grabs'));
+        $this->assertNotNull(DB::table('users')->where('id', $userId)->value('lastdownload'));
+        $this->assertSame(3, (int) DB::table('releases')->where('guid', 'release-guid')->value('grabs'));
+
+        Cache::forget('api_user_stats:'.$userId);
+        $stats = app(ApiUsageService::class)->statistics($userId);
+        $this->assertSame(2, (int) $stats->api_count);
+        $this->assertSame(1, (int) $stats->grab_count);
+    }
+
+    private function apiToken(): string
+    {
+        return (string) DB::table('users')->value('api_token');
+    }
+
+    /**
+     * Bind search/browse mocks into the container so HTTP-level requests reach them.
+     */
+    private function bindSearchMocks(): ReleaseSearchService&Mockery\MockInterface
+    {
+        $search = Mockery::mock(ReleaseSearchService::class);
+        $browse = Mockery::mock(ReleaseBrowseService::class);
+        $browse->shouldNotReceive('getBrowseRangeForApi');
+        $this->app->instance(ReleaseSearchService::class, $search);
+        $this->app->instance(ReleaseBrowseService::class, $browse);
+
+        return $search;
+    }
+
+    private function releaseRow(int $totalRows): object
+    {
+        return (object) [
+            '_totalrows' => $totalRows,
+            'searchname' => 'Ubuntu.Movie.Release',
+            'guid' => 'movie-release-guid',
+            'categories_id' => 2040,
+            'category_name' => 'Movies > WEBDL',
+            'adddate' => '2026-01-03 00:00:00',
+            'size' => 123456,
+            'totalpart' => 10,
+            'grabs' => 2,
+            'comments' => 1,
+            'passwordstatus' => 0,
+            'postdate' => '2026-01-02 00:00:00',
+        ];
+    }
+
+    private function queryRaw(string $uri, string $content, string $contentType = 'application/json'): TestResponse
+    {
+        return $this->call('QUERY', $uri, [], [], [], [
+            'CONTENT_TYPE' => $contentType,
+            'CONTENT_LENGTH' => (string) strlen($content),
+            'HTTP_ACCEPT' => 'application/json',
+        ], $content);
+    }
+
+    private function assertNotCacheable(TestResponse $response): void
+    {
+        $cacheControl = (string) $response->headers->get('Cache-Control');
+
+        $this->assertStringContainsString('no-store', $cacheControl);
+        $this->assertStringContainsString('private', $cacheControl);
+    }
+
     private function createSchema(): void
     {
         Schema::create('roles', function (Blueprint $table): void {
@@ -869,6 +1242,8 @@ class ApiRequestMatrixTest extends TestCase
             $table->timestamp('email_verified_at')->nullable();
             $table->integer('rate_limit')->default(60);
             $table->boolean('can_post')->default(true);
+            $table->integer('grabs')->default(0);
+            $table->timestamp('lastdownload')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
@@ -930,6 +1305,7 @@ class ApiRequestMatrixTest extends TestCase
         Schema::create('user_downloads', function (Blueprint $table): void {
             $table->increments('id');
             $table->unsignedInteger('users_id');
+            $table->unsignedInteger('releases_id')->nullable();
             $table->timestamp('timestamp')->nullable();
         });
 
@@ -979,6 +1355,11 @@ class ApiRequestMatrixTest extends TestCase
             $table->unsignedInteger('musicinfo_id')->default(0);
             $table->unsignedInteger('consoleinfo_id')->default(0);
             $table->unsignedInteger('groups_id')->nullable();
+        });
+
+        Schema::create('releases_groups', function (Blueprint $table): void {
+            $table->unsignedInteger('releases_id')->default(0);
+            $table->unsignedInteger('groups_id')->default(0);
         });
 
         Schema::create('usenet_groups', function (Blueprint $table): void {

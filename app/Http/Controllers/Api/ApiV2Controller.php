@@ -13,6 +13,7 @@ use App\Models\Category;
 use App\Models\Release;
 use App\Models\User;
 use App\Services\Api\ApiCapabilitiesService;
+use App\Services\Api\ApiInputCanonicalizer;
 use App\Services\Api\ApiQueryParameters;
 use App\Services\Api\ApiReleaseRowCache;
 use App\Services\Api\ApiUsageService;
@@ -57,6 +58,8 @@ class ApiV2Controller extends BasePageController
 
     private NzbUploadStagingService $nzbUploadStagingService;
 
+    private ApiInputCanonicalizer $inputCanonicalizer;
+
     /** @var array{enabled: bool, offset: int, limit: int, query_hash: string, cursor: SearchCursor|null} */
     private array $paginationContext = ['enabled' => false, 'offset' => 0, 'limit' => 0, 'query_hash' => '', 'cursor' => null];
 
@@ -76,6 +79,7 @@ class ApiV2Controller extends BasePageController
         ?ApiCapabilitiesService $capabilitiesService = null,
         ?SearchCursorCodec $cursorCodec = null,
         ?NzbUploadStagingService $nzbUploadStagingService = null,
+        ?ApiInputCanonicalizer $inputCanonicalizer = null,
     ) {
         $this->releaseSearchService = $releaseSearchService;
         $this->releaseBrowseService = $releaseBrowseService;
@@ -87,6 +91,7 @@ class ApiV2Controller extends BasePageController
         $this->capabilitiesService = $capabilitiesService ?? app(ApiCapabilitiesService::class);
         $this->cursorCodec = $cursorCodec ?? app(SearchCursorCodec::class);
         $this->nzbUploadStagingService = $nzbUploadStagingService ?? app(NzbUploadStagingService::class);
+        $this->inputCanonicalizer = $inputCanonicalizer ?? app(ApiInputCanonicalizer::class);
     }
 
     /**
@@ -210,10 +215,7 @@ class ApiV2Controller extends BasePageController
             return $this->jsonResponse(['error' => 'cursor cannot be combined with a nonzero offset'], 400);
         }
 
-        $query = $request->query();
-        unset($query['api_token'], $query['cursor'], $query['offset']);
-        ksort($query);
-        $queryHash = hash('sha256', json_encode($query, JSON_THROW_ON_ERROR));
+        $queryHash = $this->cursorQueryHash($request);
         $token = trim((string) $request->input('cursor', ''));
         $cursor = null;
         if ($token !== '') {
@@ -233,6 +235,19 @@ class ApiV2Controller extends BasePageController
         $this->paginationContext = ['enabled' => true, 'offset' => $offset, 'limit' => $limit, 'query_hash' => $queryHash, 'cursor' => $cursor];
 
         return $offset;
+    }
+
+    /**
+     * Bind cursors to the endpoint and the canonical effective input (URL and
+     * body), so GET and QUERY with the same filters share cursors while any
+     * other filter set, sort, or endpoint is rejected.
+     */
+    private function cursorQueryHash(Request $request): string
+    {
+        return hash('sha256', json_encode([
+            'endpoint' => $request->path(),
+            'params' => $this->inputCanonicalizer->canonicalize($request->except(['api_token', 'apikey', 'cursor', 'offset'])),
+        ], JSON_THROW_ON_ERROR));
     }
 
     private function parseMaxAge(Request $request): int|JsonResponse

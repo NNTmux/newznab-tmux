@@ -193,6 +193,28 @@ class BlockAbusiveServicesTest extends TestCase
         $this->assertSame(Response::HTTP_FORBIDDEN, $warmResponse->getStatusCode());
     }
 
+    public function test_http_query_searches_record_signals_for_later_correlation(): void
+    {
+        $this->enableBehavioralDetection();
+
+        $spoofedUa = 'SABnzbd/4.3.3';
+        $ip = '203.0.113.21';
+        $downloadUri = '/api/v1/api?t=get&id=release-guid&apikey=user-key';
+        $referer = ['Referer' => 'http://prowlarr.local:9696/download'];
+
+        // The search arrives as a QUERY request with t/apikey in the JSON body.
+        $search = Request::create('/api/v1/api', 'QUERY', server: [
+            'HTTP_USER_AGENT' => $spoofedUa,
+            'REMOTE_ADDR' => $ip,
+            'CONTENT_TYPE' => 'application/json',
+        ], content: (string) json_encode(['t' => 'search', 'q' => 'ubuntu', 'apikey' => 'user-key']));
+        app(BlockAbusiveServices::class)->handle($search, static fn (): Response => response()->json(['ok' => true]));
+
+        // Same scoring as a GET search: referer (30) + ua_pair (25) + ip_correlation (20) = 75.
+        $response = $this->handleRequest($downloadUri, $spoofedUa, $referer, $ip);
+        $this->assertSame(Response::HTTP_FORBIDDEN, $response->getStatusCode());
+    }
+
     public function test_enabled_proxy_indexer_app_block_allows_configured_user_agent_on_unrelated_routes(): void
     {
         config()->set('nntmux.block_proxy_indexer_apps', true);

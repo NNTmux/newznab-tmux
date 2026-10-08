@@ -198,6 +198,40 @@
       ]
     },
     {
+      "name": "Search (HTTP QUERY)",
+      "request": {
+        "method": "QUERY",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "description": "Same as Search, with filters in a JSON body (RFC 10008 QUERY). Body values must be strings or numbers; `cat` may be a list. A parameter must not appear in both the URL and the body. Responses are sent with `Cache-Control: private, no-store`.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"api_token\": \"{{apiToken}}\",\n  \"id\": \"linux\",\n  \"cat\": [1000, 2000],\n  \"limit\": 100,\n  \"maxage\": 30\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v2/search",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v2",
+            "search"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
       "name": "TV Search",
       "request": {
         "method": "GET",

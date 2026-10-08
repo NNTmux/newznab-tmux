@@ -37,6 +37,12 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ApiController extends BasePageController
 {
+    /**
+     * Functions reachable over HTTP QUERY, which RFC 10008 defines as safe.
+     * `g` (download accounting, cart deletion with del=1) and `nzbAdd` are excluded.
+     */
+    private const QUERY_SAFE_FUNCTIONS = ['s', 'tv', 'm', 'music', 'book', 'anime', 'd', 'c', 'n'];
+
     private string $type;
 
     protected ReleaseSearchService $releaseSearchService;
@@ -139,6 +145,10 @@ class ApiController extends BasePageController
             }
         } else {
             return showApiError(200, 'Missing parameter (t)');
+        }
+
+        if ($request->isMethod('QUERY') && ! in_array($function, self::QUERY_SAFE_FUNCTIONS, true)) {
+            return showApiError(203, 'Function not available via QUERY');
         }
 
         $uid = $apiKey = $oldestGrabTime = $thisOldestTime = '';

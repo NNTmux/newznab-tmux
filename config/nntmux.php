@@ -42,6 +42,8 @@ return [
         'audit_queue' => env('API_AUDIT_QUEUE', 'api-audit'),
         'access_update_interval' => (int) env('API_ACCESS_UPDATE_INTERVAL', 60),
         'metrics_sample_rate' => (float) env('API_METRICS_SAMPLE_RATE', 0.01),
+        // Max JSON body for HTTP QUERY API requests; nginx bounds QUERY bodies before PHP decodes them.
+        'query_max_body_bytes' => (int) env('API_QUERY_MAX_BODY_BYTES', 8192),
     ],
     'block_proxy_indexer_apps' => (bool) env('BLOCK_PROXY_INDEXER_APPS', false),
     'block_proxy_indexer_app_user_agents' => env('BLOCK_PROXY_INDEXER_APP_USER_AGENTS', 'Prowlarr/,NZBHydra2'),
