@@ -230,13 +230,14 @@ final class PredbSearchDriverTest extends TestCase
     {
         if ($backend === 'manticore') {
             self::assertSame('custom_pre', $request['table']);
-            self::assertSame(['equals' => [$field => $name]], $request['query']['bool']['must'][1]);
-            self::assertStringStartsWith('@'.$field.' "', $request['query']['bool']['must'][0]['query_string']);
+            $queryString = $request['query']['bool']['must'][0]['query_string'] ?? $request['query']['query_string'] ?? '';
+            self::assertStringStartsWith('@'.$field.' "^', $queryString);
+            self::assertStringEndsWith('$"', $queryString);
             if (str_contains($name, '|*')) {
-                self::assertStringContainsString('\\|\\*', $request['query']['bool']['must'][0]['query_string']);
+                self::assertStringContainsString('\\|\\*', $queryString);
             }
-            self::assertSame('utf8_general_ci', $request['options']['collation']);
-            self::assertSame(1, $request['limit']);
+            self::assertArrayNotHasKey('options', $request);
+            self::assertSame(5, $request['limit']);
             self::assertArrayNotHasKey('sort', $request);
         } else {
             self::assertSame('custom_pre', $request['index']);

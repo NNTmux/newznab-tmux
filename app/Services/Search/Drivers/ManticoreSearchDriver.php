@@ -1393,12 +1393,12 @@ class ManticoreSearchDriver implements SearchDriverInterface
 
         try {
             foreach (['title', 'filename'] as $field) {
+                // title/filename are full-text fields, so anchor the phrase to the whole field;
+                // exactValue() below decides the match.
                 $results = (new Search($this->manticoreSearch))
                     ->setTable($this->getPredbIndex())
-                    ->search('@'.$field.' "'.$literal.'"')
-                    ->filter($field, '=', $name)
-                    ->option('collation', 'utf8_general_ci')
-                    ->limit(1)
+                    ->search('@'.$field.' "^'.$literal.'$"')
+                    ->limit(5)
                     ->get();
 
                 foreach ($results as $doc) {
