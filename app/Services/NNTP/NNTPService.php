@@ -509,7 +509,8 @@ class NNTPService extends NntpClient
         }
 
         // Pre-compute keys array and Xref position for faster processing
-        $keys = array_merge(['Number'], array_keys($overview));
+        // getOverview() (part repair) caches the format with 'Number' prepended; don't add it twice.
+        $keys = array_merge(['Number'], array_keys(array_diff_key($overview, ['Number' => true])));
         $keyCount = \count($keys);
         $xrefIndex = array_search('Xref', $keys, true);
 
