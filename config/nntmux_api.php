@@ -5,6 +5,8 @@ return [
     'fanarttv_api_key' => env('FANARTTV_APIKEY', ''),
     'google_books_api_key' => env('GOOGLE_BOOKS_API_KEY', ''),
     'isbndb_api_key' => env('ISBNDB_API_KEY', ''),
+    'imdb_scraper_enabled' => env('IMDB_SCRAPER_ENABLED', true),
+    'imdb_scraper_block_backoff_minutes' => env('IMDB_SCRAPER_BLOCK_BACKOFF_MINUTES', 60),
     'imdbapi_dev_enabled' => env('IMDBAPI_DEV_ENABLED', true),
     'imdbapi_dev_base_url' => env('IMDBAPI_DEV_BASE_URL', 'https://api.imdbapi.dev'),
     'imdbapi_dev_min_interval_seconds' => env('IMDBAPI_DEV_MIN_INTERVAL_SECONDS', 15),
