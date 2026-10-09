@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
-use DariusIII\NetNntp\Protocol\ResponseCode;
 use App\Services\NNTP\NNTPService;
+use DariusIII\NetNntp\Protocol\ResponseCode;
 use PHPUnit\Framework\TestCase;
 
 final class NNTPXoverOverviewCacheTest extends TestCase

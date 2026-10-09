@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Unit;
 
 use App\Services\NNTP\NNTPService;
+use DariusIII\NetNntp\Error;
 use PHPUnit\Framework\TestCase;
 
 final class NNTPCompressedOverviewTest extends TestCase
@@ -18,9 +19,9 @@ final class NNTPCompressedOverviewTest extends TestCase
                 $this->_echo = false;
             }
 
-            protected function throwError(?string $message, ?int $code = null, mixed $userInfo = null): \DariusIII\NetNntp\Error
+            protected function throwError(?string $message, ?int $code = null, mixed $userInfo = null): Error
             {
-                return new \DariusIII\NetNntp\Error((string) $message, $code, $userInfo);
+                return new Error((string) $message, $code, $userInfo);
             }
 
             public function read(): mixed
