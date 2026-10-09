@@ -896,104 +896,66 @@ class NNTPService extends NntpClient
     }
 
     /**
-     * Loop over the compressed data when XFeature GZip Compress is turned on,
-     * string the data until we find a indicator
-     * (period, carriage feed, line return ;; .\r\n), decompress the data,
-     * split the data (bunch of headers in a string) into an array, finally
-     * return the array.
+     * Read a compressed OVER/XOVER response.
      *
-     * Have we failed to decompress the data, was there a
-     * problem downloading the data, etc..
+     * The server sends one zlib stream followed by ".\r\n". The stream is inflated as it
+     * arrives and the response ends when zlib reports the end of the stream, so a ".\r\n"
+     * that happens to appear inside the compressed bytes can't end it early.
      *
      * @return array<string, mixed>|string|NntpError On success : (array)  The headers.
      *                                               On failure : (object) DariusIII\NetNntp\Error.
-     *                                               On decompress failure: (string) error message
      */
     protected function &_getXFeatureTextResponse(): array|string|NntpError
     {
-        $possibleTerm = false;
-        // Use array accumulation for better performance with large data
-        $dataParts = [];
         $socket = $this->_socket;
+        $inflate = inflate_init(ZLIB_ENCODING_DEFLATE);
+        $parts = [];
+        $bytesReceived = 0;
+        $tail = '';
 
-        while (! feof($socket)) {
-            // Did we find a possible ending ? (.\r\n)
-            if ($possibleTerm) {
-                // Use stream_select for more efficient socket polling
-                $read = [$socket];
-                $write = $except = null;
-
-                // Check if data is available with a short timeout (5ms)
-                $ready = @stream_select($read, $write, $except, 0, 5000);
-
-                if ($ready > 0) {
-                    // Data available, read it
-                    stream_set_blocking($socket, false);
-                    $buffer = fgets($socket, 16384);
-                    stream_set_blocking($socket, true);
-                } else {
-                    $buffer = '';
-                }
-
-                // If the buffer was really empty, then we know $possibleTerm was the real ending.
-                if ($buffer === '' || $buffer === false) {
-                    // Join all parts and remove .\r\n from end, decompress data.
-                    $data = implode('', $dataParts);
-                    $deComp = @gzuncompress(substr($data, 0, -3));
-
-                    if (! empty($deComp)) {
-                        $bytesReceived = \strlen($data);
-                        if ($this->_echo && $bytesReceived > 10240) {
-                            cli()->primaryOver(
-                                'Received '.round($bytesReceived / 1024).
-                                'KB from group ('.$this->group().').'
-                            );
-                        }
-
-                        // Split the string of headers into an array of individual headers, then return it.
-                        $deComp = explode("\r\n", trim($deComp));
-
-                        return $deComp; // @phpstan-ignore return.type
-                    }
-                    $message = 'Decompression of OVER headers failed.';
-
-                    return $this->throwError(cli()->error($message), 1000);
-                }
-                // The buffer was not empty, so we know this was not the real ending, so reset $possibleTerm.
-                $possibleTerm = false;
-                $dataParts[] = $buffer;
-            } else {
-                // Get data from the stream with larger buffer.
-                $buffer = fgets($socket, 16384);
-            }
-
-            // If we got no data at all try one more time to pull data.
-            if (empty($buffer)) {
-                usleep(5000);
-                $buffer = fgets($socket, 16384);
-
-                // If we got nothing again, return error.
-                if (empty($buffer)) {
+        while (true) {
+            $buffer = fread($socket, 65536);
+            if ($buffer === false || $buffer === '') {
+                if ((stream_get_meta_data($socket)['timed_out'] ?? false) || feof($socket)) {
                     $message = 'Error fetching data from usenet server while downloading OVER headers.';
+                    $error = $this->throwError(cli()->error($message), 1000);
 
-                    return $this->throwError(cli()->error($message), 1000);
+                    return $error;
+                }
+
+                continue;
+            }
+            $bytesReceived += \strlen($buffer);
+
+            if (inflate_get_status($inflate) === ZLIB_STREAM_END) {
+                $tail .= $buffer;
+            } else {
+                $readBefore = inflate_get_read_len($inflate);
+                $out = @inflate_add($inflate, $buffer, ZLIB_SYNC_FLUSH);
+                if ($out === false) {
+                    $message = 'Decompression of OVER headers failed.';
+                    $error = $this->throwError(cli()->error($message), 1000);
+
+                    return $error;
+                }
+                $parts[] = $out;
+                if (inflate_get_status($inflate) === ZLIB_STREAM_END) {
+                    $tail = substr($buffer, inflate_get_read_len($inflate) - $readBefore);
                 }
             }
 
-            // Append current buffer to parts array.
-            $dataParts[] = $buffer;
-
-            // Check if we have the ending (.\r\n) - check last 3 chars directly
-            $bufLen = \strlen($buffer);
-            if ($bufLen >= 3 && $buffer[$bufLen - 3] === '.' && $buffer[$bufLen - 2] === "\r" && $buffer[$bufLen - 1] === "\n") {
-                // We have a possible ending, next loop check if it is.
-                $possibleTerm = true;
+            if (inflate_get_status($inflate) === ZLIB_STREAM_END && str_contains($tail, ".\r\n")) {
+                break;
             }
         }
 
-        $message = 'Unspecified error while downloading OVER headers.';
+        if ($this->_echo && $bytesReceived > 10240) {
+            cli()->primaryOver('Received '.round($bytesReceived / 1024).'KB from group ('.$this->group().').');
+        }
 
-        return $this->throwError(cli()->error($message), 1000);
+        $headers = explode("\r\n", trim(implode('', $parts)));
+
+        return $headers; // @phpstan-ignore return.type
     }
 
     /**
