@@ -45,6 +45,9 @@ final class AdditionalCandidateQuery
      */
     public const int BUCKET_LIMIT = 16;
 
+    /** Candidates read per claimed release, so rows held by other workers can be skipped. */
+    public const int CLAIM_CANDIDATE_FACTOR = 4;
+
     public const string CLAIMED_AT_COLUMN = 'additional_pp_claimed_at';
 
     public const string CLAIM_TOKEN_COLUMN = 'additional_pp_claim_token';
@@ -286,24 +289,54 @@ final class AdditionalCandidateQuery
 
         return DB::transaction(function () use ($guidChar, $effectiveLimit, $token, $groupID, $minSizeBytes, $maxSizeBytes, $columns, $excludedReleaseIds): EloquentCollection {
             $supportsClaims = self::supportsClaims();
+            // Pick candidates without a lock: FOR UPDATE would also lock the joined
+            // category rows, which every release shares, and serialize all workers.
             $query = self::baseBuilder($groupID, $guidChar, $minSizeBytes, $maxSizeBytes)
                 ->select('r.id')
                 ->orderByDesc('r.postdate')
                 ->orderBy('r.id')
-                ->limit($effectiveLimit);
+                ->limit($effectiveLimit * self::CLAIM_CANDIDATE_FACTOR);
 
             if ($excludedReleaseIds !== []) {
                 $query->whereNotIn('r.id', $excludedReleaseIds);
             }
 
-            if (DB::getDriverName() !== 'sqlite') {
-                $query->lockForUpdate();
-            }
-
-            $ids = $query
+            $candidateIds = $query
                 ->pluck('r.id')
                 ->map(static fn (mixed $id): int => (int) $id)
                 ->all();
+            if ($candidateIds === []) {
+                return (new Release)->newCollection();
+            }
+
+            // Lock only release rows, in small chunks in candidate order, skipping rows
+            // another worker holds.
+            $ids = [];
+            foreach (array_chunk($candidateIds, $effectiveLimit) as $chunk) {
+                $lockQuery = Release::query()
+                    ->from('releases as r')
+                    ->select('r.id')
+                    ->whereIn('r.id', $chunk)
+                    ->where('r.passwordstatus', -1)
+                    ->where('r.haspreview', -1)
+                    ->where('r.nzbstatus', 1);
+                self::applyClaimWindow($lockQuery);
+
+                if (DB::getDriverName() !== 'sqlite') {
+                    // A locking read locks every row it scans; the primary key keeps that to this chunk.
+                    $lockQuery->forceIndex('PRIMARY')->lock('for update skip locked');
+                }
+
+                $locked = $lockQuery
+                    ->pluck('r.id')
+                    ->map(static fn (mixed $id): int => (int) $id)
+                    ->all();
+                array_push($ids, ...array_values(array_intersect($chunk, $locked)));
+                if (count($ids) >= $effectiveLimit) {
+                    break;
+                }
+            }
+            $ids = array_slice($ids, 0, $effectiveLimit);
 
             if ($ids === []) {
                 return (new Release)->newCollection();
