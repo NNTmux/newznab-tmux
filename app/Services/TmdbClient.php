@@ -55,8 +55,6 @@ class TmdbClient
     protected function get(string $endpoint, array $params = []): ?array
     {
         if (! $this->isConfigured()) {
-            Log::warning('TMDB API key is not configured');
-
             return null;
         }
 
