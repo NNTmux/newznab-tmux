@@ -138,18 +138,18 @@ class ReleaseProcessor
                 fn (): bool => $this->prepareMessageIds($context),
             );
 
+            if ($this->isPar2Only($context)) {
+                $this->output->warning('Release '.$release->id.' only contains PAR2 data, deleting.');
+                $this->releaseManager->deleteRelease($release);
+
+                return $this->result(
+                    $context,
+                    ProcessingOutcome::DeletedPar2Only,
+                    reason: 'The release only contains PAR2 recovery data.',
+                );
+            }
+
             if ($this->shouldProcessDownloads()) {
-                if ($this->isPar2Only($context)) {
-                    $this->output->warning('Release '.$release->id.' only contains PAR2 data, deleting.');
-                    $this->releaseManager->deleteRelease($release);
-
-                    return $this->result(
-                        $context,
-                        ProcessingOutcome::DeletedPar2Only,
-                        reason: 'The release only contains PAR2 recovery data.',
-                    );
-                }
-
                 $metrics->measure(
                     ProcessingStage::DirectDownloads,
                     fn () => $this->processMessageIdDownloads($context),
@@ -258,6 +258,10 @@ class ReleaseProcessor
             $context->releaseGroupName,
             $context->release->id,
         );
+
+        if ($result['groupUnavailable']) {
+            $context->groupUnavailable = true;
+        }
 
         return $result['success'] && is_string($result['data']) && str_starts_with($result['data'], "PAR2\0PKT");
     }

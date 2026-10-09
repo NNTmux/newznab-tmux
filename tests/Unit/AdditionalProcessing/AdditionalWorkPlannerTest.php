@@ -77,11 +77,23 @@ class AdditionalWorkPlannerTest extends TestCase
         $planner = new AdditionalWorkPlanner($this->makeConfig());
 
         $plan = $planner->plan([
-            ['title' => '"KlUC4yTqeaIpcTbOIYdzhqqWF" yEnc (1/103)', 'segments' => ['<first>', '<second>']],
+            ['title' => '"KlUC4yTqeaIpcTbOIYdzhqqWF" yEnc (1/103)', 'segments' => ['<first>', '<second>'], 'filecount' => 1],
         ], 'alt.binaries.misc');
 
         $this->assertSame('<first>', $plan->probeMessageId);
         $this->assertSame([], $plan->unsupportedReasons);
+    }
+
+    #[Test]
+    public function it_does_not_probe_an_entry_merged_from_several_nzb_files(): void
+    {
+        $planner = new AdditionalWorkPlanner($this->makeConfig());
+
+        $plan = $planner->plan([
+            ['title' => '"KlUC4yTqeaIpcTbOIYdzhqqWF" yEnc (1/103)', 'segments' => ['<par2>', '<data>'], 'filecount' => 2],
+        ], 'alt.binaries.misc');
+
+        $this->assertSame('', $plan->probeMessageId);
     }
 
     #[Test]
