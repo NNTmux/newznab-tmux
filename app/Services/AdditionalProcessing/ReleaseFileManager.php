@@ -269,7 +269,19 @@ class ReleaseFileManager
             $releaseFilesCount = ReleaseFile::whereReleasesId($context->release->id)->count('releases_id') ?? 0;
 
             if (! $context->releaseHasPassword && $context->nzbHasCompressedFile && $releaseFilesCount === 0) {
-                Release::query()->where('id', $context->release->id)->update($updateRows);
+                // No file list could be read, often because volumes were still missing.
+                // Queue the release once more after a delay; a second failure stays unknown.
+                $retried = $updateRows['haspreview'] === 0 && Release::query()
+                    ->where('id', $context->release->id)
+                    ->whereNull(AdditionalCandidateQuery::ARCHIVE_RETRY_COLUMN)
+                    ->update([
+                        ...$updateRows,
+                        'haspreview' => -1,
+                        AdditionalCandidateQuery::ARCHIVE_RETRY_COLUMN => now()->addSeconds(AdditionalCandidateQuery::archiveRetryDelaySeconds()),
+                    ]) > 0;
+                if (! $retried) {
+                    Release::query()->where('id', $context->release->id)->update($updateRows);
+                }
             } else {
                 $updateRows['passwordstatus'] = $processPasswords ? $passwordStatus : ReleaseBrowseService::PASSWD_NONE;
                 $updateRows['rarinnerfilecount'] = $releaseFilesCount;

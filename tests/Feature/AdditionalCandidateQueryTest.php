@@ -175,6 +175,23 @@ class AdditionalCandidateQueryTest extends TestCase
         $this->assertSame([1], $third->pluck('id')->all());
     }
 
+    public function test_a_queued_archive_retry_is_not_a_candidate_until_it_is_due(): void
+    {
+        DB::table('categories')->insert(['id' => 1, 'disablepreview' => 0]);
+        DB::table('releases')->insert([
+            $this->releaseRow(1, 'a', postdate: '2026-07-12 10:00:00', archiveRetryAt: now()->addMinute()),
+            $this->releaseRow(2, 'a', postdate: '2026-07-12 09:00:00'),
+            $this->releaseRow(3, 'a', postdate: '2026-07-12 08:00:00', archiveRetryAt: now()->subMinute()),
+        ]);
+
+        $this->assertSame(['total' => 2, 'available' => 2], AdditionalCandidateQuery::backlogCounts());
+        $this->assertSame([2, 3], AdditionalCandidateQuery::claimBatch('a', 10, 'token-one', columns: ['id'])->pluck('id')->all());
+
+        $this->travel(61)->seconds();
+
+        $this->assertSame([1], AdditionalCandidateQuery::claimBatch('a', 10, 'token-two', columns: ['id'])->pluck('id')->all());
+    }
+
     /**
      * @return array<string, mixed>
      */
@@ -183,7 +200,8 @@ class AdditionalCandidateQueryTest extends TestCase
         string $leftguid,
         int $categoriesId = 1,
         ?\DateTimeInterface $claimedAt = null,
-        string $postdate = '2026-07-12 00:00:00'
+        string $postdate = '2026-07-12 00:00:00',
+        ?\DateTimeInterface $archiveRetryAt = null,
     ): array {
         return [
             'id' => $id,
@@ -197,6 +215,7 @@ class AdditionalCandidateQueryTest extends TestCase
             'postdate' => $postdate,
             'additional_pp_claimed_at' => $claimedAt?->format('Y-m-d H:i:s'),
             'additional_pp_claim_token' => $claimedAt === null ? null : 'claimed',
+            'archive_retry_at' => $archiveRetryAt?->format('Y-m-d H:i:s'),
         ];
     }
 
@@ -237,6 +256,7 @@ class AdditionalCandidateQueryTest extends TestCase
             $table->dateTime('postdate')->nullable();
             $table->timestamp('additional_pp_claimed_at')->nullable();
             $table->string('additional_pp_claim_token', 64)->nullable();
+            $table->timestamp('archive_retry_at')->nullable();
         });
     }
 }

@@ -11,6 +11,7 @@ final readonly class AdditionalWorkPlan
      * @param  list<string>  $jpgMessageIds
      * @param  list<ArchiveCandidate>  $archiveCandidates
      * @param  list<string>  $unsupportedReasons
+     * @param  list<string>  $probeTailMessageIds
      */
     public function __construct(
         public array $sampleMessageIds = [],
@@ -24,6 +25,7 @@ final readonly class AdditionalWorkPlan
         public int $duplicateMessageIdCount = 0,
         public array $unsupportedReasons = [],
         public string $probeMessageId = '',
+        public array $probeTailMessageIds = [],
     ) {}
 
     public function hasCompressedFile(): bool

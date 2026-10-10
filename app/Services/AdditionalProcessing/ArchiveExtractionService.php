@@ -9,13 +9,15 @@ use App\Services\AdditionalProcessing\State\ReleaseProcessingContext;
 use App\Services\Releases\ReleaseBrowseService;
 use dariusiii\rarinfo\ArchiveInfo;
 use dariusiii\rarinfo\Par2Info;
+use dariusiii\rarinfo\SzipInfo;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Process;
 
 /**
- * Service for extracting and processing archive files (RAR, ZIP).
+ * Service for extracting and processing archive files (RAR, ZIP, 7z).
  * Handles password detection, file listing, and content extraction.
+ * 7z archives are listed only; there is no extractor for them.
  */
 class ArchiveExtractionService
 {
@@ -56,7 +58,7 @@ class ArchiveExtractionService
 
         $context->compressedFilesChecked++;
 
-        // Try ArchiveInfo for RAR/ZIP
+        // Try ArchiveInfo for RAR/ZIP/7z
         if (! $this->archiveInfo->setData($compressedData, true)) {
             // Handle standalone video detection
             $videoType = $this->detectStandaloneVideo($compressedData);
@@ -262,9 +264,74 @@ class ArchiveExtractionService
                 }
 
                 return 'z';
+
+            case ArchiveInfo::TYPE_SZIP:
+                return '7';
         }
 
         return '';
+    }
+
+    /**
+     * True when the data starts with a RAR, ZIP or 7z signature.
+     */
+    public static function hasArchiveSignature(string $data): bool
+    {
+        foreach (["Rar!\x1A\x07\x00", "Rar!\x1A\x07\x01\x00", "PK\x03\x04", SzipInfo::MARKER_SIGNATURE] as $signature) {
+            if (str_starts_with($data, $signature)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * True when the data starts a 7z archive whose end header (file list) lies beyond it.
+     */
+    public function needsSevenZipEndHeader(string $data): bool
+    {
+        $start = $this->sevenZipStartHeader($data);
+
+        return $start !== null && 32 + $start['next_offset'] + $start['next_size'] > strlen($data);
+    }
+
+    /**
+     * Rebuild a listable 7z from its start header and the archive's last bytes.
+     *
+     * The start header gives the size and CRC of the end header, which 7-Zip writes
+     * last, so it can be cut from the tail and checked. Packed data is left out.
+     */
+    public function withSevenZipEndHeader(string $head, string $tail): ?string
+    {
+        $start = $this->sevenZipStartHeader($head);
+        if ($start === null || $start['next_size'] === 0 || $start['next_size'] > strlen($tail)) {
+            return null;
+        }
+
+        $endHeader = substr($tail, -$start['next_size']);
+        if (crc32($endHeader) !== $start['next_crc']) {
+            return null;
+        }
+
+        $startHeader = pack('PPV', 0, $start['next_size'], $start['next_crc']);
+
+        return substr($head, 0, 8).pack('V', crc32($startHeader)).$startHeader.$endHeader;
+    }
+
+    /**
+     * @return array{next_offset: int, next_size: int, next_crc: int}|null
+     */
+    private function sevenZipStartHeader(string $data): ?array
+    {
+        if (strlen($data) < 32 || ! str_starts_with($data, SzipInfo::MARKER_SIGNATURE)) {
+            return null;
+        }
+
+        /** @var array{next_offset: int, next_size: int, next_crc: int} $start */
+        $start = unpack('Pnext_offset/Pnext_size/Vnext_crc', $data, 12);
+
+        return $start['next_offset'] >= 0 && $start['next_size'] >= 0 ? $start : null;
     }
 
     /**

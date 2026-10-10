@@ -264,6 +264,7 @@ class AdditionalProcessingOrchestratorClaimTest extends TestCase
             $table->dateTime('postdate')->nullable();
             $table->timestamp('additional_pp_claimed_at')->nullable();
             $table->string('additional_pp_claim_token', 64)->nullable();
+            $table->timestamp('archive_retry_at')->nullable();
         });
     }
 }

@@ -87,6 +87,7 @@ class NntmuxResetPostProcessing extends Command
                             'tv_episodes_id' => 0,
                             'passwordstatus' => -1,
                             'haspreview' => -1,
+                            'archive_retry_at' => null,
                             'jpgstatus' => 0,
                             'videostatus' => 0,
                             'nfostatus' => -1,
@@ -369,6 +370,7 @@ class NntmuxResetPostProcessing extends Command
                     [
                         'passwordstatus' => -1,
                         'haspreview' => -1,
+                        'archive_retry_at' => null,
                         'jpgstatus' => 0,
                         'videostatus' => 0,
                         'nfostatus' => -1,

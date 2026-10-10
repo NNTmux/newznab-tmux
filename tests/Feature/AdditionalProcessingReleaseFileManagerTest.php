@@ -6,6 +6,7 @@ namespace Tests\Feature;
 
 use App\Facades\Search;
 use App\Models\Release;
+use App\Services\AdditionalProcessing\ArchiveExtractionService;
 use App\Services\AdditionalProcessing\ReleaseFileManager;
 use App\Services\AdditionalProcessing\State\PersistenceMetricsCollector;
 use App\Services\AdditionalProcessing\State\ReleaseProcessingContext;
@@ -26,10 +27,12 @@ use Mockery;
 use PDO;
 use ReflectionMethod;
 use Tests\TestCase;
+use Tests\Unit\AdditionalProcessing\BuildsArchiveFixtures;
 use Tests\Unit\AdditionalProcessing\CreatesProcessingConfiguration;
 
 class AdditionalProcessingReleaseFileManagerTest extends TestCase
 {
+    use BuildsArchiveFixtures;
     use CreatesProcessingConfiguration;
 
     private string $databasePath;
@@ -261,6 +264,60 @@ class AdditionalProcessingReleaseFileManagerTest extends TestCase
         }
     }
 
+    public function test_a_listed_7z_finalizes_with_no_password_and_its_file_count(): void
+    {
+        DB::table('releases')->insert($this->releaseRow());
+        Search::shouldReceive('updateRelease')->once()->with(1);
+
+        $archive = $this->sevenZip('Example.Show.S01E01.mkv', str_repeat('x', 100));
+        $archiveService = new ArchiveExtractionService($this->makeConfig());
+        $manager = $this->makeManager();
+        $context = new ReleaseProcessingContext(Release::query()->findOrFail(1));
+        $context->nzbHasCompressedFile = true;
+
+        $joined = $archiveService->withSevenZipEndHeader(substr($archive, 0, 40), substr($archive, -80));
+        $this->assertIsString($joined);
+        $result = $archiveService->processCompressedData($joined, $context, sys_get_temp_dir().'/');
+        foreach ($result['files'] as $file) {
+            $manager->addFileInfo($file, $context, '\\.(?:par2|sfv|nzb)');
+        }
+        $manager->finalizeRelease($context, true);
+
+        $release = DB::table('releases')->where('id', 1)->first();
+        $this->assertSame(ReleaseBrowseService::PASSWD_NONE, (int) $release->passwordstatus);
+        $this->assertSame(1, (int) $release->rarinnerfilecount);
+        $this->assertSame('Example.Show.S01E01.mkv', DB::table('release_files')->value('name'));
+    }
+
+    public function test_an_unreadable_archive_is_queued_for_one_retry_after_the_delay(): void
+    {
+        DB::table('releases')->insert($this->releaseRow());
+        Search::shouldReceive('updateRelease')->twice()->with(1);
+        config(['nntmux.archive_retry_delay' => 3600]);
+        $this->freezeSecond();
+
+        $manager = $this->makeManager();
+        $context = new ReleaseProcessingContext(Release::query()->findOrFail(1));
+        $context->nzbHasCompressedFile = true;
+        $manager->finalizeRelease($context, true);
+
+        $release = DB::table('releases')->where('id', 1)->first();
+        $this->assertSame(-1, (int) $release->passwordstatus);
+        $this->assertSame(-1, (int) $release->haspreview);
+        $this->assertSame(now()->addHour()->toDateTimeString(), (string) $release->archive_retry_at);
+        $this->assertNull($release->additional_pp_claimed_at);
+
+        $this->travel(2)->hours();
+        $context = new ReleaseProcessingContext(Release::query()->findOrFail(1));
+        $context->nzbHasCompressedFile = true;
+        $manager->finalizeRelease($context, true);
+
+        $release = DB::table('releases')->where('id', 1)->first();
+        $this->assertSame(-1, (int) $release->passwordstatus);
+        $this->assertSame(0, (int) $release->haspreview);
+        $this->assertSame(now()->subHour()->toDateTimeString(), (string) $release->archive_retry_at);
+    }
+
     public function test_invalid_release_file_sizes_are_rejected(): void
     {
         DB::table('releases')->insert($this->releaseRow());
@@ -395,6 +452,7 @@ class AdditionalProcessingReleaseFileManagerTest extends TestCase
             $table->integer('pp_timeout_count')->default(0);
             $table->timestamp('additional_pp_claimed_at')->nullable();
             $table->string('additional_pp_claim_token', 64)->nullable();
+            $table->timestamp('archive_retry_at')->nullable();
         });
 
         Schema::create('release_files', function (Blueprint $table): void {
