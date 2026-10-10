@@ -27,6 +27,7 @@ use PHPUnit\Framework\TestCase;
 
 class ReleaseProcessorTest extends TestCase
 {
+    use BuildsArchiveFixtures;
     use CreatesProcessingConfiguration;
 
     protected function tearDown(): void
@@ -340,6 +341,111 @@ class ReleaseProcessorTest extends TestCase
     }
 
     #[Test]
+    public function it_reads_a_7z_file_list_from_the_last_volume_tail(): void
+    {
+        $config = $this->makeConfig(['processPasswords' => true]);
+        $archive = $this->sevenZip('Movie.2026.1080p.mkv', str_repeat('x', 100));
+        $nzbParser = Mockery::mock(NzbContentParser::class);
+        $nzbParser->shouldReceive('parseNzb')->once()->andReturn([
+            'error' => null,
+            'contents' => [
+                ['title' => '"G9AJxkjPdN0iBdyG.7z.001" yEnc (1/2)', 'segments' => ['<v1-1>', '<v1-2>']],
+                ['title' => '"G9AJxkjPdN0iBdyG.7z.002" yEnc (1/2)', 'segments' => ['<v2-1>', '<v2-2>']],
+            ],
+        ]);
+
+        $downloadService = Mockery::mock(UsenetDownloadService::class);
+        $this->expectDownloadScope($downloadService);
+        $downloadService->shouldReceive('download')
+            ->once()
+            ->with(DownloadKind::Compressed, ['<v1-1>', '<v1-2>'], '', 1, '"G9AJxkjPdN0iBdyG.7z.001" yEnc (1/2)')
+            ->andReturn(['success' => true, 'data' => substr($archive, 0, 40), 'groupUnavailable' => false, 'error' => null]);
+        $downloadService->shouldReceive('download')
+            ->once()
+            ->with(DownloadKind::Compressed, ['<v2-2>'], '', 1)
+            ->andReturn(['success' => true, 'data' => substr($archive, -80), 'groupUnavailable' => false, 'error' => null]);
+
+        $releaseManager = Mockery::mock(ReleaseFileManager::class);
+        $releaseManager->shouldReceive('processReleaseNameFromNzbContents')->once()->andReturnFalse();
+        $releaseManager->shouldReceive('addFileInfo')
+            ->once()
+            ->with(Mockery::on(static fn (array $file): bool => $file['name'] === 'Movie.2026.1080p.mkv' && $file['pass'] === 0), Mockery::any(), Mockery::any())
+            ->andReturnUsing(static function (array $file, ReleaseProcessingContext $context): bool {
+                $context->totalFileInfo++;
+
+                return true;
+            });
+        $releaseManager->shouldReceive('finalizeRelease')->once()->andReturnNull();
+
+        $processor = new ReleaseProcessor(
+            $config,
+            $nzbParser,
+            new AdditionalWorkPlanner($config),
+            new ArchiveExtractionService($config),
+            Mockery::mock(MediaExtractionService::class),
+            $downloadService,
+            $releaseManager,
+            Mockery::mock(ReleaseFilesArchiveFallback::class)->shouldIgnoreMissing(),
+            $this->tempWorkspaceWithoutFiles(),
+            Mockery::mock(ConsoleOutputService::class)->shouldIgnoreMissing()
+        );
+
+        $context = $this->makeContext();
+        $context->release->nfostatus = 1;
+        $result = $processor->process($context, '/tmp/main/');
+
+        $this->assertNotSame(ProcessingOutcome::Passworded, $result->outcome);
+        $this->assertFalse($context->releaseHasPassword);
+    }
+
+    #[Test]
+    public function it_reports_a_7z_with_an_encrypted_header_as_passworded(): void
+    {
+        $config = $this->makeConfig(['processPasswords' => true]);
+        $archive = $this->sevenZip('Movie.2026.1080p.mkv', str_repeat('x', 100), encryptedHeader: true);
+        $nzbParser = Mockery::mock(NzbContentParser::class);
+        $nzbParser->shouldReceive('parseNzb')->once()->andReturn([
+            'error' => null,
+            'contents' => [['title' => '"Some.Release.7z" yEnc (1/3)', 'segments' => ['<s-1>', '<s-2>', '<s-3>', '<s-4>']]],
+        ]);
+
+        $downloadService = Mockery::mock(UsenetDownloadService::class);
+        $this->expectDownloadScope($downloadService);
+        $downloadService->shouldReceive('download')
+            ->once()
+            ->with(DownloadKind::Compressed, ['<s-1>', '<s-2>', '<s-3>'], '', 1, '"Some.Release.7z" yEnc (1/3)')
+            ->andReturn(['success' => true, 'data' => substr($archive, 0, 40), 'groupUnavailable' => false, 'error' => null]);
+        $downloadService->shouldReceive('download')
+            ->once()
+            ->with(DownloadKind::Compressed, ['<s-4>'], '', 1)
+            ->andReturn(['success' => true, 'data' => substr($archive, -40), 'groupUnavailable' => false, 'error' => null]);
+
+        $releaseManager = Mockery::mock(ReleaseFileManager::class);
+        $releaseManager->shouldReceive('processReleaseNameFromNzbContents')->once()->andReturnFalse();
+        $releaseManager->shouldReceive('finalizeRelease')->once()->andReturnNull();
+
+        $processor = new ReleaseProcessor(
+            $config,
+            $nzbParser,
+            new AdditionalWorkPlanner($config),
+            new ArchiveExtractionService($config),
+            Mockery::mock(MediaExtractionService::class),
+            $downloadService,
+            $releaseManager,
+            Mockery::mock(ReleaseFilesArchiveFallback::class),
+            $this->successfulTempWorkspace(),
+            Mockery::mock(ConsoleOutputService::class)->shouldIgnoreMissing()
+        );
+
+        $context = $this->makeContext();
+        $context->release->nfostatus = 1;
+        $result = $processor->process($context, '/tmp/main/');
+
+        $this->assertSame(ProcessingOutcome::Passworded, $result->outcome);
+        $this->assertSame(ReleaseBrowseService::PASSWD_RAR, $context->passwordStatus);
+    }
+
+    #[Test]
     public function it_reports_group_unavailability_as_an_unsuccessful_outcome(): void
     {
         $config = $this->makeConfig(['processPasswords' => true]);
@@ -620,6 +726,15 @@ class ReleaseProcessorTest extends TestCase
     {
         return Mockery::mock(TempWorkspaceService::class)
             ->shouldReceive('createReleaseTempFolder')->once()->andReturn('/tmp/ap-release/')
+            ->shouldReceive('clearDirectory')->once()->with('/tmp/ap-release/', false)->andReturnNull()
+            ->getMock();
+    }
+
+    private function tempWorkspaceWithoutFiles(): TempWorkspaceService
+    {
+        return Mockery::mock(TempWorkspaceService::class)
+            ->shouldReceive('createReleaseTempFolder')->once()->andReturn('/tmp/ap-release/')
+            ->shouldReceive('listFiles')->andReturn([])
             ->shouldReceive('clearDirectory')->once()->with('/tmp/ap-release/', false)->andReturnNull()
             ->getMock();
     }

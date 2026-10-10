@@ -56,6 +56,34 @@ class AdditionalWorkPlannerTest extends TestCase
     }
 
     #[Test]
+    public function it_selects_the_first_7z_volume_with_the_last_volume_tail(): void
+    {
+        $planner = new AdditionalWorkPlanner($this->makeConfig());
+
+        $plan = $planner->plan([
+            ['title' => '[02/12] - "G9AJxkjPdN0iBdyG.7z.002" yEnc (1/3)', 'segments' => ['<v2-1>', '<v2-2>', '<v2-3>']],
+            ['title' => '[01/12] - "G9AJxkjPdN0iBdyG.7z.001" yEnc (1/3)', 'segments' => ['<v1-1>', '<v1-2>', '<v1-3>', '<v1-4>']],
+            ['title' => '[03/12] - "G9AJxkjPdN0iBdyG.7z.003" yEnc (1/2)', 'segments' => ['<v3-1>', '<v3-2>']],
+            ['title' => '[12/12] - "G9AJxkjPdN0iBdyG.vol00+01.par2" yEnc (1/1)', 'segments' => ['<par2>']],
+        ], 'alt.binaries.misc');
+        $single = $planner->plan([
+            ['title' => '"Some.Release.7z" yEnc (1/9)', 'segments' => ['<s-1>', '<s-2>', '<s-3>', '<s-4>', '<s-5>']],
+        ], 'alt.binaries.misc');
+
+        $this->assertSame(
+            ['[01/12] - "G9AJxkjPdN0iBdyG.7z.001" yEnc (1/3)'],
+            array_map(static fn (ArchiveCandidate $candidate): string => $candidate->title, $plan->prioritizedArchiveCandidates()),
+        );
+        $this->assertTrue($plan->archiveCandidates[0]->likelyFirstVolume);
+        $this->assertSame(['<v1-1>', '<v1-2>', '<v1-3>'], $plan->archiveCandidates[0]->messageIds);
+        $this->assertSame(['<v3-2>'], $plan->archiveCandidates[0]->tailMessageIds);
+
+        $this->assertTrue($single->hasCompressedFile());
+        $this->assertTrue($single->archiveCandidates[0]->likelyFirstVolume);
+        $this->assertSame(['<s-5>'], $single->archiveCandidates[0]->tailMessageIds);
+    }
+
+    #[Test]
     public function it_reports_book_floods_and_releases_without_supported_candidates(): void
     {
         $planner = new AdditionalWorkPlanner($this->makeConfig());

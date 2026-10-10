@@ -567,7 +567,7 @@ class ReleaseProcessor
                 $downloaded++;
 
                 $processed = $this->processCompressedData(
-                    $result['data'],
+                    $this->withSevenZipTail($context, $result['data'], $archiveCandidate->tailMessageIds),
                     $context,
                     $reverse,
                     $archiveCandidate->title,
@@ -580,6 +580,32 @@ class ReleaseProcessor
                 $this->output->echoCompressedFailure($failed);
             }
         }
+    }
+
+    /**
+     * @param  list<string>  $tailMessageIds
+     */
+    private function withSevenZipTail(ReleaseProcessingContext $context, string $data, array $tailMessageIds): string
+    {
+        if ($tailMessageIds === [] || ! $this->archiveService->needsSevenZipEndHeader($data)) {
+            return $data;
+        }
+
+        $result = $this->downloadService->download(
+            DownloadKind::Compressed,
+            $tailMessageIds,
+            $context->releaseGroupName,
+            $context->release->id,
+        );
+        if ($result['groupUnavailable']) {
+            $context->groupUnavailable = true;
+        }
+
+        if (! $result['success'] || ! is_string($result['data'])) {
+            return $data;
+        }
+
+        return $this->archiveService->withSevenZipEndHeader($data, $result['data']) ?? $data;
     }
 
     private function processCompressedData(
