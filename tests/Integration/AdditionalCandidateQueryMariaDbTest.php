@@ -253,6 +253,31 @@ final class AdditionalCandidateQueryMariaDbTest extends TestCase
         $this->assertSame(0, pcntl_wexitstatus($status));
     }
 
+    #[Test]
+    public function a_second_worker_skips_rows_another_worker_holds_instead_of_waiting(): void
+    {
+        DB::table('releases')->insert(array_map(
+            fn (int $id): array => $this->releaseRow($id, now()->subSeconds($id)->format('Y-m-d H:i:s')),
+            range(1, 20),
+        ));
+        config(['database.connections.mariadb_second' => config('database.connections.mariadb')]);
+        DB::connection('mariadb_second')->statement('SET SESSION innodb_lock_wait_timeout = 1');
+
+        DB::beginTransaction();
+        try {
+            $first = AdditionalCandidateQuery::claimBatch('a', 5, 'worker-one', columns: ['id']);
+            DB::setDefaultConnection('mariadb_second');
+            $second = AdditionalCandidateQuery::claimBatch('a', 5, 'worker-two', columns: ['id']);
+        } finally {
+            DB::setDefaultConnection('mariadb');
+            DB::rollBack();
+            DB::purge('mariadb_second');
+        }
+
+        $this->assertSame([1, 2, 3, 4, 5], $first->pluck('id')->map(static fn (mixed $id): int => (int) $id)->all());
+        $this->assertSame([6, 7, 8, 9, 10], $second->pluck('id')->map(static fn (mixed $id): int => (int) $id)->all());
+    }
+
     private function createSchema(): void
     {
         $categoriesTable = $this->tableName('categories');

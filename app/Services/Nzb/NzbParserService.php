@@ -59,6 +59,8 @@ class NzbParserService
             }
 
             $result[$i]['title'] = $title;
+            // Stripped subjects can merge several NZB files into one entry.
+            $result[$i]['filecount'] = ($result[$i]['filecount'] ?? 0) + 1;
 
             // Extensions.
             if (preg_match(

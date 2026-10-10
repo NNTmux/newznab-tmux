@@ -55,8 +55,6 @@ class FanartTvService
     protected function get(string $endpoint): ?array
     {
         if (! $this->isConfigured()) {
-            Log::debug('FanartTV API key is not configured');
-
             return null;
         }
 

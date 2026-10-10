@@ -109,8 +109,6 @@ class TraktService
     protected function get(string $endpoint, array $params = [], bool $isRetryAfterRateLimit = false): ?array
     {
         if (! $this->isConfigured()) {
-            Log::debug('Trakt API key is not configured');
-
             return null;
         }
 

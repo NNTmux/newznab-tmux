@@ -5,11 +5,17 @@ declare(strict_types=1);
 namespace Tests\Unit\Services;
 
 use App\Models\Release;
+use App\Services\ImdbScraper;
 use App\Services\MovieService;
 use App\Services\TraktService;
 use App\Services\TvProcessing\Providers\TraktProvider;
+use GuzzleHttp\Client;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\Unit\ImdbScraperTestCase;
@@ -371,6 +377,61 @@ class MovieServiceTest extends ImdbScraperTestCase
 
         $this->assertFalse($result);
         $this->assertNull(Release::query()->whereKey(4)->value('imdbid'));
+    }
+
+    #[Test]
+    public function it_skips_imdb_lookups_silently_when_both_imdb_sources_are_disabled(): void
+    {
+        config([
+            'nntmux_api.imdb_scraper_enabled' => false,
+            'nntmux_api.imdbapi_dev_enabled' => false,
+        ]);
+        $mock = $this->bindImdbScraper([
+            new Response(200, ['Content-Type' => 'text/html; charset=UTF-8'], file_get_contents(base_path('tests/Fixtures/imdb/title_jsonld.html')) ?: ''),
+        ]);
+        Log::spy();
+
+        $service = new MovieService;
+        $service->echooutput = false;
+
+        $this->assertFalse($service->fetchIMDBProperties('1234567'));
+        $this->assertCount(1, $mock);
+        $this->assertFalse(Cache::has('imdb_movie_'.md5('1234567')));
+        Log::shouldNotHaveReceived('warning');
+    }
+
+    #[Test]
+    public function it_logs_a_waf_block_once_and_skips_later_titles(): void
+    {
+        config(['nntmux_api.imdbapi_dev_enabled' => false]);
+        $mock = $this->bindImdbScraper([
+            new Response(202, ['Content-Type' => 'text/html; charset=UTF-8'], '<html><script>window.awsWafCookieDomainList=[];window.gokuProps={};</script></html>'),
+        ]);
+        Log::spy();
+
+        $service = new MovieService;
+        $service->echooutput = false;
+
+        foreach (['1234567', '2345678', '3456789'] as $imdbId) {
+            $this->assertFalse($service->fetchIMDBProperties($imdbId));
+        }
+
+        $this->assertCount(0, $mock);
+        Log::shouldHaveReceived('warning')->once();
+    }
+
+    /**
+     * @param  array<int, Response>  $responses
+     */
+    private function bindImdbScraper(array $responses): MockHandler
+    {
+        $mock = new MockHandler($responses);
+        $this->app->instance(ImdbScraper::class, new ImdbScraper(new Client([
+            'handler' => HandlerStack::create($mock),
+            'http_errors' => false,
+        ])));
+
+        return $mock;
     }
 
     private function invokeLocalIMDBSearch(MovieService $service): string|false

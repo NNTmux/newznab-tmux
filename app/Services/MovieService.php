@@ -740,7 +740,13 @@ class MovieService
         }
         try {
             $scraper = app(ImdbScraper::class);
+            if (! $scraper->isEnabled()) {
+                return false;
+            }
             $scraped = $scraper->fetchById($imdbId);
+            if ($scraped === false && $scraper->wasSkipped()) {
+                return false;
+            }
             if ($scraped === false || empty($scraped['title'])) {
                 $ttl = $scraper->wasBlockedByWaf()
                     ? now()->addMinutes(30)
@@ -749,15 +755,7 @@ class MovieService
                 $failureReason = $scraper->getLastFailureReason() ?? 'unknown';
                 $fallbackFailureReason = $scraper->getLastFallbackFailureReason();
 
-                if ($scraper->wasBlockedByWaf()) {
-                    Log::warning('IMDb title fetch failed after WAF block.', [
-                        'imdb_id' => $imdbId,
-                        'reason' => $failureReason,
-                        'fallback_reason' => $fallbackFailureReason,
-                        'source' => $scraper->getLastFetchSource(),
-                        'negative_cache' => '30m',
-                    ]);
-                } else {
+                if (! $scraper->wasBlockedByWaf()) {
                     Log::warning('IMDb metadata fetch failed.', [
                         'imdb_id' => $imdbId,
                         'reason' => $failureReason,
@@ -1172,6 +1170,9 @@ class MovieService
     {
         try {
             $scraper = app(ImdbScraper::class);
+            if (! $scraper->isScrapingEnabled()) {
+                return false;
+            }
             $matches = $scraper->search($this->currentTitle);
             foreach ($matches as $match) {
                 $title = $match['title'] ?? '';

@@ -138,6 +138,17 @@ class ReleaseProcessor
                 fn (): bool => $this->prepareMessageIds($context),
             );
 
+            if ($this->isPar2Only($context)) {
+                $this->output->warning('Release '.$release->id.' only contains PAR2 data, deleting.');
+                $this->releaseManager->deleteRelease($release);
+
+                return $this->result(
+                    $context,
+                    ProcessingOutcome::DeletedPar2Only,
+                    reason: 'The release only contains PAR2 recovery data.',
+                );
+            }
+
             if ($this->shouldProcessDownloads()) {
                 $metrics->measure(
                     ProcessingStage::DirectDownloads,
@@ -229,6 +240,30 @@ class ReleaseProcessor
                 );
             }
         }
+    }
+
+    /**
+     * Obfuscated uploads can post each PAR2 volume as its own release; the first bytes give them away.
+     */
+    private function isPar2Only(ReleaseProcessingContext $context): bool
+    {
+        $messageId = $context->workPlan?->probeMessageId ?? '';
+        if ($messageId === '' || $context->groupUnavailable) {
+            return false;
+        }
+
+        $result = $this->downloadService->download(
+            DownloadKind::Compressed,
+            [$messageId],
+            $context->releaseGroupName,
+            $context->release->id,
+        );
+
+        if ($result['groupUnavailable']) {
+            $context->groupUnavailable = true;
+        }
+
+        return $result['success'] && is_string($result['data']) && str_starts_with($result['data'], "PAR2\0PKT");
     }
 
     private function shouldProcessDownloads(): bool

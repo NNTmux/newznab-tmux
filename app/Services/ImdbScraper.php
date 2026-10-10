@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Support\MetadataSources;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -20,6 +21,14 @@ class ImdbScraper
 
     protected const string IMDBAPI_DEV_COOLDOWN_CACHE_KEY = 'imdbapi_dev:cooldown';
 
+    protected const string WAF_BACKOFF_CACHE_KEY = 'imdb_scraper:waf_backoff';
+
+    protected const string WAF_BLOCKED_CACHE_KEY = 'imdb_scraper:waf_blocked';
+
+    protected const string WAF_PROBE_CACHE_KEY = 'imdb_scraper:waf_probe';
+
+    protected const int WAF_PROBE_LOCK_SECONDS = 120;
+
     protected Client $client;
 
     protected string $imdbApiDevBaseUrl;
@@ -31,6 +40,8 @@ class ImdbScraper
     protected ?string $lastFailureReason = null;
 
     protected ?string $lastFallbackFailureReason = null;
+
+    protected bool $lastFetchWasSkipped = false;
 
     public function __construct(?Client $client = null)
     {
@@ -52,6 +63,40 @@ class ImdbScraper
     public function wasBlockedByWaf(): bool
     {
         return $this->lastRequestWasBlocked;
+    }
+
+    public function isScrapingEnabled(): bool
+    {
+        return MetadataSources::isAvailable(MetadataSources::IMDB_SCRAPER);
+    }
+
+    public function isImdbApiDevEnabled(): bool
+    {
+        return MetadataSources::isAvailable(MetadataSources::IMDBAPI_DEV);
+    }
+
+    /**
+     * Whether either IMDb source (scraping or the imdbapi.dev fallback) is switched on.
+     */
+    public function isEnabled(): bool
+    {
+        return $this->isScrapingEnabled() || $this->isImdbApiDevEnabled();
+    }
+
+    /**
+     * Whether imdb.com is considered blocked, i.e. scraping is backing off or waiting for a probe.
+     */
+    public function isWafBackoffActive(): bool
+    {
+        return Cache::has(self::WAF_BLOCKED_CACHE_KEY);
+    }
+
+    /**
+     * Whether the last fetchById() made no request because every source was off or paused.
+     */
+    public function wasSkipped(): bool
+    {
+        return $this->lastFetchWasSkipped;
     }
 
     public function getLastFetchSource(): ?string
@@ -81,6 +126,7 @@ class ImdbScraper
         $this->lastFetchSource = null;
         $this->lastFailureReason = null;
         $this->lastFallbackFailureReason = null;
+        $this->lastFetchWasSkipped = false;
 
         $id = preg_replace('/[^0-9]/', '', $id) ?? '';
         if ($id === '' || strlen($id) < 5 || strlen($id) > 8) {
@@ -92,6 +138,10 @@ class ImdbScraper
         $cacheKey = 'imdb_scrape_id_'.$id;
         if (Cache::has($cacheKey)) {
             return Cache::get($cacheKey);
+        }
+
+        if (! $this->isScrapingEnabled() || ! $this->acquireScrapeSlot()) {
+            return $this->fetchWithoutScraping($id, $cacheKey);
         }
 
         $url = 'https://www.imdb.com/title/tt'.$id.'/';
@@ -111,7 +161,9 @@ class ImdbScraper
             if ($this->isWafResponse($statusCode, $html)) {
                 $this->lastRequestWasBlocked = true;
                 $this->lastFailureReason = 'waf_block';
-                Log::notice('IMDb title fetch was challenged by WAF for tt'.$id);
+                $this->startWafBackoff();
+            } else {
+                $this->endWafBackoff();
             }
 
             if (! $this->lastRequestWasBlocked && $statusCode < 400 && trim($html) !== '') {
@@ -147,6 +199,7 @@ class ImdbScraper
             return false;
         } catch (\Throwable $e) {
             Log::debug('IMDb fetch error tt'.$id.': '.$e->getMessage());
+            Cache::forget(self::WAF_PROBE_CACHE_KEY);
             if ($this->lastFailureReason === null) {
                 $this->lastFailureReason = 'html_exception';
             }
@@ -196,6 +249,10 @@ class ImdbScraper
             return Cache::get($cacheKey);
         }
 
+        if (! $this->isScrapingEnabled()) {
+            return [];
+        }
+
         $url = 'https://v2.sg.media-imdb.com/suggestion/'.urlencode($prefix).'/'.urlencode($slug).'.json';
 
         try {
@@ -213,7 +270,7 @@ class ImdbScraper
                 $results = $this->parseSuggestionJson($body);
             }
 
-            if ($results === []) {
+            if ($results === [] && ! $this->isWafBackoffActive()) {
                 $htmlResults = $this->searchHtmlFallback($query);
                 if ($htmlResults !== []) {
                     $results = $htmlResults;
@@ -221,7 +278,7 @@ class ImdbScraper
             }
 
             if ($results === []) {
-                $ttl = $this->lastRequestWasBlocked
+                $ttl = $this->isWafBackoffActive()
                     ? now()->addMinutes(self::SOFT_FAILURE_TTL_MINUTES)
                     : now()->addHours(self::HARD_FAILURE_TTL_HOURS);
                 Cache::put($cacheKey, [], $ttl);
@@ -367,9 +424,79 @@ class ImdbScraper
         }
     }
 
+    /**
+     * @return array<string, mixed>|false
+     */
+    private function fetchWithoutScraping(string $id, string $cacheKey): array|false
+    {
+        $this->lastRequestWasBlocked = $this->isScrapingEnabled();
+        $this->lastFailureReason = $this->lastRequestWasBlocked ? 'waf_backoff' : 'scraper_disabled';
+
+        if (! $this->canUseImdbApiDev()) {
+            $this->lastFetchWasSkipped = true;
+
+            return false;
+        }
+
+        $fallbackData = $this->fetchFromImdbApiDev($id);
+        if ($fallbackData !== false) {
+            $this->lastFetchSource = 'imdbapi_dev';
+            $this->lastFailureReason = null;
+            $this->lastFallbackFailureReason = null;
+            Cache::put($cacheKey, $fallbackData, now()->addDays(7));
+
+            return $fallbackData;
+        }
+
+        Cache::put($cacheKey, false, now()->addMinutes(self::SOFT_FAILURE_TTL_MINUTES));
+
+        return false;
+    }
+
+    /**
+     * While blocked, let a single worker probe imdb.com once the back-off interval has expired.
+     */
+    private function acquireScrapeSlot(): bool
+    {
+        if (! Cache::has(self::WAF_BLOCKED_CACHE_KEY)) {
+            return true;
+        }
+
+        if (Cache::has(self::WAF_BACKOFF_CACHE_KEY)) {
+            return false;
+        }
+
+        return Cache::add(self::WAF_PROBE_CACHE_KEY, true, self::WAF_PROBE_LOCK_SECONDS);
+    }
+
+    private function startWafBackoff(): void
+    {
+        $minutes = max(1, (int) config('nntmux_api.imdb_scraper_block_backoff_minutes', 60));
+        Cache::put(self::WAF_BACKOFF_CACHE_KEY, true, now()->addMinutes($minutes));
+        Cache::forget(self::WAF_PROBE_CACHE_KEY);
+
+        if (Cache::add(self::WAF_BLOCKED_CACHE_KEY, true, now()->addDays(7))) {
+            Log::warning('IMDb scraping blocked by WAF, pausing IMDb scraping for '.$minutes.' minutes');
+        } else {
+            Cache::put(self::WAF_BLOCKED_CACHE_KEY, true, now()->addDays(7));
+            Log::debug('IMDb still blocked by WAF, backing off for '.$minutes.' minutes');
+        }
+    }
+
+    private function endWafBackoff(): void
+    {
+        if (Cache::pull(self::WAF_BLOCKED_CACHE_KEY) === null) {
+            return;
+        }
+
+        Cache::forget(self::WAF_BACKOFF_CACHE_KEY);
+        Cache::forget(self::WAF_PROBE_CACHE_KEY);
+        Log::info('IMDb scraping no longer blocked by WAF, lookups resumed');
+    }
+
     private function canUseImdbApiDev(): bool
     {
-        if (! (bool) config('nntmux_api.imdbapi_dev_enabled', true)) {
+        if (! $this->isImdbApiDevEnabled()) {
             $this->lastFallbackFailureReason = 'fallback_disabled';
 
             return false;
@@ -907,6 +1034,7 @@ class ImdbScraper
 
             if ($this->isWafResponse($statusCode, $html)) {
                 $this->lastRequestWasBlocked = true;
+                $this->startWafBackoff();
 
                 return [];
             }
