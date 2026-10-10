@@ -31,9 +31,15 @@ class ReleaseProcessorTest extends TestCase
     use BuildsArchiveFixtures;
     use CreatesProcessingConfiguration;
 
+    private string $workDir = '';
+
     protected function tearDown(): void
     {
         Mockery::close();
+        if ($this->workDir !== '') {
+            array_map('unlink', glob($this->workDir.'/*') ?: []);
+            rmdir($this->workDir);
+        }
         parent::tearDown();
     }
 
@@ -404,6 +410,31 @@ class ReleaseProcessorTest extends TestCase
     }
 
     #[Test]
+    public function it_lists_a_compressed_7z_header_with_the_7zip_client(): void
+    {
+        $this->workDir = sys_get_temp_dir().'/'.uniqid('7z-release-', true);
+        mkdir($this->workDir);
+        $context = $this->processCompressedSevenZipHeader($this->fakeSevenZipClient($this->workDir), [
+            'Extras/Some.Movie.nfo',
+            'Extras/naïve – notes.txt',
+            'Some.Movie.2024.1080p.WEB-DL.mkv',
+        ]);
+
+        $this->assertTrue($context->releaseHasPassword);
+        $this->assertSame(ReleaseBrowseService::PASSWD_RAR, $context->passwordStatus);
+        $this->assertFileExists($this->workDir.'/listed-size');
+    }
+
+    #[Test]
+    public function it_leaves_a_compressed_7z_header_unlisted_without_the_7zip_client(): void
+    {
+        $context = $this->processCompressedSevenZipHeader('/nonexistent/7z', []);
+
+        $this->assertFalse($context->releaseHasPassword);
+        $this->assertSame(0, $context->totalFileInfo);
+    }
+
+    #[Test]
     public function it_reports_a_7z_with_an_encrypted_header_as_passworded(): void
     {
         $config = $this->makeConfig(['processPasswords' => true]);
@@ -744,6 +775,78 @@ class ReleaseProcessorTest extends TestCase
             'ZIP' => ['zip', []],
             '7z' => ['7z', ['<last>']],
         ];
+    }
+
+    /**
+     * @param  list<string>  $expectedNames
+     */
+    private function processCompressedSevenZipHeader(string $client, array $expectedNames): ReleaseProcessingContext
+    {
+        $config = $this->makeConfig(['processPasswords' => true, 'sevenZipPath' => $client]);
+        $archive = $this->sevenZip('ignored.mkv', str_repeat('x', 100), compressedHeader: true);
+        $tmpPath = $this->workDir !== '' ? $this->workDir.'/' : '/tmp/ap-release/';
+        $nzbParser = Mockery::mock(NzbContentParser::class);
+        $nzbParser->shouldReceive('parseNzb')->once()->andReturn([
+            'error' => null,
+            'contents' => [
+                ['title' => '"G9AJxkjPdN0iBdyG.7z.001" yEnc (1/2)', 'segments' => ['<v1-1>', '<v1-2>']],
+                ['title' => '"G9AJxkjPdN0iBdyG.7z.002" yEnc (1/2)', 'segments' => ['<v2-1>', '<v2-2>']],
+            ],
+        ]);
+
+        $downloadService = Mockery::mock(UsenetDownloadService::class);
+        $this->expectDownloadScope($downloadService);
+        $downloadService->shouldReceive('download')
+            ->once()
+            ->with(DownloadKind::Compressed, ['<v1-1>', '<v1-2>'], '', 1, '"G9AJxkjPdN0iBdyG.7z.001" yEnc (1/2)')
+            ->andReturn(['success' => true, 'data' => substr($archive, 0, 40), 'groupUnavailable' => false, 'error' => null]);
+        $downloadService->shouldReceive('download')
+            ->once()
+            ->with(DownloadKind::Compressed, ['<v2-2>'], '', 1)
+            ->andReturn(['success' => true, 'data' => substr($archive, -60), 'groupUnavailable' => false, 'error' => null]);
+
+        $listed = [];
+        $releaseManager = Mockery::mock(ReleaseFileManager::class);
+        $releaseManager->shouldReceive('processReleaseNameFromNzbContents')->once()->andReturnFalse();
+        $releaseManager->shouldReceive('addFileInfo')
+            ->andReturnUsing(static function (array $file, ReleaseProcessingContext $context) use (&$listed): bool {
+                $listed[] = $file['name'];
+                if ($file['pass'] === 1) {
+                    $context->releaseHasPassword = true;
+                    $context->passwordStatus = ReleaseBrowseService::PASSWD_RAR;
+
+                    return false;
+                }
+                $context->totalFileInfo++;
+
+                return true;
+            });
+        $releaseManager->shouldReceive('finalizeRelease')->once()->andReturnNull();
+
+        $processor = new ReleaseProcessor(
+            $config,
+            $nzbParser,
+            new AdditionalWorkPlanner($config),
+            new ArchiveExtractionService($config),
+            Mockery::mock(MediaExtractionService::class),
+            $downloadService,
+            $releaseManager,
+            Mockery::mock(ReleaseFilesArchiveFallback::class)->shouldIgnoreMissing(),
+            Mockery::mock(TempWorkspaceService::class)
+                ->shouldReceive('createReleaseTempFolder')->once()->andReturn($tmpPath)
+                ->shouldReceive('listFiles')->andReturn([])
+                ->shouldReceive('clearDirectory')->once()->with($tmpPath, false)->andReturnNull()
+                ->getMock(),
+            Mockery::mock(ConsoleOutputService::class)->shouldIgnoreMissing()
+        );
+
+        $context = $this->makeContext();
+        $context->release->nfostatus = 1;
+        $processor->process($context, '/tmp/main/');
+
+        $this->assertSame($expectedNames, $listed);
+
+        return $context;
     }
 
     private function makeProcessor(

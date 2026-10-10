@@ -3,6 +3,7 @@
 return [
     'unrar_path' => env('UNRAR_PATH', '/usr/bin/unrar'),
     'unzip_path' => env('UNZIP_PATH', '/usr/bin/unzip'),
+    'sevenzip_path' => env('SEVENZIP_PATH', is_executable('/usr/bin/7z') ? '/usr/bin/7z' : ''),
     'check_passworded_rars' => env('CHECK_PASSWORDED_RARS', false),
     'delete_passworded_releases' => env('DELETE_PASSWORDED_RELEASES', false),
     'delete_possible_passworded_releases' => env('DELETE_POSSIBLE_PASSWORDED_RELEASES', false),
