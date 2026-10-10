@@ -14,6 +14,7 @@ enum ProcessingOutcome: string
     case TimedOut = 'timed-out';
     case DeletedAfterTimeout = 'deleted-after-timeout';
     case DeletedBrokenNzb = 'deleted-broken-nzb';
+    case DeletedPar2Only = 'deleted-par2-only';
     case NotFound = 'not-found';
     case Failed = 'failed';
 
@@ -28,7 +29,7 @@ enum ProcessingOutcome: string
     public function isDeleted(): bool
     {
         return match ($this) {
-            self::DeletedAfterTimeout, self::DeletedBrokenNzb => true,
+            self::DeletedAfterTimeout, self::DeletedBrokenNzb, self::DeletedPar2Only => true,
             default => false,
         };
     }

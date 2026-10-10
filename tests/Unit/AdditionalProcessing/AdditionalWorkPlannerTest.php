@@ -72,6 +72,48 @@ class AdditionalWorkPlannerTest extends TestCase
     }
 
     #[Test]
+    public function it_probes_a_lone_file_without_an_extension(): void
+    {
+        $planner = new AdditionalWorkPlanner($this->makeConfig());
+
+        $plan = $planner->plan([
+            ['title' => '"KlUC4yTqeaIpcTbOIYdzhqqWF" yEnc (1/103)', 'segments' => ['<first>', '<second>'], 'filecount' => 1],
+        ], 'alt.binaries.misc');
+
+        $this->assertSame('<first>', $plan->probeMessageId);
+        $this->assertSame([], $plan->unsupportedReasons);
+    }
+
+    #[Test]
+    public function it_does_not_probe_an_entry_merged_from_several_nzb_files(): void
+    {
+        $planner = new AdditionalWorkPlanner($this->makeConfig());
+
+        $plan = $planner->plan([
+            ['title' => '"KlUC4yTqeaIpcTbOIYdzhqqWF" yEnc (1/103)', 'segments' => ['<par2>', '<data>'], 'filecount' => 2],
+        ], 'alt.binaries.misc');
+
+        $this->assertSame('', $plan->probeMessageId);
+    }
+
+    #[Test]
+    public function it_does_not_probe_named_or_multi_file_releases(): void
+    {
+        $planner = new AdditionalWorkPlanner($this->makeConfig());
+
+        $named = $planner->plan([
+            ['title' => '"Show.S01E01.1080p.mkv" yEnc (1/50)', 'segments' => ['<video>']],
+        ], 'alt.binaries.misc');
+        $multi = $planner->plan([
+            ['title' => '"aB3dE5fG7hJ9" yEnc (1/50)', 'segments' => ['<one>']],
+            ['title' => '"kL2mN4pQ6rS8" yEnc (1/50)', 'segments' => ['<two>']],
+        ], 'alt.binaries.misc');
+
+        $this->assertSame('', $named->probeMessageId);
+        $this->assertSame('', $multi->probeMessageId);
+    }
+
+    #[Test]
     public function it_selects_jpeg_png_and_webp_image_candidates(): void
     {
         $planner = new AdditionalWorkPlanner($this->makeConfig(['processJPGSample' => true]));

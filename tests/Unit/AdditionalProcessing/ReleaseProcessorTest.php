@@ -385,6 +385,178 @@ class ReleaseProcessorTest extends TestCase
         $this->assertStringContainsString('unavailable', $result->reason);
     }
 
+    #[Test]
+    public function it_deletes_a_release_that_only_contains_par2_data(): void
+    {
+        $config = $this->makeConfig(['processPasswords' => true]);
+        $nzbParser = Mockery::mock(NzbContentParser::class);
+        $nzbParser->shouldReceive('parseNzb')->once()->andReturn([
+            'error' => null,
+            'contents' => [['title' => '"KlUC4yTqeaIpcTbOIYdzhqqWF" yEnc (1/103)', 'segments' => ['<probe>'], 'filecount' => 1]],
+        ]);
+
+        $downloadService = Mockery::mock(UsenetDownloadService::class);
+        $this->expectDownloadScope($downloadService);
+        $downloadService->shouldReceive('download')
+            ->once()
+            ->with(DownloadKind::Compressed, ['<probe>'], '', 1)
+            ->andReturn(['success' => true, 'data' => "PAR2\0PKT".str_repeat("\0", 56), 'groupUnavailable' => false, 'error' => null]);
+
+        $releaseManager = Mockery::mock(ReleaseFileManager::class);
+        $releaseManager->shouldReceive('processReleaseNameFromNzbContents')->once()->andReturnFalse();
+        $releaseManager->shouldReceive('deleteRelease')->once()->andReturnNull();
+        $releaseManager->shouldNotReceive('finalizeRelease');
+
+        $output = Mockery::mock(ConsoleOutputService::class);
+        $output->shouldReceive('echoReleaseStart')->once()->andReturnNull();
+        $output->shouldReceive('setProcessTitle')->once()->andReturnNull();
+        $output->shouldReceive('warning')->once()->andReturnNull();
+
+        $processor = new ReleaseProcessor(
+            $config,
+            $nzbParser,
+            new AdditionalWorkPlanner($config),
+            Mockery::mock(ArchiveExtractionService::class),
+            Mockery::mock(MediaExtractionService::class),
+            $downloadService,
+            $releaseManager,
+            Mockery::mock(ReleaseFilesArchiveFallback::class),
+            $this->successfulTempWorkspace(),
+            $output
+        );
+
+        $context = $this->makeContext();
+        $context->release->nfostatus = 1;
+        $result = $processor->process($context, '/tmp/main/');
+
+        $this->assertSame(ProcessingOutcome::DeletedPar2Only, $result->outcome);
+        $this->assertTrue($result->outcome->isDeleted());
+    }
+
+    #[Test]
+    public function it_probes_for_par2_with_every_download_option_off(): void
+    {
+        $config = $this->makeConfig();
+        $nzbParser = Mockery::mock(NzbContentParser::class);
+        $nzbParser->shouldReceive('parseNzb')->once()->andReturn([
+            'error' => null,
+            'contents' => [['title' => '"KlUC4yTqeaIpcTbOIYdzhqqWF" yEnc (1/103)', 'segments' => ['<probe>'], 'filecount' => 1]],
+        ]);
+
+        $downloadService = Mockery::mock(UsenetDownloadService::class);
+        $this->expectDownloadScope($downloadService);
+        $downloadService->shouldReceive('download')
+            ->once()
+            ->with(DownloadKind::Compressed, ['<probe>'], '', 1)
+            ->andReturn(['success' => true, 'data' => "PAR2\0PKT".str_repeat("\0", 56), 'groupUnavailable' => false, 'error' => null]);
+
+        $releaseManager = Mockery::mock(ReleaseFileManager::class);
+        $releaseManager->shouldReceive('processReleaseNameFromNzbContents')->once()->andReturnFalse();
+        $releaseManager->shouldReceive('deleteRelease')->once()->andReturnNull();
+
+        $processor = new ReleaseProcessor(
+            $config,
+            $nzbParser,
+            new AdditionalWorkPlanner($config),
+            Mockery::mock(ArchiveExtractionService::class),
+            Mockery::mock(MediaExtractionService::class),
+            $downloadService,
+            $releaseManager,
+            Mockery::mock(ReleaseFilesArchiveFallback::class),
+            $this->successfulTempWorkspace(),
+            Mockery::mock(ConsoleOutputService::class)->shouldIgnoreMissing()
+        );
+
+        $context = $this->makeContext();
+        $context->release->nfostatus = 1;
+
+        $this->assertSame(ProcessingOutcome::DeletedPar2Only, $processor->process($context, '/tmp/main/')->outcome);
+    }
+
+    #[Test]
+    public function it_reports_an_unavailable_group_from_the_par2_probe(): void
+    {
+        $config = $this->makeConfig(['processPasswords' => true]);
+        $nzbParser = Mockery::mock(NzbContentParser::class);
+        $nzbParser->shouldReceive('parseNzb')->once()->andReturn([
+            'error' => null,
+            'contents' => [['title' => '"KlUC4yTqeaIpcTbOIYdzhqqWF" yEnc (1/103)', 'segments' => ['<probe>'], 'filecount' => 1]],
+        ]);
+
+        $downloadService = Mockery::mock(UsenetDownloadService::class);
+        $this->expectDownloadScope($downloadService);
+        $downloadService->shouldReceive('download')
+            ->once()
+            ->with(DownloadKind::Compressed, ['<probe>'], '', 1)
+            ->andReturn(['success' => false, 'data' => null, 'groupUnavailable' => true, 'error' => 'no such group']);
+
+        $releaseManager = Mockery::mock(ReleaseFileManager::class)->shouldIgnoreMissing();
+        $releaseManager->shouldReceive('processReleaseNameFromNzbContents')->once()->andReturnFalse();
+        $releaseManager->shouldNotReceive('deleteRelease');
+
+        $processor = new ReleaseProcessor(
+            $config,
+            $nzbParser,
+            new AdditionalWorkPlanner($config),
+            Mockery::mock(ArchiveExtractionService::class),
+            Mockery::mock(MediaExtractionService::class),
+            $downloadService,
+            $releaseManager,
+            Mockery::mock(ReleaseFilesArchiveFallback::class),
+            $this->successfulTempWorkspace(),
+            Mockery::mock(ConsoleOutputService::class)->shouldIgnoreMissing()
+        );
+
+        $context = $this->makeContext();
+        $context->release->nfostatus = 1;
+
+        $this->assertSame(ProcessingOutcome::GroupUnavailable, $processor->process($context, '/tmp/main/')->outcome);
+    }
+
+    #[Test]
+    public function it_keeps_a_probed_release_whose_data_is_not_par2(): void
+    {
+        $config = $this->makeConfig(['processPasswords' => true]);
+        $nzbParser = Mockery::mock(NzbContentParser::class);
+        $nzbParser->shouldReceive('parseNzb')->once()->andReturn([
+            'error' => null,
+            'contents' => [['title' => '"KlUC4yTqeaIpcTbOIYdzhqqWF" yEnc (1/103)', 'segments' => ['<probe>'], 'filecount' => 1]],
+        ]);
+
+        $downloadService = Mockery::mock(UsenetDownloadService::class);
+        $this->expectDownloadScope($downloadService);
+        $downloadService->shouldReceive('download')
+            ->once()
+            ->with(DownloadKind::Compressed, ['<probe>'], '', 1)
+            ->andReturn(['success' => true, 'data' => "\x1A\x45\xDF\xA3".str_repeat("\0", 60), 'groupUnavailable' => false, 'error' => null]);
+
+        $releaseManager = Mockery::mock(ReleaseFileManager::class);
+        $releaseManager->shouldReceive('processReleaseNameFromNzbContents')->once()->andReturnFalse();
+        $releaseManager->shouldNotReceive('deleteRelease');
+        $releaseManager->shouldReceive('finalizeRelease')->once()->andReturnNull();
+
+        $output = Mockery::mock(ConsoleOutputService::class)->shouldIgnoreMissing();
+
+        $processor = new ReleaseProcessor(
+            $config,
+            $nzbParser,
+            new AdditionalWorkPlanner($config),
+            Mockery::mock(ArchiveExtractionService::class),
+            Mockery::mock(MediaExtractionService::class),
+            $downloadService,
+            $releaseManager,
+            Mockery::mock(ReleaseFilesArchiveFallback::class),
+            $this->successfulTempWorkspace(),
+            $output
+        );
+
+        $context = $this->makeContext();
+        $context->release->nfostatus = 1;
+        $result = $processor->process($context, '/tmp/main/');
+
+        $this->assertNotSame(ProcessingOutcome::DeletedPar2Only, $result->outcome);
+    }
+
     private function makeProcessor(
         ?NzbContentParser $nzbParser = null,
         ?ReleaseFileManager $releaseManager = null,

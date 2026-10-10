@@ -108,6 +108,19 @@ final readonly class AdditionalWorkPlanner
             }
         }
 
+        // A lone file without an extension can't be classified by name; sample its first segment.
+        // The entry must stand for exactly one NZB file, not several merged by a stripped subject.
+        $probeMessageId = '';
+        if ($archiveCandidates === [] && count($nzbContents) === 1) {
+            $only = array_values($nzbContents)[0];
+            if (is_array($only) && isset($only['segments'][0])
+                && (int) ($only['filecount'] ?? 0) === 1
+                && ! $this->hasFileExtension((string) ($only['title'] ?? ''))
+            ) {
+                $probeMessageId = (string) $only['segments'][0];
+            }
+        }
+
         $bookFlood = $bookFileCount > 80 && ($bookFileCount * 2) >= count($nzbContents);
         $unsupportedReasons = [];
         if ($bookFlood) {
@@ -118,6 +131,7 @@ final readonly class AdditionalWorkPlanner
             && $jpgMessageIds === []
             && $mediaInfoMessageId === ''
             && $audioInfoMessageId === ''
+            && $probeMessageId === ''
         ) {
             $unsupportedReasons[] = 'no-supported-candidates';
         }
@@ -133,7 +147,15 @@ final readonly class AdditionalWorkPlanner
             bookFlood: $bookFlood,
             duplicateMessageIdCount: $duplicateMessageIdCount,
             unsupportedReasons: $unsupportedReasons,
+            probeMessageId: $probeMessageId,
         );
+    }
+
+    private function hasFileExtension(string $title): bool
+    {
+        $name = preg_match('/"([^"]+)"/', $title, $quoted) === 1 ? $quoted[1] : $title;
+
+        return preg_match('/\.[a-z0-9]{2,4}$/i', trim($name)) === 1;
     }
 
     private function isSupportFile(string $title): bool
