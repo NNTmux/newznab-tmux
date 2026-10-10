@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Services\NntmuxUpdateLock;
 use App\Services\Tmux\Tmux;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
+use Illuminate\Support\Str;
 use Symfony\Component\Console\Helper\ProgressBar;
 
 class UpdateNNTmux extends Command
@@ -22,6 +24,7 @@ class UpdateNNTmux extends Command
                             {--skip-composer : Skip composer update}
                             {--skip-npm : Skip npm operations}
                             {--skip-db : Skip database migrations}
+                            {--git-lock-timeout=10 : Seconds to wait for an existing Git index lock}
                             {--force : Force update even if up-to-date}';
 
     /**
@@ -52,8 +55,22 @@ class UpdateNNTmux extends Command
     /**
      * Execute the console command.
      */
-    public function handle(): int
+    public function handle(NntmuxUpdateLock $lock): int
     {
+        try {
+            return $lock->run(fn (): int => $this->updateInstallation(), checkGit: ! $this->option('skip-git'), gitLockTimeout: (int) $this->option('git-lock-timeout'));
+        } catch (\Exception $e) {
+            $this->error('❌ Update failed before preparing the environment: '.$e->getMessage());
+
+            return Command::FAILURE;
+        }
+    }
+
+    private function updateInstallation(): int
+    {
+        $this->wasInMaintenance = false;
+        $this->tmuxWasRunning = false;
+        $this->composerWasRun = false;
         $this->info('🚀 Starting NNTmux update process...');
 
         // Initialize progress tracking
@@ -78,10 +95,10 @@ class UpdateNNTmux extends Command
             return Command::SUCCESS;
 
         } catch (\Exception $e) {
-            $this->progressBar->finish();
+            $this->progressBar->clear();
             $this->newLine(2);
             $this->error('❌ Update failed: '.$e->getMessage());
-            $this->restoreEnvironment();
+            $this->restoreEnvironment(restartTmux: false);
 
             return Command::FAILURE;
         }
@@ -125,7 +142,7 @@ class UpdateNNTmux extends Command
             $this->call('down', [
                 '--render' => 'errors::maintenance',
                 '--retry' => 120,
-                '--secret' => config('app.key'),
+                '--secret' => Str::random(40),
             ]);
         }
 
@@ -175,7 +192,7 @@ class UpdateNNTmux extends Command
     {
         $this->info('📥 Updating from git repository...');
 
-        $gitResult = $this->call('nntmux:git');
+        $gitResult = $this->call('nntmux:git', ['--git-lock-timeout' => $this->option('git-lock-timeout')]);
 
         if ($gitResult !== 0) {
             throw new \Exception('Git update failed');
@@ -409,7 +426,7 @@ class UpdateNNTmux extends Command
     /**
      * Restore the original environment state
      */
-    private function restoreEnvironment(): void
+    private function restoreEnvironment(bool $restartTmux = true): void
     {
         // Restore maintenance mode state
         if (! $this->wasInMaintenance && App::isDownForMaintenance()) {
@@ -417,8 +434,10 @@ class UpdateNNTmux extends Command
         }
 
         // Restore tmux state
-        if ($this->tmuxWasRunning) {
+        if ($this->tmuxWasRunning && $restartTmux) {
             $this->call('tmux:start');
+        } elseif ($this->tmuxWasRunning) {
+            $this->warn('  ⚠ Skipping tmux restart because update did not complete successfully');
         }
     }
 }
