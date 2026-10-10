@@ -1158,6 +1158,59 @@ class ReleaseProcessorTest extends TestCase
         $this->assertNull($context->mediaPlan);
     }
 
+    #[Test]
+    public function it_lists_a_later_rar_volume_when_the_first_lacks_its_header_segment(): void
+    {
+        $config = $this->makeConfig(['processPasswords' => true]);
+        $volume = $this->rar('Movie.2026.1080p.mkv', str_repeat('x', 100), laterVolume: true);
+        $nzbParser = Mockery::mock(NzbContentParser::class);
+        $nzbParser->shouldReceive('parseNzb')->once()->andReturn([
+            'error' => null,
+            'contents' => [
+                ['title' => '"release.part01.rar" yEnc (2/2)', 'segments' => ['<p1-2>'], 'firstsegment' => false],
+                ['title' => '"release.part02.rar" yEnc (1/2)', 'segments' => ['<p2-1>'], 'firstsegment' => true],
+            ],
+        ]);
+
+        $downloadService = Mockery::mock(UsenetDownloadService::class);
+        $this->expectDownloadScope($downloadService);
+        $downloadService->shouldReceive('download')
+            ->once()
+            ->with(DownloadKind::Compressed, ['<p2-1>'], '', 1, '"release.part02.rar" yEnc (1/2)')
+            ->andReturn(['success' => true, 'data' => $volume, 'groupUnavailable' => false, 'error' => null]);
+
+        $releaseManager = Mockery::mock(ReleaseFileManager::class);
+        $releaseManager->shouldReceive('processReleaseNameFromNzbContents')->once()->andReturnFalse();
+        $releaseManager->shouldReceive('addFileInfo')
+            ->once()
+            ->with(Mockery::on(static fn (array $file): bool => $file['name'] === 'Movie.2026.1080p.mkv'), Mockery::any(), Mockery::any())
+            ->andReturnUsing(static function (array $file, ReleaseProcessingContext $context): bool {
+                $context->totalFileInfo++;
+
+                return true;
+            });
+        $releaseManager->shouldReceive('finalizeRelease')->once()->andReturnNull();
+
+        $processor = new ReleaseProcessor(
+            $config,
+            $nzbParser,
+            new AdditionalWorkPlanner($config),
+            new ArchiveExtractionService($config),
+            Mockery::mock(MediaExtractionService::class),
+            $downloadService,
+            $releaseManager,
+            Mockery::mock(ReleaseFilesArchiveFallback::class)->shouldIgnoreMissing(),
+            $this->tempWorkspaceWithoutFiles(),
+            Mockery::mock(ConsoleOutputService::class)->shouldIgnoreMissing()
+        );
+
+        $context = $this->makeContext();
+        $context->release->nfostatus = 1;
+        $processor->process($context, '/tmp/main/');
+
+        $this->assertSame(1, $context->totalFileInfo);
+    }
+
     /**
      * @return array<string, array{string, list<string>}>
      */

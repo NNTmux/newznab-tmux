@@ -77,6 +77,7 @@ final readonly class AdditionalWorkPlanner
                             messageIds: $archiveMessageIds,
                             likelyFirstVolume: $this->isLikelyFirstVolume($title),
                             sourceIndex: $sourceIndex,
+                            hasFirstSegment: ($file['firstsegment'] ?? true) !== false,
                         );
                     }
                 }
@@ -135,9 +136,12 @@ final readonly class AdditionalWorkPlanner
                     likelyFirstVolume: true,
                     sourceIndex: $candidate->sourceIndex,
                     tailMessageIds: [$tail],
+                    hasFirstSegment: $candidate->hasFirstSegment,
                 );
             }
         }
+
+        $archiveCandidates = $this->preferRarVolumesWithHeaders($archiveCandidates);
 
         // Files without an extension can't be classified by name; sample their first segments.
         // Each entry must stand for exactly one NZB file, not several merged by a stripped subject.
@@ -342,6 +346,76 @@ final readonly class AdditionalWorkPlanner
         arsort($sizes);
 
         return array_slice(array_keys($sizes), 0, 2);
+    }
+
+    /**
+     * Every RAR volume starts with its own archive and file headers, but only in segment 1.
+     * When the first volume lacks that segment, inspect the earliest volume that has it.
+     *
+     * @param  list<ArchiveCandidate>  $candidates
+     * @return list<ArchiveCandidate>
+     */
+    private function preferRarVolumesWithHeaders(array $candidates): array
+    {
+        $volumes = [];
+        foreach ($candidates as $index => $candidate) {
+            $volume = $this->rarVolume($candidate->title);
+            if ($volume !== null) {
+                $volumes[$volume[0]][$index] = $volume[1];
+            }
+        }
+
+        foreach ($volumes as $set) {
+            asort($set);
+            $first = array_key_first($set);
+            if (! $candidates[$first]->likelyFirstVolume || $candidates[$first]->hasFirstSegment) {
+                continue;
+            }
+
+            foreach (array_keys($set) as $index) {
+                if ($candidates[$index]->hasFirstSegment) {
+                    $candidates[$first] = $this->withLikelyFirstVolume($candidates[$first], false);
+                    $candidates[$index] = $this->withLikelyFirstVolume($candidates[$index], true);
+                    break;
+                }
+            }
+        }
+
+        return $candidates;
+    }
+
+    private function withLikelyFirstVolume(ArchiveCandidate $candidate, bool $likelyFirstVolume): ArchiveCandidate
+    {
+        return new ArchiveCandidate(
+            title: $candidate->title,
+            messageIds: $candidate->messageIds,
+            likelyFirstVolume: $likelyFirstVolume,
+            sourceIndex: $candidate->sourceIndex,
+            tailMessageIds: $candidate->tailMessageIds,
+            hasFirstSegment: $candidate->hasFirstSegment,
+        );
+    }
+
+    /**
+     * @return array{0: string, 1: int}|null set name and volume order (.rar before .r00, part01 before part02)
+     */
+    private function rarVolume(string $title): ?array
+    {
+        [$name, $prefix] = preg_match('/"([^"\r\n]+)"/', $title, $quoted) === 1
+            ? [$quoted[1], '^(.+)']
+            : [$title, '([^"\s\/]+)'];
+
+        if (preg_match('/'.$prefix.'\.part(\d+)\.rar(?:$|[ ")-])/i', $name, $match) === 1) {
+            return [strtolower($match[1]), (int) $match[2]];
+        }
+        if (preg_match('/'.$prefix.'\.rar(?:$|[ ")-])/i', $name, $match) === 1) {
+            return [strtolower($match[1]), 0];
+        }
+        if (preg_match('/'.$prefix.'\.r(\d{2,3})(?:$|[ ")-])/i', $name, $match) === 1) {
+            return [strtolower($match[1]), (int) $match[2] + 1];
+        }
+
+        return null;
     }
 
     private function hasFileExtension(string $title): bool
