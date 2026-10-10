@@ -137,6 +137,7 @@ final readonly class AdditionalWorkPlanner
         // The entry must stand for exactly one NZB file, not several merged by a stripped subject.
         $probeMessageId = '';
         $probeTailMessageIds = [];
+        $probeContinuationMessageIds = [];
         if ($archiveCandidates === [] && count($nzbContents) === 1) {
             $only = array_values($nzbContents)[0];
             if (is_array($only) && isset($only['segments'][0])
@@ -144,6 +145,13 @@ final readonly class AdditionalWorkPlanner
                 && ! $this->hasFileExtension((string) ($only['title'] ?? ''))
             ) {
                 $probeMessageId = (string) $only['segments'][0];
+                $probeArchiveMessageIds = $this->extractSegments(
+                    $only['segments'],
+                    max(1, $this->config->maximumRarSegments),
+                    $seenMessageIds,
+                    $duplicateMessageIdCount,
+                );
+                $probeContinuationMessageIds = array_slice($probeArchiveMessageIds, 1);
                 // A 7z found by the probe needs its last segment for the file list.
                 $lastSegment = (string) $only['segments'][array_key_last($only['segments'])];
                 if ($lastSegment !== $probeMessageId) {
@@ -180,6 +188,7 @@ final readonly class AdditionalWorkPlanner
             unsupportedReasons: $unsupportedReasons,
             probeMessageId: $probeMessageId,
             probeTailMessageIds: $probeTailMessageIds,
+            probeContinuationMessageIds: $probeContinuationMessageIds,
         );
     }
 
@@ -221,6 +230,10 @@ final readonly class AdditionalWorkPlanner
      */
     private function sevenZipVolume(string $title): ?array
     {
+        if (preg_match('/"([^"\r\n]+)\.7z(?:\.(\d{3}))?"/i', $title, $match) === 1) {
+            return [strtolower($match[1]), (int) ($match[2] ?? 0)];
+        }
+
         if (preg_match(self::SEVEN_ZIP_PATTERN, $title, $match) !== 1) {
             return null;
         }

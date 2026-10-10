@@ -344,8 +344,8 @@ class ReleaseProcessorTest extends TestCase
     #[Test]
     public function it_reads_a_7z_file_list_from_the_last_volume_tail(): void
     {
-        $config = $this->makeConfig(['processPasswords' => true]);
-        $archive = $this->sevenZip('Movie.2026.1080p.mkv', str_repeat('x', 100));
+        $config = $this->makeConfig(['processPasswords' => true, 'processJPGSample' => true]);
+        $archive = $this->sevenZip('release.nfo', str_repeat('x', 100));
         $nzbParser = Mockery::mock(NzbContentParser::class);
         $nzbParser->shouldReceive('parseNzb')->once()->andReturn([
             'error' => null,
@@ -370,13 +370,18 @@ class ReleaseProcessorTest extends TestCase
         $releaseManager->shouldReceive('processReleaseNameFromNzbContents')->once()->andReturnFalse();
         $releaseManager->shouldReceive('addFileInfo')
             ->once()
-            ->with(Mockery::on(static fn (array $file): bool => $file['name'] === 'Movie.2026.1080p.mkv' && $file['pass'] === 0), Mockery::any(), Mockery::any())
+            ->with(Mockery::on(static fn (array $file): bool => $file['name'] === 'release.nfo' && $file['pass'] === 0), Mockery::any(), Mockery::any())
             ->andReturnUsing(static function (array $file, ReleaseProcessingContext $context): bool {
                 $context->totalFileInfo++;
 
                 return true;
             });
         $releaseManager->shouldReceive('finalizeRelease')->once()->andReturnNull();
+
+        $archiveFallback = Mockery::mock(ReleaseFilesArchiveFallback::class)->shouldIgnoreMissing();
+        $archiveFallback->shouldNotReceive('processJpgFromArchiveFileList');
+        $archiveFallback->shouldReceive('processNfoFromDownloadedArchives')->once()
+            ->with(Mockery::on(static fn (ReleaseProcessingContext $context): bool => $context->downloadedArchives === []));
 
         $processor = new ReleaseProcessor(
             $config,
@@ -386,13 +391,12 @@ class ReleaseProcessorTest extends TestCase
             Mockery::mock(MediaExtractionService::class),
             $downloadService,
             $releaseManager,
-            Mockery::mock(ReleaseFilesArchiveFallback::class)->shouldIgnoreMissing(),
+            $archiveFallback,
             $this->tempWorkspaceWithoutFiles(),
             Mockery::mock(ConsoleOutputService::class)->shouldIgnoreMissing()
         );
 
         $context = $this->makeContext();
-        $context->release->nfostatus = 1;
         $result = $processor->process($context, '/tmp/main/');
 
         $this->assertNotSame(ProcessingOutcome::Passworded, $result->outcome);
@@ -694,6 +698,11 @@ class ReleaseProcessorTest extends TestCase
                 ->once()
                 ->with(DownloadKind::Compressed, $tailIds, '', 1)
                 ->andReturn(['success' => true, 'data' => substr($archive, -80), 'groupUnavailable' => false, 'error' => null]);
+        } else {
+            $downloadService->shouldReceive('download')
+                ->once()
+                ->with(DownloadKind::Compressed, ['<last>'], '', 1)
+                ->andReturn(['success' => true, 'data' => substr($archive, 80), 'groupUnavailable' => false, 'error' => null]);
         }
 
         $releaseManager = Mockery::mock(ReleaseFileManager::class);

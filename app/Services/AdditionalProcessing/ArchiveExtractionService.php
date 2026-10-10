@@ -54,6 +54,7 @@ class ArchiveExtractionService
             'files' => [],
             'hasPassword' => false,
             'passwordStatus' => ReleaseBrowseService::PASSWD_NONE,
+            'listingOnly' => false,
         ];
 
         $context->compressedFilesChecked++;
@@ -84,8 +85,11 @@ class ArchiveExtractionService
             return $result;
         }
 
+        $listingOnly = $this->archiveInfo->type === ArchiveInfo::TYPE_SZIP;
+        $result['listingOnly'] = $listingOnly;
+
         try {
-            $dataSummary = $this->archiveInfo->getSummary(true);
+            $dataSummary = $this->archiveInfo->getSummary(! $listingOnly);
         } catch (\Exception $e) {
             if ($this->config->debugMode) {
                 Log::warning($e->getTraceAsString());
@@ -103,21 +107,24 @@ class ArchiveExtractionService
             }
 
             return [
-                'success' => false,
-                'files' => [],
+                ...$result,
                 'hasPassword' => true,
                 'passwordStatus' => ReleaseBrowseService::PASSWD_RAR,
             ];
         }
 
         // Prepare extraction directories
-        $this->prepareExtractionDirectories($tmpPath);
+        if (! $listingOnly) {
+            $this->prepareExtractionDirectories($tmpPath);
+        }
 
         // Process based on archive type
         $archiveMarker = $this->extractArchive($compressedData, $dataSummary, $tmpPath);
 
         // Get file list
-        $files = $this->archiveInfo->getArchiveFileList();
+        $files = $listingOnly
+            ? $this->archiveInfo->getArchiveFileList(false)
+            : $this->archiveInfo->getArchiveFileList();
         if (! is_array($files) || count($files) === 0) {
             return $result;
         }
@@ -129,6 +136,7 @@ class ArchiveExtractionService
             'passwordStatus' => ReleaseBrowseService::PASSWD_NONE,
             'archiveMarker' => $archiveMarker,
             'dataSummary' => $dataSummary,
+            'listingOnly' => $listingOnly,
         ];
     }
 
@@ -418,6 +426,10 @@ class ArchiveExtractionService
      */
     public function extractSpecificFiles(string $compressedData, array $filenames, string $tmpPath): array
     {
+        if (str_starts_with($compressedData, SzipInfo::MARKER_SIGNATURE)) {
+            return [];
+        }
+
         $filenames = array_values(array_unique(array_filter(
             $filenames,
             static fn (string $filename): bool => $filename !== '',
@@ -426,6 +438,10 @@ class ArchiveExtractionService
         $remaining = $filenames;
 
         if ($this->archiveInfo->setData($compressedData, true)) {
+            if ($this->archiveInfo->type === ArchiveInfo::TYPE_SZIP) {
+                return [];
+            }
+
             foreach ($filenames as $filename) {
                 try {
                     $extracted = $this->archiveInfo->getFileData($filename);

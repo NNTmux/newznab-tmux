@@ -12,10 +12,12 @@ use Illuminate\Process\PendingProcess;
 use Illuminate\Support\Facades\Process;
 use Mockery;
 use Tests\TestCase;
+use Tests\Unit\AdditionalProcessing\BuildsArchiveFixtures;
 use Tests\Unit\AdditionalProcessing\CreatesProcessingConfiguration;
 
 class ArchiveExtractionCommandTest extends TestCase
 {
+    use BuildsArchiveFixtures;
     use CreatesProcessingConfiguration;
 
     protected function tearDown(): void
@@ -106,6 +108,28 @@ class ArchiveExtractionCommandTest extends TestCase
 
         $this->assertSame([], glob($tmpPath.'*') ?: []);
         rmdir($tmpPath);
+    }
+
+    public function test_7z_extraction_never_invokes_external_tools_even_with_unreadable_headers(): void
+    {
+        Process::fake();
+        $archiveInfo = Mockery::mock(ArchiveInfo::class);
+        $archiveInfo->shouldReceive('setExternalClients')->once();
+        $archiveInfo->shouldNotReceive('setData');
+        $archiveInfo->shouldNotReceive('getFileData');
+        $service = new ArchiveExtractionService($this->makeConfig([
+            'unrarPath' => '/usr/bin/unrar',
+            'unzipPath' => '/usr/bin/unzip',
+        ]), $archiveInfo);
+        $archive = $this->sevenZip('release.nfo', str_repeat('A', 20));
+        $joined = $service->withSevenZipEndHeader(substr($archive, 0, 40), substr($archive, -80));
+        $this->assertIsString($joined);
+
+        foreach ([$archive, $joined, substr($archive, 0, 32)] as $data) {
+            $this->assertNull($service->extractSpecificFile($data, 'release.nfo', '/unused/'));
+        }
+
+        Process::assertNothingRan();
     }
 
     /**

@@ -150,6 +150,43 @@ class ArchiveExtractionServiceTest extends TestCase
         $this->assertSame('Movie.2026.1080p.mkv', $result['files'][0]['name']);
         $this->assertSame(100, $result['files'][0]['size']);
         $this->assertSame(0, $result['files'][0]['pass']);
+        $this->assertTrue($result['listingOnly']);
+    }
+
+    #[Test]
+    public function it_lists_7z_without_recursion_or_preparing_extraction_directories(): void
+    {
+        $archiveInfo = Mockery::mock(ArchiveInfo::class);
+        $archiveInfo->type = ArchiveInfo::TYPE_SZIP;
+        $archiveInfo->error = '';
+        $archiveInfo->shouldReceive('setData')->once()->with('ARCHIVE', true)->andReturnTrue();
+        $archiveInfo->shouldReceive('getSummary')->once()->with(false)->andReturn(['main_type' => ArchiveInfo::TYPE_SZIP]);
+        $archiveInfo->shouldReceive('getArchiveFileList')->once()->with(false)->andReturn([
+            ['name' => 'nested.7z', 'size' => 20, 'pass' => 0],
+        ]);
+        $service = new ArchiveExtractionService($this->makeConfig(['extractUsingRarInfo' => false]), $archiveInfo);
+
+        $result = $service->processCompressedData('ARCHIVE', $this->sevenZipContext(), '/unused/');
+
+        $this->assertTrue($result['success']);
+        $this->assertTrue($result['listingOnly']);
+        $this->assertSame('nested.7z', $result['files'][0]['name']);
+    }
+
+    #[Test]
+    public function it_never_extracts_file_bytes_from_reconstructed_7z_headers(): void
+    {
+        $service = new ArchiveExtractionService($this->makeConfig());
+        $archive = $this->sevenZip('release.nfo', str_repeat('A', 20));
+        $joined = $service->withSevenZipEndHeader(substr($archive, 0, 40), substr($archive, -80));
+        $this->assertIsString($joined);
+
+        $result = $service->processCompressedData($joined, $this->sevenZipContext(), '/unused/');
+
+        $this->assertTrue($result['success']);
+        $this->assertSame('release.nfo', $result['files'][0]['name']);
+        $this->assertSame([], $service->extractSpecificFiles($joined, ['release.nfo'], '/unused/'));
+        $this->assertNull($service->extractSpecificFile($joined, 'release.nfo', '/unused/'));
     }
 
     #[Test]

@@ -15,6 +15,7 @@ use App\Services\AdditionalProcessing\State\ProcessingMetrics;
 use App\Services\AdditionalProcessing\State\ReleaseProcessingContext;
 use App\Services\Releases\ReleaseBrowseService;
 use App\Services\TempWorkspaceService;
+use dariusiii\rarinfo\SzipInfo;
 use Illuminate\Support\Facades\File;
 
 /**
@@ -258,7 +259,7 @@ class ReleaseProcessor
      */
     private function downloadProbe(ReleaseProcessingContext $context): ?string
     {
-        $messageId = $context->workPlan?->probeMessageId ?? '';
+        $messageId = $context->workPlan->probeMessageId ?? '';
         if ($messageId === '' || $context->groupUnavailable) {
             return null;
         }
@@ -281,6 +282,26 @@ class ReleaseProcessor
     {
         if ($context->groupUnavailable || $context->workPlan === null) {
             return;
+        }
+
+        if (! str_starts_with($data, SzipInfo::MARKER_SIGNATURE)) {
+            // Batch downloads can return a partial body as success when a later article is missing.
+            foreach ($context->workPlan->probeContinuationMessageIds as $messageId) {
+                $result = $this->downloadService->download(
+                    DownloadKind::Compressed,
+                    [$messageId],
+                    $context->releaseGroupName,
+                    $context->release->id,
+                );
+                if ($result['groupUnavailable']) {
+                    $context->groupUnavailable = true;
+                }
+                if (! $result['success'] || ! is_string($result['data'])) {
+                    return;
+                }
+
+                $data .= $result['data'];
+            }
         }
 
         $this->output->echoCompressedDownload();
@@ -694,6 +715,10 @@ class ReleaseProcessor
             if ($this->releaseManager->addFileInfo($file, $context, $this->config->supportFileRegex)) {
                 $this->output->echoFileInfoAdded();
             }
+        }
+
+        if (! empty($result['listingOnly'])) {
+            return $context->totalFileInfo > 0;
         }
 
         if ($context->releaseHasNoNFO
