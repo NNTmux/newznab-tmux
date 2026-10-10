@@ -133,30 +133,44 @@ final readonly class AdditionalWorkPlanner
             }
         }
 
-        // A lone file without an extension can't be classified by name; sample its first segment.
-        // The entry must stand for exactly one NZB file, not several merged by a stripped subject.
-        $probeMessageId = '';
-        $probeTailMessageIds = [];
-        $probeContinuationMessageIds = [];
-        if ($archiveCandidates === [] && count($nzbContents) === 1) {
-            $only = array_values($nzbContents)[0];
-            if (is_array($only) && isset($only['segments'][0])
-                && (int) ($only['filecount'] ?? 0) === 1
-                && ! $this->hasFileExtension((string) ($only['title'] ?? ''))
-            ) {
-                $probeMessageId = (string) $only['segments'][0];
-                $probeArchiveMessageIds = $this->extractSegments(
-                    $only['segments'],
+        // Files without an extension can't be classified by name; sample their first segments.
+        // Each entry must stand for exactly one NZB file, not several merged by a stripped subject.
+        $probeCandidates = [];
+        $probeIsOnlyFile = false;
+        if ($archiveCandidates === []) {
+            $unnamed = [];
+            foreach (array_values($nzbContents) as $sourceIndex => $file) {
+                if (is_array($file) && isset($file['segments'][0])
+                    && (int) ($file['filecount'] ?? 0) === 1
+                    && ! $this->hasFileExtension((string) ($file['title'] ?? ''))
+                ) {
+                    $unnamed[$sourceIndex] = $file;
+                }
+            }
+            $probeIsOnlyFile = $unnamed !== [] && count($nzbContents) === 1;
+
+            // Archive volumes carry the payload, so the largest files are tried first.
+            uasort($unnamed, static fn (array $a, array $b): int => (int) ($b['size'] ?? 0) <=> (int) ($a['size'] ?? 0));
+            foreach (array_slice($unnamed, 0, $probeIsOnlyFile ? 1 : $this->config->archiveProbeFiles, true) as $sourceIndex => $file) {
+                $messageIds = $this->extractSegments(
+                    $file['segments'],
                     max(1, $this->config->maximumRarSegments),
                     $seenMessageIds,
                     $duplicateMessageIdCount,
                 );
-                $probeContinuationMessageIds = array_slice($probeArchiveMessageIds, 1);
-                // A 7z found by the probe needs its last segment for the file list.
-                $lastSegment = (string) $only['segments'][array_key_last($only['segments'])];
-                if ($lastSegment !== $probeMessageId) {
-                    $probeTailMessageIds = [$lastSegment];
+                if ($messageIds === []) {
+                    continue;
                 }
+
+                // A 7z found by the probe needs its last segment for the file list.
+                $lastSegment = (string) $file['segments'][array_key_last($file['segments'])];
+                $probeCandidates[] = new ArchiveCandidate(
+                    title: (string) ($file['title'] ?? ''),
+                    messageIds: $messageIds,
+                    likelyFirstVolume: false,
+                    sourceIndex: $sourceIndex,
+                    tailMessageIds: $lastSegment !== $messageIds[0] ? [$lastSegment] : [],
+                );
             }
         }
 
@@ -170,7 +184,7 @@ final readonly class AdditionalWorkPlanner
             && $jpgMessageIds === []
             && $mediaInfoMessageId === ''
             && $audioInfoMessageId === ''
-            && $probeMessageId === ''
+            && $probeCandidates === []
         ) {
             $unsupportedReasons[] = 'no-supported-candidates';
         }
@@ -186,9 +200,8 @@ final readonly class AdditionalWorkPlanner
             bookFlood: $bookFlood,
             duplicateMessageIdCount: $duplicateMessageIdCount,
             unsupportedReasons: $unsupportedReasons,
-            probeMessageId: $probeMessageId,
-            probeTailMessageIds: $probeTailMessageIds,
-            probeContinuationMessageIds: $probeContinuationMessageIds,
+            probeCandidates: $probeCandidates,
+            probeIsOnlyFile: $probeIsOnlyFile,
         );
     }
 
