@@ -136,6 +136,7 @@ final readonly class AdditionalWorkPlanner
         // A lone file without an extension can't be classified by name; sample its first segment.
         // The entry must stand for exactly one NZB file, not several merged by a stripped subject.
         $probeMessageId = '';
+        $probeTailMessageIds = [];
         if ($archiveCandidates === [] && count($nzbContents) === 1) {
             $only = array_values($nzbContents)[0];
             if (is_array($only) && isset($only['segments'][0])
@@ -143,6 +144,11 @@ final readonly class AdditionalWorkPlanner
                 && ! $this->hasFileExtension((string) ($only['title'] ?? ''))
             ) {
                 $probeMessageId = (string) $only['segments'][0];
+                // A 7z found by the probe needs its last segment for the file list.
+                $lastSegment = (string) $only['segments'][array_key_last($only['segments'])];
+                if ($lastSegment !== $probeMessageId) {
+                    $probeTailMessageIds = [$lastSegment];
+                }
             }
         }
 
@@ -173,6 +179,7 @@ final readonly class AdditionalWorkPlanner
             duplicateMessageIdCount: $duplicateMessageIdCount,
             unsupportedReasons: $unsupportedReasons,
             probeMessageId: $probeMessageId,
+            probeTailMessageIds: $probeTailMessageIds,
         );
     }
 

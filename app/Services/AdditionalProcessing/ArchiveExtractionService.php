@@ -273,6 +273,20 @@ class ArchiveExtractionService
     }
 
     /**
+     * True when the data starts with a RAR, ZIP or 7z signature.
+     */
+    public static function hasArchiveSignature(string $data): bool
+    {
+        foreach (["Rar!\x1A\x07\x00", "Rar!\x1A\x07\x01\x00", "PK\x03\x04", SzipInfo::MARKER_SIGNATURE] as $signature) {
+            if (str_starts_with($data, $signature)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * True when the data starts a 7z archive whose end header (file list) lies beyond it.
      */
     public function needsSevenZipEndHeader(string $data): bool

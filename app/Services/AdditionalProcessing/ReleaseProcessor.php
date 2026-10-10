@@ -138,7 +138,8 @@ class ReleaseProcessor
                 fn (): bool => $this->prepareMessageIds($context),
             );
 
-            if ($this->isPar2Only($context)) {
+            $probeData = $this->downloadProbe($context);
+            if ($probeData !== null && str_starts_with($probeData, "PAR2\0PKT")) {
                 $this->output->warning('Release '.$release->id.' only contains PAR2 data, deleting.');
                 $this->releaseManager->deleteRelease($release);
 
@@ -147,6 +148,12 @@ class ReleaseProcessor
                     ProcessingOutcome::DeletedPar2Only,
                     reason: 'The release only contains PAR2 recovery data.',
                 );
+            }
+
+            // The probed file may be an archive behind an obfuscated name.
+            $probedArchive = $probeData !== null && ArchiveExtractionService::hasArchiveSignature($probeData) ? $probeData : null;
+            if ($probedArchive !== null) {
+                $context->nzbHasCompressedFile = true;
             }
 
             if ($this->shouldProcessDownloads()) {
@@ -162,7 +169,10 @@ class ReleaseProcessor
                     $triedCompressedMids = [];
                     $metrics->measure(
                         ProcessingStage::ArchiveDownloads,
-                        function () use ($context, &$triedCompressedMids): void {
+                        function () use ($context, &$triedCompressedMids, $probedArchive): void {
+                            if ($probedArchive !== null) {
+                                $this->processProbedArchive($context, $probedArchive);
+                            }
                             $this->processNzbCompressedFiles($context, false, $triedCompressedMids);
                         },
                     );
@@ -243,13 +253,14 @@ class ReleaseProcessor
     }
 
     /**
+     * Sample the first segment of a lone file the planner couldn't classify by name.
      * Obfuscated uploads can post each PAR2 volume as its own release; the first bytes give them away.
      */
-    private function isPar2Only(ReleaseProcessingContext $context): bool
+    private function downloadProbe(ReleaseProcessingContext $context): ?string
     {
         $messageId = $context->workPlan?->probeMessageId ?? '';
         if ($messageId === '' || $context->groupUnavailable) {
-            return false;
+            return null;
         }
 
         $result = $this->downloadService->download(
@@ -263,7 +274,22 @@ class ReleaseProcessor
             $context->groupUnavailable = true;
         }
 
-        return $result['success'] && is_string($result['data']) && str_starts_with($result['data'], "PAR2\0PKT");
+        return $result['success'] && is_string($result['data']) ? $result['data'] : null;
+    }
+
+    private function processProbedArchive(ReleaseProcessingContext $context, string $data): void
+    {
+        if ($context->groupUnavailable || $context->workPlan === null) {
+            return;
+        }
+
+        $this->output->echoCompressedDownload();
+        $this->processCompressedData(
+            $this->withSevenZipTail($context, $data, $context->workPlan->probeTailMessageIds),
+            $context,
+            false,
+            (string) ($context->nzbContents[0]['title'] ?? ''),
+        );
     }
 
     private function shouldProcessDownloads(): bool

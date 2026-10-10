@@ -113,6 +113,23 @@ class AdditionalWorkPlannerTest extends TestCase
     }
 
     #[Test]
+    public function it_keeps_the_last_segment_of_a_probed_file_for_a_7z_end_header(): void
+    {
+        $planner = new AdditionalWorkPlanner($this->makeConfig());
+
+        $plan = $planner->plan([
+            ['title' => '"KlUC4yTqeaIpcTbOIYdzhqqWF" yEnc (1/103)', 'segments' => ['<first>', '<second>', '<last>'], 'filecount' => 1],
+        ], 'alt.binaries.misc');
+        $oneSegment = $planner->plan([
+            ['title' => '"KlUC4yTqeaIpcTbOIYdzhqqWF" yEnc (1/1)', 'segments' => ['<only>'], 'filecount' => 1],
+        ], 'alt.binaries.misc');
+
+        $this->assertSame('<first>', $plan->probeMessageId);
+        $this->assertSame(['<last>'], $plan->probeTailMessageIds);
+        $this->assertSame([], $oneSegment->probeTailMessageIds);
+    }
+
+    #[Test]
     public function it_does_not_probe_an_entry_merged_from_several_nzb_files(): void
     {
         $planner = new AdditionalWorkPlanner($this->makeConfig());

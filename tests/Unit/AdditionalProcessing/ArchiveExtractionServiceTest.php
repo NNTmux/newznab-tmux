@@ -182,6 +182,17 @@ class ArchiveExtractionServiceTest extends TestCase
         $this->assertSame(1, $result['files'][0]['pass']);
     }
 
+    #[Test]
+    public function it_recognises_archive_signatures(): void
+    {
+        $this->assertTrue(ArchiveExtractionService::hasArchiveSignature($this->rar('a.mkv', 'x')));
+        $this->assertTrue(ArchiveExtractionService::hasArchiveSignature("Rar!\x1A\x07\x01\x00".str_repeat("\0", 8)));
+        $this->assertTrue(ArchiveExtractionService::hasArchiveSignature($this->zip('a.mkv', 'x')));
+        $this->assertTrue(ArchiveExtractionService::hasArchiveSignature($this->sevenZip('a.mkv', 'x')));
+        $this->assertFalse(ArchiveExtractionService::hasArchiveSignature("PAR2\0PKT".str_repeat("\0", 8)));
+        $this->assertFalse(ArchiveExtractionService::hasArchiveSignature("\x1A\x45\xDF\xA3".str_repeat("\0", 8)));
+    }
+
     private function sevenZipContext(): ReleaseProcessingContext
     {
         return new ReleaseProcessingContext(new Release(['id' => 1, 'guid' => 'fixture-guid']));

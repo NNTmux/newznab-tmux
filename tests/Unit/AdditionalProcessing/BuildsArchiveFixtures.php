@@ -36,4 +36,27 @@ trait BuildsArchiveFixtures
 
         return "7z\xBC\xAF\x27\x1C\x00\x04".pack('V', crc32($start)).$start.$packed.$header;
     }
+
+    /**
+     * Build a minimal RAR4 archive with one stored file.
+     */
+    private function rar(string $name, string $content): string
+    {
+        $file = pack('VVCVVCCvV', strlen($content), strlen($content), 0, crc32($content), 0, 20, 0x30, strlen($name), 0x20).$name;
+
+        return "Rar!\x1A\x07\x00"
+            ."\x00\x00\x73\x00\x00\x0D\x00\x00\x00\x00\x00\x00\x00"
+            ."\x00\x00\x74".pack('vv', 0x8000, 7 + strlen($file)).$file
+            .$content;
+    }
+
+    /**
+     * Build the local header and data of one stored ZIP entry.
+     */
+    private function zip(string $name, string $content): string
+    {
+        return "PK\x03\x04"
+            .pack('vvvvvVVVvv', 20, 0, 0, 0, 0, crc32($content), strlen($content), strlen($content), strlen($name), 0)
+            .$name.$content;
+    }
 }
