@@ -281,6 +281,12 @@ These bugs turned up while building and running the self-hosted stack in `docker
 - **Fix:** read the aggregates with plain SELECTs, which take no locks, and write only rows that drifted, each by primary key and only if it still holds the values read. A batch with nothing to correct now issues no writes at all, taking 24 ms for 500 live collections. One code path now serves MariaDB and SQLite. Covered by `CbpReleaseEligibilityTest`, which also runs on MariaDB through `CbpReleaseEligibilityMariaDbTest`.
 - **Made worse by:** `collection_delay_hours = 0`, which made every collection old enough to reconcile and release as it is, so the reconcile swept collections header workers were still writing. `tuning.sql` now sets 2, the app's own default.
 
+### 39. One dead address in a round-robin IRC host kept the EFnet scraper offline (Fixed)
+
+- **Where:** `IRCClient::_initiateStream()` (`app/Services/IRCClient.php`).
+- **Symptom:** `irc.efnet.org` resolves to ten servers. One of them (195.159.90.90) did not answer. PHP's `stream_socket_client()` tries a single resolved address, so the scraper failed with "Unable to connect" every time the dead one came first. The supervisor kept backing off, up to its maximum delay, while the other nine servers were reachable.
+- **Fix:** after the first attempt fails, the client resolves every address of the host and tries each in random order. A TLS connection by address still checks the certificate against the host name.
+
 ## Issues in the docker/ stack itself (all fixed)
 
 | Issue | Fix |
