@@ -1212,6 +1212,101 @@ class ReleaseProcessorTest extends TestCase
     }
 
     #[Test]
+    #[DataProvider('splitVideoPayloads')]
+    public function it_decides_a_split_video_by_its_data_with_only_password_checks(string $payload): void
+    {
+        $config = $this->makeConfig(['processPasswords' => true]);
+        $data = match ($payload) {
+            'video' => "\x1A\x45\xDF\xA3".str_repeat("\x00", 200),
+            'archive' => $this->rar('Movie.2026.1080p.mkv', str_repeat('x', 100)),
+            'encrypted archive' => $this->rar('Movie.2026.1080p.mkv', str_repeat('x', 100), encryptedFile: true),
+        };
+        $nzbParser = Mockery::mock(NzbContentParser::class);
+        $nzbParser->shouldReceive('parseNzb')->once()->andReturn([
+            'error' => null,
+            'contents' => [
+                ['title' => '"Movie.2026.sample.mkv" yEnc (1/5)', 'segments' => ['<s-1>']],
+                ['title' => '"Movie.2026.mkv.001" yEnc (1/80)', 'segments' => ['<m1-1>', '<m1-2>']],
+                ['title' => '"Movie.2026.mkv.002" yEnc (1/80)', 'segments' => ['<m2-1>', '<m2-2>']],
+            ],
+        ]);
+
+        $downloadService = Mockery::mock(UsenetDownloadService::class);
+        $this->expectDownloadScope($downloadService);
+        $downloadService->shouldReceive('download')
+            ->once()
+            ->with(DownloadKind::Compressed, ['<m1-1>'], '', 1, '"Movie.2026.mkv.001" yEnc (1/80)')
+            ->andReturn(['success' => true, 'data' => $data, 'groupUnavailable' => false, 'error' => null]);
+
+        $tmpPath = sys_get_temp_dir().'/split-video-'.uniqid().'/';
+        mkdir($tmpPath);
+        $workspace = Mockery::mock(TempWorkspaceService::class);
+        $workspace->shouldReceive('createReleaseTempFolder')->once()->andReturn($tmpPath);
+        $workspace->shouldReceive('listFiles')->andReturn([]);
+        $workspace->shouldReceive('clearDirectory')->once()->with($tmpPath, false)
+            ->andReturnUsing(static function () use ($tmpPath): void {
+                array_map('unlink', glob($tmpPath.'*') ?: []);
+                rmdir($tmpPath);
+            });
+
+        $mediaService = Mockery::mock(MediaExtractionService::class);
+        $releaseManager = Mockery::mock(ReleaseFileManager::class);
+        $releaseManager->shouldReceive('processReleaseNameFromNzbContents')->once()->andReturnFalse();
+        $releaseManager->shouldReceive('finalizeRelease')->once()->andReturnNull();
+        if ($payload === 'video') {
+            $mediaService->shouldIgnoreMissing(false);
+            $releaseManager->shouldNotReceive('addFileInfo');
+        } else {
+            $mediaService->shouldNotReceive('getMediaInfo');
+            $releaseManager->shouldReceive('addFileInfo')
+                ->once()
+                ->with(Mockery::on(static fn (array $file): bool => $file['name'] === 'Movie.2026.1080p.mkv'), Mockery::any(), Mockery::any())
+                ->andReturnUsing(static function (array $file, ReleaseProcessingContext $context): bool {
+                    if ($file['pass']) {
+                        $context->releaseHasPassword = true;
+                        $context->passwordStatus = ReleaseBrowseService::PASSWD_RAR;
+
+                        return false;
+                    }
+
+                    return true;
+                });
+        }
+
+        $processor = new ReleaseProcessor(
+            $config,
+            $nzbParser,
+            new AdditionalWorkPlanner($config),
+            new ArchiveExtractionService($config),
+            $mediaService,
+            $downloadService,
+            $releaseManager,
+            Mockery::mock(ReleaseFilesArchiveFallback::class)->shouldIgnoreMissing(),
+            $workspace,
+            Mockery::mock(ConsoleOutputService::class)->shouldIgnoreMissing()
+        );
+
+        $context = $this->makeContext();
+        $context->release->nfostatus = 1;
+        $processor->process($context, '/tmp/main/');
+
+        $this->assertSame($payload === 'encrypted archive', $context->releaseHasPassword);
+        $this->assertSame($payload === 'video', $context->compressedFilesAreMedia());
+    }
+
+    /**
+     * @return array<string, array{string}>
+     */
+    public static function splitVideoPayloads(): array
+    {
+        return [
+            'video data' => ['video'],
+            'archive data' => ['archive'],
+            'encrypted archive data' => ['encrypted archive'],
+        ];
+    }
+
+    #[Test]
     public function it_lists_the_first_volume_of_several_archive_sets_for_a_season_pack(): void
     {
         $downloaded = [];

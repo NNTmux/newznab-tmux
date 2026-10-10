@@ -270,7 +270,9 @@ class ReleaseFileManager
 
             $releaseFilesCount = ReleaseFile::whereReleasesId($context->release->id)->count('releases_id') ?? 0;
 
-            if (! $context->releaseHasPassword && $context->nzbHasCompressedFile && $releaseFilesCount === 0) {
+            if (! $context->releaseHasPassword && $context->nzbHasCompressedFile && ! $context->compressedFilesAreMedia()
+                && $releaseFilesCount === 0
+            ) {
                 // No file list could be read, often because volumes were still missing.
                 // Queue the release once more after a delay; a second failure stays unknown.
                 $retried = $updateRows['haspreview'] === 0 && Release::query()

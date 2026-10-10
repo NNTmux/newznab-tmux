@@ -59,21 +59,21 @@ class ArchiveExtractionService
 
         $context->compressedFilesChecked++;
 
+        // Plain media is not an archive, even if ArchiveInfo finds a marker inside it.
+        $videoType = self::hasArchiveSignature($compressedData) ? null : $this->detectStandaloneVideo($compressedData);
+        if ($videoType !== null) {
+            return [
+                'success' => false,
+                'files' => [],
+                'hasPassword' => false,
+                'passwordStatus' => ReleaseBrowseService::PASSWD_NONE,
+                'standaloneVideoType' => $videoType,
+                'standaloneVideoData' => $compressedData,
+            ];
+        }
+
         // Try ArchiveInfo for RAR/ZIP/7z
         if (! $this->archiveInfo->setData($compressedData, true)) {
-            // Handle standalone video detection
-            $videoType = $this->detectStandaloneVideo($compressedData);
-            if ($videoType !== null) {
-                return [
-                    'success' => false,
-                    'files' => [],
-                    'hasPassword' => false,
-                    'passwordStatus' => ReleaseBrowseService::PASSWD_NONE,
-                    'standaloneVideoType' => $videoType,
-                    'standaloneVideoData' => $compressedData,
-                ];
-            }
-
             return $result;
         }
 
@@ -343,50 +343,27 @@ class ArchiveExtractionService
     }
 
     /**
-     * Detect standalone video from binary data.
+     * Detect a plain media container (not an archive) from its leading bytes.
      */
     public function detectStandaloneVideo(string $data): ?string
     {
-        $len = strlen($data);
-        if ($len < 16) {
+        if (strlen($data) < 16) {
             return null;
         }
 
-        // AVI
-        if (strncmp($data, 'RIFF', 4) === 0 && substr($data, 8, 4) === 'AVI ') {
-            return 'avi';
-        }
-        // Matroska / WebM
-        if (strncmp($data, "\x1A\x45\xDF\xA3", 4) === 0) {
-            return 'mkv';
-        }
-        // MPEG
         $sig4 = substr($data, 0, 4);
-        if ($sig4 === "\x00\x00\x01\xBA" || $sig4 === "\x00\x00\x01\xB3") {
-            return 'mpg';
-        }
-        // Transport Stream
-        if ($len >= 188 * 5) {
-            $isTs = true;
-            for ($i = 0; $i < 5; $i++) {
-                if (! isset($data[188 * $i]) || $data[188 * $i] !== "\x47") {
-                    $isTs = false;
-                    break;
-                }
-            }
-            if ($isTs) {
-                return 'mpg';
-            }
-        }
-        // MP4/MOV
-        if (substr($data, 4, 4) === 'ftyp') {
-            $brands = ['isom', 'iso2', 'avc1', 'mp41', 'mp42', 'dash', 'MSNV', 'qt  ', 'M4V ', 'M4P ', 'M4B ', 'M4A '];
-            if (in_array(substr($data, 8, 4), $brands, true)) {
-                return 'mp4';
-            }
-        }
 
-        return null;
+        return match (true) {
+            $sig4 === 'RIFF' && substr($data, 8, 4) === 'AVI ' => 'avi',
+            $sig4 === "\x1A\x45\xDF\xA3" => 'mkv',
+            $sig4 === "\x00\x00\x01\xBA", $sig4 === "\x00\x00\x01\xB3" => 'mpg',
+            $data[0] === "\x47" && ($data[188] ?? '') === "\x47" && ($data[376] ?? '') === "\x47" => 'ts',
+            substr($data, 4, 4) === 'ftyp' && preg_match('/^[\x20-\x7E]{4}$/', substr($data, 8, 4)) === 1 => 'mp4',
+            str_starts_with($data, "\x30\x26\xB2\x75\x8E\x66\xCF\x11") => 'wmv',
+            str_starts_with($data, "FLV\x01") => 'flv',
+            $sig4 === 'OggS' => 'ogv',
+            default => null,
+        };
     }
 
     /**

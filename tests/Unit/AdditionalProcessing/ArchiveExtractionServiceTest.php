@@ -110,7 +110,27 @@ class ArchiveExtractionServiceTest extends TestCase
 
         $this->assertSame('avi', $service->detectStandaloneVideo($avi));
         $this->assertSame('mp4', $service->detectStandaloneVideo($mp4));
+        $this->assertSame('mp4', $service->detectStandaloneVideo(str_repeat("\0", 4).'ftypmp71'.str_repeat("\0", 16)));
+        $this->assertSame('ts', $service->detectStandaloneVideo(str_repeat("\x47".str_repeat("\0", 187), 3)));
+        $this->assertSame('flv', $service->detectStandaloneVideo("FLV\x01".str_repeat("\0", 16)));
+        $this->assertSame('ogv', $service->detectStandaloneVideo('OggS'.str_repeat("\0", 16)));
         $this->assertNull($service->detectStandaloneVideo('tiny'));
+    }
+
+    #[Test]
+    public function it_treats_plain_media_as_unpassworded_without_archive_inspection(): void
+    {
+        $archiveInfo = Mockery::mock(ArchiveInfo::class);
+        $archiveInfo->shouldNotReceive('setData');
+        $service = new ArchiveExtractionService($this->makeConfig(), $archiveInfo, Mockery::mock(Par2Info::class));
+        $context = new ReleaseProcessingContext(new Release(['id' => 1, 'guid' => 'fixture-guid']));
+        $mkv = "\x1A\x45\xDF\xA3".str_repeat("\0", 60).$this->rar('inner.mkv', 'x');
+
+        $result = $service->processCompressedData($mkv, $context, sys_get_temp_dir().'/');
+
+        $this->assertSame('mkv', $result['standaloneVideoType']);
+        $this->assertFalse($result['hasPassword']);
+        $this->assertSame(ReleaseBrowseService::PASSWD_NONE, $result['passwordStatus']);
     }
 
     #[Test]
