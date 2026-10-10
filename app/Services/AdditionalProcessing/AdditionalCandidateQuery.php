@@ -52,6 +52,9 @@ final class AdditionalCandidateQuery
 
     public const string CLAIM_TOKEN_COLUMN = 'additional_pp_claim_token';
 
+    /** Set once when an unreadable archive is queued for its single retry; never cleared. */
+    public const string ARCHIVE_RETRY_COLUMN = 'archive_retry_at';
+
     private static ?bool $supportsClaims = null;
 
     /**
@@ -111,6 +114,7 @@ final class AdditionalCandidateQuery
             ->where('r.haspreview', -1)
             ->where('r.nzbstatus', 1)
             ->where('c.disablepreview', 0);
+        self::applyArchiveRetryWindow($query);
         if ($min > 0) {
             $query->where('r.size', '>', $min);
         }
@@ -320,6 +324,7 @@ final class AdditionalCandidateQuery
                     ->where('r.passwordstatus', -1)
                     ->where('r.haspreview', -1)
                     ->where('r.nzbstatus', 1);
+                self::applyArchiveRetryWindow($lockQuery);
                 self::applyClaimWindow($lockQuery);
 
                 if (DB::getDriverName() !== 'sqlite') {
@@ -421,6 +426,25 @@ final class AdditionalCandidateQuery
                 ->whereNull('r.'.self::CLAIMED_AT_COLUMN)
                 ->orWhere('r.'.self::CLAIMED_AT_COLUMN, '<', $staleBefore);
         });
+    }
+
+    /**
+     * Keep a release queued for an archive retry out of the candidates until it is due.
+     *
+     * @param  Builder<Release>  $query
+     */
+    private static function applyArchiveRetryWindow(Builder $query): void
+    {
+        $query->where(function (Builder $retryQuery): void {
+            $retryQuery
+                ->whereNull('r.'.self::ARCHIVE_RETRY_COLUMN)
+                ->orWhere('r.'.self::ARCHIVE_RETRY_COLUMN, '<=', now());
+        });
+    }
+
+    public static function archiveRetryDelaySeconds(): int
+    {
+        return max(0, (int) config('nntmux.archive_retry_delay', 86400));
     }
 
     public static function claimTtlSeconds(): int

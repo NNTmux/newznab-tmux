@@ -289,6 +289,35 @@ class AdditionalProcessingReleaseFileManagerTest extends TestCase
         $this->assertSame('Example.Show.S01E01.mkv', DB::table('release_files')->value('name'));
     }
 
+    public function test_an_unreadable_archive_is_queued_for_one_retry_after_the_delay(): void
+    {
+        DB::table('releases')->insert($this->releaseRow());
+        Search::shouldReceive('updateRelease')->twice()->with(1);
+        config(['nntmux.archive_retry_delay' => 3600]);
+        $this->freezeSecond();
+
+        $manager = $this->makeManager();
+        $context = new ReleaseProcessingContext(Release::query()->findOrFail(1));
+        $context->nzbHasCompressedFile = true;
+        $manager->finalizeRelease($context, true);
+
+        $release = DB::table('releases')->where('id', 1)->first();
+        $this->assertSame(-1, (int) $release->passwordstatus);
+        $this->assertSame(-1, (int) $release->haspreview);
+        $this->assertSame(now()->addHour()->toDateTimeString(), (string) $release->archive_retry_at);
+        $this->assertNull($release->additional_pp_claimed_at);
+
+        $this->travel(2)->hours();
+        $context = new ReleaseProcessingContext(Release::query()->findOrFail(1));
+        $context->nzbHasCompressedFile = true;
+        $manager->finalizeRelease($context, true);
+
+        $release = DB::table('releases')->where('id', 1)->first();
+        $this->assertSame(-1, (int) $release->passwordstatus);
+        $this->assertSame(0, (int) $release->haspreview);
+        $this->assertSame(now()->subHour()->toDateTimeString(), (string) $release->archive_retry_at);
+    }
+
     public function test_invalid_release_file_sizes_are_rejected(): void
     {
         DB::table('releases')->insert($this->releaseRow());
@@ -423,6 +452,7 @@ class AdditionalProcessingReleaseFileManagerTest extends TestCase
             $table->integer('pp_timeout_count')->default(0);
             $table->timestamp('additional_pp_claimed_at')->nullable();
             $table->string('additional_pp_claim_token', 64)->nullable();
+            $table->timestamp('archive_retry_at')->nullable();
         });
 
         Schema::create('release_files', function (Blueprint $table): void {

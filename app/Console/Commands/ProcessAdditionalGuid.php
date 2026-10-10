@@ -73,6 +73,7 @@ class ProcessAdditionalGuid extends Command
             Release::where('id', $release->id)->update([
                 'passwordstatus' => -1,
                 'haspreview' => -1,
+                'archive_retry_at' => null,
                 'jpgstatus' => 0,
                 'videostatus' => 0,
                 'nfostatus' => -1,

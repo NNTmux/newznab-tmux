@@ -68,7 +68,7 @@ final class AdditionalCandidateQueryMariaDbTest extends TestCase
         DB::statement(<<<SQL
             INSERT INTO `{$releasesTable}` (
                 id, guid, leftguid, passwordstatus, haspreview, nzbstatus,
-                categories_id, size, postdate, additional_pp_claimed_at
+                categories_id, size, postdate, additional_pp_claimed_at, archive_retry_at
             )
             SELECT
                 seq,
@@ -80,7 +80,8 @@ final class AdditionalCandidateQueryMariaDbTest extends TestCase
                 1,
                 2097152,
                 DATE_SUB(NOW(), INTERVAL seq SECOND),
-                IF(MOD(seq, 679) = 0, NOW(), NULL)
+                IF(MOD(seq, 679) = 0, NOW(), NULL),
+                IF(MOD(seq, 485) = 0, DATE_ADD(NOW(), INTERVAL 1 DAY), NULL)
             FROM seq_1_to_50000
             SQL);
 
@@ -94,6 +95,7 @@ final class AdditionalCandidateQueryMariaDbTest extends TestCase
               AND r.haspreview = -1
               AND r.nzbstatus = 1
               AND c.disablepreview = 0
+              AND (r.archive_retry_at IS NULL OR r.archive_retry_at <= NOW())
               AND r.size > 1048576
               AND r.size < 107374182400
               AND r.leftguid = 'a'
@@ -111,6 +113,7 @@ final class AdditionalCandidateQueryMariaDbTest extends TestCase
               AND r.haspreview = -1
               AND r.nzbstatus = 1
               AND c.disablepreview = 0
+              AND (r.archive_retry_at IS NULL OR r.archive_retry_at <= NOW())
               AND r.size > 1048576
               AND r.size < 107374182400
             GROUP BY r.leftguid
@@ -125,6 +128,7 @@ final class AdditionalCandidateQueryMariaDbTest extends TestCase
               AND r.haspreview = -1
               AND r.nzbstatus = 1
               AND c.disablepreview = 0
+              AND (r.archive_retry_at IS NULL OR r.archive_retry_at <= NOW())
               AND r.size > 1048576
               AND r.size < 107374182400
             SQL);
@@ -207,6 +211,7 @@ final class AdditionalCandidateQueryMariaDbTest extends TestCase
                           AND r.haspreview = -1
                           AND r.nzbstatus = 1
                           AND c.disablepreview = 0
+                          AND (r.archive_retry_at IS NULL OR r.archive_retry_at <= NOW())
                           AND r.leftguid = 'a'
                           AND (r.additional_pp_claimed_at IS NULL OR r.additional_pp_claimed_at < DATE_SUB(NOW(), INTERVAL 300 SECOND))
                         ORDER BY r.postdate DESC, r.id ASC
@@ -297,6 +302,7 @@ final class AdditionalCandidateQueryMariaDbTest extends TestCase
                 postdate DATETIME NULL,
                 additional_pp_claimed_at TIMESTAMP NULL,
                 additional_pp_claim_token VARCHAR(64) NULL,
+                archive_retry_at TIMESTAMP NULL,
                 KEY ix_releases_haspreview_passwordstatus (haspreview, passwordstatus),
                 KEY ix_releases_add_pp_claim_queue (passwordstatus, haspreview, nzbstatus, leftguid, postdate DESC, id, additional_pp_claimed_at)
             ) ENGINE=InnoDB
