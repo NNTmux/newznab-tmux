@@ -43,7 +43,7 @@ class UpdateNNTmuxGit extends Command
     public function handle(NntmuxUpdateLock $lock): int
     {
         try {
-            return $lock->run(fn (): int => $this->updateRepository(), gitLockTimeout: (int) $this->option('git-lock-timeout'));
+            return $lock->run(fn (): int => $this->updateRepository($lock), gitLockTimeout: (int) $this->option('git-lock-timeout'));
         } catch (\Exception $e) {
             $this->error('❌ Git update failed: '.$e->getMessage());
 
@@ -51,7 +51,7 @@ class UpdateNNTmuxGit extends Command
         }
     }
 
-    private function updateRepository(): int
+    private function updateRepository(NntmuxUpdateLock $lock): int
     {
         $this->info('🔄 Starting git update process...');
 
@@ -65,7 +65,7 @@ class UpdateNNTmuxGit extends Command
         // Check for uncommitted changes
         if ($this->hasUncommittedChanges() && ! $this->option('no-stash')) {
             $this->info('📦 Stashing local changes...');
-            $this->stashChanges();
+            $this->stashChanges($lock);
         }
 
         // Get current branch
@@ -117,15 +117,54 @@ class UpdateNNTmuxGit extends Command
     /**
      * Stash uncommitted changes
      */
-    private function stashChanges(): void
+    private function stashChanges(NntmuxUpdateLock $lock): void
     {
-        $process = Process::path(base_path())->timeout(300)->run(['git', 'stash', 'push', '-m', 'Auto-stash before update on '.now()->toDateTimeString()]);
+        $stashReference = $this->getStashReference();
+        $deadline = hrtime(true) + max(0, (int) $this->option('git-lock-timeout')) * 1_000_000_000;
 
-        if (! $process->successful()) {
-            throw new \Exception('Failed to stash changes: '.$process->errorOutput());
+        for ($attempt = 1; $attempt <= 3; $attempt++) {
+            $remainingSeconds = max(0, (int) ceil(($deadline - hrtime(true)) / 1_000_000_000));
+            $lock->ensureGitAvailable($remainingSeconds);
+            $process = Process::path(base_path())->timeout(300)->run(['git', 'stash', 'push', '-m', 'Auto-stash before update on '.now()->toDateTimeString()]);
+
+            if ($process->successful()) {
+                $this->line('  ✓ Changes stashed successfully');
+
+                return;
+            }
+
+            $details = trim($process->errorOutput()."\n".$process->output());
+            $message = 'Failed to stash changes (exit '.$process->exitCode().'): '.($details !== ''
+                ? $details
+                : 'Git returned no output. Its index refresh may have failed; check index locks, repository permissions, and available disk space.');
+
+            if ($this->getStashReference() !== $stashReference) {
+                throw new \Exception($message.' The stash reference changed; inspect git stash list and git status before retrying.');
+            }
+
+            $mayBeIndexLockFailure = $details === '' || str_contains($details, 'index.lock');
+            if (! $mayBeIndexLockFailure || $attempt === 3 || hrtime(true) >= $deadline) {
+                throw new \Exception($message);
+            }
+
+            $this->warn('  ⚠ Git stash failed before saving changes; retrying ('.($attempt + 1).'/3)...');
+            usleep(100_000);
+        }
+    }
+
+    private function getStashReference(): ?string
+    {
+        $process = Process::path(base_path())->run(['git', 'rev-parse', '--verify', '--quiet', 'refs/stash']);
+
+        if ($process->successful()) {
+            return trim($process->output());
         }
 
-        $this->line('  ✓ Changes stashed successfully');
+        if ($process->exitCode() === 1 && trim($process->errorOutput()) === '') {
+            return null;
+        }
+
+        throw new \Exception('Failed to check existing stash: '.$process->errorOutput());
     }
 
     /**

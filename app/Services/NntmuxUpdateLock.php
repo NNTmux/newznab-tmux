@@ -58,7 +58,7 @@ class NntmuxUpdateLock
         }
     }
 
-    private function ensureGitAvailable(int $timeout): void
+    public function ensureGitAvailable(int $timeout): void
     {
         $result = Process::path(base_path())->run(['git', 'rev-parse', '--path-format=absolute', '--git-path', 'index.lock']);
         $path = trim($result->output());
