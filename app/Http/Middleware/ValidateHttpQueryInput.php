@@ -16,7 +16,8 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * Validates the complete effective input (URL and JSON body together), then
  * rewrites both parameter bags into the canonical form a GET request would
- * produce, so controllers keep their legacy parsing. Other methods pass through.
+ * produce, so controllers keep their legacy parsing. For v2, other methods get
+ * the same URL value-type check; v1 keeps its legacy array parameters.
  *
  * Laravel decodes JSON bodies while capturing the request, so the size check
  * here is a contract limit; the resource limit belongs to the web server.
@@ -36,6 +37,11 @@ final class ValidateHttpQueryInput
     public function handle(Request $request, Closure $next, string $version = 'v2'): Response
     {
         if (! $request->isMethod('QUERY')) {
+            $error = $version === 'v2' ? $this->validateUrlValues($request->query->all()) : null;
+            if ($error !== null) {
+                return $this->errorResponse($version, $error['status'], $error['message']);
+            }
+
             return $next($request);
         }
 
@@ -103,9 +109,23 @@ final class ValidateHttpQueryInput
             }
         }
 
+        return $this->validateUrlValues($query);
+    }
+
+    /**
+     * Reject URL parameters sent as arrays (`?id[]=x`) unless they are list
+     * parameters, so scalar filters never reach the controllers as arrays.
+     *
+     * @param  array<array-key, mixed>  $query
+     * @return array{status: int, message: string}|null
+     */
+    private function validateUrlValues(array $query): ?array
+    {
         foreach ($query as $key => $value) {
             if (! $this->isValidUrlValue((string) $key, $value)) {
-                return ['status' => 400, 'message' => 'Parameter '.$key.' has an unsupported type'];
+                $name = preg_match(self::KEY_PATTERN, (string) $key) === 1 ? (string) $key : 'value';
+
+                return ['status' => 400, 'message' => 'Parameter '.$name.' has an unsupported type'];
             }
         }
 

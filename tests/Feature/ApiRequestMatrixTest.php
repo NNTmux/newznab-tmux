@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Facades\Search;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Controllers\Api\ApiV2Controller;
 use App\Models\Category;
@@ -11,6 +12,9 @@ use App\Services\Api\ApiUsageService;
 use App\Services\Nzb\NzbService;
 use App\Services\Releases\ReleaseBrowseService;
 use App\Services\Releases\ReleaseSearchService;
+use App\Services\Search\DTO\ReleaseSearchQuery;
+use App\Services\Search\DTO\SearchPage;
+use App\Services\Search\Support\SearchFailureTracker;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Filesystem\Filesystem;
@@ -1160,6 +1164,258 @@ class ApiRequestMatrixTest extends TestCase
         $stats = app(ApiUsageService::class)->statistics($userId);
         $this->assertSame(2, (int) $stats->api_count);
         $this->assertSame(1, (int) $stats->grab_count);
+    }
+
+    public function test_v2_getnzb_streams_the_nzb_and_records_one_grab(): void
+    {
+        $userId = (int) DB::table('users')->value('id');
+        $nzbFolder = $this->writeReleaseNzb();
+
+        try {
+            $response = $this->get('/api/v2/getnzb?api_token='.$this->apiToken().'&id=release-guid');
+            $response->assertOk()->assertHeader('Content-Type', 'application/x-nzb');
+            $this->assertStringContainsString('<nzb', $response->streamedContent());
+        } finally {
+            (new Filesystem)->deleteDirectory($nzbFolder);
+        }
+
+        $this->assertSame(1, DB::table('user_requests')->where('users_id', $userId)->count());
+        $this->assertSame(1, DB::table('user_downloads')->where(['users_id' => $userId, 'releases_id' => 1])->count());
+    }
+
+    public function test_v2_getnzb_without_a_backing_nzb_file_returns_a_json_404(): void
+    {
+        config(['nntmux_settings.path_to_nzbs' => sys_get_temp_dir().'/nntmux-api-matrix-missing-'.bin2hex(random_bytes(6))]);
+
+        $this->getJson('/api/v2/getnzb?api_token='.$this->apiToken().'&id=release-guid')
+            ->assertNotFound()
+            ->assertJsonPath('error', 'NZB file not found!');
+
+        $this->assertSame(0, DB::table('user_downloads')->count());
+    }
+
+    public function test_v2_getnzb_with_an_exhausted_download_allowance_returns_a_json_429(): void
+    {
+        $userId = (int) DB::table('users')->value('id');
+        DB::table('roles')->where('id', 1)->update(['downloadrequests' => 1]);
+        DB::table('user_downloads')->insert(['users_id' => $userId, 'releases_id' => 1, 'timestamp' => now()]);
+        $nzbFolder = $this->writeReleaseNzb();
+
+        try {
+            $this->getJson('/api/v2/getnzb?api_token='.$this->apiToken().'&id=release-guid')
+                ->assertTooManyRequests()
+                ->assertJsonPath('error', 'Download limit reached');
+        } finally {
+            (new Filesystem)->deleteDirectory($nzbFolder);
+        }
+
+        $this->assertSame(1, DB::table('user_downloads')->where('users_id', $userId)->count());
+    }
+
+    public function test_v2_getnzb_for_an_unknown_guid_returns_a_json_404(): void
+    {
+        $this->getJson('/api/v2/getnzb?api_token='.$this->apiToken().'&id=unknown-guid')
+            ->assertNotFound()
+            ->assertJsonPath('error', 'No such item (the guid you provided has no release in our database)');
+    }
+
+    public function test_v2_quota_allows_exactly_the_role_limit_despite_cached_statistics(): void
+    {
+        $userId = (int) DB::table('users')->value('id');
+        DB::table('roles')->where('id', 1)->update(['apirequests' => 2]);
+        $this->bindSearchMocks()->shouldReceive('apiSearch')->twice()->andReturn(collect());
+        // Warm the 60-second display cache at zero requests.
+        app(ApiUsageService::class)->statistics($userId);
+
+        $this->getJson('/api/v2/search?api_token='.$this->apiToken().'&id=one')
+            ->assertOk()
+            ->assertJsonPath('apiCurrent', 1);
+        $this->getJson('/api/v2/search?api_token='.$this->apiToken().'&id=two')
+            ->assertOk()
+            ->assertJsonPath('apiCurrent', 2);
+        $this->getJson('/api/v2/search?api_token='.$this->apiToken().'&id=three')
+            ->assertTooManyRequests()
+            ->assertJsonPath('error', 'Request limit reached');
+
+        $this->assertSame(2, DB::table('user_requests')->where('users_id', $userId)->count());
+    }
+
+    public function test_v1_quota_rejects_a_user_exactly_at_the_role_limit(): void
+    {
+        DB::table('roles')->where('id', 1)->update(['apirequests' => 1]);
+        DB::table('user_requests')->insert([
+            'users_id' => (int) DB::table('users')->value('id'),
+            'request' => '/api/v1/api?q=earlier&t=search',
+            'timestamp' => now(),
+        ]);
+
+        $this->get('/api/v1/api?t=search&apikey='.$this->apiToken().'&q=ubuntu')
+            ->assertTooManyRequests()
+            ->assertSee('Request limit reached (1/1)', false);
+    }
+
+    /**
+     * @return array<string, array{string, string}>
+     */
+    public static function invalidV2PaginationProvider(): array
+    {
+        return [
+            'zero limit' => ['limit=0', 'Incorrect parameter (limit must be a positive integer, at most 100 results are returned)'],
+            'non-numeric limit' => ['limit=ten', 'Incorrect parameter (limit must be a positive integer, at most 100 results are returned)'],
+            'negative offset' => ['offset=-5', 'Incorrect parameter (offset must be a non-negative integer)'],
+            'fractional offset' => ['offset=1.5', 'Incorrect parameter (offset must be a non-negative integer)'],
+        ];
+    }
+
+    #[DataProvider('invalidV2PaginationProvider')]
+    public function test_v2_search_rejects_invalid_pagination(string $parameter, string $error): void
+    {
+        $this->bindSearchMocks()->shouldNotReceive('apiSearch');
+
+        $this->getJson('/api/v2/search?api_token='.$this->apiToken().'&id=ubuntu&'.$parameter)
+            ->assertBadRequest()
+            ->assertJsonPath('error', $error);
+    }
+
+    public function test_v2_search_caps_limit_at_the_advertised_maximum(): void
+    {
+        $this->bindSearchMocks()->shouldReceive('apiSearch')
+            ->once()
+            ->with('ubuntu', -1, 0, 100, -1, [5030], [-1], 0, 'posted_desc', null)
+            ->andReturn(collect());
+
+        $this->getJson('/api/v2/search?api_token='.$this->apiToken().'&id=ubuntu&limit=5000')->assertOk();
+    }
+
+    public function test_v2_get_rejects_array_values_for_scalar_parameters_before_recording_usage(): void
+    {
+        $this->bindSearchMocks()->shouldNotReceive('apiSearch');
+
+        $this->getJson('/api/v2/search?api_token='.$this->apiToken().'&id[]=ubuntu')
+            ->assertBadRequest()
+            ->assertJsonPath('error', 'Parameter id has an unsupported type');
+
+        $this->assertSame(0, DB::table('user_requests')->count());
+    }
+
+    public function test_v2_anime_passes_minsize_to_the_search(): void
+    {
+        $this->bindSearchMocks()->shouldReceive('animeSearch')
+            ->once()
+            ->with(-1, 0, 100, 'naruto', [-1], -1, [5030], -1, 'posted_desc', 1024)
+            ->andReturn(collect());
+
+        $this->getJson('/api/v2/anime?api_token='.$this->apiToken().'&id=naruto&minsize=1024')->assertOk();
+    }
+
+    public function test_v2_search_failure_returns_retryable_503_and_is_not_cached(): void
+    {
+        $search = $this->bindSearchMocks();
+        $search->shouldReceive('apiSearch')->once()->andReturnUsing(function (): Collection {
+            app(SearchFailureTracker::class)->record();
+
+            return collect();
+        });
+        $search->shouldReceive('apiSearch')->once()->andReturn(collect([$this->releaseRow(1)]));
+
+        $this->getJson('/api/v2/search?api_token='.$this->apiToken().'&id=ubuntu')
+            ->assertServiceUnavailable()
+            ->assertHeader('Retry-After', '30')
+            ->assertJsonPath('error', 'Search is temporarily unavailable, retry shortly');
+
+        $this->getJson('/api/v2/search?api_token='.$this->apiToken().'&id=ubuntu')
+            ->assertOk()
+            ->assertJsonCount(1, 'results');
+    }
+
+    public function test_v2_search_failure_serves_the_last_known_rows_while_they_are_still_stale_cached(): void
+    {
+        config(['nntmux.api.release_cache_ttl' => 1, 'nntmux.api.release_cache_jitter' => 0]);
+        $search = $this->bindSearchMocks();
+        $search->shouldReceive('apiSearch')->once()->andReturn(collect([$this->releaseRow(1)]));
+        $search->shouldReceive('apiSearch')->once()->andReturnUsing(function (): Collection {
+            app(SearchFailureTracker::class)->record();
+
+            return collect();
+        });
+
+        $this->getJson('/api/v2/search?api_token='.$this->apiToken().'&id=ubuntu')->assertOk()->assertJsonCount(1, 'results');
+        $this->travel(5)->seconds();
+
+        $this->getJson('/api/v2/search?api_token='.$this->apiToken().'&id=ubuntu')
+            ->assertOk()
+            ->assertJsonCount(1, 'results');
+    }
+
+    public function test_v2_search_results_include_the_release_guid(): void
+    {
+        $this->bindSearchMocks()->shouldReceive('apiSearch')->once()->andReturn(collect([$this->releaseRow(1)]));
+
+        $this->getJson('/api/v2/search?api_token='.$this->apiToken().'&id=ubuntu')
+            ->assertOk()
+            ->assertJsonPath('results.0.guid', 'movie-release-guid');
+    }
+
+    public function test_v2_capabilities_only_advertise_filters_the_endpoints_apply(): void
+    {
+        $searching = $this->getJson('/api/v2/capabilities')->assertOk()->json('searching');
+
+        foreach ($searching as $function => $capability) {
+            $parameters = explode(',', $capability['supportedParams']);
+            $this->assertNotContains('maxsize', $parameters, $function);
+            $this->assertNotContains('genre', $parameters, $function);
+        }
+        $this->assertContains('minsize', explode(',', $searching['anime-search']['supportedParams']));
+    }
+
+    public function test_name_sorted_api_search_orders_all_index_candidates_by_name_before_paging(): void
+    {
+        DB::table('releases')->insert(array_merge((array) DB::table('releases')->where('id', 1)->first(), [
+            'id' => 2,
+            'searchname' => 'Alpha.Release',
+            'guid' => 'alpha-guid',
+        ]));
+        $pdo = DB::connection()->getPdo();
+        if ($pdo instanceof PDO && method_exists($pdo, 'sqliteCreateFunction')) {
+            $pdo->sqliteCreateFunction('CONCAT', static fn (...$parts): string => implode('', $parts));
+        }
+        Search::shouldReceive('isAvailable')->andReturn(true);
+        Search::shouldReceive('searchReleasePage')
+            ->twice()
+            ->withArgs(static fn (ReleaseSearchQuery $query): bool => $query->offset === 0 && $query->limit === 2000)
+            ->andReturn(new SearchPage(ids: [1, 2], total: 2, fuzzy: false, driver: 'manticore'));
+        $service = app(ReleaseSearchService::class);
+
+        $firstPage = $service->apiSearch('release', -1, 0, 1, -1, [], [-1], 0, 'name_asc');
+        $secondPage = $service->apiSearch('release', -1, 1, 1, -1, [], [-1], 0, 'name_asc');
+
+        $this->assertSame(['Alpha.Release'], $firstPage->pluck('searchname')->all());
+        $this->assertSame(2, $firstPage[0]->_totalrows);
+        $this->assertTrue($firstPage[0]->_search_has_more);
+        $this->assertSame(['Ubuntu.Release'], $secondPage->pluck('searchname')->all());
+        $this->assertFalse($secondPage[0]->_search_has_more);
+    }
+
+    public function test_movie_name_search_filters_every_index_match_before_capping(): void
+    {
+        config(['search.default' => 'manticore', 'search.drivers.manticore.max_matches' => 7500]);
+        Search::shouldReceive('isAvailable')->andReturn(true);
+        Search::shouldReceive('searchReleases')->once()->with(['searchname' => 'ubuntu'], 7500)->andReturn([1]);
+        Search::shouldReceive('searchReleasesFiltered')->once()->andReturn(['ids' => [], 'total' => 0, 'fuzzy' => false]);
+
+        $releases = app(ReleaseSearchService::class)->moviesSearch(name: 'ubuntu');
+
+        $this->assertCount(0, $releases);
+    }
+
+    private function writeReleaseNzb(): string
+    {
+        $nzbFolder = sys_get_temp_dir().'/nntmux-api-matrix-nzbs-'.bin2hex(random_bytes(6));
+        config(['nntmux_settings.path_to_nzbs' => $nzbFolder]);
+        $nzbFile = app(NzbService::class)->getNzbPath('release-guid', 0, true);
+        file_put_contents($nzbFile, (string) gzencode('<?xml version="1.0" encoding="UTF-8"?><nzb xmlns="http://www.newzbin.com/DTD/2003/nzb"></nzb>'));
+
+        return $nzbFolder;
     }
 
     private function apiToken(): string

@@ -7,6 +7,7 @@ namespace App\Services\Api;
 use App\Jobs\UpdateUserApiAccess;
 use App\Models\User;
 use App\Models\UserRequest;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
@@ -26,6 +27,10 @@ final class ApiUsageService
     ];
 
     private const AUDIT_VALUE_MAX_LENGTH = 64;
+
+    private const QUOTA_LOCK_SECONDS = 10;
+
+    private const QUOTA_LOCK_WAIT_SECONDS = 5;
 
     /** Matches the `user_requests.request` varchar(255) column. */
     private const AUDIT_MAX_LENGTH = 255;
@@ -50,6 +55,36 @@ final class ApiUsageService
                 [$userId, $oneDayAgo, $userId, $oneDayAgo, $userId, $oneDayAgo, $userId, $oneDayAgo]
             );
         });
+    }
+
+    /**
+     * Atomically check the rolling 24-hour request quota and record the request.
+     *
+     * Enforcement counts `user_requests` directly instead of reading the cached
+     * {@see statistics()}, and holds a per-user lock so concurrent requests
+     * cannot all claim the last remaining slot.
+     *
+     * @return int|null Requests used in the window including this one, or null when the quota is exhausted (nothing recorded)
+     *
+     * @throws LockTimeoutException When another request for the same user holds the lock for too long
+     */
+    public function reserve(User $user, Request $request, int $maxRequests): ?int
+    {
+        return Cache::lock('api_quota:'.$user->id, self::QUOTA_LOCK_SECONDS)
+            ->block(self::QUOTA_LOCK_WAIT_SECONDS, function () use ($user, $request, $maxRequests): ?int {
+                $used = UserRequest::query()
+                    ->where('users_id', $user->id)
+                    ->where('timestamp', '>', now()->subDay()->toDateTimeString())
+                    ->count();
+
+                if ($used >= $maxRequests) {
+                    return null;
+                }
+
+                $this->record($user, $request);
+
+                return $used + 1;
+            });
     }
 
     public function record(User $user, Request $request): void

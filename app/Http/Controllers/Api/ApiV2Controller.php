@@ -24,17 +24,16 @@ use App\Services\Releases\ReleaseBrowseService;
 use App\Services\Releases\ReleaseSearchService;
 use App\Services\Search\DTO\SearchCursor;
 use App\Services\Search\SearchCursorCodec;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Routing\Redirector;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
+use STS\ZipStream\Builder;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ApiV2Controller extends BasePageController
 {
@@ -97,6 +96,10 @@ class ApiV2Controller extends BasePageController
     /**
      * Validate API token and return cached user, or a normalized JSON API error on failure.
      * Caches user lookup for 5 minutes to reduce DB hits.
+     *
+     * With $enforceRequestLimit, every authenticated request is checked against the
+     * rolling daily quota and recorded in one atomic step, whether or not its
+     * parameters later turn out to be invalid.
      */
     private function resolveUser(Request $request, bool $enforceRequestLimit = true): User|JsonResponse
     {
@@ -119,12 +122,20 @@ class ApiV2Controller extends BasePageController
         $user->loadMissing('role');
 
         if ($enforceRequestLimit) {
-            $userStats = $this->userStatsFor($user);
-            $thisRequests = (int) ($userStats->api_count ?? 0);
-            $maxRequests = (int) $user->role->apirequests;
-            if ($thisRequests > $maxRequests) {
+            try {
+                $used = $this->usageService->reserve($user, $request, (int) $user->role->apirequests);
+            } catch (LockTimeoutException) {
+                return apiJsonError(500, 'Too many concurrent requests, retry shortly');
+            }
+
+            if ($used === null) {
                 return apiJsonError(500, 'Request limit reached');
             }
+
+            // The display statistics are cached; report the count enforcement just saw.
+            $userStats = clone $this->usageService->statistics($user->id);
+            $userStats->api_count = $used;
+            $this->resolvedUserStats[$user->id] = $userStats;
         }
 
         return $user;
@@ -153,11 +164,6 @@ class ApiV2Controller extends BasePageController
     private function userStatsFor(User $user): object
     {
         return $this->resolvedUserStats[$user->id] ??= $this->usageService->statistics($user->id);
-    }
-
-    private function recordApiRequest(User $user, Request $request): void
-    {
-        $this->usageService->record($user, $request);
     }
 
     /**
@@ -205,6 +211,9 @@ class ApiV2Controller extends BasePageController
 
     private function resolvePaginationOffset(Request $request, int $limit): int|JsonResponse
     {
+        if ($request->has('offset') && ! $this->isNonNegativeInteger($request->input('offset'))) {
+            return $this->jsonResponse(['error' => 'Incorrect parameter (offset must be a non-negative integer)'], 400);
+        }
         $offset = $this->queryParameters->offset($request);
         if (! $request->has('cursor')) {
             $this->paginationContext = ['enabled' => false, 'offset' => $offset, 'limit' => $limit, 'query_hash' => '', 'cursor' => null];
@@ -248,6 +257,25 @@ class ApiV2Controller extends BasePageController
             'endpoint' => $request->path(),
             'params' => $this->inputCanonicalizer->canonicalize($request->except(['api_token', 'apikey', 'cursor', 'offset'])),
         ], JSON_THROW_ON_ERROR));
+    }
+
+    /**
+     * Page size: a positive integer, capped at the maximum advertised in capabilities.
+     */
+    private function parseLimit(Request $request): int|JsonResponse
+    {
+        if ($request->has('limit')
+            && (! $this->isNonNegativeInteger($request->input('limit')) || (int) $request->input('limit') < 1)) {
+            return $this->jsonResponse(['error' => 'Incorrect parameter (limit must be a positive integer, at most '.ApiQueryParameters::MAX_LIMIT.' results are returned)'], 400);
+        }
+
+        return $this->queryParameters->limit($request);
+    }
+
+    private function isNonNegativeInteger(mixed $value): bool
+    {
+        return (is_int($value) && $value >= 0)
+            || (is_string($value) && preg_match('/^\d{1,9}$/', trim($value)) === 1);
     }
 
     private function parseMaxAge(Request $request): int|JsonResponse
@@ -303,18 +331,19 @@ class ApiV2Controller extends BasePageController
             return $user;
         }
 
-        $this->recordApiRequest($user, $request);
-
         // Get request parameters efficiently
         $imdbId = (string) Str::replace('tt', '', (string) $request->input('imdbid', ''));
         $tmdbId = (int) $request->input('tmdbid', -1);
         $traktId = (int) $request->input('traktid', -1);
-        $minSize = max(0, (int) $request->input('minsize', 0));
+        $minSize = $this->queryParameters->minimumSize($request);
         $searchName = $request->input('id', '');
         if ($searchName === '' && ! imdb_id_is_valid($imdbId) && $tmdbId <= 0 && $traktId <= 0) {
             return $this->jsonResponse(['error' => 'Specify id (query), imdbid, tmdbid, or traktid'], 400);
         }
-        $limit = $this->queryParameters->limit($request);
+        $limit = $this->parseLimit($request);
+        if (! is_int($limit)) {
+            return $limit;
+        }
         $offset = $this->resolvePaginationOffset($request, $limit);
         if (! is_int($offset)) {
             return $offset;
@@ -372,13 +401,14 @@ class ApiV2Controller extends BasePageController
             return $user;
         }
 
-        $this->recordApiRequest($user, $request);
-
         if ($request->has('id') && $request->isNotFilled('id')) {
             return $this->jsonResponse(['error' => 'Incorrect parameter (id must not be empty)'], 400);
         }
 
-        $limit = $this->queryParameters->limit($request);
+        $limit = $this->parseLimit($request);
+        if (! is_int($limit)) {
+            return $limit;
+        }
         $offset = $this->resolvePaginationOffset($request, $limit);
         if (! is_int($offset)) {
             return $offset;
@@ -393,7 +423,7 @@ class ApiV2Controller extends BasePageController
             return $sort;
         }
 
-        $minSize = max(0, (int) $request->input('minsize', 0));
+        $minSize = $this->queryParameters->minimumSize($request);
         $catExclusions = User::getCachedCategoryExclusionById($user->id);
         $groupName = $this->queryParameters->group($request);
         $searchName = (string) $request->input('id', '');
@@ -453,13 +483,14 @@ class ApiV2Controller extends BasePageController
             return $user;
         }
 
-        $this->recordApiRequest($user, $request);
-
         if ($request->has('id') && $request->isNotFilled('id')) {
             return $this->jsonResponse(['error' => 'Incorrect parameter (id must not be empty)'], 400);
         }
 
-        $limit = $this->queryParameters->limit($request);
+        $limit = $this->parseLimit($request);
+        if (! is_int($limit)) {
+            return $limit;
+        }
         $offset = $this->resolvePaginationOffset($request, $limit);
         if (! is_int($offset)) {
             return $offset;
@@ -474,7 +505,7 @@ class ApiV2Controller extends BasePageController
             return $sort;
         }
 
-        $minSize = max(0, (int) $request->input('minsize', 0));
+        $minSize = $this->queryParameters->minimumSize($request);
         $catExclusions = User::getCachedCategoryExclusionById($user->id);
         $groupName = $this->queryParameters->group($request);
         $searchName = (string) $request->input('id', '');
@@ -534,8 +565,6 @@ class ApiV2Controller extends BasePageController
             return $user;
         }
 
-        $this->recordApiRequest($user, $request);
-
         $q = (string) $request->input('id', '');
         $anidb = (int) $request->input('anidbid', -1);
         $anilist = (int) $request->input('anilistid', -1);
@@ -543,7 +572,10 @@ class ApiV2Controller extends BasePageController
             return $this->jsonResponse(['error' => 'Specify id (query), anidbid, or anilistid'], 400);
         }
 
-        $limit = $this->queryParameters->limit($request);
+        $limit = $this->parseLimit($request);
+        if (! is_int($limit)) {
+            return $limit;
+        }
         $offset = $this->resolvePaginationOffset($request, $limit);
         if (! is_int($offset)) {
             return $offset;
@@ -559,6 +591,7 @@ class ApiV2Controller extends BasePageController
         }
 
         $catExclusions = User::getCachedCategoryExclusionById($user->id);
+        $minSize = $this->queryParameters->minimumSize($request);
 
         $relData = $this->releaseRowCache->remember('v2', 'anime', [
             'id' => $q,
@@ -570,6 +603,7 @@ class ApiV2Controller extends BasePageController
             'sort' => $sort,
             'category' => $categoryID,
             'max_age' => $maxAge,
+            'min_size' => $minSize,
             'excluded' => $catExclusions,
         ], fn () => $this->releaseSearchService->animeSearch(
             $anidb,
@@ -580,7 +614,8 @@ class ApiV2Controller extends BasePageController
             $maxAge,
             $catExclusions,
             $anilist,
-            $sort
+            $sort,
+            $minSize
         ));
 
         return $this->buildSearchResponse($relData, $user);
@@ -597,10 +632,8 @@ class ApiV2Controller extends BasePageController
             return $user;
         }
 
-        $this->recordApiRequest($user, $request);
-
         $catExclusions = User::getCachedCategoryExclusionById($user->id);
-        $minSize = $request->has('minsize') && $request->input('minsize') > 0 ? $request->input('minsize') : 0;
+        $minSize = $this->queryParameters->minimumSize($request);
         $maxAge = $this->parseMaxAge($request);
         if (! is_int($maxAge)) {
             return $maxAge;
@@ -614,7 +647,10 @@ class ApiV2Controller extends BasePageController
             $groupName = $groupName[0] ?? -1;
         }
         $categoryID = $this->queryParameters->categories($request);
-        $limit = $this->queryParameters->limit($request);
+        $limit = $this->parseLimit($request);
+        if (! is_int($limit)) {
+            return $limit;
+        }
         $offset = $this->resolvePaginationOffset($request, $limit);
         if (! is_int($offset)) {
             return $offset;
@@ -676,7 +712,7 @@ class ApiV2Controller extends BasePageController
         }
 
         $catExclusions = User::getCachedCategoryExclusionById($user->id);
-        $minSize = $request->has('minsize') && $request->input('minsize') > 0 ? $request->input('minsize') : 0;
+        $minSize = $this->queryParameters->minimumSize($request);
         if (! $this->hasTvSearchParameters($request)) {
             return $this->jsonResponse(['error' => 'Specify id (query), vid, tvdbid, traktid, rid, tvmazeid, imdbid, or tmdbid'], 400);
         }
@@ -688,7 +724,6 @@ class ApiV2Controller extends BasePageController
         if (! is_string($sort)) {
             return $sort;
         }
-        $this->recordApiRequest($user, $request);
 
         $siteIdArr = [
             'id' => $request->input('vid') ?? null,
@@ -709,7 +744,10 @@ class ApiV2Controller extends BasePageController
             $airDate = str_replace('/', '-', $year[0].'-'.$episode);
         }
 
-        $limit = $this->queryParameters->limit($request);
+        $limit = $this->parseLimit($request);
+        if (! is_int($limit)) {
+            return $limit;
+        }
         $offset = $this->resolvePaginationOffset($request, $limit);
         if (! is_int($offset)) {
             return $offset;
@@ -750,22 +788,30 @@ class ApiV2Controller extends BasePageController
         return $this->buildSearchResponse($relData, $user);
     }
 
-    public function getNzb(Request $request): Application|ResponseFactory|JsonResponse|Redirector|RedirectResponse
+    /**
+     * Stream a single NZB. Errors from the download path (missing file, exhausted
+     * download allowance) are rendered as JSON like every other v2 error.
+     */
+    public function getNzb(Request $request): JsonResponse|Response|StreamedResponse|Builder
     {
         $user = $this->resolveUser($request);
         if ($user instanceof JsonResponse) {
             return $user;
         }
 
-        $this->recordApiRequest($user, $request);
-        $relData = Release::checkGuidForApi($request->input('id'));
-        if ($relData) {
-            $request->attributes->set(GetNzbController::REQUEST_USER_ATTRIBUTE, $user);
-
-            return app(GetNzbController::class)->getNzb($request);
+        $guid = $this->scalarInput($request, 'id');
+        if ($guid === '') {
+            return apiJsonError(200, 'Missing parameter (id)');
         }
 
-        return $this->jsonResponse(['data' => 'No such item (the guid you provided has no release in our database)'], 404);
+        if (! Release::checkGuidForApi(str_ireplace('.nzb', '', $guid))) {
+            return $this->jsonResponse(['error' => 'No such item (the guid you provided has no release in our database)'], 404);
+        }
+
+        $request->attributes->set(GetNzbController::REQUEST_USER_ATTRIBUTE, $user);
+        $request->attributes->set(GetNzbController::JSON_ERRORS_ATTRIBUTE, true);
+
+        return app(GetNzbController::class)->getNzb($request);
     }
 
     public function nzbAdd(Request $request): JsonResponse
@@ -814,7 +860,6 @@ class ApiV2Controller extends BasePageController
             return $this->jsonResponse(['error' => 'Missing parameter (guid is required for single release details)'], 400);
         }
 
-        $this->recordApiRequest($user, $request);
         $guid = $request->input('id');
         $relData = $this->releaseRowCache->remember('v2', 'details', [
             'guid' => $guid,

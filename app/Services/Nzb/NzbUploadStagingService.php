@@ -12,6 +12,11 @@ use Illuminate\Support\Str;
 
 final class NzbUploadStagingService
 {
+    /**
+     * Hidden directory (relative to the upload folder) in which uploads are assembled.
+     */
+    public const STAGING_DIRECTORY = '.staging';
+
     private const MAX_NFO_SIZE = 65535;
 
     private NzbUploadManifestService $manifests;
@@ -33,8 +38,9 @@ final class NzbUploadStagingService
         $folder = $this->ensureUploadFolder();
 
         $uploadId = Str::uuid()->toString();
+        $stagingDirectory = $this->ensureStagingFolder($folder).DIRECTORY_SEPARATOR.$uploadId;
         $uploadDirectory = $folder.DIRECTORY_SEPARATOR.$uploadId;
-        if (! $this->filesystem->makeDirectory($uploadDirectory, 0775, true)) {
+        if (! $this->filesystem->makeDirectory($stagingDirectory, 0775, true)) {
             throw new NzbUploadException('Failed to create upload staging directory', 500);
         }
 
@@ -45,21 +51,23 @@ final class NzbUploadStagingService
 
         try {
             foreach ($files as [$filename, $content, $type]) {
-                $path = $uploadDirectory.DIRECTORY_SEPARATOR.$filename;
+                $path = $stagingDirectory.DIRECTORY_SEPARATOR.$filename;
                 if ($this->filesystem->put($path, $content) === false) {
                     throw new NzbUploadException("Failed to write {$filename} to disk", 500);
                 }
             }
 
             $this->manifests->create(
-                $uploadDirectory,
+                $stagingDirectory,
                 $uploadId,
                 $nzbName,
                 $nfoDetails[0] ?? null,
             );
+
+            $this->publish($stagingDirectory, $uploadDirectory);
         } catch (\Throwable $exception) {
-            if ($this->filesystem->isDirectory($uploadDirectory)
-                && ! $this->filesystem->deleteDirectory($uploadDirectory)) {
+            if ($this->filesystem->isDirectory($stagingDirectory)
+                && ! $this->filesystem->deleteDirectory($stagingDirectory)) {
                 Log::channel('nzb_upload')->error('Failed to roll back partial API upload', [
                     'upload_id' => $uploadId,
                     'files' => array_column($files, 0),
@@ -120,8 +128,17 @@ final class NzbUploadStagingService
         if ($this->filesystem->exists($path)) {
             throw new NzbUploadException("A staged file named {$filename} already exists", 409);
         }
-        if ($this->filesystem->put($path, $content) === false) {
-            throw new NzbUploadException("Failed to write {$filename} to disk", 500);
+        $temporaryPath = $this->ensureStagingFolder($folder).DIRECTORY_SEPARATOR.Str::uuid()->toString().'.nfo';
+        try {
+            if ($this->filesystem->put($temporaryPath, $content) === false) {
+                throw new NzbUploadException("Failed to write {$filename} to disk", 500);
+            }
+
+            $this->publish($temporaryPath, $path);
+        } finally {
+            if ($this->filesystem->exists($temporaryPath)) {
+                $this->filesystem->delete($temporaryPath);
+            }
         }
 
         Log::channel('nzb_upload')->info('Legacy NFO file staged by API v1', [
@@ -169,6 +186,41 @@ final class NzbUploadStagingService
         }
 
         return [$filename, $basename, $content];
+    }
+
+    /**
+     * Create the hidden work area where uploads are assembled before publication.
+     *
+     * It lives inside the upload folder so publishing is a same-filesystem rename, and its
+     * dot-prefixed name keeps Finder-based scans (`ImportNzbs`, `findManifests()`) from ever
+     * seeing in-progress or abandoned uploads.
+     */
+    private function ensureStagingFolder(string $folder): string
+    {
+        $stagingFolder = $folder.DIRECTORY_SEPARATOR.self::STAGING_DIRECTORY;
+        // Forced (error-suppressed) so concurrent uploads racing to create it don't fail.
+        $this->filesystem->makeDirectory($stagingFolder, 0775, true, true);
+        if (! $this->filesystem->isDirectory($stagingFolder)) {
+            throw new NzbUploadException('Failed to create upload staging directory', 500);
+        }
+
+        return $stagingFolder;
+    }
+
+    /**
+     * Atomically move a fully written upload from the staging area to where importers scan.
+     */
+    private function publish(string $stagingPath, string $publishedPath): void
+    {
+        try {
+            $moved = $this->filesystem->move($stagingPath, $publishedPath);
+        } catch (\Throwable) {
+            $moved = false;
+        }
+
+        if (! $moved) {
+            throw new NzbUploadException('Failed to publish staged upload', 500);
+        }
     }
 
     private function ensureUploadFolder(): string

@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "5f2f7e0b-66a9-4d0f-9f68-2a0e7ac5d4f2",
     "name": "NNTmux API v2",
-    "description": "Code-aligned collection for NNTmux `/api/v2` endpoints.\n\nSource references:\n- routes/api.php\n- app/Http/Controllers/Api/ApiV2Controller.php\n- app/Transformers/ApiTransformer.php\n- app/Transformers/DetailsTransformer.php\n\nNotes:\n- `capabilities` is public.\n- Other endpoints require `api_token` query param and may also be guarded by `auth:api` middleware depending on server auth setup.\n- `details` returns a single object (`link` field), while search endpoints return an envelope with `Results` (`url` field).",
+    "description": "Code-aligned collection for NNTmux `/api/v2` endpoints.\n\nSource references:\n- routes/api.php\n- app/Http/Controllers/Api/ApiV2Controller.php\n- app/Data/Api/ReleaseData.php\n- app/Services/Api/V2/ApiV2Presenter.php\n\nNotes:\n- `capabilities` is public.\n- Other endpoints require `api_token` query param and may also be guarded by `auth:api` middleware depending on server auth setup.\n- `details` returns a single object (`link` field), while search endpoints return an envelope with `results` (`url` and `guid` fields).",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -66,7 +66,7 @@
             }
           ],
           "cookie": [],
-          "body": "{\n  \"server\": {\n    \"title\": \"NNTmux\",\n    \"strapline\": \"High speed indexing\",\n    \"email\": \"admin@example.com\",\n    \"url\": \"https://example.com\"\n  },\n  \"limits\": {\n    \"max\": 100,\n    \"default\": 100\n  },\n  \"searching\": {\n    \"search\": {\n      \"available\": \"yes\",\n      \"supportedParams\": \"id\"\n    },\n    \"tv-search\": {\n      \"available\": \"yes\",\n      \"supportedParams\": \"id,vid,tvdbid,traktid,rid,tvmazeid,imdbid,tmdbid,season,ep\"\n    },\n    \"movie-search\": {\n      \"available\": \"yes\",\n      \"supportedParams\": \"id, imdbid, tmdbid, traktid\"\n    },\n    \"audio-search\": {\n      \"available\": \"no\",\n      \"supportedParams\": \"\"\n    }\n  },\n  \"registration\": {\n    \"available\": \"no\",\n    \"open\": \"yes\"\n  },\n  \"categories\": [\n    {\n      \"id\": 2000,\n      \"name\": \"Movies\",\n      \"subcategories\": {\n        \"2030\": \"SD\",\n        \"2040\": \"HD\"\n      }\n    }\n  ]\n}"
+          "body": "{\n  \"server\": {\n    \"title\": \"NNTmux\",\n    \"strapline\": \"High speed indexing\",\n    \"email\": \"admin@example.com\",\n    \"url\": \"https://example.com\"\n  },\n  \"limits\": {\n    \"max\": 100,\n    \"default\": 100\n  },\n  \"searching\": {\n    \"search\": {\n      \"available\": \"yes\",\n      \"supportedParams\": \"id,group,minsize,maxage,cat,limit,offset,cursor,sort\"\n    },\n    \"tv-search\": {\n      \"available\": \"yes\",\n      \"supportedParams\": \"id,vid,tvdbid,traktid,rid,tvmazeid,imdbid,tmdbid,season,ep,cat,minsize,maxage,limit,offset,cursor,sort\"\n    },\n    \"movie-search\": {\n      \"available\": \"yes\",\n      \"supportedParams\": \"id,imdbid,tmdbid,traktid,cat,minsize,maxage,limit,offset,cursor,sort\"\n    },\n    \"audio-search\": {\n      \"available\": \"yes\",\n      \"supportedParams\": \"id,cat,minsize,maxage,group,limit,offset,cursor,sort\"\n    },\n    \"book-search\": {\n      \"available\": \"yes\",\n      \"supportedParams\": \"id,cat,minsize,maxage,group,limit,offset,cursor,sort\"\n    },\n    \"anime-search\": {\n      \"available\": \"yes\",\n      \"supportedParams\": \"id,anidbid,anilistid,cat,minsize,maxage,limit,offset,cursor,sort\"\n    }\n  },\n  \"registration\": {\n    \"available\": \"no\",\n    \"open\": \"yes\"\n  },\n  \"categories\": [\n    {\n      \"id\": 2000,\n      \"name\": \"Movies\",\n      \"subcategories\": {\n        \"2030\": \"SD\",\n        \"2040\": \"HD\"\n      }\n    }\n  ]\n}"
         }
       ]
     },
@@ -158,7 +158,7 @@
             }
           ],
           "cookie": [],
-          "body": "{\n  \"Total\": 123,\n  \"apiCurrent\": 2,\n  \"apiMax\": 1000,\n  \"grabCurrent\": 1,\n  \"grabMax\": 100,\n  \"apiOldestTime\": \"Wed, 20 Nov 2024 12:00:00 +0000\",\n  \"grabOldestTime\": \"\",\n  \"Results\": [\n    {\n      \"title\": \"Linux.ISO.Collection.2024-11\",\n      \"details\": \"https://example.com/details/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\n      \"url\": \"https://example.com/getnzb?id=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.nzb&r=replace-with-user-api-token\",\n      \"category\": 4050,\n      \"category_name\": \"PC > 0day\",\n      \"added\": \"Wed, 20 Nov 2024 12:00:00 +0000\",\n      \"size\": 734003200,\n      \"files\": 55,\n      \"grabs\": null,\n      \"comments\": null,\n      \"password\": 0,\n      \"usenetdate\": \"Wed, 20 Nov 2024 10:00:00 +0000\"\n    }\n  ]\n}"
+          "body": "{\n  \"Total\": 123,\n  \"apiCurrent\": 2,\n  \"apiMax\": 1000,\n  \"grabCurrent\": 1,\n  \"grabMax\": 100,\n  \"apiOldestTime\": \"Wed, 20 Nov 2024 12:00:00 +0000\",\n  \"grabOldestTime\": \"\",\n  \"results\": [\n    {\n      \"title\": \"Linux.ISO.Collection.2024-11\",\n      \"guid\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\n      \"details\": \"https://example.com/details/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\n      \"url\": \"https://example.com/getnzb?id=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.nzb&r=replace-with-user-api-token\",\n      \"category\": 4050,\n      \"category_name\": \"PC > 0day\",\n      \"added\": \"Wed, 20 Nov 2024 12:00:00 +0000\",\n      \"size\": 734003200,\n      \"files\": 55,\n      \"grabs\": null,\n      \"comments\": null,\n      \"password\": 0,\n      \"usenetdate\": \"Wed, 20 Nov 2024 10:00:00 +0000\"\n    }\n  ]\n}"
         },
         {
           "name": "403 Forbidden - Missing or Invalid API Key",
@@ -301,7 +301,7 @@
             }
           ],
           "cookie": [],
-          "body": "{\n  \"Total\": 1,\n  \"apiCurrent\": 5,\n  \"apiMax\": 1000,\n  \"grabCurrent\": 1,\n  \"grabMax\": 100,\n  \"apiOldestTime\": \"Wed, 20 Nov 2024 12:00:00 +0000\",\n  \"grabOldestTime\": \"\",\n  \"Results\": [\n    {\n      \"title\": \"Law.And.Order.S07E12.1080p.WEB-DL\",\n      \"details\": \"https://example.com/details/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\n      \"url\": \"https://example.com/getnzb?id=bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb.nzb&r=replace-with-user-api-token\",\n      \"category\": 5040,\n      \"category_name\": \"TV > HD\",\n      \"added\": \"Wed, 20 Nov 2024 12:30:00 +0000\",\n      \"size\": 1450971565,\n      \"files\": 44,\n      \"grabs\": 3,\n      \"comments\": 0,\n      \"password\": 0,\n      \"usenetdate\": \"Wed, 20 Nov 2024 10:30:00 +0000\",\n      \"episode_title\": \"Final Answer\",\n      \"season\": \"7\",\n      \"episode\": \"12\",\n      \"tvairdate\": \"2024-11-19\",\n      \"tvdbid\": 153021,\n      \"traktid\": 1393,\n      \"tvrageid\": null,\n      \"tvmazeid\": 73,\n      \"imdbid\": 1520211,\n      \"tmdbid\": 1402\n    }\n  ]\n}"
+          "body": "{\n  \"Total\": 1,\n  \"apiCurrent\": 5,\n  \"apiMax\": 1000,\n  \"grabCurrent\": 1,\n  \"grabMax\": 100,\n  \"apiOldestTime\": \"Wed, 20 Nov 2024 12:00:00 +0000\",\n  \"grabOldestTime\": \"\",\n  \"results\": [\n    {\n      \"title\": \"Law.And.Order.S07E12.1080p.WEB-DL\",\n      \"guid\": \"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\n      \"details\": \"https://example.com/details/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\n      \"url\": \"https://example.com/getnzb?id=bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb.nzb&r=replace-with-user-api-token\",\n      \"category\": 5040,\n      \"category_name\": \"TV > HD\",\n      \"added\": \"Wed, 20 Nov 2024 12:30:00 +0000\",\n      \"size\": 1450971565,\n      \"files\": 44,\n      \"grabs\": 3,\n      \"comments\": 0,\n      \"password\": 0,\n      \"usenetdate\": \"Wed, 20 Nov 2024 10:30:00 +0000\",\n      \"episode_title\": \"Final Answer\",\n      \"season\": \"7\",\n      \"episode\": \"12\",\n      \"tvairdate\": \"2024-11-19\",\n      \"tvdbid\": 153021,\n      \"traktid\": 1393,\n      \"tvrageid\": null,\n      \"tvmazeid\": 73,\n      \"imdbid\": 1520211,\n      \"tmdbid\": 1402\n    }\n  ]\n}"
         }
       ]
     },
@@ -365,7 +365,7 @@
             }
           ],
           "cookie": [],
-          "body": "{\n  \"Total\": 1,\n  \"apiCurrent\": 8,\n  \"apiMax\": 1000,\n  \"grabCurrent\": 1,\n  \"grabMax\": 100,\n  \"apiOldestTime\": \"Wed, 20 Nov 2024 12:00:00 +0000\",\n  \"grabOldestTime\": \"\",\n  \"Results\": [\n    {\n      \"title\": \"Movie.Title.2024.1080p.BluRay.x264\",\n      \"details\": \"https://example.com/details/cccccccccccccccccccccccccccccccc\",\n      \"url\": \"https://example.com/getnzb?id=cccccccccccccccccccccccccccccccc.nzb&r=replace-with-user-api-token\",\n      \"category\": 2040,\n      \"category_name\": \"Movies > HD\",\n      \"added\": \"Wed, 20 Nov 2024 12:15:00 +0000\",\n      \"size\": 2854971565,\n      \"files\": 77,\n      \"grabs\": 12,\n      \"comments\": 2,\n      \"password\": 0,\n      \"usenetdate\": \"Wed, 20 Nov 2024 09:00:00 +0000\",\n      \"imdbid\": 1418646,\n      \"tmdbid\": 43418,\n      \"traktid\": 29200\n    }\n  ]\n}"
+          "body": "{\n  \"Total\": 1,\n  \"apiCurrent\": 8,\n  \"apiMax\": 1000,\n  \"grabCurrent\": 1,\n  \"grabMax\": 100,\n  \"apiOldestTime\": \"Wed, 20 Nov 2024 12:00:00 +0000\",\n  \"grabOldestTime\": \"\",\n  \"results\": [\n    {\n      \"title\": \"Movie.Title.2024.1080p.BluRay.x264\",\n      \"guid\": \"cccccccccccccccccccccccccccccccc\",\n      \"details\": \"https://example.com/details/cccccccccccccccccccccccccccccccc\",\n      \"url\": \"https://example.com/getnzb?id=cccccccccccccccccccccccccccccccc.nzb&r=replace-with-user-api-token\",\n      \"category\": 2040,\n      \"category_name\": \"Movies > HD\",\n      \"added\": \"Wed, 20 Nov 2024 12:15:00 +0000\",\n      \"size\": 2854971565,\n      \"files\": 77,\n      \"grabs\": 12,\n      \"comments\": 2,\n      \"password\": 0,\n      \"usenetdate\": \"Wed, 20 Nov 2024 09:00:00 +0000\",\n      \"imdbid\": 1418646,\n      \"tmdbid\": 43418,\n      \"traktid\": 29200\n    }\n  ]\n}"
         }
       ]
     },
@@ -492,7 +492,7 @@
       "request": {
         "method": "GET",
         "header": [],
-        "description": "Redirects to the NZB download endpoint when GUID exists. Optional `del=1` forwards delete-on-download behavior.",
+        "description": "Streams the NZB (`application/x-nzb`) when the GUID exists and records one grab. Optional `del=1` removes the release from the user's cart. Errors (unknown GUID, missing NZB file, exhausted download allowance) are JSON.",
         "url": {
           "raw": "{{baseUrl}}/api/v2/getnzb?api_token={{apiToken}}&id={{guid}}&del=1",
           "host": [
@@ -521,7 +521,7 @@
       },
       "response": [
         {
-          "name": "302 Found - Redirect to Download",
+          "name": "200 OK - NZB Download",
           "originalRequest": {
             "method": "GET",
             "header": [],
@@ -537,17 +537,21 @@
               ]
             }
           },
-          "status": "Found",
-          "code": 302,
-          "_postman_previewlanguage": "text",
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "xml",
           "header": [
             {
-              "key": "Location",
-              "value": "https://example.com/getnzb?r=replace-with-user-api-token&id=replace-with-release-guid&del=1"
+              "key": "Content-Type",
+              "value": "application/x-nzb"
+            },
+            {
+              "key": "Content-Disposition",
+              "value": "attachment; filename=\"Release.Name.nzb\""
             }
           ],
           "cookie": [],
-          "body": ""
+          "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<nzb xmlns=\"http://www.newzbin.com/DTD/2003/nzb\">\n  ...\n</nzb>"
         },
         {
           "name": "404 Not Found - GUID Missing in Database",
@@ -576,10 +580,10 @@
             }
           ],
           "cookie": [],
-          "body": "{\n  \"data\": \"No such item (the guid you provided has no release in our database)\"\n}"
+          "body": "{\n  \"error\": \"No such item (the guid you provided has no release in our database)\"\n}"
         },
         {
-          "name": "403 Forbidden - Missing or Invalid API Key",
+          "name": "400 Bad Request - Missing API Token",
           "originalRequest": {
             "method": "GET",
             "header": [],
@@ -606,6 +610,35 @@
           ],
           "cookie": [],
           "body": "{\n  \"error\": \"Missing parameter (api_token)\"\n}"
+        },
+        {
+          "name": "429 Too Many Requests - Download Limit Reached",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v2/getnzb?api_token={{apiToken}}&id={{guid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "getnzb"
+              ]
+            }
+          },
+          "status": "Too Many Requests",
+          "code": 429,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"error\": \"Download limit reached\"\n}"
         }
       ]
     },
@@ -620,15 +653,29 @@
             "body": {
               "mode": "formdata",
               "formdata": [
-                { "key": "api_token", "value": "{{apiToken}}", "type": "text" },
-                { "key": "nzb", "type": "file", "src": "Release.nzb" }
+                {
+                  "key": "api_token",
+                  "value": "{{apiToken}}",
+                  "type": "text"
+                },
+                {
+                  "key": "nzb",
+                  "type": "file",
+                  "src": "Release.nzb"
+                }
               ]
             },
             "description": "Stages one NZB for deferred import. The authenticated user must have posting privileges.",
             "url": {
               "raw": "{{baseUrl}}/api/v2/nzbadd",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v2", "nzbadd"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "nzbadd"
+              ]
             }
           },
           "response": []
@@ -641,17 +688,39 @@
             "body": {
               "mode": "formdata",
               "formdata": [
-                { "key": "api_token", "value": "{{apiToken}}", "type": "text" },
-                { "key": "cat", "value": "5040", "type": "text" },
-                { "key": "nzb", "type": "file", "src": "Release.nzb" },
-                { "key": "nfo", "type": "file", "src": "scene-info.nfo" }
+                {
+                  "key": "api_token",
+                  "value": "{{apiToken}}",
+                  "type": "text"
+                },
+                {
+                  "key": "cat",
+                  "value": "5040",
+                  "type": "text"
+                },
+                {
+                  "key": "nzb",
+                  "type": "file",
+                  "src": "Release.nzb"
+                },
+                {
+                  "key": "nfo",
+                  "type": "file",
+                  "src": "scene-info.nfo"
+                }
               ]
             },
             "description": "Atomically stages an NZB and an optional NFO with any safe basename. Run nntmux:import-nzbs before nntmux:import-nfos. Category is echoed metadata only.",
             "url": {
               "raw": "{{baseUrl}}/api/v2/nzbadd",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v2", "nzbadd"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "nzbadd"
+              ]
             }
           },
           "response": [
@@ -662,14 +731,25 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/api/v2/nzbadd",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["api", "v2", "nzbadd"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v2",
+                    "nzbadd"
+                  ]
                 }
               },
               "status": "Created",
               "code": 201,
               "_postman_previewlanguage": "json",
-              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "cookie": [],
               "body": "{\n  \"success\": true,\n  \"status\": \"staged\",\n  \"name\": \"Release\",\n  \"category\": \"5040\",\n  \"files\": {\n    \"nzb\": { \"filename\": \"Release.nzb\", \"type\": \"nzb\" },\n    \"nfo\": { \"filename\": \"scene-info.nfo\", \"type\": \"nfo\" }\n  }\n}"
             }

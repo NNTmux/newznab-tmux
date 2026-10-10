@@ -20,6 +20,7 @@ use App\Services\Search\DTO\SearchPage;
 use App\Services\Search\Support\ManticoreClientFactory;
 use App\Services\Search\Support\ManticoreIndexRegistry;
 use App\Services\Search\Support\ReleaseIndexProjection;
+use App\Services\Search\Support\SearchFailureTracker;
 use App\Support\PredbSearchDocument;
 use App\Support\ReleaseSearchIndexDocument;
 use App\Support\SecondaryIndexDocuments;
@@ -109,6 +110,14 @@ class ManticoreSearchDriver implements SearchDriverInterface
     public function getDriverName(): string
     {
         return 'manticore';
+    }
+
+    /**
+     * Note a failed query so result caches can tell it apart from an empty result.
+     */
+    private function recordSearchFailure(): void
+    {
+        app(SearchFailureTracker::class)->record();
     }
 
     /**
@@ -1311,6 +1320,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
                 return $this->searchIndexes($index, '', [], $searchArray, $normalizedLimit);
             }
 
+            $this->recordSearchFailure();
             Log::error('ManticoreSearch fuzzySearchIndexes ResponseException: '.$message, [
                 'index' => $index,
                 'searchArray' => $searchArray,
@@ -1318,12 +1328,14 @@ class ManticoreSearchDriver implements SearchDriverInterface
 
             return [];
         } catch (RuntimeException $e) {
+            $this->recordSearchFailure();
             Log::error('ManticoreSearch fuzzySearchIndexes RuntimeException: '.$e->getMessage(), [
                 'index' => $index,
             ]);
 
             return [];
         } catch (\Throwable $e) {
+            $this->recordSearchFailure();
             Log::error('ManticoreSearch fuzzySearchIndexes unexpected error: '.$e->getMessage(), [
                 'index' => $index,
             ]);
@@ -1561,6 +1573,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
                         'index' => $rt_index,
                     ]);
                 } catch (ResponseException $e2) {
+                    $this->recordSearchFailure();
                     Log::error('ManticoreSearch searchIndexes ResponseException after retry: '.$e2->getMessage(), [
                         'index' => $rt_index,
                         'search' => $searchString,
@@ -1569,6 +1582,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
                     return [];
                 }
             } else {
+                $this->recordSearchFailure();
                 Log::error('ManticoreSearch searchIndexes ResponseException: '.$e->getMessage(), [
                     'index' => $rt_index,
                     'search' => $searchString,
@@ -1577,6 +1591,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
                 return [];
             }
         } catch (RuntimeException $e) {
+            $this->recordSearchFailure();
             Log::error('ManticoreSearch searchIndexes RuntimeException: '.$e->getMessage(), [
                 'index' => $rt_index,
                 'search' => $searchString,
@@ -1584,6 +1599,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
 
             return [];
         } catch (\Throwable $e) {
+            $this->recordSearchFailure();
             Log::error('ManticoreSearch searchIndexes unexpected error: '.$e->getMessage(), [
                 'index' => $rt_index,
                 'search' => $searchString,
@@ -2205,6 +2221,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
                 }
             }
         } catch (\Throwable $e) {
+            $this->recordSearchFailure();
             Log::error('ManticoreSearch searchMovieByExternalIds error: '.$e->getMessage(), [
                 'externalIds' => $externalIds,
             ]);
@@ -2431,6 +2448,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
                 }
             }
         } catch (\Throwable $e) {
+            $this->recordSearchFailure();
             Log::error('ManticoreSearch searchTvShowByExternalIds error: '.$e->getMessage(), [
                 'externalIds' => $externalIds,
             ]);
@@ -2514,6 +2532,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
                 }
             }
         } catch (\Throwable $e) {
+            $this->recordSearchFailure();
             Log::error('ManticoreSearch searchReleasesByMultipleExternalIds error: '.$e->getMessage(), [
                 'externalIdSets' => $externalIdSets,
             ]);
@@ -2579,6 +2598,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
 
             return $resultIds; // @phpstan-ignore return.type
         } catch (\Throwable $e) {
+            $this->recordSearchFailure();
             Log::error('ManticoreSearch searchReleasesByCategory error: '.$e->getMessage(), [
                 'categoryIds' => $categoryIds,
             ]);
@@ -2649,6 +2669,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
 
             return $resultIds; // @phpstan-ignore return.type
         } catch (\Throwable $e) {
+            $this->recordSearchFailure();
             Log::error('ManticoreSearch searchReleasesWithCategoryFilter error: '.$e->getMessage(), [
                 'searchTerm' => $searchTerm,
                 'categoryIds' => $categoryIds,
@@ -2664,6 +2685,8 @@ class ManticoreSearchDriver implements SearchDriverInterface
     public function searchReleasesFiltered(array $criteria, int $limit, int $offset = 0): array
     {
         if (! $this->isAvailable()) {
+            $this->recordSearchFailure();
+
             return ['ids' => [], 'total' => 0, 'fuzzy' => false, 'available' => false];
         }
 
@@ -2741,6 +2764,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
             try {
                 $results = $query->get();
             } catch (\Throwable $e) {
+                $this->recordSearchFailure();
                 Log::error('ManticoreSearch searchReleasesFiltered error: '.$e->getMessage(), [
                     'criteria' => $criteria,
                 ]);

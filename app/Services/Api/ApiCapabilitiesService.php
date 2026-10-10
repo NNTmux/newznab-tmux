@@ -54,7 +54,7 @@ final readonly class ApiCapabilitiesService
     /** @return array<string, mixed> */
     public function v2(): array
     {
-        $data = Cache::remember('api_v2_capabilities_cursor_v1', 600, function (): array {
+        $data = Cache::remember('api_v2_capabilities_cursor_v2', 600, function (): array {
             return [
                 'server' => [
                     'title' => config('app.name'),
@@ -62,14 +62,14 @@ final readonly class ApiCapabilitiesService
                     'email' => config('mail.from.address'),
                     'url' => url('/'),
                 ],
-                'limits' => ['max' => 100, 'default' => 100],
+                'limits' => ['max' => ApiQueryParameters::MAX_LIMIT, 'default' => ApiQueryParameters::MAX_LIMIT],
                 'searching' => [
-                    'search' => ['available' => 'yes', 'supportedParams' => 'id,group,minsize,maxsize,maxage,cat,limit,offset,cursor,sort'],
-                    'tv-search' => ['available' => 'yes', 'supportedParams' => 'id,vid,tvdbid,traktid,rid,tvmazeid,imdbid,tmdbid,season,ep,cat,minsize,maxsize,maxage,limit,offset,cursor,sort'],
-                    'movie-search' => ['available' => 'yes', 'supportedParams' => 'id,imdbid,tmdbid,traktid,genre,cat,minsize,maxsize,maxage,limit,offset,cursor,sort'],
-                    'audio-search' => ['available' => 'yes', 'supportedParams' => 'id,cat,minsize,maxsize,maxage,group,limit,offset,cursor,sort'],
-                    'book-search' => ['available' => 'yes', 'supportedParams' => 'id,cat,minsize,maxsize,maxage,group,limit,offset,cursor,sort'],
-                    'anime-search' => ['available' => 'yes', 'supportedParams' => 'id,anidbid,anilistid,cat,minsize,maxsize,maxage,limit,offset,cursor,sort'],
+                    'search' => ['available' => 'yes', 'supportedParams' => 'id,group,minsize,maxage,cat,limit,offset,cursor,sort'],
+                    'tv-search' => ['available' => 'yes', 'supportedParams' => 'id,vid,tvdbid,traktid,rid,tvmazeid,imdbid,tmdbid,season,ep,cat,minsize,maxage,limit,offset,cursor,sort'],
+                    'movie-search' => ['available' => 'yes', 'supportedParams' => 'id,imdbid,tmdbid,traktid,cat,minsize,maxage,limit,offset,cursor,sort'],
+                    'audio-search' => ['available' => 'yes', 'supportedParams' => 'id,cat,minsize,maxage,group,limit,offset,cursor,sort'],
+                    'book-search' => ['available' => 'yes', 'supportedParams' => 'id,cat,minsize,maxage,group,limit,offset,cursor,sort'],
+                    'anime-search' => ['available' => 'yes', 'supportedParams' => 'id,anidbid,anilistid,cat,minsize,maxage,limit,offset,cursor,sort'],
                 ],
                 'categories' => Category::getForApi()
                     ->map(static fn (RootCategory $category): array => CategoryData::fromCategory($category)->toArray())

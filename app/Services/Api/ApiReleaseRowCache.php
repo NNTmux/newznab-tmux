@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services\Api;
 
+use App\Exceptions\SearchUnavailableException;
 use App\Facades\Search;
+use App\Services\Search\Support\SearchFailureTracker;
+use Countable;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
@@ -45,10 +48,8 @@ class ApiReleaseRowCache
 
                 $this->logCacheEvent('miss_lock_owner', $apiVersion, $scope);
                 $this->markRequest('miss');
-                $rows = $callback();
-                $this->putCachedValue($cacheKey, $rows);
 
-                return $rows;
+                return $this->load($cacheKey, $apiVersion, $callback);
             } finally {
                 $lock->release();
             }
@@ -64,10 +65,51 @@ class ApiReleaseRowCache
 
         $this->logCacheEvent('miss_lock_contended', $apiVersion, $scope);
         $this->markRequest('miss_contended');
-        $rows = $callback();
-        $this->putCachedValue($cacheKey, $rows);
 
-        return $rows;
+        return $this->load($cacheKey, $apiVersion, $callback);
+    }
+
+    /**
+     * Run the search and cache its rows, unless a search-engine query failed
+     * while it ran: then the rows are returned uncached, and an empty result
+     * becomes the last known rows (bounded by the stale TTL) or a retryable 503.
+     *
+     * @param  callable(): mixed  $callback
+     *
+     * @throws SearchUnavailableException
+     */
+    private function load(string $cacheKey, string $apiVersion, callable $callback): mixed
+    {
+        $failures = app(SearchFailureTracker::class);
+        $failuresBefore = $failures->count();
+
+        $rows = $callback();
+
+        if ($failures->count() === $failuresBefore) {
+            $this->putCachedValue($cacheKey, $rows);
+
+            return $rows;
+        }
+
+        if (! $this->isEmptyResult($rows)) {
+            return $rows;
+        }
+
+        [$staleHit, $stale] = $this->getCachedValue($cacheKey.':stale');
+        if ($staleHit) {
+            $this->markRequest('stale_after_failure');
+
+            return $stale;
+        }
+
+        throw new SearchUnavailableException($apiVersion);
+    }
+
+    private function isEmptyResult(mixed $rows): bool
+    {
+        return $rows === null
+            || $rows === []
+            || ($rows instanceof Countable && count($rows) === 0);
     }
 
     /**

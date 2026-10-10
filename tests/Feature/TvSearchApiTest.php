@@ -125,7 +125,7 @@ final class TvSearchApiTest extends TestCase
     {
         $mock = Mockery::mock(SearchService::class, [$this->app]);
         $mock->shouldReceive('searchReleasesByExternalId')->never();
-        $mock->shouldReceive('searchReleases')->once()->with(['searchname' => 'Simpsons'], 1000)->andReturn([1]);
+        $mock->shouldReceive('searchReleases')->once()->with(['searchname' => 'Simpsons'], 10000)->andReturn([1]);
         $mock->shouldReceive('searchReleasesWithFuzzy')->never();
         $mock->shouldReceive('isAvailable')->andReturn(false);
 
@@ -158,7 +158,7 @@ final class TvSearchApiTest extends TestCase
         $mock->shouldReceive('searchReleasesByExternalId')->never();
         $mock->shouldReceive('searchReleases')
             ->once()
-            ->with(['searchname' => 'Simpsons S06E24'], 1000)
+            ->with(['searchname' => 'Simpsons S06E24'], 10000)
             ->andReturn([1, 2]);
         $mock->shouldReceive('searchReleasesWithFuzzy')->never();
         $mock->shouldReceive('isAvailable')->andReturn(false);
@@ -262,7 +262,7 @@ final class TvSearchApiTest extends TestCase
 
         $mock = Mockery::mock(SearchService::class, [$this->app]);
         $mock->shouldReceive('searchReleasesByExternalId')->never();
-        $mock->shouldReceive('searchReleases')->once()->with(['searchname' => 'The Simpsons'], 1000)->andReturn([]);
+        $mock->shouldReceive('searchReleases')->once()->with(['searchname' => 'The Simpsons'], 10000)->andReturn([]);
         $mock->shouldReceive('searchReleasesWithFuzzy')->never();
         $mock->shouldReceive('isAvailable')->andReturn(false);
 

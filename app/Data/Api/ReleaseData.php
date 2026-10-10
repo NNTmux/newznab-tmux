@@ -26,6 +26,7 @@ final class ReleaseData extends Data
 {
     public function __construct(
         public string $title,
+        public string $guid,
         public string $details,
         public string $url,
         public int $category,
@@ -79,6 +80,7 @@ final class ReleaseData extends Data
 
         $base = [
             'title' => (string) $get('searchname', ''),
+            'guid' => $guid,
             'details' => $detailsBaseUrl.$guid,
             'url' => $getNzbBaseUrl.'?id='.$guid.'.nzb&r='.$user->api_token,
             'category' => $categoriesId,

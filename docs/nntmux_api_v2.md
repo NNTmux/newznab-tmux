@@ -22,6 +22,8 @@ https://<host>/api/v2
 - All other v2 routes require `api_token`.
 - Route-level middleware uses token-aware throttling (`apiRateLimit`) and accepts `api_token` or the legacy `apikey` alias when that middleware is reused.
 - `POST /nzbadd` is intentionally exempt from route-level rate limiting and API request quotas, and uploads are not recorded as API usage. Authentication and posting privileges still apply.
+- Daily quota: each role allows `apirequests` requests in a rolling 24 hours. Every authenticated request to a quota-counted endpoint (all except `capabilities` and `nzbadd`) is checked and recorded in one atomic step, so a user at exactly the limit is rejected and parallel requests cannot share the last slot. A request counts once it passes authentication, even if its parameters are then rejected.
+- `/getnzb` also enforces the role's `downloadrequests` allowance; a user who has used it gets `429 Download limit reached`.
 - Controller-level auth errors return a JSON error envelope:
 
 ```json
@@ -38,6 +40,7 @@ Common auth/rate-limit statuses:
 | 401 | `Incorrect user credentials` |
 | 403 | `Account suspended` |
 | 429 | `Request limit reached` |
+| 429 | `Too many concurrent requests, retry shortly` (another request for the same user held the quota lock for over 5 seconds) |
 
 ## Common Query Parameters
 
@@ -45,14 +48,24 @@ Common auth/rate-limit statuses:
 |---|---|---:|---|
 | `api_token` | string | - | Required except `capabilities`. |
 | `id` | string | `""` | Search text/fallback identifier on search endpoints. |
-| `limit` | int | `100` | Max rows in page. |
-| `offset` | int | `0` | Zero-based pagination offset. |
+| `limit` | int | `100` | Rows per page. Values above `100` are capped at `100`; `0`, negative or non-integer values return JSON `400`. |
+| `offset` | int | `0` | Zero-based pagination offset. Negative or non-integer values return JSON `400`. |
 | `cat` | csv string | `-1` | Category filter; `TV_WEBDL` auto-add can apply when `TV_HD` is requested. |
 | `group` | string | `-1` | Usenet group filter (where supported). |
 | `maxage` | int | `-1` | Max post age in days. Invalid values return JSON `400`. |
 | `minsize` | int | `0` | Min release size in bytes. |
-| `maxsize` | int | - | Accepted for compatibility; currently not enforced in query layer. |
 | `sort` | string | `posted_desc` | `cat|name|size|files|stats|posted` + `_asc|_desc`. |
+
+Only `cat` accepts a list (`cat[]=2000&cat[]=5030`). Any other parameter sent as
+an array (for example `id[]=ubuntu`) returns JSON `400` (`Parameter id has an
+unsupported type`) before the request is counted.
+
+`maxsize` and `genre` are not supported and are not advertised in
+`capabilities`.
+
+Text search with `sort=name_asc|name_desc` orders by name across the 2,000 most
+recent matches (after all filters); `Total` is capped at that number, so paging
+never goes past what the ordering covers.
 
 Sorting examples:
 
@@ -223,7 +236,7 @@ Behavior:
 
 - If `id` is present: text search.
 - If `id` is omitted: browse mode.
-- Includes API usage counters via response headers (`X-Api-Current`, `X-Api-Max`, `X-Grab-Current`, `X-Grab-Max`, `X-Api-Oldest-Time`, `X-Grab-Oldest-Time`).
+- Includes API usage counters in the response body (`apiCurrent`, `apiMax`, `grabCurrent`, `grabMax`, `apiOldestTime`, `grabOldestTime`; see [Search Envelope](#search-envelope-search-tv-movies-audio-books-anime)). `apiCurrent` includes the current request.
 
 ## 3) TV Search
 
@@ -282,12 +295,17 @@ Selectors:
 
 - `id` and/or `anidbid` and/or `anilistid`
 
+Optional filters:
+
+- `cat`, `maxage`, `minsize`, `sort`, `offset`, `limit`
+
 ## 8) Get NZB
 
 - `GET /getnzb`
 - Auth: required
-- Valid GUID redirects to `/getnzb?r=<api_token>&id=<guid>[&del=1]`
-- Not found returns HTTP `404` JSON.
+- Requires `id` (GUID; a trailing `.nzb` is accepted). Optional `del=1` removes the release from the user's cart.
+- A valid GUID streams the NZB directly (`200`, `Content-Type: application/x-nzb`) and records one grab.
+- Errors are JSON: unknown GUID or missing NZB file `404`, download allowance used up `429 Download limit reached`.
 
 ## 9) Details
 
@@ -368,9 +386,19 @@ to `null`.
   "grabMax": 100,
   "apiOldestTime": "Wed, 20 Nov 2024 12:00:00 +0000",
   "grabOldestTime": "",
-  "results": []
+  "results": [
+    {
+      "title": "Linux.ISO.Collection.2024-11",
+      "guid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "details": "https://example.com/details/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "url": "https://example.com/getnzb?id=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.nzb&r=<api_token>"
+    }
+  ]
 }
 ```
+
+Each result carries the release `guid`, so clients do not need to parse it out
+of `details` or `url`. Use it as `id` for `/details` and `/getnzb`.
 
 ### Details Object (`/details`)
 
@@ -383,9 +411,11 @@ Returns a single release object (not envelope). Download field name is `link` (n
 - Invalid token: JSON `401`
 - Disabled account: JSON `403`
 - Invalid `maxage`: JSON `400`
-- Invalid `sort`: JSON `400`
+- Invalid `sort`, `limit` or `offset`, or a scalar parameter sent as an array: JSON `400`
 - Missing required endpoint parameter (`id`, etc.): JSON `400`
-- Missing GUID in `/getnzb`: JSON `404`
+- Unknown GUID or missing NZB file in `/getnzb`: JSON `404`
+- Daily request quota or download allowance used up: JSON `429`
+- Search engine query failed and no recent result is available: JSON `503` with `Retry-After: 30`. Failed searches are never cached as empty results; if the same search succeeded recently, its last known rows are returned instead.
 
 ## Unsupported in v2
 

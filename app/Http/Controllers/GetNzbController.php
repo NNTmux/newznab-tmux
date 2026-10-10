@@ -24,9 +24,16 @@ class GetNzbController extends BasePageController
 {
     public const string REQUEST_USER_ATTRIBUTE = 'nntmux.getnzb.user';
 
+    /**
+     * Request attribute that switches error responses from newznab XML to JSON (API v2).
+     */
+    public const string JSON_ERRORS_ATTRIBUTE = 'nntmux.getnzb.json_errors';
+
     private const int BUFFER_SIZE = 1000000;
 
     private const string NZB_SUFFIX = '.nzb';
+
+    private bool $jsonErrors = false;
 
     /**
      * Download NZB file(s) for authenticated users
@@ -35,6 +42,8 @@ class GetNzbController extends BasePageController
      */
     public function getNzb(Request $request, ?string $guid = null): JsonResponse|Response|StreamedResponse|Builder
     {
+        $this->jsonErrors = $request->attributes->getBoolean(self::JSON_ERRORS_ATTRIBUTE);
+
         // Normalize guid parameter
         $this->normalizeGuidParameter($request, $guid);
 
@@ -80,9 +89,9 @@ class GetNzbController extends BasePageController
     /**
      * Authenticate user via session or RSS token
      *
-     * @return array<string, mixed>|Response
+     * @return array<string, mixed>|JsonResponse|Response
      */
-    private function authenticateUser(Request $request): array|Response
+    private function authenticateUser(Request $request): array|JsonResponse|Response
     {
         $resolvedUser = $request->attributes->get(self::REQUEST_USER_ATTRIBUTE);
         if ($resolvedUser instanceof User) {
@@ -101,16 +110,16 @@ class GetNzbController extends BasePageController
     /**
      * Get user data from a user resolved by an upstream API controller.
      *
-     * @return array<string, mixed>|Response
+     * @return array<string, mixed>|JsonResponse|Response
      */
-    private function getUserDataFromResolvedUser(User $user): array|Response
+    private function getUserDataFromResolvedUser(User $user): array|JsonResponse|Response
     {
         if (! $user->hasVerifiedEmail()) {
-            return showApiError(100);
+            return $this->apiError(100);
         }
 
         if ($user->is_disabled || $user->hasRole('Disabled')) {
-            return showApiError(101);
+            return $this->apiError(101);
         }
 
         $user->loadMissing('role');
@@ -126,16 +135,16 @@ class GetNzbController extends BasePageController
     /**
      * Get user data from authenticated session
      *
-     * @return array<string, mixed>|Response
+     * @return array<string, mixed>|JsonResponse|Response
      */
-    private function getUserDataFromSession(): array|Response
+    private function getUserDataFromSession(): array|JsonResponse|Response
     {
         if (! $this->userdata->hasVerifiedEmail()) {
-            return showApiError(100);
+            return $this->apiError(100);
         }
 
         if ($this->userdata->is_disabled || $this->userdata->hasRole('Disabled')) {
-            return showApiError(101);
+            return $this->apiError(101);
         }
 
         return [
@@ -149,21 +158,21 @@ class GetNzbController extends BasePageController
     /**
      * Get user data from RSS token
      *
-     * @return array<string, mixed>|Response
+     * @return array<string, mixed>|JsonResponse|Response
      */
-    private function getUserDataFromRssToken(Request $request): array|Response
+    private function getUserDataFromRssToken(Request $request): array|JsonResponse|Response
     {
         if ($request->missing('r')) {
-            return showApiError(200);
+            return $this->apiError(200);
         }
 
         $user = User::findVerifiedByApiToken((string) $request->input('r'));
         if (! $user) {
-            return showApiError(100);
+            return $this->apiError(100);
         }
 
         if ($user->is_disabled || $user->hasRole('Disabled')) {
-            return showApiError(101);
+            return $this->apiError(101);
         }
 
         return [
@@ -180,11 +189,11 @@ class GetNzbController extends BasePageController
      *
      * @throws Exception
      */
-    private function checkDownloadLimit(int $uid, int $maxDownloads): ?Response
+    private function checkDownloadLimit(int $uid, int $maxDownloads): JsonResponse|Response|null
     {
         $requests = UserDownload::getDownloadRequests($uid);
-        if ($requests > $maxDownloads) {
-            return showApiError(501);
+        if ($requests >= $maxDownloads) {
+            return $this->apiError(501);
         }
 
         return null;
@@ -193,12 +202,12 @@ class GetNzbController extends BasePageController
     /**
      * Validate and sanitize the release ID parameter
      */
-    private function validateAndSanitizeId(Request $request): string|Response
+    private function validateAndSanitizeId(Request $request): string|JsonResponse|Response
     {
         $id = $this->scalarInput($request, 'id');
 
         if ($id === '') {
-            return showApiError(200, 'Parameter id is required');
+            return $this->apiError(200, 'Parameter id is required');
         }
 
         // Remove .nzb suffix if present
@@ -227,14 +236,14 @@ class GetNzbController extends BasePageController
         string $userName,
         int $maxDownloads,
         string $releaseId
-    ): JsonResponse|Response|StreamedResponse|Builder {
+    ): JsonResponse|Response|Builder {
         $guids = explode(',', $releaseId);
         $guidCount = \count($guids);
 
         // Check if zip download would exceed limits
         $requests = UserDownload::getDownloadRequests($uid);
         if ($requests + $guidCount > $maxDownloads) {
-            return showApiError(501);
+            return $this->apiError(501);
         }
 
         $zip = getStreamingZip($guids);
@@ -284,17 +293,17 @@ class GetNzbController extends BasePageController
         int $uid,
         string $rssToken,
         string $releaseId
-    ): Response|StreamedResponse {
+    ): JsonResponse|Response|StreamedResponse {
         // Get NZB file path and validate
         $nzbPath = app(NzbService::class)->nzbPath($releaseId);
         if ($nzbPath === false) {
-            return showApiError(300, 'NZB file not found!');
+            return $this->apiError(300, 'NZB file not found!');
         }
 
         // Get release data
         $releaseData = Release::getByGuid($releaseId);
         if ($releaseData === null) {
-            return showApiError(300, 'Release not found!');
+            return $this->apiError(300, 'Release not found!');
         }
 
         // Update statistics
@@ -436,5 +445,13 @@ class GetNzbController extends BasePageController
         }
 
         gzclose($fileHandle);
+    }
+
+    /**
+     * Render an API error in the caller's format: newznab XML by default, JSON for API v2.
+     */
+    private function apiError(int $errorCode, string $errorText = ''): JsonResponse|Response
+    {
+        return $this->jsonErrors ? apiJsonError($errorCode, $errorText) : showApiError($errorCode, $errorText);
     }
 }

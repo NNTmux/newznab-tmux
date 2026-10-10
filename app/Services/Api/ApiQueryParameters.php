@@ -11,6 +11,8 @@ use Illuminate\Http\Request;
 
 final class ApiQueryParameters
 {
+    public const int MAX_LIMIT = 100;
+
     /** @return array<int, string|int> */
     public function categories(Request $request): array
     {
@@ -57,24 +59,27 @@ final class ApiQueryParameters
         return $group === false ? -1 : $group;
     }
 
+    /**
+     * Page size, clamped to 1..MAX_LIMIT (the maximum advertised in capabilities).
+     */
     public function limit(Request $request): int
     {
         return $request->has('limit') && is_numeric($request->input('limit'))
-            ? (int) $request->input('limit')
-            : 100;
+            ? max(1, min(self::MAX_LIMIT, (int) $request->input('limit')))
+            : self::MAX_LIMIT;
     }
 
     public function offset(Request $request): int
     {
         return $request->has('offset') && is_numeric($request->input('offset'))
-            ? (int) $request->input('offset')
+            ? max(0, (int) $request->input('offset'))
             : 0;
     }
 
     public function minimumSize(Request $request): int
     {
-        return $request->has('minsize') && $request->input('minsize') > 0
-            ? (int) $request->input('minsize')
+        return $request->has('minsize') && is_numeric($request->input('minsize'))
+            ? max(0, (int) $request->input('minsize'))
             : 0;
     }
 

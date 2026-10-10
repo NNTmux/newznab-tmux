@@ -79,7 +79,7 @@ final class MovieSearchApiTest extends TestCase
     {
         $mock = Mockery::mock(SearchService::class, [$this->app]);
         $mock->shouldReceive('searchReleasesByExternalId')->never();
-        $mock->shouldReceive('searchReleases')->once()->with(['searchname' => 'Resurrection 2025'], 1000)->andReturn([1]);
+        $mock->shouldReceive('searchReleases')->once()->with(['searchname' => 'Resurrection 2025'], 10000)->andReturn([1]);
         $mock->shouldReceive('searchReleasesWithFuzzy')->never();
         $mock->shouldReceive('isAvailable')->andReturn(false);
 
@@ -111,7 +111,7 @@ final class MovieSearchApiTest extends TestCase
 
         $mock = Mockery::mock(SearchService::class, [$this->app]);
         $mock->shouldReceive('searchReleasesByExternalId')->never();
-        $mock->shouldReceive('searchReleases')->once()->with(['searchname' => 'Resurrection 2025'], 1000)->andReturn([]);
+        $mock->shouldReceive('searchReleases')->once()->with(['searchname' => 'Resurrection 2025'], 10000)->andReturn([]);
         $mock->shouldReceive('searchReleasesWithFuzzy')->never();
         $mock->shouldReceive('isAvailable')->andReturn(false);
 

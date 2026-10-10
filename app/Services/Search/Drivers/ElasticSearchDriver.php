@@ -18,6 +18,7 @@ use App\Services\Search\DTO\SearchPage;
 use App\Services\Search\Support\ElasticsearchClientFactory;
 use App\Services\Search\Support\ElasticsearchResponseHelper;
 use App\Services\Search\Support\ReleaseIndexProjection;
+use App\Services\Search\Support\SearchFailureTracker;
 use App\Support\PredbSearchDocument;
 use App\Support\ReleaseSearchIndexDocument;
 use App\Support\SecondaryIndexDocuments;
@@ -99,6 +100,14 @@ class ElasticSearchDriver implements SearchDriverInterface
     public function getDriverName(): string
     {
         return 'elasticsearch';
+    }
+
+    /**
+     * Note a failed query so result caches can tell it apart from an empty result.
+     */
+    private function recordSearchFailure(): void
+    {
+        app(SearchFailureTracker::class)->record();
     }
 
     /**
@@ -938,6 +947,7 @@ class ElasticSearchDriver implements SearchDriverInterface
             return $result;
 
         } catch (ElasticsearchException $e) {
+            $this->recordSearchFailure();
             Log::error('ElasticSearch indexSearch error: '.$e->getMessage(), [
                 'keywords' => $keywords,
                 'limit' => $limit,
@@ -985,6 +995,7 @@ class ElasticSearchDriver implements SearchDriverInterface
             return $result;
 
         } catch (ElasticsearchException $e) {
+            $this->recordSearchFailure();
             Log::error('ElasticSearch indexSearchApi error: '.$e->getMessage(), [
                 'keywords' => $keywords,
                 'limit' => $limit,
@@ -1035,6 +1046,7 @@ class ElasticSearchDriver implements SearchDriverInterface
             return $result;
 
         } catch (ElasticsearchException $e) {
+            $this->recordSearchFailure();
             Log::error('ElasticSearch indexSearchTMA error: '.$e->getMessage(), [
                 'keywords' => $keywords,
                 'limit' => $limit,
@@ -1834,10 +1846,12 @@ class ElasticSearchDriver implements SearchDriverInterface
             return $searchResult; // @phpstan-ignore return.type
 
         } catch (ElasticsearchException $e) {
+            $this->recordSearchFailure();
             Log::error('ElasticSearch search error: '.$e->getMessage());
 
             return [];
         } catch (\Throwable $e) {
+            $this->recordSearchFailure();
             Log::error('ElasticSearch search unexpected error: '.$e->getMessage());
 
             return [];
@@ -2129,6 +2143,7 @@ class ElasticSearchDriver implements SearchDriverInterface
             return $result;
 
         } catch (\Throwable $e) {
+            $this->recordSearchFailure();
             Log::error('ElasticSearch searchMovies error: '.$e->getMessage());
 
             return ['id' => [], 'data' => []];
@@ -2195,6 +2210,7 @@ class ElasticSearchDriver implements SearchDriverInterface
                 'data' => $data,
             ];
         } catch (\Throwable $e) {
+            $this->recordSearchFailure();
             Log::error('ElasticSearch searchMoviesByFields error: '.$e->getMessage());
 
             return ['imdbids' => [], 'movieinfo_ids' => [], 'data' => []];
@@ -2279,6 +2295,7 @@ class ElasticSearchDriver implements SearchDriverInterface
             }
 
         } catch (\Throwable $e) {
+            $this->recordSearchFailure();
             Log::error('ElasticSearch searchMovieByExternalIds error: '.$e->getMessage(), [
                 'externalIds' => $externalIds,
             ]);
@@ -2512,6 +2529,7 @@ class ElasticSearchDriver implements SearchDriverInterface
             return $result;
 
         } catch (\Throwable $e) {
+            $this->recordSearchFailure();
             Log::error('ElasticSearch searchTvShows error: '.$e->getMessage());
 
             return ['id' => [], 'data' => []];
@@ -2596,6 +2614,7 @@ class ElasticSearchDriver implements SearchDriverInterface
             }
 
         } catch (\Throwable $e) {
+            $this->recordSearchFailure();
             Log::error('ElasticSearch searchTvShowByExternalIds error: '.$e->getMessage(), [
                 'externalIds' => $externalIds,
             ]);
@@ -2685,6 +2704,7 @@ class ElasticSearchDriver implements SearchDriverInterface
 
             return $resultIds; // @phpstan-ignore return.type
         } catch (\Throwable $e) {
+            $this->recordSearchFailure();
             Log::error('ElasticSearch searchReleasesByMultipleExternalIds error: '.$e->getMessage(), [
                 'externalIdSets' => $externalIdSets,
             ]);
@@ -2769,6 +2789,7 @@ class ElasticSearchDriver implements SearchDriverInterface
             return $resultIds; // @phpstan-ignore return.type
 
         } catch (\Throwable $e) {
+            $this->recordSearchFailure();
             Log::error('ElasticSearch searchReleasesByCategory error: '.$e->getMessage(), [
                 'categoryIds' => $categoryIds,
             ]);
@@ -2855,6 +2876,7 @@ class ElasticSearchDriver implements SearchDriverInterface
             return $resultIds;
 
         } catch (\Throwable $e) {
+            $this->recordSearchFailure();
             Log::error('ElasticSearch searchReleasesWithCategoryFilter error: '.$e->getMessage(), [
                 'searchTerm' => $searchTerm,
                 'categoryIds' => $categoryIds,
@@ -2870,6 +2892,8 @@ class ElasticSearchDriver implements SearchDriverInterface
     public function searchReleasesFiltered(array $criteria, int $limit, int $offset = 0): array
     {
         if (! $this->isElasticsearchAvailable()) {
+            $this->recordSearchFailure();
+
             return ['ids' => [], 'total' => 0, 'fuzzy' => false, 'available' => false];
         }
 
@@ -2986,6 +3010,7 @@ class ElasticSearchDriver implements SearchDriverInterface
                     'has_more' => count($ids) === max(1, min($limit, self::MAX_RESULTS)) && ($total === 0 || count($ids) + $offset < $total),
                 ];
             } catch (\Throwable $e) {
+                $this->recordSearchFailure();
                 Log::error('ElasticSearch searchReleasesFiltered error: '.$e->getMessage());
 
                 return ['ids' => [], 'total' => 0, 'fuzzy' => $useFuzzy, 'available' => false];
@@ -3377,6 +3402,7 @@ class ElasticSearchDriver implements SearchDriverInterface
 
             return ['id' => $ids, 'data' => $data];
         } catch (\Throwable $e) {
+            $this->recordSearchFailure();
             Log::error('ElasticSearch searchSecondary error: '.$e->getMessage(), ['secondary' => $index->value]);
 
             return ['id' => [], 'data' => []];

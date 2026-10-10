@@ -11,6 +11,7 @@ use App\Services\Search\Drivers\ManticoreSearchDriver;
 use App\Services\Search\MediaSearchService;
 use App\Services\Search\SearchService;
 use App\Services\Search\Support\ElasticsearchClientFactory;
+use App\Services\Search\Support\SearchFailureTracker;
 use Elastic\Elasticsearch\Client;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
@@ -42,6 +43,9 @@ class SearchServiceProvider extends ServiceProvider
         $this->app->bind(SearchDriverInterface::class, function (Application $app) {
             return $app->make(SearchService::class)->driver();
         });
+
+        // Per-request record of failed search queries (see ApiReleaseRowCache)
+        $this->app->scoped(SearchFailureTracker::class);
 
         // Register the MediaSearchService for optimized movie/TV searches
         $this->app->singleton(MediaSearchService::class, function (Application $app) {

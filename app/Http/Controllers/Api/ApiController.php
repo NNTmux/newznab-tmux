@@ -192,7 +192,7 @@ class ApiController extends BasePageController
 
         // Quota enforcement happens before endpoint-specific request recording.
         if ($uid !== '') {
-            if ($thisRequests > $maxRequests) {
+            if ($thisRequests >= $maxRequests) {
                 return showApiError(500, 'Request limit reached ('.$thisRequests.'/'.$maxRequests.')');
             }
         }

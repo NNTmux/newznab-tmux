@@ -263,6 +263,12 @@ class ReleaseSearchService
                 'include_documents' => true,
             ];
 
+            // The index has no sortable name attribute: let it filter, then order
+            // and page the most recent matches by name in SQL (see apiSearchByName).
+            if ($orderField === 'searchname') {
+                return $this->apiSearchByName($criteria, $offset, $limit, $orderDir);
+            }
+
             $criteria['track_total'] = $cursor === null;
             $searchPage = Search::searchReleasePage(ReleaseSearchQuery::fromCriteria($criteria, $limit, $offset, $cursor));
             $filtered = $searchPage->legacy();
@@ -344,6 +350,63 @@ class ReleaseSearchService
         }
 
         return $this->apiSearchLegacyMysql($searchName, $groupName, $offset, $limit, $maxAge, $excludedCats, $cat, $minSize, $orderBy);
+    }
+
+    /**
+     * Name-ordered API search. Every filter runs in the search index, which returns
+     * up to SEARCH_INDEX_MAX_CANDIDATES of the newest matches; SQL then orders those
+     * by name and applies the page window. The total is the number of candidates,
+     * so clients can never page past what the ordering covers.
+     *
+     * @param  array<string, mixed>  $criteria
+     * @return Collection<int, Release>
+     */
+    private function apiSearchByName(array $criteria, int $offset, int $limit, string $orderDir): Collection
+    {
+        $criteria['sort_field'] = 'postdate_ts';
+        $criteria['sort_dir'] = 'desc';
+        $criteria['include_documents'] = false;
+        $criteria['track_total'] = true;
+
+        $candidates = Search::searchReleasePage(ReleaseSearchQuery::fromCriteria($criteria, self::SEARCH_INDEX_MAX_CANDIDATES, 0));
+        $total = count($candidates->ids);
+        if ($total === 0 || $offset >= $total) {
+            return new Collection;
+        }
+
+        $sql = sprintf(
+            "SELECT r.id, r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate,
+                cp.title AS parent_category, c.title AS sub_category,
+                CONCAT(cp.title, ' > ', c.title) AS category_name,
+                g.name AS group_name,
+                m.imdbid, m.tmdbid, m.traktid,
+                v.tvdb, v.trakt, v.tvrage, v.tvmaze, v.imdb, v.tmdb,
+                tve.firstaired, tve.title, tve.series, tve.episode
+            FROM releases r
+            INNER JOIN categories c ON c.id = r.categories_id
+            INNER JOIN root_categories cp ON cp.id = c.root_categories_id
+            LEFT JOIN usenet_groups g ON g.id = r.groups_id
+            LEFT JOIN videos v ON r.videos_id = v.id AND r.videos_id > 0
+            LEFT JOIN tv_episodes tve ON r.tv_episodes_id = tve.id AND r.tv_episodes_id > 0
+            LEFT JOIN movieinfo m ON m.id = r.movieinfo_id AND r.movieinfo_id > 0
+            WHERE r.id IN (%s)
+            ORDER BY r.searchname %s, r.id %s
+            LIMIT %d OFFSET %d",
+            implode(',', array_map('intval', $candidates->ids)),
+            $orderDir === 'asc' ? 'ASC' : 'DESC',
+            $orderDir === 'asc' ? 'ASC' : 'DESC',
+            $limit,
+            $offset
+        );
+
+        $releases = Release::fromQuery($sql);
+        if ($releases->isNotEmpty()) {
+            $releases[0]->_totalrows = $total;
+            $releases[0]->_search_last_sort = [];
+            $releases[0]->_search_has_more = $offset + $releases->count() < $total;
+        }
+
+        return $releases;
     }
 
     /**
@@ -682,7 +745,7 @@ class ReleaseSearchService
         // Try to get releases directly from search index using external IDs
         $searchResult = [];
         if (! empty($externalIds)) {
-            $searchResult = Search::searchReleasesByExternalId($externalIds, $searchLimit);
+            $searchResult = Search::searchReleasesByExternalId($externalIds, $this->prefilterCandidateLimit());
 
             if (config('app.debug') && ! empty($searchResult)) {
                 Log::debug('tvSearch: Found releases via search index by external IDs', [
@@ -801,7 +864,7 @@ class ReleaseSearchService
                 }
             }
 
-            $searchResult = Search::searchReleases(['searchname' => $searchName], $searchLimit);
+            $searchResult = Search::searchReleases(['searchname' => $searchName], $this->prefilterCandidateLimit());
 
             // Fall back to MySQL if search engine failed (only if enabled)
             if (empty($searchResult) && config('nntmux.mysql_search_fallback', false) === true) {
@@ -1018,7 +1081,7 @@ class ReleaseSearchService
         // Try to get releases directly from search index using external IDs
         $indexSearchResult = [];
         if (! empty($externalIds)) {
-            $indexSearchResult = Search::searchReleasesByExternalId($externalIds, $searchLimit);
+            $indexSearchResult = Search::searchReleasesByExternalId($externalIds, $this->prefilterCandidateLimit());
 
             if (config('app.debug') && ! empty($indexSearchResult)) {
                 Log::debug('apiTvSearch: Found releases via search index by external IDs', [
@@ -1072,7 +1135,7 @@ class ReleaseSearchService
         }
         $searchResult = $indexSearchResult; // Use index search result if we have it
         if (! $hasStrictTvSelector && empty($searchResult) && ! empty($name)) {
-            $searchResult = Search::searchReleases(['searchname' => $name], $searchLimit);
+            $searchResult = Search::searchReleases(['searchname' => $name], $this->prefilterCandidateLimit());
 
             // Fall back to MySQL if search engine failed (only if enabled)
             if (empty($searchResult) && config('nntmux.mysql_search_fallback', false) === true) {
@@ -1155,9 +1218,10 @@ class ReleaseSearchService
      *
      * @param  array<int|string, mixed>  $cat  Category IDs (list or associative)
      * @param  array<int, int>  $excludedCategories
+     * @param  int  $minSize  Minimum release size in bytes; 0 disables the filter
      * @return Collection|mixed
      */
-    public function animeSearch(mixed $aniDbID, int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, array $excludedCategories = [], int $anilistId = -1, string $orderBy = 'posted_desc'): mixed
+    public function animeSearch(mixed $aniDbID, int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, array $excludedCategories = [], int $anilistId = -1, string $orderBy = 'posted_desc', int $minSize = 0): mixed
     {
         [$orderField, $orderDir] = $this->getBrowseOrder($orderBy);
         if ($anilistId > 0) {
@@ -1196,14 +1260,15 @@ class ReleaseSearchService
 
         $whereSql = sprintf(
             'WHERE r.passwordstatus %s
-			%s %s %s %s %s %s',
+			%s %s %s %s %s %s %s',
             $this->showPasswords(),
             ($aniDbID > -1 ? sprintf(' AND r.anidbid = %d ', $aniDbID) : ''),
             $anidbIdFilter,
             (! empty($searchResult) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
             ! empty($excludedCategories) ? sprintf('AND r.categories_id NOT IN('.implode(',', $excludedCategories).')') : '',
             Category::getCategorySearch($cat, 'anime'),
-            ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : '')
+            ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : ''),
+            ($minSize > 0 ? sprintf(' AND r.size >= %d ', $minSize) : '')
         );
         $baseSql = sprintf(
             "SELECT r.id, r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.haspreview, r.jpgstatus,  cp.title AS parent_category, c.title AS sub_category,
@@ -1272,7 +1337,7 @@ class ReleaseSearchService
 
         // Use search index for external ID lookups (much faster than database JOINs)
         if ($hasExternalIds) {
-            $searchResult = Search::searchReleasesByExternalId($externalIds, $searchLimit);
+            $searchResult = Search::searchReleasesByExternalId($externalIds, $this->prefilterCandidateLimit());
 
             if (config('app.debug') && ! empty($searchResult)) {
                 Log::debug('moviesSearch: Found releases via search index by external IDs', [
@@ -1284,7 +1349,7 @@ class ReleaseSearchService
 
         // Only perform name searches when the request does not already target a specific external ID.
         if (! $hasExternalIds && ! empty($name)) {
-            $searchResult = Search::searchReleases(['searchname' => $name], $searchLimit);
+            $searchResult = Search::searchReleases(['searchname' => $name], $this->prefilterCandidateLimit());
 
             // Fall back to MySQL if search engine returned no results (only if enabled)
             if (empty($searchResult) && config('nntmux.mysql_search_fallback', false) === true) {
@@ -1610,6 +1675,19 @@ class ReleaseSearchService
      * Search-backed pages still apply SQL filters and ordering after the index lookup,
      * so fetch a buffered candidate set without handing MySQL thousands of IDs.
      */
+    /**
+     * Candidate cap for index lookups whose IDs are filtered by category, age and
+     * size afterwards. Capping before those filters would drop valid matches (and
+     * shrink totals) whenever many unrelated releases match, so fetch as many IDs
+     * as the engine returns for one query.
+     */
+    private function prefilterCandidateLimit(): int
+    {
+        $maxMatches = (int) config('search.drivers.'.config('search.default', 'manticore').'.max_matches', 10000);
+
+        return max(self::SEARCH_INDEX_MAX_CANDIDATES, $maxMatches);
+    }
+
     private function determineSearchCandidateLimit(int $offset, int $limit): int
     {
         $pageSize = max(1, $limit);

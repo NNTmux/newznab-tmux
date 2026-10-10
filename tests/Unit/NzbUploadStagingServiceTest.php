@@ -10,6 +10,7 @@ use App\Services\Nzb\NzbUploadStagingService;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\File;
 use PDO;
 use Tests\TestCase;
 
@@ -190,6 +191,141 @@ final class NzbUploadStagingServiceTest extends TestCase
         } catch (NzbUploadException) {
             $this->assertSame([], $filesystem->directories($this->uploadFolder));
         }
+    }
+
+    public function test_a_successful_stage_publishes_the_complete_upload_and_leaves_nothing_in_staging(): void
+    {
+        (new NzbUploadStagingService(new Filesystem))->stage(
+            $this->nzb('Release.nzb'),
+            UploadedFile::fake()->createWithContent('Release.nfo', 'release information'),
+        );
+
+        $uploadDirectory = $this->onlyUploadDirectory();
+
+        $this->assertFileExists($uploadDirectory.'/Release.nzb');
+        $this->assertFileExists($uploadDirectory.'/Release.nfo');
+        $this->assertFileExists($uploadDirectory.'/'.NzbUploadManifestService::FILENAME);
+        $this->assertSame([], $this->stagingEntries());
+    }
+
+    public function test_importers_never_see_an_upload_before_it_is_published(): void
+    {
+        $uploadFolder = $this->uploadFolder;
+        $filesystem = new class($uploadFolder) extends Filesystem
+        {
+            /** @var list<array{files:list<string>,manifests:list<string>}> */
+            public array $snapshots = [];
+
+            public function __construct(private readonly string $uploadFolder) {}
+
+            public function move($path, $target): bool
+            {
+                $this->snapshots[] = [
+                    'files' => array_map(
+                        static fn (\SplFileInfo $file): string => $file->getPathname(),
+                        File::allFiles($this->uploadFolder),
+                    ),
+                    'manifests' => (new NzbUploadManifestService(new Filesystem))->findManifests($this->uploadFolder),
+                ];
+
+                return parent::move($path, $target);
+            }
+        };
+
+        (new NzbUploadStagingService($filesystem))->stage(
+            $this->nzb('Release.nzb'),
+            UploadedFile::fake()->createWithContent('Release.nfo', 'release information'),
+        );
+
+        $this->assertCount(2, $filesystem->snapshots, 'Expected a manifest write and a publish rename.');
+        foreach ($filesystem->snapshots as $snapshot) {
+            $this->assertSame([], $snapshot['files']);
+            $this->assertSame([], $snapshot['manifests']);
+        }
+        $this->assertCount(3, File::allFiles($this->uploadFolder));
+    }
+
+    public function test_scans_ignore_abandoned_staging_directories(): void
+    {
+        $abandoned = $this->uploadFolder.'/'.NzbUploadStagingService::STAGING_DIRECTORY.'/crashed-upload';
+        (new Filesystem)->makeDirectory($abandoned, 0775, true);
+        file_put_contents($abandoned.'/Release.nzb', '<?xml version="1.0"?><nzb></nzb>');
+        file_put_contents($abandoned.'/'.NzbUploadManifestService::FILENAME, '{}');
+
+        $this->assertSame([], File::allFiles($this->uploadFolder));
+        $this->assertSame([], (new NzbUploadManifestService(new Filesystem))->findManifests($this->uploadFolder));
+    }
+
+    public function test_a_manifest_write_failure_leaves_no_staged_or_published_upload(): void
+    {
+        $filesystem = new class extends Filesystem
+        {
+            public function put($path, $contents, $lock = false): int|bool
+            {
+                return str_contains((string) $path, NzbUploadManifestService::FILENAME)
+                    ? false
+                    : parent::put($path, $contents, $lock);
+            }
+        };
+
+        try {
+            (new NzbUploadStagingService($filesystem))->stage(
+                $this->nzb('Release.nzb'),
+                UploadedFile::fake()->createWithContent('Release.nfo', 'release information'),
+            );
+            $this->fail('Expected manifest write to fail.');
+        } catch (NzbUploadException $exception) {
+            $this->assertSame('Failed to write upload pair to disk', $exception->getMessage());
+            $this->assertSame(500, $exception->status);
+        }
+
+        $this->assertSame([], $filesystem->directories($this->uploadFolder));
+        $this->assertSame([], $this->stagingEntries());
+    }
+
+    public function test_a_publish_rename_failure_rolls_back_the_staged_upload(): void
+    {
+        $filesystem = new class extends Filesystem
+        {
+            public function move($path, $target): bool
+            {
+                return str_contains((string) $target, NzbUploadManifestService::FILENAME)
+                    && parent::move($path, $target);
+            }
+        };
+
+        try {
+            (new NzbUploadStagingService($filesystem))->stage($this->nzb('Release.nzb'));
+            $this->fail('Expected publish rename to fail.');
+        } catch (NzbUploadException $exception) {
+            $this->assertSame('Failed to publish staged upload', $exception->getMessage());
+            $this->assertSame(500, $exception->status);
+        }
+
+        $this->assertSame([], $filesystem->directories($this->uploadFolder));
+        $this->assertSame([], $this->stagingEntries());
+    }
+
+    public function test_a_legacy_nfo_is_published_without_leaving_a_staging_file(): void
+    {
+        $result = (new NzbUploadStagingService(new Filesystem))->stageLegacyFile(
+            UploadedFile::fake()->createWithContent('Release.nfo', 'release information'),
+        );
+
+        $this->assertSame('Release.nfo', $result['filename']);
+        $this->assertSame('release information', file_get_contents($this->uploadFolder.'/Release.nfo'));
+        $this->assertSame([], $this->stagingEntries());
+    }
+
+    /** @return list<string> */
+    private function stagingEntries(): array
+    {
+        $staging = $this->uploadFolder.'/'.NzbUploadStagingService::STAGING_DIRECTORY;
+        if (! is_dir($staging)) {
+            return [];
+        }
+
+        return array_values(array_diff((array) scandir($staging), ['.', '..']));
     }
 
     private function nzb(string $name): UploadedFile
