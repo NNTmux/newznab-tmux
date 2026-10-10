@@ -279,6 +279,10 @@ class TraktProvider extends AbstractTvProvider
     {
         $return = false;
 
+        if (! $this->client->isConfigured()) {
+            return false;
+        }
+
         if ($videoId > 0 && (int) $series === -1 && (int) $episode === -1) {
             $this->addEpisodesForShow($siteId, $videoId);
 
@@ -359,6 +363,10 @@ class TraktProvider extends AbstractTvProvider
         $return = $response = false;
         $highestMatch = 0;
         $highest = null;
+
+        if (! $this->client->isConfigured()) {
+            return false;
+        }
 
         // Trakt does NOT like shows with the year in them even without the parentheses
         // Do this for the API Search only as a local lookup should require it

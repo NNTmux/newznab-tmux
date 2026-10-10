@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Services\IGDB\Models\Company;
 use App\Services\IGDB\Models\Game;
+use App\Support\MetadataSources;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -78,8 +79,7 @@ class IGDBService
      */
     public function isConfigured(): bool
     {
-        return config('igdb.credentials.client_id') !== ''
-            && config('igdb.credentials.client_secret') !== '';
+        return MetadataSources::isAvailable(MetadataSources::IGDB);
     }
 
     /**

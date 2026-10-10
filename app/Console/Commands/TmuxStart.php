@@ -12,6 +12,7 @@ use App\Services\Tmux\TmuxCommand;
 use App\Services\Tmux\TmuxLayoutBuilder;
 use App\Services\Tmux\TmuxPaneManager;
 use App\Services\Tmux\TmuxSessionManager;
+use App\Support\MetadataSources;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Process;
@@ -102,6 +103,10 @@ class TmuxStart extends Command
             $runtimeState->requestStop(false);
             $runtimeState->setTmuxRunning(true);
             $this->info('✅ Running flag set');
+
+            foreach (MetadataSources::logSummary() as $line) {
+                $this->warn('  ⚠ '.$line);
+            }
 
             // Start monitor in background
             $this->info('🚀 Starting monitor...');

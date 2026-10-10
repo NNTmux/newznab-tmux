@@ -9,6 +9,7 @@ use App\Services\FanartTvService;
 use App\Services\ReleaseImageService;
 use App\Services\TmdbClient;
 use App\Services\TraktService;
+use App\Support\MetadataSources;
 use CanIHaveSomeCoffee\TheTVDbAPI\Exception\ParseException;
 use CanIHaveSomeCoffee\TheTVDbAPI\Exception\ResourceNotFoundException;
 use CanIHaveSomeCoffee\TheTVDbAPI\Exception\UnauthorizedException;
@@ -517,7 +518,7 @@ class TvdbProvider extends AbstractTvProvider
     protected function authorizeTvdb(): void
     {
         $this->token = '';
-        if (config('tvdb.api_key') === null || config('tvdb.user_pin') === null) {
+        if (! MetadataSources::isAvailable(MetadataSources::TVDB)) {
             cli()->warning('TVDB API key or user pin not set. Running in local mode only!', true);
             $this->local = true;
         } else {
