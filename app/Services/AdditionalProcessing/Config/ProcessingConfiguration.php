@@ -39,6 +39,8 @@ final readonly class ProcessingConfiguration
 
     public int $maximumRarPasswordChecks;
 
+    public int $archiveProbeFiles;
+
     public int $maxSizeBytes;
 
     public int $minSizeBytes;
@@ -113,6 +115,7 @@ final readonly class ProcessingConfiguration
         $this->segmentsToDownload = (int) (app(ConfigurationProvider::class)->postProcessing()->segmentsToDownload ?: 2);
         $this->maximumRarSegments = (int) (app(ConfigurationProvider::class)->postProcessing()->maxPartsProcessed ?: 3);
         $this->maximumRarPasswordChecks = max((int) (app(ConfigurationProvider::class)->postProcessing()->passwordCheckAttempts ?: 1), 1);
+        $this->archiveProbeFiles = max(0, (int) config('nntmux.archive_probe_files', 3));
         // Delegate to AdditionalCandidateQuery so size-filter semantics
         // (explicit '0' means disabled, empty/null means default) are owned
         // in one place and shared between the bucket query and the per-worker

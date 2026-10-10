@@ -31,6 +31,7 @@ trait CreatesProcessingConfiguration
             'segmentsToDownload' => 2,
             'maximumRarSegments' => 3,
             'maximumRarPasswordChecks' => 1,
+            'archiveProbeFiles' => 3,
             'maxSizeBytes' => 107374182400,
             'minSizeBytes' => 0,
             'alternateNNTP' => false,
