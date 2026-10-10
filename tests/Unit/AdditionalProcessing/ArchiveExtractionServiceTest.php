@@ -18,9 +18,15 @@ class ArchiveExtractionServiceTest extends TestCase
     use BuildsArchiveFixtures;
     use CreatesProcessingConfiguration;
 
+    private string $workDir = '';
+
     protected function tearDown(): void
     {
         Mockery::close();
+        if ($this->workDir !== '') {
+            array_map('unlink', glob($this->workDir.'/*') ?: []);
+            rmdir($this->workDir);
+        }
         parent::tearDown();
     }
 
@@ -228,6 +234,125 @@ class ArchiveExtractionServiceTest extends TestCase
         $this->assertTrue(ArchiveExtractionService::hasArchiveSignature($this->sevenZip('a.mkv', 'x')));
         $this->assertFalse(ArchiveExtractionService::hasArchiveSignature("PAR2\0PKT".str_repeat("\0", 8)));
         $this->assertFalse(ArchiveExtractionService::hasArchiveSignature("\x1A\x45\xDF\xA3".str_repeat("\0", 8)));
+    }
+
+    #[Test]
+    public function it_parses_a_recorded_7z_listing(): void
+    {
+        $files = ArchiveExtractionService::parseSevenZipListing((string) file_get_contents(dirname(__DIR__, 2).'/Fixtures/7z-list-slt.txt'));
+
+        $this->assertSame(
+            ['Extras/Some.Movie.nfo', 'Extras/naïve – notes.txt', 'Some.Movie.2024.1080p.WEB-DL.mkv'],
+            array_column($files, 'name'),
+        );
+        $this->assertSame([4, 2, 2000], array_column($files, 'size'));
+        $this->assertSame([0, 0, 1], array_column($files, 'pass'));
+        $this->assertSame('b45776c8', $files[0]['crc32']);
+        $this->assertSame(strtotime('2026-10-10 15:46:58'), $files[0]['date']);
+    }
+
+    #[Test]
+    public function it_lists_a_compressed_7z_header_through_a_sparse_copy_of_the_archive(): void
+    {
+        $dir = $this->workDir();
+        $service = new ArchiveExtractionService($this->makeConfig(['sevenZipPath' => $this->fakeSevenZipClient($dir)]));
+        $archive = $this->sevenZip('ignored.mkv', str_repeat('x', 100), compressedHeader: true);
+        $context = $this->sevenZipContext();
+
+        $result = $service->listEncodedSevenZip(substr($archive, 0, 40), substr($archive, -60), $context, $dir.'/');
+
+        $this->assertIsArray($result);
+        $this->assertTrue($result['success']);
+        $this->assertTrue($result['listingOnly']);
+        $this->assertSame('Some.Movie.2024.1080p.WEB-DL.mkv', $result['files'][2]['name']);
+        $this->assertSame(1, $result['files'][2]['pass']);
+        $this->assertSame(1, $context->compressedFilesChecked);
+        $this->assertSame((string) strlen($archive), trim((string) file_get_contents($dir.'/listed-size')));
+        $this->assertSame([$dir.'/7z', $dir.'/listed-size'], glob($dir.'/*'));
+    }
+
+    #[Test]
+    public function it_gives_up_on_a_compressed_7z_header_whose_packed_stream_is_not_in_the_tail(): void
+    {
+        $dir = $this->workDir();
+        $service = new ArchiveExtractionService($this->makeConfig(['sevenZipPath' => $this->fakeSevenZipClient($dir)]));
+        $archive = $this->sevenZip('ignored.mkv', str_repeat('x', 100), compressedHeader: true);
+        $context = $this->sevenZipContext();
+
+        $this->assertNull($service->listEncodedSevenZip(substr($archive, 0, 40), substr($archive, -40), $context, $dir.'/'));
+        $this->assertFileDoesNotExist($dir.'/listed-size');
+        $this->assertSame(0, $context->compressedFilesChecked);
+    }
+
+    #[Test]
+    public function it_leaves_plain_and_encrypted_7z_headers_to_rarinfo(): void
+    {
+        $dir = $this->workDir();
+        $service = new ArchiveExtractionService($this->makeConfig(['sevenZipPath' => $this->fakeSevenZipClient($dir)]));
+        $plain = $this->sevenZip('Movie.2026.1080p.mkv', str_repeat('x', 100));
+        $encrypted = $this->sevenZip('Movie.2026.1080p.mkv', str_repeat('x', 100), encryptedHeader: true);
+
+        $this->assertNull($service->listEncodedSevenZip(substr($plain, 0, 40), substr($plain, -80), $this->sevenZipContext(), $dir.'/'));
+        $this->assertNull($service->listEncodedSevenZip(substr($encrypted, 0, 40), substr($encrypted, -60), $this->sevenZipContext(), $dir.'/'));
+        $this->assertFileDoesNotExist($dir.'/listed-size');
+    }
+
+    #[Test]
+    public function it_does_not_list_compressed_7z_headers_without_a_7zip_client(): void
+    {
+        $archive = $this->sevenZip('ignored.mkv', str_repeat('x', 100), compressedHeader: true);
+
+        foreach ([false, '/nonexistent/7z'] as $client) {
+            $service = new ArchiveExtractionService($this->makeConfig(['sevenZipPath' => $client]));
+            $this->assertNull($service->listEncodedSevenZip(substr($archive, 0, 40), substr($archive, -60), $this->sevenZipContext(), sys_get_temp_dir().'/'));
+        }
+    }
+
+    #[Test]
+    public function it_lists_real_7z_archives_with_compressed_headers(): void
+    {
+        $client = '/usr/bin/7z';
+        if (! is_executable($client)) {
+            $this->markTestSkipped('7-Zip is not installed.');
+        }
+
+        $dir = $this->workDir();
+        $service = new ArchiveExtractionService($this->makeConfig(['sevenZipPath' => $client]));
+        file_put_contents($dir.'/Real.Movie.2026.mkv', random_bytes(300000));
+        file_put_contents($dir.'/real.nfo', 'nfo');
+
+        $list = function (string $switches) use ($client, $dir, $service): ?array {
+            exec(escapeshellarg($client).' a -bd -mx=1 '.$switches.' '.escapeshellarg($dir.'/arc.7z')
+                .' '.escapeshellarg($dir.'/Real.Movie.2026.mkv').' '.escapeshellarg($dir.'/real.nfo').' 2>&1', $output, $code);
+            $this->assertSame(0, $code, implode("\n", $output));
+            $archive = (string) file_get_contents($dir.'/arc.7z');
+            unlink($dir.'/arc.7z');
+            $nextHeader = 32 + unpack('P', $archive, 12)[1];
+            $this->assertSame("\x17", $archive[$nextHeader]);
+
+            return $service->listEncodedSevenZip(substr($archive, 0, 65536), substr($archive, -65536), $this->sevenZipContext(), $dir.'/');
+        };
+
+        $plain = $list('');
+        $this->assertIsArray($plain);
+        $this->assertSame(['Real.Movie.2026.mkv', 'real.nfo'], array_column($plain['files'], 'name'));
+        $this->assertSame([300000, 3], array_column($plain['files'], 'size'));
+        $this->assertSame([0, 0], array_column($plain['files'], 'pass'));
+
+        $encryptedFiles = $list('-pSecret');
+        $this->assertIsArray($encryptedFiles);
+        $this->assertSame([1, 1], array_column($encryptedFiles['files'], 'pass'));
+
+        $this->assertNull($list('-pSecret -mhe=on'));
+        $this->assertSame([$dir.'/Real.Movie.2026.mkv', $dir.'/real.nfo'], glob($dir.'/*'));
+    }
+
+    private function workDir(): string
+    {
+        $this->workDir = sys_get_temp_dir().'/'.uniqid('7z-test-', true);
+        mkdir($this->workDir);
+
+        return $this->workDir;
     }
 
     private function sevenZipContext(): ReleaseProcessingContext

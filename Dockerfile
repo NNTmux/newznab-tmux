@@ -27,7 +27,7 @@ FROM dunglas/frankenphp:1-php8.5-bookworm AS production
 ENV LANG=C.UTF-8
 WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates curl unzip tmux unrar-free lame ffmpeg mediainfo jpegoptim webp \
+    ca-certificates curl unzip tmux unrar-free p7zip-full lame ffmpeg mediainfo jpegoptim webp \
     optipng pngquant libavif-bin python3 time procps mariadb-client libmagic1 \
     && rm -rf /var/lib/apt/lists/*
 RUN install-php-extensions bcmath exif gd intl mbstring pdo_mysql pdo_sqlite sockets pcntl redis imagick zip

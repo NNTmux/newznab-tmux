@@ -305,9 +305,10 @@ class ReleaseProcessor
         }
 
         $this->output->echoCompressedDownload();
-        $this->processCompressedData(
-            $this->withSevenZipTail($context, $data, $context->workPlan->probeTailMessageIds),
+        $this->processArchiveData(
             $context,
+            $data,
+            $context->workPlan->probeTailMessageIds,
             false,
             (string) ($context->nzbContents[0]['title'] ?? ''),
         );
@@ -613,9 +614,10 @@ class ReleaseProcessor
                 $this->output->echoCompressedDownload();
                 $downloaded++;
 
-                $processed = $this->processCompressedData(
-                    $this->withSevenZipTail($context, $result['data'], $archiveCandidate->tailMessageIds),
+                $processed = $this->processArchiveData(
                     $context,
+                    $result['data'],
+                    $archiveCandidate->tailMessageIds,
                     $reverse,
                     $archiveCandidate->title,
                 );
@@ -632,10 +634,38 @@ class ReleaseProcessor
     /**
      * @param  list<string>  $tailMessageIds
      */
-    private function withSevenZipTail(ReleaseProcessingContext $context, string $data, array $tailMessageIds): string
+    private function processArchiveData(
+        ReleaseProcessingContext $context,
+        string $data,
+        array $tailMessageIds,
+        bool $reverse,
+        string $archiveTitle,
+    ): bool {
+        $tail = $this->downloadSevenZipTail($context, $data, $tailMessageIds);
+        if ($tail === null) {
+            return $this->processCompressedData($data, $context, $reverse, $archiveTitle);
+        }
+
+        $listing = $this->archiveService->listEncodedSevenZip($data, $tail, $context, $context->tmpPath);
+        if ($listing !== null) {
+            return $this->handleArchiveResult($listing, $data, $context, $reverse, $archiveTitle);
+        }
+
+        return $this->processCompressedData(
+            $this->archiveService->withSevenZipEndHeader($data, $tail) ?? $data,
+            $context,
+            $reverse,
+            $archiveTitle,
+        );
+    }
+
+    /**
+     * @param  list<string>  $tailMessageIds
+     */
+    private function downloadSevenZipTail(ReleaseProcessingContext $context, string $data, array $tailMessageIds): ?string
     {
         if ($tailMessageIds === [] || ! $this->archiveService->needsSevenZipEndHeader($data)) {
-            return $data;
+            return null;
         }
 
         $result = $this->downloadService->download(
@@ -648,11 +678,7 @@ class ReleaseProcessor
             $context->groupUnavailable = true;
         }
 
-        if (! $result['success'] || ! is_string($result['data'])) {
-            return $data;
-        }
-
-        return $this->archiveService->withSevenZipEndHeader($data, $result['data']) ?? $data;
+        return $result['success'] && is_string($result['data']) ? $result['data'] : null;
     }
 
     private function processCompressedData(
@@ -661,12 +687,25 @@ class ReleaseProcessor
         bool $reverse,
         string $archiveTitle = '',
     ): bool {
-        $result = $this->archiveService->processCompressedData(
+        return $this->handleArchiveResult(
+            $this->archiveService->processCompressedData($compressedData, $context, $context->tmpPath),
             $compressedData,
             $context,
-            $context->tmpPath
+            $reverse,
+            $archiveTitle,
         );
+    }
 
+    /**
+     * @param  array<string, mixed>  $result
+     */
+    private function handleArchiveResult(
+        array $result,
+        string $compressedData,
+        ReleaseProcessingContext $context,
+        bool $reverse,
+        string $archiveTitle,
+    ): bool {
         if ($result['hasPassword']) {
             $context->releaseHasPassword = true;
             $context->passwordStatus = $result['passwordStatus'];

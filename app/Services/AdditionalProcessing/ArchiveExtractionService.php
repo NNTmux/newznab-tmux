@@ -13,6 +13,7 @@ use dariusiii\rarinfo\SzipInfo;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Process;
+use Symfony\Component\Process\Process as SymfonyProcess;
 
 /**
  * Service for extracting and processing archive files (RAR, ZIP, 7z).
@@ -325,6 +326,136 @@ class ArchiveExtractionService
         $startHeader = pack('PPV', 0, $start['next_size'], $start['next_crc']);
 
         return substr($head, 0, 8).pack('V', crc32($startHeader)).$startHeader.$endHeader;
+    }
+
+    /**
+     * List a 7z whose end header is compressed, which rarinfo can't decode, with the 7-Zip client.
+     *
+     * The client gets a sparse copy of the archive holding only the downloaded first and
+     * last bytes at their real offsets; that is enough when the packed header stream lies
+     * inside them, as 7-Zip writes it just before the end header.
+     *
+     * @return array<string, mixed>|null result like processCompressedData(), or null to fall back
+     */
+    public function listEncodedSevenZip(
+        string $head,
+        string $tail,
+        ReleaseProcessingContext $context,
+        string $tmpPath,
+    ): ?array {
+        $client = $this->config->sevenZipPath;
+        if (! is_string($client) || ! is_executable($client)) {
+            return null;
+        }
+
+        $start = $this->sevenZipStartHeader($head);
+        $joined = $this->withSevenZipEndHeader($head, $tail);
+        if ($start === null || $joined === null) {
+            return null;
+        }
+
+        $szip = new SzipInfo;
+        $szip->setData($joined);
+        $encoded = null;
+        foreach ($szip->getHeaders() ?: [] as $header) {
+            if ($header['type'] === SzipInfo::PROPERTY_ENCODED_HEADER) {
+                $encoded = $header;
+            }
+        }
+        if ($encoded === null || $szip->isEncrypted || ! isset($encoded['pack_offset'], $encoded['pack_sizes'])) {
+            return null;
+        }
+
+        $length = 32 + $start['next_offset'] + $start['next_size'];
+        $tailStart = $length - strlen($tail);
+        $packStart = 32 + (int) $encoded['pack_offset'];
+        $packEnd = $packStart + (int) array_sum($encoded['pack_sizes']);
+        if ($tailStart < 0 || $packEnd > $length - $start['next_size']
+            || ($packStart < $tailStart && $packEnd > strlen($head))
+        ) {
+            return null;
+        }
+
+        $file = $tmpPath.uniqid('7z_', true).'.7z';
+        try {
+            $handle = @fopen($file, 'wb');
+            if ($handle === false) {
+                return null;
+            }
+            $written = fwrite($handle, $head) === strlen($head)
+                && fseek($handle, $tailStart) === 0
+                && fwrite($handle, $tail) === strlen($tail);
+            fclose($handle);
+            if (! $written) {
+                return null;
+            }
+
+            // A dummy password makes an encrypted archive fail instead of prompting.
+            $process = new SymfonyProcess([$client, 'l', '-slt', '-ba', '-sccUTF-8', '-pnntmux', '-t7z', '--', $file]);
+            $process->setTimeout(60)->run();
+        } catch (\Throwable) {
+            return null;
+        } finally {
+            @unlink($file);
+        }
+
+        $files = $process->isSuccessful() ? self::parseSevenZipListing($process->getOutput()) : [];
+        if ($files === []) {
+            return null;
+        }
+
+        $context->compressedFilesChecked++;
+
+        return [
+            'success' => true,
+            'files' => $files,
+            'hasPassword' => false,
+            'passwordStatus' => ReleaseBrowseService::PASSWD_NONE,
+            'archiveMarker' => '7',
+            'dataSummary' => ['main_type' => ArchiveInfo::TYPE_SZIP],
+            'listingOnly' => true,
+        ];
+    }
+
+    /**
+     * Turn `7z l -slt` output into rarinfo-style file records, leaving out directories.
+     *
+     * @return list<array{name: string, size: int, date: int, pass: int, compressed: int, crc32?: string}>
+     */
+    public static function parseSevenZipListing(string $output): array
+    {
+        $files = [];
+        foreach (preg_split('/\R\s*\R/', trim($output)) ?: [] as $block) {
+            $entry = [];
+            foreach (preg_split('/\R/', $block) ?: [] as $line) {
+                $parts = explode(' = ', $line, 2);
+                if (count($parts) === 2) {
+                    $entry[$parts[0]] = $parts[1];
+                } elseif (str_ends_with($line, ' =')) {
+                    $entry[substr($line, 0, -2)] = '';
+                }
+            }
+
+            if (($entry['Path'] ?? '') === '' || ! array_key_exists('Size', $entry)
+                || ($entry['Folder'] ?? '') === '+' || str_starts_with($entry['Attributes'] ?? '', 'D')
+            ) {
+                continue;
+            }
+
+            $file = [
+                'name' => $entry['Path'],
+                'size' => (int) $entry['Size'],
+                'date' => (int) strtotime(substr($entry['Modified'] ?? '', 0, 19)),
+                'pass' => ($entry['Encrypted'] ?? '') === '+' ? 1 : 0,
+                'compressed' => in_array($entry['Method'] ?? '', ['', 'Copy'], true) ? 0 : 1,
+            ];
+            if (preg_match('/^[0-9A-F]{1,8}$/i', $entry['CRC'] ?? '') === 1) {
+                $file['crc32'] = dechex((int) hexdec($entry['CRC']));
+            }
+            $files[] = $file;
+        }
+
+        return $files;
     }
 
     /**
