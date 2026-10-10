@@ -126,9 +126,8 @@ class AdditionalWorkPlannerTest extends TestCase
                 ['title' => '"obfuscated" yEnc', 'segments' => ['<first>', '<second>', '<third>', '<last>'], 'filecount' => 1],
             ], 'alt.binaries.test');
 
-            $this->assertSame('<first>', $plan->probeMessageId);
-            $this->assertSame(array_slice(['<second>', '<third>'], 0, max(0, $budget - 1)), $plan->probeContinuationMessageIds);
-            $this->assertSame(['<last>'], $plan->probeTailMessageIds);
+            $this->assertSame(['<first>', ...array_slice(['<second>', '<third>'], 0, max(0, $budget - 1))], $plan->probeCandidates[0]->messageIds);
+            $this->assertSame(['<last>'], $plan->probeCandidates[0]->tailMessageIds);
         }
     }
 
@@ -141,7 +140,8 @@ class AdditionalWorkPlannerTest extends TestCase
             ['title' => '"KlUC4yTqeaIpcTbOIYdzhqqWF" yEnc (1/103)', 'segments' => ['<first>', '<second>'], 'filecount' => 1],
         ], 'alt.binaries.misc');
 
-        $this->assertSame('<first>', $plan->probeMessageId);
+        $this->assertSame('<first>', $plan->probeCandidates[0]->messageIds[0]);
+        $this->assertTrue($plan->probeIsOnlyFile);
         $this->assertSame([], $plan->unsupportedReasons);
     }
 
@@ -157,9 +157,9 @@ class AdditionalWorkPlannerTest extends TestCase
             ['title' => '"KlUC4yTqeaIpcTbOIYdzhqqWF" yEnc (1/1)', 'segments' => ['<only>'], 'filecount' => 1],
         ], 'alt.binaries.misc');
 
-        $this->assertSame('<first>', $plan->probeMessageId);
-        $this->assertSame(['<last>'], $plan->probeTailMessageIds);
-        $this->assertSame([], $oneSegment->probeTailMessageIds);
+        $this->assertSame('<first>', $plan->probeCandidates[0]->messageIds[0]);
+        $this->assertSame(['<last>'], $plan->probeCandidates[0]->tailMessageIds);
+        $this->assertSame([], $oneSegment->probeCandidates[0]->tailMessageIds);
     }
 
     #[Test]
@@ -171,24 +171,52 @@ class AdditionalWorkPlannerTest extends TestCase
             ['title' => '"KlUC4yTqeaIpcTbOIYdzhqqWF" yEnc (1/103)', 'segments' => ['<par2>', '<data>'], 'filecount' => 2],
         ], 'alt.binaries.misc');
 
-        $this->assertSame('', $plan->probeMessageId);
+        $this->assertSame([], $plan->probeCandidates);
     }
 
     #[Test]
-    public function it_does_not_probe_named_or_multi_file_releases(): void
+    public function it_does_not_probe_named_files_or_releases_with_a_named_archive(): void
     {
         $planner = new AdditionalWorkPlanner($this->makeConfig());
 
         $named = $planner->plan([
-            ['title' => '"Show.S01E01.1080p.mkv" yEnc (1/50)', 'segments' => ['<video>']],
+            ['title' => '"Show.S01E01.1080p.mkv" yEnc (1/50)', 'segments' => ['<video>'], 'filecount' => 1],
         ], 'alt.binaries.misc');
-        $multi = $planner->plan([
-            ['title' => '"aB3dE5fG7hJ9" yEnc (1/50)', 'segments' => ['<one>']],
-            ['title' => '"kL2mN4pQ6rS8" yEnc (1/50)', 'segments' => ['<two>']],
+        $withArchive = $planner->plan([
+            ['title' => '"Show.S01E01.part01.rar" yEnc (1/50)', 'segments' => ['<rar>'], 'filecount' => 1],
+            ['title' => '"aB3dE5fG7hJ9" yEnc (1/50)', 'segments' => ['<one>'], 'filecount' => 1],
         ], 'alt.binaries.misc');
 
-        $this->assertSame('', $named->probeMessageId);
-        $this->assertSame('', $multi->probeMessageId);
+        $this->assertSame([], $named->probeCandidates);
+        $this->assertSame([], $withArchive->probeCandidates);
+    }
+
+    #[Test]
+    public function it_probes_the_largest_unnamed_files_of_a_multi_file_release_up_to_the_cap(): void
+    {
+        $contents = [
+            ['title' => '"aB3dE5fG7hJ9" yEnc (1/2)', 'segments' => ['<small-1>', '<small-2>'], 'size' => 10, 'filecount' => 1],
+            ['title' => '"kL2mN4pQ6rS8" yEnc (1/3)', 'segments' => ['<big-1>', '<big-2>', '<big-3>'], 'size' => 500, 'filecount' => 1],
+            ['title' => '"release.nfo" yEnc (1/1)', 'segments' => ['<nfo>'], 'size' => 900, 'filecount' => 1],
+            ['title' => '"zZ9yY8xX7wW6" yEnc (1/50)', 'segments' => ['<merged-1>', '<merged-2>'], 'size' => 900, 'filecount' => 2],
+            ['title' => '"tT1uU2vV3wW4" yEnc (1/3)', 'segments' => ['<equal-1>', '<equal-2>'], 'size' => 500, 'filecount' => 1],
+            ['title' => '"qQ5rR6sS7tT8" yEnc (1/1)', 'segments' => ['<mid>'], 'size' => 100, 'filecount' => 1],
+        ];
+
+        $plan = (new AdditionalWorkPlanner($this->makeConfig()))->plan($contents, 'alt.binaries.misc');
+
+        $this->assertFalse($plan->probeIsOnlyFile);
+        $this->assertSame(
+            [['<big-1>', '<big-2>', '<big-3>'], ['<equal-1>', '<equal-2>'], ['<mid>']],
+            array_map(static fn ($candidate): array => $candidate->messageIds, $plan->probeCandidates),
+        );
+        $this->assertSame([['<big-3>'], ['<equal-2>'], []], array_map(static fn ($candidate): array => $candidate->tailMessageIds, $plan->probeCandidates));
+        $this->assertSame([1, 4, 5], array_map(static fn ($candidate): int => $candidate->sourceIndex, $plan->probeCandidates));
+
+        $one = (new AdditionalWorkPlanner($this->makeConfig(['archiveProbeFiles' => 1])))->plan($contents, 'alt.binaries.misc');
+        $none = (new AdditionalWorkPlanner($this->makeConfig(['archiveProbeFiles' => 0])))->plan($contents, 'alt.binaries.misc');
+        $this->assertCount(1, $one->probeCandidates);
+        $this->assertSame([], $none->probeCandidates);
     }
 
     #[Test]

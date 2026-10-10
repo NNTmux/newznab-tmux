@@ -5,6 +5,7 @@ namespace Tests\Unit\AdditionalProcessing;
 use App\Models\Release;
 use App\Services\AdditionalProcessing\AdditionalWorkPlanner;
 use App\Services\AdditionalProcessing\ArchiveExtractionService;
+use App\Services\AdditionalProcessing\Config\ProcessingConfiguration;
 use App\Services\AdditionalProcessing\ConsoleOutputService;
 use App\Services\AdditionalProcessing\DTO\DownloadMetrics;
 use App\Services\AdditionalProcessing\Enums\DownloadKind;
@@ -734,6 +735,128 @@ class ReleaseProcessorTest extends TestCase
         $this->assertTrue($context->nzbHasCompressedFile);
     }
 
+    #[Test]
+    public function it_inspects_an_archive_found_in_a_later_file_of_an_obfuscated_release(): void
+    {
+        $config = $this->makeConfig(['processPasswords' => true]);
+        $archive = $this->rar('Movie.2026.1080p.mkv', str_repeat('x', 100));
+        $nzbParser = Mockery::mock(NzbContentParser::class);
+        $nzbParser->shouldReceive('parseNzb')->once()->andReturn([
+            'error' => null,
+            'contents' => [
+                ['title' => '"aB3dE5fG7hJ9" yEnc (1/3)', 'segments' => ['<par2-1>', '<par2-2>'], 'size' => 900, 'filecount' => 1],
+                ['title' => '"kL2mN4pQ6rS8" yEnc (1/2)', 'segments' => ['<rar-1>', '<rar-2>'], 'size' => 800, 'filecount' => 1],
+                ['title' => '"tT1uU2vV3wW4" yEnc (1/2)', 'segments' => ['<other-1>'], 'size' => 700, 'filecount' => 1],
+            ],
+        ]);
+
+        $downloadService = Mockery::mock(UsenetDownloadService::class);
+        $this->expectDownloadScope($downloadService);
+        $downloadService->shouldReceive('download')
+            ->once()
+            ->with(DownloadKind::Compressed, ['<par2-1>'], '', 1)
+            ->andReturn(['success' => true, 'data' => "PAR2\0PKT".str_repeat("\0", 56), 'groupUnavailable' => false, 'error' => null]);
+        $downloadService->shouldReceive('download')
+            ->once()
+            ->with(DownloadKind::Compressed, ['<rar-1>'], '', 1)
+            ->andReturn(['success' => true, 'data' => substr($archive, 0, 60), 'groupUnavailable' => false, 'error' => null]);
+        $downloadService->shouldReceive('download')
+            ->once()
+            ->with(DownloadKind::Compressed, ['<rar-2>'], '', 1)
+            ->andReturn(['success' => true, 'data' => substr($archive, 60), 'groupUnavailable' => false, 'error' => null]);
+
+        $releaseManager = Mockery::mock(ReleaseFileManager::class);
+        $releaseManager->shouldReceive('processReleaseNameFromNzbContents')->once()->andReturnFalse();
+        $releaseManager->shouldNotReceive('deleteRelease');
+        $releaseManager->shouldReceive('addFileInfo')
+            ->once()
+            ->with(Mockery::on(static fn (array $file): bool => $file['name'] === 'Movie.2026.1080p.mkv'), Mockery::any(), Mockery::any())
+            ->andReturnTrue();
+        $releaseManager->shouldReceive('finalizeRelease')->once()->andReturnNull();
+
+        $processor = new ReleaseProcessor(
+            $config,
+            $nzbParser,
+            new AdditionalWorkPlanner($config),
+            new ArchiveExtractionService($config),
+            Mockery::mock(MediaExtractionService::class),
+            $downloadService,
+            $releaseManager,
+            Mockery::mock(ReleaseFilesArchiveFallback::class)->shouldIgnoreMissing(),
+            $this->tempWorkspaceWithoutFiles(),
+            Mockery::mock(ConsoleOutputService::class)->shouldIgnoreMissing()
+        );
+
+        $context = $this->makeContext();
+        $context->release->nfostatus = 1;
+        $processor->process($context, '/tmp/main/');
+
+        $this->assertTrue($context->nzbHasCompressedFile);
+    }
+
+    #[Test]
+    public function it_probes_at_most_the_configured_number_of_files_and_never_deletes_a_multi_file_release(): void
+    {
+        $config = $this->makeConfig(['processPasswords' => true, 'archiveProbeFiles' => 2]);
+        $nzbParser = Mockery::mock(NzbContentParser::class);
+        $nzbParser->shouldReceive('parseNzb')->once()->andReturn([
+            'error' => null,
+            'contents' => array_map(
+                static fn (int $i): array => ['title' => '"obfuscated'.$i.'" yEnc (1/1)', 'segments' => ['<file-'.$i.'>'], 'size' => 100, 'filecount' => 1],
+                range(1, 4),
+            ),
+        ]);
+
+        $downloadService = Mockery::mock(UsenetDownloadService::class);
+        $this->expectDownloadScope($downloadService);
+        foreach (['<file-1>', '<file-2>'] as $messageId) {
+            $downloadService->shouldReceive('download')
+                ->once()
+                ->with(DownloadKind::Compressed, [$messageId], '', 1)
+                ->andReturn(['success' => true, 'data' => "PAR2\0PKT".str_repeat("\0", 56), 'groupUnavailable' => false, 'error' => null]);
+        }
+
+        $releaseManager = Mockery::mock(ReleaseFileManager::class);
+        $releaseManager->shouldReceive('processReleaseNameFromNzbContents')->once()->andReturnFalse();
+        $releaseManager->shouldNotReceive('deleteRelease');
+        $releaseManager->shouldReceive('finalizeRelease')->once()->andReturnNull();
+
+        $result = $this->multiFileProbeProcessor($config, $nzbParser, $downloadService, $releaseManager)
+            ->process($this->makeContext(), '/tmp/main/');
+
+        $this->assertNotSame(ProcessingOutcome::DeletedPar2Only, $result->outcome);
+    }
+
+    #[Test]
+    public function it_stops_probing_files_when_the_group_is_unavailable(): void
+    {
+        $config = $this->makeConfig(['processPasswords' => true]);
+        $nzbParser = Mockery::mock(NzbContentParser::class);
+        $nzbParser->shouldReceive('parseNzb')->once()->andReturn([
+            'error' => null,
+            'contents' => [
+                ['title' => '"aB3dE5fG7hJ9" yEnc (1/1)', 'segments' => ['<one>'], 'filecount' => 1],
+                ['title' => '"kL2mN4pQ6rS8" yEnc (1/1)', 'segments' => ['<two>'], 'filecount' => 1],
+            ],
+        ]);
+
+        $downloadService = Mockery::mock(UsenetDownloadService::class);
+        $this->expectDownloadScope($downloadService);
+        $downloadService->shouldReceive('download')
+            ->once()
+            ->with(DownloadKind::Compressed, ['<one>'], '', 1)
+            ->andReturn(['success' => false, 'data' => null, 'groupUnavailable' => true, 'error' => 'No such group']);
+
+        $releaseManager = Mockery::mock(ReleaseFileManager::class);
+        $releaseManager->shouldReceive('processReleaseNameFromNzbContents')->once()->andReturnFalse();
+        $releaseManager->shouldReceive('finalizeRelease')->once()->andReturnNull();
+
+        $result = $this->multiFileProbeProcessor($config, $nzbParser, $downloadService, $releaseManager)
+            ->process($this->makeContext(), '/tmp/main/');
+
+        $this->assertSame(ProcessingOutcome::GroupUnavailable, $result->outcome);
+    }
+
     /**
      * @return array<string, array{string, list<string>}>
      */
@@ -744,6 +867,26 @@ class ReleaseProcessorTest extends TestCase
             'ZIP' => ['zip', []],
             '7z' => ['7z', ['<last>']],
         ];
+    }
+
+    private function multiFileProbeProcessor(
+        ProcessingConfiguration $config,
+        NzbContentParser $nzbParser,
+        UsenetDownloadService $downloadService,
+        ReleaseFileManager $releaseManager,
+    ): ReleaseProcessor {
+        return new ReleaseProcessor(
+            $config,
+            $nzbParser,
+            new AdditionalWorkPlanner($config),
+            new ArchiveExtractionService($config),
+            Mockery::mock(MediaExtractionService::class),
+            $downloadService,
+            $releaseManager,
+            Mockery::mock(ReleaseFilesArchiveFallback::class)->shouldIgnoreMissing(),
+            $this->tempWorkspaceWithoutFiles(),
+            Mockery::mock(ConsoleOutputService::class)->shouldIgnoreMissing()
+        );
     }
 
     private function makeProcessor(

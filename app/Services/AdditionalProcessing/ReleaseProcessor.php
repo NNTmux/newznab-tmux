@@ -6,6 +6,7 @@ namespace App\Services\AdditionalProcessing;
 
 use App\Models\UsenetGroup;
 use App\Services\AdditionalProcessing\Config\ProcessingConfiguration;
+use App\Services\AdditionalProcessing\DTO\ArchiveCandidate;
 use App\Services\AdditionalProcessing\DTO\ReleaseProcessingResult;
 use App\Services\AdditionalProcessing\Enums\DownloadKind;
 use App\Services\AdditionalProcessing\Enums\ProcessingOutcome;
@@ -139,8 +140,8 @@ class ReleaseProcessor
                 fn (): bool => $this->prepareMessageIds($context),
             );
 
-            $probeData = $this->downloadProbe($context);
-            if ($probeData !== null && str_starts_with($probeData, "PAR2\0PKT")) {
+            $probe = $this->downloadProbe($context);
+            if ($probe !== null && $context->workPlan?->probeIsOnlyFile === true && str_starts_with($probe[1], "PAR2\0PKT")) {
                 $this->output->warning('Release '.$release->id.' only contains PAR2 data, deleting.');
                 $this->releaseManager->deleteRelease($release);
 
@@ -152,7 +153,7 @@ class ReleaseProcessor
             }
 
             // The probed file may be an archive behind an obfuscated name.
-            $probedArchive = $probeData !== null && ArchiveExtractionService::hasArchiveSignature($probeData) ? $probeData : null;
+            $probedArchive = $probe !== null && ArchiveExtractionService::hasArchiveSignature($probe[1]) ? $probe : null;
             if ($probedArchive !== null) {
                 $context->nzbHasCompressedFile = true;
             }
@@ -172,7 +173,7 @@ class ReleaseProcessor
                         ProcessingStage::ArchiveDownloads,
                         function () use ($context, &$triedCompressedMids, $probedArchive): void {
                             if ($probedArchive !== null) {
-                                $this->processProbedArchive($context, $probedArchive);
+                                $this->processProbedArchive($context, $probedArchive[0], $probedArchive[1]);
                             }
                             $this->processNzbCompressedFiles($context, false, $triedCompressedMids);
                         },
@@ -254,39 +255,51 @@ class ReleaseProcessor
     }
 
     /**
-     * Sample the first segment of a lone file the planner couldn't classify by name.
-     * Obfuscated uploads can post each PAR2 volume as its own release; the first bytes give them away.
+     * Sample the first segment of files the planner couldn't classify by name, stopping at the
+     * first archive. Obfuscated uploads can post each PAR2 volume as its own release; the first
+     * bytes of a lone file give them away, so its sample is returned whatever it holds.
+     *
+     * @return array{0: ArchiveCandidate, 1: string}|null
      */
-    private function downloadProbe(ReleaseProcessingContext $context): ?string
+    private function downloadProbe(ReleaseProcessingContext $context): ?array
     {
-        $messageId = $context->workPlan->probeMessageId ?? '';
-        if ($messageId === '' || $context->groupUnavailable) {
-            return null;
+        foreach ($context->workPlan->probeCandidates ?? [] as $candidate) {
+            if ($context->groupUnavailable) {
+                return null;
+            }
+
+            $result = $this->downloadService->download(
+                DownloadKind::Compressed,
+                [$candidate->messageIds[0]],
+                $context->releaseGroupName,
+                $context->release->id,
+            );
+
+            if ($result['groupUnavailable']) {
+                $context->groupUnavailable = true;
+            }
+
+            if (! $result['success'] || ! is_string($result['data'])) {
+                continue;
+            }
+
+            if ($context->workPlan->probeIsOnlyFile || ArchiveExtractionService::hasArchiveSignature($result['data'])) {
+                return [$candidate, $result['data']];
+            }
         }
 
-        $result = $this->downloadService->download(
-            DownloadKind::Compressed,
-            [$messageId],
-            $context->releaseGroupName,
-            $context->release->id,
-        );
-
-        if ($result['groupUnavailable']) {
-            $context->groupUnavailable = true;
-        }
-
-        return $result['success'] && is_string($result['data']) ? $result['data'] : null;
+        return null;
     }
 
-    private function processProbedArchive(ReleaseProcessingContext $context, string $data): void
+    private function processProbedArchive(ReleaseProcessingContext $context, ArchiveCandidate $candidate, string $data): void
     {
-        if ($context->groupUnavailable || $context->workPlan === null) {
+        if ($context->groupUnavailable) {
             return;
         }
 
         if (! str_starts_with($data, SzipInfo::MARKER_SIGNATURE)) {
             // Batch downloads can return a partial body as success when a later article is missing.
-            foreach ($context->workPlan->probeContinuationMessageIds as $messageId) {
+            foreach (array_slice($candidate->messageIds, 1) as $messageId) {
                 $result = $this->downloadService->download(
                     DownloadKind::Compressed,
                     [$messageId],
@@ -306,10 +319,10 @@ class ReleaseProcessor
 
         $this->output->echoCompressedDownload();
         $this->processCompressedData(
-            $this->withSevenZipTail($context, $data, $context->workPlan->probeTailMessageIds),
+            $this->withSevenZipTail($context, $data, $candidate->tailMessageIds),
             $context,
             false,
-            (string) ($context->nzbContents[0]['title'] ?? ''),
+            $candidate->title,
         );
     }
 
