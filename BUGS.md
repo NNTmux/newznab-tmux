@@ -267,12 +267,13 @@ These bugs turned up while building and running the self-hosted stack in `docker
 - **Symptom:** with `NNTP_COMPRESSED_HEADERS=true` on Newshosting, binaries workers fail in `NNTPService::_getXFeatureTextResponse()` → `throwError()` (`NNTPService.php:892,960`).
 - **Status:** the docker/ stack uses the upstream default (`false`). The failure could be provider-specific or a decode bug; not investigated further.
 
-### 35. PreDB lookups break on release names with unbalanced parentheses (Open)
+### 35. PreDB lookups break on release names with unbalanced parentheses (Fixed)
 
 - **Where:** `ManticoreSearchDriver::searchPredb()` → `searchIndexes()` (`app/Services/Search/Drivers/ManticoreSearchDriver.php:1366-1371, ~1496`). The search string goes through `prepareUserSearchQuery()`, which keeps query operators for user-typed searches.
 - **Bug:** the lookups search with machine-generated release names. A stray `)` or `(` reaches Manticore's `query_string` unescaped.
 - **Symptom:** `ManticoreSearch searchIndexes ResponseException: "table predb_rt: query error: P08: syntax error, unexpected ')'"` with `"search":"idk_rza-everyone_knows_)-21ccf990"`; 6 times on 2026-10-09 and 5 on 2026-10-10. That release's PreDB lookup fails.
 - **Fix:** escape machine-generated names with `escapeString()` in `searchPredb()`, or have `prepareUserSearchQuery()` escape unbalanced parentheses.
+- **Fix (staged):** `NameFixingService::findBestPredbMatch()` now searches `predbSearchText($fileName)`: everything except letters, digits and the `.`, `_`, `-` separators becomes a space, and a leading `-` (negation) is dropped. The original name is still used for the cache key and match scoring, and the PreDB search keeps its operators for people typing searches (`Predb::search`). It recurred at 08:27 and 08:34 UTC on 2026-10-11 with hashed names such as `)C<b;<C6.U#…`; the exact name from the log now runs without error against `predb_rt`. Covered by `NameFixingPredbSearchTextTest`.
 
 ### 36. PHPStan can't analyse console commands without a database (Open)
 

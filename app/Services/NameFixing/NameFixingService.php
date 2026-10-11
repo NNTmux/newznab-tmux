@@ -495,9 +495,25 @@ class NameFixingService
             $this->predbMatchCache = [];
         }
 
-        $results = Search::searchPredb($fileName);
+        $searchText = self::predbSearchText($fileName);
+        $results = $searchText === '' ? [] : Search::searchPredb($searchText);
 
         return $this->predbMatchCache[$fileName] = $this->predbMatchSelector->selectBestMatch($fileName, $results);
+    }
+
+    /**
+     * Release file names are machine generated, so they are searched as plain words. The PreDB search
+     * keeps query operators for people typing searches; a stray parenthesis, quote or `|` in a hashed
+     * name reached Manticore unescaped and failed the lookup with a syntax error. Everything except
+     * letters, digits and the `.`, `_` and `-` separators becomes a space, and a leading `-` (a negation
+     * operator) is dropped.
+     */
+    public static function predbSearchText(string $fileName): string
+    {
+        $text = preg_replace('/[^\p{L}\p{N}\s._-]+/u', ' ', $fileName) ?? '';
+        $text = preg_replace('/(?<=^|\s)-+/', '', $text) ?? '';
+
+        return trim(preg_replace('/\s+/', ' ', $text) ?? '');
     }
 
     /**
