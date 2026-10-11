@@ -309,6 +309,12 @@ These bugs turned up while building and running the self-hosted stack in `docker
 - **Symptom:** `stream_socket_client(): SSL: Handshake timed out` became an `ErrorException` that bypassed `doConnect()`'s retry loop. Post-processing logged it for dozens of releases, and on 2026-10-11 at 01:01 UTC a `safe_binaries` worker exited with code 1 and failed its whole batch.
 - **Fix (staged):** the call is silenced and the failure is returned as an NNTP error, so the retry loop handles it. Covered by `NNTPServiceConnectFailureTest`, which fails without the fix.
 
+### 42. One unreachable TV provider crashes the whole TV post-processing worker (Fixed)
+
+- **Where:** `TvProcessor::runProviders()` (`app/Services/TvProcessor.php`). `TvdbProvider::__construct()` logs in to TVDB, and the `GuzzleHttp` connect exception it throws was not caught.
+- **Symptom:** on 2026-10-11 at 02:23 UTC a DNS failure (`cURL error 6: Could not resolve host: api4.thetvdb.com`) killed the worker (exit 1), failed the whole `postProcess_tv` batch and skipped the TVMaze, TMDB and Trakt providers. It was identified from the worker output that #23 now logs.
+- **Fix (staged):** a provider that throws is logged as a warning and marked failed, and the pipeline continues with the next provider. Its releases stay pending for the next cycle. Covered by `TvProcessorProviderFailureTest`.
+
 ## Issues in the docker/ stack itself (all fixed)
 
 | Issue | Fix |
