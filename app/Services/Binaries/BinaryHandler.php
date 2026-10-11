@@ -182,10 +182,15 @@ final class BinaryHandler
             $existingKeys[$key] = true;
         }
 
+        // Unique-key order (collections_id, binaryhash), so concurrent workers upserting the
+        // same cross-posted binaries take their locks in the same sequence instead of deadlocking.
+        $sortedRows = $lookupRows;
+        usort($sortedRows, static fn (array $a, array $b): int => [(int) $a['collections_id'], (string) $a['hash']] <=> [(int) $b['collections_id'], (string) $b['hash']]);
+
         if (DB::getDriverName() === 'sqlite') {
-            $this->bulkInsertBinariesSqlite($lookupRows);
+            $this->bulkInsertBinariesSqlite($sortedRows);
         } else {
-            $this->bulkInsertBinariesMysql($lookupRows);
+            $this->bulkInsertBinariesMysql($sortedRows);
         }
 
         // Only re-query for rows we couldn't satisfy from the prefetch

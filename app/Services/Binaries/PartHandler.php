@@ -165,6 +165,8 @@ final class PartHandler
     {
         $driver = DB::getDriverName();
         $totalInserted = 0;
+        // Primary-key order (binaries_id, partnumber), so concurrent workers lock shared rows in the same sequence.
+        usort($parts, static fn (array $a, array $b): int => [(int) $a['binaries_id'], (int) $a['partnumber']] <=> [(int) $b['binaries_id'], (int) $b['partnumber']]);
 
         try {
             foreach (array_chunk($parts, $this->chunkSize) as $chunk) {

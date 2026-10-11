@@ -252,11 +252,13 @@ These bugs turned up while building and running the self-hosted stack in `docker
 
 ## Observed on the running stack (not yet root-caused)
 
-### 16. Binary header storage hits lock-retry exhaustion under concurrent binaries and backfill
+### 16. Binary header storage hits lock-retry exhaustion under concurrent binaries and backfill (Fixed)
 
 - **Log:** `production.ERROR: Binary header storage chunk rolled back {"groups_id":11,…,"attempts":10,"reason":"Lock retries exhausted"}`. Seen once about 25k groups were active with backfill on, even with `transaction-isolation = READ-COMMITTED`.
 - **Status:** this matches the known contention described in the wiki (issue #1874 / PR #1872). Not seen since cutting back to the 207 groups.
 - **Update (2026-10-10):** a related failure shows up with the 207 groups, 12 binaries threads, and 24 backfill threads. `Binary header storage chunk rolled back {"groups_id":1,…,"attempts":1,"reason":"Storage failed","exception":"Illuminate\\Database\\QueryException","code":"23000"}` was logged 85 times between 01:09 and 12:33 UTC, all in alt.binaries.boneless. A duplicate-key (23000) error is not retried, so the whole chunk is dropped and its articles fall back to part repair. Not root-caused; likely two workers inserting the same binary or part concurrently.
+- **Root cause (2026-10-11):** `SHOW ENGINE INNODB STATUS` showed two header workers deadlocking on `ix_collection_collectionhash`. Each upserted a multi-row `INSERT INTO collections … ON DUPLICATE KEY UPDATE` whose rows were in arbitrary order. Cross-posts (alt.binaries.misc and alt.binaries.boneless) give workers on different groups the same collection hashes, so they took the same unique-key locks in opposite orders. After a restart it reached about 10 rolled-back chunks a minute.
+- **Fix (staged):** `CollectionHandler`, `BinaryHandler` and `PartHandler` sort each batch by its unique key before writing it: `collectionhash`; `(collections_id, binaryhash)`; `(collections_id, group_name)` for `collection_groups`; `(binaries_id, partnumber)`. Concurrent workers now take shared locks in one order. Covered by `test_header_storage_writes_rows_in_unique_key_order_so_concurrent_workers_cannot_deadlock`.
 
 ### 17. Compressed `XOVER` headers fail with the primary provider
 

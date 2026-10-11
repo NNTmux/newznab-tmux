@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Binaries;
 
 use App\Support\SqlError;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -127,6 +128,7 @@ final class HeaderStorageService
                             ? 'Lock retries exhausted' : 'Storage failed',
                         'exception' => $this->lastStorageException::class,
                         'code' => $this->lastStorageException->getCode(),
+                        ...$this->constraintContext($this->lastStorageException),
                     ]);
                 }
 
@@ -136,6 +138,27 @@ final class HeaderStorageService
             $this->failedInserts = array_slice($this->failedInserts, 0, $failedInsertCount);
             usleep((min(2000, 100 * $attempt) + random_int(0, 25)) * 1000);
         } while (true);
+    }
+
+    /**
+     * The driver error number and the key or column a constraint failure names, without
+     * the statement, its bindings or the offending value.
+     *
+     * @return array{driver_code?: int, constraint?: string}
+     */
+    private function constraintContext(\Throwable $exception): array
+    {
+        if (! $exception instanceof QueryException) {
+            return [];
+        }
+
+        $context = ['driver_code' => (int) ($exception->errorInfo[1] ?? 0)];
+        $message = (string) ($exception->errorInfo[2] ?? '');
+        if (preg_match("/for key '([^']+)'|Column '([^']+)' cannot be null|constraint failed: (\\S+)/", $message, $match) === 1) {
+            $context['constraint'] = $match[1] !== '' ? $match[1] : (($match[2] ?? '') !== '' ? $match[2] : (string) ($match[3] ?? ''));
+        }
+
+        return $context;
     }
 
     /**
@@ -264,14 +287,25 @@ final class HeaderStorageService
 
         $binaryIds = $this->binaryHandler->getOrCreateBinaries($binaryRecords, $groupMySQL['id']);
 
+        $partIndexes = [];
         foreach ($binaryRecords as $index => $record) {
-            $header = $record['header'];
             if (! isset($binaryIds[$index])) {
-                $this->markHeaderFailed($header, $transaction);
+                $this->markHeaderFailed($record['header'], $transaction);
 
                 continue;
             }
 
+            $partIndexes[] = $index;
+        }
+
+        // The part handler flushes every SQL chunk inside this transaction, so parts are queued in
+        // primary-key order (binaries_id, partnumber) across all flushes. Concurrent workers then
+        // take shared part locks in one order instead of deadlocking across flush boundaries.
+        usort($partIndexes, static fn (int $a, int $b): int => [$binaryIds[$a], (int) ($binaryRecords[$a]['header']['matches'][2] ?? 0)]
+            <=> [$binaryIds[$b], (int) ($binaryRecords[$b]['header']['matches'][2] ?? 0)]);
+
+        foreach ($partIndexes as $index) {
+            $header = $binaryRecords[$index]['header'];
             if (! $this->partHandler->addPart($binaryIds[$index], $header)) {
                 $this->markHeaderFailed($header, $transaction);
             }

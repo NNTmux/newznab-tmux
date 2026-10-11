@@ -301,10 +301,15 @@ final class CollectionHandler
             }
         }
 
+        // Concurrent header workers upsert overlapping cross-posted collections; inserting in
+        // unique-key order makes them take those locks in the same sequence instead of deadlocking.
+        $sortedRows = $rowsByCollectionKey;
+        uasort($sortedRows, static fn (array $a, array $b): int => strcmp((string) $a['collectionhash'], (string) $b['collectionhash']));
+
         if (DB::getDriverName() === 'sqlite') {
-            $this->bulkInsertCollectionsSqlite($rowsByCollectionKey);
+            $this->bulkInsertCollectionsSqlite($sortedRows);
         } else {
-            $this->bulkInsertCollectionsMysql($rowsByCollectionKey);
+            $this->bulkInsertCollectionsMysql($sortedRows);
         }
 
         // Only resolve ids for the hashes we couldn't satisfy from the
@@ -432,6 +437,8 @@ final class CollectionHandler
                 $rows[] = ['collections_id' => $collectionId, 'group_name' => $groupName];
             }
         }
+        // Primary-key order, so concurrent workers lock shared rows in the same sequence.
+        usort($rows, static fn (array $a, array $b): int => [$a['collections_id'], $a['group_name']] <=> [$b['collections_id'], $b['group_name']]);
 
         foreach (array_chunk($rows, $this->sqlChunkSize) as $chunk) {
             if (DB::getDriverName() === 'sqlite') {

@@ -185,6 +185,60 @@ class BinariesStorageInternalsTest extends TestCase
         $this->assertSame(325, (int) $binary->partsize);
     }
 
+    public function test_a_constraint_rollback_logs_the_key_but_not_the_value(): void
+    {
+        $this->createHeaderStorageTables();
+        DB::statement("CREATE TRIGGER reject_parts BEFORE INSERT ON parts BEGIN SELECT RAISE(ABORT, 'UNIQUE constraint failed: parts.messageid'); END");
+        config(['app.debug' => false]);
+        Log::spy();
+        $service = new HeaderStorageService($this->deterministicCollectionHandler(), config: new BinariesConfig);
+
+        $this->assertSame([920], $service->store([$this->parsedHeader(920, 1)], ['id' => 1, 'name' => 'alt.test'], true));
+
+        Log::shouldHaveReceived('error')->once()->with('Binary header storage chunk rolled back', Mockery::on(
+            static fn (array $context): bool => $context['reason'] === 'Storage failed'
+                && $context['driver_code'] === 19
+                && $context['constraint'] === 'parts.messageid'
+                && ! str_contains(json_encode($context), '920')
+        ));
+    }
+
+    public function test_header_storage_writes_rows_in_unique_key_order_so_concurrent_workers_cannot_deadlock(): void
+    {
+        $this->createHeaderStorageTables();
+
+        $headers = [];
+        $number = 600;
+        foreach (['Zulu.Release', 'Alpha.Release', 'Mike.Release', 'Echo.Release'] as $subject) {
+            foreach ([3, 1, 2] as $partNumber) {
+                $headers[] = $this->parsedHeaderWithTotal(++$number, $partNumber, 3, $subject);
+            }
+        }
+
+        // One storage transaction, as in a live header chunk, written in several SQL chunks.
+        $service = new HeaderStorageService($this->deterministicCollectionHandler(), config: new BinariesConfig(sqlChunkSize: 5));
+        $this->assertSame([], $service->store($headers, ['id' => 1, 'name' => 'alt.test'], true));
+
+        $collectionHashes = DB::table('collections')->orderBy('id')->pluck('collectionhash')->all();
+        $sortedHashes = $collectionHashes;
+        sort($sortedHashes, SORT_STRING);
+        $this->assertCount(4, $collectionHashes);
+        $this->assertSame($sortedHashes, $collectionHashes);
+
+        $binaryKeys = DB::table('binaries')->orderBy('id')->get(['collections_id', 'binaryhash'])
+            ->map(static fn (object $row): array => [(int) $row->collections_id, (string) $row->binaryhash])->all();
+        $sortedBinaryKeys = $binaryKeys;
+        usort($sortedBinaryKeys, static fn (array $a, array $b): int => $a <=> $b);
+        $this->assertSame($sortedBinaryKeys, $binaryKeys);
+
+        $partKeys = DB::table('parts')->orderBy('rowid')->get(['binaries_id', 'partnumber'])
+            ->map(static fn (object $row): array => [(int) $row->binaries_id, (int) $row->partnumber])->all();
+        $sortedPartKeys = $partKeys;
+        usort($sortedPartKeys, static fn (array $a, array $b): int => $a <=> $b);
+        $this->assertCount(12, $partKeys);
+        $this->assertSame($sortedPartKeys, $partKeys);
+    }
+
     public function test_header_storage_batch_updates_binary_that_exists_before_chunk(): void
     {
         $this->createHeaderStorageTables();
