@@ -58,6 +58,23 @@ final class NNTPServiceGetXoverReturnTypeTest extends TestCase
         );
     }
 
+    /**
+     * Regression test for a production TypeError that failed whole batches of `update:binaries` workers:
+     *
+     *   NNTPService::_getTextResponse(): Return value must be of type
+     *   NNTPService|array|string, DariusIII\NetNntp\Error returned
+     *
+     * getXOVER() calls _getTextResponse() and already checks the result with isError(), but the override
+     * narrowed the parent's `mixed` return type, so a server error response threw before that check ran.
+     */
+    public function test_get_text_response_return_type_permits_nntp_error(): void
+    {
+        $returnType = (new ReflectionMethod(NNTPService::class, '_getTextResponse'))->getReturnType();
+
+        $this->assertInstanceOf(ReflectionNamedType::class, $returnType);
+        $this->assertSame('mixed', $returnType->getName());
+    }
+
     public function test_is_error_recognizes_nntp_error_instances(): void
     {
         $error = new NntpError('400 no such group', 400);

@@ -315,6 +315,12 @@ These bugs turned up while building and running the self-hosted stack in `docker
 - **Symptom:** on 2026-10-11 at 02:23 UTC a DNS failure (`cURL error 6: Could not resolve host: api4.thetvdb.com`) killed the worker (exit 1), failed the whole `postProcess_tv` batch and skipped the TVMaze, TMDB and Trakt providers. It was identified from the worker output that #23 now logs.
 - **Fix (staged):** a provider that throws is logged as a warning and marked failed, and the pipeline continues with the next provider. Its releases stay pending for the next cycle. Covered by `TvProcessorProviderFailureTest`.
 
+### 43. A server error response during XOVER throws a TypeError and fails `update:binaries` workers (Fixed)
+
+- **Where:** `NNTPService::_getTextResponse()` (`app/Services/NNTP/NNTPService.php`) declared `NNTPService|array|string`, narrowing the parent's `mixed`. `getXOVER()` already guards the result with `isError()`, but the override threw first. Upstream fixed the same defect for `getXOVER()` itself.
+- **Symptom:** `_getTextResponse(): Return value must be of type NNTPService|array|string, DariusIII\\NetNntp\\Error returned`. On 2026-10-11 at 02:52 UTC it failed 14 binaries and backfill workers in 20 seconds, and the same signature explains the bursts of exit-1 workers at 01:39 and 01:46 UTC. It was identified from the output tails that #23 now logs. Each failure drops that group's pass until the next cycle.
+- **Fix (staged):** the override returns `mixed`, matching its parent and every other method on the class that can return an Error. Covered by `test_get_text_response_return_type_permits_nntp_error`.
+
 ## Issues in the docker/ stack itself (all fixed)
 
 | Issue | Fix |

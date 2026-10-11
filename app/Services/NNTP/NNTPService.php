@@ -881,10 +881,11 @@ class NNTPService extends NntpClient
      * of their _getTextResponse function since it is incompatible at decoding
      * headers when XFeature GZip compression is enabled server side.
      *
-     * @return NNTPService|array<string, mixed>|string Our overridden function when compression is enabled.
-     *                                                 parent  Parent function when no compression.
+     * @return mixed Our overridden function's result when compression is enabled, otherwise the
+     *               parent's. Either may be a DariusIII\NetNntp\Error when the server answers with
+     *               an error; callers check it with NNTPService::isError().
      */
-    public function _getTextResponse(): NNTPService|array|string
+    public function _getTextResponse(): mixed
     {
         if ($this->_compressionEnabled &&
             isset($this->_currentStatusResponse[1]) &&
