@@ -297,6 +297,49 @@ class CbpReleaseEligibilityTest extends TestCase
         }
     }
 
+    public function test_stuck_collection_cleanup_matches_the_coalesce_rule_without_sorting(): void
+    {
+        $cutoff = now()->subHours(48);
+        $old = $cutoff->copy()->subHour()->format('Y-m-d H:i:s');
+        $new = $cutoff->copy()->addHour()->format('Y-m-d H:i:s');
+        $row = static fn (int $group, int $filecheck, ?string $seen, ?string $dateAdded, ?string $added): int => DB::table('collections')->insertGetId([
+            'groups_id' => $group, 'filecheck' => $filecheck, 'last_seen_at' => $seen, 'dateadded' => $dateAdded, 'added' => $added,
+        ]);
+        $deleted = [
+            'last seen long ago' => $row(1, 0, $old, $new, $new),
+            'never seen, added long ago' => $row(1, 1, null, $old, $new),
+            'never seen, only the original timestamp' => $row(1, 15, null, null, $old),
+        ];
+        $kept = [
+            'seen recently' => $row(1, 0, $new, $old, $old),
+            'never seen, dateadded recent' => $row(1, 0, null, $new, $old),
+            'already sized' => $row(1, CollectionFileCheckStatus::Sized->value, $old, $old, $old),
+            'another group' => $row(2, 0, $old, $old, $old),
+        ];
+        $selects = [];
+        DB::listen(static function ($query) use (&$selects): void {
+            if (preg_match('/^\s*select\b.*\bfrom\s+[`"]?collections\b.*\blimit\b/is', $query->sql) === 1) {
+                $selects[] = strtolower($query->sql);
+            }
+        });
+
+        $service = new ReleaseProcessingService;
+        (new \ReflectionMethod($service, 'deleteStuckCollectionBatch'))->invoke($service, 1, $cutoff);
+
+        $remaining = DB::table('collections')->pluck('id')->map(static fn ($id): int => (int) $id)->all();
+        foreach ($deleted as $case => $id) {
+            $this->assertNotContains($id, $remaining, $case);
+        }
+        foreach ($kept as $case => $id) {
+            $this->assertContains($id, $remaining, $case);
+        }
+        $this->assertNotEmpty($selects);
+        foreach ($selects as $sql) {
+            $this->assertStringNotContainsString('order by', $sql);
+            $this->assertStringNotContainsString('coalesce(last_seen_at', $sql);
+        }
+    }
+
     private function process(?int $groupId): void
     {
         $processor = new ReleaseProcessingService(binariesConfig: new BinariesConfig(sqlChunkSize: 2, reconcileBatchSize: 2));

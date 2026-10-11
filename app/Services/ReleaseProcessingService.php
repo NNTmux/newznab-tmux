@@ -1080,10 +1080,20 @@ final class ReleaseProcessingService
                         CollectionFileCheckStatus::ZeroPart->value,
                         10,
                     ])
-                    ->orderBy('id')
+                    // No ORDER BY: each batch deletes what it selected and the next query
+                    // starts over (see deleteCollectionQueryInBatches()).
                     ->limit(self::BATCH_SIZE);
                 if (Schema::hasColumn('collections', 'last_seen_at')) {
-                    $query->whereRaw('COALESCE(last_seen_at, dateadded, added) < ?', [$cutoff]);
+                    // Same as COALESCE(last_seen_at, dateadded, added) < cutoff, but written
+                    // so the (groups_id, filecheck, last_seen_at, id) index can range-scan it;
+                    // the COALESCE form made MariaDB read every collection in the group.
+                    $query->where(static function ($stale) use ($cutoff): void {
+                        $stale->where('last_seen_at', '<', $cutoff)
+                            ->orWhere(static function ($unseen) use ($cutoff): void {
+                                $unseen->whereNull('last_seen_at')
+                                    ->whereRaw('COALESCE(dateadded, added) < ?', [$cutoff]);
+                            });
+                    });
                 } else {
                     $query->where('added', '<', $cutoff);
                 }
