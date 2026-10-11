@@ -68,6 +68,15 @@ class PredbImportFeedCommandTest extends TestCase
     }
 
     #[Test]
+    public function the_factory_builds_the_opt_in_predb_org_source(): void
+    {
+        $factory = new PredbFeedSourceFactory;
+
+        $this->assertSame('predb_org', $factory->makeOne('predb_org')->key());
+        $this->assertNotContains('predb_org', (array) config('predb_feeds.sources'));
+    }
+
+    #[Test]
     public function it_inserts_new_pres_from_every_source_and_indexes_them(): void
     {
         $this->fakeFeeds();

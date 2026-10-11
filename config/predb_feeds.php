@@ -29,6 +29,7 @@ return [
         'predb_club' => 'https://predb.club/api/v1/',
         'predb_net' => 'https://api.predb.net/',
         'predb_me' => (string) env('PREDB_FEED_RSS_URL', 'https://predb.me/?rss=1'),
+        'predb_org' => 'https://predb.org/api/search',
         'predatabase' => 'https://predataba.se/api/search',
         'srrdb' => 'https://api.srrdb.com/v1/search/order:date-desc',
         'xrel' => 'https://api.xrel.to/v2/release/latest.json',

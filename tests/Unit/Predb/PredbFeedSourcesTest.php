@@ -8,6 +8,7 @@ use App\Models\Predb;
 use App\Services\Predb\Feeds\PredbFeedEntry;
 use App\Services\Predb\Feeds\Sources\PredbClubSource;
 use App\Services\Predb\Feeds\Sources\PredbNetSource;
+use App\Services\Predb\Feeds\Sources\PredbOrgSource;
 use App\Services\Predb\Feeds\Sources\RssFeedSource;
 use App\Services\Predb\Feeds\Sources\SrrdbSource;
 use App\Services\Predb\Feeds\Sources\XrelSource;
@@ -114,6 +115,45 @@ final class PredbFeedSourcesTest extends TestCase
     {
         $this->assertSame('https://api.srrdb.com/v1/search/order:date-desc', SrrdbSource::pageUrl('https://api.srrdb.com/v1/search/order:date-desc', 1));
         $this->assertSame('https://api.srrdb.com/v1/search/order:date-desc/skip:90', SrrdbSource::pageUrl('https://api.srrdb.com/v1/search/order:date-desc/', 3));
+    }
+
+    #[Test]
+    public function predb_org_rows_map_section_size_and_time(): void
+    {
+        $entries = (new PredbOrgSource('https://predb.org/api/search'))->parseRows($this->json('predb_org.json')['values']);
+
+        $this->assertCount(3, $entries);
+        $this->assertSame('Traqueur.De.Chars.S03E09.DOC.FRENCH.1080p.WEB.H264-BAWLS', $entries[0]->title);
+        $this->assertSame('predb.org', $entries[0]->source);
+        $this->assertSame('PRE', $entries[0]->category);
+        $this->assertSame('1099MB', $entries[0]->size);
+        $this->assertSame('24', $entries[0]->files);
+        $this->assertSame(Predb::PRE_NONUKE, $entries[0]->nuked);
+        $this->assertSame('FLAC-WEB', $entries[2]->category);
+    }
+
+    #[Test]
+    public function predb_org_rows_with_a_nuke_reason_are_nuked_and_nameless_rows_are_skipped(): void
+    {
+        $entries = (new PredbOrgSource('https://predb.org/api/search'))->parseRows([
+            ['rlsname' => 'Some.Show.S01E01.720p.HDTV.x264-GRP', 'section' => 'TV', 'ctime' => 1791500000, 'size' => 0, 'files' => 0, 'nukereason' => 'dupe.Other.Show-GRP'],
+            ['rlsname' => '', 'section' => 'TV'],
+            'not a row',
+        ]);
+
+        $this->assertCount(1, $entries);
+        $this->assertSame(Predb::PRE_NUKED, $entries[0]->nuked);
+        $this->assertSame('dupe.Other.Show-GRP', $entries[0]->nukeReason);
+
+        $byStatus = (new PredbOrgSource('https://predb.org/api/search'))->parseRows([
+            ['rlsname' => 'Nuked.Without.Reason-GRP', 'status' => '1', 'nukereason' => ''],
+            ['rlsname' => 'Normal.Release-GRP', 'status' => '0', 'nukereason' => ''],
+        ]);
+        $this->assertSame(Predb::PRE_NUKED, $byStatus[0]->nuked);
+        $this->assertNull($byStatus[0]->nukeReason);
+        $this->assertSame(Predb::PRE_NONUKE, $byStatus[1]->nuked);
+        $this->assertNull($entries[0]->size);
+        $this->assertNull($entries[0]->files);
     }
 
     #[Test]

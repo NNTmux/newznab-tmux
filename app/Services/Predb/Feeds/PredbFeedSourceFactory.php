@@ -8,6 +8,7 @@ use App\Services\Predb\Feeds\Contracts\PredbFeedSource;
 use App\Services\Predb\Feeds\Sources\PredatabaseSource;
 use App\Services\Predb\Feeds\Sources\PredbClubSource;
 use App\Services\Predb\Feeds\Sources\PredbNetSource;
+use App\Services\Predb\Feeds\Sources\PredbOrgSource;
 use App\Services\Predb\Feeds\Sources\RssFeedSource;
 use App\Services\Predb\Feeds\Sources\SrrdbSource;
 use App\Services\Predb\Feeds\Sources\XrelSource;
@@ -23,7 +24,7 @@ class PredbFeedSourceFactory
      */
     public function availableKeys(): array
     {
-        return ['predb_club', 'predb_net', 'predb_me', 'predatabase', 'srrdb', 'xrel', 'xrel_p2p'];
+        return ['predb_club', 'predb_net', 'predb_me', 'predb_org', 'predatabase', 'srrdb', 'xrel', 'xrel_p2p'];
     }
 
     /**
@@ -48,6 +49,7 @@ class PredbFeedSourceFactory
             'predb_club' => new PredbClubSource($endpoint, $pageSize, $timeout, $userAgent),
             'predb_net' => new PredbNetSource($endpoint, $pageSize, $timeout, $userAgent),
             'predb_me' => new RssFeedSource('predb_me', 'predb.me', $endpoint, $pageSize, $timeout, $userAgent),
+            'predb_org' => new PredbOrgSource($endpoint, $pageSize, $timeout, $userAgent),
             'predatabase' => new PredatabaseSource($endpoint, $pageSize, $timeout, $userAgent, (string) config('predb_feeds.predatabase_api_key', '')),
             'srrdb' => new SrrdbSource($endpoint, $pageSize, $timeout, $userAgent, (string) config('predb_feeds.srrdb_timezone', 'Europe/Brussels')),
             'xrel' => new XrelSource($endpoint, $pageSize, $timeout, $userAgent),
