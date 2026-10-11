@@ -445,7 +445,7 @@ class Tmux
      * takes over two minutes, which stalls the monitor loop past the health check's heartbeat limit
      * and gets the whole indexer restarted; large tables therefore use InnoDB's row estimate.
      */
-    protected function tableRowCount(string $table): int
+    public function tableRowCount(string $table): int
     {
         $rows = $this->estimatedRowCount($table);
 

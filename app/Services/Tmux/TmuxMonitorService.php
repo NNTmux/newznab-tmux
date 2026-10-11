@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Tmux;
 
+use App\Enums\TmuxMode;
 use App\Models\Category;
 use App\Models\Collection;
 use App\Models\Release;
@@ -33,6 +34,11 @@ class TmuxMonitorService
     protected float $lastOperationalRefreshAt = 0.0;
 
     protected float $lastSlowRefreshAt = 0.0;
+
+    /**
+     * Whether counts.now.collections_table holds a row estimate rather than an exact count.
+     */
+    protected bool $collectionsCountIsEstimate = false;
 
     public function __construct(?ProcessingRuntimeStateRepository $runtimeState = null)
     {
@@ -154,6 +160,10 @@ class TmuxMonitorService
         if ($this->refreshIsDue($this->lastSlowRefreshAt, $slowRefreshDelay, $now)) {
             $this->refreshSlowStatistics();
             $this->lastSlowRefreshAt = $now;
+            $statisticsChanged = true;
+        }
+
+        if ($this->refreshCollectionCountForBackfillControls()) {
             $statisticsChanged = true;
         }
 
@@ -299,7 +309,14 @@ class TmuxMonitorService
         $timer = microtime(true);
 
         try {
-            $this->runVar['counts']['now']['collections_table'] = Collection::query()->count();
+            // The collections kill switch and progressive backfill decide on this count,
+            // so keep it exact when either is on; otherwise it is display-only and can be
+            // over 10M rows, so use the row estimate (see Tmux::tableRowCount()).
+            $estimate = ! $this->collectionCountDrivesBackfill();
+            $this->runVar['counts']['now']['collections_table'] = $estimate
+                ? $this->tmux->tableRowCount('collections')
+                : Collection::query()->count();
+            $this->collectionsCountIsEstimate = $estimate;
             $this->runVar['counts']['now']['releases'] = Release::query()->count();
 
             foreach ($this->aggregateTableRowCounts($this->tmux->cbpmTableQuery()) as $key => $count) {
@@ -323,6 +340,47 @@ class TmuxMonitorService
         } catch (\Exception $e) {
             logger()->error('Error collecting table counts: '.$e->getMessage());
         }
+    }
+
+    /**
+     * Replace an estimated collections count with an exact one as soon as a backfill
+     * control that decides on it is turned on, instead of at the next slow refresh.
+     */
+    protected function refreshCollectionCountForBackfillControls(): bool
+    {
+        if (! $this->collectionsCountIsEstimate || ! $this->collectionCountDrivesBackfill()) {
+            return false;
+        }
+
+        try {
+            $this->runVar['counts']['now']['collections_table'] = Collection::query()->count();
+        } catch (\Exception $e) {
+            // Keep the flag set so the next loop retries.
+            logger()->error('Error counting collections for backfill controls: '.$e->getMessage());
+
+            return false;
+        }
+        $this->collectionsCountIsEstimate = false;
+
+        return true;
+    }
+
+    /**
+     * Whether backfill runs (the tmux mode schedules it and TmuxTaskRunner::runBackfill()
+     * launches backfill modes 1 and 4) and decides on the collections count through the
+     * kill switch or progressive delay.
+     */
+    private function collectionCountDrivesBackfill(): bool
+    {
+        // Same mode resolution as TmuxMonitor::runPaneTasks().
+        $mode = TmuxMode::tryFrom((int) ($this->runVar['constants']['sequential'] ?? 0)) ?? TmuxMode::Full;
+        if (! isset($mode->tasks()['backfill'])
+            || ! \in_array((int) ($this->runVar['settings']['backfill'] ?? 0), [1, 4], true)) {
+            return false;
+        }
+
+        return (int) ($this->runVar['settings']['collections_kill'] ?? 0) > 0
+            || (int) ($this->runVar['settings']['progressive'] ?? 0) === 1;
     }
 
     /**
@@ -533,7 +591,10 @@ class TmuxMonitorService
         $collections = (int) ($this->runVar['counts']['now']['collections_table'] ?? 0);
 
         $this->runVar['killswitch']['pp'] = ($ppKillLimit > 0 && $ppKillLimit < $totalWork);
-        $this->runVar['killswitch']['coll'] = ($collKillLimit > 0 && $collKillLimit < $collections);
+        // Fail closed: while backfill decides on the collections count but only an
+        // estimate is available (the exact count failed), hold backfill.
+        $this->runVar['killswitch']['coll'] = ($collKillLimit > 0 && $collKillLimit < $collections)
+            || ($this->collectionsCountIsEstimate && $this->collectionCountDrivesBackfill());
     }
 
     /**
