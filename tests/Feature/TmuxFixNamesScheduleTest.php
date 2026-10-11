@@ -30,6 +30,7 @@ class TmuxFixNamesScheduleTest extends TestCase
             'tmux.fix_names.full_backlog' => true,
             'tmux.fix_names.full_backlog_interval_minutes' => 60,
             'tmux.fix_names.predbft' => true,
+            'tmux.fix_names.predbft_scheduled' => false,
             'cache.stores.fixnames_claims' => ['driver' => 'array'],
             'tmux.fix_names.cache_store' => 'fixnames_claims',
         ]);
@@ -83,6 +84,18 @@ class TmuxFixNamesScheduleTest extends TestCase
         $this->assertStringNotContainsString('releases:fix-names 3 ', $this->launched[0]);
         $this->assertStringContainsString('predbft', $this->launched[0]);
         $this->assertTrue(Cache::store('fixnames_claims')->has(self::SLOT));
+    }
+
+    #[Test]
+    public function the_pane_leaves_the_predb_pass_to_the_scheduler_while_it_runs_it(): void
+    {
+        // A legacy TMUX_FIX_NAMES_PREDBFT=true must not make the pass start twice.
+        config(['tmux.fix_names.predbft' => true, 'tmux.fix_names.predbft_scheduled' => true]);
+
+        $this->assertTrue($this->runTask(alive: false, renames: 5));
+
+        $this->assertStringNotContainsString('predbft', $this->launched[0]);
+        $this->assertStringContainsString('releases:fix-names 3 ', $this->launched[0]);
     }
 
     #[Test]

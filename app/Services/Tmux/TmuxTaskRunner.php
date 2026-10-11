@@ -440,7 +440,8 @@ class TmuxTaskRunner
         $enabled = (int) ($runVar['settings']['fix_names'] ?? 0);
         $work = (int) ($runVar['counts']['now']['processrenames'] ?? 0);
         $pane = $this->paneManager->paneForRole(TmuxPaneRole::FixNames, '1.0');
-        $predbft = (bool) config('tmux.fix_names.predbft', true);
+        // The scheduler runs the PreDB full-text pass instead while predbft_scheduled is on (routes/console.php).
+        $predbft = (bool) config('tmux.fix_names.predbft', true) && ! (bool) config('tmux.fix_names.predbft_scheduled', true);
 
         if ($enabled !== 1) {
             return $this->disablePane($pane, 'Fix Release Names', 'disabled in settings');

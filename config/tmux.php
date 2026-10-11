@@ -37,6 +37,10 @@ return [
         'full_backlog' => (bool) env('TMUX_FIX_NAMES_FULL_BACKLOG', true),
         'full_backlog_interval_minutes' => (int) env('TMUX_FIX_NAMES_FULL_INTERVAL', 60),
         'predbft' => (bool) env('TMUX_FIX_NAMES_PREDBFT', true),
+        // Run the PreDB full-text pass from the scheduler every five minutes (routes/console.php) instead of at the
+        // end of the tmux cycle, where slow passes starve it. While this is on, the tmux cycle skips the pass, so
+        // the pass has exactly one launcher. Only meaningful while `predbft` is on; `predbft` false turns the pass off.
+        'predbft_scheduled' => (bool) env('TMUX_FIX_NAMES_PREDBFT_SCHEDULED', true),
         // Cache store for the once-per-interval claim; must be a single backend, not a failover store.
         'cache_store' => (string) env('TMUX_FIX_NAMES_CACHE_STORE', 'redis'),
     ],
