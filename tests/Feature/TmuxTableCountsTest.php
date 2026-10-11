@@ -75,4 +75,24 @@ final class TmuxTableCountsTest extends TestCase
         $refresh->invoke($monitor);
         $this->assertSame(0, $state->getValue($monitor)['counts']['now']['parts_table']);
     }
+
+    public function test_large_tables_use_the_row_estimate_and_small_ones_an_exact_count(): void
+    {
+        DB::table('missed_parts')->insert([['id' => 1], ['id' => 2]]);
+        $tmux = $this->getMockBuilder(Tmux::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['estimatedRowCount'])
+            ->getMock();
+        $tmux->method('estimatedRowCount')->willReturnCallback(static fn (string $table): int => match ($table) {
+            'parts' => 98_000_000,
+            'binaries' => 14_900_000,
+            default => 12,
+        });
+
+        $this->assertEquals([
+            (object) ['name' => 'binaries', 'row_count' => 14_900_000],
+            (object) ['name' => 'parts', 'row_count' => 98_000_000],
+            (object) ['name' => 'missed_parts', 'row_count' => 2],
+        ], $tmux->cbpmTableQuery());
+    }
 }

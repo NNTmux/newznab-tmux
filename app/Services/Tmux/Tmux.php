@@ -429,9 +429,43 @@ class Tmux
         $counts = [];
 
         foreach (['binaries', 'parts', 'missed_parts'] as $table) {
-            $counts[] = (object) ['name' => $table, 'row_count' => DB::table($table)->count()];
+            $counts[] = (object) ['name' => $table, 'row_count' => $this->tableRowCount($table)];
         }
 
         return $counts;
+    }
+
+    /**
+     * Above this many rows the InnoDB estimate replaces an exact count.
+     */
+    private const int EXACT_COUNT_LIMIT = 1_000_000;
+
+    /**
+     * Row count for the monitor display. An exact COUNT(*) over the hundred-million-row parts table
+     * takes over two minutes, which stalls the monitor loop past the health check's heartbeat limit
+     * and gets the whole indexer restarted; large tables therefore use InnoDB's row estimate.
+     */
+    protected function tableRowCount(string $table): int
+    {
+        $rows = $this->estimatedRowCount($table);
+
+        return $rows !== null && $rows > self::EXACT_COUNT_LIMIT ? $rows : DB::table($table)->count();
+    }
+
+    /**
+     * InnoDB's row estimate, or null where the driver has none.
+     */
+    protected function estimatedRowCount(string $table): ?int
+    {
+        if (! \in_array(DB::getDriverName(), ['mysql', 'mariadb'], true)) {
+            return null;
+        }
+
+        $estimate = DB::selectOne(
+            'SELECT TABLE_ROWS AS row_estimate FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?',
+            [$table]
+        );
+
+        return (int) ($estimate->row_estimate ?? 0);
     }
 }

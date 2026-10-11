@@ -321,6 +321,12 @@ These bugs turned up while building and running the self-hosted stack in `docker
 - **Symptom:** `_getTextResponse(): Return value must be of type NNTPService|array|string, DariusIII\\NetNntp\\Error returned`. On 2026-10-11 at 02:52 UTC it failed 14 binaries and backfill workers in 20 seconds, and the same signature explains the bursts of exit-1 workers at 01:39 and 01:46 UTC. It was identified from the output tails that #23 now logs. Each failure drops that group's pass until the next cycle.
 - **Fix (staged):** the override returns `mixed`, matching its parent and every other method on the class that can return an Error. Covered by `test_get_text_response_return_type_permits_nntp_error`.
 
+### 44. The tmux monitor's exact row counts stall it until the supervisor restarts the whole indexer (Fixed)
+
+- **Where:** `Tmux::cbpmTableQuery()` (`app/Services/Tmux/Tmux.php`) ran `COUNT(*)` on `binaries`, `parts` and `missed_parts` on every slow refresh, and the monitor loop that does it is also what beats the heartbeat that `tmux:health-check` reads (`TmuxHealthCheck.php`, 60-second limit).
+- **Symptom:** with about 98M `parts` rows, `SELECT COUNT(*) FROM parts` took 136 seconds (binaries 9 s). The health check logged `monitor_heartbeat_stale` roughly every 15 minutes (03:51, 04:06, 04:21 UTC on 2026-10-11), and at 04:23:36 it failed 5 times in a row, so `indexer.sh` exited and Docker restarted the container, cancelling every running worker. Earlier cancellation bursts (00:25, 01:21) have the same signature. The monitor only displays these counts.
+- **Fix (staged):** tables over 1M rows use InnoDB's row estimate from `information_schema`; small tables and SQLite keep the exact count. Covered by `test_large_tables_use_the_row_estimate_and_small_ones_an_exact_count`.
+
 ## Issues in the docker/ stack itself (all fixed)
 
 | Issue | Fix |
