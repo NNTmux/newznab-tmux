@@ -71,3 +71,6 @@ Schedule::command('nntmux:index-logs')->everyMinute()->withoutOverlapping()->run
 Schedule::command('admin:warm-dashboard')->everyFifteenMinutes()->withoutOverlapping();
 // Poll public PreDB JSON/RSS feeds (config/predb_feeds.php); the IRC scraper remains the realtime source
 Schedule::command('predb:import-feed --quiet')->everyFiveMinutes()->withoutOverlapping()->runInBackground()->when(static fn (): bool => (bool) config('predb_feeds.enabled'));
+// Link releases to PreDB titles that arrived after the release was created (feeds, IRC, history imports).
+// Only recent releases are scanned; the old ones are covered by running `predb:check` by hand.
+Schedule::command('predb:check 3 --quiet')->everyTenMinutes()->withoutOverlapping()->runInBackground();

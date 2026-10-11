@@ -561,6 +561,15 @@ class PredbImportFeedCommandTest extends TestCase
         ]);
     }
 
+    #[Test]
+    public function releases_are_linked_to_late_arriving_predb_titles_on_a_schedule(): void
+    {
+        $event = $this->scheduledEvent('predb:check 3');
+
+        $this->assertSame('*/10 * * * *', $event->expression);
+        $this->assertTrue($event->withoutOverlapping);
+    }
+
     private function scheduledEvent(string $command): Event
     {
         foreach ($this->app->make(Schedule::class)->events() as $event) {
