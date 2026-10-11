@@ -160,7 +160,7 @@ abstract class BaseRunner
                     if (! $stream) {
                         echo $process->getErrorOutput();
                     }
-                    $this->recordWorkerOutcome($key, $status, $process->getExitCode());
+                    $this->recordWorkerOutcome($key, $status, $process->getExitCode(), $this->outputTail($process));
                     unset($running[$key]);
                 }
                 usleep(50000);
@@ -216,11 +216,37 @@ abstract class BaseRunner
         return $this->cancellationRequested;
     }
 
-    private function recordWorkerOutcome(string|int $key, string $status, ?int $exitCode): void
+    private function recordWorkerOutcome(string|int $key, string $status, ?int $exitCode, string $outputTail = ''): void
     {
         $this->workerOutcomes[$key] = ['status' => $status, 'exit_code' => $exitCode];
         if ($status !== 'success') {
-            Log::error('Multiprocessing worker did not succeed', ['worker' => $key, 'outcome' => $status, 'exit_code' => $exitCode]);
+            Log::error('Multiprocessing worker did not succeed', [
+                'worker' => $key,
+                'outcome' => $status,
+                'exit_code' => $exitCode,
+                ...($outputTail !== '' ? ['output_tail' => $outputTail] : []),
+            ]);
         }
+    }
+
+    /**
+     * The last lines a worker wrote, so a failed worker's reason reaches the log instead of
+     * only the tmux pane. Bounded, and only read for workers that did not succeed.
+     */
+    private function outputTail(Process $process): string
+    {
+        if ($process->isSuccessful()) {
+            return '';
+        }
+
+        $tail = static function (string $text): string {
+            $text = trim(preg_replace('/\e\[[0-9;]*m/', '', $text) ?? $text);
+
+            return mb_substr($text, -400);
+        };
+        $stderr = $tail($process->getErrorOutput());
+        $stdout = $tail($process->getOutput());
+
+        return trim(($stderr !== '' ? 'stderr: '.$stderr : '').($stdout !== '' ? "\nstdout: ".$stdout : ''));
     }
 }

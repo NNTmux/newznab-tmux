@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Unit\Services\Runners;
 
 use App\Services\Runners\BaseRunner;
+use Illuminate\Support\Facades\Log;
 use PHPUnit\Framework\Attributes\Test;
 use RuntimeException;
 use Tests\TestCase;
@@ -51,6 +52,40 @@ class BaseRunnerTest extends TestCase
             $this->assertStringContainsString('hung timeout', $exception->getMessage());
             $this->assertSame('timeout', $runner->outcomes()['hung']['status']);
             $this->assertSame(['status' => 'success', 'exit_code' => 0], $runner->outcomes()['ok']);
+        }
+    }
+
+    #[Test]
+    public function a_failed_worker_logs_the_tail_of_its_output(): void
+    {
+        Log::spy();
+        $runner = new BaseRunnerTestDouble;
+        try {
+            $runner->pool(['failed' => [PHP_BINARY, '-r', 'fwrite(STDERR, "Cannot connect to server: too many connections"); exit(1);'], 'ok' => [PHP_BINARY, '-r', 'echo "fine";']], 2, 3);
+            $this->fail('Expected a failed batch.');
+        } catch (RuntimeException) {
+            Log::shouldHaveReceived('error')->once()->with(
+                'Multiprocessing worker did not succeed',
+                \Mockery::on(static fn (array $context): bool => $context['worker'] === 'failed'
+                    && str_contains($context['output_tail'] ?? '', 'too many connections')),
+            );
+        }
+    }
+
+    #[Test]
+    public function a_failed_workers_stderr_survives_verbose_stdout(): void
+    {
+        Log::spy();
+        $runner = new BaseRunnerTestDouble;
+        try {
+            $runner->pool(['failed' => [PHP_BINARY, '-r', 'fwrite(STDERR, "Cannot connect: too many connections"); echo str_repeat("progress line\n", 200); exit(1);']], 1, 3);
+            $this->fail('Expected a failed batch.');
+        } catch (RuntimeException) {
+            Log::shouldHaveReceived('error')->once()->with(
+                'Multiprocessing worker did not succeed',
+                \Mockery::on(static fn (array $context): bool => str_contains($context['output_tail'] ?? '', 'stderr: Cannot connect: too many connections')
+                    && str_contains($context['output_tail'], 'stdout: ')),
+            );
         }
     }
 
