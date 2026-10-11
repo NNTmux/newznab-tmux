@@ -47,6 +47,12 @@ final class HeaderStorageTransaction
      */
     public function begin(): void
     {
+        // The aggregate refreshes read parts and binaries with plain SELECTs so they take
+        // no locks; under REPEATABLE READ those reads would come from a snapshot that
+        // misses rows other header workers committed meanwhile, so use READ COMMITTED.
+        if (DB::transactionLevel() === 0 && \in_array(DB::getDriverName(), ['mysql', 'mariadb'], true)) {
+            DB::statement('SET TRANSACTION ISOLATION LEVEL READ COMMITTED');
+        }
         DB::beginTransaction();
         $this->hadErrors = false;
         $this->lastException = null;
