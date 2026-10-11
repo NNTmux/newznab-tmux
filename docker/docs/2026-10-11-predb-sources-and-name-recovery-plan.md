@@ -11,7 +11,7 @@ Status: proposed. Measurements are from the docker stack on 2026-10-11, about 30
 
 Conclusion: more scene PreDB data does not raise the link rate much. Naming the hashed and raw releases through post-processing is the larger gain, and PreDB titles then help confirm the names it finds.
 
-## Part A extra sources
+## Extra sources
 
 ### Goal
 
@@ -21,7 +21,7 @@ Add cheap redundancy and catch gaps when a primary feed is down, without adding 
 
 | Source | Type | New rows seen | Work |
 |---|---|---|---|
-| scnlog.me RSS | HTTP feed | 0 of 40 (all already present) | Small code change: add the key to `PredbFeedSourceFactory::availableKeys()` and map it to an `RssFeedSource` in `makeOne()` (it throws for unknown keys), add the endpoint to `config/predb_feeds.php`, then list the key in `PREDB_FEED_SOURCES` |
+| `scnlog.me` RSS | HTTP feed | 0 of 40 (all already present) | Small code change: add the key to `PredbFeedSourceFactory::availableKeys()` and map it to an `RssFeedSource` in `makeOne()` (it throws for unknown keys), add the endpoint to `config/predb_feeds.php`, then list the key in `PREDB_FEED_SOURCES` |
 | opentrackers.org `#pre` | IRC | Not measured. The bots relay corrupt-net, zenet, and predb.se, which the stack already follows | Add a network entry to `config/irc_settings.php` (TLS 6697) and a parser for the `[PRE] [SECTION] name` line. Like every optional network it needs environment keys: `SCRAPE_IRC_OPENTRACKERS_ENABLED` (default `false`) plus server, port, and TLS keys, each with a comment in `.env.example` |
 | ngp.re live stream | Pusher WebSocket plus HTML fragment | Overlaps the existing ngp IRC feed | Skip unless the IRC feed proves incomplete |
 
@@ -38,10 +38,10 @@ Rejected: predb.dev (its `robots.txt` disallows everything), Skwirll's dump (`/a
 ### Acceptance
 
 - A new source's measured contribution is recorded in the PR.
-- A per-source health check covers it. No such checker is in the repo yet (the one used while writing this plan was a local scratch script), so Part A starts by adding it as `docker/bin/predb-health`: container state, IRC scraper processes, and a probe of each feed endpoint. Source activity is judged by successful polls, received messages, or parsed-entry timestamps per source, not by rows attributed to it: `predb.source` is set only on a new insert, so a healthy redundant source (scnlog, opentrackers) often shows zero attributed rows because another source won the race. New sources extend it.
+- A per-source health check covers it. No such checker is in the repo yet (the one used while writing this plan was a local scratch script), so the extra-sources work starts by adding it as `docker/bin/predb-health`: container state, IRC scraper processes, and a probe of each feed endpoint. Source activity is judged by successful polls, received messages, or parsed-entry timestamps per source, not by rows attributed to it: `predb.source` is set only on a new insert, so a healthy redundant source (scnlog, opentrackers) often shows zero attributed rows because another source won the race. New sources extend it.
 - Turning it off is a one-line config change.
 
-## Part B: recovering names for hashed and raw releases
+## Recovering names for hashed and raw releases
 
 ### Findings
 
@@ -114,6 +114,6 @@ Record these before Step 1 and after each step (a saved query is enough):
 ## Order of work
 
 1. Merge the deploy guard (#27) so deploys stop restarting the stack mid-run.
-2. Part B step 1 (settings), then measure.
-3. Part B step 2 (code), then the one-off pass.
-4. Part A sources in any order; each is small and independent.
+2. Name recovery step 1 (settings), then measure.
+3. Name recovery step 2 (code), then the one-off pass.
+4. The extra sources, in any order; each is small and independent.
