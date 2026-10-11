@@ -111,17 +111,9 @@ class UpdatePerGroup extends Command
      */
     private function processReleases(string $groupID): void
     {
-        $limit = $this->releaseProcessingService->getReleaseCreationLimit();
-
         $this->releaseProcessingService->processIncompleteCollections($groupID);
         $this->releaseProcessingService->processCollectionSizes($groupID);
-        $this->releaseProcessingService->deleteUnwantedCollections($groupID);
-
-        do {
-            [$result, $nzbFilesAdded] = $this->releaseProcessingService->createReleasesAndNzbs($groupID);
-
-            $shouldContinue = $result->total() >= $limit || $nzbFilesAdded >= $limit;
-        } while ($shouldContinue);
+        $this->releaseProcessingService->processReleaseCreationBatches($groupID);
 
         $this->releaseProcessingService->deleteCollections($groupID);
     }

@@ -23,7 +23,7 @@ use Tests\TestCase;
  */
 class UnrarArgumentsTest extends TestCase
 {
-    private const string UNRAR = '/usr/bin/unrar';
+    private string $unrarPath;
 
     private string $tmpPath;
 
@@ -33,6 +33,9 @@ class UnrarArgumentsTest extends TestCase
 
         $this->tmpPath = sys_get_temp_dir().'/unrar-args-'.uniqid('', true).'/';
         File::ensureDirectoryExists($this->tmpPath);
+        $this->unrarPath = $this->tmpPath.'unrar';
+        File::put($this->unrarPath, "#!/bin/sh\nexit 0\n");
+        chmod($this->unrarPath, 0700);
         Process::fake();
     }
 
@@ -68,7 +71,7 @@ class UnrarArgumentsTest extends TestCase
     public function nfo_extraction_ends_unrar_switches_with_double_dash(): void
     {
         $nfo = (new ReflectionClass(NfoService::class))->newInstanceWithoutConstructor();
-        foreach (['tmpPath' => $this->tmpPath, 'unrarPath' => self::UNRAR, 'timeoutPath' => false, 'timeoutSeconds' => 0, 'echo' => false] as $property => $value) {
+        foreach (['tmpPath' => $this->tmpPath, 'unrarPath' => $this->unrarPath, 'timeoutPath' => false, 'timeoutSeconds' => 0, 'echo' => false] as $property => $value) {
             (new \ReflectionProperty($nfo, $property))->setValue($nfo, $value);
         }
 
@@ -81,7 +84,7 @@ class UnrarArgumentsTest extends TestCase
     {
         Process::assertRan(function (PendingProcess $process): bool {
             $command = (array) $process->command;
-            $unrarAt = array_search(self::UNRAR, $command, true);
+            $unrarAt = array_search($this->unrarPath, $command, true);
             if ($unrarAt === false) {
                 return false;
             }
@@ -95,7 +98,7 @@ class UnrarArgumentsTest extends TestCase
     {
         $config = (new ReflectionClass(ProcessingConfiguration::class))->newInstanceWithoutConstructor();
         foreach ([
-            'unrarPath' => self::UNRAR,
+            'unrarPath' => $this->unrarPath,
             'unzipPath' => false,
             'extractUsingRarInfo' => false,
             'timeoutPath' => false,

@@ -31,12 +31,17 @@ class ReleaseCreationService
     /**
      * Create releases from complete collections.
      *
+     * @param  list<int>|null  $allowedIds
      * @return array{added:int,dupes:int}
      *
      * @throws \Throwable
      */
-    public function createReleases(int|string|null $groupID, int $limit, bool $echoCLI): array
+    public function createReleases(int|string|null $groupID, int $limit, bool $echoCLI, ?array $allowedIds = null): array
     {
+        if ($allowedIds === []) {
+            return ['added' => 0, 'dupes' => 0];
+        }
+
         $startTime = now()->toImmutable();
         $categorize = new CategorizationService;
         $returnCount = 0;
@@ -51,6 +56,9 @@ class ReleaseCreationService
             ->where('collections.filesize', '>', 0);
         if (! empty($groupID)) {
             $collectionsQuery->where('collections.groups_id', $groupID);
+        }
+        if ($allowedIds !== null) {
+            $collectionsQuery->whereIn('collections.id', $allowedIds);
         }
         $collectionsQuery->select(['collections.*', 'usenet_groups.name as gname'])
             ->join('usenet_groups', 'usenet_groups.id', '=', 'collections.groups_id')

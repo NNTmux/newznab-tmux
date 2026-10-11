@@ -6,11 +6,17 @@ namespace App\Services\AdditionalProcessing;
 
 use App\Models\UsenetGroup;
 use App\Services\AdditionalProcessing\Config\ProcessingConfiguration;
+use App\Services\AdditionalProcessing\DTO\AdditionalWorkPlan;
 use App\Services\AdditionalProcessing\DTO\ArchiveCandidate;
 use App\Services\AdditionalProcessing\DTO\ReleaseProcessingResult;
 use App\Services\AdditionalProcessing\Enums\DownloadKind;
 use App\Services\AdditionalProcessing\Enums\ProcessingOutcome;
 use App\Services\AdditionalProcessing\Enums\ProcessingStage;
+use App\Services\AdditionalProcessing\Media\ArchivedMediaSlicer;
+use App\Services\AdditionalProcessing\Media\ImageCandidateRanker;
+use App\Services\AdditionalProcessing\Media\MediaArticleFetcher;
+use App\Services\AdditionalProcessing\Media\MediaSourceResolver;
+use App\Services\AdditionalProcessing\Media\MediaSourceStage;
 use App\Services\AdditionalProcessing\State\PersistenceMetricsCollector;
 use App\Services\AdditionalProcessing\State\ProcessingMetrics;
 use App\Services\AdditionalProcessing\State\ReleaseProcessingContext;
@@ -29,6 +35,12 @@ class ReleaseProcessor
      */
     private array $groupNameCache = [];
 
+    private readonly MediaSourceResolver $mediaSourceResolver;
+
+    private readonly ArchivedMediaSlicer $archivedMediaSlicer;
+
+    private readonly MediaSourceStage $mediaSourceStage;
+
     public function __construct(
         private readonly ProcessingConfiguration $config,
         private readonly NzbContentParser $nzbParser,
@@ -42,7 +54,20 @@ class ReleaseProcessor
         private readonly ConsoleOutputService $output,
         private readonly ?ReleaseSearchSyncCoordinator $searchSyncCoordinator = null,
         private readonly ?PersistenceMetricsCollector $persistenceMetricsCollector = null,
-    ) {}
+        ?MediaSourceResolver $mediaSourceResolver = null,
+        ?ArchivedMediaSlicer $archivedMediaSlicer = null,
+        ?MediaSourceStage $mediaSourceStage = null,
+    ) {
+        $this->mediaSourceResolver = $mediaSourceResolver ?? new MediaSourceResolver($config, $downloadService);
+        $this->archivedMediaSlicer = $archivedMediaSlicer ?? new ArchivedMediaSlicer($config);
+        $this->mediaSourceStage = $mediaSourceStage ?? new MediaSourceStage(
+            $config,
+            $mediaService,
+            new MediaArticleFetcher($downloadService),
+            $this->archivedMediaSlicer,
+            $output,
+        );
+    }
 
     public function process(ReleaseProcessingContext $context, string $mainTmpPath): ReleaseProcessingResult
     {
@@ -139,6 +164,15 @@ class ReleaseProcessor
                 ProcessingStage::MessageIdSelection,
                 fn (): bool => $this->prepareMessageIds($context),
             );
+            if ($context->workPlan?->par2IndexCandidates !== [] && $this->shouldProcessDownloads()) {
+                $metrics->measure(
+                    ProcessingStage::MediaSourcePlanning,
+                    fn () => $this->applyMediaSourcePlan($context),
+                );
+                if (($timeoutResult = $this->processingTimeoutResult($context, $metrics)) !== null) {
+                    return $timeoutResult;
+                }
+            }
 
             $probe = $this->downloadProbe($context);
             if ($probe !== null && $context->workPlan?->probeIsOnlyFile === true && str_starts_with($probe[1], "PAR2\0PKT")) {
@@ -203,6 +237,16 @@ class ReleaseProcessor
                         if (($timeoutResult = $this->processingTimeoutResult($context, $metrics)) !== null) {
                             return $timeoutResult;
                         }
+                    }
+                }
+
+                if ($this->mediaSourceStage->hasWork($context)) {
+                    $metrics->measure(
+                        ProcessingStage::MediaSources,
+                        fn () => $this->mediaSourceStage->run($context),
+                    );
+                    if (($timeoutResult = $this->processingTimeoutResult($context, $metrics)) !== null) {
+                        return $timeoutResult;
                     }
                 }
 
@@ -333,6 +377,7 @@ class ReleaseProcessor
             $context,
             false,
             $candidate->title,
+            $candidate,
         );
     }
 
@@ -352,6 +397,13 @@ class ReleaseProcessor
             $context->nzbContents,
             $context->releaseGroupName,
         );
+        $this->useWorkPlan($context, $workPlan);
+
+        return $workPlan->bookFlood;
+    }
+
+    private function useWorkPlan(ReleaseProcessingContext $context, AdditionalWorkPlan $workPlan): void
+    {
         $context->workPlan = $workPlan;
         $context->nzbHasCompressedFile = $workPlan->hasCompressedFile();
         $context->sampleMessageIDs = $workPlan->sampleMessageIds;
@@ -359,8 +411,35 @@ class ReleaseProcessor
         $context->mediaInfoMessageIDs = $workPlan->mediaInfoMessageId;
         $context->audioInfoMessageIDs = $workPlan->audioInfoMessageId;
         $context->audioInfoExtension = $workPlan->audioInfoExtension;
+    }
 
-        return $workPlan->bookFlood;
+    /**
+     * Plan again under the real names the PAR2 index gave obfuscated files,
+     * filling in the samples, images and archives the posted names hid.
+     */
+    private function applyMediaSourcePlan(ReleaseProcessingContext $context): void
+    {
+        if ($context->workPlan === null) {
+            return;
+        }
+
+        $plan = $this->mediaSourceResolver->resolve($context);
+        if ($plan === null) {
+            return;
+        }
+
+        $context->mediaPlan = $plan;
+        $this->output->echoPar2Mapped(count($plan->mappedFiles));
+
+        $renamed = $context->nzbContents;
+        foreach ($plan->mappedFiles as $sourceIndex => $mapped) {
+            $renamed[$sourceIndex]['title'] = '"'.$mapped->file->name.'" yEnc (1/'.count($renamed[$sourceIndex]['segments']).')';
+        }
+
+        $this->useWorkPlan(
+            $context,
+            $context->workPlan->withMappedNames($this->workPlanner->plan($renamed, $context->releaseGroupName)),
+        );
     }
 
     private function initializeContext(ReleaseProcessingContext $context): void
@@ -390,6 +469,9 @@ class ReleaseProcessor
         $context->resetCounters();
     }
 
+    /**
+     * @phpstan-impure
+     */
     private function processingTimeoutResult(
         ReleaseProcessingContext $context,
         ProcessingMetrics $metrics,
@@ -482,6 +564,15 @@ class ReleaseProcessor
                     $context->markFound('video');
                     $this->output->echoVideoCreated();
                 }
+
+                // The media-info article is the sample's first one; it is already here.
+                if ($context->mediaInfoMessageIDs !== '' && $context->mediaInfoMessageIDs === ($context->sampleMessageIDs[0] ?? null)) {
+                    if (! $context->foundMediaInfo && $this->mediaService->getMediaInfo($fileLocation, $context->release->id)) {
+                        $context->markFound('mediaInfo');
+                        $this->output->echoMediaInfoAdded();
+                    }
+                    $context->mediaInfoMessageIDs = '';
+                }
             } elseif (! $result['success']) {
                 $this->output->echoSampleFailure();
             }
@@ -553,29 +644,52 @@ class ReleaseProcessor
         }
 
         if (! $context->foundJPGSample && $context->jpgMessageIDs !== []) {
+            $this->processImageDownloads($context);
+        }
+    }
+
+    /**
+     * Download the release's best posted images whole, one at a time, until one is usable.
+     */
+    private function processImageDownloads(ReleaseProcessingContext $context): void
+    {
+        $candidates = $context->workPlan->imageCandidates ?? [];
+        $messageIdLists = $candidates !== []
+            ? array_map(static fn ($candidate): array => $candidate->messageIds, $candidates)
+            : [$context->jpgMessageIDs];
+
+        foreach ($messageIdLists as $messageIds) {
+            if ($context->foundJPGSample || $context->groupUnavailable) {
+                return;
+            }
+
             $result = $this->downloadService->download(
                 DownloadKind::Jpg,
-                $context->jpgMessageIDs,
+                $messageIds,
                 $context->releaseGroupName,
                 $context->release->id
             );
-
-            if ($result['success'] && is_string($result['data'])) {
-                $this->output->echoJpgDownload();
-                $fileLocation = $context->tmpPath.'samplepicture.jpg';
-                File::put($fileLocation, $result['data']);
-
-                if ($this->mediaService->isValidImage($fileLocation)
-                    && $this->mediaService->getJPGSample($fileLocation, $context->release->guid)
-                ) {
-                    $context->markFound('jpgSample');
-                    $this->output->echoJpgSaved();
-                }
-
-                File::delete($fileLocation);
-            } elseif (! $result['success']) {
-                $this->output->echoJpgFailure();
+            if ($result['groupUnavailable']) {
+                $context->groupUnavailable = true;
             }
+            if (! $result['success'] || ! is_string($result['data'])) {
+                $this->output->echoJpgFailure();
+
+                continue;
+            }
+
+            $this->output->echoJpgDownload();
+            $fileLocation = $context->tmpPath.'samplepicture.img';
+            File::put($fileLocation, $result['data']);
+
+            if ($this->mediaService->isUsableImage($fileLocation)
+                && $this->mediaService->getJPGSample($fileLocation, $context->release->guid)
+            ) {
+                $context->markFound('jpgSample');
+                $this->output->echoJpgSaved();
+            }
+
+            File::delete($fileLocation);
         }
     }
 
@@ -642,6 +756,7 @@ class ReleaseProcessor
                     $context,
                     $reverse,
                     $archiveCandidate->title,
+                    $archiveCandidate,
                 );
                 if ($processed) {
                     break;
@@ -685,6 +800,7 @@ class ReleaseProcessor
         ReleaseProcessingContext $context,
         bool $reverse,
         string $archiveTitle = '',
+        ?ArchiveCandidate $source = null,
     ): bool {
         $result = $this->archiveService->processCompressedData(
             $compressedData,
@@ -744,6 +860,10 @@ class ReleaseProcessor
 
         if (! empty($result['listingOnly'])) {
             return $context->totalFileInfo > 0;
+        }
+
+        if (! $context->releaseHasPassword && is_array($result['files'])) {
+            $this->archivedMediaSlicer->register($context, $compressedData, $result['files'], $source);
         }
 
         if ($context->releaseHasNoNFO
@@ -818,6 +938,7 @@ class ReleaseProcessor
             return;
         }
 
+        $images = [];
         foreach ($files as $file) {
             $filePath = is_object($file) ? $file->getPathname() : $file;
 
@@ -876,11 +997,7 @@ class ReleaseProcessor
             }
 
             if (! $context->foundJPGSample && preg_match('/\.(jpe?g|png|webp)$/i', $filePath) === 1) {
-                if ($this->mediaService->getJPGSample($filePath, $context->release->guid)) {
-                    $context->markFound('jpgSample');
-                    $this->output->echoJpgSaved();
-                }
-                File::delete($filePath);
+                $images[] = $filePath;
 
                 continue;
             }
@@ -899,11 +1016,7 @@ class ReleaseProcessor
             }
 
             if (! $context->foundJPGSample && preg_match('/^JPE?G|^PNG|^WebP/i', $output) === 1) {
-                if ($this->mediaService->getJPGSample($filePath, $context->release->guid)) {
-                    $context->markFound('jpgSample');
-                    $this->output->echoJpgSaved();
-                }
-                File::delete($filePath);
+                $images[] = $filePath;
             } elseif ((! $context->foundMediaInfo || ! $context->foundSample || ! $context->foundVideo)
                 && preg_match('/Matroska data|MPEG v4|MPEG sequence, v2|\WAVI\W/i', $output) === 1
             ) {
@@ -934,6 +1047,33 @@ class ReleaseProcessor
                     $this->archiveService->getPar2Info()
                 );
             }
+        }
+
+        $this->useBestExtractedImage($context, $images);
+    }
+
+    /**
+     * Save the best usable image among those unpacked from the release's archives.
+     *
+     * @param  list<string>  $images
+     */
+    private function useBestExtractedImage(ReleaseProcessingContext $context, array $images): void
+    {
+        $ranked = ImageCandidateRanker::sort(
+            $images,
+            static fn (string $path): string => $path,
+            static fn (string $path): int => (int) @filesize($path),
+        );
+
+        foreach ($ranked as $path) {
+            if (! $context->foundJPGSample
+                && $this->mediaService->isUsableImage($path)
+                && $this->mediaService->getJPGSample($path, $context->release->guid)
+            ) {
+                $context->markFound('jpgSample');
+                $this->output->echoJpgSaved();
+            }
+            File::delete($path);
         }
     }
 }

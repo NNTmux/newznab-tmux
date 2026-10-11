@@ -7,6 +7,7 @@ namespace App\Services\AdditionalProcessing;
 use App\Models\ReleaseFile;
 use App\Services\AdditionalProcessing\DTO\ArchiveCandidate;
 use App\Services\AdditionalProcessing\Enums\DownloadKind;
+use App\Services\AdditionalProcessing\Media\ImageCandidateRanker;
 use App\Services\AdditionalProcessing\State\ReleaseProcessingContext;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Facades\File;
@@ -36,14 +37,26 @@ class ReleaseFilesArchiveFallback
     ): void {
         $imageFiles = array_values(array_filter(
             $files,
-            static fn (array $file): bool => preg_match('/\.(jpe?g|png|webp)$/i', (string) ($file['name'] ?? '')) === 1
+            static fn (mixed $file): bool => is_array($file)
+                && empty($file['pass'])
+                && preg_match('/\.(jpe?g|png|webp)$/i', (string) ($file['name'] ?? '')) === 1
         ));
 
         if ($imageFiles === []) {
             return;
         }
 
-        usort($imageFiles, static fn (array $a, array $b): int => ((int) ($b['size'] ?? 0)) <=> ((int) ($a['size'] ?? 0)));
+        // Images that can be copied straight out of the downloaded data go first, then the most telling.
+        $complete = ArchiveExtractionService::completeStoredEntries($imageFiles);
+        usort($imageFiles, static fn (array $a, array $b): int => [
+            ! isset($complete[(string) ($a['name'] ?? '')]),
+            ImageCandidateRanker::rank((string) ($a['name'] ?? '')),
+            -(int) ($a['size'] ?? 0),
+        ] <=> [
+            ! isset($complete[(string) ($b['name'] ?? '')]),
+            ImageCandidateRanker::rank((string) ($b['name'] ?? '')),
+            -(int) ($b['size'] ?? 0),
+        ]);
 
         $this->processExtractedCandidatesFromData(
             $compressedData,
@@ -51,7 +64,7 @@ class ReleaseFilesArchiveFallback
             $context,
             'extracted_',
             function (string $tempPath, ReleaseProcessingContext $context): bool {
-                if (! $this->mediaService->isValidImage($tempPath)) {
+                if (! $this->mediaService->isUsableImage($tempPath)) {
                     return false;
                 }
 
@@ -81,12 +94,18 @@ class ReleaseFilesArchiveFallback
                     ->orWhere('name', 'like', '%.webp');
             })
             ->orderByDesc('size')
-            ->limit(3)
+            ->limit(10)
             ->get();
 
         if ($imageFiles->isEmpty()) {
             return;
         }
+
+        $imageFiles = new EloquentCollection(array_slice(ImageCandidateRanker::sort(
+            $imageFiles->all(),
+            static fn (ReleaseFile $file): string => (string) $file->name,
+            static fn (ReleaseFile $file): int => (int) $file->size,
+        ), 0, 3));
 
         $this->processStoredReleaseFiles(
             $context,
@@ -94,7 +113,7 @@ class ReleaseFilesArchiveFallback
             'release_file_',
             static fn (ReleaseProcessingContext $context): bool => $context->foundJPGSample,
             function (string $tempPath, ReleaseProcessingContext $context): bool {
-                if (! $this->mediaService->isValidImage($tempPath)) {
+                if (! $this->mediaService->isUsableImage($tempPath)) {
                     return false;
                 }
 

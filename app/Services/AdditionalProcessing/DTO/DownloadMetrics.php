@@ -12,5 +12,6 @@ final readonly class DownloadMetrics
         public int $cacheHits = 0,
         public int $bytesDownloaded = 0,
         public int $bytesReused = 0,
+        public int $mediaBytesDownloaded = 0,
     ) {}
 }

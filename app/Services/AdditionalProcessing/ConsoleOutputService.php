@@ -168,6 +168,16 @@ class ConsoleOutputService
         $this->echo('(vRAW)', 'primaryOver');
     }
 
+    public function echoPar2Mapped(int $files): void
+    {
+        $this->echo('(p2n:'.$files.')', 'primaryOver');
+    }
+
+    public function echoMediaSource(string $kind): void
+    {
+        $this->echo('(src:'.$kind.')', 'primaryOver');
+    }
+
     public function echoReleaseTimeout(int $releaseId, int $elapsedSeconds): void
     {
         $this->echo('T', 'warningOver');

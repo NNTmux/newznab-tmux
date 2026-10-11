@@ -6,7 +6,9 @@ namespace App\Services\AdditionalProcessing\State;
 
 use App\Models\Release;
 use App\Services\AdditionalProcessing\DTO\AdditionalWorkPlan;
+use App\Services\AdditionalProcessing\DTO\ArchivedMediaEntry;
 use App\Services\AdditionalProcessing\DTO\DownloadedArchive;
+use App\Services\AdditionalProcessing\DTO\MediaSourcePlan;
 
 /**
  * Mutable context object that holds the processing state for a single release.
@@ -80,6 +82,19 @@ class ReleaseProcessingContext
     public array $nzbContents = [];
 
     public ?AdditionalWorkPlan $workPlan = null;
+
+    /** Real names the PAR2 index revealed for obfuscated files. */
+    public ?MediaSourcePlan $mediaPlan = null;
+
+    /** Network bytes left for finding preview sources. */
+    public ?MediaByteBudget $mediaBudget = null;
+
+    /**
+     * Starts of videos stored in downloaded archive volumes, samples first.
+     *
+     * @var list<ArchivedMediaEntry>
+     */
+    public array $archivedMedia = [];
 
     /**
      * @var list<DownloadedArchive>
@@ -213,6 +228,9 @@ class ReleaseProcessingContext
         $this->archiveRetryable = false;
         $this->groupUnavailable = false;
         $this->workPlan = null;
+        $this->mediaPlan = null;
+        $this->mediaBudget = null;
+        $this->archivedMedia = [];
         $this->releaseDownloadedArchives();
         $this->resetMessageIDs();
         $this->resetCounters();
@@ -236,6 +254,31 @@ class ReleaseProcessingContext
         $archive = new DownloadedArchive($title, $data, $files);
         $this->downloadedArchives[] = $archive;
         $this->retainedArchiveBytes += $archive->byteSize();
+
+        return true;
+    }
+
+    /**
+     * Keep at most two archived videos, so memory stays bounded; a sample displaces a main video.
+     */
+    public function rememberArchivedMedia(ArchivedMediaEntry $entry): bool
+    {
+        foreach ($this->archivedMedia as $known) {
+            if ($known->name === $entry->name) {
+                return false;
+            }
+        }
+
+        if (count($this->archivedMedia) >= self::MAX_RETAINED_ARCHIVES) {
+            $replace = $entry->isSample ? array_search(false, array_map(static fn (ArchivedMediaEntry $known): bool => $known->isSample, $this->archivedMedia), true) : false;
+            if ($replace === false) {
+                return false;
+            }
+            unset($this->archivedMedia[$replace]);
+        }
+
+        $this->archivedMedia[] = $entry;
+        usort($this->archivedMedia, static fn (ArchivedMediaEntry $a, ArchivedMediaEntry $b): int => $b->isSample <=> $a->isSample);
 
         return true;
     }

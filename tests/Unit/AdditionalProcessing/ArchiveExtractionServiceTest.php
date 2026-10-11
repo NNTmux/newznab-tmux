@@ -29,6 +29,9 @@ class ArchiveExtractionServiceTest extends TestCase
     {
         $archiveInfo = Mockery::mock(ArchiveInfo::class);
         $archiveInfo->shouldReceive('setData')->once()->with('ARCHIVE', true)->andReturn(true);
+        $archiveInfo->shouldReceive('getArchiveFileList')->once()->andReturn([
+            ['name' => 'cover.jpg', 'size' => 10, 'pass' => 0, 'compressed' => 0, 'range' => '20-29', 'source' => 'main'],
+        ]);
         $archiveInfo->shouldReceive('getFileData')->once()->with('cover.jpg')->andReturn('IMAGE-DATA');
 
         $service = new ArchiveExtractionService(
@@ -45,6 +48,10 @@ class ArchiveExtractionServiceTest extends TestCase
     {
         $archiveInfo = Mockery::mock(ArchiveInfo::class);
         $archiveInfo->shouldReceive('setData')->once()->with('ARCHIVE', true)->andReturn(true);
+        $archiveInfo->shouldReceive('getArchiveFileList')->once()->andReturn([
+            ['name' => 'release.nfo', 'size' => 8, 'pass' => 0, 'compressed' => 0, 'range' => '20-27', 'source' => 'main'],
+            ['name' => 'cover.jpg', 'size' => 10, 'pass' => 0, 'compressed' => 0, 'range' => '40-49', 'source' => 'main'],
+        ]);
         $archiveInfo->shouldReceive('getFileData')->once()->with('release.nfo')->andReturn('NFO-DATA');
         $archiveInfo->shouldReceive('getFileData')->once()->with('cover.jpg')->andReturn('IMAGE-DATA');
 
@@ -58,6 +65,35 @@ class ArchiveExtractionServiceTest extends TestCase
             'release.nfo' => 'NFO-DATA',
             'cover.jpg' => 'IMAGE-DATA',
         ], $service->extractSpecificFiles('ARCHIVE', ['release.nfo', 'cover.jpg'], sys_get_temp_dir().'/'));
+    }
+
+    #[Test]
+    public function it_copies_a_stored_entry_that_is_wholly_inside_the_downloaded_data(): void
+    {
+        $service = new ArchiveExtractionService($this->makeConfig());
+
+        $this->assertSame(
+            ['cover.jpg' => 'JPEG-BYTES'],
+            $service->extractSpecificFiles($this->rar('cover.jpg', 'JPEG-BYTES'), ['cover.jpg'], sys_get_temp_dir().'/'),
+        );
+    }
+
+    #[Test]
+    public function it_does_not_copy_compressed_or_truncated_entries(): void
+    {
+        $service = new ArchiveExtractionService($this->makeConfig());
+        $content = str_repeat('JPEG-BYTES', 10);
+
+        $this->assertSame([], $service->extractSpecificFiles(
+            $this->rar('cover.jpg', $content, method: 0x33),
+            ['cover.jpg'],
+            sys_get_temp_dir().'/',
+        ));
+        $this->assertSame([], $service->extractSpecificFiles(
+            substr($this->rar('cover.jpg', $content), 0, -10),
+            ['cover.jpg'],
+            sys_get_temp_dir().'/',
+        ));
     }
 
     #[Test]

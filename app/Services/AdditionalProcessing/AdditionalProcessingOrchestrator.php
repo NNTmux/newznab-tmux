@@ -274,6 +274,7 @@ class AdditionalProcessingOrchestrator
             'download_cache_hits' => $downloadMetrics->cacheHits,
             'nntp_bytes' => $downloadMetrics->bytesDownloaded,
             'reused_bytes' => $downloadMetrics->bytesReused,
+            'preview_bytes' => $downloadMetrics->mediaBytesDownloaded,
             'database_statements' => $persistenceMetrics->databaseStatements,
             'database_milliseconds' => round($persistenceMetrics->databaseMilliseconds, 3),
             'search_sync_requests' => $persistenceMetrics->searchSyncRequests,

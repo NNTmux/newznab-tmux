@@ -267,4 +267,92 @@ class AdditionalWorkPlannerTest extends TestCase
         $this->assertFalse($plan->archiveCandidates[0]->likelyFirstVolume);
         $this->assertSame(['<last-volume>'], $plan->orderedArchiveCandidates(true)[0]->messageIds);
     }
+
+    #[Test]
+    public function it_picks_the_par2_index_rather_than_a_recovery_volume(): void
+    {
+        $planner = new AdditionalWorkPlanner($this->makeConfig(['par2MediaMapping' => true, 'par2IndexMaxSegments' => 1]));
+
+        $plan = $planner->plan([
+            ['title' => '"movie.vol00+01.par2" yEnc (1/2)', 'segments' => ['<vol>', '<vol-2>'], 'size' => 500, 'filecount' => 1],
+            ['title' => '"movie.par2" yEnc (1/2)', 'segments' => ['<index>', '<index-2>'], 'size' => 800, 'filecount' => 1],
+            ['title' => '"movie.part01.rar" yEnc (1/9)', 'segments' => ['<rar>'], 'size' => 9000, 'filecount' => 1],
+        ], 'alt.binaries.test');
+
+        $this->assertCount(1, $plan->par2IndexCandidates);
+        $this->assertSame(['<index>'], $plan->par2IndexCandidates[0]->messageIds);
+        $this->assertSame(1, $plan->par2IndexCandidates[0]->sourceIndex);
+    }
+
+    #[Test]
+    public function it_takes_the_smallest_unnamed_files_as_the_index_of_an_obfuscated_release(): void
+    {
+        $planner = new AdditionalWorkPlanner($this->makeConfig(['par2MediaMapping' => true]));
+        $nzb = [
+            ['title' => '"8f3a1c" yEnc (1/90)', 'segments' => ['<big>'], 'size' => 90000, 'filecount' => 1],
+            ['title' => '"0c71de" yEnc (1/1)', 'segments' => ['<small>'], 'size' => 700, 'filecount' => 1],
+            ['title' => '"55be02" yEnc (1/5)', 'segments' => ['<mid>'], 'size' => 5000, 'filecount' => 1],
+        ];
+
+        $this->assertSame(
+            [1, 2],
+            array_map(static fn (ArchiveCandidate $candidate): int => $candidate->sourceIndex, $planner->plan($nzb, 'alt.binaries.test')->par2IndexCandidates),
+        );
+        $this->assertSame([], $planner->plan(array_slice($nzb, 0, 2), 'alt.binaries.test')->par2IndexCandidates);
+        $this->assertSame([], (new AdditionalWorkPlanner($this->makeConfig()))->plan($nzb, 'alt.binaries.test')->par2IndexCandidates);
+    }
+
+    #[Test]
+    public function it_lists_full_length_videos_largest_first_without_samples_or_archives(): void
+    {
+        $planner = new AdditionalWorkPlanner($this->makeConfig([
+            'processThumbnails' => true,
+            'mediaMainVideoFallback' => true,
+            'mediaMainVideoMinBytes' => 1000,
+        ]));
+
+        $plan = $planner->plan([
+            ['title' => '"Movie.Part1.mkv" yEnc (1/9)', 'segments' => ['<a>'], 'size' => 5000, 'filecount' => 1],
+            ['title' => '"Movie.sample.mkv" yEnc (1/1)', 'segments' => ['<s>'], 'size' => 9000, 'filecount' => 1],
+            ['title' => '"Movie.Part2.mkv" yEnc (1/9)', 'segments' => ['<b>'], 'size' => 8000, 'filecount' => 1],
+            ['title' => '"Movie.mkv.part01.rar" yEnc (1/9)', 'segments' => ['<r>'], 'size' => 9900, 'filecount' => 1],
+            ['title' => '"Extras.mkv" yEnc (1/1)', 'segments' => ['<e>'], 'size' => 500, 'filecount' => 1],
+        ], 'alt.binaries.test');
+
+        $this->assertSame([2, 0], $plan->mainVideoSourceIndexes);
+    }
+
+    #[Test]
+    public function it_does_not_take_an_archived_sample_for_a_video_sample(): void
+    {
+        $planner = new AdditionalWorkPlanner($this->makeConfig(['processThumbnails' => true]));
+
+        $plan = $planner->plan([
+            ['title' => '"movie-sample.part01.rar" yEnc (1/3)', 'segments' => ['<rar>']],
+        ], 'alt.binaries.test');
+
+        $this->assertSame([], $plan->sampleMessageIds);
+        $this->assertTrue($plan->hasCompressedFile());
+    }
+
+    #[Test]
+    public function it_plans_whole_downloads_of_the_best_few_images(): void
+    {
+        $planner = new AdditionalWorkPlanner($this->makeConfig(['processJPGSample' => true, 'mediaImageMaxBytes' => 3000000]));
+
+        $plan = $planner->plan([
+            ['title' => '"movie.back.jpg" yEnc (1/2)', 'segments' => ['<back-1>', '<back-2>'], 'size' => 900000, 'filecount' => 1],
+            ['title' => '"movie.cover.jpg" yEnc (1/3)', 'segments' => ['<cover-1>', '<cover-2>', '<cover-3>'], 'size' => 1900000, 'filecount' => 1],
+            ['title' => '"movie.screens.jpg" yEnc (1/4)', 'segments' => ['<s-1>', '<s-2>', '<s-3>', '<s-4>'], 'size' => 2600000, 'filecount' => 1],
+            ['title' => '"movie.huge.screens.jpg" yEnc (1/9)', 'segments' => ['<h-1>'], 'size' => 6000000, 'filecount' => 1],
+            ['title' => '"logo.png" yEnc (1/1)', 'segments' => ['<logo>'], 'size' => 4000, 'filecount' => 1],
+            ['title' => '"movie.jpg" yEnc (1/1)', 'segments' => ['<plain>'], 'size' => 300000, 'filecount' => 1],
+        ], 'alt.binaries.erotica');
+
+        $this->assertSame(['<s-1>', '<s-2>', '<s-3>', '<s-4>'], $plan->jpgMessageIds);
+        $this->assertSame(
+            ['"movie.screens.jpg" yEnc (1/4)', '"movie.cover.jpg" yEnc (1/3)', '"movie.jpg" yEnc (1/1)'],
+            array_map(static fn ($candidate): string => $candidate->title, $plan->imageCandidates),
+        );
+    }
 }

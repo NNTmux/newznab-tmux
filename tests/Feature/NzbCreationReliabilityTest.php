@@ -560,7 +560,7 @@ class IndexingReleaseCreationService extends ReleaseCreationService
     /**
      * @return array{added: int, dupes: int}
      */
-    public function createReleases(int|string|null $groupID, int $limit, bool $echoCLI): array
+    public function createReleases(int|string|null $groupID, int $limit, bool $echoCLI, ?array $allowedIds = null): array
     {
         foreach ($this->releaseIds as $releaseId) {
             Search::updateRelease($releaseId);

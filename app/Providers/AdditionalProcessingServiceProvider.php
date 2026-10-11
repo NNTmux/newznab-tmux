@@ -9,6 +9,8 @@ use App\Services\AdditionalProcessing\AdditionalWorkPlanner;
 use App\Services\AdditionalProcessing\ArchiveExtractionService;
 use App\Services\AdditionalProcessing\Config\ProcessingConfiguration;
 use App\Services\AdditionalProcessing\ConsoleOutputService;
+use App\Services\AdditionalProcessing\Media\MediaSourceResolver;
+use App\Services\AdditionalProcessing\Media\MediaToolFactory;
 use App\Services\AdditionalProcessing\MediaExtractionService;
 use App\Services\AdditionalProcessing\NzbContentParser;
 use App\Services\AdditionalProcessing\ReleaseFileManager;
@@ -121,6 +123,7 @@ class AdditionalProcessingServiceProvider extends ServiceProvider
                 $app->make(ReleaseExtraService::class),
                 new CategorizationService,
                 $app->make(ReleaseSearchSyncCoordinator::class),
+                $app->make(MediaToolFactory::class),
             );
         });
 
@@ -148,6 +151,18 @@ class AdditionalProcessingServiceProvider extends ServiceProvider
                 $app->make(ConsoleOutputService::class),
                 $app->make(ReleaseSearchSyncCoordinator::class),
                 $app->make(PersistenceMetricsCollector::class),
+                $app->make(MediaSourceResolver::class),
+            );
+        });
+
+        $this->app->singleton(MediaToolFactory::class, function ($app) {
+            return new MediaToolFactory($app->make(ProcessingConfiguration::class));
+        });
+
+        $this->app->singleton(MediaSourceResolver::class, function ($app) {
+            return new MediaSourceResolver(
+                $app->make(ProcessingConfiguration::class),
+                $app->make(UsenetDownloadService::class),
             );
         });
 
