@@ -77,10 +77,16 @@ final class NameFixingQueryService
         int $time,
         int $categories,
         int $afterId = 0,
-        int $limit = self::BATCH_SIZE
+        int $limit = self::BATCH_SIZE,
+        ?int $throughId = null
     ): array {
         [$where, $bindings] = $this->candidateWhere($source, $time, $categories);
         $bindings[] = $afterId;
+        $ceiling = '';
+        if ($throughId !== null) {
+            $ceiling = ' AND r.id <= ?';
+            $bindings[] = $throughId;
+        }
         $bindings[] = max(1, $limit);
 
         return $this->database->select(
@@ -90,11 +96,18 @@ final class NameFixingQueryService
                     r.proc_hash16k, r.proc_crc32
              FROM releases r
              WHERE {$where}
-             AND r.id > ?
+             AND r.id > ?{$ceiling}
              ORDER BY r.id ASC
              LIMIT ?",
             $bindings
         );
+    }
+
+    public function highWatermark(): int
+    {
+        $rows = $this->database->select('SELECT MAX(id) AS highest_id FROM releases');
+
+        return (int) ($rows[0]->highest_id ?? 0);
     }
 
     public function countCandidates(string $source, int $time, int $categories): int
@@ -111,8 +124,15 @@ final class NameFixingQueryService
     /**
      * @return list<object>
      */
-    public function standardCandidateBatch(string $leftGuid, int $limit): array
+    public function standardCandidateBatch(string $leftGuid, int $limit, ?int $beforeId = null): array
     {
+        $cursor = $beforeId === null ? '' : ' AND r.id < ?';
+        $bindings = [$leftGuid];
+        if ($beforeId !== null) {
+            $bindings[] = $beforeId;
+        }
+        $bindings[] = max(1, $limit);
+
         return $this->database->select(
             'SELECT r.id AS releases_id, r.id, r.name, r.searchname, r.fromname, r.guid,
                     r.groups_id, r.categories_id, r.size AS relsize, r.predb_id, r.nfostatus,
@@ -133,10 +153,10 @@ final class NameFixingQueryService
                 OR r.proc_hash16k = 0
                 OR r.proc_crc32 = 0
              )
-             AND r.categories_id IN ('.implode(',', Category::OTHERS_GROUP).')
+             AND r.categories_id IN ('.implode(',', Category::OTHERS_GROUP).')'.$cursor.'
              ORDER BY r.id DESC
              LIMIT ?',
-            [$leftGuid, max(1, $limit)]
+            $bindings
         );
     }
 

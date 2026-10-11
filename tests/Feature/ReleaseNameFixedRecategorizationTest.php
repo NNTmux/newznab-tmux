@@ -10,6 +10,7 @@ use App\Models\Category;
 use App\Models\Release;
 use App\Models\UsenetGroup;
 use App\Services\NameFixing\ReleaseUpdateService;
+use App\Support\Par2RenameProgress;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
@@ -65,6 +66,8 @@ class ReleaseNameFixedRecategorizationTest extends TestCase
         DB::reconnect();
 
         $this->createSchema();
+        $migration = require base_path('database/migrations/2026_10_11_215821_create_par2_rename_progress_table.php');
+        $migration->up();
     }
 
     protected function tearDown(): void
@@ -108,6 +111,7 @@ class ReleaseNameFixedRecategorizationTest extends TestCase
             'adddate' => now(),
         ]);
 
+        Par2RenameProgress::save($release->id, str_repeat('a', 64), 1, [0]);
         $service = app(ReleaseUpdateService::class);
         $service->updateRelease(
             $release->fresh(),
@@ -128,6 +132,7 @@ class ReleaseNameFixedRecategorizationTest extends TestCase
         $this->assertSame(Category::TV_HD, $release->categories_id);
         $this->assertSame(1, (int) $release->iscategorized);
         $this->assertSame(1, (int) $release->isrenamed);
+        $this->assertNull(Par2RenameProgress::get($release->id));
     }
 
     public function test_renaming_tv_episode_to_full_season_keeps_it_out_of_movies(): void

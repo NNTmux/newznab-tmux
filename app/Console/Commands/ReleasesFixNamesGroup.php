@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Enums\Par2RenameOutcome;
 use App\Services\NameFixing\NameFixingQueryService;
 use App\Services\NameFixing\NameFixingService;
 use App\Services\NfoService;
@@ -84,7 +85,7 @@ class ReleasesFixNamesGroup extends Command
         $nntp = null;
         $nzbcontents = null;
         $connectionAttempted = false;
-        $par2Processor = function (object $release) use (&$connectionAttempted, &$nntp, &$nzbcontents): bool {
+        $par2Processor = function (object $release) use (&$connectionAttempted, &$nntp, &$nzbcontents): Par2RenameOutcome {
             if (! $connectionAttempted) {
                 $connectionAttempted = true;
                 $nntp = app(NNTPService::class);
@@ -107,7 +108,11 @@ class ReleasesFixNamesGroup extends Command
                 }
             }
 
-            return $nzbcontents !== null && $nzbcontents->checkPar2(
+            if ($nzbcontents === null) {
+                return Par2RenameOutcome::Retryable;
+            }
+
+            return $nzbcontents->checkPar2Result(
                 $release->guid,
                 $release->releases_id,
                 $release->groups_id,

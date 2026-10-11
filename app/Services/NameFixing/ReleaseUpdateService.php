@@ -12,6 +12,7 @@ use App\Services\AdditionalProcessing\ReleaseSearchSyncCoordinator;
 use App\Services\AdditionalProcessing\State\PersistenceMetricsCollector;
 use App\Services\Categorization\CategorizationService;
 use App\Services\ReleaseCleaningService;
+use App\Support\Par2RenameProgress;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
@@ -363,6 +364,11 @@ class ReleaseUpdateService
             ));
         });
 
+        if ($preId > 0 || ($nameStatus && ($this->getStatusColumnsForType($type)['isrenamed'] ?? 0) === 1)) {
+            DB::afterCommit(static function () use ($release): void {
+                Par2RenameProgress::forget((int) $release->releases_id);
+            });
+        }
         $this->searchSyncCoordinator->request((int) $release->releases_id);
     }
 
@@ -398,6 +404,11 @@ class ReleaseUpdateService
 
         if ($id !== 0) {
             DB::update("UPDATE releases SET {$column} = ? WHERE id = ?", [$status, $id]);
+            if (($column === 'proc_par2' && $status === 1) || ($column === 'predb_id' && $status > 0)) {
+                DB::afterCommit(static function () use ($id): void {
+                    Par2RenameProgress::forget($id);
+                });
+            }
         }
     }
 

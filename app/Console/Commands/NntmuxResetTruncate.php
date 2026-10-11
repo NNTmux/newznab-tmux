@@ -50,8 +50,8 @@ class NntmuxResetTruncate extends Command
         }
         unset($value);
 
+        DB::statement('SET FOREIGN_KEY_CHECKS = 1;');
         $delcount = Release::query()->where('nzbstatus', '=', 0)->delete();
         $this->info($delcount.' releases had no nzb, deleted.');
-        DB::statement('SET FOREIGN_KEY_CHECKS = 1;');
     }
 }

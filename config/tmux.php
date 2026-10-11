@@ -30,8 +30,8 @@ return [
     'scheduled_health_check' => (bool) env('TMUX_SCHEDULED_HEALTH_CHECK', true),
 
     /*
-    | Fix-names pane. The "past 6 hours" passes always run; full-backlog passes (every release
-    | not yet tried) run at most once per interval, and PreDB full-text matching runs each cycle.
+    | Fix-names pane. Recent database passes run each cycle; historical database passes run
+    | once per interval. Bounded recent and historical PAR2 sweeps resume each cycle.
     */
     'fix_names' => [
         'full_backlog' => (bool) env('TMUX_FIX_NAMES_FULL_BACKLOG', true),
@@ -41,8 +41,12 @@ return [
         // end of the tmux cycle, where slow passes starve it. While this is on, the tmux cycle skips the pass, so
         // the pass has exactly one launcher. Only meaningful while `predbft` is on; `predbft` false turns the pass off.
         'predbft_scheduled' => (bool) env('TMUX_FIX_NAMES_PREDBFT_SCHEDULED', true),
-        // Cache store for the once-per-interval claim; must be a single backend, not a failover store.
+        // Shared cache for interval claims, PAR2 claims and progress; use one backend, not failover.
         'cache_store' => (string) env('TMUX_FIX_NAMES_CACHE_STORE', 'redis'),
+        'par2_max_releases' => (int) env('TMUX_FIX_NAMES_PAR2_MAX_RELEASES', 100),
+        'par2_budget_seconds' => (int) env('TMUX_FIX_NAMES_PAR2_BUDGET_SECONDS', 60),
+        'par2_max_probes' => (int) env('TMUX_FIX_NAMES_PAR2_MAX_PROBES', 4),
+        'par2_max_probe_bytes' => (int) env('TMUX_FIX_NAMES_PAR2_MAX_PROBE_BYTES', 2097152),
     ],
 
     'terminal' => [

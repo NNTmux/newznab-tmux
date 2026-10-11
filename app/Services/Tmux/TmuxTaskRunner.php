@@ -452,8 +452,8 @@ class TmuxTaskRunner
             return true;
         }
 
-        // The recent-work count only covers the 6-hour levels. The full-backlog levels and PreDB
-        // full-text matching have their own work sources, so they are scheduled independently.
+        // The count includes historical pending rename work. Historical database levels and PreDB
+        // full-text matching also have independent sources and schedules.
         $fullBacklog = $this->claimFullBacklogSlot();
 
         if ($work === 0 && ! $fullBacklog && ! $predbft) {
@@ -479,17 +479,17 @@ class TmuxTaskRunner
      *
      * The odd levels only look at releases added in the past 6 hours, so a release whose
      * post-processing finishes later would never be renamed. The matching full-backlog (even)
-     * levels therefore run too, at most once per configured interval because they scan the whole
-     * backlog, followed by PreDB full-text matching (`predbft`).
+     * database levels therefore run too, at most once per configured interval. The bounded
+     * historical PAR2 sweep resumes each cycle while work remains, followed by PreDB full-text
+     * matching (`predbft`) when the scheduler does not own it.
      *
      * @return list<string>
      */
     protected function fixNamesCommands(bool $renamePasses, bool $fullBacklog, bool $predbft): array
     {
         $artisan = escapeshellarg(PHP_BINARY).' '.escapeshellarg(base_path('artisan'));
-        // Methods 7 and 8 download PAR2 files from Usenet and can run for an hour or more, so they go last:
-        // the database-only passes (NFO, file names, mediainfo, hashes) then run first every cycle instead of
-        // waiting behind them.
+        // Bounded PAR2 batches follow database-only work. The historical sweep has its own cursor,
+        // so it advances each cycle rather than waiting an hour between small batches.
         $levels = $renamePasses ? [3, 5, 9, 11, 13, 15, 17, 19] : [];
         if ($fullBacklog) {
             array_push($levels, 4, 6, 10, 12, 14, 16, 18, 20);
@@ -497,7 +497,7 @@ class TmuxTaskRunner
         if ($renamePasses) {
             $levels[] = 7;
         }
-        if ($fullBacklog) {
+        if ($fullBacklog || ($renamePasses && (bool) config('tmux.fix_names.full_backlog', true))) {
             $levels[] = 8;
         }
 

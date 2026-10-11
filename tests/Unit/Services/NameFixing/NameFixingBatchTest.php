@@ -8,15 +8,18 @@ use App\Services\NameFixing\NameFixingQueryService;
 use App\Services\NameFixing\NameFixingService;
 use App\Services\NameFixing\ReleaseUpdateService;
 use Illuminate\Database\ConnectionInterface;
+use Illuminate\Support\Facades\Cache;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use Tests\TestCase;
 
 class NameFixingBatchTest extends TestCase
 {
     #[Test]
     public function grouped_processing_fetches_sources_once_for_the_whole_batch(): void
     {
+        config(['tmux.fix_names.cache_store' => 'array']);
+        Cache::store('array')->flush();
         $database = $this->createMock(ConnectionInterface::class);
         $database->expects($this->exactly(5))
             ->method('select')

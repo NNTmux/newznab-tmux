@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Enums\Par2RenameOutcome;
 use App\Services\AdditionalProcessing\AdditionalProcessingOrchestrator;
 use App\Services\Configuration\ConfigurationProvider;
 use App\Services\NameFixing\NameFixingService;
@@ -263,5 +264,11 @@ final class PostProcessService
         int $show
     ): bool {
         return $this->par2Processor->parseFromMessage($messageID, $relID, $groupID, $nntp, $show);
+    }
+
+    /** @param null|callable(): bool $canPersist */
+    public function parsePAR2ForRename(string $messageID, int $relID, int $groupID, NNTPService $nntp, int $show, ?callable $canPersist = null, bool $expectedPar2 = false): Par2RenameOutcome
+    {
+        return $this->par2Processor->parseForRename($messageID, $relID, $groupID, $nntp, $show, $canPersist, $expectedPar2);
     }
 }

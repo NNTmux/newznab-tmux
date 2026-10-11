@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Enums\Par2RenameOutcome;
 use App\Models\Category;
 use App\Models\Release;
 use App\Models\ReleaseFile;
@@ -26,6 +27,8 @@ class Par2Processor
 
     private bool $alternateNNTP;
 
+    private bool $existingNameConfirmed = false;
+
     public function __construct(NameFixingService $nameFixingService, Par2Info $par2Info, bool $addPar2, bool $alternateNNTP)
     {
         $this->nameFixingService = $nameFixingService;
@@ -45,8 +48,18 @@ class Par2Processor
      */
     public function parseFromMessage(string $messageID, int $relID, int $groupID, NNTPService $nntp, int $show): bool
     {
+        $outcome = $this->parseForRename($messageID, $relID, $groupID, $nntp, $show);
+
+        return $outcome === Par2RenameOutcome::Renamed || $this->existingNameConfirmed;
+    }
+
+    /** @param null|callable(): bool $canPersist */
+    public function parseForRename(string $messageID, int $relID, int $groupID, NNTPService $nntp, int $show, ?callable $canPersist = null, bool $expectedPar2 = false): Par2RenameOutcome
+    {
+        $this->existingNameConfirmed = false;
+        $this->nameFixingService->reset();
         if ($messageID === '') {
-            return false;
+            return Par2RenameOutcome::Retryable;
         }
 
         $query = Release::query()
@@ -55,29 +68,35 @@ class Par2Processor
             ->first();
 
         if ($query === null) {
-            return false;
+            return Par2RenameOutcome::NoMatch;
         }
 
         // Only get a new name if the category is OTHER.
-        $foundName = true;
-        if (\in_array((int) $query['categories_id'], Category::OTHERS_GROUP, true)) {
-            $foundName = false;
-        }
+        $attemptRename = \in_array((int) $query['categories_id'], Category::OTHERS_GROUP, true);
+        $foundName = ! $attemptRename;
 
         // Get the PAR2 file.
         $par2 = $nntp->getMessages(UsenetGroup::getNameByID($groupID), $messageID, $this->alternateNNTP);
-        if ($nntp->isError($par2)) {
-            return false;
+        if (NNTPService::isError($par2) || ! is_string($par2) || $par2 === '') {
+            return Par2RenameOutcome::Retryable;
+        }
+
+        if ($canPersist !== null && ! $canPersist()) {
+            return Par2RenameOutcome::Deferred;
         }
 
         // Put the PAR2 into Par2Info, check if there's an error.
         $this->par2Info->setData($par2);
         if ($this->par2Info->error) {
-            return false;
+            return $expectedPar2 || str_contains($par2, Par2Info::PACKET_MARKER)
+                ? Par2RenameOutcome::Retryable : Par2RenameOutcome::NoMatch;
         }
 
         // Get the file list from Par2Info.
         $files = $this->par2Info->getFileList();
+        if (! array_filter($files, static fn (array $file): bool => isset($file['name']))) {
+            return Par2RenameOutcome::Retryable;
+        }
         if (\count($files) > 0) {
             $filesAdded = 0;
 
@@ -114,7 +133,7 @@ class Par2Processor
                 // Try to get a new name.
                 if ($foundName === false) {
                     $query['textstring'] = $file['name'];
-                    if ($this->nameFixingService->checkName($query, true, 'PAR2, ', true, (bool) $show)) {
+                    if ($this->nameFixingService->checkName($query, true, 'PAR2, ', true, (bool) $show, markProcessed: false)) {
                         $foundName = true;
                     }
                 }
@@ -126,10 +145,16 @@ class Par2Processor
                 Release::whereId($relID)->increment('rarinnerfilecount', $filesAdded);
             }
             if ($foundName === true) {
-                return true;
+                if (! $attemptRename) {
+                    $this->existingNameConfirmed = true;
+
+                    return Par2RenameOutcome::NoMatch;
+                }
+
+                return Par2RenameOutcome::Renamed;
             }
         }
 
-        return false;
+        return Par2RenameOutcome::NoMatch;
     }
 }

@@ -8,7 +8,7 @@ use App\Services\Tmux\TmuxPaneManager;
 use App\Services\Tmux\TmuxTaskRunner;
 use Illuminate\Support\Facades\Cache;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use ReflectionMethod;
 use ReflectionProperty;
 use RuntimeException;
@@ -117,6 +117,16 @@ class TmuxFixNamesScheduleTest extends TestCase
     }
 
     #[Test]
+    public function bounded_historical_par2_work_keeps_running_between_full_database_intervals(): void
+    {
+        $this->runTask(alive: false, renames: 5);
+        $this->runTask(alive: false, renames: 5);
+
+        $this->assertStringContainsString('releases:fix-names 8 ', $this->launched[1]);
+        $this->assertStringNotContainsString('releases:fix-names 4 ', $this->launched[1]);
+    }
+
+    #[Test]
     public function the_pane_idles_when_nothing_is_due(): void
     {
         config(['tmux.fix_names.predbft' => false]);
@@ -154,8 +164,8 @@ class TmuxFixNamesScheduleTest extends TestCase
     private function runTask(bool $alive, int $renames, bool $respawnSucceeds = true): bool
     {
         $runner = new TmuxTaskRunner('fixnames-test');
-        /** @var TmuxPaneManager&MockObject $panes */
-        $panes = $this->createMock(TmuxPaneManager::class);
+        /** @var TmuxPaneManager&Stub $panes */
+        $panes = $this->createStub(TmuxPaneManager::class);
         $panes->method('paneForRole')->willReturn('%1');
         $panes->method('isAlive')->willReturn($alive);
         $capture = function (string $pane, string|array $command) use ($respawnSucceeds): bool {

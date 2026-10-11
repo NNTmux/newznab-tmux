@@ -4,11 +4,20 @@ declare(strict_types=1);
 
 namespace App\Services\Nzb;
 
+use App\Enums\Par2RenameOutcome;
 use App\Models\Release;
 use App\Services\Configuration\ConfigurationProvider;
 use App\Services\NfoService;
 use App\Services\NNTP\NNTPService;
 use App\Services\PostProcessService;
+use App\Support\Par2RenameProgress;
+use Illuminate\Cache\Lock;
+use Illuminate\Contracts\Cache\LockProvider;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
+use RuntimeException;
+use SimpleXMLElement;
+use Throwable;
 
 /**
  * Service for processing NZB contents - extracting NFO files, PAR2 information,
@@ -31,6 +40,11 @@ class NzbContentsService
     protected bool $echoOutput;
 
     protected bool $alternateNntp;
+
+    /** @var array{candidates_probed: int, articles_received: int} */
+    private array $par2Stats = ['candidates_probed' => 0, 'articles_received' => 0];
+
+    private bool $par2StructureValid = true;
 
     public function __construct(
         ?NzbService $nzbService = null,
@@ -210,9 +224,9 @@ class NzbContentsService
      * Loads and parses an NZB file based on a GUID.
      *
      * @param  string  $guid  The release GUID to locate the NZB file
-     * @return \SimpleXMLElement|false The parsed NZB file as SimpleXMLElement or false on failure
+     * @return SimpleXMLElement|false The parsed NZB file as SimpleXMLElement or false on failure
      */
-    public function loadNzb(string $guid): \SimpleXMLElement|false
+    public function loadNzb(string $guid): SimpleXMLElement|false
     {
         // Fetch the NZB file path using the GUID
         $nzbPath = $this->nzbService->nzbPath($guid);
@@ -242,25 +256,204 @@ class NzbContentsService
      */
     public function checkPar2(string $guid, int $relID, int $groupID, int $nameStatus, int $show): bool
     {
-        $nzbFile = $this->loadNzb($guid);
-        if ($nzbFile !== false) {
-            foreach ($nzbFile->file as $nzbContents) {
-                if ($nameStatus === 1
-                    && $this->postProcessService->parsePAR2((string) $nzbContents->segments->segment, $relID, $groupID, $this->nntp, $show)
-                    && preg_match('/\.(par[2" ]|\d{2,3}").+\(1\/1\)/i', (string) $nzbContents->attributes()->subject)
-                ) {
-                    Release::query()->where('id', $relID)->update(['proc_par2' => 1]);
+        return $this->checkPar2Result($guid, $relID, $groupID, $nameStatus, $show) === Par2RenameOutcome::Renamed;
+    }
 
-                    return true;
+    public function checkPar2Result(string $guid, int $relID, int $groupID, int $nameStatus, int $show, ?float $deadline = null): Par2RenameOutcome
+    {
+        $this->par2Stats = ['candidates_probed' => 0, 'articles_received' => 0];
+        if ($nameStatus !== 1) {
+            return Par2RenameOutcome::Deferred;
+        }
+
+        $lock = null;
+        $claimed = false;
+        try {
+            $cache = Cache::store((string) config('tmux.fix_names.cache_store', 'redis'));
+            $store = $cache->getStore();
+            if (! $store instanceof LockProvider) {
+                throw new RuntimeException('The PAR2 rename cache store must support atomic locks.');
+            }
+            $lease = max(600, 10 * max(
+                (int) config('nntmux_nntp.socket_timeout', 120),
+                (int) config('nntmux_nntp.alternate_server_socket_timeout', 120)
+            ));
+            $lock = $store->lock('rename:par2:'.$relID, $lease);
+            if (! $lock instanceof Lock) {
+                throw new RuntimeException('The PAR2 rename cache lock must support renewal.');
+            }
+            $claimed = $lock->get();
+            if (! $claimed) {
+                return Par2RenameOutcome::Deferred;
+            }
+
+            $release = Release::query()->where('id', $relID)->first(['proc_par2', 'isrenamed']);
+            if ($release === null || (int) $release->proc_par2 === 1) {
+                Par2RenameProgress::forget($relID);
+
+                return Par2RenameOutcome::NoMatch;
+            }
+            if ((int) $release->isrenamed === 1) {
+                if (! $this->refreshPar2Claim($lock)) {
+                    return Par2RenameOutcome::Deferred;
+                }
+                Release::query()->where('id', $relID)->update(['proc_par2' => 1]);
+                Par2RenameProgress::forget($relID);
+
+                return Par2RenameOutcome::NoMatch;
+            }
+
+            $nzbFile = $this->loadNzb($guid);
+            if ($nzbFile === false) {
+                return Par2RenameOutcome::Retryable;
+            }
+
+            $candidates = $this->par2Candidates($nzbFile);
+            $signature = hash('sha256', serialize($candidates));
+            $progress = Par2RenameProgress::get($relID);
+            $offset = is_array($progress) && ($progress['signature'] ?? '') === $signature
+                ? max(0, (int) ($progress['offset'] ?? 0)) : 0;
+            $retry = [];
+            $savedRetries = is_array($progress) && ($progress['signature'] ?? '') === $signature
+                ? ($progress['retry_indexes'] ?? []) : [];
+            if (is_array($savedRetries)) {
+                foreach ($savedRetries as $index) {
+                    if (is_int($index) && $index >= 0 && $index < count($candidates)) {
+                        $retry[$index] = true;
+                    }
+                }
+            }
+            $pending = $offset < count($candidates) ? range($offset, count($candidates) - 1) : [];
+            $pending = array_values(array_unique(array_merge($pending, array_keys($retry))));
+            $budget = max(1, (int) config('tmux.fix_names.par2_max_probes', 4));
+            $outcome = Par2RenameOutcome::NoMatch;
+
+            foreach ($pending as $index) {
+                if ($this->par2Stats['candidates_probed'] >= $budget || ($deadline !== null && now()->getTimestampMs() / 1000 >= $deadline) || ! $this->refreshPar2Claim($lock)) {
+                    return Par2RenameOutcome::Deferred;
+                }
+
+                $this->par2Stats['candidates_probed']++;
+                try {
+                    $outcome = $this->postProcessService->parsePAR2ForRename(
+                        $candidates[$index]['id'], $relID, $groupID, $this->nntp, $show,
+                        function () use ($lock): bool {
+                            $this->par2Stats['articles_received']++;
+
+                            return $this->refreshPar2Claim($lock);
+                        }, $candidates[$index]['explicit']
+                    );
+                } catch (Throwable $e) {
+                    Log::warning('PAR2 probe remains pending', ['release_id' => $relID, 'candidate_index' => $index, 'error' => $e->getMessage()]);
+                    $outcome = Par2RenameOutcome::Retryable;
+                }
+                if ($outcome === Par2RenameOutcome::Deferred || ! $this->refreshPar2Claim($lock)) {
+                    return Par2RenameOutcome::Deferred;
+                }
+                if ($outcome === Par2RenameOutcome::Renamed) {
+                    break;
+                }
+                if ($outcome === Par2RenameOutcome::Retryable) {
+                    unset($retry[$index]);
+                    $retry[$index] = true;
+                } else {
+                    unset($retry[$index]);
+                }
+                $offset = max($offset, $index + 1);
+                if (! Par2RenameProgress::save($relID, $signature, $offset, array_keys($retry))) {
+                    return Par2RenameOutcome::NoMatch;
+                }
+            }
+
+            if ($outcome !== Par2RenameOutcome::Renamed && ($retry !== [] || ! $this->par2StructureValid)) {
+                return Par2RenameOutcome::Retryable;
+            }
+
+            if (! $this->refreshPar2Claim($lock)) {
+                return Par2RenameOutcome::Deferred;
+            }
+            Release::query()->where('id', $relID)->update(['proc_par2' => 1]);
+            Par2RenameProgress::forget($relID);
+
+            return $outcome;
+        } catch (Throwable $e) {
+            Log::warning('PAR2 rename attempt remains pending', ['release_id' => $relID, 'error' => $e->getMessage()]);
+
+            return Par2RenameOutcome::Retryable;
+        } finally {
+            if ($claimed && $lock !== null) {
+                try {
+                    $lock->release();
+                } catch (Throwable $e) {
+                    Log::warning('Could not release PAR2 rename claim; it will expire', ['release_id' => $relID, 'error' => $e->getMessage()]);
+                }
+            }
+        }
+    }
+
+    /** @return array{candidates_probed: int, articles_received: int} */
+    public function par2Stats(): array
+    {
+        return $this->par2Stats;
+    }
+
+    /** @phpstan-impure */
+    private function refreshPar2Claim(Lock $lock): bool
+    {
+        return $lock->refresh();
+    }
+
+    /** @return list<array{id: string, explicit: bool}> */
+    private function par2Candidates(SimpleXMLElement $nzb): array
+    {
+        $explicit = $volumes = $hidden = [];
+        $this->par2StructureValid = count($nzb->file) > 0;
+        foreach ($nzb->file as $file) {
+            if (count($file->segments->segment) === 0) {
+                $this->par2StructureValid = false;
+
+                continue;
+            }
+            foreach ($file->segments->segment as $entry) {
+                if (trim((string) $entry) === '') {
+                    $this->par2StructureValid = false;
+                }
+            }
+            $subject = (string) $file->attributes()->subject;
+            $segment = $file->segments->segment[0];
+            $id = trim((string) $segment);
+            if ($id === '') {
+                $this->par2StructureValid = false;
+
+                continue;
+            }
+
+            if (preg_match('/\.par2(?:["\s]|$)/i', $subject)) {
+                if (preg_match('/\.vol\d+\+\d+\.par2(?:["\s]|$)/i', $subject)) {
+                    $volumes[$id] = ['id' => $id, 'explicit' => true];
+                } else {
+                    $explicit[$id] = ['id' => $id, 'explicit' => true];
+                }
+            } else {
+                $knownContent = preg_match('/\.(?:rar|r\d{2,3}|\d{3}|7z|zip|mkv|mp4|avi|m2ts|ts|iso|nfo|sfv|srr|srs|jpg|png|mp3|flac)(?:["\s]|$)/i', $subject);
+                $singlePart = count($file->segments->segment) === 1 && $this->parserService->extractPartsTotal($subject) <= 1;
+                if (! $knownContent || $singlePart) {
+                    $bytes = filter_var((string) $segment->attributes()->bytes, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+                    if ($bytes === false) {
+                        $this->par2StructureValid = false;
+
+                        continue;
+                    }
+                    if ($bytes <= max(1, (int) config('tmux.fix_names.par2_max_probe_bytes', 2097152))) {
+                        $hidden[$id] = ['id' => $id, 'explicit' => false, 'bytes' => $bytes];
+                    }
                 }
             }
         }
 
-        if ($nameStatus === 1) {
-            Release::query()->where('id', $relID)->update(['proc_par2' => 1]);
-        }
+        uasort($hidden, static fn (array $first, array $second): int => $first['bytes'] <=> $second['bytes']);
 
-        return false;
+        return array_values($explicit + $volumes + $hidden);
     }
 
     /**
