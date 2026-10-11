@@ -1,0 +1,198 @@
+#!/bin/sh
+# Deploy guard for the docker/ stack: one deploy at a time, a log of who deployed what, and no
+# rebuild when nothing changed.
+#
+#   deploy-guard run <target> -- <command...>
+#
+# A guarded command may run another guarded command (make deploy runs build and up): the inner run
+# sees the lock is held by its own parent (DEPLOY_GUARD_HELD) and neither takes nor releases it.
+#
+# Environment:
+#   DEPLOY_BY            who is deploying (a session or person name); logged. Default: the login user.
+#   SKIP_IF_UNCHANGED=1  skip the command when the tree matches the last stamped deploy.
+#   STAMP_ON_SUCCESS=1   record the tree fingerprint after the command succeeds.
+#   REQUIRE_IMAGE=<ref>  with SKIP_IF_UNCHANGED, only skip while this docker image still exists.
+#   FORCE=1              never skip.
+#   DEPLOY_LOCK_DIR, DEPLOY_LOG, DEPLOY_STAMP, DEPLOY_REPO  override the default paths (tests).
+#
+# Exit status: the command's; 75 when another deploy holds the lock; 76 when the checkout changed while a
+# STAMP_ON_SUCCESS command ran (the result is stale, so nothing downstream should use it).
+set -eu
+# The log, stamp and lock are shared by everyone who deploys from this checkout.
+umask 0002
+
+DIR=$(cd "$(dirname "$0")/.." && pwd)
+REPO="${DEPLOY_REPO:-$(cd "$DIR/.." && pwd)}"
+LOCK="${DEPLOY_LOCK_DIR:-$DIR/.deploy.lock}"
+CLAIM="$LOCK.claim"
+LOG="${DEPLOY_LOG:-$DIR/.deploy.log}"
+STAMP="${DEPLOY_STAMP:-$DIR/.deploy.stamp}"
+WHO=$(id -un 2>/dev/null || id -u)
+BY="${DEPLOY_BY:-$WHO}"
+
+hash_stdin() {
+    if command -v sha256sum >/dev/null 2>&1; then sha256sum; else shasum -a 256; fi | cut -d' ' -f1
+}
+
+# One "hash  path" line per untracked file, plus its mode, so file boundaries, names, contents and
+# permissions (an execute bit survives COPY into the image) are all part of the fingerprint.
+untracked_hashes() {
+    (
+        cd "$REPO"
+        if command -v sha256sum >/dev/null 2>&1; then
+            git ls-files -o --exclude-standard -z | xargs -0 sha256sum -- 2>/dev/null || true
+        else
+            git ls-files -o --exclude-standard -z | xargs -0 shasum -a 256 -- 2>/dev/null || true
+        fi
+        # Symlinks are hashed and statted through to their target above; also record where each points.
+        git ls-files -o --exclude-standard -z | xargs -0 -n1 sh -c 'if [ -L "$1" ]; then printf "link %s -> %s\n" "$1" "$(readlink "$1")"; fi' _ 2>/dev/null || true
+        if stat -c '%a %n' . >/dev/null 2>&1; then
+            git ls-files -o --exclude-standard -z | xargs -0 stat -c '%a %n' -- 2>/dev/null || true
+        else
+            git ls-files -o --exclude-standard -z | xargs -0 stat -f '%Lp %N' 2>/dev/null || true
+        fi
+    )
+}
+
+# HEAD plus uncommitted changes plus every untracked file with its own content hash: the image bakes
+# the working tree.
+fingerprint() {
+    head=$(git -C "$REPO" rev-parse HEAD)
+    diff=$(git -C "$REPO" diff HEAD | hash_stdin)
+    untracked=$(untracked_hashes | hash_stdin)
+    echo "$head $diff $untracked"
+}
+
+log() {
+    printf '%s %s by=%s user=%s head=%s %s\n' "$(date -u '+%Y-%m-%dT%H:%M:%SZ')" "$1" "$BY" "$WHO" \
+        "$(git -C "$REPO" rev-parse --short HEAD 2>/dev/null || echo unknown)" "${2:-}" >>"$LOG"
+}
+
+# The lock is a symlink whose target text is the owner (pid, who, what, since). Creating a symlink is
+# atomic and carries its content from the first instant, so there is never a lock without an owner.
+lock_info() {
+    readlink "$LOCK" 2>/dev/null || true
+}
+
+info_pid() {
+    printf '%s' "$1" | sed -n 's/^pid=\([0-9][0-9]*\).*/\1/p'
+}
+
+# `ps -p` works for another user's process too; `kill -0` fails with EPERM there and would make a live
+# owner look dead.
+# When a process started, with spaces turned into underscores; empty if the process does not exist.
+process_start() {
+    ps -o lstart= -p "$1" 2>/dev/null | tr -s ' ' '_' | tr -d '\n'
+}
+
+# True while the lock owner described by $1 (the lock text) is still the same process: its pid exists
+# and, when the lock recorded a start time, it started then. A reused pid has a different start time.
+owner_alive() {
+    pid=$(info_pid "$1")
+    [ -n "$pid" ] || return 1
+    ps -p "$pid" >/dev/null 2>&1 || return 1
+    recorded=$(printf '%s' "$1" | sed -n 's/.* start=\([^ ]*\).*/\1/p')
+    [ -z "$recorded" ] || [ "$recorded" = "$(process_start "$pid")" ]
+}
+
+release() {
+    rm -f "$LOCK"
+}
+
+busy() {
+    echo "deploy-guard: another deploy is running ($1); leaving the stack alone." >&2
+    exit 75
+}
+
+# Take the lock. A lock whose owner has died is removed under a short-lived claim directory, and only
+# if it still holds the dead owner's text, so two sessions that see the same stale lock cannot remove
+# each other's fresh one.
+acquire() {
+    target=$1
+    info="pid=$$ by=$BY target=$target since=$(date -u '+%Y-%m-%dT%H:%M:%SZ') start=$(process_start "$$")"
+    attempts=0
+    while [ "$attempts" -lt 10 ]; do
+        attempts=$((attempts + 1))
+        if ln -sn "$info" "$LOCK" 2>/dev/null; then
+            return 0
+        fi
+
+        seen=$(lock_info)
+        if owner_alive "$seen"; then
+            busy "$seen"
+        fi
+
+        if mkdir "$CLAIM" 2>/dev/null; then
+            now=$(lock_info)
+            if [ -n "$now" ] && [ "$now" = "$seen" ] && ! owner_alive "$now"; then
+                echo "deploy-guard: removing a stale lock" >&2
+                rm -rf "$LOCK"
+            fi
+            rmdir "$CLAIM" 2>/dev/null || true
+        else
+            # Someone else is clearing it. A claim older than a minute was left by a crashed process.
+            if [ -n "$(find "$CLAIM" -maxdepth 0 -mmin +1 2>/dev/null)" ]; then
+                rmdir "$CLAIM" 2>/dev/null || true
+            else
+                sleep 0.3
+            fi
+        fi
+    done
+    busy "$(lock_info)"
+}
+
+unchanged() {
+    [ "${FORCE:-0}" != 1 ] || return 1
+    [ "${SKIP_IF_UNCHANGED:-0}" = 1 ] || return 1
+    [ -f "$STAMP" ] || return 1
+    [ "$(cat "$STAMP")" = "$(fingerprint)" ] || return 1
+    if [ -n "${REQUIRE_IMAGE:-}" ]; then
+        docker image inspect "$REQUIRE_IMAGE" >/dev/null 2>&1 || return 1
+    fi
+}
+
+cmd_run() {
+    [ "$#" -ge 3 ] || { echo "usage: deploy-guard run <target> -- <command...>" >&2; exit 64; }
+    target=$1
+    shift
+    [ "$1" = -- ] && shift
+
+    if [ -n "${DEPLOY_GUARD_HELD:-}" ] && [ "$(info_pid "$(lock_info)")" = "$DEPLOY_GUARD_HELD" ] && owner_alive "$(lock_info)"; then
+        : # Our parent guard holds the lock; it also releases it.
+    else
+        acquire "$target"
+        trap release EXIT
+        trap 'exit 130' INT TERM
+        DEPLOY_GUARD_HELD=$$
+        export DEPLOY_GUARD_HELD
+    fi
+
+    if unchanged; then
+        log "$target" "result=skipped (nothing changed since the last deploy; FORCE=1 to override)"
+        echo "deploy-guard: nothing changed since the last $target; skipping (FORCE=1 to override)."
+        exit 0
+    fi
+
+    log "$target" "result=started"
+    # The tree that goes into the build is the one fingerprinted now. Stamp it afterwards only if the
+    # shared checkout did not change in the meantime; otherwise the image holds older bytes than the stamp.
+    before=$(fingerprint)
+    if "$@"; then rc=0; else rc=$?; fi
+    if [ "$rc" -eq 0 ] && [ "${STAMP_ON_SUCCESS:-0}" = 1 ]; then
+        if [ "$(fingerprint)" = "$before" ]; then
+            printf '%s\n' "$before" >"$STAMP"
+        else
+            rm -f "$STAMP"
+            log "$target" "result=tree-changed-during-run (not stamped; the next build will run)"
+            echo "deploy-guard: the checkout changed while $target ran, so what was built is already out of date; not deploying it. Run again." >&2
+            rc=76
+        fi
+    fi
+    log "$target" "result=finished rc=$rc"
+    exit "$rc"
+}
+
+case "${1:-}" in
+    run) shift; cmd_run "$@" ;;
+    *) echo "usage: deploy-guard run <target> -- <command...>" >&2; exit 64 ;;
+esac

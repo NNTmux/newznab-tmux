@@ -57,3 +57,7 @@ docker/config/app.env
 docker/config/usenet_servers.json
 docker/docs/
 docker/app/nzb-yenc-ffi/target/
+docker/.deploy.lock
+docker/.deploy.lock.claim
+docker/.deploy.log
+docker/.deploy.stamp

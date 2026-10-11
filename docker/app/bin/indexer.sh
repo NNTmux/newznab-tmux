@@ -7,7 +7,7 @@ cd /app
 
 SESSION="${TMUX_SESSION_NAME:-nntmux}"
 INTERVAL="${INDEXER_HEALTH_INTERVAL:-30}"
-MAX_FAILURES="${INDEXER_MAX_FAILURES:-5}"
+MAX_FAILURES="${INDEXER_MAX_FAILURES:-10}"
 
 # Docker signals invoke this callback; it is not reached by the main loop.
 # shellcheck disable=SC2317

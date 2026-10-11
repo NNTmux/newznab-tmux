@@ -51,3 +51,7 @@ Dockerfile		-binary text
 /deploy/** -binary text eol=lf
 .env.example -binary text eol=lf
 /tests/Fixtures/rapidyenc-abi.c -binary text eol=lf
+
+# Reviewable, mergeable text despite the repository-wide `* binary` default
+docker/bin/deploy-guard	-binary text eol=lf
+docker/Makefile		-binary text eol=lf

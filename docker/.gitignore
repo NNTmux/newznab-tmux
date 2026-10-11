@@ -1,0 +1,5 @@
+# Written by bin/deploy-guard
+.deploy.lock
+.deploy.lock.claim/
+.deploy.log
+.deploy.stamp

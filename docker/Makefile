@@ -39,10 +39,24 @@ perms: dirs ## Linux hosts: let the app containers' user (33:33) use their bind 
 			'chown -R 33:33 /stack/data/storage /stack/data/install && chown $(shell id -u):33 /stack/config/app.env && chmod 0640 /stack/config/app.env'; \
 	fi
 
+# Deploys (build, up) share one stack, so they go through bin/deploy-guard: one at a time, logged to
+# .deploy.log with DEPLOY_BY, and a rebuild is skipped while nothing changed (FORCE=1 overrides).
+DEPLOY_BY ?=
+GUARD     := DEPLOY_BY="$(DEPLOY_BY)" $(CURDIR)/bin/deploy-guard
+
 .PHONY: build
-build: ## Build nntmux/base:local (root Dockerfile) and nntmux/app:local (overlay)
+build: ## Build nntmux/base:local and nntmux/app:local; skipped when nothing changed (FORCE=1, DEPLOY_BY=name)
+	@SKIP_IF_UNCHANGED=1 STAMP_ON_SUCCESS=1 REQUIRE_IMAGE=nntmux/app:local FORCE="$(FORCE)" \
+		$(GUARD) run build -- $(MAKE) --no-print-directory -C $(CURDIR) build-images
+
+.PHONY: build-images
+build-images:
 	docker build -t nntmux/base:local -f $(REPO)/Dockerfile $(REPO)
 	docker build -t nntmux/app:local -f $(CURDIR)/app/Dockerfile $(REPO)
+
+.PHONY: deploy
+deploy: ## Build when changed, then start/recreate the stack, under one lock (DEPLOY_BY=name)
+	@FORCE="$(FORCE)" $(GUARD) run deploy -- sh -c '$(MAKE) --no-print-directory -C $(CURDIR) build && $(MAKE) --no-print-directory -C $(CURDIR) up'
 
 .PHONY: init
 init: env dirs build ## First-time install: build, migrate+seed, indexes, groups, tuning, predb seed, start
@@ -67,8 +81,8 @@ seed: seed-db ## Re-seed groups/tuning and restart the indexer to pick it up
 	$(DC) restart indexer
 
 .PHONY: up
-up: ## Start the whole stack
-	$(DC) up -d
+up: ## Start the whole stack (one deploy at a time; DEPLOY_BY=name)
+	@$(GUARD) run up -- $(DC) up -d
 
 .PHONY: down
 down: ## Stop the stack (tmux session stops cleanly)

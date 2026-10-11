@@ -150,6 +150,15 @@ find app -name "*.php" | xargs php -l  # PHP syntax lint on all changed files
 
 Auto-runs: PHP lint, Composer lock validation, Pint formatting. Commit limits: 200 char subject, 72 char body.
 
+## Docker deploys (shared stack)
+
+Every session that works in this repo shares one checkout and one `docker/` compose project, and `make build` followed by `make up` recreates `web`, `horizon`, `scheduler` and `indexer` together, which also restarts the tmux engine and every IRC scraper.
+
+- **Only one session deploys.** Feature sessions run tests and open PRs; they do not run `make build`, `make up`, `make deploy` or `make restart`. The deploying session batches merged PRs, then deploys once.
+- Deploy with `make -C docker deploy DEPLOY_BY=<session name>`. `bin/deploy-guard` allows one deploy at a time (`docker/.deploy.lock`; the second one exits with status 75), appends who deployed what to `docker/.deploy.log`, and skips the rebuild while nothing changed since the last deploy (`FORCE=1` overrides).
+- If a deploy is refused because another is running, wait for it to finish; never delete the lock unless its `pid` is dead (the guard already clears a stale lock).
+- Fix a single service with `make -C docker restart s=<service>`, not a full rebuild.
+
 ## Git (agents never commit or push)
 
 - **Never run `git commit` or `git push`** (including `--amend`, tags, or force pushes), even when a task looks finished. The maintainer reviews, commits, and pushes.
