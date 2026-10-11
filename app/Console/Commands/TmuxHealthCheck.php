@@ -113,7 +113,8 @@ class TmuxHealthCheck extends Command
             }
 
             $heartbeat = (new TmuxPaneManager($this->sessionName))->heartbeatTime();
-            $maximumAge = max(60, 6 * (int) config('tmux.monitor.delay', 10));
+            // The monitor beats once per loop and then sleeps for its delay, so a healthy heartbeat is at least that old.
+            $maximumAge = max(1, (int) config('tmux.monitor.heartbeat_max_age', 180), (int) config('tmux.monitor.delay', 10) + 15);
             if ($heartbeat !== null && time() - $heartbeat > $maximumAge) {
                 $this->logHealthCheck('warning', 'monitor_heartbeat_stale');
                 $this->warn('Monitor heartbeat is stale; its active pane was preserved.');

@@ -154,6 +154,8 @@ return [
     'monitor' => [
         'delay' => env('TMUX_MONITOR_DELAY', 10),
         'refresh_interval' => env('TMUX_REFRESH_INTERVAL', 60),
+        // Seconds the monitor loop may go without beating before `tmux:health-check` calls it stale.
+        'heartbeat_max_age' => (int) env('TMUX_HEARTBEAT_MAX_AGE', 180),
     ],
 
     'performance' => [

@@ -174,6 +174,31 @@ class TmuxHealthCheckCommandTest extends TestCase
         Process::assertNotRan(fn (PendingProcess $process): bool => $this->isTmuxCommand($process, 'respawn-pane') || $this->isTmuxCommand($process, 'kill-session'));
     }
 
+    public function test_a_slow_monitor_loop_within_the_heartbeat_tolerance_is_healthy(): void
+    {
+        ConfigurationTestBuilder::updateRuntime(['tmux_running' => true]);
+        $this->fakeExistingMonitor(dead: false, heartbeat: time() - 90);
+        $this->artisan('tmux:health-check --auto-restart --session=custom-session')->assertExitCode(0);
+    }
+
+    public function test_the_heartbeat_tolerance_is_configurable(): void
+    {
+        // Below the old 60-second floor: a 45-second-old heartbeat must now be stale.
+        config(['tmux.monitor.heartbeat_max_age' => 30]);
+        ConfigurationTestBuilder::updateRuntime(['tmux_running' => true]);
+        $this->fakeExistingMonitor(dead: false, heartbeat: time() - 45);
+        $this->artisan('tmux:health-check --auto-restart --session=custom-session')->assertExitCode(1);
+    }
+
+    public function test_the_heartbeat_limit_never_drops_below_the_monitor_delay(): void
+    {
+        // A 300-second delay means a healthy heartbeat is up to 300 seconds old between beats.
+        config(['tmux.monitor.delay' => 300]);
+        ConfigurationTestBuilder::updateRuntime(['tmux_running' => true]);
+        $this->fakeExistingMonitor(dead: false, heartbeat: time() - 250);
+        $this->artisan('tmux:health-check --auto-restart --session=custom-session')->assertExitCode(0);
+    }
+
     public function test_session_probe_reports_missing_even_when_stopped(): void
     {
         $this->fakeMissingSession();
