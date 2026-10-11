@@ -40,7 +40,7 @@ class CbpReleaseEligibilityTest extends TestCase
     protected function tearDown(): void
     {
         if ($this->ownsTables) {
-            foreach (['parts', 'binaries', 'collection_groups', 'collections'] as $table) {
+            foreach (['parts', 'binaries', 'collection_groups', 'collections', 'usenet_groups'] as $table) {
                 Schema::dropIfExists($table);
             }
         }
@@ -258,6 +258,43 @@ class CbpReleaseEligibilityTest extends TestCase
         };
         $this->assertLessThan($position('/from `parts`/'), $position('/from `binaries`.*for update/'));
         $this->assertLessThan($position('/count\(\*\) as currentfiles/'), $position('/from `collections`.*for update/'));
+    }
+
+    public function test_unwanted_collection_cleanup_deletes_every_batch_without_sorting(): void
+    {
+        Schema::create('usenet_groups', static function (Blueprint $table): void {
+            $table->increments('id');
+            $table->string('name');
+            $table->boolean('active')->default(true);
+            $table->bigInteger('minsizetoformrelease')->default(0);
+            $table->integer('minfilestoformrelease')->default(0);
+        });
+        DB::table('usenet_groups')->insert(['id' => 1, 'name' => 'alt.binaries.test', 'minsizetoformrelease' => 1000]);
+        if (DB::getDriverName() === 'sqlite') {
+            DB::connection()->getPdo()->sqliteCreateFunction('REGEXP', static fn (string $pattern, ?string $value): int => (int) preg_match('~'.$pattern.'~i', (string) $value));
+        }
+        $rows = [];
+        foreach (range(1, 501) as $i) {
+            $rows[] = ['groups_id' => 1, 'filecheck' => CollectionFileCheckStatus::Sized->value, 'filesize' => $i, 'totalfiles' => 2];
+        }
+        foreach (array_chunk($rows, 100) as $chunk) {
+            DB::table('collections')->insert($chunk);
+        }
+        $kept = DB::table('collections')->insertGetId(['groups_id' => 1, 'filecheck' => CollectionFileCheckStatus::Sized->value, 'filesize' => 104857600, 'totalfiles' => 2]);
+        $selects = [];
+        DB::listen(static function ($query) use (&$selects): void {
+            if (preg_match('/^\s*select\b.*\bfrom\s+[`"]?collections\b.*\blimit\b/is', $query->sql) === 1) {
+                $selects[] = strtolower($query->sql);
+            }
+        });
+
+        (new ReleaseProcessingService)->deleteUnwantedCollections(1);
+
+        $this->assertSame([$kept], DB::table('collections')->pluck('id')->map(static fn ($id): int => (int) $id)->all(), 'All 501 small collections are deleted across batches.');
+        $this->assertNotEmpty($selects);
+        foreach ($selects as $sql) {
+            $this->assertStringNotContainsString('order by', $sql);
+        }
     }
 
     private function process(?int $groupId): void

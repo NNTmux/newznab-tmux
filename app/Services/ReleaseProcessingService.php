@@ -989,7 +989,10 @@ final class ReleaseProcessingService
         $deleted = 0;
         $idColumn = $query instanceof \Illuminate\Database\Eloquent\Builder ? 'id' : 'c.id';
         do {
-            $ids = (clone $query)->orderBy($idColumn)->limit(self::BATCH_SIZE)->pluck($idColumn)->all();
+            // No ORDER BY: each batch deletes what it selected and the next query starts
+            // over, so order doesn't matter, and sorting by id made MariaDB walk the primary
+            // key through millions of pending collections instead of using a filecheck index.
+            $ids = (clone $query)->limit(self::BATCH_SIZE)->pluck($idColumn)->all();
             if ($ids === []) {
                 break;
             }
