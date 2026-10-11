@@ -455,6 +455,34 @@ class BinariesStorageInternalsTest extends TestCase
         yield 'retry limit exhausted' => [10];
     }
 
+    public function test_a_parent_row_deleted_mid_chunk_is_retried_and_logged_by_constraint(): void
+    {
+        $this->createHeaderStorageTables();
+        config(['app.debug' => false]);
+        Log::spy();
+        $attempts = 0;
+        $missingParent = static function (string $sql, array $bindings): QueryException {
+            $pdo = new \PDOException('SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row');
+            $pdo->errorInfo = ['23000', 1452, 'Cannot add or update a child row: a foreign key constraint fails (`nntmux`.`binaries`, CONSTRAINT `FK_Collections` FOREIGN KEY (`collections_id`) REFERENCES `collections` (`id`) ON DELETE CASCADE)'];
+
+            return new QueryException('mariadb', $sql, $bindings, $pdo);
+        };
+        DB::listen(static function (QueryExecuted $query) use (&$attempts, $missingParent): void {
+            if (str_starts_with($query->sql, 'insert or ignore into "binaries"') && ++$attempts <= 1) {
+                throw $missingParent($query->sql, $query->bindings);
+            }
+        });
+        $service = new HeaderStorageService($this->deterministicCollectionHandler(), config: new BinariesConfig);
+
+        $this->assertSame([], $service->store([$this->parsedHeader(1300, 1)], ['id' => 1, 'name' => 'alt.test'], true));
+        $this->assertSame(2, $attempts);
+        $this->assertSame(1, DB::table('parts')->count());
+        Log::shouldNotHaveReceived('error');
+
+        $context = (new \ReflectionMethod($service, 'constraintContext'))->invoke($service, $missingParent('INSERT INTO binaries ...', []));
+        $this->assertSame(['driver_code' => 1452, 'constraint' => 'FK_Collections'], $context);
+    }
+
     #[DataProvider('lockFailures')]
     public function test_transient_database_failures_retry_without_losing_failure_accounting(int $failures): void
     {

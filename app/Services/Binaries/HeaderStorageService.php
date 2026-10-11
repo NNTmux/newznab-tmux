@@ -118,14 +118,17 @@ final class HeaderStorageService
             }
 
             $attempt++;
-            if ($attempt >= self::LOCK_RETRY_MAX || ! $this->isTransientLockError($this->lastStorageException)) {
+            if ($attempt >= self::LOCK_RETRY_MAX || ! $this->isRetryableStorageError($this->lastStorageException)) {
                 if ($this->lastStorageException !== null) {
                     Log::error('Binary header storage chunk rolled back', [
                         'groups_id' => $groupMySQL['id'],
                         'article_count' => \count($headers),
                         'attempts' => $attempt,
-                        'reason' => $this->isTransientLockError($this->lastStorageException)
-                            ? 'Lock retries exhausted' : 'Storage failed',
+                        'reason' => match (true) {
+                            $this->isTransientLockError($this->lastStorageException) => 'Lock retries exhausted',
+                            $this->isMissingParentRow($this->lastStorageException) => 'Parent row retries exhausted',
+                            default => 'Storage failed',
+                        },
                         'exception' => $this->lastStorageException::class,
                         'code' => $this->lastStorageException->getCode(),
                         ...$this->constraintContext($this->lastStorageException),
@@ -154,8 +157,8 @@ final class HeaderStorageService
 
         $context = ['driver_code' => (int) ($exception->errorInfo[1] ?? 0)];
         $message = (string) ($exception->errorInfo[2] ?? '');
-        if (preg_match("/for key '([^']+)'|Column '([^']+)' cannot be null|constraint failed: (\\S+)/", $message, $match) === 1) {
-            $context['constraint'] = $match[1] !== '' ? $match[1] : (($match[2] ?? '') !== '' ? $match[2] : (string) ($match[3] ?? ''));
+        if (preg_match("/for key '([^']+)'|Column '([^']+)' cannot be null|constraint failed: (\\S+)|CONSTRAINT `([^`]+)`/", $message, $match) === 1) {
+            $context['constraint'] = (string) (array_values(array_filter(array_slice($match, 1), static fn (string $part): bool => $part !== ''))[0] ?? '');
         }
 
         return $context;
@@ -245,6 +248,23 @@ final class HeaderStorageService
     private function isTransientLockError(?\Throwable $exception): bool
     {
         return $exception !== null && SqlError::isTransientLock($exception);
+    }
+
+    /**
+     * Lock conflicts, and a collection or binary deleted by the releases or cleanup pass after this
+     * attempt resolved its id. A fresh attempt re-resolves (or recreates) the parent row.
+     */
+    private function isRetryableStorageError(?\Throwable $exception): bool
+    {
+        return $this->isTransientLockError($exception) || $this->isMissingParentRow($exception);
+    }
+
+    /**
+     * MySQL/MariaDB 1452: a child row's foreign key names a parent row that no longer exists.
+     */
+    private function isMissingParentRow(?\Throwable $exception): bool
+    {
+        return $exception instanceof QueryException && (int) ($exception->errorInfo[1] ?? 0) === 1452;
     }
 
     /**

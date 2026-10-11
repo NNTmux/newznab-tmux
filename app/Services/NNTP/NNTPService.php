@@ -1199,7 +1199,11 @@ class NNTPService extends NntpClient
             ? stream_context_create(streamSslContextOptions())
             : null;
 
-        $socket = stream_socket_client(
+        // A failed TLS handshake ("SSL: Handshake timed out") is reported as a PHP warning, which the
+        // framework turns into an exception that kills the worker. Silence it and report the failure
+        // through the normal NNTP error path below, keeping the warning text when errorString is empty.
+        error_clear_last();
+        $socket = @stream_socket_client(
             $transport.'://'.$host.':'.$port,
             $errorNumber,
             $errorString,
@@ -1208,6 +1212,9 @@ class NNTPService extends NntpClient
             $context
         );
         if ($socket === false) {
+            if ($errorString === '') {
+                $errorString = (string) (error_get_last()['message'] ?? '');
+            }
             $message = "Connection to $transport://$host:$port failed.";
             if (preg_match('/tls|ssl/', $transport)) {
                 $message .= ' Try disabling SSL/TLS, and/or try a different port.';

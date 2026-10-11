@@ -295,6 +295,18 @@ These bugs turned up while building and running the self-hosted stack in `docker
 - **Symptom:** `irc.efnet.org` resolves to ten servers. One of them (195.159.90.90) did not answer. PHP's `stream_socket_client()` tries a single resolved address, so the scraper failed with "Unable to connect" every time the dead one came first. The supervisor kept backing off, up to its maximum delay, while the other nine servers were reachable.
 - **Fix:** after the first attempt fails, the client resolves every address of the host and tries each in random order. A TLS connection by address still checks the certificate against the host name.
 
+### 40. Header storage chunks fail with foreign-key error 1452 when the releases pass deletes their parents (Fixed)
+
+- **Where:** `HeaderStorageService::storeChunk()` retried only lock conflicts.
+- **Symptom:** on 2026-10-11 at 01:06 UTC, 9 chunks in alt.binaries.boneless were rolled back within 3 seconds with SQLSTATE 23000, driver code 1452, on `binaries`/`parts`: a collection or binary resolved earlier in the attempt was deleted before the child insert.
+- **Fix (staged):** driver 1452 is now retried like a lock conflict, up to 10 attempts, and each attempt re-resolves or recreates the parents. The rollback log also records `driver_code` and `constraint`. Covered by `test_a_parent_row_deleted_mid_chunk_is_retried_and_logged_by_constraint`.
+
+### 41. A TLS handshake timeout while connecting to the provider kills the whole worker (Fixed)
+
+- **Where:** `NNTPService::connect()` (`app/Services/NNTP/NNTPService.php`) called `stream_socket_client()` unsilenced.
+- **Symptom:** `stream_socket_client(): SSL: Handshake timed out` became an `ErrorException` that bypassed `doConnect()`'s retry loop. Post-processing logged it for dozens of releases, and on 2026-10-11 at 01:01 UTC a `safe_binaries` worker exited with code 1 and failed its whole batch.
+- **Fix (staged):** the call is silenced and the failure is returned as an NNTP error, so the retry loop handles it. Covered by `NNTPServiceConnectFailureTest`, which fails without the fix.
+
 ## Issues in the docker/ stack itself (all fixed)
 
 | Issue | Fix |
