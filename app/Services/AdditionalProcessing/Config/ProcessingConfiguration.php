@@ -81,7 +81,44 @@ final readonly class ProcessingConfiguration
 
     public string|false $ffmpegPath;
 
+    public string|false $ffprobePath;
+
     public string|false $mediaInfoPath;
+
+    // Preview source settings
+    public bool $par2MediaMapping;
+
+    public int $par2IndexMaxSegments;
+
+    public int $par2VerifyFiles;
+
+    public bool $mediaArchiveSlicing;
+
+    public bool $mediaMainVideoFallback;
+
+    public bool $mediaMidSources;
+
+    public int $mediaMaxBytes;
+
+    public int $mediaSampleMaxBytes;
+
+    public int $mediaMidBytes;
+
+    public int $mediaMainVideoMinBytes;
+
+    public int $mediaImageMaxBytes;
+
+    public int $mediaStageMaxSeconds;
+
+    public int $mediaFfmpegTimeout;
+
+    public int $thumbnailFrameAttempts;
+
+    public float $thumbnailMinStddev;
+
+    public float $thumbnailMinLuma;
+
+    public float $thumbnailMaxLuma;
 
     // Timeout settings
     public int $releaseProcessingTimeout;
@@ -126,7 +163,25 @@ final readonly class ProcessingConfiguration
         $this->ffmpegDuration = (int) (app(ConfigurationProvider::class)->postProcessing()->ffmpegDuration ?: 5);
         $this->addPAR2Files = (bool) config('nntmux_settings.add_par2');
         $this->ffmpegPath = config('nntmux_settings.ffmpeg_path') ?: false;
+        $this->ffprobePath = self::resolveFfprobePath(config('nntmux_settings.ffprobe_path') ?: false, $this->ffmpegPath);
         $this->mediaInfoPath = config('nntmux_settings.mediainfo_path') ?: false;
+        $this->par2MediaMapping = (bool) config('nntmux.par2_media_mapping', true);
+        $this->par2IndexMaxSegments = max(1, (int) config('nntmux.par2_index_max_segments', 2));
+        $this->par2VerifyFiles = max(0, (int) config('nntmux.par2_verify_files', 2));
+        $this->mediaArchiveSlicing = (bool) config('nntmux.media_archive_slicing', true);
+        $this->mediaMainVideoFallback = (bool) config('nntmux.media_main_video_fallback', true);
+        $this->mediaMidSources = (bool) config('nntmux.media_mid_sources', false);
+        $this->mediaMaxBytes = max(0, (int) config('nntmux.media_max_bytes', 16777216));
+        $this->mediaSampleMaxBytes = max(1048576, (int) config('nntmux.media_sample_max_bytes', 8388608));
+        $this->mediaMidBytes = max(262144, (int) config('nntmux.media_mid_bytes', 3145728));
+        $this->mediaMainVideoMinBytes = max(0, (int) config('nntmux.media_main_video_min_bytes', 104857600));
+        $this->mediaImageMaxBytes = max(1048576, (int) config('nntmux.media_image_max_bytes', 8388608));
+        $this->mediaStageMaxSeconds = max(0, (int) config('nntmux.media_stage_max_seconds', 30));
+        $this->mediaFfmpegTimeout = max(1, (int) config('nntmux.media_ffmpeg_timeout', 30));
+        $this->thumbnailFrameAttempts = min(10, max(1, (int) config('nntmux.thumbnail_frame_attempts', 4)));
+        $this->thumbnailMinStddev = (float) config('nntmux.thumbnail_min_stddev', 12);
+        $this->thumbnailMinLuma = (float) config('nntmux.thumbnail_min_luma', 24);
+        $this->thumbnailMaxLuma = (float) config('nntmux.thumbnail_max_luma', 232);
         if (! $this->ffmpegPath) {
             $this->processAudioSample = false;
             $this->processThumbnails = false;
@@ -155,6 +210,25 @@ final readonly class ProcessingConfiguration
         $this->ignoreBookRegex = '/\\b(epub|lit|mobi|pdf|sipdf|html)\\b.*\\.rar(?!.{20,})/i';
         $this->supportFileRegex = '\\.(?:vol\\d{1,3}\\+\\d{1,3}|par2|srs|sfv|nzb)';
         $this->videoFileRegex = '\\.(AVI|F4V|IFO|M1V|M2V|M4V|MKV|MOV|MP4|MPEG|MPG|MPGV|MPV|OGV|QT|RM|RMVB|TS|VOB|WMV)';
+    }
+
+    /**
+     * Use the configured ffprobe, or the one installed next to ffmpeg.
+     */
+    public static function resolveFfprobePath(string|false $ffprobePath, string|false $ffmpegPath): string|false
+    {
+        if ($ffprobePath !== false && is_executable($ffprobePath)) {
+            return $ffprobePath;
+        }
+
+        if ($ffmpegPath !== false) {
+            $sibling = dirname($ffmpegPath).DIRECTORY_SEPARATOR.'ffprobe';
+            if (is_executable($sibling)) {
+                return $sibling;
+            }
+        }
+
+        return $ffprobePath;
     }
 
     /**

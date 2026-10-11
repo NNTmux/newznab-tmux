@@ -21,6 +21,39 @@ return [
     'archive_retry_delay' => (int) env('NN_ARCHIVE_RETRY_DELAY', 86400),
     // Files of an obfuscated multi-file release whose first segment is checked for an archive.
     'archive_probe_files' => (int) env('NN_ARCHIVE_PROBE_FILES', 3),
+    // Read the release's PAR2 index to find samples, videos and archives behind obfuscated names.
+    'par2_media_mapping' => (bool) env('NN_PAR2_MEDIA_MAPPING', true),
+    // Articles of the PAR2 index downloaded per release.
+    'par2_index_max_segments' => (int) env('NN_PAR2_INDEX_MAX_SEGMENTS', 2),
+    // Mapped files whose first article is checked against the PAR2 16 KiB hash.
+    'par2_verify_files' => (int) env('NN_PAR2_VERIFY_FILES', 2),
+    // Cut stored (uncompressed) videos out of downloaded RAR/ZIP volumes for previews.
+    'media_archive_slicing' => (bool) env('NN_MEDIA_ARCHIVE_SLICING', true),
+    // Take a preview from the main video file when the release has no sample.
+    'media_main_video_fallback' => (bool) env('NN_MEDIA_MAIN_VIDEO_FALLBACK', true),
+    // Also fetch a chunk from the middle of a video when its opening frames are unusable.
+    'media_mid_sources' => (bool) env('NN_MEDIA_MID_SOURCES', false),
+    // Extra bytes one release may download for preview sources.
+    'media_max_bytes' => (int) env('NN_MEDIA_MAX_BYTES', 16777216),
+    // Bytes of the start of a video handed to ffmpeg.
+    'media_sample_max_bytes' => (int) env('NN_MEDIA_SAMPLE_MAX_BYTES', 8388608),
+    // Bytes fetched from the middle of a video.
+    'media_mid_bytes' => (int) env('NN_MEDIA_MID_BYTES', 3145728),
+    // Smallest file treated as a main video rather than a sample.
+    'media_main_video_min_bytes' => (int) env('NN_MEDIA_MAIN_VIDEO_MIN_BYTES', 104857600),
+    // Largest posted image downloaded whole as a release's sample picture.
+    'media_image_max_bytes' => (int) env('NN_MEDIA_IMAGE_MAX_BYTES', 8388608),
+    // Seconds one release may spend on preview sources after the regular downloads.
+    'media_stage_max_seconds' => (int) env('NN_MEDIA_STAGE_MAX_SECONDS', 30),
+    // Seconds one ffmpeg or ffprobe call may run.
+    'media_ffmpeg_timeout' => (int) env('NN_MEDIA_FFMPEG_TIMEOUT', 30),
+    // Keyframes compared when choosing a preview frame.
+    'thumbnail_frame_attempts' => (int) env('NN_THUMBNAIL_FRAME_ATTEMPTS', 4),
+    // Frames with less brightness variation than this are treated as blank.
+    'thumbnail_min_stddev' => (float) env('NN_THUMBNAIL_MIN_STDDEV', 12),
+    // Frames darker or brighter on average than these limits are rejected.
+    'thumbnail_min_luma' => (float) env('NN_THUMBNAIL_MIN_LUMA', 24),
+    'thumbnail_max_luma' => (float) env('NN_THUMBNAIL_MAX_LUMA', 232),
     'stream_fork_output' => env('STREAM_FORK_OUTPUT', false),
     'cbp' => [
         // Bound the amount of header data retained and written in one transaction.

@@ -442,10 +442,16 @@ class ArchiveExtractionService
                 return [];
             }
 
+            $entries = self::completeStoredEntries($this->archiveInfo->getArchiveFileList());
+
             foreach ($filenames as $filename) {
+                if (! isset($entries[$filename])) {
+                    continue;
+                }
+
                 try {
                     $extracted = $this->archiveInfo->getFileData($filename);
-                    if ($extracted !== false && $extracted !== '') {
+                    if (is_string($extracted) && strlen($extracted) === $entries[$filename]) {
                         $extractedFiles[$filename] = $extracted;
                         $remaining = array_values(array_diff($remaining, [$filename]));
                     }
@@ -465,6 +471,35 @@ class ArchiveExtractionService
         }
 
         return $extractedFiles;
+    }
+
+    /**
+     * Entries whose bytes can be copied straight out of the downloaded data:
+     * stored, not encrypted, and wholly inside it.
+     *
+     * @param  array<int|string, mixed>  $files
+     * @return array<string, int> name => size
+     */
+    public static function completeStoredEntries(array $files): array
+    {
+        $entries = [];
+        foreach ($files as $file) {
+            if (! is_array($file) || ! isset($file['name'], $file['size'], $file['range'])
+                || ($file['source'] ?? 'main') !== 'main'
+                || ! empty($file['pass'])
+                || ! empty($file['is_dir'])
+                || ($file['compressed'] ?? null) !== 0
+            ) {
+                continue;
+            }
+
+            [$start, $end] = array_map(intval(...), explode('-', (string) $file['range'], 2) + [1 => -1]);
+            if ((int) $file['size'] > 0 && $end - $start + 1 === (int) $file['size']) {
+                $entries[(string) $file['name']] = (int) $file['size'];
+            }
+        }
+
+        return $entries;
     }
 
     private function extractSpecificFileWithExternalTools(

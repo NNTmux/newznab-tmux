@@ -160,6 +160,7 @@ class ProcessAdditionalGuid extends Command
                 ['Cache hits', (string) $result->downloadMetrics->cacheHits],
                 ['Bytes downloaded', (string) $result->downloadMetrics->bytesDownloaded],
                 ['Bytes reused', (string) $result->downloadMetrics->bytesReused],
+                ['Bytes for previews', (string) $result->downloadMetrics->mediaBytesDownloaded],
             ]);
         }
 

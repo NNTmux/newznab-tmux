@@ -9,6 +9,7 @@ use App\Services\Yenc\NativePayloadDecoder;
 use App\Services\Yenc\PayloadDecoder;
 use App\Services\Yenc\PhpPayloadDecoder;
 use App\Services\Yenc\RawPayloadDecoder;
+use App\Services\Yenc\YencPart;
 use RuntimeException;
 
 class YencService
@@ -75,6 +76,34 @@ class YencService
         }
 
         return $text;
+    }
+
+    /**
+     * Decode leniently like decodeIgnore(), also returning what the yEnc header says about the file.
+     *
+     * @return array{0: string, 1: YencPart|null}
+     */
+    public function decodeWithFrame(string $text): array
+    {
+        $frame = ArticleFrame::parse($text);
+        if ($frame === null) {
+            return [$text, null];
+        }
+
+        $slice = $this->payloadSlice($text, $frame);
+        $decoded = $this->hasDanglingEscape($slice)
+            ? (new PhpPayloadDecoder)->decode($this->stripLineEndings($slice))
+            : $this->decodePayload($slice);
+
+        $part = new YencPart(
+            name: trim($frame->header['name']),
+            size: $this->metadataNumber($frame->header['size']) ?? 0,
+            part: isset($frame->header['part']) ? $this->metadataNumber($frame->header['part']) : null,
+            begin: isset($frame->part['begin']) ? $this->metadataNumber($frame->part['begin']) : null,
+            end: isset($frame->part['end']) ? $this->metadataNumber($frame->part['end']) : null,
+        );
+
+        return [$decoded, $part];
     }
 
     public function enabled(): bool

@@ -257,4 +257,24 @@ class YencServiceTest extends TestCase
         $this->assertNull($decoder->receivedRaw);
         $this->assertSame('klm=M', $decoder->receivedStripped);
     }
+
+    public function test_decode_with_frame_reports_where_a_part_sits_in_its_file(): void
+    {
+        $article = YencArticles::part('second part bytes', 'Movie.2024.mkv', 1000, 2, 101, 10);
+
+        [$data, $part] = $this->yencService->decodeWithFrame($article);
+
+        $this->assertSame('second part bytes', $data);
+        $this->assertNotNull($part);
+        $this->assertSame('Movie.2024.mkv', $part->name);
+        $this->assertSame(1000, $part->size);
+        $this->assertSame(2, $part->part);
+        $this->assertSame(100, $part->offset());
+        $this->assertSame(17, $part->length());
+    }
+
+    public function test_decode_with_frame_returns_unframed_text_unchanged(): void
+    {
+        $this->assertSame(['plain body', null], $this->yencService->decodeWithFrame('plain body'));
+    }
 }

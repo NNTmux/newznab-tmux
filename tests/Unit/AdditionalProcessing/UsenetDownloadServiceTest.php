@@ -5,6 +5,8 @@ namespace Tests\Unit\AdditionalProcessing;
 use App\Services\AdditionalProcessing\Enums\DownloadKind;
 use App\Services\AdditionalProcessing\UsenetDownloadService;
 use App\Services\NNTP\NNTPService;
+use App\Services\Yenc\YencPart;
+use DariusIII\NetNntp\Error as NntpError;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -162,5 +164,74 @@ class UsenetDownloadServiceTest extends TestCase
 
         $this->assertFalse($service->meetsMinimumSize(str_repeat('a', 40)));
         $this->assertTrue($service->meetsMinimumSize(str_repeat('a', 41)));
+    }
+
+    #[Test]
+    public function it_downloads_one_article_with_its_yenc_part_and_counts_it_as_preview_traffic(): void
+    {
+        $part = new YencPart('Movie.mkv', 5000, 2, 1001, 2000);
+        $nntp = Mockery::mock(NNTPService::class);
+        $nntp->shouldReceive('getArticleByMessageID')
+            ->twice()
+            ->with('<article>', false)
+            ->andReturn(['data' => 'ARTICLE', 'part' => $part]);
+
+        $service = new UsenetDownloadService($this->makeConfig(), $nntp);
+        $service->beginReleaseScope();
+
+        $result = $service->downloadArticle(DownloadKind::MediaSource, '<article>', 'alt.binaries.test', 10);
+        $again = $service->downloadArticle(DownloadKind::MediaSource, '<article>', 'alt.binaries.test', 10);
+        $metrics = $service->finishReleaseScope();
+
+        $this->assertTrue($result['success']);
+        $this->assertSame('ARTICLE', $result['data']);
+        $this->assertSame($part, $result['part']);
+        $this->assertSame('ARTICLE', $again['data'], 'articles are not cached, so the second call goes to the server');
+        $this->assertSame(2, $metrics->networkRequests);
+        $this->assertSame(14, $metrics->mediaBytesDownloaded);
+    }
+
+    #[Test]
+    public function it_reuses_a_cached_download_of_the_same_single_article(): void
+    {
+        $nntp = Mockery::mock(NNTPService::class);
+        $nntp->shouldReceive('getMessagesByMessageID')->once()->with(['<probe>'], false)->andReturn('PROBE-DATA');
+        $nntp->shouldNotReceive('getArticleByMessageID');
+
+        $service = new UsenetDownloadService($this->makeConfig(), $nntp);
+        $service->beginReleaseScope();
+        $service->download(DownloadKind::Compressed, ['<probe>'], 'alt.binaries.test', 10);
+
+        $result = $service->downloadArticle(DownloadKind::MediaSource, '<probe>', 'alt.binaries.test', 10);
+
+        $this->assertSame('PROBE-DATA', $result['data']);
+        $this->assertNull($result['part']);
+        $this->assertSame(1, $service->finishReleaseScope()->cacheHits);
+    }
+
+    #[Test]
+    public function it_reports_an_unavailable_group_while_downloading_an_article(): void
+    {
+        $nntp = Mockery::mock(NNTPService::class);
+        $nntp->shouldReceive('getArticleByMessageID')->once()->andReturn(new NntpError('411 No such news group'));
+
+        $result = (new UsenetDownloadService($this->makeConfig(), $nntp))->downloadArticle(DownloadKind::Par2Index, '<par2>');
+
+        $this->assertFalse($result['success']);
+        $this->assertTrue($result['groupUnavailable']);
+    }
+
+    #[Test]
+    public function it_keeps_uncached_downloads_out_of_the_release_cache(): void
+    {
+        $nntp = Mockery::mock(NNTPService::class);
+        $nntp->shouldReceive('getMessagesByMessageID')->twice()->with(['<mid>'], false)->andReturn('MID-DATA');
+
+        $service = new UsenetDownloadService($this->makeConfig(), $nntp);
+        $service->beginReleaseScope();
+        $service->download(DownloadKind::MediaSource, ['<mid>'], cache: false);
+        $service->download(DownloadKind::MediaSource, ['<mid>'], cache: false);
+
+        $this->assertSame(0, $service->finishReleaseScope()->cacheHits);
     }
 }

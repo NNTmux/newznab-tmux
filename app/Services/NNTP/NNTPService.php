@@ -6,6 +6,7 @@ namespace App\Services\NNTP;
 
 use App\Services\Configuration\ConfigurationProvider;
 use App\Services\Tmux\Tmux;
+use App\Services\Yenc\YencPart;
 use App\Services\YencService;
 use DariusIII\NetNntp\Client as NntpClient;
 use DariusIII\NetNntp\Error as NntpError;
@@ -753,7 +754,7 @@ class NNTPService extends NntpClient
      *
      * @throws \Exception
      */
-    protected function _getMessageByMessageID(mixed $identifier): mixed
+    protected function _getMessageByMessageID(mixed $identifier, bool $raw = false): mixed
     {
         // If numeric we cannot safely fetch without group context – delegate to existing path via error.
         if (is_numeric($identifier)) {
@@ -768,7 +769,43 @@ class NNTPService extends NntpClient
             return $this->_handleErrorResponse($response);
         }
 
-        return $this->readBody();
+        return $raw ? $this->readRawBody() : $this->readBody();
+    }
+
+    /**
+     * Fetch one article by Message-ID and decode it, keeping what its yEnc header says
+     * about the file it belongs to. Falls back to the alternate provider if enabled.
+     *
+     * @return array{data: string, part: YencPart|null}|NntpError
+     *
+     * @throws \Exception
+     */
+    public function getArticleByMessageID(string $identifier, bool $alternate = false): array|NntpError
+    {
+        $connected = $this->_checkConnection(false);
+        if ($connected !== true) {
+            return $connected instanceof NntpError ? $connected : $this->throwError('Unable to connect to usenet!');
+        }
+
+        $raw = $this->_getMessageByMessageID($identifier, true);
+        if (self::isError($raw) && $alternate) {
+            $alt = new self;
+            $altConnected = $this->_currentServer === $this->_configServer
+                ? $alt->doConnect($this->_configCompressedHeaders, true)
+                : $alt->doConnect();
+            if ($altConnected === true) {
+                $raw = $alt->_getMessageByMessageID($identifier, true);
+                $alt->doQuit();
+            }
+        }
+        if (! is_string($raw)) {
+            return $raw instanceof NntpError ? $raw : $this->throwError('Article could not be read.');
+        }
+
+        $this->_yencService ??= app(YencService::class);
+        [$data, $part] = $this->_yencService->decodeWithFrame($raw);
+
+        return ['data' => $data, 'part' => $part];
     }
 
     /**
@@ -1022,8 +1059,21 @@ class NNTPService extends NntpClient
         return $this->_handleErrorResponse($response);
     }
 
-    /** Read one dot-terminated BODY response, removing NNTP dot stuffing exactly once. */
+    /** Read one dot-terminated BODY response and yEnc decode it. */
     protected function readBody(): mixed
+    {
+        $body = $this->readRawBody();
+        if (! is_string($body)) {
+            return $body;
+        }
+
+        $this->_yencService ??= app(YencService::class);
+
+        return $this->_yencService->decodeIgnore($body);
+    }
+
+    /** Read one dot-terminated BODY response, removing NNTP dot stuffing exactly once. */
+    protected function readRawBody(): mixed
     {
         $body = '';
         $line = '';
@@ -1038,9 +1088,7 @@ class NNTPService extends NntpClient
                 continue;
             }
             if ($line === ".\r\n") {
-                $this->_yencService ??= app(YencService::class);
-
-                return $this->_yencService->decodeIgnore($body);
+                return $body;
             }
             $body .= str_starts_with($line, '..') ? substr($line, 1) : $line;
             $line = '';

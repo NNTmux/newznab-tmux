@@ -69,7 +69,7 @@ class ReleaseFilesArchiveFallbackTest extends TestCase
             ->andReturn(['cover.webp' => 'WEBP-DATA']);
 
         $media = Mockery::mock(MediaExtractionService::class);
-        $media->shouldReceive('isValidImage')->once()->andReturn(true);
+        $media->shouldReceive('isUsableImage')->once()->andReturn(true);
         $media->shouldReceive('getJPGSample')->once()->andReturn(true);
 
         $output = Mockery::mock(ConsoleOutputService::class);
@@ -87,6 +87,33 @@ class ReleaseFilesArchiveFallbackTest extends TestCase
         $fallback->processJpgFromArchiveFileList('ARCHIVE', [['name' => 'cover.webp', 'size' => 99]], $context);
 
         $this->assertTrue($context->foundJPGSample);
+    }
+
+    #[Test]
+    public function it_skips_passworded_images_and_tries_stored_complete_ones_first(): void
+    {
+        $archive = Mockery::mock(ArchiveExtractionService::class);
+        $archive->shouldReceive('extractSpecificFiles')
+            ->once()
+            ->with('ARCHIVE', ['small.jpg', 'large.jpg'], Mockery::type('string'))
+            ->andReturn([]);
+
+        $fallback = new ReleaseFilesArchiveFallback(
+            $archive,
+            Mockery::mock(MediaExtractionService::class),
+            Mockery::mock(UsenetDownloadService::class),
+            Mockery::mock(ReleaseFileManager::class),
+            Mockery::mock(ConsoleOutputService::class),
+        );
+
+        $context = $this->makeContext();
+        $fallback->processJpgFromArchiveFileList('ARCHIVE', [
+            ['name' => 'locked.jpg', 'size' => 900, 'pass' => 1, 'compressed' => 0, 'range' => '0-899'],
+            ['name' => 'large.jpg', 'size' => 500, 'pass' => 0, 'compressed' => 1, 'range' => '0-299'],
+            ['name' => 'small.jpg', 'size' => 100, 'pass' => 0, 'compressed' => 0, 'range' => '300-399'],
+        ], $context);
+
+        $this->assertFalse($context->foundJPGSample);
     }
 
     #[Test]

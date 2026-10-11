@@ -8,6 +8,13 @@ use App\Enums\ImageAssetProfile;
 use App\Models\Category;
 use App\Models\Release;
 use App\Services\AdditionalProcessing\Config\ProcessingConfiguration;
+use App\Services\AdditionalProcessing\DTO\MediaSourceHints;
+use App\Services\AdditionalProcessing\Enums\SourcePosition;
+use App\Services\AdditionalProcessing\Media\FfmpegFrameGrabber;
+use App\Services\AdditionalProcessing\Media\FrameQualityScorer;
+use App\Services\AdditionalProcessing\Media\ImageInspector;
+use App\Services\AdditionalProcessing\Media\MediaToolFactory;
+use App\Services\AdditionalProcessing\Media\ThumbnailFrameSelector;
 use App\Services\AdditionalProcessing\State\PersistenceMetricsCollector;
 use App\Services\AdditionalProcessing\State\ReleaseProcessingContext;
 use App\Services\Categorization\CategorizationService;
@@ -19,7 +26,6 @@ use FFMpeg\Coordinate\TimeCode;
 use FFMpeg\FFMpeg;
 use FFMpeg\FFProbe;
 use FFMpeg\Filters\Video\ResizeFilter;
-use FFMpeg\Format\Audio\Vorbis;
 use FFMpeg\Format\Video\Ogg;
 use FFMpeg\Media\Video;
 use Illuminate\Support\Facades\File;
@@ -32,9 +38,11 @@ use Mhor\MediaInfo\MediaInfo;
  */
 class MediaExtractionService
 {
-    private ?FFMpeg $ffmpeg = null;
+    private readonly MediaToolFactory $tools;
 
-    private ?FFProbe $ffprobe = null;
+    private readonly ThumbnailFrameSelector $frameSelector;
+
+    private readonly ImageInspector $imageInspector;
 
     private ?MediaInfo $mediaInfo = null;
 
@@ -46,71 +54,69 @@ class MediaExtractionService
         private readonly ReleaseExtraService $releaseExtra,
         private readonly CategorizationService $categorize,
         ?ReleaseSearchSyncCoordinator $searchSyncCoordinator = null,
+        ?MediaToolFactory $tools = null,
+        ?ThumbnailFrameSelector $frameSelector = null,
     ) {
         $this->searchSyncCoordinator = $searchSyncCoordinator
             ?? new ReleaseSearchSyncCoordinator(
                 new PersistenceMetricsCollector,
             );
+        $this->tools = $tools ?? new MediaToolFactory($config);
+        $scorer = new FrameQualityScorer($config->thumbnailMinStddev, $config->thumbnailMinLuma, $config->thumbnailMaxLuma);
+        $this->frameSelector = $frameSelector ?? new ThumbnailFrameSelector(
+            $config,
+            new FfmpegFrameGrabber($this->tools, $config->debugMode),
+            $scorer,
+        );
+        $this->imageInspector = new ImageInspector($scorer, $config->thumbnailMinStddev);
     }
 
     /**
-     * Get video time code for sample extraction.
+     * Read a file's duration in seconds from its container, or from its first video stream.
      */
-    public function getVideoTime(string $videoLocation): string
+    public function getMediaDuration(string $videoLocation): ?float
     {
         try {
             if (! $this->ffprobe()->isValid($videoLocation)) {
-                return '';
+                return null;
             }
-            $time = $this->ffprobe()->format($videoLocation)->get('duration');
+
+            $duration = $this->ffprobe()->format($videoLocation)->get('duration');
+            if (! is_numeric($duration) || (float) $duration <= 0) {
+                $duration = $this->ffprobe()->streams($videoLocation)->videos()->first()?->get('duration');
+            }
         } catch (\Throwable $e) {
             if ($this->config->debugMode) {
                 Log::debug($e->getMessage());
             }
 
-            return '';
+            return null;
         }
 
-        if (empty($time) || ! preg_match('/time=(\d{1,2}:\d{1,2}:)?(\d{1,2})\.(\d{1,2})\s*bitrate=/i', $time, $numbers)) {
-            return '';
-        }
-
-        if ($numbers[3] > 0) {
-            $numbers[3]--;
-        } elseif ($numbers[1] > 0) {
-            $numbers[2]--;
-            $numbers[3] = '99';
-        }
-
-        return '00:00:'.str_pad($numbers[2], 2, '0', STR_PAD_LEFT).'.'.str_pad($numbers[3], 2, '0', STR_PAD_LEFT);
+        return is_numeric($duration) && (float) $duration > 0 ? (float) $duration : null;
     }
 
     /**
-     * Extract a sample image from a video file.
+     * Extract a preview image from a video file, skipping blank frames.
      */
-    public function getSample(string $fileLocation, string $tmpPath, string $guid): bool
+    public function getSample(string $fileLocation, string $tmpPath, string $guid, ?MediaSourceHints $hints = null): bool
     {
         if (! $this->config->processThumbnails || ! File::isFile($fileLocation)) {
             return false;
         }
 
-        $fileName = $tmpPath.'zzzz'.random_int(5, 12).random_int(5, 12).'.jpg';
-        $time = $this->getVideoTime($fileLocation);
+        $workDirectory = $tmpPath.'frames_'.bin2hex(random_bytes(6)).'/';
 
         try {
-            if ($this->ffprobe()->isValid($fileLocation)) {
-                /** @var Video $video */
-                $video = $this->ffmpeg()->open($fileLocation);
-                $video->frame(TimeCode::fromString($time === '' ? '00:00:03:00' : $time))
-                    ->save($fileName);
-            }
-            if (! File::isFile($fileName)) {
+            File::ensureDirectoryExists($workDirectory);
+            $frame = $this->frameSelector->select($fileLocation, $workDirectory, $hints);
+            if ($frame === null) {
                 return false;
             }
 
             return $this->releaseImage->saveLocalImage(
                 $guid.'_thumb',
-                $fileName,
+                $frame,
                 $this->releaseImage->imgSavePath,
                 ImageAssetProfile::Preview,
             )->success;
@@ -121,79 +127,46 @@ class MediaExtractionService
 
             return false;
         } finally {
-            File::delete($fileName);
+            File::deleteDirectory($workDirectory);
         }
     }
 
     /**
      * Create a video sample clip.
+     *
+     * A complete file is clipped from 30% in; a partial download from its start,
+     * because only the start is known to be there.
      */
-    public function getVideo(string $fileLocation, string $tmpPath, string $guid): bool
+    public function getVideo(string $fileLocation, string $tmpPath, string $guid, ?MediaSourceHints $hints = null): bool
     {
-        if (! $this->config->processVideo || ! File::isFile($fileLocation)) {
+        if (! $this->config->processVideo || ! File::isFile($fileLocation) || $hints?->position === SourcePosition::Mid) {
             return false;
         }
 
         $fileName = $tmpPath.'zzzz'.$guid.'.ogv';
-        $newMethod = false;
 
-        // Try to get sample from end of video if duration is short
-        if ($this->config->ffmpegDuration < 60) {
-            $time = $this->getVideoTime($fileLocation);
-            if ($time !== '' && preg_match('/(\d{2}).(\d{2})/', $time, $numbers)) {
-                $newMethod = true;
-                if ($numbers[1] <= $this->config->ffmpegDuration) {
-                    $lowestLength = '00:00:00.00';
-                } else {
-                    $lowestLength = ($numbers[1] - $this->config->ffmpegDuration);
-                    $end = '.'.$numbers[2];
-                    $lowestLength = match (strlen((string) $lowestLength)) {
-                        1 => '00:00:0'.$lowestLength.$end,
-                        2 => '00:00:'.$lowestLength.$end,
-                        default => '00:00:60.00',
-                    };
+        try {
+            if ($this->ffprobe()->isValid($fileLocation)) {
+                $start = 0.0;
+                if ($hints?->position === SourcePosition::Complete) {
+                    $duration = $this->getMediaDuration($fileLocation) ?? 0.0;
+                    $start = max(0.0, min($duration * 0.3, $duration - $this->config->ffmpegDuration));
                 }
 
-                try {
-                    if ($this->ffprobe()->isValid($fileLocation)) {
-                        /** @var Video $video */
-                        $video = $this->ffmpeg()->open($fileLocation);
-                        $clip = $video->clip(
-                            TimeCode::fromString($lowestLength),
-                            TimeCode::fromSeconds($this->config->ffmpegDuration)
-                        );
-                        $format = new Ogg;
-                        $format->setAudioCodec('libvorbis');
-                        $clip->filters()->resize(new Dimension(320, -1), ResizeFilter::RESIZEMODE_SCALE_HEIGHT);
-                        $clip->save($format, $fileName);
-                    }
-                } catch (\Throwable $e) {
-                    if ($this->config->debugMode) {
-                        Log::error($e->getTraceAsString());
-                    }
-                }
+                /** @var Video $video */
+                $video = $this->ffmpeg()->open($fileLocation);
+                $clip = $video->clip(
+                    TimeCode::fromSeconds($start),
+                    TimeCode::fromSeconds($this->config->ffmpegDuration)
+                );
+                $format = new Ogg;
+                $format->setAudioCodec('libvorbis');
+                $clip->filters()->resize(new Dimension(320, -1), ResizeFilter::RESIZEMODE_SCALE_HEIGHT);
+                $clip->save($format, $fileName);
             }
-        }
-
-        // Fallback: use start of video
-        if (! $newMethod) {
-            try {
-                if ($this->ffprobe()->isValid($fileLocation)) {
-                    /** @var Video $video */
-                    $video = $this->ffmpeg()->open($fileLocation);
-                    $clip = $video->clip(
-                        TimeCode::fromSeconds(0),
-                        TimeCode::fromSeconds($this->config->ffmpegDuration)
-                    );
-                    $format = new Ogg;
-                    $format->setAudioCodec('libvorbis');
-                    $clip->filters()->resize(new Dimension(320, -1), ResizeFilter::RESIZEMODE_SCALE_HEIGHT);
-                    $clip->save($format, $fileName);
-                }
-            } catch (\Throwable $e) {
-                if ($this->config->debugMode) {
-                    Log::error($e->getTraceAsString());
-                }
+        } catch (\Throwable $e) {
+            if ($this->config->debugMode) {
+                Log::error($e->getTraceAsString());
             }
         }
 
@@ -368,10 +341,7 @@ class MediaExtractionService
 
             try {
                 if ($this->ffprobe()->isValid($fileLocation)) {
-                    $audioSample = $this->ffmpeg()->open($fileLocation);
-                    $format = new Vorbis;
-                    $audioSample->clip(TimeCode::fromSeconds(30), TimeCode::fromSeconds(30)); // @phpstan-ignore method.notFound
-                    $audioSample->save($format, $tmpPath.$audioFileName);
+                    $this->saveAudioClip($fileLocation, $tmpPath.$audioFileName);
                 }
             } catch (\Throwable $e) {
                 if ($this->config->debugMode) {
@@ -396,6 +366,27 @@ class MediaExtractionService
         }
 
         return $result;
+    }
+
+    /**
+     * Encode 30 seconds of a track as Ogg Vorbis, skipping the intro of anything over a minute.
+     */
+    public function saveAudioClip(string $fileLocation, string $outputFile): bool
+    {
+        $duration = $this->getMediaDuration($fileLocation) ?? 0.0;
+
+        $this->ffmpeg()->getFFMpegDriver()->command([
+            '-y',
+            '-ss', $duration > 60 ? '30' : '0',
+            '-t', '30',
+            '-i', $fileLocation,
+            '-vn',
+            '-c:a', 'libvorbis',
+            '-q:a', '4',
+            $outputFile,
+        ]);
+
+        return File::isFile($outputFile) && File::size($outputFile) > 0;
     }
 
     /**
@@ -452,6 +443,14 @@ class MediaExtractionService
     }
 
     /**
+     * Whether an image is complete, big enough to show something, and not blank.
+     */
+    public function isUsableImage(string $filePath): bool
+    {
+        return File::isFile($filePath) && $this->imageInspector->isUsable($filePath);
+    }
+
+    /**
      * Check if file is a valid image (JPEG or PNG).
      */
     public function isValidImage(string $filePath): bool
@@ -467,21 +466,12 @@ class MediaExtractionService
 
     private function ffmpeg(): FFMpeg
     {
-        if ($this->ffmpeg === null) {
-            $timeout = $this->config->timeoutSeconds > 0 ? $this->config->timeoutSeconds : 60;
-            $this->ffmpeg = FFMpeg::create(['timeout' => $timeout]);
-        }
-
-        return $this->ffmpeg;
+        return $this->tools->ffmpeg();
     }
 
     private function ffprobe(): FFProbe
     {
-        if ($this->ffprobe === null) {
-            $this->ffprobe = FFProbe::create();
-        }
-
-        return $this->ffprobe;
+        return $this->tools->ffprobe();
     }
 
     private function mediaInfo(): MediaInfo

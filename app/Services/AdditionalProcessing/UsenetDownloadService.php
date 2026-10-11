@@ -8,6 +8,7 @@ use App\Services\AdditionalProcessing\Config\ProcessingConfiguration;
 use App\Services\AdditionalProcessing\DTO\DownloadMetrics;
 use App\Services\AdditionalProcessing\Enums\DownloadKind;
 use App\Services\NNTP\NNTPService;
+use App\Services\Yenc\YencPart;
 use Exception;
 use Illuminate\Support\Facades\Log;
 
@@ -44,6 +45,8 @@ class UsenetDownloadService
 
     private int $bytesReused = 0;
 
+    private int $mediaBytesDownloaded = 0;
+
     public function __construct(
         private readonly ProcessingConfiguration $config,
         ?NNTPService $nntp = null
@@ -65,6 +68,7 @@ class UsenetDownloadService
             cacheHits: $this->cacheHits,
             bytesDownloaded: $this->bytesDownloaded,
             bytesReused: $this->bytesReused,
+            mediaBytesDownloaded: $this->mediaBytesDownloaded,
         );
 
         $this->clearReleaseScope();
@@ -123,10 +127,7 @@ class UsenetDownloadService
             if (is_object($binary) && method_exists($binary, 'getMessage')) {
                 $errorMessage = $binary->getMessage();
 
-                // Check for group unavailability
-                if (stripos($errorMessage, 'No such news group') !== false
-                    || stripos($errorMessage, 'Group not found') !== false
-                ) {
+                if ($this->isGroupUnavailableMessage($errorMessage)) {
                     $result['groupUnavailable'] = true;
                     $result['error'] = 'Group unavailable: '.$errorMessage;
 
@@ -162,6 +163,7 @@ class UsenetDownloadService
      * Download content for a specific processing step.
      *
      * @param  array<int|string, mixed>|string  $messageIDs
+     * @param  bool  $cache  false keeps the result out of the release cache
      * @return array{success: bool, data: string|null, groupUnavailable: bool, error: string|null}
      */
     public function download(
@@ -169,7 +171,8 @@ class UsenetDownloadService
         array|string $messageIDs,
         string $groupName = '',
         ?int $releaseId = null,
-        ?string $fileTitle = null
+        ?string $fileTitle = null,
+        bool $cache = true,
     ): array {
         $messageIdList = is_array($messageIDs) ? array_values($messageIDs) : [$messageIDs];
         $cacheKey = $this->downloadFingerprint($messageIdList, $groupName);
@@ -206,7 +209,12 @@ class UsenetDownloadService
         if ($this->releaseScopeActive && $result['success'] && is_string($result['data'])) {
             $byteSize = strlen($result['data']);
             $this->bytesDownloaded += $byteSize;
-            $this->rememberSuccessfulDownload($cacheKey, $result, $byteSize);
+            if ($kind->isPreviewSource()) {
+                $this->mediaBytesDownloaded += $byteSize;
+            }
+            if ($cache) {
+                $this->rememberSuccessfulDownload($cacheKey, $result, $byteSize);
+            }
         }
 
         if (! $result['success'] && $this->config->debugMode) {
@@ -222,6 +230,78 @@ class UsenetDownloadService
         }
 
         return $result;
+    }
+
+    /**
+     * Download one article together with what its yEnc header says about its file.
+     *
+     * A cached copy is reused, but the article is never added to the release cache,
+     * so the cache keeps room for the archives the fallbacks download again.
+     *
+     * @return array{success: bool, data: string|null, part: YencPart|null, groupUnavailable: bool, error: string|null}
+     */
+    public function downloadArticle(
+        DownloadKind $kind,
+        string $messageId,
+        string $groupName = '',
+        ?int $releaseId = null,
+    ): array {
+        $result = ['success' => false, 'data' => null, 'part' => null, 'groupUnavailable' => false, 'error' => null];
+        if ($messageId === '') {
+            $result['error'] = 'No message IDs provided';
+
+            return $result;
+        }
+
+        $cacheKey = $this->downloadFingerprint([$messageId], $groupName);
+        if ($this->releaseScopeActive) {
+            $this->logicalRequests++;
+
+            if (isset($this->releaseCache[$cacheKey])) {
+                $cached = $this->releaseCache[$cacheKey];
+                $this->cacheHits++;
+                $this->bytesReused += is_string($cached['data']) ? strlen($cached['data']) : 0;
+
+                return [...$cached, 'part' => null];
+            }
+
+            $this->networkRequests++;
+        }
+
+        $article = $this->nntp->getArticleByMessageID($messageId, $this->config->alternateNNTP);
+        if (! is_array($article) || $article['data'] === '') {
+            $errorMessage = is_array($article) ? null : $article->getMessage();
+            $result['groupUnavailable'] = $errorMessage !== null && $this->isGroupUnavailableMessage($errorMessage);
+            $result['error'] = $errorMessage ?? 'Download failed';
+
+            if ($this->config->debugMode) {
+                Log::debug('Article download failed', [
+                    'kind' => $kind->value,
+                    'release_id' => $releaseId,
+                    'request_fingerprint' => $cacheKey,
+                    'group' => $groupName,
+                    'error' => $result['error'],
+                ]);
+            }
+
+            return $result;
+        }
+
+        if ($this->releaseScopeActive) {
+            $byteSize = strlen($article['data']);
+            $this->bytesDownloaded += $byteSize;
+            if ($kind->isPreviewSource()) {
+                $this->mediaBytesDownloaded += $byteSize;
+            }
+        }
+
+        return [...$result, 'success' => true, 'data' => $article['data'], 'part' => $article['part']];
+    }
+
+    private function isGroupUnavailableMessage(string $errorMessage): bool
+    {
+        return stripos($errorMessage, 'No such news group') !== false
+            || stripos($errorMessage, 'Group not found') !== false;
     }
 
     /**
@@ -262,6 +342,7 @@ class UsenetDownloadService
         $this->cacheHits = 0;
         $this->bytesDownloaded = 0;
         $this->bytesReused = 0;
+        $this->mediaBytesDownloaded = 0;
     }
 
     /**

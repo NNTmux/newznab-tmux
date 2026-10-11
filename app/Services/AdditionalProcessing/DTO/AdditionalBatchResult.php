@@ -153,6 +153,7 @@ final readonly class AdditionalBatchResult
         $cacheHits = 0;
         $bytesDownloaded = 0;
         $bytesReused = 0;
+        $mediaBytesDownloaded = 0;
 
         foreach ($this->results as $result) {
             if ($result->downloadMetrics === null) {
@@ -164,6 +165,7 @@ final readonly class AdditionalBatchResult
             $cacheHits += $result->downloadMetrics->cacheHits;
             $bytesDownloaded += $result->downloadMetrics->bytesDownloaded;
             $bytesReused += $result->downloadMetrics->bytesReused;
+            $mediaBytesDownloaded += $result->downloadMetrics->mediaBytesDownloaded;
         }
 
         return new DownloadMetrics(
@@ -172,6 +174,7 @@ final readonly class AdditionalBatchResult
             cacheHits: $cacheHits,
             bytesDownloaded: $bytesDownloaded,
             bytesReused: $bytesReused,
+            mediaBytesDownloaded: $mediaBytesDownloaded,
         );
     }
 
