@@ -235,11 +235,6 @@ final class ReleaseProcessingService
 
         // Phase 1: Collection processing
         $this->outputHeader('Phase 1: Collection Processing');
-        $this->processIncompleteCollections($normalizedGroupId);
-        $this->processCollectionSizes($normalizedGroupId);
-
-        // Phase 2: Release creation loop
-        $this->outputHeader('Phase 2: Release Creation');
         $totals = $this->runReleaseCreationLoop($normalizedGroupId, $categorize, $postProcess, $nntp);
 
         // Phase 3: Cleanup
@@ -270,7 +265,7 @@ final class ReleaseProcessingService
         int $postProcess,
         NNTPService $nntp
     ): array {
-        return $this->processReleaseCreationBatches(
+        return $this->processCollectionsAndReleases(
             $normalizedGroupId,
             fn () => $this->categorizeReleases($categorize, $normalizedGroupId),
             function () use ($postProcess, $nntp, $normalizedGroupId): void {
@@ -377,26 +372,11 @@ final class ReleaseProcessingService
                 break;
             }
             $totals['iterations']++;
-            $rejectedIds = $this->deleteUnwantedCollections($normalizedGroupId, $windowIds);
-            $allowedIds = array_values(array_diff($windowIds, $rejectedIds));
-
-            // Index each release once per pass, in bulk, instead of at creation, for its NZB
-            // and again after categorization.
-            [$result, $nzbFilesAdded] = app(SearchService::class)->deferReleaseUpdates(function () use ($normalizedGroupId, $allowedIds, $afterCreation): array {
-                $pass = $this->createReleasesAndNzbs($normalizedGroupId, $allowedIds);
-                if ($afterCreation !== null) {
-                    $afterCreation();
-                }
-
-                return $pass;
-            });
+            [$result, $nzbFilesAdded] = $this->processReleaseCollectionWindow($normalizedGroupId, $windowIds, $afterCreation, $afterPass);
             $totals['releases'] += $result->added;
             $totals['dupes'] += $result->dupes;
             $totals['nzbs'] += $nzbFilesAdded;
 
-            if ($afterPass !== null) {
-                $afterPass();
-            }
             foreach ($windowIds as $id) {
                 $processedIds[$id] = true;
             }
@@ -412,6 +392,99 @@ final class ReleaseProcessingService
         } while ($shouldContinue);
 
         return $totals;
+    }
+
+    /**
+     * Drain ready collections before preparation, then consume each freshly reconciled
+     * page outside the downtime barrier. Sized rows never participate in downtime
+     * compensation or stuck cleanup, so they need not wait for either operation.
+     *
+     * @param  callable(): void|null  $afterCreation
+     * @param  callable(): void|null  $afterPass
+     * @return array{releases: int, nzbs: int, dupes: int, iterations: int}
+     */
+    public function processCollectionsAndReleases(
+        int|string|null $groupID,
+        ?callable $afterCreation = null,
+        ?callable $afterPass = null,
+    ): array {
+        $groupId = $this->normalizeGroupId($groupID);
+        $totals = $this->hasReleaseCreationWork($groupId)
+            ? $this->processReleaseCreationBatches($groupId, $afterCreation)
+            : ['releases' => 0, 'nzbs' => 0, 'dupes' => 0, 'iterations' => 0];
+        $windowSize = max(1, min(self::BATCH_SIZE, $this->settings->releaseCreationLimit));
+
+        $this->processIncompleteCollections($groupId, function (array $ids) use ($groupId, $windowSize, $afterCreation, &$totals): void {
+            foreach (array_chunk($ids, $windowSize) as $windowIds) {
+                $readyIds = Collection::query()->whereIn('id', $windowIds)
+                    ->where('filecheck', CollectionFileCheckStatus::CompleteParts->value)
+                    ->when($groupId !== null, static fn ($q) => $q->where('groups_id', $groupId))
+                    ->orderBy('id')->pluck('id')->map(static fn ($id): int => (int) $id)->all();
+                if ($readyIds === []) {
+                    continue;
+                }
+                Collection::query()->whereIn('id', $readyIds)
+                    ->where('filecheck', CollectionFileCheckStatus::CompleteParts->value)
+                    ->update(['filecheck' => CollectionFileCheckStatus::Sized->value]);
+                [$result, $nzbs] = $this->processReleaseCollectionWindow($groupId, $readyIds, $afterCreation, null);
+                $totals['releases'] += $result->added;
+                $totals['dupes'] += $result->dupes;
+                $totals['nzbs'] += $nzbs;
+                $totals['iterations']++;
+            }
+        });
+
+        // Preserve the final sweep for collections completed concurrently by ingestion,
+        // and the normal cursor/NZB retry behavior after preparation finishes.
+        $this->processCollectionSizes($groupId);
+        if ($this->hasReleaseCreationWork($groupId) || $totals['iterations'] === 0) {
+            $final = $this->processReleaseCreationBatches($groupId, $afterCreation);
+            foreach ($final as $key => $value) {
+                $totals[$key] += $value;
+            }
+        }
+        // Legacy callbacks perform retention cleanup across all collection states.
+        // Run them only once every preparation page has had a chance to reconcile,
+        // size and release its rows, including old CompleteParts outside compensation.
+        if ($afterPass !== null) {
+            for ($pass = 0; $pass < $totals['iterations']; $pass++) {
+                $afterPass();
+            }
+        }
+
+        return $totals;
+    }
+
+    private function hasReleaseCreationWork(?int $groupId): bool
+    {
+        return Collection::query()->where('filecheck', CollectionFileCheckStatus::Sized->value)
+            ->when($groupId !== null, static fn ($q) => $q->where('groups_id', $groupId))->exists()
+            || NzbCreationCandidateQuery::baseBuilder($groupId)->exists();
+    }
+
+    /**
+     * @param  list<int>  $windowIds
+     * @param  callable(): void|null  $afterCreation
+     * @param  callable(): void|null  $afterPass
+     * @return array{ReleaseCreationResult, int}
+     */
+    private function processReleaseCollectionWindow(?int $groupId, array $windowIds, ?callable $afterCreation, ?callable $afterPass): array
+    {
+        $rejectedIds = $this->deleteUnwantedCollections($groupId, $windowIds);
+        $allowedIds = array_values(array_diff($windowIds, $rejectedIds));
+        $pass = app(SearchService::class)->deferReleaseUpdates(function () use ($groupId, $allowedIds, $afterCreation): array {
+            $result = $this->createReleasesAndNzbs($groupId, $allowedIds);
+            if ($afterCreation !== null) {
+                $afterCreation();
+            }
+
+            return $result;
+        });
+        if ($afterPass !== null) {
+            $afterPass();
+        }
+
+        return $pass;
     }
 
     /** @return PriorityWindowState */
@@ -616,16 +689,18 @@ final class ReleaseProcessingService
     /**
      * Process incomplete collections to find complete ones.
      *
+     * @param  callable(list<int>): void|null  $afterReconciliation
+     *
      * @throws Throwable
      */
-    public function processIncompleteCollections(int|string|null $groupID): void
+    public function processIncompleteCollections(int|string|null $groupID, ?callable $afterReconciliation = null): void
     {
         $startTime = now()->toImmutable();
         $this->outputSubHeader('Finding Complete Collections');
 
         $normalizedGroupId = $this->normalizeGroupId($groupID);
         $this->processStuckCollections($normalizedGroupId ?? 0);
-        $this->reconcileIncompleteCollections($normalizedGroupId);
+        $this->reconcileIncompleteCollections($normalizedGroupId, $afterReconciliation);
 
         $count = $this->countCompleteCollections($normalizedGroupId);
         $this->outputStat('Complete collections found', $count);
@@ -670,8 +745,10 @@ final class ReleaseProcessingService
      * Reconcile only a bounded keyset page at a time. Stored parts are the
      * authority for binary counts/sizes; binary aggregates are then the
      * authority for collection readiness and filesize.
+     *
+     * @param  callable(list<int>): void|null  $afterReconciliation
      */
-    private function reconcileIncompleteCollections(?int $groupId): void
+    private function reconcileIncompleteCollections(?int $groupId, ?callable $afterReconciliation): void
     {
         $lastId = 0;
         $statuses = [
@@ -713,6 +790,9 @@ final class ReleaseProcessingService
                 break;
             }
             $lastId = (int) end($ids);
+            if ($afterReconciliation !== null) {
+                $afterReconciliation($ids);
+            }
         } while (\count($ids) === $this->binariesConfig->reconcileBatchSize);
     }
 

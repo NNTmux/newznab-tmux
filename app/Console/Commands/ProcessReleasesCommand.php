@@ -77,9 +77,7 @@ class ProcessReleasesCommand extends Command
      */
     private function processReleasesForGroup(string $groupID): void
     {
-        $this->releaseProcessingService->processIncompleteCollections($groupID);
-        $this->releaseProcessingService->processCollectionSizes($groupID);
-        $this->releaseProcessingService->processReleaseCreationBatches($groupID);
+        $this->releaseProcessingService->processCollectionsAndReleases($groupID);
 
         $this->releaseProcessingService->deleteCollections($groupID);
     }

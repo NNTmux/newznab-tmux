@@ -9,13 +9,17 @@ use App\Console\Commands\UpdatePerGroup;
 use App\Enums\CollectionFileCheckStatus;
 use App\Enums\ConfigurationDomain;
 use App\Models\Release;
+use App\Services\Binaries\BinariesConfig;
 use App\Services\CollectionCleanupService;
+use App\Services\NNTP\NNTPService;
 use App\Services\Nzb\NzbCreationCandidateQuery;
 use App\Services\Nzb\NzbService;
 use App\Services\ReleaseCleaningService;
 use App\Services\ReleaseCreationService;
 use App\Services\ReleaseProcessingService;
 use App\Services\Releases\ReleaseDuplicateFinder;
+use App\Services\Tmux\CollectionDowntimeCompensator;
+use App\Services\Tmux\CollectionReconciliationBarrier;
 use App\Support\Data\NzbCreationResult;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -445,12 +449,225 @@ class ReleaseCollectionWindowTest extends TestCase
         $this->assertSame([5, 9], DB::table('releases')->orderBy('id')->pluck('id')->all());
     }
 
-    private function service(WindowTestReleaseCreationService $creation, ?CollectionCleanupService $cleanup = null): ReleaseProcessingService
+    #[DataProvider('processingCommands')]
+    public function test_ready_releases_are_created_before_incomplete_collection_work(string $commandClass): void
+    {
+        $this->insertCollection(5);
+        $test = $this;
+        $this->app->instance(CollectionReconciliationBarrier::class, new class($test) implements CollectionReconciliationBarrier
+        {
+            public function __construct(private ReleaseCollectionWindowTest $test) {}
+
+            public function withReconciliationBarrier(int $delayHours, callable $work): mixed
+            {
+                $this->test->assertTrue(DB::table('releases')->where('id', 5)->exists(), 'Ready releases must not wait for cleanup or reconciliation.');
+
+                return $work();
+            }
+        });
+        $command = new $commandClass($this->service(new WindowTestReleaseCreationService));
+        $method = $command instanceof ProcessReleasesCommand ? 'processReleasesForGroup' : 'processReleases';
+        (new ReflectionMethod($command, $method))->invoke($command, '1');
+
+        $this->assertSame(1, DB::table('releases')->where('id', 5)->value('nzbstatus'));
+    }
+
+    public function test_reconciled_pages_create_releases_outside_the_barrier_before_the_next_page(): void
+    {
+        foreach ([1, 2, 3] as $id) {
+            $this->insertCollection($id);
+            DB::table('collections')->where('id', $id)->update(['filecheck' => 2]);
+            DB::table('parts')->insert(['binaries_id' => $id, 'size' => 5000]);
+        }
+        $barrier = new class($this) implements CollectionReconciliationBarrier
+        {
+            public bool $locked = false;
+
+            private int $pages = 0;
+
+            public function __construct(private ReleaseCollectionWindowTest $test) {}
+
+            public function withReconciliationBarrier(int $delayHours, callable $work): mixed
+            {
+                if ($this->pages++ >= 2) {
+                    $this->test->assertTrue(DB::table('releases')->where('id', 1)->exists(), 'The first reconciled page must create releases before the next page starts.');
+                }
+                $this->locked = true;
+                try {
+                    return $work();
+                } finally {
+                    $this->locked = false;
+                }
+            }
+        };
+        $this->app->instance(CollectionReconciliationBarrier::class, $barrier);
+        $totals = $this->service(new WindowTestReleaseCreationService, binariesConfig: new BinariesConfig(reconcileBatchSize: 2))
+            ->processCollectionsAndReleases(1, function () use ($barrier): void {
+                $this->assertFalse($barrier->locked, 'Release creation callbacks must run after releasing the ingestion barrier.');
+            });
+
+        $this->assertSame([1, 2, 3], DB::table('releases')->orderBy('id')->pluck('id')->all());
+        $this->assertSame(3, $totals['releases']);
+        $this->assertSame(3, $totals['nzbs']);
+    }
+
+    public function test_fresh_pages_validate_all_rules_even_when_priority_cursors_are_ahead(): void
+    {
+        foreach ([1, 2, 3, 4] as $id) {
+            $this->insertCollection($id, binaryName: $id === 2 ? 'Example.par2' : 'Example.rar');
+            DB::table('collections')->where('id', $id)->update(['filecheck' => 2]);
+            DB::table('parts')->insert(['binaries_id' => $id, 'size' => $id === 3 ? 10 : 5000]);
+        }
+        $this->insertCollection(100, size: 10);
+        Cache::put('cbp:release-window:cursor:group:1', ['last_id' => 50, 'max_id' => 100], 3600);
+        Cache::put('cbp:release-priority-window:cursor:group:1', [
+            'max_id' => 100, 'group_ids' => [1], 'position' => 0,
+            'cursors' => [1 => ['last_size' => 9999, 'last_id' => 50]], 'exhausted' => [],
+        ], 3600);
+        $creation = new WindowTestReleaseCreationService;
+        $seenDuringReconciliation = false;
+        $totals = $this->service($creation, binariesConfig: new BinariesConfig(reconcileBatchSize: 2))
+            ->processCollectionsAndReleases(1, function () use (&$seenDuringReconciliation): void {
+                if (DB::table('releases')->where('id', 1)->exists()
+                    && DB::table('collections')->where('id', 4)->value('filecheck') === 2) {
+                    $seenDuringReconciliation = true;
+                }
+            });
+
+        $this->assertTrue($seenDuringReconciliation);
+        $this->assertSame([1, 4], DB::table('releases')->orderBy('id')->pluck('id')->all());
+        $this->assertSame(2, $totals['releases']);
+        $this->assertSame(0, DB::table('collections')->whereIn('id', [2, 3])->count());
+        foreach ($creation->windows as $window) {
+            $this->assertLessThanOrEqual(3, count($window));
+        }
+    }
+
+    public function test_preparation_failure_does_not_size_or_create_unreconciled_collections(): void
+    {
+        $this->insertCollection(1);
+        $this->insertCollection(2);
+        DB::table('collections')->where('id', 2)->update(['filecheck' => 2]);
+        $this->app->instance(CollectionReconciliationBarrier::class, new class implements CollectionReconciliationBarrier
+        {
+            public function withReconciliationBarrier(int $delayHours, callable $work): mixed
+            {
+                throw new \RuntimeException('reconciliation unavailable');
+            }
+        });
+        try {
+            $this->service(new WindowTestReleaseCreationService)->processCollectionsAndReleases(1);
+            $this->fail('Preparation errors must propagate.');
+        } catch (\RuntimeException $e) {
+            $this->assertSame('reconciliation unavailable', $e->getMessage());
+        }
+
+        $this->assertSame([1], DB::table('releases')->pluck('id')->all());
+        $this->assertSame(2, DB::table('collections')->where('id', 2)->value('filecheck'));
+    }
+
+    public function test_legacy_service_compensates_waiting_rows_before_initial_retention_cleanup(): void
+    {
+        ConfigurationTestBuilder::update(ConfigurationDomain::Ingestion, [
+            'collection_delay_hours' => 2, 'part_retention_hours' => 24,
+        ]);
+        DB::statement('ALTER TABLE collections ADD COLUMN last_seen_at DATETIME NULL');
+        DB::statement('ALTER TABLE releases ADD COLUMN iscategorized INTEGER DEFAULT 1');
+        $this->insertCollection(1);
+        $this->insertCollection(2);
+        DB::table('collections')->where('id', 2)->update([
+            'filecheck' => 0, 'dateadded' => now()->subDays(4)->subHour(), 'added' => now()->subDays(4)->subHour(),
+        ]);
+        $marker = tempnam(sys_get_temp_dir(), 'release-downtime-');
+        file_put_contents($marker, (string) now()->subDays(4)->getTimestamp());
+        $this->app->instance(CollectionReconciliationBarrier::class, new CollectionDowntimeCompensator($marker));
+        $service = $this->service(new WindowTestReleaseCreationService);
+        try {
+            $totals = (new ReflectionMethod($service, 'runReleaseCreationLoop'))->invoke($service, 1, 1, 0, new NNTPService);
+
+            $this->assertSame(1, $totals['releases']);
+            $this->assertSame(0, DB::table('collections')->where('id', 2)->value('filecheck'));
+            $this->assertGreaterThan(now()->subHours(2)->format('Y-m-d H:i:s'), DB::table('collections')->where('id', 2)->value('dateadded'));
+            $this->assertTrue(DB::table('binaries')->where('collections_id', 2)->exists());
+        } finally {
+            foreach (glob($marker.'*') as $file) {
+                unlink($file);
+            }
+        }
+    }
+
+    public function test_retention_callbacks_wait_for_old_complete_parts_in_later_pages(): void
+    {
+        ConfigurationTestBuilder::update(ConfigurationDomain::Ingestion, ['part_retention_hours' => 24]);
+        foreach ([1, 2, 3] as $id) {
+            $this->insertCollection($id);
+            DB::table('collections')->where('id', $id)->update([
+                'filecheck' => 2, 'dateadded' => now()->subDays(4), 'added' => now()->subDays(4),
+            ]);
+            DB::table('parts')->insert(['binaries_id' => $id, 'size' => 5000]);
+        }
+        $service = $this->service(new WindowTestReleaseCreationService, binariesConfig: new BinariesConfig(reconcileBatchSize: 2));
+        $totals = $service->processCollectionsAndReleases(1, afterPass: fn () => $service->deleteCollections(1));
+
+        $this->assertSame([1, 2, 3], DB::table('releases')->orderBy('id')->pluck('id')->all());
+        $this->assertSame(3, $totals['releases']);
+        $this->assertSame(0, DB::table('collections')->count());
+    }
+
+    public function test_idle_pipeline_runs_legacy_callbacks_once(): void
+    {
+        $categorized = 0;
+        $postProcessed = 0;
+        $totals = $this->service(new WindowTestReleaseCreationService)->processCollectionsAndReleases(1,
+            function () use (&$categorized): void {
+                $categorized++;
+            },
+            function () use (&$postProcessed): void {
+                $postProcessed++;
+            },
+        );
+
+        $this->assertSame(1, $categorized);
+        $this->assertSame(1, $postProcessed);
+        $this->assertSame(1, $totals['iterations']);
+    }
+
+    public function test_prepared_release_does_not_add_empty_callback_passes(): void
+    {
+        $this->insertCollection(1);
+        DB::table('collections')->where('id', 1)->update(['filecheck' => 2]);
+        DB::table('parts')->insert(['binaries_id' => 1, 'size' => 5000]);
+        $passes = 0;
+        $totals = $this->service(new WindowTestReleaseCreationService)->processCollectionsAndReleases(1,
+            afterPass: function () use (&$passes): void {
+                $passes++;
+            },
+        );
+
+        $this->assertSame(1, $totals['releases']);
+        $this->assertSame(1, $passes);
+        $this->assertSame(1, $totals['iterations']);
+    }
+
+    public function test_pipeline_still_drains_nzb_only_batches_without_collections(): void
+    {
+        foreach (range(1, 7) as $id) {
+            DB::table('releases')->insert(['id' => $id, 'guid' => 'release-'.$id, 'name' => 'Release.'.$id, 'groups_id' => 1, 'postdate' => now()]);
+        }
+        $totals = $this->service(new WindowTestReleaseCreationService)->processCollectionsAndReleases(1);
+
+        $this->assertSame(0, $totals['releases']);
+        $this->assertSame(7, $totals['nzbs']);
+        $this->assertSame(7, DB::table('releases')->where('nzbstatus', 1)->count());
+    }
+
+    private function service(WindowTestReleaseCreationService $creation, ?CollectionCleanupService $cleanup = null, ?BinariesConfig $binariesConfig = null): ReleaseProcessingService
     {
         return (new ReleaseProcessingService(
             nzb: new WindowTestNzbService(new CollectionCleanupService),
             releaseCreationService: $creation,
             collectionCleanupService: $cleanup ?? new CollectionCleanupService,
+            binariesConfig: $binariesConfig,
         ))->setEchoCLI(false);
     }
 

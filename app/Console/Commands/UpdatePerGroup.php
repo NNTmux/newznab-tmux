@@ -111,9 +111,7 @@ class UpdatePerGroup extends Command
      */
     private function processReleases(string $groupID): void
     {
-        $this->releaseProcessingService->processIncompleteCollections($groupID);
-        $this->releaseProcessingService->processCollectionSizes($groupID);
-        $this->releaseProcessingService->processReleaseCreationBatches($groupID);
+        $this->releaseProcessingService->processCollectionsAndReleases($groupID);
 
         $this->releaseProcessingService->deleteCollections($groupID);
     }
