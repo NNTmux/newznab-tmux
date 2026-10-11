@@ -17,11 +17,33 @@ class ReleasesRunner extends BaseRunner
         $groups = DB::select('SELECT id, name FROM usenet_groups WHERE (active = 1 OR backfill = 1)');
         $maxProcesses = (int) app(ConfigurationProvider::class)->ingestion()->releaseThreads;
 
+        $hasCollections = [];
+        if ($groups !== []) {
+            $groupIds = array_map(static fn (object $group): int => (int) $group->id, $groups);
+            $placeholders = implode(',', array_fill(0, count($groupIds), '?'));
+            try {
+                $presence = DB::select(
+                    'SELECT id,
+                        EXISTS (SELECT 1 FROM collections WHERE collections.groups_id = usenet_groups.id) AS has_collections
+                     FROM usenet_groups WHERE id IN ('.$placeholders.')',
+                    $groupIds
+                );
+                foreach ($presence as $group) {
+                    $hasCollections[(int) $group->id] = (bool) $group->has_collections;
+                }
+            } catch (\PDOException) {
+                // Preserve per-group recovery when the batched collection lookup fails.
+                $hasCollections = null;
+            }
+        }
+
         $uGroups = [];
         foreach ($groups as $group) {
             try {
-                $query = DB::select(sprintf('SELECT id FROM collections WHERE groups_id = %d LIMIT 1', $group->id));
-                if (! empty($query)) {
+                $hasCollection = $hasCollections === null
+                    ? ! empty(DB::select(sprintf('SELECT id FROM collections WHERE groups_id = %d LIMIT 1', $group->id)))
+                    : ($hasCollections[(int) $group->id] ?? false);
+                if ($hasCollection) {
                     $uGroups[] = ['id' => $group->id, 'name' => $group->name];
                 }
             } catch (\PDOException $e) {

@@ -9,7 +9,6 @@ use App\Services\Runners\BackfillRunner;
 use App\Services\Runners\BinariesRunner;
 use App\Services\Runners\PostProcessRunner;
 use App\Services\Runners\ReleasesRunner;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\Process\Process;
 
@@ -258,39 +257,11 @@ class ForkingService
     }
 
     /**
-     * Process end work for releases (DNR signalling).
+     * Run release maintenance after the per-group workers finish.
      */
     protected function processReleasesEndWork(): void
     {
-        $count = $this->getReleaseWorkCount();
-        $command = $this->backfillRunner->buildDnrCommandPublic("releases  {$count}_");
-        $this->executeCommand($command);
-    }
-
-    /**
-     * Count groups with pending collections.
-     */
-    protected function getReleaseWorkCount(): int
-    {
-        $groups = DB::select('SELECT id FROM usenet_groups WHERE (active = 1 OR backfill = 1)');
-        $count = 0;
-
-        foreach ($groups as $group) {
-            try {
-                $query = DB::select(
-                    sprintf('SELECT id FROM collections WHERE groups_id = %d LIMIT 1', $group->id)
-                );
-                if (! empty($query)) {
-                    $count++;
-                }
-            } catch (\PDOException $e) {
-                if (config('app.debug')) {
-                    Log::debug($e->getMessage());
-                }
-            }
-        }
-
-        return $count;
+        $this->executeCommand([PHP_BINARY, base_path('artisan'), 'releases:process', '--maintenance-only']);
     }
 
     /**

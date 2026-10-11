@@ -157,7 +157,7 @@ class ReleaseFilesArchiveFallback
 
         foreach ($context->downloadedArchives as $archive) {
             $nfoFiles = array_values(array_filter(
-                $this->archiveService->sortFilesWithNfoPriority($archive->files),
+                $archive->files,
                 fn (array $file): bool => $this->archiveService->isNfoFile((string) ($file['name'] ?? '')),
             ));
 

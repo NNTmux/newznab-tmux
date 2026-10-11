@@ -19,6 +19,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Facade;
 use Mockery;
+use Mockery\MockInterface;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
@@ -153,7 +154,6 @@ class ReleaseFilesArchiveFallbackTest extends TestCase
         $files = [['name' => 'release.nfo', 'size' => 200]];
 
         $archive = Mockery::mock(ArchiveExtractionService::class);
-        $archive->shouldReceive('sortFilesWithNfoPriority')->once()->with($files)->andReturn($files);
         $archive->shouldReceive('isNfoFile')->once()->with('release.nfo')->andReturn(true);
         $archive->shouldReceive('extractSpecificFiles')
             ->once()
@@ -203,7 +203,6 @@ class ReleaseFilesArchiveFallbackTest extends TestCase
         ];
 
         $archive = Mockery::mock(ArchiveExtractionService::class);
-        $archive->shouldReceive('sortFilesWithNfoPriority')->once()->with($files)->andReturn($files);
         $archive->shouldReceive('isNfoFile')->twice()->andReturn(true);
         $archive->shouldNotReceive('extractSpecificFile');
         $archive->shouldReceive('extractSpecificFiles')
@@ -246,6 +245,77 @@ class ReleaseFilesArchiveFallbackTest extends TestCase
         $fallback->processNfoFromDownloadedArchives($context);
 
         $this->assertFalse($context->releaseHasNoNFO);
+    }
+
+    #[Test]
+    public function it_classifies_archive_files_once_and_preserves_the_first_three_nfo_candidates(): void
+    {
+        $files = [
+            ['name' => 'movie.mkv', 'size' => 900],
+            ['name' => 'readme.txt', 'size' => 10],
+            ['name' => 'cover.jpg', 'size' => 100],
+            ['name' => 'release.NFO', 'size' => 20],
+            ['size' => 0],
+            ['name' => 'notes.txt', 'size' => 30],
+            ['name' => 'fourth.nfo', 'size' => 40],
+        ];
+
+        $archive = new class($this->makeConfig()) extends ArchiveExtractionService
+        {
+            /** @var list<string> */
+            public array $classifiedNames = [];
+
+            /** @var list<string> */
+            public array $extractedNames = [];
+
+            public function isNfoFile(string $filename): bool
+            {
+                $this->classifiedNames[] = $filename;
+
+                return parent::isNfoFile($filename);
+            }
+
+            public function extractSpecificFiles(string $compressedData, array $filenames, string $tmpPath): array
+            {
+                $this->extractedNames = $filenames;
+
+                return array_combine($filenames, $filenames);
+            }
+        };
+
+        /** @var UsenetDownloadService&MockInterface $download */
+        $download = Mockery::mock(UsenetDownloadService::class);
+        $download->shouldNotReceive('download');
+        $download->shouldReceive('getNNTP')->once()->andReturn(Mockery::mock(NNTPService::class));
+
+        $processedNames = [];
+        /** @var ReleaseFileManager&MockInterface $manager */
+        $manager = Mockery::mock(ReleaseFileManager::class);
+        $manager->shouldReceive('processNfoFile')->times(3)->andReturnUsing(
+            function (string $path) use (&$processedNames): bool {
+                $processedNames[] = file_get_contents($path);
+
+                return false;
+            }
+        );
+
+        /** @var MediaExtractionService&MockInterface $media */
+        $media = Mockery::mock(MediaExtractionService::class);
+        /** @var ConsoleOutputService&MockInterface $output */
+        $output = Mockery::mock(ConsoleOutputService::class);
+
+        $fallback = new ReleaseFilesArchiveFallback($archive, $media, $download, $manager, $output);
+
+        $context = $this->makeContext();
+        $context->releaseHasNoNFO = true;
+        $this->assertTrue($context->rememberDownloadedArchive('release.rar', 'ARCHIVE', $files));
+
+        $fallback->processNfoFromDownloadedArchives($context);
+
+        $this->assertSame(['movie.mkv', 'readme.txt', 'cover.jpg', 'release.NFO', '', 'notes.txt', 'fourth.nfo'], $archive->classifiedNames);
+        $this->assertSame(['readme.txt', 'release.NFO', 'notes.txt'], $archive->extractedNames);
+        $this->assertSame(['readme.txt', 'release.NFO', 'notes.txt'], $processedNames);
+        $this->assertTrue($context->releaseHasNoNFO);
     }
 
     #[Test]
