@@ -15,12 +15,20 @@ UPDATE ingestion_configurations SET
     max_messages = 20000,
     -- Drop collections under 2 MB before they become releases. Article-obfuscated posts in
     -- boneless/cores/comp otherwise yield one ~740 KB release per article.
+    -- Do not raise this to "only large files" casually: `releases:process` also DELETES every existing
+    -- release under this size (ReleaseProcessingService::deleteReleasesUnderMinSize).
     min_size_to_form_release = 2097152,
     backfill_days_mode = 1,
     backfill_quantity = 200000,
     updated_at = NOW();
 
 UPDATE post_processing_configurations SET
+    -- Additional post-processing (par2, files, NFO, media info) only for releases of 1 GB or more, so the
+    -- queue holds the large releases instead of 1.2M small ones. The candidate query is "size > minimum", so a
+    -- release of exactly 1 GiB is skipped; the round value is kept because the admin settings page rounds
+    -- sizes to whole units on save. The NFO worker has its own minimum.
+    min_size_to_post_process = 1073741824,
+    min_size_to_process_nfo = 1073741824,
     post_threads = 16,
     nfo_threads = 4,
     post_threads_non = 3,
