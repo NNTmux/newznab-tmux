@@ -49,6 +49,21 @@ final class MissedPartHandler
     }
 
     /**
+     * Queue every article number in an inclusive range for part repair.
+     *
+     * Used when a worker could not fetch its range at all (for example the provider refused its login):
+     * sibling ranges move the group's cursor past it, so without this the headers would never be fetched.
+     */
+    public function addMissingRange(int $first, int $last, int $groupId): void
+    {
+        if ($last < $first) {
+            return;
+        }
+
+        $this->addMissingParts(range($first, $last), $groupId);
+    }
+
+    /**
      * @param  array<int, int|string>  $numbers
      */
     private function addMissingPartsSqlite(array $numbers, int $groupId): void

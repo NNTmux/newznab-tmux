@@ -342,6 +342,28 @@ These bugs turned up while building and running the self-hosted stack in `docker
 - **Symptom:** `P08: syntax error, unexpected TOK_FIELDLIMIT near ' @searchname (…)'`. The `releases:fix-names predbft` pass searches `name` and `searchname` for every PreDB title, so on 2026-10-11 at 06:33–06:34 UTC it logged 570 of these in two minutes and matched no release. The query reproduces directly against Manticore, and the same query with a single `@@relaxed` succeeds.
 - **Fix (staged):** the terms are built by `buildFieldSearchExpression()`, which prefixes `@@relaxed` once. Single-field queries are unchanged. Covered by `ManticoreFieldSearchExpressionTest`, which fails without the change.
 
+### 47. Configured worker concurrency (79) exceeds the primary provider's connection cap (73) (Open, configuration)
+
+- **Where:** `ingestion_configurations` and `post_processing_configurations` thread settings against `NNTP_CONNECTIONS` (`docker/config/app.env`). Nothing enforces one connection budget across the separate worker pools.
+- **Symptom:** Newshosting answers a burst of logins with `Authentication rejected`, and the affected `articles:get-range` workers exit 1. This happened at 05:20, 05:25, 07:17, 07:21 and 09:14 UTC on 2026-10-11 (4 to 12 workers each), each time `multiprocessing:safe` launched its 12 workers on top of the others. The failed batch is re-queued on the next cycle, so nothing is lost.
+- **Numbers:** binaries/safe 12 + backfill 30 + additional post-processing 16 + NFO 10 + non-additional 3 + Amazon 2 + fix-names 6 = 79 workers that can hold a connection at once, against `NNTP_CONNECTIONS=73` (65 were established at one sample).
+- **Already fixed in code:** the login failure used to throw a `TypeError` and all 10 retries ran within about two seconds (BUGS #45); they now back off, and the error is returned to the caller.
+- **Suggested fix (tuning, not applied):** bring the sum under the cap, for example `backfill_threads` 30 → 24 and `nfo_threads` 10 → 6 (a total of 69), or raise the provider allowance. A shared connection pool across the pools would remove the mismatch for good.
+
+### 48. A header range that fails before it is scanned is skipped for good (Fixed)
+
+- **Where:** `GetArticleRange::handle()` (`app/Console/Commands/GetArticleRange.php`), run by `BinariesRunner::safeBinaries()` for each `maxmssgs`-sized range of a group, in parallel.
+- **Bug:** every worker that succeeds moves `usenet_groups.last_record` to its own last article (`WHERE last_record < …`). A worker that failed before scanning (provider refused the login, group could not be selected, exception) recorded nothing in `missed_parts`. If a later range of the same group succeeded, the next cycle started above the failed range and its headers were never fetched.
+- **Symptom:** on 2026-10-11, 41 `articles:get-range` workers died with `Cannot authenticate to server news.newshosting.com … (Authentication rejected)`, each covering up to 20,000 articles, in bursts at 05:20, 05:25, 07:17, 07:21 and 09:14 UTC. Which of those ranges were already past the cursor was not recorded, so the exact loss can't be counted.
+- **Fix (staged):** a range that fails before its scan is queued whole into `missed_parts` (`MissedPartHandler::addMissingRange()`), so the next part repair pass fetches it. Covered by `GetArticleRangeFailureTest`. A scan that downloads no headers (`BinariesService::scan()` returns an empty array on a failed XOVER) is not covered yet.
+
+### 49. Provider rejects logins when the account's connection allowance is used up (Open, configuration)
+
+- **Where:** `NNTP_CONNECTIONS=73` (`docker/config/app.env`) against the worker pools: binaries/safe 12, backfill 30, additional post-processing 16, non-additional 3, Amazon 2, fix-names 6, about 69 at the same moment. Additional and NFO (10) run one after the other in the same pane, so they count once. Nothing enforces one connection budget across the separate pools.
+- **Symptom:** Newshosting answers bursts of logins with `Authentication rejected` when `multiprocessing:safe` launches its 12 workers on top of the others (65 connections were established at one sample). Our own configured peak is within a few connections of the cap, and other clients on the same account (for example `rustnzb-local` on this host) use the rest, so it can't be attributed to this stack alone.
+- **Already fixed in code:** the failure no longer throws a `TypeError` and retries back off (BUGS #45); a failed range is no longer lost (BUGS #48).
+- **Suggested fix (tuning, not applied):** leave headroom under the cap, for example `backfill_threads` 30 → 24, or raise the account allowance. A shared connection pool across the pools would remove the mismatch for good.
+
 ## Issues in the docker/ stack itself (all fixed)
 
 | Issue | Fix |

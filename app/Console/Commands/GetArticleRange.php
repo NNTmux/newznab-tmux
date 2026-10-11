@@ -6,6 +6,7 @@ namespace App\Console\Commands;
 
 use App\Models\UsenetGroup;
 use App\Services\Binaries\BinariesService;
+use App\Services\Binaries\MissedPartHandler;
 use App\Services\Configuration\ConfigurationProvider;
 use App\Services\NNTP\NNTPService;
 use Illuminate\Console\Command;
@@ -48,9 +49,14 @@ class GetArticleRange extends Command
             return self::FAILURE;
         }
 
+        // Ranges run in parallel and each success moves the group's cursor to its own end, so a range
+        // that fails before it has been scanned would be skipped for good; queue it for part repair.
+        $scanned = false;
+
         try {
             $nntp = $this->getNntp();
-            $groupMySQL = UsenetGroup::getByName($groupName)->toArray();
+            $group = UsenetGroup::getByName($groupName);
+            $groupMySQL = $group?->toArray();
 
             if ($groupMySQL === null) {
                 $this->error("Group not found: {$groupName}");
@@ -60,11 +66,14 @@ class GetArticleRange extends Command
 
             if (NNTPService::isError($nntp->selectGroup($groupMySQL['name']))
                 && NNTPService::isError($nntp->dataError($nntp, $groupMySQL['name']))) {
+                $this->queueRangeForRepair($groupName, $firstArticle, $lastArticle);
+
                 return self::FAILURE;
             }
 
             $binaries = new BinariesService;
             $binaries->setNntp($nntp);
+            $scanned = true;
             $return = $binaries->scan(
                 $groupMySQL,
                 $firstArticle,
@@ -82,8 +91,27 @@ class GetArticleRange extends Command
         } catch (\Throwable $e) {
             Log::error($e->getTraceAsString());
             $this->error($e->getMessage());
+            if (! $scanned) {
+                $this->queueRangeForRepair($groupName, $firstArticle, $lastArticle);
+            }
 
             return self::FAILURE;
+        }
+    }
+
+    /**
+     * Queue the whole range in the group's part repair list so a later pass fetches it.
+     */
+    private function queueRangeForRepair(string $groupName, int $first, int $last): void
+    {
+        try {
+            $groupId = (int) (UsenetGroup::query()->where('name', $groupName)->value('id') ?? 0);
+            if ($groupId > 0) {
+                (new MissedPartHandler)->addMissingRange($first, $last, $groupId);
+                $this->warn("Queued articles {$first}-{$last} of {$groupName} for part repair.");
+            }
+        } catch (\Throwable $e) {
+            Log::error('Unable to queue a failed article range for part repair: '.$e->getMessage());
         }
     }
 
@@ -144,7 +172,7 @@ class GetArticleRange extends Command
     /**
      * Get NNTP connection.
      */
-    private function getNntp(): NNTPService
+    protected function getNntp(): NNTPService
     {
         $nntp = new NNTPService;
 
