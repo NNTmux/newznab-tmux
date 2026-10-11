@@ -12,6 +12,7 @@ use App\Services\Binaries\HeaderStorageService;
 use App\Services\Binaries\HeaderStorageTransaction;
 use App\Services\CollectionsCleaningService;
 use App\Services\ReleaseProcessingService;
+use App\Services\Tmux\CollectionReconciliationBarrier;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -338,6 +339,53 @@ class CbpReleaseEligibilityTest extends TestCase
             $this->assertStringNotContainsString('order by', $sql);
             $this->assertStringNotContainsString('coalesce(last_seen_at', $sql);
         }
+    }
+
+    public function test_reconciliation_waits_for_downtime_compensation_before_stale_selection(): void
+    {
+        $waiting = $this->collection(1, now()->subHours(3)->format('Y-m-d H:i:s'));
+        $this->app->instance(CollectionReconciliationBarrier::class, new class($waiting) implements CollectionReconciliationBarrier
+        {
+            public function __construct(private readonly int $collectionId) {}
+
+            public function withReconciliationBarrier(int $delayHours, callable $work): mixed
+            {
+                DB::table('collections')->where('id', $this->collectionId)->update(['dateadded' => now()]);
+
+                return $work();
+            }
+        });
+
+        $this->process(1);
+
+        $this->assertStatus($waiting, CollectionFileCheckStatus::Default);
+        $this->assertSame(2, (int) DB::table('collections')->where('id', $waiting)->value('totalfiles'));
+        $this->assertSame(1, DB::table('parts')->count());
+    }
+
+    public function test_stuck_cleanup_waits_for_downtime_compensation_before_deletion(): void
+    {
+        $waiting = $this->collection(1, now()->subDays(3)->format('Y-m-d H:i:s'));
+        DB::table('collections')->where('id', $waiting)->update(['last_seen_at' => null]);
+        $this->app->instance(CollectionReconciliationBarrier::class, new class($waiting) implements CollectionReconciliationBarrier
+        {
+            public function __construct(private readonly int $collectionId) {}
+
+            public function withReconciliationBarrier(int $delayHours, callable $work): mixed
+            {
+                DB::table('collections')->where('id', $this->collectionId)->update(['dateadded' => now()]);
+
+                return $work();
+            }
+        });
+
+        $service = new ReleaseProcessingService;
+        (new \ReflectionMethod($service, 'processStuckCollections'))->invoke($service, 1);
+
+        $this->assertSame(1, DB::table('collections')->where('id', $waiting)->count());
+        $this->assertStatus($waiting, CollectionFileCheckStatus::Default);
+        $this->assertSame(1, DB::table('binaries')->count());
+        $this->assertSame(1, DB::table('parts')->count());
     }
 
     private function process(?int $groupId): void

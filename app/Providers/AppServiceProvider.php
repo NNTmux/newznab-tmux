@@ -45,6 +45,8 @@ use App\Services\Monitoring\Collectors\TmuxSnapshotCollector;
 use App\Services\Monitoring\Prometheus\TextFormatter;
 use App\Services\Monitoring\PrometheusMetricsExporter;
 use App\Services\Search\Support\ManticoreClientFactory;
+use App\Services\Tmux\CollectionDowntimeCompensator;
+use App\Services\Tmux\CollectionReconciliationBarrier;
 use App\Services\Yenc\DecoderFactory;
 use App\Services\YencService;
 use App\View\Composers\AdminDataComposer;
@@ -110,6 +112,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->app->alias(CollectionDowntimeCompensator::class, CollectionReconciliationBarrier::class);
+
         $this->app->singleton(YencService::class, function (Application $app): YencService {
             $decoder = (new DecoderFactory($app['log']))->make(
                 (string) $app['config']->get('yenc.decoder', 'auto'),

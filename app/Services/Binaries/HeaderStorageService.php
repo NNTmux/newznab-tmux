@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Binaries;
 
+use App\Services\Tmux\CollectionDowntimeCompensator;
 use App\Support\SqlError;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Log;
@@ -53,10 +54,14 @@ final class HeaderStorageService
      * @param  array<string, mixed>  $groupMySQL  Group info from database
      * @param  bool  $addToPartRepair  Caller repair mode; failures are returned in every mode
      * @return array<int, int|string> Article numbers that failed to insert
+     *
+     * @phpstan-impure
      */
     public function store(array $headers, array $groupMySQL, bool $addToPartRepair = true): array
     {
         if (empty($headers)) {
+            $this->noteIngestion(); // A caught-up group is still live ingestion.
+
             return [];
         }
 
@@ -98,6 +103,8 @@ final class HeaderStorageService
             }
             unset($chunk);
         }
+
+        $this->noteIngestion();
 
         return array_values(array_unique($this->failedInserts));
     }
@@ -362,5 +369,18 @@ final class HeaderStorageService
         }
 
         return $fileCount;
+    }
+
+    /**
+     * Headers were stored: ingestion is running even if the tmux monitor is not, so a
+     * monitor-only recovery doesn't count as downtime (see CollectionDowntimeCompensator).
+     */
+    private function noteIngestion(): void
+    {
+        try {
+            app(CollectionDowntimeCompensator::class)->noteIngestion();
+        } catch (\Throwable $e) {
+            Log::debug('Unable to record ingestion activity: '.$e->getMessage());
+        }
     }
 }

@@ -7,6 +7,7 @@ namespace App\Services\Binaries;
 use App\Models\UsenetGroup;
 use App\Services\Configuration\ProcessingRuntimeStateRepository;
 use App\Services\NNTP\NNTPService;
+use App\Services\Tmux\CollectionDowntimeCompensator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -200,6 +201,13 @@ class BinariesService
     public function updateGroup(array $groupMySQL, int $maxHeaders = 0): void
     {
         $startGroup = now();
+        // Ingestion is live even when the group turns out to be caught up (the early
+        // returns below), so a monitor-only recovery doesn't count this as downtime.
+        try {
+            app(CollectionDowntimeCompensator::class)->noteIngestion();
+        } catch (\Throwable) {
+            // Best effort.
+        }
         $this->logIndexerStart();
 
         $nntp = $this->getNntp();

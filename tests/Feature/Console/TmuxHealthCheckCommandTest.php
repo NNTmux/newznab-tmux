@@ -11,7 +11,10 @@ use Illuminate\Support\Facades\Process;
 use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Support\ConfigurationTestBuilder;
+use Tests\Support\MarkerIoFailures;
 use Tests\TestCase;
+
+require_once __DIR__.'/../../Support/MarkerIoFailures.php';
 
 class TmuxHealthCheckCommandTest extends TestCase
 {
@@ -283,6 +286,28 @@ class TmuxHealthCheckCommandTest extends TestCase
         $this->artisan('tmux:start --session=custom-session --force')->assertExitCode(1);
 
         Process::assertNotRan(fn (PendingProcess $process): bool => $this->isTmuxCommand($process, 'kill-session'));
+        Process::assertNotRan(fn (PendingProcess $process): bool => $this->isTmuxCommand($process, 'new-session'));
+    }
+
+    public function test_start_does_not_create_a_session_after_compensation_fails(): void
+    {
+        Process::fake(function (PendingProcess $process) {
+            if ($process->command === 'which tmux 2>/dev/null') {
+                return Process::result('tmux');
+            }
+            if ($this->isTmuxCommand($process, 'has-session')) {
+                return Process::result('', '', 1);
+            }
+
+            return Process::result();
+        });
+        MarkerIoFailures::$shortWrite = true;
+        try {
+            $this->artisan('tmux:start --session=compensation-failure --force')->assertExitCode(1);
+        } finally {
+            MarkerIoFailures::$shortWrite = false;
+        }
+
         Process::assertNotRan(fn (PendingProcess $process): bool => $this->isTmuxCommand($process, 'new-session'));
     }
 

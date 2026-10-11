@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Enums\TmuxMode;
-use App\Models\Collection;
 use App\Services\Configuration\ConfigurationProvider;
 use App\Services\Configuration\ProcessingRuntimeStateRepository;
 use App\Services\Monitoring\TmuxMetricsSnapshot;
+use App\Services\Tmux\CollectionDowntimeCompensator;
 use App\Services\Tmux\TmuxCommand;
 use App\Services\Tmux\TmuxMonitorService;
 use App\Services\Tmux\TmuxOutput;
@@ -17,7 +17,6 @@ use App\Services\Tmux\TmuxSessionManager;
 use App\Services\Tmux\TmuxTaskRunner;
 use App\Support\MetadataSources;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Process;
 
 class TmuxMonitor extends Command
@@ -29,7 +28,7 @@ class TmuxMonitor extends Command
      */
     protected $signature = 'tmux:monitor
                             {--session= : Tmux session name}
-                            {--reset-collections : Reset old collections before starting}
+                            {--reset-collections : Kept for compatibility; collection delays are always compensated on start}
                             {--ready-channel= : Internal startup acknowledgement channel}';
 
     /**
@@ -54,11 +53,6 @@ class TmuxMonitor extends Command
     {
 
         try {
-            // Reset old collections if requested
-            if ($this->option('reset-collections')) {
-                $this->resetOldCollections();
-            }
-
             // Initialize services
             $sessionName = $this->option('session')
                 ?? app(ConfigurationProvider::class)->tmux()->sessionName;
@@ -75,6 +69,12 @@ class TmuxMonitor extends Command
 
                 return Command::FAILURE;
             }
+
+            // Give collections back the time lost while nothing was running. Always, not
+            // only with --reset-collections: a monitor recovered by tmux:health-check would
+            // otherwise overwrite the activity marker without compensating. Only once the
+            // session is known to exist, so a failed launch can't consume the outage.
+            $this->resetOldCollections();
 
             cli()->header('Starting Tmux Monitor');
             $this->info("📊 Monitoring session: {$sessionName}");
@@ -99,6 +99,7 @@ class TmuxMonitor extends Command
                 if (! $this->sessionManager->sessionExists() || ! $panes->heartbeat()) {
                     throw new \RuntimeException('Tmux monitor session disappeared.');
                 }
+                $this->recordIngestionActivity();
 
                 MetadataSources::logDailySummary();
 
@@ -142,28 +143,28 @@ class TmuxMonitor extends Command
     /**
      * Reset old collections based on delay time
      */
+    /**
+     * Mark ingestion as running, so a later start can tell how long it was down.
+     */
+    private function recordIngestionActivity(): void
+    {
+        try {
+            app(CollectionDowntimeCompensator::class)->recordActivity();
+        } catch (\Throwable $e) {
+            logger()->warning('Unable to record tmux ingestion activity: '.$e->getMessage());
+        }
+    }
+
     private function resetOldCollections(): void
     {
         $delayTime = app(ConfigurationProvider::class)->ingestion()->collectionDelayHours;
 
-        cli()->header('Resetting expired collections...');
+        cli()->header('Adjusting collection delays...');
 
-        try {
-            DB::transaction(function () use ($delayTime) {
-                $count = Collection::query()
-                    ->where('dateadded', '<', now()->subHours($delayTime))
-                    ->update(['dateadded' => now()]);
-
-                if ($count > 0) {
-                    $this->info("✅ Reset {$count} collections");
-                } else {
-                    $this->info('✅ No collections needed resetting');
-                }
-            }, 10);
-
-        } catch (\Exception $e) {
-            $this->error('Failed to reset collections: '.$e->getMessage());
-        }
+        $count = app(CollectionDowntimeCompensator::class)->compensate($delayTime);
+        $this->info($count > 0
+            ? "✅ Gave {$count} waiting collections back the time lost while the indexer was down"
+            : '✅ No collections needed more time');
     }
 
     /**

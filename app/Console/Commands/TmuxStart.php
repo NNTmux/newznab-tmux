@@ -5,16 +5,15 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Enums\TmuxPaneRole;
-use App\Models\Collection;
 use App\Services\Configuration\ConfigurationProvider;
 use App\Services\Configuration\ProcessingRuntimeStateRepository;
+use App\Services\Tmux\CollectionDowntimeCompensator;
 use App\Services\Tmux\TmuxCommand;
 use App\Services\Tmux\TmuxLayoutBuilder;
 use App\Services\Tmux\TmuxPaneManager;
 use App\Services\Tmux\TmuxSessionManager;
 use App\Support\MetadataSources;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Process;
 
 class TmuxStart extends Command
@@ -169,22 +168,10 @@ class TmuxStart extends Command
     {
         $delayTime = app(ConfigurationProvider::class)->ingestion()->collectionDelayHours;
 
-        try {
-            DB::transaction(function () use ($delayTime) {
-                $count = Collection::query()
-                    ->where('dateadded', '<', now()->subHours($delayTime))
-                    ->update(['dateadded' => now()]);
-
-                if ($count > 0) {
-                    $this->info("  ✓ Reset {$count} expired collections");
-                } else {
-                    $this->info('  ✓ No collections needed resetting');
-                }
-            }, 10);
-
-        } catch (\Exception $e) {
-            $this->warn('  ⚠ Failed to reset collections: '.$e->getMessage());
-        }
+        $count = app(CollectionDowntimeCompensator::class)->compensate($delayTime);
+        $this->info($count > 0
+            ? "  ✓ Gave {$count} waiting collections back the time lost while the indexer was down"
+            : '  ✓ No collections needed more time');
     }
 
     /**

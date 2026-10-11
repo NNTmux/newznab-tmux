@@ -22,6 +22,7 @@ use App\Services\Releases\ReleaseBrowseService;
 use App\Services\Releases\ReleaseDuplicateFinder;
 use App\Services\Releases\ReleaseManagementService;
 use App\Services\Search\SearchService;
+use App\Services\Tmux\CollectionReconciliationBarrier;
 use App\Support\Data\NzbCreationResult;
 use App\Support\Data\ProcessReleasesSettings;
 use App\Support\Data\ReleaseCreationResult;
@@ -430,30 +431,52 @@ final class ReleaseProcessingService
         ];
 
         do {
-            $query = Collection::query()
-                ->where('id', '>', $lastId)
-                ->where(function ($query) use ($statuses): void {
-                    $query->where('filecheck', CollectionFileCheckStatus::CompleteParts->value)
-                        ->orWhere(function ($stale) use ($statuses): void {
-                            $stale->whereIn('filecheck', array_values(array_diff(
-                                $statuses,
-                                [CollectionFileCheckStatus::CompleteParts->value]
-                            )))->whereRaw(
-                                'COALESCE(dateadded, added) < ?',
-                                [now()->subHours($this->settings->collectionDelayTime)]
-                            );
-                        });
-                })
-                ->when($groupId !== null, static fn ($q) => $q->where('groups_id', $groupId))
-                ->orderBy('id')
-                ->limit($this->binariesConfig->reconcileBatchSize);
-            $ids = $query->pluck('id')->map(static fn ($id): int => (int) $id)->all();
+            $ids = $this->withCollectionReconciliationBarrier(function () use ($lastId, $groupId, $statuses): array {
+                $query = Collection::query()
+                    ->where('id', '>', $lastId)
+                    ->where(function ($query) use ($statuses): void {
+                        $query->where('filecheck', CollectionFileCheckStatus::CompleteParts->value)
+                            ->orWhere(function ($stale) use ($statuses): void {
+                                $stale->whereIn('filecheck', array_values(array_diff(
+                                    $statuses,
+                                    [CollectionFileCheckStatus::CompleteParts->value]
+                                )))->whereRaw(
+                                    'COALESCE(dateadded, added) < ?',
+                                    [now()->subHours($this->settings->collectionDelayTime)]
+                                );
+                            });
+                    })
+                    ->when($groupId !== null, static fn ($q) => $q->where('groups_id', $groupId))
+                    ->orderBy('id')
+                    ->limit($this->binariesConfig->reconcileBatchSize);
+                $ids = $query->pluck('id')->map(static fn ($id): int => (int) $id)->all();
+                if ($ids !== []) {
+                    $this->reconcileCollectionIds($ids, $statuses);
+                }
+
+                return $ids;
+            });
             if ($ids === []) {
                 break;
             }
             $lastId = (int) end($ids);
-            $this->reconcileCollectionIds($ids, $statuses);
         } while (\count($ids) === $this->binariesConfig->reconcileBatchSize);
+    }
+
+    /**
+     * @template TResult
+     *
+     * @param  callable(): TResult  $work
+     * @return TResult
+     */
+    private function withCollectionReconciliationBarrier(callable $work): mixed
+    {
+        if (! app()->bound(CollectionReconciliationBarrier::class)) {
+            return $work();
+        }
+
+        return app(CollectionReconciliationBarrier::class)
+            ->withReconciliationBarrier($this->settings->collectionDelayTime, $work);
     }
 
     /**
@@ -1030,11 +1053,12 @@ final class ReleaseProcessingService
      */
     private function processStuckCollections(int $groupID): void
     {
-        $cutoff = $this->calculateStuckCollectionsCutoff();
         $totalDeleted = 0;
 
         do {
-            $affected = $this->deleteStuckCollectionBatch($groupID, $cutoff);
+            $affected = $this->withCollectionReconciliationBarrier(
+                fn (): int => $this->deleteStuckCollectionBatch($groupID, $this->calculateStuckCollectionsCutoff())
+            );
             $totalDeleted += $affected;
 
             if ($affected < self::BATCH_SIZE) {
