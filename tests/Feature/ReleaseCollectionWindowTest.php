@@ -154,7 +154,7 @@ class ReleaseCollectionWindowTest extends TestCase
     }
 
     #[DataProvider('longPrefixes')]
-    public function test_collection_work_is_capped_and_resumes_past_long_unproductive_prefixes(?int $groupId, string $kind): void
+    public function test_collection_work_is_capped_while_priority_and_background_resume_independently(?int $groupId, string $kind): void
     {
         foreach (range(1, 60) as $id) {
             $this->insertCollection($id, size: match ($kind) {
@@ -165,16 +165,28 @@ class ReleaseCollectionWindowTest extends TestCase
         $firstCreation = new WindowTestReleaseCreationService(failAll: $kind === 'failed');
         $first = $this->service($firstCreation)->processReleaseCreationBatches($groupId);
 
-        $this->assertSame(0, $first['releases']);
+        $this->assertSame($kind === 'failed' ? 0 : 1, $first['releases']);
         $this->assertCount(20, $firstCreation->windows);
         $this->assertTrue(DB::table('collections')->where('id', 61)->exists());
 
+        if ($kind !== 'failed') {
+            $this->assertSame([61], DB::table('releases')->pluck('id')->all());
+            DB::table('collections')->where('id', 60)->update(['filesize' => 5000]);
+        }
         $secondCreation = new WindowTestReleaseCreationService;
         $second = $this->service($secondCreation)->processReleaseCreationBatches($groupId);
 
-        $this->assertSame(1, $second['releases']);
-        $this->assertSame([61], DB::table('releases')->pluck('id')->all());
-        $this->assertSame([[61]], $secondCreation->windows);
+        if ($kind === 'failed') {
+            $this->assertSame(4, $second['releases']);
+            $this->assertSame([58, 59, 60, 61], DB::table('releases')->orderBy('id')->pluck('id')->all());
+            $this->assertSame([61], $secondCreation->windows[0]);
+            $this->service(new WindowTestReleaseCreationService)->processReleaseCreationBatches($groupId);
+            $this->assertSame(61, DB::table('releases')->count(), 'Completed epochs must revisit earlier failed inserts.');
+        } else {
+            $this->assertSame(1, $second['releases']);
+            $this->assertSame([60, 61], DB::table('releases')->orderBy('id')->pluck('id')->all());
+            $this->assertLessThan(20, count($secondCreation->windows), 'Background cleanup resumes rather than rescanning the zero-sized prefix.');
+        }
     }
 
     public function test_group_and_global_cursors_are_independent_of_other_groups_and_orphan_cleanup(): void
@@ -183,15 +195,19 @@ class ReleaseCollectionWindowTest extends TestCase
             $this->insertCollection($id, size: 0);
         }
         $this->insertCollection(161);
-        $this->insertCollection(1, group: 2);
+        foreach (range(1, 6) as $id) {
+            $this->insertCollection($id, group: 2);
+        }
         Cache::forever(CollectionCleanupService::ORPHAN_SWEEP_CURSOR, 9999);
         $creation = new WindowTestReleaseCreationService;
 
-        $this->assertSame(0, $this->service($creation)->processReleaseCreationBatches(1)['releases']);
-        $this->assertSame(1, $this->service($creation)->processReleaseCreationBatches(null)['releases']);
-        $this->assertSame([1], DB::table('releases')->pluck('id')->all(), 'Global processing must start independently of the group cursor.');
         $this->assertSame(1, $this->service($creation)->processReleaseCreationBatches(1)['releases']);
-        $this->assertSame([1, 161], DB::table('releases')->orderBy('id')->pluck('id')->all());
+        $this->assertSame(6, $this->service($creation)->processReleaseCreationBatches(null)['releases']);
+        $this->assertSame([1, 2, 3, 4, 5, 6, 161], DB::table('releases')->orderBy('id')->pluck('id')->all(), 'Global priority must start independently of the group cursor.');
+        DB::table('collections')->where('id', 160)->update(['filesize' => 5000]);
+        $resumedCreation = new WindowTestReleaseCreationService;
+        $this->assertSame(1, $this->service($resumedCreation)->processReleaseCreationBatches(1)['releases']);
+        $this->assertSame([[160], [158, 159]], $resumedCreation->windows, 'The group background cursor must not be replaced by the global cursor.');
         $this->assertSame(9999, Cache::get(CollectionCleanupService::ORPHAN_SWEEP_CURSOR));
     }
 
@@ -202,32 +218,142 @@ class ReleaseCollectionWindowTest extends TestCase
     }
 
     #[DataProvider('snapshotScopes')]
+    public function test_numeric_eligible_collections_beyond_twenty_invalid_windows_are_created_before_cleanup(?int $groupId): void
+    {
+        foreach (range(1, 63) as $id) {
+            $this->insertCollection($id, size: 10);
+        }
+        $this->insertCollection(64);
+        $createdBeforeCleanup = false;
+        $totals = $this->service(new WindowTestReleaseCreationService)->processReleaseCreationBatches($groupId, function () use (&$createdBeforeCleanup): void {
+            if (DB::table('releases')->where('id', 64)->exists() && DB::table('collections')->where('id', 1)->exists()) {
+                $createdBeforeCleanup = true;
+            }
+        });
+
+        $this->assertSame(1, $totals['releases']);
+        $this->assertSame([64], DB::table('releases')->pluck('id')->all());
+        $this->assertTrue($createdBeforeCleanup);
+        $this->assertGreaterThan(0, DB::table('collections')->where('filesize', 10)->count(), 'Background cleanup must leave a bounded remainder.');
+        $this->assertLessThan(63, DB::table('collections')->where('filesize', 10)->count(), 'Background cleanup must also advance.');
+    }
+
+    #[DataProvider('snapshotScopes')]
+    public function test_size_order_does_not_strand_an_older_larger_candidate_after_processing_the_highest_id(?int $groupId): void
+    {
+        ConfigurationTestBuilder::update(ConfigurationDomain::Ingestion, ['max_releases_created' => 1]);
+        foreach (range(1, 63) as $id) {
+            $this->insertCollection($id, size: 10);
+        }
+        $this->insertCollection(64, size: 9000);
+        $this->insertCollection(65, size: 5000);
+
+        $totals = $this->service(new WindowTestReleaseCreationService)->processReleaseCreationBatches($groupId);
+
+        $this->assertSame(2, $totals['releases']);
+        $this->assertSame([64, 65], DB::table('releases')->orderBy('id')->pluck('id')->all());
+    }
+
+    /** @return array<string, array{?int}> */
+    public static function inactiveFlags(): array
+    {
+        return ['inactive' => [0], 'null flag' => [null]];
+    }
+
+    #[DataProvider('inactiveFlags')]
+    public function test_global_priority_preserves_inactive_groups_numeric_cleanup_exemption(?int $active): void
+    {
+        DB::table('usenet_groups')->where('id', 2)->update(['active' => $active, 'minsizetoformrelease' => 30000, 'minfilestoformrelease' => 5]);
+        foreach (range(1, 63) as $id) {
+            $this->insertCollection($id, size: 10);
+        }
+        $this->insertCollection(64, size: 20000, files: 1, group: 2);
+
+        $totals = $this->service(new WindowTestReleaseCreationService)->processReleaseCreationBatches(null);
+
+        $this->assertSame(1, $totals['releases']);
+        $this->assertSame([64], DB::table('releases')->pluck('id')->all());
+    }
+
+    public function test_priority_keeps_exact_numeric_boundaries_and_still_rejects_failed_rules(): void
+    {
+        $this->insertCollection(1, size: 999);
+        $this->insertCollection(2, size: 1000);
+        $this->insertCollection(3, size: 10000);
+        $this->insertCollection(4, size: 10001);
+        $this->insertCollection(5, files: 1);
+
+        $totals = $this->service(new WindowTestReleaseCreationService)->processReleaseCreationBatches(1);
+
+        $this->assertSame(2, $totals['releases']);
+        $this->assertSame([2, 3], DB::table('releases')->orderBy('id')->pluck('id')->all());
+        $this->assertSame(0, DB::table('collections')->whereIn('id', [1, 4, 5])->count());
+    }
+
+    public function test_global_priority_bounds_empty_group_probes_and_resumes_its_frozen_group_list(): void
+    {
+        foreach (range(3, 22) as $id) {
+            DB::table('usenet_groups')->insert(['id' => $id, 'name' => 'alt.test.'.$id]);
+        }
+        foreach (range(1, 60) as $id) {
+            $this->insertCollection($id, size: 10);
+        }
+        foreach (range(2, 21) as $groupId) {
+            $this->insertCollection(100 + $groupId, size: 10, group: $groupId);
+        }
+        $this->insertCollection(10000, group: 22);
+        DB::enableQueryLog();
+        DB::flushQueryLog();
+        try {
+            $first = $this->service(new WindowTestReleaseCreationService)->processReleaseCreationBatches(null);
+            $firstQueries = DB::getQueryLog();
+            DB::flushQueryLog();
+            $second = $this->service(new WindowTestReleaseCreationService)->processReleaseCreationBatches(null);
+            $secondQueries = DB::getQueryLog();
+        } finally {
+            DB::disableQueryLog();
+        }
+        $priorityQueries = static fn (array $queries): array => array_values(array_filter($queries, static fn (array $query): bool => str_contains($query['query'], 'order by "filesize" asc')));
+        $firstProbes = $priorityQueries($firstQueries);
+        $secondProbes = $priorityQueries($secondQueries);
+
+        $this->assertSame(0, $first['releases']);
+        $this->assertCount(20, $firstProbes);
+        $this->assertSame(1, $second['releases']);
+        $this->assertSame([10000], DB::table('releases')->pluck('id')->all());
+        $this->assertCount(2, $secondProbes);
+        $this->assertSame([21, 22], array_map(static fn (array $query): int => (int) $query['bindings'][0], $secondProbes));
+    }
+
+    #[DataProvider('snapshotScopes')]
     public function test_new_arrivals_cannot_extend_an_unfinished_snapshot_and_starve_failed_rows(?int $groupId): void
     {
-        $this->insertCollection(1);
-        foreach (range(2, 60) as $id) {
-            $this->insertCollection($id, size: 0);
+        foreach (range(1, 63) as $id) {
+            $this->insertCollection($id, size: 4000);
         }
-        $this->insertCollection(61);
-        $first = $this->service(new WindowTestReleaseCreationService(failedId: 1))->processReleaseCreationBatches($groupId);
+        $this->insertCollection(64, size: 9000);
+        $this->insertCollection(65, size: 5000);
+        $first = $this->service(new WindowTestReleaseCreationService(failAll: true))->processReleaseCreationBatches($groupId);
         $this->assertSame(0, $first['releases']);
 
-        foreach (range(62, 180) as $id) {
-            $this->insertCollection($id, size: 0);
+        foreach (range(66, 185) as $id) {
+            $this->insertCollection($id, size: 4500);
         }
         $secondCreation = new WindowTestReleaseCreationService;
         $second = $this->service($secondCreation)->processReleaseCreationBatches($groupId);
 
-        $this->assertSame(1, $second['releases']);
-        $this->assertSame([[61]], $secondCreation->windows, 'The resumed pass must finish its original ceiling before accepting new arrivals.');
+        $this->assertGreaterThan(0, $second['releases']);
+        $this->assertTrue(DB::table('releases')->where('id', 64)->exists(), 'The old larger candidate must be processed before new smaller arrivals.');
+        $this->assertTrue(DB::table('releases')->where('id', 65)->exists());
+        $this->assertSame(0, DB::table('releases')->where('id', '>', 65)->count(), 'Both readers must finish their original frozen ceiling before accepting arrivals.');
 
-        foreach (range(181, 300) as $id) {
-            $this->insertCollection($id, size: 0);
+        foreach (range(186, 305) as $id) {
+            $this->insertCollection($id, size: 4500);
         }
         $third = $this->service(new WindowTestReleaseCreationService)->processReleaseCreationBatches($groupId);
 
-        $this->assertSame(1, $third['releases']);
-        $this->assertSame([1, 61], DB::table('releases')->orderBy('id')->pluck('id')->all(), 'A completed epoch must wrap and retry the old failed row despite continued arrivals.');
+        $this->assertGreaterThan(0, $third['releases']);
+        $this->assertTrue(DB::table('releases')->where('id', 1)->exists(), 'A completed epoch must wrap and retry old failed rows despite continued arrivals.');
     }
 
     public function test_malformed_cached_window_state_starts_a_safe_new_snapshot(): void

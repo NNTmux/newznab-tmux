@@ -47,6 +47,8 @@ use Throwable;
  * - Generating NZB files
  * - Categorizing releases
  * - Cleanup of old/unwanted releases
+ *
+ * @phpstan-type PriorityWindowState array{max_id: int, group_ids: list<int>, position: int, cursors: array<int, array{last_size: int, last_id: int}>, exhausted: array<int, true>}
  */
 final class ReleaseProcessingService
 {
@@ -65,6 +67,10 @@ final class ReleaseProcessingService
     private const int COLLECTION_WINDOWS_PER_PASS = 20;
 
     private const string COLLECTION_WINDOW_CURSOR_PREFIX = 'cbp:release-window:cursor:';
+
+    private const string PRIORITY_WINDOW_CURSOR_PREFIX = 'cbp:release-priority-window:cursor:';
+
+    private const int PRIORITY_GROUP_PROBES_PER_PASS = 20;
 
     private bool $echoCLI;
 
@@ -275,14 +281,14 @@ final class ReleaseProcessingService
     }
 
     /**
-     * Validate and create one bounded collection window at a time. The cursor
-     * advances even when a delete or insert fails, leaving those rows for the
-     * next invocation without blocking later collections. Each invocation
-     * validates at most 20 windows and returns partial totals while a backlog
-     * remains. Separate group/global cursors resume the next invocation and
-     * retain their snapshot ceiling until exhausted, then wrap so ongoing
-     * arrivals cannot starve old failed rows. NZB-only work still drains using
-     * the existing success-count continuation rule.
+     * Prioritize numerically eligible collections, alternating with background
+     * cleanup under a shared budget of 20 validation windows. Independent
+     * cursors retain their snapshot ceilings until exhausted. The global
+     * priority reader probes groups round-robin using the same indexed query
+     * as a single-group worker, with at most 20 probes per invocation. All
+     * selected IDs still pass the complete cleanup rules before creation.
+     * Totals are partial while a backlog remains. NZB-only work retains the
+     * existing success-count continuation rule.
      *
      * @param  callable():void|null  $afterCreation
      * @param  callable():void|null  $afterPass
@@ -320,24 +326,57 @@ final class ReleaseProcessingService
             Cache::forget($cursorKey);
         }
         $moreCollections = $maxId > 0;
+        $priorityCursorKey = self::PRIORITY_WINDOW_CURSOR_PREFIX.($normalizedGroupId === null ? 'all' : 'group:'.$normalizedGroupId);
+        $priorityState = $this->loadPriorityWindowState($normalizedGroupId, $priorityCursorKey);
+        $morePriority = $priorityState['group_ids'] !== [];
+        $priorityProbes = 0;
+        $preferPriority = true;
         $windowsProcessed = 0;
+        $processedIds = [];
+        $nzbFilesAdded = $limit;
 
         do {
-            $totals['iterations']++;
-            $readWindow = $moreCollections && $windowsProcessed < self::COLLECTION_WINDOWS_PER_PASS;
-            $windowIds = $readWindow
-                ? (clone $candidateQuery)->where('id', '>', $lastId)->where('id', '<=', $maxId)
-                    ->orderBy('id')->limit($windowSize)->pluck('id')
-                    ->map(static fn ($id): int => (int) $id)->all()
-                : [];
-            if ($readWindow) {
-                $moreCollections = count($windowIds) === $windowSize;
-            }
-            if ($windowIds !== []) {
-                $lastId = $windowIds[array_key_last($windowIds)];
+            $windowIds = [];
+            $selectedReader = null;
+            while ($windowsProcessed < self::COLLECTION_WINDOWS_PER_PASS
+                && ($moreCollections || ($morePriority && $priorityProbes < self::PRIORITY_GROUP_PROBES_PER_PASS))) {
+                if (($preferPriority || ! $moreCollections) && $morePriority && $priorityProbes < self::PRIORITY_GROUP_PROBES_PER_PASS) {
+                    $priorityWindow = $this->nextPriorityCollectionWindow($normalizedGroupId, $priorityState, $windowSize, $priorityProbes, $processedIds);
+                    $windowIds = $priorityWindow['ids'];
+                    $morePriority = $priorityWindow['more'];
+                    $preferPriority = false;
+                    if ($windowIds === []) {
+                        $this->persistCollectionWindowState($priorityCursorKey, $priorityState, $morePriority);
+
+                        continue;
+                    }
+                    $selectedReader = 'priority';
+                } else {
+                    $pageIds = (clone $candidateQuery)->where('id', '>', $lastId)->where('id', '<=', $maxId)
+                        ->orderBy('id')->limit($windowSize + 1)->pluck('id')
+                        ->map(static fn ($id): int => (int) $id)->all();
+                    $moreCollections = count($pageIds) > $windowSize;
+                    $backgroundIds = array_slice($pageIds, 0, $windowSize);
+                    if ($backgroundIds !== []) {
+                        $lastId = $backgroundIds[array_key_last($backgroundIds)];
+                    }
+                    $windowIds = array_values(array_filter($backgroundIds, static fn (int $id): bool => ! isset($processedIds[$id])));
+                    $preferPriority = true;
+                    if ($windowIds === []) {
+                        $this->persistCollectionWindowState($cursorKey, ['last_id' => $lastId, 'max_id' => $maxId], $moreCollections);
+
+                        continue;
+                    }
+                    $selectedReader = 'background';
+                }
                 $windowsProcessed++;
-                $moreCollections = $moreCollections && $lastId < $maxId;
+                break;
             }
+
+            if ($windowIds === [] && $totals['iterations'] > 0 && $nzbFilesAdded < $limit) {
+                break;
+            }
+            $totals['iterations']++;
             $rejectedIds = $this->deleteUnwantedCollections($normalizedGroupId, $windowIds);
             $allowedIds = array_values(array_diff($windowIds, $rejectedIds));
 
@@ -358,20 +397,147 @@ final class ReleaseProcessingService
             if ($afterPass !== null) {
                 $afterPass();
             }
-
-            if ($readWindow) {
-                if ($moreCollections) {
-                    Cache::forever($cursorKey, ['last_id' => $lastId, 'max_id' => $maxId]);
-                } else {
-                    Cache::forget($cursorKey);
-                }
+            foreach ($windowIds as $id) {
+                $processedIds[$id] = true;
+            }
+            if ($selectedReader === 'priority') {
+                $this->persistCollectionWindowState($priorityCursorKey, $priorityState, $morePriority);
+            } elseif ($selectedReader === 'background') {
+                $this->persistCollectionWindowState($cursorKey, ['last_id' => $lastId, 'max_id' => $maxId], $moreCollections);
             }
 
-            $shouldContinue = ($moreCollections && $windowsProcessed < self::COLLECTION_WINDOWS_PER_PASS)
+            $shouldContinue = (($moreCollections || ($morePriority && $priorityProbes < self::PRIORITY_GROUP_PROBES_PER_PASS))
+                && $windowsProcessed < self::COLLECTION_WINDOWS_PER_PASS)
                 || $nzbFilesAdded >= $limit;
         } while ($shouldContinue);
 
         return $totals;
+    }
+
+    /** @return PriorityWindowState */
+    private function loadPriorityWindowState(?int $groupId, string $cursorKey): array
+    {
+        $savedState = Cache::get($cursorKey);
+        if ($this->isValidPriorityWindowState($savedState, $groupId)) {
+            return $savedState;
+        }
+
+        $maxId = (int) Collection::query()->where('filecheck', CollectionFileCheckStatus::Sized->value)
+            ->when($groupId !== null, static fn ($q) => $q->where('groups_id', $groupId))->max('id');
+        $groupIds = [];
+        if ($maxId > 0) {
+            $groupIds = $groupId !== null ? [$groupId] : UsenetGroup::query()
+                ->whereExists(static fn ($q) => $q->select(DB::raw(1))->from('collections as c')
+                    ->whereColumn('c.groups_id', 'usenet_groups.id')
+                    ->where('c.filecheck', CollectionFileCheckStatus::Sized->value)
+                    ->where('c.filesize', '>', 0)->where('c.id', '<=', $maxId))
+                ->orderBy('id')->pluck('id')->map(static fn ($id): int => (int) $id)->all();
+        }
+        Cache::forget($cursorKey);
+
+        return ['max_id' => $maxId, 'group_ids' => $groupIds, 'position' => 0, 'cursors' => [], 'exhausted' => []];
+    }
+
+    /**
+     * @phpstan-assert-if-true PriorityWindowState $state
+     */
+    private function isValidPriorityWindowState(mixed $state, ?int $groupId): bool
+    {
+        if (! is_array($state) || ! isset($state['max_id'], $state['group_ids'], $state['position'], $state['cursors'], $state['exhausted'])
+            || ! is_int($state['max_id']) || $state['max_id'] <= 0
+            || ! is_array($state['group_ids']) || ! array_is_list($state['group_ids']) || $state['group_ids'] === []
+            || ! is_int($state['position']) || $state['position'] < 0 || $state['position'] >= count($state['group_ids'])
+            || ! is_array($state['cursors']) || ! is_array($state['exhausted'])) {
+            return false;
+        }
+        foreach ($state['group_ids'] as $id) {
+            if (! is_int($id) || $id <= 0) {
+                return false;
+            }
+        }
+        if (count(array_unique($state['group_ids'])) !== count($state['group_ids'])
+            || ($groupId !== null && $state['group_ids'] !== [$groupId])) {
+            return false;
+        }
+        foreach ($state['cursors'] as $id => $cursor) {
+            if (! in_array($id, $state['group_ids'], true) || ! is_array($cursor)
+                || ! isset($cursor['last_size'], $cursor['last_id'])
+                || ! is_int($cursor['last_size']) || $cursor['last_size'] < 0
+                || ! is_int($cursor['last_id']) || $cursor['last_id'] < 0 || $cursor['last_id'] > $state['max_id']) {
+                return false;
+            }
+        }
+        foreach ($state['exhausted'] as $id => $done) {
+            if (! in_array($id, $state['group_ids'], true) || $done !== true) {
+                return false;
+            }
+        }
+
+        return count($state['exhausted']) < count($state['group_ids']);
+    }
+
+    /**
+     * @param  PriorityWindowState  $state
+     * @param  array<int, true>  $processedIds
+     * @return array{ids: list<int>, more: bool}
+     */
+    private function nextPriorityCollectionWindow(?int $groupId, array &$state, int $windowSize, int &$probes, array $processedIds): array
+    {
+        $inspected = 0;
+        $groupCount = count($state['group_ids']);
+        while ($probes < self::PRIORITY_GROUP_PROBES_PER_PASS && $inspected < $groupCount) {
+            $probeGroupId = $state['group_ids'][$state['position']];
+            $state['position'] = ($state['position'] + 1) % $groupCount;
+            $inspected++;
+            if (isset($state['exhausted'][$probeGroupId])) {
+                continue;
+            }
+            $probes++;
+            $groupSettings = UsenetGroup::getGroupByID($probeGroupId);
+            $applyNumeric = $groupId !== null || (int) ($groupSettings['active'] ?? 0) === 1;
+            $minSize = $applyNumeric ? max((int) ($groupSettings['minsizetoformrelease'] ?? 0), $this->settings->minSizeToFormRelease) : 0;
+            $minFiles = $applyNumeric ? max((int) ($groupSettings['minfilestoformrelease'] ?? 0), $this->settings->minFilesToFormRelease) : 0;
+            $query = Collection::query()->where('groups_id', $probeGroupId)
+                ->where('filecheck', CollectionFileCheckStatus::Sized->value)
+                ->where('filesize', '>=', max(1, $minSize))->where('id', '<=', $state['max_id']);
+            if ($applyNumeric && $this->settings->maxSizeToFormRelease > 0) {
+                $query->where('filesize', '<=', $this->settings->maxSizeToFormRelease);
+            }
+            if ($minFiles > 0) {
+                $query->where('totalfiles', '>=', $minFiles);
+            }
+            if (isset($state['cursors'][$probeGroupId])) {
+                $cursor = $state['cursors'][$probeGroupId];
+                $query->where(static fn ($q) => $q->where('filesize', '>', $cursor['last_size'])
+                    ->orWhere(static fn ($sameSize) => $sameSize->where('filesize', $cursor['last_size'])->where('id', '>', $cursor['last_id'])));
+            }
+            $page = $query->orderBy('filesize')->orderBy('id')->limit($windowSize + 1)->get(['id', 'filesize']);
+            $rows = $page->take($windowSize);
+            if ($page->count() <= $windowSize) {
+                $state['exhausted'][$probeGroupId] = true;
+            }
+            if ($rows->isNotEmpty()) {
+                $last = $rows->last();
+                $state['cursors'][$probeGroupId] = ['last_size' => (int) $last->filesize, 'last_id' => (int) $last->id];
+            }
+            $ids = $rows->pluck('id')->map(static fn ($id): int => (int) $id)
+                ->filter(static fn (int $id): bool => ! isset($processedIds[$id]))->values()->all();
+            if ($ids !== []) {
+                return ['ids' => $ids, 'more' => count($state['exhausted']) < $groupCount];
+            }
+        }
+
+        return ['ids' => [], 'more' => count($state['exhausted']) < $groupCount];
+    }
+
+    /** @param array<string, mixed> $state */
+    private function persistCollectionWindowState(string $cursorKey, array $state, bool $more): void
+    {
+        if ($more) {
+            Cache::forever($cursorKey, $state);
+        } else {
+            Cache::forget($cursorKey);
+        }
     }
 
     /**
