@@ -294,7 +294,8 @@ class ManticoreSearchQueryTest extends TestCase
 
         $this->assertIsString($driverSource);
         $this->assertStringContainsString("'media_video_codec',", $driverSource);
-        $this->assertStringContainsString('in_array($key, self::RELEASE_FIELD_SEARCH_FIELDS, true)', $driverSource);
+        $this->assertStringContainsString('self::RELEASE_FIELD_SEARCH_FIELDS,', $driverSource);
+        $this->assertStringContainsString('in_array($key, $allowedFields, true)', $driverSource);
         $this->assertStringContainsString("\$query->filter('has_media_info', '='", $driverSource);
         $this->assertStringContainsString("\$query->filter('media_unique_id', '='", $driverSource);
         $this->assertStringContainsString("\$query->filter('media_video_width', 'gte'", $driverSource);
@@ -310,8 +311,14 @@ class ManticoreSearchQueryTest extends TestCase
         $driverSource = file_get_contents(__DIR__.'/../../app/Services/Search/Drivers/ManticoreSearchDriver.php');
 
         $this->assertIsString($driverSource);
+        // Field terms are scoped with grouping parentheses, and `@@relaxed` is prefixed once for the whole query.
         $this->assertStringContainsString(
-            "\$terms[] = '@@relaxed '.self::scopeReleaseSearchQuery((string) \$value, \$prepared, '@'.\$key);",
+            "\$terms[] = self::scopeReleaseSearchQuery(\$rawValue, \$preparedValue, '@'.\$key);",
+            $driverSource
+        );
+        $this->assertStringContainsString("'@@relaxed '.implode(' ', \$terms)", $driverSource);
+        $this->assertStringNotContainsString(
+            "\$terms[] = '@@relaxed '.self::scopeReleaseSearchQuery(",
             $driverSource
         );
         $this->assertStringNotContainsString(

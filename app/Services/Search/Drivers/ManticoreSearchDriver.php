@@ -42,6 +42,11 @@ class ManticoreSearchDriver implements BulkReleaseIndexUpdater, SearchDriverInte
     private const AVAILABILITY_CHECK_CACHE_TTL = 30;
 
     /** @var list<string> */
+    /**
+     * Matches a release name in either name field; one selector is an OR across both fields.
+     */
+    private const string RELEASE_NAME_FIELDS_SELECTOR = '@(name,searchname)';
+
     private const RELEASE_FIELD_SEARCH_FIELDS = [
         'searchname',
         'plainsearchname',
@@ -911,6 +916,34 @@ class ManticoreSearchDriver implements BulkReleaseIndexUpdater, SearchDriverInte
     }
 
     /**
+     * Combine per-field terms into one query. `@@relaxed` is a query-wide modifier that is only valid
+     * once, at the start; repeating it before each field made every multi-field search (such as the
+     * PreDB title match on `name` and `searchname`) a syntax error.
+     *
+     * @param  array<string, mixed>  $searchArray
+     * @param  list<string>|null  $allowedFields  When given, only these string keys are searched
+     */
+    public static function buildFieldSearchExpression(array $searchArray, ?array $allowedFields = null): ?string
+    {
+        $terms = [];
+        foreach ($searchArray as $key => $value) {
+            if ($allowedFields !== null && (! is_string($key) || ! in_array($key, $allowedFields, true))) {
+                continue;
+            }
+            // An explicit check: empty() would also drop the legitimate search term "0".
+            if ($value !== null && $value !== '') {
+                $rawValue = (string) $value;
+                $preparedValue = self::prepareUserSearchQuery($rawValue);
+                if ($preparedValue !== '') {
+                    $terms[] = self::scopeReleaseSearchQuery($rawValue, $preparedValue, '@'.$key);
+                }
+            }
+        }
+
+        return $terms === [] ? null : '@@relaxed '.implode(' ', $terms);
+    }
+
+    /**
      * Build a release-name query that also handles punctuation used as token
      * separators in Usenet subjects (for example, WEB-DL.x265).
      *
@@ -923,7 +956,7 @@ class ManticoreSearchDriver implements BulkReleaseIndexUpdater, SearchDriverInte
     {
         $primary = self::scopePreparedQueryToField($preparedQuery, $fieldSelector);
 
-        if ($fieldSelector !== '@searchname' || self::queryHasNegation($rawQuery)) {
+        if (! in_array($fieldSelector, ['@searchname', self::RELEASE_NAME_FIELDS_SELECTOR], true) || self::queryHasNegation($rawQuery)) {
             return $primary;
         }
 
@@ -1307,9 +1340,30 @@ class ManticoreSearchDriver implements BulkReleaseIndexUpdater, SearchDriverInte
             }
         }
 
-        $result = $this->searchIndexes($this->getReleasesIndex(), '', [], $searchArray, $limit);
+        // The same text for both name fields means "match it in either one" (the PreDB title lookup); a
+        // per-field AND would miss releases whose searchname has not been fixed yet.
+        $nameText = self::sharedNameFieldText($searchArray);
+        $result = $nameText !== null
+            ? $this->searchIndexes($this->getReleasesIndex(), $nameText, ['name', 'searchname'], [], $limit) // @phpstan-ignore argument.type
+            : $this->searchIndexes($this->getReleasesIndex(), '', [], $searchArray, $limit);
 
         return ! empty($result) ? ($result['id'] ?? []) : [];
+    }
+
+    /**
+     * The shared text when a search covers exactly `name` and `searchname` with identical, non-empty values.
+     *
+     * @param  array<string, mixed>  $searchArray
+     */
+    public static function sharedNameFieldText(array $searchArray): ?string
+    {
+        if (count($searchArray) !== 2 || ! array_key_exists('name', $searchArray) || ! array_key_exists('searchname', $searchArray)) {
+            return null;
+        }
+
+        $name = (string) $searchArray['name'];
+
+        return $name !== '' && $name === (string) $searchArray['searchname'] ? $name : null;
     }
 
     /**
@@ -1668,19 +1722,8 @@ class ManticoreSearchDriver implements BulkReleaseIndexUpdater, SearchDriverInte
         // Use prepareUserSearchQuery() to preserve search operators (!, -, "", |, *)
         $searchExpr = null;
         if (! empty($searchArray)) {
-            $terms = [];
-            foreach ($searchArray as $key => $value) {
-                if (! empty($value)) {
-                    $rawValue = (string) $value;
-                    $preparedValue = self::prepareUserSearchQuery($rawValue);
-                    if (! empty($preparedValue)) {
-                        $terms[] = '@@relaxed '.self::scopeReleaseSearchQuery($rawValue, $preparedValue, '@'.$key);
-                    }
-                }
-            }
-            if (! empty($terms)) {
-                $searchExpr = implode(' ', $terms);
-            } else {
+            $searchExpr = self::buildFieldSearchExpression($searchArray);
+            if ($searchExpr === null) {
                 if (config('app.debug')) {
                     Log::debug('ManticoreSearch::searchIndexes no terms after escaping searchArray');
                 }
@@ -2901,22 +2944,15 @@ class ManticoreSearchDriver implements BulkReleaseIndexUpdater, SearchDriverInte
                         ->option('distance', $distance)
                         ->option('field_weights', $profile['fields']);
                 } else {
-                    $searchArray = $this->phrasesToSearchArray($phrases);
-                    $terms = [];
-                    foreach ($searchArray as $key => $value) {
-                        if (! is_string($key) || ! in_array($key, self::RELEASE_FIELD_SEARCH_FIELDS, true) || $value === '' || $value === null) {
-                            continue;
-                        }
-                        $prepared = self::prepareUserSearchQuery((string) $value);
-                        if ($prepared !== '') {
-                            $terms[] = '@@relaxed '.self::scopeReleaseSearchQuery((string) $value, $prepared, '@'.$key);
-                        }
-                    }
-                    if ($terms === []) {
+                    $searchExpression = self::buildFieldSearchExpression(
+                        $this->phrasesToSearchArray($phrases),
+                        self::RELEASE_FIELD_SEARCH_FIELDS,
+                    );
+                    if ($searchExpression === null) {
                         return ['ids' => [], 'total' => 0, 'fuzzy' => false];
                     }
                     $profile = ManticoreIndexRegistry::profile('releases');
-                    $query->search(implode(' ', $terms))
+                    $query->search($searchExpression)
                         ->option('ranker', $profile['ranker'])
                         ->option('field_weights', $profile['fields']);
                 }

@@ -335,6 +335,12 @@ These bugs turned up while building and running the self-hosted stack in `docker
 - **Symptom:** on 2026-10-11, 13 `TypeError: throwError(): Argument #1 ($message) must be of type string, null given` (lines 284 and 322) and a post-processing failure at 02:50. At 05:20 and 05:25 UTC Newshosting answered a burst of logins with `Authentication rejected` (the account was probably at its connection limit, shared with other clients). All 10 configured retries were spent within about two seconds, then the `TypeError` skipped every caller's `isError()` handling, including the alternate-provider fallback, and failed the worker (and for `safe_binaries`, its whole batch).
 - **Fix (staged):** a `failureMessage()` helper prints the text and returns it, and every retry now waits `0.4 s × attempt`, capped at 3 s (about 20 s over 10 retries). Covered by `NNTPServiceConnectFailureTest`, which fails without the change.
 
+### 46. Every multi-field Manticore search is a syntax error, so PreDB title matching never matches (Fixed)
+
+- **Where:** `ManticoreSearchDriver::searchIndexes()` (`app/Services/Search/Drivers/ManticoreSearchDriver.php`) prefixed each field's term with `@@relaxed` and joined them, giving `@@relaxed @name (…) @@relaxed @searchname (…)`. `@@relaxed` is a query-wide modifier that is only valid once, at the start.
+- **Symptom:** `P08: syntax error, unexpected TOK_FIELDLIMIT near ' @searchname (…)'`. The `releases:fix-names predbft` pass searches `name` and `searchname` for every PreDB title, so on 2026-10-11 at 06:33–06:34 UTC it logged 570 of these in two minutes and matched no release. The query reproduces directly against Manticore, and the same query with a single `@@relaxed` succeeds.
+- **Fix (staged):** the terms are built by `buildFieldSearchExpression()`, which prefixes `@@relaxed` once. Single-field queries are unchanged. Covered by `ManticoreFieldSearchExpressionTest`, which fails without the change.
+
 ## Issues in the docker/ stack itself (all fixed)
 
 | Issue | Fix |
