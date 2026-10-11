@@ -14,6 +14,14 @@ return [
 
     'enabled' => (bool) env('PREDB_FEEDS_ENABLED', false),
 
+    // Default keys: predb_club, predb_net, predb_me, predatabase, xrel, xrel_p2p. These OPT-IN sources are never
+    // in the default list; add them to PREDB_FEED_SOURCES explicitly:
+    //  - predb_org: predb.org history import (newest entries trail by about a day).
+    //  - srrdb: first page only (terms: "Use but don't scrape").
+    //  - scnsrc_me: scnsrc.me RSS; titles use spaces, so names are lossy (dots are guessed).
+    //  - eztv: EZTV RSS; P2P TV names, lossy spaced titles; robots.txt unverified (Cloudflare challenge).
+    //  - predb_ovh: predb.ovh JSON API; documented v1 API; not yet verified against live responses.
+    //  - apibay: The Pirate Bay top-100 recent dump (movies/TV only); P2P names, not scene PREs.
     'sources' => array_values(array_filter(array_map(
         'trim',
         explode(',', (string) env('PREDB_FEED_SOURCES', 'predb_club,predb_net,predb_me,predatabase,xrel,xrel_p2p'))
@@ -34,6 +42,10 @@ return [
         'srrdb' => 'https://api.srrdb.com/v1/search/order:date-desc',
         'xrel' => 'https://api.xrel.to/v2/release/latest.json',
         'xrel_p2p' => 'https://api.xrel.to/v2/p2p/releases.json',
+        'scnsrc_me' => 'https://www.scnsrc.me/feed',
+        'eztv' => 'https://eztvx.to/ezrss.xml',
+        'predb_ovh' => 'https://predb.ovh/api/v1/',
+        'apibay' => 'https://apibay.org/precompiled/data_top100_recent.json',
     ],
 
     // Sources whose terms forbid scraping: never paged beyond the first page (srrDB: "Use but don't

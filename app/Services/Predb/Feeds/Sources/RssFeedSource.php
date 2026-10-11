@@ -12,6 +12,11 @@ use Throwable;
 
 /**
  * Generic RSS 2.0 PreDB feed (e.g. predb.me). Only the item title (and pubDate when present) is used.
+ *
+ * Opt-in feeds that publish human-readable titles ("Show S01E01 720p WEB h264-GROUP", scnsrc.me, EZTV) set
+ * $spacedTitles: whitespace becomes dots and a trailing " EZTV" tag is dropped. That is lossy (the original
+ * dots, underscores and casing are unrecoverable), so those sources must stay opt-in. $mapCategory copies the
+ * first RSS <category> element into the entry category.
  */
 final class RssFeedSource extends HttpFeedSource
 {
@@ -22,6 +27,8 @@ final class RssFeedSource extends HttpFeedSource
         int $pageSize = 100,
         int $timeout = 15,
         string $userAgent = 'NNTmux-PreDB-Importer/1.0',
+        private readonly bool $spacedTitles = false,
+        private readonly bool $mapCategory = false,
     ) {
         parent::__construct($endpoint, $pageSize, $timeout, $userAgent);
     }
@@ -72,13 +79,20 @@ final class RssFeedSource extends HttpFeedSource
         foreach ($document->channel->item as $item) {
             $title = trim((string) $item->title);
 
+            if ($this->spacedTitles) {
+                $title = $this->dotted($title);
+            }
+
             if ($title === '' || str_contains($title, ' ')) {
                 continue;
             }
 
+            $category = $this->mapCategory ? trim((string) $item->category) : '';
+
             $entries[] = new PredbFeedEntry(
                 title: $title,
                 source: $this->sourceLabel,
+                category: $category !== '' ? $category : null,
                 predate: $this->parseDate((string) $item->pubDate),
             );
 
@@ -88,6 +102,13 @@ final class RssFeedSource extends HttpFeedSource
         }
 
         return $entries;
+    }
+
+    private function dotted(string $title): string
+    {
+        $title = (string) preg_replace('/\s+EZTV$/i', '', trim($title));
+
+        return (string) preg_replace('/\s+/', '.', $title);
     }
 
     private function parseDate(string $value): ?CarbonImmutable

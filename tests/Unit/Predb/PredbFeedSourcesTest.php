@@ -6,9 +6,11 @@ namespace Tests\Unit\Predb;
 
 use App\Models\Predb;
 use App\Services\Predb\Feeds\PredbFeedEntry;
+use App\Services\Predb\Feeds\Sources\ApibaySource;
 use App\Services\Predb\Feeds\Sources\PredbClubSource;
 use App\Services\Predb\Feeds\Sources\PredbNetSource;
 use App\Services\Predb\Feeds\Sources\PredbOrgSource;
+use App\Services\Predb\Feeds\Sources\PredbOvhSource;
 use App\Services\Predb\Feeds\Sources\RssFeedSource;
 use App\Services\Predb\Feeds\Sources\SrrdbSource;
 use App\Services\Predb\Feeds\Sources\XrelSource;
@@ -154,6 +156,63 @@ final class PredbFeedSourcesTest extends TestCase
         $this->assertSame(Predb::PRE_NONUKE, $byStatus[1]->nuked);
         $this->assertNull($entries[0]->size);
         $this->assertNull($entries[0]->files);
+    }
+
+    #[Test]
+    public function scnsrc_titles_are_dotted_and_the_first_category_is_kept(): void
+    {
+        $source = new RssFeedSource('scnsrc_me', 'scnsrc.me', 'https://www.scnsrc.me/feed', spacedTitles: true, mapCategory: true);
+        $entries = $source->parseXml((string) file_get_contents($this->fixture('scnsrc_me.xml')));
+
+        $this->assertCount(2, $entries);
+        $this->assertSame('Show.Name.S01E01.720p.WEB.h264-GROUP', $entries[0]->title);
+        $this->assertSame('scnsrc.me', $entries[0]->source);
+        $this->assertSame('TV', $entries[0]->category);
+        $this->assertSame('2026-10-09 02:37:37', $entries[0]->predate?->format('Y-m-d H:i:s'));
+        $this->assertNull($entries[1]->category);
+    }
+
+    #[Test]
+    public function eztv_titles_are_dotted_and_the_site_tag_is_dropped(): void
+    {
+        $source = new RssFeedSource('eztv', 'eztv', 'https://eztvx.to/ezrss.xml', spacedTitles: true);
+        $entries = $source->parseXml((string) file_get_contents($this->fixture('eztv.xml')));
+
+        $this->assertCount(1, $entries);
+        $this->assertSame('Show.Name.S02E03.1080p.WEB.H264-GROUP', $entries[0]->title);
+        $this->assertSame('eztv', $entries[0]->source);
+        $this->assertNull($entries[0]->category);
+    }
+
+    #[Test]
+    public function predb_ovh_rows_are_normalised_with_status_mapping(): void
+    {
+        $entries = (new PredbOvhSource('https://predb.ovh/api/v1/'))->parseRows($this->json('predb_ovh.json')['data']['rows']);
+
+        $this->assertCount(3, $entries);
+        $this->assertSame('predb.ovh', $entries[0]->source);
+        $this->assertSame('TV-WEB-X264', $entries[0]->category);
+        $this->assertSame('457MB', $entries[0]->size);
+        $this->assertSame('32', $entries[0]->files);
+        $this->assertSame(1791513593, $entries[0]->predate?->getTimestamp());
+        $this->assertNull($entries[1]->size);
+        $this->assertSame(Predb::PRE_NUKED, $entries[2]->nuked);
+        $this->assertSame('dupe.2026-10-01', $entries[2]->nukeReason);
+    }
+
+    #[Test]
+    public function apibay_keeps_only_movie_and_tv_categories_and_converts_bytes(): void
+    {
+        $entries = (new ApibaySource('https://apibay.org/precompiled/data_top100_recent.json'))->parseRows($this->json('apibay.json'));
+
+        $this->assertSame(['Some.Show.S01E01.1080p.WEB.h264-GRP', 'Some.Movie.2026.720p.BluRay.x264-GRP'], array_map(static fn (PredbFeedEntry $e): string => $e->title, $entries));
+        $this->assertSame('apibay', $entries[0]->source);
+        $this->assertSame('TV-HD', $entries[0]->category);
+        $this->assertSame('MOVIE-HD', $entries[1]->category);
+        $this->assertSame('1024MB', $entries[0]->size);
+        $this->assertSame('3', $entries[0]->files);
+        $this->assertNull($entries[1]->files);
+        $this->assertSame(1791513593, $entries[0]->predate?->getTimestamp());
     }
 
     #[Test]

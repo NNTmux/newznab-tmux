@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\Services\Predb\Feeds;
 
 use App\Services\Predb\Feeds\Contracts\PredbFeedSource;
+use App\Services\Predb\Feeds\Sources\ApibaySource;
 use App\Services\Predb\Feeds\Sources\PredatabaseSource;
 use App\Services\Predb\Feeds\Sources\PredbClubSource;
 use App\Services\Predb\Feeds\Sources\PredbNetSource;
 use App\Services\Predb\Feeds\Sources\PredbOrgSource;
+use App\Services\Predb\Feeds\Sources\PredbOvhSource;
 use App\Services\Predb\Feeds\Sources\RssFeedSource;
 use App\Services\Predb\Feeds\Sources\SrrdbSource;
 use App\Services\Predb\Feeds\Sources\XrelSource;
@@ -24,7 +26,7 @@ class PredbFeedSourceFactory
      */
     public function availableKeys(): array
     {
-        return ['predb_club', 'predb_net', 'predb_me', 'predb_org', 'predatabase', 'srrdb', 'xrel', 'xrel_p2p'];
+        return ['predb_club', 'predb_net', 'predb_me', 'predb_org', 'predatabase', 'srrdb', 'xrel', 'xrel_p2p', 'scnsrc_me', 'eztv', 'predb_ovh', 'apibay'];
     }
 
     /**
@@ -54,6 +56,10 @@ class PredbFeedSourceFactory
             'srrdb' => new SrrdbSource($endpoint, $pageSize, $timeout, $userAgent, (string) config('predb_feeds.srrdb_timezone', 'Europe/Brussels')),
             'xrel' => new XrelSource($endpoint, $pageSize, $timeout, $userAgent),
             'xrel_p2p' => new XrelSource($endpoint, $pageSize, $timeout, $userAgent, p2p: true),
+            'scnsrc_me' => new RssFeedSource('scnsrc_me', 'scnsrc.me', $endpoint, $pageSize, $timeout, $userAgent, spacedTitles: true, mapCategory: true),
+            'eztv' => new RssFeedSource('eztv', 'eztv', $endpoint, $pageSize, $timeout, $userAgent, spacedTitles: true),
+            'predb_ovh' => new PredbOvhSource($endpoint, $pageSize, $timeout, $userAgent),
+            'apibay' => new ApibaySource($endpoint, $pageSize, $timeout, $userAgent),
             default => throw new InvalidArgumentException("Unknown PreDB feed source [{$key}]. Available: ".implode(', ', $this->availableKeys())),
         };
     }

@@ -1,0 +1,4 @@
+{"status":"success","message":"","data":{"rowCount":3,"offset":0,"reqCount":3,"total":3,"time":0.01,"rows":[
+{"id":1,"name":"WAR.2026.S01E02.FRENCH.WEB.H264-BAWLS","team":"BAWLS","cat":"TV-WEB-X264","genre":"","url":"","size":467968,"files":32,"preAt":1791513593,"nuke":null},
+{"id":2,"name":"Nybble_and_Nibble_CD32_AMIGA-bADkARMA","team":"bADkARMA","cat":"GAMES","genre":"","url":"","size":0,"files":0,"preAt":1791513524,"nuke":null},
+{"id":3,"name":"Some.Movie.2026.1080p.WEB.H264-NUKED","team":"NUKED","cat":"X264-1080","genre":"","url":"","size":2202112,"files":46,"preAt":1791510000,"nuke":{"id":9,"typeId":1,"type":"nuke","preId":3,"reason":"dupe.2026-10-01","net":"x","nukeAt":1791510100}}]}}
