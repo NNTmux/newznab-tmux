@@ -327,6 +327,14 @@ These bugs turned up while building and running the self-hosted stack in `docker
 - **Symptom:** with about 98M `parts` rows, `SELECT COUNT(*) FROM parts` took 136 seconds (binaries 9 s). The health check logged `monitor_heartbeat_stale` roughly every 15 minutes (03:51, 04:06, 04:21 UTC on 2026-10-11), and at 04:23:36 it failed 5 times in a row, so `indexer.sh` exited and Docker restarted the container, cancelling every running worker. Earlier cancellation bursts (00:25, 01:21) have the same signature. The monitor only displays these counts.
 - **Fix (staged):** tables over 1M rows use InnoDB's row estimate from `information_schema`; small tables and SQLite keep the exact count. Covered by `test_large_tables_use_the_row_estimate_and_small_ones_an_exact_count`.
 
+### 45. NNTP connect and login failures throw a TypeError, and the retry loop never pauses (Fixed)
+
+- **Where:** `NNTPService::doConnect()` and `connect()` (`app/Services/NNTP/NNTPService.php`).
+  - Six `throwError(cli()->error($message))` calls passed the return value of `cli()->error()`, which prints and returns `void`, into `throwError(string)`.
+  - The retry loop's two failure branches `continue`d before reaching the "sleep .4 seconds between retries", so every retry ran back to back.
+- **Symptom:** on 2026-10-11, 13 `TypeError: throwError(): Argument #1 ($message) must be of type string, null given` (lines 284 and 322) and a post-processing failure at 02:50. At 05:20 and 05:25 UTC Newshosting answered a burst of logins with `Authentication rejected` (the account was probably at its connection limit, shared with other clients). All 10 configured retries were spent within about two seconds, then the `TypeError` skipped every caller's `isError()` handling, including the alternate-provider fallback, and failed the worker (and for `safe_binaries`, its whole batch).
+- **Fix (staged):** a `failureMessage()` helper prints the text and returns it, and every retry now waits `0.4 s × attempt`, capped at 3 s (about 20 s over 10 retries). Covered by `NNTPServiceConnectFailureTest`, which fails without the change.
+
 ## Issues in the docker/ stack itself (all fixed)
 
 | Issue | Fix |

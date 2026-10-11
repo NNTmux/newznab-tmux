@@ -269,6 +269,8 @@ class NNTPService extends NntpClient
 
             // If error, try to connect again.
             if ($cErr && $retries > 0) {
+                $this->pauseBeforeRetry($this->_nntpRetries - $retries);
+
                 continue;
             }
 
@@ -281,7 +283,7 @@ class NNTPService extends NntpClient
                     ': '.
                     $cError;
 
-                return $this->throwError(cli()->error($message));
+                return $this->throwError($this->failureMessage($message));
             }
 
             // If we are connected, try to authenticate.
@@ -306,6 +308,8 @@ class NNTPService extends NntpClient
 
                     // If error, try to authenticate again.
                     if ($aErr && $retries > 0) {
+                        $this->pauseBeforeRetry($this->_nntpRetries - $retries);
+
                         continue;
                     }
 
@@ -319,7 +323,7 @@ class NNTPService extends NntpClient
                             $userName.
                             ' ('.$aError.')';
 
-                        return $this->throwError(cli()->error($message));
+                        return $this->throwError($this->failureMessage($message));
                     }
                 }
             }
@@ -337,13 +341,34 @@ class NNTPService extends NntpClient
                 break;
             }
 
-            // Sleep .4 seconds between retries.
-            usleep(400000);
+            $this->pauseBeforeRetry($this->_nntpRetries - $retries);
         }
         // If we somehow got out of the loop, return an error.
         $message = 'Unable to connect to '.$this->_currentServer.$enc;
 
-        return $this->throwError(cli()->error($message));
+        return $this->throwError($this->failureMessage($message));
+    }
+
+    /**
+     * Print an NNTP failure and hand the text back for the Error object. cli()->error() prints and
+     * returns void, so passing its result to throwError() raised a TypeError that bypassed every
+     * caller's isError() handling (including the alternate-provider fallback) and killed the worker.
+     */
+    protected function failureMessage(string $message): string
+    {
+        cli()->error($message);
+
+        return $message;
+    }
+
+    /**
+     * Wait before retrying a failed connect or login. A provider that rejects logins because the account
+     * is at its connection limit needs seconds, not milliseconds, to free a slot, and the retry loop's
+     * `continue` paths used to skip the pause entirely, spending every retry within about two seconds.
+     */
+    protected function pauseBeforeRetry(int $attempt): void
+    {
+        usleep(min(3000, 400 * max(1, $attempt)) * 1000);
     }
 
     /**
@@ -665,7 +690,7 @@ class NNTPService extends NntpClient
         } else {
             $message = 'Wrong Identifier type, array, int or string accepted. This type of var was passed: '.gettype($identifiers);
 
-            return $this->throwError(cli()->error($message));
+            return $this->throwError($this->failureMessage($message));
         }
 
         if ($aConnected === true) {
@@ -919,7 +944,7 @@ class NNTPService extends NntpClient
             if ($buffer === false || $buffer === '') {
                 if ((stream_get_meta_data($socket)['timed_out'] ?? false) || feof($socket)) {
                     $message = 'Error fetching data from usenet server while downloading OVER headers.';
-                    $error = $this->throwError(cli()->error($message), 1000);
+                    $error = $this->throwError($this->failureMessage($message), 1000);
 
                     return $error;
                 }
@@ -935,7 +960,7 @@ class NNTPService extends NntpClient
                 $out = @inflate_add($inflate, $buffer, ZLIB_SYNC_FLUSH);
                 if ($out === false) {
                     $message = 'Decompression of OVER headers failed.';
-                    $error = $this->throwError(cli()->error($message), 1000);
+                    $error = $this->throwError($this->failureMessage($message), 1000);
 
                     return $error;
                 }
