@@ -7013,21 +7013,21 @@
         },
         {
             "name": "stechstudio/laravel-zipstream",
-            "version": "5.10",
+            "version": "5.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/stechstudio/laravel-zipstream.git",
-                "reference": "be02faa07c3a74f23ad76148b2f8f6007fc3eb87"
+                "reference": "e3c2f33131c0c08edccb2f00775d6ea41b5c5cdd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/stechstudio/laravel-zipstream/zipball/be02faa07c3a74f23ad76148b2f8f6007fc3eb87",
-                "reference": "be02faa07c3a74f23ad76148b2f8f6007fc3eb87",
+                "url": "https://api.github.com/repos/stechstudio/laravel-zipstream/zipball/e3c2f33131c0c08edccb2f00775d6ea41b5c5cdd",
+                "reference": "e3c2f33131c0c08edccb2f00775d6ea41b5c5cdd",
                 "shasum": ""
             },
             "require": {
-                "guzzlehttp/guzzle": "^7.0",
-                "guzzlehttp/psr7": "^2.6",
+                "guzzlehttp/guzzle": "^7.0|^8.0",
+                "guzzlehttp/psr7": "^2.6|^3.0",
                 "illuminate/support": "^10.0|^11.0|^12.0|^13.0",
                 "league/flysystem-path-prefixing": "^3.28",
                 "maennchen/zipstream-php": "^v3.0",
@@ -7074,9 +7074,9 @@
             ],
             "support": {
                 "issues": "https://github.com/stechstudio/laravel-zipstream/issues",
-                "source": "https://github.com/stechstudio/laravel-zipstream/tree/5.10"
+                "source": "https://github.com/stechstudio/laravel-zipstream/tree/5.11"
             },
-            "time": "2026-03-18T12:49:12+00:00"
+            "time": "2026-10-10T22:23:05+00:00"
         },
         {
             "name": "symfony/cache",
