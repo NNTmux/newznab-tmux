@@ -69,6 +69,10 @@ services:
   indexer:
     <<: *app
     command: ["/app/deploy/cloud/tmux.sh"]
+    environment:
+      PHP_INI_SCAN_DIR: /usr/local/etc/php/conf.d:/usr/local/etc/php/indexer-conf.d
+      YENC_DECODER: auto
+      YENC_NATIVE_LIBRARY: /usr/local/lib/nntmux/libnzbyenc.so
     tty: true
     mem_limit: 8g
     healthcheck:

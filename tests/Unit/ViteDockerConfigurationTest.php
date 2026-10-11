@@ -16,6 +16,32 @@ class ViteDockerConfigurationTest extends TestCase
         $this->assertMatchesRegularExpression('/^ENV LANG=C\.UTF-8$/m', $matches[1]);
     }
 
+    public function test_cloud_indexer_image_bundles_the_native_yenc_decoder(): void
+    {
+        $dockerfile = $this->projectFile('Dockerfile');
+
+        $this->assertMatchesRegularExpression('/^FROM rust:1\.98-bookworm AS yenc$/m', $dockerfile);
+        $this->assertStringContainsString('cargo test --release --locked', $dockerfile);
+        $this->assertStringContainsString('COPY --from=yenc /out/libnzbyenc.so /usr/local/lib/nntmux/libnzbyenc.so', $dockerfile);
+        $this->assertMatchesRegularExpression('/install-php-extensions[^\n]+\bffi\b/', $dockerfile);
+        $this->assertStringContainsString(
+            'COPY docker/app/php/yenc-ffi.ini /usr/local/etc/php/indexer-conf.d/99-yenc-ffi.ini',
+            $dockerfile,
+        );
+        $this->assertStringContainsString('ffi.enable = false', $this->projectFile('docker/8.5/php.ini'));
+        $this->assertSame("ffi.enable = true\n", $this->projectFile('docker/app/php/yenc-ffi.ini'));
+
+        $cloudCompose = Yaml::parse($this->projectFile('deploy/cloud/compose.yaml'));
+        $environment = $cloudCompose['services']['indexer']['environment'];
+
+        $this->assertSame('auto', $environment['YENC_DECODER']);
+        $this->assertSame('/usr/local/lib/nntmux/libnzbyenc.so', $environment['YENC_NATIVE_LIBRARY']);
+        $this->assertSame(
+            '/usr/local/etc/php/conf.d:/usr/local/etc/php/indexer-conf.d',
+            $environment['PHP_INI_SCAN_DIR'],
+        );
+    }
+
     public function test_compose_uses_latest_tags_for_services_that_publish_them(): void
     {
         $this->assertServicesUseLatestTags('docker-compose.yml.prod-dist');

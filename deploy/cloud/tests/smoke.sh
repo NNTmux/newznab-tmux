@@ -81,6 +81,15 @@ CONFIG
 expected_hash=$(sha256sum "$root/config/application.env" | cut -d ' ' -f1)
 docker run --rm --user 0:0 --entrypoint sh -v "$root/data:/setup" -v "$root/config/application.env:/configuration.env" "$image" -c 'mkdir -p /setup/storage /setup/install; chown -R 33:33 /setup/storage /setup/install /configuration.env'
 compose config --quiet
+# shellcheck disable=SC2016 # The PHP payload must receive its $ expressions literally.
+compose run --rm --no-deps indexer php -r '
+require "/app/vendor/autoload.php";
+$decoder = (new App\Services\Yenc\DecoderFactory)->make((string) getenv("YENC_DECODER"), (string) getenv("YENC_NATIVE_LIBRARY"));
+if (! $decoder instanceof App\Services\Yenc\NativePayloadDecoder || $decoder->decode("klm=@=J=M=}..\x0b==") !== "ABC\xd6\xe0\xe3\x13\x04\x04\xe1\xd3") {
+    fwrite(STDERR, "Native yEnc is not available to the indexer.\n");
+    exit(1);
+}
+'
 compose up -d --wait --wait-timeout 300 mariadb redis manticore
 compose run --rm --no-deps web php artisan nntmux:deploy-init --no-interaction
 if compose run --rm --no-deps web php artisan nntmux:deploy-init --no-interaction; then

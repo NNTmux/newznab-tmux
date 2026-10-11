@@ -1,6 +1,14 @@
 # syntax=docker/dockerfile:1
 FROM composer:2.8 AS composer
 FROM node:22-bookworm AS node
+FROM rust:1.98-bookworm AS yenc
+WORKDIR /src
+COPY docker/app/nzb-yenc-ffi/ /src/
+RUN --mount=type=cache,target=/usr/local/cargo/registry \
+    cargo test --release --locked \
+    && cargo build --release --locked \
+    && install -D -m 0644 target/release/libnzbyenc.so /out/libnzbyenc.so
+
 FROM dunglas/frankenphp:1-php8.5-bookworm AS build
 WORKDIR /app
 COPY --from=composer /usr/bin/composer /usr/local/bin/composer
@@ -31,8 +39,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     optipng pngquant libavif-bin python3 time procps mariadb-client libmagic1 \
     && rm -rf /var/lib/apt/lists/*
 RUN install-php-extensions bcmath exif gd intl mbstring pdo_mysql pdo_sqlite sockets pcntl redis imagick zip
+RUN install-php-extensions ffi
+COPY --from=yenc /out/libnzbyenc.so /usr/local/lib/nntmux/libnzbyenc.so
 COPY --from=build --chown=www-data:www-data /app /app
 COPY docker/8.5/php.ini /usr/local/etc/php/conf.d/99-nntmux.ini
+COPY docker/app/php/yenc-ffi.ini /usr/local/etc/php/indexer-conf.d/99-yenc-ffi.ini
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
     && mkdir -p /app/_install /app/storage/covers /app/storage/app/public \
     && ln -s ../storage/covers /app/public/covers \
