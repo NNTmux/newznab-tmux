@@ -99,6 +99,24 @@ class TmuxFixNamesScheduleTest extends TestCase
     }
 
     #[Test]
+    public function the_slow_par2_download_passes_run_after_the_database_only_ones(): void
+    {
+        $this->assertTrue($this->runTask(alive: false, renames: 5));
+
+        $command = $this->launched[0];
+        $seven = strpos($command, 'releases:fix-names 7 ');
+        $eight = strpos($command, 'releases:fix-names 8 ');
+        $this->assertNotFalse($seven);
+        $this->assertNotFalse($eight);
+        foreach ([3, 4, 5, 6, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20] as $level) {
+            $position = strpos($command, "releases:fix-names {$level} ");
+            $this->assertNotFalse($position, "method {$level} is scheduled");
+            $this->assertLessThan($seven, $position, "method {$level} runs before the NNTP passes");
+        }
+        $this->assertLessThan($eight, $seven);
+    }
+
+    #[Test]
     public function the_pane_idles_when_nothing_is_due(): void
     {
         config(['tmux.fix_names.predbft' => false]);

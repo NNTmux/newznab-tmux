@@ -487,9 +487,18 @@ class TmuxTaskRunner
     protected function fixNamesCommands(bool $renamePasses, bool $fullBacklog, bool $predbft): array
     {
         $artisan = escapeshellarg(PHP_BINARY).' '.escapeshellarg(base_path('artisan'));
-        $levels = $renamePasses ? [3, 5, 7, 9, 11, 13, 15, 17, 19] : [];
+        // Methods 7 and 8 download PAR2 files from Usenet and can run for an hour or more, so they go last:
+        // the database-only passes (NFO, file names, mediainfo, hashes) then run first every cycle instead of
+        // waiting behind them.
+        $levels = $renamePasses ? [3, 5, 9, 11, 13, 15, 17, 19] : [];
         if ($fullBacklog) {
-            array_push($levels, 4, 6, 8, 10, 12, 14, 16, 18, 20);
+            array_push($levels, 4, 6, 10, 12, 14, 16, 18, 20);
+        }
+        if ($renamePasses) {
+            $levels[] = 7;
+        }
+        if ($fullBacklog) {
+            $levels[] = 8;
         }
 
         $commands = array_map(
