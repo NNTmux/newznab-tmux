@@ -371,6 +371,12 @@ These bugs turned up while building and running the self-hosted stack in `docker
 - **Fix (staged):** the limit is now `tmux.monitor.heartbeat_max_age` (`TMUX_HEARTBEAT_MAX_AGE`, default 180 s). A genuinely hung monitor is still reported once its heartbeat is 3 minutes old, and the supervisor restarts the container after the next `INDEXER_MAX_FAILURES` checks (default 10, 30 seconds apart), roughly 8 minutes in total. Covered by two new `TmuxHealthCheckCommandTest` cases.
 - **Related, not fixed:** the release stage is the real limiter. It updates `collections` one row at a time (`UPDATE collections SET filesize…, filecheck…`) across a table of about 14.5M rows, so a pass takes over an hour at low CPU while ingestion keeps adding collections. That needs less ingestion or a set-based release pass, and is recorded as open here.
 
+### 51. Two TV workers adding the same show: the loser dies on a duplicate key and fails its batch (Fixed)
+
+- **Where:** `AbstractTvProvider::add()` (`app/Services/TvProcessing/Providers/AbstractTvProvider.php`) looks a video up by title and, if there is none, calls `Video::create()`. Nothing stops a second worker from inserting the same show in between.
+- **Symptom:** `SQLSTATE[23000] 1062 Duplicate entry 'Less Than Evil-0-2018-12-03 00:00:00-KR' for key 'ix_videos_title'` escaped, killed the worker (exit 1) and failed the whole `postProcess_tv` batch on 2026-10-11 at 13:25 UTC (4 times that day).
+- **Fix (staged):** `add()` catches the unique violation, loads the row the other worker created and takes the normal update path. If the row can't be found the original exception is rethrown. Covered by `TvProviderVideoInsertRaceTest`, which fails without the change.
+
 ## Issues in the docker/ stack itself (all fixed)
 
 | Issue | Fix |
