@@ -211,6 +211,26 @@ class ReleaseUpdateService
     }
 
     /**
+     * Run work that renames a release, and send its search index update only after the work returns, so a
+     * caller's own transaction has committed first. A throwing callback sends no update.
+     */
+    public function deferSearchSync(int $releaseId, \Closure $work): void
+    {
+        $this->searchSyncCoordinator->beginReleaseScope($releaseId);
+
+        try {
+            $work();
+        } catch (\Throwable $exception) {
+            $this->searchSyncCoordinator->discard($releaseId);
+            $this->searchSyncCoordinator->finishReleaseScope();
+
+            throw $exception;
+        }
+
+        $this->searchSyncCoordinator->finishReleaseScope();
+    }
+
+    /**
      * Check if the source is trusted enough to bypass plausibility checks.
      */
     protected function isTrustedSource(string $type, string $method, int $preId): bool

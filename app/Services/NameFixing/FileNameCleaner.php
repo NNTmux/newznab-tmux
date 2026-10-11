@@ -82,6 +82,46 @@ class FileNameCleaner
     private const SUBTITLE_EXTENSIONS = '/\.(srt|sub|idx|ass|ssa|vtt|sup)$/i';
 
     /**
+     * Strip archive wrappers and part/volume markers repeatedly (`.rar.par2`, `.tar.zst`, `.7z.003`,
+     * `.part01.rar`), then at most one payload extension. Only one, so a title that ends in a token that is
+     * also an extension (`Movie.2020.1080p.DTS.mkv`) keeps it.
+     */
+    public function stripFileSuffixes(string $fileName): string
+    {
+        $wrappers = [
+            ...self::ARCHIVE_PATTERNS,
+            '/\.(zst|tgz|lz4|enc|rev)$/i',
+            '/\.vol\d+[+-]\d+$/i',
+            '/\.part\d{0,4}$/i',
+            '/\.(nfo|sfv|nzb|srr|srs)$/i',
+        ];
+
+        $original = $fileName;
+        do {
+            $previous = $fileName;
+            $fileName = preg_replace($wrappers, '', $fileName) ?? $fileName;
+        } while ($fileName !== $previous);
+
+        // After a wrapper (`.rar`, `.par2`) came off, a trailing codec word is part of the title, not a file
+        // extension: `Movie.2020.1080p.DTS.rar` is the title `Movie.2020.1080p.DTS`.
+        if ($fileName !== $original && preg_match('/\.(dts|ac3|eac3|truehd|ts|opus|flac|aac|mp3|ogg|wav|m4a|mka|wma)$/i', $fileName) === 1) {
+            return $fileName;
+        }
+
+        // Document and playlist files that the shared payload lists do not cover.
+        $extraPayload = '/\.(docx?|rtf|xlsx?|pptx?|odt|m3u8?|txt|m4b|aiff?|amr|m2v|m1v|mpv|mpgv|qt|mp2|ra|w64|ifo|mks|ogm)$/i';
+
+        foreach ([self::VIDEO_EXTENSIONS, self::AUDIO_EXTENSIONS, self::IMAGE_EXTENSIONS, self::EBOOK_EXTENSIONS, self::GAMEAPP_EXTENSIONS, self::SUBTITLE_EXTENSIONS, $extraPayload] as $payload) {
+            $stripped = preg_replace($payload, '', $fileName) ?? $fileName;
+            if ($stripped !== $fileName) {
+                return $stripped;
+            }
+        }
+
+        return $fileName;
+    }
+
+    /**
      * Clean a filename for PreDB matching.
      *
      * @param  string  $fileName  The filename to clean

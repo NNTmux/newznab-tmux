@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\Predb;
+use App\Services\NameFixing\FileNameCleaner;
 use App\Services\NameFixing\NzbSplitUnwrapper;
 
 /**
@@ -18,6 +19,11 @@ class ReleaseCleaningService
      */
     /** @phpstan-ignore classConstant.unused */
     private const string REGEX_END = '[ -]{0,3}yEnc$/u';
+
+    /**
+     * `[01/10] - "file.ext"`: a file counter and a quoted file name, as most posting tools write them.
+     */
+    private const string COUNTER_FILE_SUBJECT = '/^\[\s*\d+\s*\/\s*\d+\s*\]\s*-?\s*(?:"|#34;)(?P<file>(?:(?!"|#34;).){4,})(?:"|#34;)/';
 
     /**
      * Used for matching file extension endings in article subjects.
@@ -201,7 +207,7 @@ class ReleaseCleaningService
             ];
         }
 
-        return [
+        return $this->counterFileSubjectName() ?? [
             'cleansubject' => $this->releaseCleanerHelper($this->subject),
             'properlynamed' => false,
         ];
@@ -413,6 +419,11 @@ class ReleaseCleaningService
      */
     public function generic(): array
     {
+        $fromFile = $this->counterFileSubjectName();
+        if ($fromFile !== null) {
+            return $fromFile;
+        }
+
         // This regex gets almost all of the predb release names also keep in mind that not every subject ends with yEnc, some are truncated, because of the 255 character limit and some have extra charaters tacked onto the end, like (5/10).
         if (preg_match(
             '/^\[\d+\][\-_\s]{0,3}(\[(reup|full|repost.+?|part|re-repost|xtr|sample)(\])?[\-_\s]{0,3}\[[\- #@\.\w]+\][\-_\s]{0,3}|\[[\- #@\.\w]+\][\-_\s]{0,3}\[(reup|full|repost.+?|part|re-repost|xtr|sample)(\])?[\-_\s]{0,3}|\[.+?efnet\][\-_\s]{0,3}|\[(reup|full|repost.+?|part|re-repost|xtr|sample)(\])?[\-_\s]{0,3})(\[FULL\])?[\-_\s]{0,3}(\[ )?(\[)? ?(\/sz\/)?(F: - )?(?P<title>[\- _!@\.\'\w\(\)~]{10,}) ?(\])?[\-_\s]{0,3}(\[)? ?(REPOST|REPACK|SCENE|EXTRA PARS|REAL)? ?(\])?[\-_\s]{0,3}?(\[\d+[\-\/~]\d+\])?[\-_\s]{0,3}["|#34;]*.+["|#34;]* ?[yEnc]{0,4}/i',
@@ -430,6 +441,47 @@ class ReleaseCleaningService
             'cleansubject' => $this->releaseCleanerHelper($this->subject),
             'properlynamed' => false,
         ];
+    }
+
+    /**
+     * The release name a posted file name implies, or null when it does not look like a release name.
+     */
+    public function releaseNameFromFile(string $file): ?string
+    {
+        $fileNameCleaner = new FileNameCleaner;
+        // Not fixerCleaner(): it drops every non-ASCII character, and these names may be accented.
+        $name = $fileNameCleaner->stripFileSuffixes($fileNameCleaner->extractFilenameFromPath($file));
+        $name = preg_replace('/[.\-_](sample|proof|thumbs?)$/i', '', $name) ?? $name;
+        $name = trim(preg_replace('/\s\s+/u', ' ', $name) ?? $name, " .-_\t");
+
+        // isPlausibleReleaseTitle() counts any final `.word` as a group suffix, which every dotted file name
+        // has (`Annual.Report.Final`). Check it with that last dot made a space, so only a `-GROUP` suffix, a
+        // year, quality or episode tag makes the name plausible.
+        $withoutDottedSuffix = preg_replace('/\.([^.\-]+)$/', ' $1', $name) ?? $name;
+
+        return $fileNameCleaner->isPlausibleReleaseTitle($withoutDottedSuffix) ? $name : null;
+    }
+
+    /**
+     * Counter-and-filename subjects: `[01/10] - "Release.Name-GRP.mkv" yEnc`. The file name, minus its
+     * extensions and part/volume markers, is the release name. Hashed (obfuscated) file names give null, so
+     * the subject stays and the name-fixing passes can still find their real names.
+     *
+     * @return array{cleansubject: string, properlynamed: false}|null
+     */
+    private function counterFileSubjectName(): ?array
+    {
+        // `lRap` is `yEnc` in ROT13: the whole subject is scrambled, so its file name is too.
+        if (preg_match(self::COUNTER_FILE_SUBJECT, $this->subject, $hit) !== 1) {
+            return null;
+        }
+        // Look after the file name only, past any size or counter between it and the marker.
+        if (preg_match('/\blRap\b/i', substr($this->subject, \strlen($hit[0]))) === 1) {
+            return null;
+        }
+        $fromFile = $this->releaseNameFromFile($hit['file']);
+
+        return $fromFile === null ? null : ['cleansubject' => $fromFile, 'properlynamed' => false];
     }
 
     public function releaseCleanerHelper(string $subject): string
@@ -457,6 +509,8 @@ class ReleaseCleaningService
         // Remove part/volume markers from the end
         $cleanerName = preg_replace('/\.part\d+(\.rar)?$/i', '', $cleanerName);
         $cleanerName = preg_replace('/\.vol\d+\+\d+\.par2$/i', '', $cleanerName);
+        // `.par2` is already gone, so also strip a bare volume marker (both `vol01+02` and `vol01-02`).
+        $cleanerName = preg_replace('/\.vol\d+[+-]\d+$/i', '', $cleanerName);
         $cleanerName = preg_replace('/\d{1,3}\.rev"?$/i', '', $cleanerName);
 
         // Remove "Release Name" or "sample-" from the start
