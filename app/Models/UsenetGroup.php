@@ -213,7 +213,7 @@ class UsenetGroup extends Model
         return $res === null ? 0 : $res->count('id');
     }
 
-    public static function getGroupsRange(string $groupname = '', mixed $active = null): LengthAwarePaginator // @phpstan-ignore missingType.generics
+    public static function getGroupsRange(string $groupname = '', mixed $active = null, bool $withReleaseCounts = false): LengthAwarePaginator // @phpstan-ignore missingType.generics
     {
         $groups = self::query()
             ->select([
@@ -241,7 +241,35 @@ class UsenetGroup extends Model
             $groups->where('active', '=', 0);
         }
 
-        return $groups->paginate(config('nntmux.items_per_page'));
+        $page = $groups->paginate(config('nntmux.items_per_page'));
+        if ($withReleaseCounts) {
+            self::attachReleaseCounts($page);
+        }
+
+        return $page;
+    }
+
+    /**
+     * Set num_releases on the groups of one page. Counting only this page's groups keeps the
+     * query bounded; a count across every group made the list too slow (upstream 5dc7dce1a).
+     *
+     * @param  LengthAwarePaginator<int, self>  $page
+     */
+    private static function attachReleaseCounts(LengthAwarePaginator $page): void
+    {
+        $groups = $page->items();
+        if ($groups === []) {
+            return;
+        }
+
+        $releaseCounts = DB::table('releases')
+            ->whereIn('groups_id', array_map(static fn (self $group): int => (int) $group->id, $groups))
+            ->groupBy('groups_id')
+            ->pluck(DB::raw('COUNT(*)'), 'groups_id');
+
+        foreach ($groups as $group) {
+            $group->setAttribute('num_releases', (int) ($releaseCounts[$group->id] ?? 0));
+        }
     }
 
     /**

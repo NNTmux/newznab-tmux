@@ -20,7 +20,7 @@ class AdminGroupController extends BasePageController
     public function index(AdminGroupListRequest $request): mixed
     {
         $groupname = $request->groupName();
-        $grouplist = UsenetGroup::getGroupsRange($groupname);
+        $grouplist = UsenetGroup::getGroupsRange($groupname, null, true);
         $title = 'Group List';
 
         return view('admin.groups.index', compact('title', 'groupname', 'grouplist'));
@@ -123,7 +123,7 @@ class AdminGroupController extends BasePageController
     public function active(AdminGroupListRequest $request): mixed
     {
         $groupname = $request->groupName();
-        $grouplist = UsenetGroup::getGroupsRange($groupname, true);
+        $grouplist = UsenetGroup::getGroupsRange($groupname, true, true);
         $title = 'Active Groups';
 
         return view('admin.groups.index', compact('title', 'groupname', 'grouplist'));
@@ -135,7 +135,7 @@ class AdminGroupController extends BasePageController
     public function inactive(AdminGroupListRequest $request): mixed
     {
         $groupname = $request->groupName();
-        $grouplist = UsenetGroup::getGroupsRange($groupname, false);
+        $grouplist = UsenetGroup::getGroupsRange($groupname, false, true);
         $title = 'Inactive Groups';
 
         return view('admin.groups.index', compact('title', 'groupname', 'grouplist'));

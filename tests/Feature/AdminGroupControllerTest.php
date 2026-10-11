@@ -6,6 +6,7 @@ namespace Tests\Feature;
 
 use App\Http\Controllers\Admin\AdminGroupController;
 use App\Models\Content;
+use App\Models\UsenetGroup;
 use App\View\Composers\GlobalDataComposer;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\Schema\Blueprint;
@@ -188,6 +189,25 @@ class AdminGroupControllerTest extends TestCase
         $this->assertSame(['MB', 'GB'], $response->getData()['sizeUnits']);
     }
 
+    public function test_group_list_counts_each_groups_releases(): void
+    {
+        $this->createUsenetGroupsTable();
+        $this->createReleasesTable();
+        $busyId = DB::table('usenet_groups')->insertGetId(['name' => 'alt.binaries.boneless', 'active' => 1]);
+        $quietId = DB::table('usenet_groups')->insertGetId(['name' => 'alt.binaries.boneless.nl', 'active' => 1]);
+        $emptyId = DB::table('usenet_groups')->insertGetId(['name' => 'alt.binaries.empty', 'active' => 1]);
+        DB::table('releases')->insert([
+            ['groups_id' => $busyId], ['groups_id' => $busyId], ['groups_id' => $busyId], ['groups_id' => $quietId],
+        ]);
+
+        $groups = collect(UsenetGroup::getGroupsRange('', null, true)->items())->keyBy('id');
+
+        $this->assertSame(3, $groups[$busyId]->num_releases);
+        $this->assertSame(1, $groups[$quietId]->num_releases);
+        $this->assertSame(0, $groups[$emptyId]->num_releases);
+        $this->assertNull(UsenetGroup::getGroupsRange()->items()[0]->num_releases);
+    }
+
     private function setEnvironmentValue(string $key, ?string $value): void
     {
         if ($value === null) {
@@ -233,12 +253,22 @@ class AdminGroupControllerTest extends TestCase
             $table->string('description')->default('');
             $table->unsignedBigInteger('first_record')->default(0);
             $table->unsignedBigInteger('last_record')->default(0);
+            $table->dateTime('first_record_postdate')->nullable();
+            $table->dateTime('last_record_postdate')->nullable();
             $table->dateTime('last_updated')->nullable();
             $table->boolean('active')->default(false);
             $table->boolean('backfill')->default(false);
             $table->unsignedBigInteger('minsizetoformrelease')->nullable();
             $table->unsignedBigInteger('minfilestoformrelease')->nullable();
             $table->integer('backfill_target')->default(1);
+        });
+    }
+
+    private function createReleasesTable(): void
+    {
+        Schema::create('releases', function (Blueprint $table): void {
+            $table->increments('id');
+            $table->unsignedInteger('groups_id')->index();
         });
     }
 
