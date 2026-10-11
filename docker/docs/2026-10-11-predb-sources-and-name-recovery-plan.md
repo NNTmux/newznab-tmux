@@ -11,7 +11,7 @@ Status: proposed. Measurements are from the docker stack on 2026-10-11, about 30
 
 Conclusion: more scene PreDB data does not raise the link rate much. Naming the hashed and raw releases through post-processing is the larger gain, and PreDB titles then help confirm the names it finds.
 
-## Part A extra PreDB sources
+## Part A extra sources
 
 ### Goal
 
@@ -38,7 +38,7 @@ Rejected: predb.dev (its `robots.txt` disallows everything), Skwirll's dump (`/a
 ### Acceptance
 
 - A new source's measured contribution is recorded in the PR.
-- A per-source health check covers it. No such checker is in the repo yet (the one used while writing this plan was a local scratch script), so Part A starts by adding it as `docker/bin/predb-health`: container state, IRC scraper processes, and a probe of each feed endpoint. Source activity is judged by successful polls, received messages, or parsed-entry timestamps per source, not by rows attributed to it: `predb.source` is set only on a new insert, so a healthy redundant source (scnlog, opentrackers) will often show zero attributed rows because another source won the race. New sources extend it.
+- A per-source health check covers it. No such checker is in the repo yet (the one used while writing this plan was a local scratch script), so Part A starts by adding it as `docker/bin/predb-health`: container state, IRC scraper processes, and a probe of each feed endpoint. Source activity is judged by successful polls, received messages, or parsed-entry timestamps per source, not by rows attributed to it: `predb.source` is set only on a new insert, so a healthy redundant source (scnlog, opentrackers) often shows zero attributed rows because another source won the race. New sources extend it.
 - Turning it off is a one-line config change.
 
 ## Part B: recovering names for hashed and raw releases

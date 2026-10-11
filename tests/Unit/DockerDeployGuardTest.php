@@ -173,6 +173,23 @@ final class DockerDeployGuardTest extends TestCase
     }
 
     #[Test]
+    public function verify_refuses_when_the_tree_changed_since_the_last_build(): void
+    {
+        $flags = ['SKIP_IF_UNCHANGED' => '1', 'STAMP_ON_SUCCESS' => '1'];
+
+        $this->assertSame(0, $this->guard(['verify'])->getExitCode(), 'nothing built yet, nothing to contradict');
+
+        $this->guard(['run', 'build', '--', 'true'], $flags);
+        $this->assertSame(0, $this->guard(['verify'])->getExitCode());
+
+        file_put_contents($this->repo.'/app.txt', "changed after the build\n");
+        $process = $this->guard(['verify']);
+
+        $this->assertSame(76, $process->getExitCode());
+        $this->assertStringContainsString('out of date', $process->getErrorOutput());
+    }
+
+    #[Test]
     public function a_lock_whose_pid_was_reused_by_another_process_is_stale(): void
     {
         // PID 1 exists, but it did not start when the lock owner did.

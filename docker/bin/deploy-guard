@@ -3,6 +3,7 @@
 # rebuild when nothing changed.
 #
 #   deploy-guard run <target> -- <command...>
+#   deploy-guard verify    exit 76 if the tree changed since the last stamped build (nothing stamped is fine)
 #
 # A guarded command may run another guarded command (make deploy runs build and up): the inner run
 # sees the lock is held by its own parent (DEPLOY_GUARD_HELD) and neither takes nor releases it.
@@ -192,7 +193,17 @@ cmd_run() {
     exit "$rc"
 }
 
+# Before rolling out an image, check the checkout still matches the tree that image was built from.
+cmd_verify() {
+    [ -f "$STAMP" ] || exit 0
+    if [ "$(cat "$STAMP")" != "$(fingerprint)" ]; then
+        echo "deploy-guard: the checkout changed since the last build, so the image is out of date; not deploying it. Run again." >&2
+        exit 76
+    fi
+}
+
 case "${1:-}" in
     run) shift; cmd_run "$@" ;;
+    verify) cmd_verify ;;
     *) echo "usage: deploy-guard run <target> -- <command...>" >&2; exit 64 ;;
 esac

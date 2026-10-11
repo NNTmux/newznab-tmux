@@ -56,7 +56,7 @@ build-images:
 
 .PHONY: deploy
 deploy: ## Build when changed, then start/recreate the stack, under one lock (DEPLOY_BY=name)
-	@FORCE="$(FORCE)" $(GUARD) run deploy -- sh -c '$(MAKE) --no-print-directory -C $(CURDIR) build && $(MAKE) --no-print-directory -C $(CURDIR) up'
+	@FORCE="$(FORCE)" $(GUARD) run deploy -- sh -c '$(MAKE) --no-print-directory -C $(CURDIR) build && $(CURDIR)/bin/deploy-guard verify && $(MAKE) --no-print-directory -C $(CURDIR) up'
 
 .PHONY: init
 init: env dirs build ## First-time install: build, migrate+seed, indexes, groups, tuning, predb seed, start
