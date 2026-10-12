@@ -12,7 +12,7 @@ use Throwable;
 
 final class ReleaseFingerprintCollector
 {
-    public const SCHEMA_VERSION = 2;
+    public const SCHEMA_VERSION = 3;
 
     private const MAX_ARTICLE_BODY_BYTES = 2_000_000;
 
@@ -708,6 +708,7 @@ final class ReleaseFingerprintCollector
             '/(?:\.part\d+\.rar|\.rar|\.r\d{2,})\z/i',
             (string) ($sourceFile['filename'] ?? ''),
         ) === 1));
+        $par2SourceArticleMatches = $this->matchPar2SourcesToNzbFiles($par2SourceRarFiles, $observations);
         $par2RecoveryPercent = $par2Complete && $par2RecoverySliceConflicts === [] && ! $multiplePar2Sets && is_int($par2SourceBlocks) && $par2SourceBlocks > 0 && ! $par2PackedLayout
             ? round($recoveryCount / $par2SourceBlocks * 100, 3)
             : null;
@@ -780,6 +781,7 @@ final class ReleaseFingerprintCollector
                     'source_file_definition_conflicts' => $par2SourceDefinitionConflicts,
                     'source_rar_files' => $par2SourceRarFiles,
                     'source_rar_total_bytes' => array_sum(array_column($par2SourceRarFiles, 'file_length')),
+                    'source_rar_article_matches' => $par2SourceArticleMatches,
                     'input_file_slice_checksums' => $par2Ifsc['files'],
                     'ifsc_conflicts' => $par2Ifsc['conflicts'],
                     'ifsc_slice_count_mismatches' => $par2Ifsc['slice_count_mismatches'],
@@ -832,6 +834,122 @@ final class ReleaseFingerprintCollector
                     'Candidate posting software is a fingerprint clue, not confirmed uploader identity.',
                 ],
             ],
+        ];
+    }
+
+    /** @param list<array<string, mixed>> $sourceFiles
+     *  @param list<array<string, mixed>> $observations
+     *  @return array{basis: string, matched_count: int, ambiguous_count: int, unmatched_count: int, contradictory_length_count: int, insufficient_prefix_count: int, length_unavailable_count: int, matches: list<array<string, mixed>>}
+     */
+    private function matchPar2SourcesToNzbFiles(array $sourceFiles, array $observations): array
+    {
+        $sourcesByPrefixMd5 = [];
+        foreach ($sourceFiles as $sourceFile) {
+            $prefixMd5 = strtolower((string) ($sourceFile['md5_first_16k'] ?? ''));
+            if (preg_match('/\A[a-f0-9]{32}\z/D', $prefixMd5) === 1) {
+                $sourcesByPrefixMd5[$prefixMd5][] = $sourceFile;
+            }
+        }
+
+        $matches = [];
+        foreach ($observations as $observation) {
+            if (($observation['kind'] ?? null) !== 'rar'
+                || ($observation['sample_role'] ?? null) !== 'first'
+                || ($observation['segment_number'] ?? null) !== 1
+                || ! is_int($observation['file_index'] ?? null)) {
+                continue;
+            }
+            $yenc = $observation['metadata']['yenc'] ?? null;
+            $prefixMd5 = is_array($yenc) ? strtolower((string) ($yenc['par2_first_16k_md5_candidate'] ?? '')) : '';
+            $hasPrefixMd5 = preg_match('/\A[a-f0-9]{32}\z/D', $prefixMd5) === 1;
+            $hashCandidates = $hasPrefixMd5 ? ($sourcesByPrefixMd5[$prefixMd5] ?? []) : [];
+            $expectedLength = is_array($yenc) && is_int($yenc['file_size'] ?? null) ? $yenc['file_size'] : null;
+            $exactLengthCandidates = array_values(array_filter(
+                $hashCandidates,
+                static fn (array $sourceFile): bool => is_int($sourceFile['file_length'] ?? null)
+                    && $expectedLength !== null && $sourceFile['file_length'] === $expectedLength,
+            ));
+            $unknownLengthCandidateCount = count(array_filter(
+                $hashCandidates,
+                static fn (array $sourceFile): bool => ! is_int($sourceFile['file_length'] ?? null),
+            ));
+            if (! $hasPrefixMd5) {
+                $matchStatus = 'insufficient_prefix';
+            } elseif ($hashCandidates === []) {
+                $matchStatus = 'unmatched';
+            } elseif ($expectedLength === null
+                || ($unknownLengthCandidateCount > 0 && count($exactLengthCandidates) === 1)) {
+                $matchStatus = 'length_unavailable';
+            } elseif (count($exactLengthCandidates) === 1) {
+                $matchStatus = 'matched';
+            } elseif (count($exactLengthCandidates) > 1) {
+                $matchStatus = 'ambiguous';
+            } elseif ($unknownLengthCandidateCount > 0) {
+                $matchStatus = 'length_unavailable';
+            } else {
+                $matchStatus = 'contradictory_length';
+            }
+
+            $messageId = (string) ($observation['message_id'] ?? '');
+            if ($messageId === '') {
+                continue;
+            }
+            $relationshipSources = $matchStatus === 'matched' ? $exactLengthCandidates : $hashCandidates;
+            $candidateIds = array_map(
+                static fn (array $sourceFile): string => (string) ($sourceFile['recovery_set_id'] ?? '').':'.strtolower((string) ($sourceFile['file_id'] ?? '')),
+                $relationshipSources,
+            );
+            sort($candidateIds);
+            $key = implode("\0", [
+                (string) $observation['file_index'],
+                $messageId,
+                $hasPrefixMd5 ? $prefixMd5 : 'insufficient-prefix',
+                $matchStatus,
+                implode(',', $candidateIds),
+            ]);
+            $matches[$key] ??= [
+                'relationship' => 'par2_source_file_to_nzb_rar',
+                'status' => $matchStatus,
+                'nzb_file_index' => $observation['file_index'],
+                'nzb_subject' => $observation['nzb_subject'] ?? null,
+                'message_id' => $messageId,
+                'observed_first_16k_md5' => $hasPrefixMd5 ? $prefixMd5 : null,
+                'observed_yenc_file_length' => $expectedLength,
+                'candidate_source_files' => array_map(static fn (array $sourceFile): array => [
+                    'recovery_set_id' => $sourceFile['recovery_set_id'] ?? null,
+                    'file_id' => $sourceFile['file_id'] ?? null,
+                    'filename' => $sourceFile['filename'] ?? null,
+                    'file_length' => $sourceFile['file_length'] ?? null,
+                ], $relationshipSources),
+                'provider_observations' => [],
+            ];
+            $matches[$key]['provider_observations'][] = [
+                'server' => $observation['server'] ?? null,
+                'provider_label' => $observation['provider_label'] ?? null,
+            ];
+        }
+
+        foreach ($matches as &$match) {
+            $uniqueProviders = [];
+            foreach ($match['provider_observations'] as $providerObservation) {
+                $providerKey = json_encode($providerObservation, JSON_INVALID_UTF8_SUBSTITUTE);
+                if (is_string($providerKey)) {
+                    $uniqueProviders[$providerKey] = $providerObservation;
+                }
+            }
+            $match['provider_observations'] = array_values($uniqueProviders);
+        }
+        unset($match);
+
+        return [
+            'basis' => 'Compare PAR2 FileDesc md5_first_16k with the first 16384 decoded bytes from NZB segment 1; multipart yEnc samples must declare a valid range beginning at byte 1. A unique hash and whole-file length match is labeled matched; prefix-only or ambiguous evidence is kept separate.',
+            'matched_count' => count(array_filter($matches, static fn (array $match): bool => $match['status'] === 'matched')),
+            'ambiguous_count' => count(array_filter($matches, static fn (array $match): bool => $match['status'] === 'ambiguous')),
+            'unmatched_count' => count(array_filter($matches, static fn (array $match): bool => $match['status'] === 'unmatched')),
+            'contradictory_length_count' => count(array_filter($matches, static fn (array $match): bool => $match['status'] === 'contradictory_length')),
+            'insufficient_prefix_count' => count(array_filter($matches, static fn (array $match): bool => $match['status'] === 'insufficient_prefix')),
+            'length_unavailable_count' => count(array_filter($matches, static fn (array $match): bool => $match['status'] === 'length_unavailable')),
+            'matches' => array_values($matches),
         ];
     }
 

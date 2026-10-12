@@ -294,6 +294,9 @@ final class NzbFingerprintAnalyzer
                 'trailer_fields' => $frame->trailer,
                 'decoded_segment_size' => $decodedSize,
                 'decoded_segment_sha256' => $decodedHash,
+                'par2_first_16k_md5_candidate' => $decodedSize !== null && $decodedSize >= 16_384
+                    && (! $multipart || $rangeIsValid === true && $rangeStart === 1)
+                    ? hash('md5', substr($decoded[0], 0, 16_384)) : null,
                 'encoded_payload_sha256' => $payloadHash,
                 'payload_line_count' => count($payloadLineLengths),
                 'payload_line_length_min' => $payloadLineLengths === [] ? null : min($payloadLineLengths),
