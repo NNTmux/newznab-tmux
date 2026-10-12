@@ -81,6 +81,14 @@ PHPUnit only (no Pest). Create tests: `php artisan make:test --phpunit {name}`
 - Test harnesses in `tests/Support/` (e.g., `DatabaseTestCase`, `TestBinariesHarness`)
 - PHPUnit 12 — use `#[Test]` attributes or `test` prefix naming
 
+## Evidence-led Performance and Change Validation
+
+- Keep test endpoints and state isolated. Record the source commit, migration/schema state, relevant runtime configuration, and fixture or dataset provenance with a result; do not treat an isolated test result as production evidence.
+- Start a behavior change with a deterministic test that exercises the real handler: capture the failing case first, then keep both the success path and important failure modes covered after the fix.
+- For database or search changes, inspect the actual query or index access plan and validate result counts and lock/write behavior. Do not infer an improvement solely from application-level elapsed time.
+- Benchmark before setting a target. Use the same workload matrix, backend, image/dependency versions, cache condition, CPU/resource limits, and measurement method for baseline and candidate runs. Retain failed, noisy, and regressed runs with the successful ones; report relevant percentiles, result correctness, and resource use rather than a speedup alone. Follow [`docs/search-performance.md`](docs/search-performance.md) for the required search matrix and maintenance validation.
+- Keep evidence labels precise: a local test, review-clean branch, merged commit, deployed service, and observed live behavior are separate states. A feature session may validate and prepare a PR, but only the designated deployer performs the shared-stack deployment and records the post-deploy check.
+
 ## Project Conventions
 
 ### Models (`app/Models/`)
