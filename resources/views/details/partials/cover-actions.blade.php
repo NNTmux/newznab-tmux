@@ -29,31 +29,31 @@
                                 @endif
                             </div>
                         </div>
-                        <div class="release-detail-actions flex flex-wrap gap-2">
-                            <a href="{{ url('/getnzb/' . $release->guid) }}" class="download-nzb release-action release-action-download px-4 py-2">
-                                <i class="fas fa-download mr-2"></i> Download NZB
+                        <div class="release-detail-actions" role="group" aria-label="Release actions">
+                            <a href="{{ url('/getnzb/' . $release->guid) }}" class="download-nzb" title="Download NZB">
+                                <i class="fas fa-download" aria-hidden="true"></i> Download NZB
                             </a>
-                            <a href="#" class="add-to-cart release-action release-action-primary px-4 py-2" data-guid="{{ $release->guid }}">
-                                <i class="icon_cart fas fa-shopping-basket mr-2"></i> Add to Cart
-                            </a>
+                            <button type="button" class="add-to-cart" data-guid="{{ $release->guid }}" title="Add to basket">
+                                <i class="icon_cart fas fa-shopping-basket" aria-hidden="true"></i> Add to Cart
+                            </button>
                             @if(isset($release->nfostatus) && $release->nfostatus == 1)
-                                <button type="button" class="nfo-badge release-action release-action-primary px-4 py-2" data-guid="{{ $release->guid }}" title="View NFO file">
-                                    <i class="fas fa-file-alt mr-2"></i> View NFO
+                                <button type="button" class="nfo-badge release-inspection-actions__nfo" data-guid="{{ $release->guid }}" title="View NFO file">
+                                    <i class="fas fa-file-alt" aria-hidden="true"></i> View NFO
                                 </button>
                             @endif
                             @if(($release->totalpart ?? 0) > 0)
-                                <button type="button" class="filelist-badge release-action release-action-muted px-4 py-2" data-guid="{{ $release->guid }}" title="View file list">
-                                    <i class="fas fa-list mr-2"></i> View Files
+                                <button type="button" class="filelist-badge" data-guid="{{ $release->guid }}" title="View file list">
+                                    <i class="fas fa-list" aria-hidden="true"></i> View Files
                                 </button>
                             @endif
                             @auth
                                 @if(auth()->user()->hasRole('Admin') || auth()->user()->hasRole('Moderator'))
-                                    <a href="{{ route('admin.release-edit', ['id' => $release->guid]) }}" class="release-action release-action-primary px-4 py-2" title="Edit Release">
-                                        <i class="fas fa-edit mr-2"></i> Edit Release
+                                    <a href="{{ route('admin.release-edit', ['id' => $release->guid]) }}" class="release-detail-actions__edit" title="Edit Release">
+                                        <i class="fas fa-edit" aria-hidden="true"></i> Edit Release
                                     </a>
                                 @endif
                             @endauth
-                            <x-report-button :release-id="$release->id" :reported-count="$totalReportCount ?? 0" variant="button-lg" />
+                            <x-report-button :release-id="$release->id" :reported-count="$totalReportCount ?? 0" variant="button" />
                         </div>
                         @if(!empty($originalReportData) && $originalReportData->count() > 0)
                             <div class="mt-4 rounded-lg border border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-900/20 p-4">

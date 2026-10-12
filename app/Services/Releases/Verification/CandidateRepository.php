@@ -6,6 +6,7 @@ namespace App\Services\Releases\Verification;
 
 use App\Services\CollectionCleanupService;
 use App\Services\Nzb\NzbService;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -19,9 +20,13 @@ final class CandidateRepository
     public function archive(int $collectionId): void
     {
         app(VerificationResetService::class)->withAdmission(function () use ($collectionId): void {
-            DB::transaction(function () use ($collectionId): void {
-                $state = DB::table('release_verification_state')->where('id', 1)->lockForUpdate()->first();
-                $collection = DB::table('collections')->where('id', $collectionId)->lockForUpdate()->first();
+            $currentReads = DB::transactionLevel() > 0;
+            $hash = DB::table('collections')->where('id', $collectionId)->value('collectionhash');
+            if (! is_string($hash)) {
+                return;
+            }
+            DB::transaction(function () use ($collectionId, $hash, $currentReads): void {
+                $collection = $this->lockArchiveCollection($collectionId, $hash);
                 if ($collection === null) {
                     return;
                 }
@@ -29,6 +34,7 @@ final class CandidateRepository
                     && ! $this->cleanup->verificationEligibleCollections()->where('collections.id', $collectionId)->exists()) {
                     return;
                 }
+                $state = DB::table('release_verification_state')->where('id', 1)->lockForUpdate()->first();
                 if ($state === null) {
                     throw new RuntimeException('Verification migration has not initialized capacity state.');
                 }
@@ -54,7 +60,7 @@ final class CandidateRepository
                     $identity = sha1($sourceIdentity.':generation:'.$existing->id);
                     $existing = null;
                 }
-                $manifest = $this->snapshot($collection);
+                $manifest = $this->snapshot($collection, $currentReads);
                 $newArticles = true;
                 if ($existing !== null && $existing->manifest_path !== '') {
                     $oldManifest = $this->store->read($existing->manifest_path);
@@ -107,6 +113,19 @@ final class CandidateRepository
                 }
             }, 5);
         });
+    }
+
+    /** Lock through ingestion's unique hash index before taking the shared capacity row. */
+    private function lockArchiveCollection(int $collectionId, string $hash): ?object
+    {
+        $query = DB::table('collections')->where('collectionhash', $hash)->where('id', $collectionId);
+        if (in_array(DB::getDriverName(), ['mysql', 'mariadb'], true)) {
+            $query->forceIndex('ix_collection_collectionhash')->lock('for update skip locked');
+        } else {
+            $query->lockForUpdate();
+        }
+
+        return $query->first();
     }
 
     /** @param array<string, mixed> $manifest */
@@ -204,21 +223,21 @@ final class CandidateRepository
     }
 
     /** @return array<string, mixed> */
-    private function snapshot(object $collection): array
+    private function snapshot(object $collection, bool $currentReads = false): array
     {
         $groups = Schema::hasTable('collection_groups')
-            ? DB::table('collection_groups')->where('collections_id', $collection->id)->pluck('group_name')->all() : [];
+            ? $this->snapshotQuery('collection_groups', $currentReads)->where('collections_id', $collection->id)->pluck('group_name')->all() : [];
         if ($groups === []) {
-            $groups = [(string) DB::table('usenet_groups')->where('id', $collection->groups_id)->value('name')];
+            $groups = [(string) $this->snapshotQuery('usenet_groups', $currentReads)->where('id', $collection->groups_id)->value('name')];
         }
         sort($groups);
         $files = [];
         $metadataBytes = 0;
-        $binaries = DB::table('binaries')->where('collections_id', $collection->id)->orderBy('binaryhash')
+        $binaries = $this->snapshotQuery('binaries', $currentReads)->where('collections_id', $collection->id)->orderBy('binaryhash')
             ->select(['id', 'binaryhash', 'name', 'totalparts'])->cursor();
         foreach ($binaries->chunk(100) as $batch) {
             $segmentsByBinary = [];
-            foreach (DB::table('parts')->whereIn('binaries_id', $batch->pluck('id')->all())
+            foreach ($this->snapshotQuery('parts', $currentReads)->whereIn('binaries_id', $batch->pluck('id')->all())
                 ->orderBy('binaries_id')->orderBy('partnumber')
                 ->select(['binaries_id', 'partnumber', 'messageid', 'size'])->cursor() as $part) {
                 $metadataBytes += 128 + strlen($part->messageid);
@@ -258,6 +277,14 @@ final class CandidateRepository
             'regex_id' => (int) $collection->collection_regexes_id,
             'expected_files' => $expected,
             'groups' => $groups, 'files' => $files, 'conflict' => false];
+    }
+
+    /** Current reads avoid a caller-owned repeatable-read snapshot omitting committed headers. */
+    private function snapshotQuery(string $table, bool $currentReads): Builder
+    {
+        $query = DB::table($table);
+
+        return $currentReads ? $query->sharedLock() : $query;
     }
 
     /** @param array<string, mixed> $old

@@ -35,7 +35,7 @@
 @elseif($variant === 'button')
     <button type="button"
             data-report-release-id="{{ $releaseId }}"
-            class="report-trigger release-action px-3 py-1.5 text-{{ $size }} {{ $hasReports ? 'bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 hover:bg-orange-200 dark:hover:bg-orange-800' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-red-100 dark:hover:bg-red-900 hover:text-red-700 dark:hover:text-red-300' }}"
+            class="report-trigger release-action px-3 py-1.5 text-{{ $size }} {{ $hasReports ? 'bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 hover:bg-orange-200 dark:hover:bg-orange-800' : 'bg-red-50 dark:bg-red-400/10 text-red-700 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-400/20 hover:text-red-800 dark:hover:text-red-300' }}"
             title="{{ $reportTitle }}">
         <i class="fas fa-flag mr-1.5"></i>
         <span class="report-label">{{ $hasReports ? 'Reported' : 'Report' }}</span>
