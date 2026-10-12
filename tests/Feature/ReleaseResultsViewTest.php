@@ -135,4 +135,27 @@ class ReleaseResultsViewTest extends TestCase
         }
         $this->assertSame(0, $document->querySelectorAll('.report-trigger')->length);
     }
+
+    public function test_detail_submitter_links_to_advanced_search_for_all_posts(): void
+    {
+        $submitter = 'alice+usenet@example.test';
+        $release = (object) [
+            'category_name' => 'TV',
+            'size' => 1073741824,
+            'totalpart' => 42,
+            'adddate' => '2026-10-12 12:00:00',
+            'group_name' => 'alt.binaries.example',
+            'postdate' => '2026-10-12 12:00:00',
+            'fromname' => $submitter,
+            'grabs' => 2,
+        ];
+
+        $html = view('details.partials.info-sidebar', compact('release'))->render();
+        $document = HTMLDocument::createFromString('<!doctype html><html><head><title>Release</title></head><body>'.$html.'</body></html>');
+        $submitterLink = $document->querySelector('a[aria-label="View all posts by '.$submitter.'"]');
+
+        $this->assertNotNull($submitterLink);
+        $this->assertSame(route('search', ['searchadvposter' => $submitter]), $submitterLink->getAttribute('href'));
+        $this->assertSame($submitter, $submitterLink->textContent);
+    }
 }

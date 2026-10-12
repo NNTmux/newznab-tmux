@@ -31,9 +31,9 @@
                         <div>
                             <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Posted By</dt>
                             <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100 break-all">
-                                <span class="inline-flex items-center px-2 py-1 rounded bg-primary-100 dark:bg-primary-900/50 text-primary-800 dark:text-primary-200 text-xs font-mono">
+                                <a href="{{ route('search', ['searchadvposter' => $release->fromname]) }}" class="inline-flex items-center px-2 py-1 rounded bg-primary-100 dark:bg-primary-900/50 text-primary-800 dark:text-primary-200 text-xs font-mono hover:text-primary-600 dark:hover:text-primary-300" aria-label="View all posts by {{ $release->fromname }}">
                                     <i class="fas fa-user mr-1"></i>{{ $release->fromname }}
-                                </span>
+                                </a>
                             </dd>
                         </div>
                     @endif
