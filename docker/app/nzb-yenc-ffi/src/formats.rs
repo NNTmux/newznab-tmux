@@ -3,6 +3,8 @@ use serde::Serialize;
 #[derive(Debug, Serialize)]
 pub struct FormatMetadata {
     pub parser_engine: &'static str,
+    pub candidate_scan_limit_per_format: usize,
+    pub candidate_scan_truncated_formats: Vec<&'static str>,
     pub signatures: Vec<SignatureMatch>,
     pub headers: Vec<FormatHeader>,
 }
@@ -95,12 +97,70 @@ pub enum FormatHeader {
     Zip {
         offset: usize,
         local_file_header_signature: bool,
+        local_header_available: bool,
+        structure_valid: bool,
+        version_needed: Option<u16>,
+        flags: Option<u16>,
+        compression_method: Option<u16>,
+        modification_time_dos: Option<u16>,
+        modification_date_dos: Option<u16>,
+        crc32: Option<u32>,
+        compressed_size: Option<u32>,
+        uncompressed_size: Option<u32>,
+        filename_bytes_hex: Option<String>,
+        filename_bytes_sha256: Option<String>,
+        filename_hex_truncated: Option<bool>,
+        filename_utf8_valid: Option<bool>,
+        filename_bytes_length: Option<usize>,
+        filename_utf8_flag_set: Option<bool>,
+        filename_encoding_hint: Option<&'static str>,
+        extra_field_bytes_length: Option<usize>,
+        extra_field_bytes_sha256: Option<String>,
+        extra_field_prefix_hex: Option<String>,
+        extra_field_hex_truncated: Option<bool>,
+        zip64_extra_payload_length: Option<usize>,
+        data_descriptor_follows: Option<bool>,
+        zip64_extra_present: Option<bool>,
+        zip64_extra_valid: Option<bool>,
+        zip64_size_sentinel_present: Option<bool>,
     },
     Gzip {
         offset: usize,
+        fixed_header_available: bool,
+        structure_valid: bool,
+        compression_method: Option<u8>,
+        flags: Option<u8>,
+        modification_time: Option<u32>,
+        extra_flags: Option<u8>,
+        operating_system: Option<u8>,
+        extra_field_declared_length: Option<usize>,
+        extra_field_bytes_length: Option<usize>,
+        extra_field_bytes_sha256: Option<String>,
+        extra_field_prefix_hex: Option<String>,
+        extra_field_hex_truncated: Option<bool>,
+        original_filename_bytes_hex: Option<String>,
+        original_filename_bytes_length: Option<usize>,
+        original_filename_bytes_sha256: Option<String>,
+        original_filename_hex_truncated: Option<bool>,
+        comment_bytes_hex: Option<String>,
+        comment_bytes_length: Option<usize>,
+        comment_bytes_sha256: Option<String>,
+        comment_hex_truncated: Option<bool>,
+        header_crc16_present: Option<bool>,
+        header_crc16_valid: Option<bool>,
     },
     Xz {
         offset: usize,
+        stream_header_available: bool,
+        structure_valid: bool,
+        stream_flags_hex: Option<String>,
+        check_id: Option<u8>,
+        check_name: Option<&'static str>,
+        check_id_supported: Option<bool>,
+        reserved_flags_valid: Option<bool>,
+        header_crc32: Option<u32>,
+        calculated_header_crc32: Option<u32>,
+        header_crc32_valid: Option<bool>,
     },
 }
 
@@ -125,6 +185,8 @@ pub struct Rar5ArchiveMetadata {
 const MAX_RAR5_MAIN_EXTRA_RECORDS: usize = 4096;
 const MAX_RAR5_ARCHIVE_NAME_DISPLAY_BYTES: usize = 4096;
 const MAX_RAR5_ARCHIVE_NAME_HEX_BYTES: usize = 256;
+const MAX_SIGNATURE_CANDIDATES_PER_FORMAT: usize = 16;
+const MAX_GZIP_OPTIONAL_FIELD_BYTES: usize = 65_536;
 
 const RAR4: &[u8] = b"Rar!\x1a\x07\x00";
 const RAR5: &[u8] = b"Rar!\x1a\x07\x01\x00";
@@ -138,6 +200,7 @@ const ISO_PVD_OFFSET: usize = 32_768;
 pub fn parse(data: &[u8]) -> FormatMetadata {
     let mut signatures = Vec::new();
     let mut headers = Vec::new();
+    let mut candidate_scan_truncated_formats = Vec::new();
 
     for (format, signature) in [
         ("RAR 5", RAR5),
@@ -147,12 +210,21 @@ pub fn parse(data: &[u8]) -> FormatMetadata {
         ("gzip", GZIP),
         ("XZ", XZ),
     ] {
-        let found = if matches!(format, "RAR 4" | "RAR 5") {
-            find_with_limit(data, signature, 1_048_576 + signature.len())
+        let maximum_end = if matches!(format, "RAR 4" | "RAR 5") {
+            1_048_576 + signature.len()
         } else {
-            find(data, signature)
+            data.len()
         };
-        if let Some(offset) = found {
+        let (offsets, truncated) = find_all_with_limit(
+            data,
+            signature,
+            maximum_end,
+            MAX_SIGNATURE_CANDIDATES_PER_FORMAT,
+        );
+        if truncated {
+            candidate_scan_truncated_formats.push(format);
+        }
+        for offset in offsets {
             signatures.push(SignatureMatch {
                 format,
                 offset,
@@ -162,12 +234,9 @@ pub fn parse(data: &[u8]) -> FormatMetadata {
                 "RAR 4" => headers.push(parse_rar4(data, offset)),
                 "RAR 5" => headers.push(parse_rar5(data, offset)),
                 "7-Zip" => headers.push(parse_7z(data, offset)),
-                "ZIP" => headers.push(FormatHeader::Zip {
-                    offset,
-                    local_file_header_signature: true,
-                }),
-                "gzip" => headers.push(FormatHeader::Gzip { offset }),
-                "XZ" => headers.push(FormatHeader::Xz { offset }),
+                "ZIP" => headers.push(parse_zip(data, offset)),
+                "gzip" => headers.push(parse_gzip(data, offset)),
+                "XZ" => headers.push(parse_xz(data, offset)),
                 _ => {}
             }
         }
@@ -184,6 +253,8 @@ pub fn parse(data: &[u8]) -> FormatMetadata {
 
     FormatMetadata {
         parser_engine: "nntmux-rust-ffi",
+        candidate_scan_limit_per_format: MAX_SIGNATURE_CANDIDATES_PER_FORMAT,
+        candidate_scan_truncated_formats,
         signatures,
         headers,
     }
@@ -649,6 +720,263 @@ fn sha256_hex(bytes: &[u8]) -> String {
     hex(&digest)
 }
 
+fn parse_zip(data: &[u8], offset: usize) -> FormatHeader {
+    let header_start = offset.checked_add(ZIP.len());
+    let fixed_header =
+        header_start.and_then(|start| start.checked_add(26).and_then(|end| data.get(start..end)));
+    let version_needed = fixed_header.map(|bytes| u16::from_le_bytes([bytes[0], bytes[1]]));
+    let flags = fixed_header.map(|bytes| u16::from_le_bytes([bytes[2], bytes[3]]));
+    let compression_method = fixed_header.map(|bytes| u16::from_le_bytes([bytes[4], bytes[5]]));
+    let modification_time_dos = fixed_header.map(|bytes| u16::from_le_bytes([bytes[6], bytes[7]]));
+    let modification_date_dos = fixed_header.map(|bytes| u16::from_le_bytes([bytes[8], bytes[9]]));
+    let crc32 = fixed_header.map(|bytes| le_u32(bytes, 10));
+    let compressed_size = fixed_header.map(|bytes| le_u32(bytes, 14));
+    let uncompressed_size = fixed_header.map(|bytes| le_u32(bytes, 18));
+    let filename_length =
+        fixed_header.map(|bytes| u16::from_le_bytes([bytes[22], bytes[23]]) as usize);
+    let extra_length =
+        fixed_header.map(|bytes| u16::from_le_bytes([bytes[24], bytes[25]]) as usize);
+    let variable_fields = header_start
+        .and_then(|start| start.checked_add(26))
+        .zip(filename_length)
+        .zip(extra_length)
+        .and_then(|((start, filename_len), extra_len)| {
+            let filename_end = start.checked_add(filename_len)?;
+            let extra_end = filename_end.checked_add(extra_len)?;
+            Some((
+                data.get(start..filename_end)?,
+                data.get(filename_end..extra_end)?,
+            ))
+        });
+    let filename = variable_fields.map(|(name, _)| name);
+    let extra = variable_fields.map(|(_, extra)| extra);
+    let zip64_payload = extra.and_then(inspect_zip_extra_fields);
+    let zip64_extra_present = zip64_payload.as_ref().map(Option::is_some);
+    let zip64_extra_payload_length = zip64_payload
+        .as_ref()
+        .and_then(|payload| payload.map(<[u8]>::len));
+    let zip64_size_sentinel_present = compressed_size
+        .zip(uncompressed_size)
+        .map(|(compressed, uncompressed)| compressed == u32::MAX || uncompressed == u32::MAX);
+    let zip64_extra_valid = zip64_size_sentinel_present.zip(zip64_payload.as_ref()).map(
+        |(has_size_sentinel, payload)| {
+            if !has_size_sentinel {
+                return true;
+            }
+            let Some(payload) = payload else {
+                return false;
+            };
+            let required_size_bytes = usize::from(uncompressed_size == Some(u32::MAX)) * 8
+                + usize::from(compressed_size == Some(u32::MAX)) * 8;
+            payload.len() >= required_size_bytes
+        },
+    );
+    let local_header_available = fixed_header.is_some();
+    let structure_valid = local_header_available
+        && variable_fields.is_some()
+        && zip64_extra_present.is_some()
+        && zip64_extra_valid == Some(true);
+
+    FormatHeader::Zip {
+        offset,
+        local_file_header_signature: true,
+        local_header_available,
+        structure_valid,
+        version_needed,
+        flags,
+        compression_method,
+        modification_time_dos,
+        modification_date_dos,
+        crc32,
+        compressed_size,
+        uncompressed_size,
+        filename_bytes_hex: filename.map(|bytes| hex(&bytes[..bytes.len().min(256)])),
+        filename_bytes_sha256: filename.map(sha256_hex),
+        filename_hex_truncated: filename.map(|bytes| bytes.len() > 256),
+        filename_utf8_valid: filename.map(|bytes| std::str::from_utf8(bytes).is_ok()),
+        filename_bytes_length: filename.map(<[u8]>::len),
+        filename_utf8_flag_set: flags.map(|value| value & 0x0800 != 0),
+        filename_encoding_hint: flags.map(|value| {
+            if value & 0x0800 != 0 {
+                "utf8"
+            } else {
+                "cp437_or_legacy"
+            }
+        }),
+        extra_field_bytes_length: extra.map(<[u8]>::len),
+        extra_field_bytes_sha256: extra.map(sha256_hex),
+        extra_field_prefix_hex: extra.map(|bytes| hex(&bytes[..bytes.len().min(128)])),
+        extra_field_hex_truncated: extra.map(|bytes| bytes.len() > 128),
+        zip64_extra_payload_length,
+        data_descriptor_follows: flags.map(|value| value & 0x0008 != 0),
+        zip64_extra_present,
+        zip64_extra_valid,
+        zip64_size_sentinel_present,
+    }
+}
+
+fn inspect_zip_extra_fields(mut extra: &[u8]) -> Option<Option<&[u8]>> {
+    let mut zip64_payload = None;
+    while !extra.is_empty() {
+        let header = extra.get(..4)?;
+        let header_id = u16::from_le_bytes([header[0], header[1]]);
+        let data_size = u16::from_le_bytes([header[2], header[3]]) as usize;
+        let record_end = 4usize.checked_add(data_size)?;
+        let payload = extra.get(4..record_end)?;
+        if header_id == 0x0001 {
+            if zip64_payload.is_some() {
+                return None;
+            }
+            zip64_payload = Some(payload);
+        }
+        extra = extra.get(record_end..)?;
+    }
+    Some(zip64_payload)
+}
+
+fn parse_gzip(data: &[u8], offset: usize) -> FormatHeader {
+    let fixed = offset.checked_add(10).and_then(|end| data.get(offset..end));
+    let compression_method = fixed.and_then(|bytes| bytes.get(2).copied());
+    let flags = fixed.and_then(|bytes| bytes.get(3).copied());
+    let modification_time = fixed.map(|bytes| le_u32(bytes, 4));
+    let extra_flags = fixed.and_then(|bytes| bytes.get(8).copied());
+    let operating_system = fixed.and_then(|bytes| bytes.get(9).copied());
+    let mut cursor = offset.saturating_add(10);
+    let mut optional_fields_valid = fixed.is_some();
+    let mut extra_field_declared_length = None;
+    let mut extra_field = None;
+    let mut original_filename = None;
+    let mut comment = None;
+    if let Some(flags_value) = flags {
+        if flags_value & 0x04 != 0 {
+            if let Some(length_bytes) = data.get(cursor..cursor.saturating_add(2)) {
+                let length = u16::from_le_bytes([length_bytes[0], length_bytes[1]]) as usize;
+                extra_field_declared_length = Some(length);
+                cursor = cursor.saturating_add(2);
+                if length <= MAX_GZIP_OPTIONAL_FIELD_BYTES {
+                    if let Some(extra_end) =
+                        cursor.checked_add(length).filter(|end| *end <= data.len())
+                    {
+                        extra_field = data.get(cursor..extra_end);
+                        cursor = extra_end;
+                    } else {
+                        optional_fields_valid = false;
+                    }
+                } else {
+                    optional_fields_valid = false;
+                }
+            } else {
+                optional_fields_valid = false;
+            }
+        }
+        if optional_fields_valid && flags_value & 0x08 != 0 {
+            match take_nul_terminated(data, cursor, MAX_GZIP_OPTIONAL_FIELD_BYTES) {
+                Some((field, next)) => {
+                    original_filename = Some(field);
+                    cursor = next;
+                }
+                None => optional_fields_valid = false,
+            }
+        }
+        if optional_fields_valid && flags_value & 0x10 != 0 {
+            match take_nul_terminated(data, cursor, MAX_GZIP_OPTIONAL_FIELD_BYTES) {
+                Some((field, next)) => {
+                    comment = Some(field);
+                    cursor = next;
+                }
+                None => optional_fields_valid = false,
+            }
+        }
+    }
+    let header_crc16_present = flags.map(|value| value & 0x02 != 0);
+    let header_crc16_valid = if header_crc16_present == Some(true) && optional_fields_valid {
+        let checksum_bytes = data.get(cursor..cursor.saturating_add(2));
+        checksum_bytes.map(|bytes| {
+            let expected = u16::from_le_bytes([bytes[0], bytes[1]]);
+            let calculated = crc32fast::hash(&data[offset..cursor]) as u16;
+            expected == calculated
+        })
+    } else {
+        None
+    };
+    if header_crc16_present == Some(true) && header_crc16_valid.is_none() {
+        optional_fields_valid = false;
+    }
+    let reserved_flags_valid = flags.is_some_and(|value| value & 0xe0 == 0);
+
+    FormatHeader::Gzip {
+        offset,
+        fixed_header_available: fixed.is_some(),
+        structure_valid: fixed.is_some()
+            && optional_fields_valid
+            && compression_method == Some(8)
+            && reserved_flags_valid,
+        compression_method,
+        flags,
+        modification_time,
+        extra_flags,
+        operating_system,
+        extra_field_declared_length,
+        extra_field_bytes_length: extra_field.map(<[u8]>::len),
+        extra_field_bytes_sha256: extra_field.map(sha256_hex),
+        extra_field_prefix_hex: extra_field.map(|bytes| hex(&bytes[..bytes.len().min(128)])),
+        extra_field_hex_truncated: extra_field.map(|bytes| bytes.len() > 128),
+        original_filename_bytes_hex: original_filename
+            .map(|bytes| hex(&bytes[..bytes.len().min(256)])),
+        original_filename_bytes_length: original_filename.map(<[u8]>::len),
+        original_filename_bytes_sha256: original_filename.map(sha256_hex),
+        original_filename_hex_truncated: original_filename.map(|bytes| bytes.len() > 256),
+        comment_bytes_hex: comment.map(|bytes| hex(&bytes[..bytes.len().min(256)])),
+        comment_bytes_length: comment.map(<[u8]>::len),
+        comment_bytes_sha256: comment.map(sha256_hex),
+        comment_hex_truncated: comment.map(|bytes| bytes.len() > 256),
+        header_crc16_present,
+        header_crc16_valid,
+    }
+}
+
+fn take_nul_terminated(data: &[u8], start: usize, maximum: usize) -> Option<(&[u8], usize)> {
+    let end = start.checked_add(maximum)?.min(data.len());
+    let relative_end = data.get(start..end)?.iter().position(|byte| *byte == 0)?;
+    let field_end = start.checked_add(relative_end)?;
+    Some((data.get(start..field_end)?, field_end.checked_add(1)?))
+}
+
+fn parse_xz(data: &[u8], offset: usize) -> FormatHeader {
+    let header = offset.checked_add(12).and_then(|end| data.get(offset..end));
+    let stream_flags = header.and_then(|bytes| bytes.get(6..8));
+    let stream_flags_hex = stream_flags.map(hex);
+    let check_id = stream_flags.and_then(|bytes| bytes.get(1).copied());
+    let check_name = check_id.and_then(|id| match id {
+        0 => Some("none"),
+        1 => Some("crc32"),
+        4 => Some("crc64"),
+        10 => Some("sha256"),
+        _ => None,
+    });
+    let reserved_flags_valid = stream_flags.map(|bytes| bytes[0] == 0 && bytes[1] & 0xf0 == 0);
+    let check_id_supported = check_id.map(|id| check_name.is_some() && id <= 15);
+    let header_crc32 = header.map(|bytes| le_u32(bytes, 8));
+    let calculated_header_crc32 = stream_flags.map(crc32fast::hash);
+    let header_crc32_valid = header_crc32
+        .zip(calculated_header_crc32)
+        .map(|(expected, calculated)| expected == calculated);
+
+    FormatHeader::Xz {
+        offset,
+        stream_header_available: header.is_some(),
+        structure_valid: header.is_some() && reserved_flags_valid == Some(true),
+        stream_flags_hex,
+        check_id,
+        check_name,
+        check_id_supported,
+        reserved_flags_valid,
+        header_crc32,
+        calculated_header_crc32,
+        header_crc32_valid,
+    }
+}
+
 fn parse_7z(data: &[u8], offset: usize) -> FormatHeader {
     let start = offset + SEVEN_ZIP.len();
     let header = start.checked_add(26).and_then(|end| data.get(start..end));
@@ -767,15 +1095,25 @@ fn ascii_field(data: &[u8], offset: usize, length: usize) -> String {
         .to_owned()
 }
 
-fn find(data: &[u8], signature: &[u8]) -> Option<usize> {
-    data.windows(signature.len())
-        .position(|window| window == signature)
-}
-
-fn find_with_limit(data: &[u8], signature: &[u8], maximum_end: usize) -> Option<usize> {
-    data.get(..data.len().min(maximum_end))?
-        .windows(signature.len())
-        .position(|window| window == signature)
+fn find_all_with_limit(
+    data: &[u8],
+    signature: &[u8],
+    maximum_end: usize,
+    maximum_matches: usize,
+) -> (Vec<usize>, bool) {
+    if signature.is_empty() || maximum_matches == 0 {
+        return (Vec::new(), false);
+    }
+    let mut matches = data
+        .get(..data.len().min(maximum_end))
+        .into_iter()
+        .flat_map(|bounded_data| bounded_data.windows(signature.len()).enumerate())
+        .filter_map(|(offset, window)| (window == signature).then_some(offset))
+        .take(maximum_matches.saturating_add(1))
+        .collect::<Vec<_>>();
+    let truncated = matches.len() > maximum_matches;
+    matches.truncate(maximum_matches);
+    (matches, truncated)
 }
 
 fn le_u32(data: &[u8], offset: usize) -> u32 {

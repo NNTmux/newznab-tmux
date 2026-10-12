@@ -270,6 +270,15 @@ final class NzbFingerprintAnalyzer
             $controlLines = [];
             preg_match_all('/^(?:=ybegin|=ypart|=yend)[^\r\n]*/mi', $rawBody, $controlMatches);
             $controlLines = $controlMatches[0] ?? [];
+            $par2PrefixLength = min($headerExpectedDecodedSize ?? 16_384, 16_384);
+            $prefixCoverageIsValid = $decodedSize !== null && $par2PrefixLength > 0
+                && $decodedSize >= $par2PrefixLength
+                && (! $multipart
+                    ? $headerExpectedDecodedSize === null || $decodedSize === $headerExpectedDecodedSize
+                    : $rangeIsValid === true && $rangeStart === 1 && $rangeEnd >= $par2PrefixLength
+                        && $decodedSize === $ypartExpectedDecodedSize);
+            $par2PrefixMd5Candidate = $prefixCoverageIsValid
+                ? hash('md5', substr($decoded[0], 0, $par2PrefixLength)) : null;
             $yenc = [
                 'name' => $frame->header['name'] ?? null,
                 'file_size' => isset($frame->header['size']) ? (int) $frame->header['size'] : null,
@@ -294,9 +303,7 @@ final class NzbFingerprintAnalyzer
                 'trailer_fields' => $frame->trailer,
                 'decoded_segment_size' => $decodedSize,
                 'decoded_segment_sha256' => $decodedHash,
-                'par2_first_16k_md5_candidate' => $decodedSize !== null && $decodedSize >= 16_384
-                    && (! $multipart || $rangeIsValid === true && $rangeStart === 1)
-                    ? hash('md5', substr($decoded[0], 0, 16_384)) : null,
+                'par2_first_16k_md5_candidate' => $par2PrefixMd5Candidate,
                 'encoded_payload_sha256' => $payloadHash,
                 'payload_line_count' => count($payloadLineLengths),
                 'payload_line_length_min' => $payloadLineLengths === [] ? null : min($payloadLineLengths),

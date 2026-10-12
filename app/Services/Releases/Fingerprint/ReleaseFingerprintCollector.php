@@ -708,7 +708,7 @@ final class ReleaseFingerprintCollector
             '/(?:\.part\d+\.rar|\.rar|\.r\d{2,})\z/i',
             (string) ($sourceFile['filename'] ?? ''),
         ) === 1));
-        $par2SourceArticleMatches = $this->matchPar2SourcesToNzbFiles($par2SourceRarFiles, $observations);
+        $par2SourceArticleMatches = $this->matchPar2SourcesToNzbFiles($par2SourceFiles, $observations);
         $par2RecoveryPercent = $par2Complete && $par2RecoverySliceConflicts === [] && ! $multiplePar2Sets && is_int($par2SourceBlocks) && $par2SourceBlocks > 0 && ! $par2PackedLayout
             ? round($recoveryCount / $par2SourceBlocks * 100, 3)
             : null;
@@ -853,10 +853,21 @@ final class ReleaseFingerprintCollector
 
         $matches = [];
         foreach ($observations as $observation) {
-            if (($observation['kind'] ?? null) !== 'rar'
-                || ($observation['sample_role'] ?? null) !== 'first'
+            if (($observation['sample_role'] ?? null) !== 'first'
                 || ($observation['segment_number'] ?? null) !== 1
                 || ! is_int($observation['file_index'] ?? null)) {
+                continue;
+            }
+            $signatures = $observation['metadata']['decoded_format_metadata']['signatures'] ?? [];
+            $startsWithRarSignature = count(array_filter($signatures, static function (mixed $signature): bool {
+                if (! is_array($signature)) {
+                    return false;
+                }
+                $format = $signature['format'] ?? $signature['name'] ?? null;
+
+                return in_array($format, ['RAR 4', 'RAR 5'], true) && ($signature['offset'] ?? null) === 0;
+            })) > 0;
+            if (! $startsWithRarSignature) {
                 continue;
             }
             $yenc = $observation['metadata']['yenc'] ?? null;
@@ -903,6 +914,7 @@ final class ReleaseFingerprintCollector
             $key = implode("\0", [
                 (string) $observation['file_index'],
                 $messageId,
+                $expectedLength === null ? 'length-unknown' : (string) $expectedLength,
                 $hasPrefixMd5 ? $prefixMd5 : 'insufficient-prefix',
                 $matchStatus,
                 implode(',', $candidateIds),
