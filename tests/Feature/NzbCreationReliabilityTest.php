@@ -131,6 +131,20 @@ class NzbCreationReliabilityTest extends TestCase
         $this->assertSame(0, DB::table('search_index_failures')->count());
     }
 
+    public function test_preferred_candidates_keep_claim_guards_group_scope_and_total_budget(): void
+    {
+        $this->insertRelease(1, 'a', claimedAt: now());
+        $this->insertRelease(2, 'b', postdate: '2026-07-13 10:00:00');
+        $this->insertRelease(3, 'c', postdate: '2026-07-13 09:00:00');
+        $this->insertRelease(4, 'd', postdate: '2026-07-13 08:00:00');
+        DB::table('releases')->where('id', 3)->update(['groups_id' => 2]);
+        $claimed = NzbCreationCandidateQuery::claimBatch(1, 2, 'preferred-token', ['id'], [1, 3, 4]);
+        $this->assertSame([4, 2], $claimed->pluck('id')->all());
+        $this->assertSame('claimed', DB::table('releases')->where('id', 1)->value('nzb_creation_claim_token'));
+        $this->assertNull(DB::table('releases')->where('id', 3)->value('nzb_creation_claim_token'));
+        $this->assertSame('preferred-token', DB::table('releases')->where('id', 4)->value('nzb_creation_claim_token'));
+    }
+
     public function test_candidate_query_skips_active_claims_and_recovers_stale_claims(): void
     {
         $this->insertRelease(1, 'a', claimedAt: now(), postdate: '2026-07-13 10:00:00');

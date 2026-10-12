@@ -99,6 +99,16 @@ class ProcessReleasesMaintenanceTest extends TestCase
         $this->assertSame([], DB::getQueryLog());
     }
 
+    public function test_ready_only_requires_a_group_and_rejects_maintenance_mode_without_processing(): void
+    {
+        $this->prepareMaintenanceDatabase();
+        $this->app->instance(ReleaseProcessingService::class, $this->app->make(ReleaseProcessingService::class));
+        DB::flushQueryLog();
+        $this->artisan('releases:process', ['--ready-only' => true])->assertExitCode(Command::FAILURE);
+        $this->artisan('releases:process', ['--ready-only' => true, '--maintenance-only' => true])->assertExitCode(Command::FAILURE);
+        $this->assertSame([], DB::getQueryLog());
+    }
+
     private function prepareMaintenanceDatabase(): void
     {
         config(['nntmux.echocli' => false]);

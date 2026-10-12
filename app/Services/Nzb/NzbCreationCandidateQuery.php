@@ -43,6 +43,7 @@ final class NzbCreationCandidateQuery
 
     /**
      * @param  list<string>  $columns
+     * @param  list<int>  $preferredIds
      * @return EloquentCollection<int, Release>
      */
     public static function claimBatch(
@@ -50,10 +51,11 @@ final class NzbCreationCandidateQuery
         int $limit,
         string $token,
         array $columns = ['*'],
+        array $preferredIds = [],
     ): EloquentCollection {
         $effectiveLimit = max(1, $limit);
 
-        return DB::transaction(function () use ($groupID, $effectiveLimit, $token, $columns): EloquentCollection {
+        return DB::transaction(function () use ($groupID, $effectiveLimit, $token, $columns, $preferredIds): EloquentCollection {
             $supportsClaims = self::supportsClaims();
             $query = self::baseBuilder($groupID)
                 ->select('r.id')
@@ -65,10 +67,13 @@ final class NzbCreationCandidateQuery
                 $query->lockForUpdate();
             }
 
-            $ids = $query
-                ->pluck('r.id')
-                ->map(static fn (mixed $id): int => (int) $id)
-                ->all();
+            $ids = $preferredIds === [] ? [] : (clone $query)->whereIn('r.id', $preferredIds)
+                ->pluck('r.id')->map(static fn (mixed $id): int => (int) $id)->all();
+            if (count($ids) < $effectiveLimit) {
+                $ids = [...$ids, ...$query->when($ids !== [], static fn ($q) => $q->whereNotIn('r.id', $ids))
+                    ->limit($effectiveLimit - count($ids))->pluck('r.id')
+                    ->map(static fn (mixed $id): int => (int) $id)->all()];
+            }
 
             if ($ids === []) {
                 return (new Release)->newCollection();

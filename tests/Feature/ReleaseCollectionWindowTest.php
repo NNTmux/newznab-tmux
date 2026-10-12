@@ -661,6 +661,111 @@ class ReleaseCollectionWindowTest extends TestCase
         $this->assertSame(7, DB::table('releases')->where('nzbstatus', 1)->count());
     }
 
+    public function test_ready_pass_creates_valid_releases_without_draining_undersized_collections_or_other_groups(): void
+    {
+        $this->insertCollection(1, size: 10);
+        $this->insertCollection(2, group: 2);
+        $this->insertCollection(3, binaryName: 'Example.par2');
+        $this->insertCollection(4);
+        $totals = $this->service(new WindowTestReleaseCreationService)->processReadyReleaseWindow(1);
+
+        $this->assertSame(1, $totals['releases']);
+        $this->assertSame(1, $totals['nzbs']);
+        $this->assertSame([4], DB::table('releases')->pluck('id')->all());
+        $this->assertSame(3, (int) DB::table('collections')->where('id', 1)->value('filecheck'));
+        $this->assertSame(3, (int) DB::table('collections')->where('id', 2)->value('filecheck'));
+        $this->assertFalse(DB::table('collections')->where('id', 3)->exists());
+    }
+
+    public function test_ready_pass_limits_nzb_work_and_the_full_pass_still_drains_the_rest(): void
+    {
+        foreach (range(1, 7) as $id) {
+            DB::table('releases')->insert(['id' => $id, 'guid' => 'release-'.$id, 'name' => 'Release.'.$id, 'groups_id' => 1, 'postdate' => now()]);
+        }
+        $service = $this->service(new WindowTestReleaseCreationService);
+        DB::enableQueryLog();
+        DB::flushQueryLog();
+        try {
+            $ready = $service->processReadyReleaseWindow(1);
+            $queries = DB::getQueryLog();
+        } finally {
+            DB::disableQueryLog();
+        }
+        $this->assertFalse(collect($queries)->contains(static fn (array $query): bool => preg_match('/select count\(\*\).*from ["`]?releases/i', $query['query']) === 1));
+        $this->assertSame(3, $ready['nzbs']);
+        $this->assertSame(4, DB::table('releases')->where('nzbstatus', 0)->count());
+        $full = $service->processReleaseCreationBatches(1);
+        $this->assertSame(4, $full['nzbs']);
+        $this->assertSame(7, DB::table('releases')->where('nzbstatus', 1)->count());
+    }
+
+    public function test_ready_only_command_does_not_start_reconciliation_or_cleanup(): void
+    {
+        $this->insertCollection(1, size: 10);
+        $this->insertCollection(2);
+        $this->app->instance(ReleaseProcessingService::class, $this->service(new WindowTestReleaseCreationService));
+        $this->artisan('releases:process', ['groupId' => '1', '--ready-only' => true])->assertSuccessful();
+        $this->assertSame(1, DB::table('releases')->where('id', 2)->where('nzbstatus', 1)->count());
+        $this->assertSame(3, (int) DB::table('collections')->where('id', 1)->value('filecheck'));
+    }
+
+    public function test_ready_pass_caps_both_creation_and_nzbs_at_fifty_and_full_processing_preserves_remaining_work(): void
+    {
+        ConfigurationTestBuilder::update(ConfigurationDomain::Ingestion, ['max_releases_created' => 100]);
+        foreach (range(1, 60) as $id) {
+            $this->insertCollection($id);
+        }
+        $service = $this->service(new WindowTestReleaseCreationService);
+        $ready = $service->processReadyReleaseWindow(1);
+        $this->assertSame(50, $ready['releases']);
+        $this->assertSame(50, $ready['nzbs']);
+        $this->assertSame(10, DB::table('collections')->where('filecheck', 3)->count());
+        $full = $service->processReleaseCreationBatches(1);
+        $this->assertSame(10, $full['releases']);
+        $this->assertSame(10, $full['nzbs']);
+    }
+
+    public function test_ready_window_publishes_new_releases_before_newer_nzb_backlog(): void
+    {
+        $this->insertCollection(100);
+        foreach (range(1, 3) as $id) {
+            DB::table('releases')->insert(['id' => $id, 'guid' => 'backlog-'.$id, 'name' => 'Backlog', 'groups_id' => 1, 'postdate' => now()->addDay()]);
+        }
+        $result = $this->service(new WindowTestReleaseCreationService)->processReadyReleaseWindow(1);
+        $this->assertSame(1, $result['releases']);
+        $this->assertSame(1, (int) DB::table('releases')->where('id', 100)->value('nzbstatus'));
+        $this->assertSame(3, $result['nzbs']);
+    }
+
+    public function test_ready_snapshot_advances_past_failed_rows_and_new_smaller_arrivals(): void
+    {
+        foreach (range(1, 4) as $id) {
+            $this->insertCollection($id);
+        }
+        $this->service(new WindowTestReleaseCreationService(failAll: true))->processReadyReleaseWindow(1);
+        foreach (range(100, 102) as $id) {
+            $this->insertCollection($id, size: 2000);
+        }
+        $next = $this->service(new WindowTestReleaseCreationService)->processReadyReleaseWindow(1);
+        $this->assertSame(1, $next['releases']);
+        $this->assertSame([4], DB::table('releases')->pluck('id')->all());
+        $retry = $this->service(new WindowTestReleaseCreationService)->processReadyReleaseWindow(1);
+        $this->assertSame(3, $retry['releases']);
+        $this->assertSame(3, DB::table('releases')->whereIn('id', [100, 101, 102])->count());
+    }
+
+    public function test_empty_saved_snapshot_clears_before_processing_new_arrivals(): void
+    {
+        foreach (range(1, 4) as $id) {
+            $this->insertCollection($id);
+        }
+        $this->service(new WindowTestReleaseCreationService(failAll: true))->processReadyReleaseWindow(1);
+        DB::table('collections')->delete();
+        $this->assertSame(0, $this->service(new WindowTestReleaseCreationService)->processReadyReleaseWindow(1)['releases']);
+        $this->insertCollection(100, size: 2000);
+        $this->assertSame(1, $this->service(new WindowTestReleaseCreationService)->processReadyReleaseWindow(1)['releases']);
+    }
+
     private function service(WindowTestReleaseCreationService $creation, ?CollectionCleanupService $cleanup = null, ?BinariesConfig $binariesConfig = null): ReleaseProcessingService
     {
         return (new ReleaseProcessingService(

@@ -19,7 +19,8 @@ class ProcessReleasesCommand extends Command
      */
     protected $signature = 'releases:process
                             {groupId? : Group ID to process (optional)}
-                            {--maintenance-only : Run release cleanup and categorization without processing collections}';
+                            {--maintenance-only : Run release cleanup and categorization without processing collections}
+                            {--ready-only : Process one bounded ready window for a group without reconciliation or retention cleanup}';
 
     /**
      * The console command description.
@@ -53,8 +54,16 @@ class ProcessReleasesCommand extends Command
             return self::FAILURE;
         }
 
+        if ($this->option('ready-only') && ($groupId === null || $this->option('maintenance-only'))) {
+            $this->error('The --ready-only option requires a group ID and cannot be combined with --maintenance-only.');
+
+            return self::FAILURE;
+        }
+
         try {
-            if ($this->option('maintenance-only')) {
+            if ($this->option('ready-only')) {
+                $this->releaseProcessingService->processReadyReleaseWindow((int) $groupId);
+            } elseif ($this->option('maintenance-only')) {
                 $this->runPostProcessingTasks();
             } elseif ($groupId !== null) {
                 $this->processReleasesForGroup((string) $groupId);

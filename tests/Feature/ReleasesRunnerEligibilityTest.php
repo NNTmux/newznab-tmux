@@ -122,6 +122,127 @@ class ReleasesRunnerEligibilityTest extends TestCase
         }
     }
 
+    #[DataProvider('groupProcessingModes')]
+    public function test_every_group_gets_a_ready_pass_before_full_preparation_starts(string $method): void
+    {
+        config(['nntmux.stream_fork_output' => false]);
+        foreach ([1, 2, 109] as $id) {
+            DB::table('usenet_groups')->insert(['id' => $id, 'name' => 'alt.test.'.$id, 'active' => 1, 'backfill' => 0]);
+            DB::table('collections')->insert(['groups_id' => $id]);
+        }
+        $directory = sys_get_temp_dir().'/nntmux-ready-phase-'.bin2hex(random_bytes(8));
+        mkdir($directory);
+        ob_start();
+        try {
+            (new RefillingEligibilityReleasesRunner($directory))->{$method}();
+            $events = file($directory.'/phases', FILE_IGNORE_NEW_LINES);
+            $this->assertIsArray($events);
+            $this->assertContains('ready:finish:109', $events);
+            $this->assertLessThan(array_search('full:start:1', $events, true), array_search('ready:finish:109', $events, true));
+        } finally {
+            ob_end_clean();
+            foreach (glob($directory.'/*') ?: [] as $file) {
+                unlink($file);
+            }
+            rmdir($directory);
+        }
+    }
+
+    #[DataProvider('groupProcessingModes')]
+    public function test_ready_failure_recovered_by_full_processing_returns_for_maintenance(string $method): void
+    {
+        foreach ([1, 2, 109] as $id) {
+            DB::table('usenet_groups')->insert(['id' => $id, 'name' => 'alt.test.'.$id, 'active' => 1, 'backfill' => 0]);
+            DB::table('collections')->insert(['groups_id' => $id]);
+        }
+        $runner = new class extends CapturingEligibilityReleasesRunner
+        {
+            protected function runParallelCommandsWithCompletion(array $commands, int $maxProcesses, callable $onComplete): void
+            {
+                if (in_array('--ready-only', reset($commands), true)) {
+                    throw new RuntimeException('ready pass temporarily failed');
+                }
+                parent::runParallelCommandsWithCompletion($commands, $maxProcesses, $onComplete);
+            }
+        };
+        $runner->{$method}();
+        $this->assertCount(3, $runner->commands);
+    }
+
+    #[DataProvider('groupProcessingModes')]
+    public function test_cancelling_the_ready_pass_does_not_launch_full_preparation(string $method): void
+    {
+        if (! function_exists('pcntl_signal') || ! function_exists('posix_kill')) {
+            $this->markTestSkipped('POSIX signals are unavailable.');
+        }
+        config(['nntmux.stream_fork_output' => false]);
+        foreach ([1, 2, 109] as $id) {
+            DB::table('usenet_groups')->insert(['id' => $id, 'name' => 'alt.test.'.$id, 'active' => 1, 'backfill' => 0]);
+            DB::table('collections')->insert(['groups_id' => $id]);
+        }
+        $directory = sys_get_temp_dir().'/nntmux-ready-cancel-'.bin2hex(random_bytes(8));
+        mkdir($directory);
+        ob_start();
+        try {
+            try {
+                (new RefillingEligibilityReleasesRunner($directory, cancelReady: true))->{$method}();
+                $this->fail('Expected cancellation.');
+            } catch (RuntimeException $exception) {
+                $this->assertStringContainsString('cancellation', $exception->getMessage());
+                $events = file($directory.'/phases', FILE_IGNORE_NEW_LINES);
+                $this->assertIsArray($events);
+                $this->assertFalse(collect($events)->contains(static fn (string $event): bool => str_starts_with($event, 'full:start:')));
+            }
+        } finally {
+            ob_end_clean();
+            foreach (glob($directory.'/*') ?: [] as $file) {
+                unlink($file);
+            }
+            rmdir($directory);
+        }
+    }
+
+    public function test_cancellation_during_final_ready_completion_does_not_start_full_processing(): void
+    {
+        if (! function_exists('pcntl_signal') || ! function_exists('posix_kill')) {
+            $this->markTestSkipped('POSIX signals are unavailable.');
+        }
+        config(['nntmux.stream_fork_output' => false]);
+        DB::table('usenet_groups')->insert(['id' => 109, 'name' => 'alt.test.109', 'active' => 1, 'backfill' => 0]);
+        DB::table('collections')->insert(['groups_id' => 109]);
+        $directory = sys_get_temp_dir().'/nntmux-ready-final-cancel-'.bin2hex(random_bytes(8));
+        mkdir($directory);
+        $runner = new class($directory) extends RefillingEligibilityReleasesRunner
+        {
+            protected function runParallelCommandsWithCompletion(array $commands, int $maxProcesses, callable $onComplete): void
+            {
+                $ready = in_array('--ready-only', reset($commands), true);
+                parent::runParallelCommandsWithCompletion($commands, $maxProcesses, static function (int|string $key, string $output) use ($onComplete, $ready): void {
+                    $onComplete($key, $output);
+                    if ($ready) {
+                        posix_kill(getmypid(), SIGTERM);
+                    }
+                });
+            }
+        };
+        ob_start();
+        try {
+            try {
+                $runner->releases();
+                $this->fail('Expected cancellation at the phase boundary.');
+            } catch (RuntimeException $exception) {
+                $this->assertStringContainsString('cancellation', $exception->getMessage());
+                $this->assertFalse(is_file($directory.'/events'));
+            }
+        } finally {
+            ob_end_clean();
+            foreach (glob($directory.'/*') ?: [] as $file) {
+                unlink($file);
+            }
+            rmdir($directory);
+        }
+    }
+
     #[DataProvider('outputModes')]
     public function test_dispatches_each_eligible_group_once_in_existing_order_with_two_selection_queries(bool $streaming): void
     {
@@ -218,6 +339,9 @@ class CapturingEligibilityReleasesRunner extends ReleasesRunner
     /** @var list<list<string>> */
     public array $commands = [];
 
+    /** @var list<list<string>> */
+    public array $readyCommands = [];
+
     /** @var list<int> */
     public array $limits = [];
 
@@ -234,12 +358,22 @@ class CapturingEligibilityReleasesRunner extends ReleasesRunner
 
     protected function runParallelCommandsWithCompletion(array $commands, int $maxProcesses, callable $onComplete): void
     {
+        if (in_array('--ready-only', reset($commands), true)) {
+            array_push($this->readyCommands, ...array_values($commands));
+
+            return;
+        }
         array_push($this->commands, ...array_values($commands));
         $this->limits[] = $maxProcesses;
     }
 
     protected function runStreamingCommands(array $commands, int $maxProcesses, string $desc): void
     {
+        if ($desc === 'ready_releases') {
+            array_push($this->readyCommands, ...array_values($commands));
+
+            return;
+        }
         array_push($this->commands, ...array_values($commands));
         $this->limits[] = $maxProcesses;
         $this->streamingDescriptions[] = $desc;
@@ -248,28 +382,39 @@ class CapturingEligibilityReleasesRunner extends ReleasesRunner
 
 class RefillingEligibilityReleasesRunner extends ReleasesRunner
 {
-    public function __construct(private readonly string $directory, private readonly bool $failFirst = false) {}
+    public function __construct(private readonly string $directory, private readonly bool $failFirst = false, private readonly bool $cancelReady = false) {}
 
     protected function buildDnrCommand(string $args): array
     {
         $id = explode('  ', trim($args))[1];
-        $worker = <<<'PHP'
-            [$script, $directory, $id, $failFirst] = $argv;
-            $event = static fn (string $phase) => file_put_contents($directory.'/events', $phase.':'.$id.PHP_EOL, FILE_APPEND | LOCK_EX);
+        $worker = <<<'REFILL_WORKER'
+            [$script, $directory, $id, $failFirst, $cancelReady] = $argv;
+            $ready = in_array('--ready-only', $argv, true);
+            $mode = $ready ? 'ready' : 'full';
+            $marker = $directory.'/later-started-'.$mode;
+            $event = static function (string $phase) use ($directory, $id, $mode, $ready): void {
+                file_put_contents($directory.($ready ? '/ready-events' : '/events'), $phase.':'.$id.PHP_EOL, FILE_APPEND | LOCK_EX);
+                file_put_contents($directory.'/phases', $mode.':'.$phase.':'.$id.PHP_EOL, FILE_APPEND | LOCK_EX);
+            };
             $event('start');
+            if ($ready && $id === '1' && $cancelReady === '1') {
+                usleep(100000);
+                posix_kill(posix_getppid(), SIGTERM);
+                sleep(5);
+            }
             if ($id === '1') {
                 $deadline = microtime(true) + 10;
-                while (!is_file($directory.'/later-started')) {
+                while (!is_file($marker)) {
                     if (microtime(true) >= $deadline) { exit(7); }
                     usleep(10000);
                 }
             }
-            if ($id === '109') { touch($directory.'/later-started'); }
+            if ($id === '109') { touch($marker); }
             $event('finish');
             echo 'worker-output:'.$id.PHP_EOL;
             if ($id === '1' && $failFirst === '1') { exit(7); }
-            PHP;
+            REFILL_WORKER;
 
-        return [PHP_BINARY, '-r', $worker, $this->directory, $id, $this->failFirst ? '1' : '0'];
+        return [PHP_BINARY, '-r', $worker, $this->directory, $id, $this->failFirst ? '1' : '0', $this->cancelReady ? '1' : '0'];
     }
 }

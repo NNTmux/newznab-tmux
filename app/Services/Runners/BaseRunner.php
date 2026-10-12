@@ -26,6 +26,11 @@ abstract class BaseRunner
         return (int) ($configured ?? config('nntmux.multiprocessing_max_child_time', 1800));
     }
 
+    protected function hasCancellationRequest(): bool
+    {
+        return $this->cancellationRequested;
+    }
+
     /** @return list<string> */
     protected function buildDnrCommand(string $args): array
     {
