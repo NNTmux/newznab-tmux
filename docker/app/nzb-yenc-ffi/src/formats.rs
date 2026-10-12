@@ -294,12 +294,16 @@ fn parse_rar5(data: &[u8], offset: usize) -> FormatHeader {
     } else {
         Some(0)
     };
-    let typed_header_end = extra_size
+    // RAR5 stores typed header fields before the optional extra area. Keeping
+    // that boundary explicit prevents extra-record bytes from satisfying
+    // required fields in a truncated typed header.
+    let extra_area_start = extra_size
         .and_then(|size| usize::try_from(size).ok())
-        .and_then(|size| header_end.checked_sub(size))
-        .filter(|end| *end >= cursor);
-    let extra_area_valid = typed_header_end.is_some();
-    let typed_header_end = typed_header_end.unwrap_or(cursor);
+        .and_then(|size| header_end.checked_sub(size));
+    let extra_area_valid = extra_area_start.is_some_and(|start| start >= cursor);
+    let typed_header_end = extra_area_start
+        .filter(|start| *start >= cursor)
+        .unwrap_or(cursor);
     let mut main_archive_flags = None;
     let mut main_volume_number = None;
     let mut algorithm_version = None;
@@ -854,5 +858,30 @@ mod tests {
             password_check_data_hex.as_deref(),
             Some("cc".repeat(12).as_str())
         );
+    }
+
+    #[test]
+    fn rar5_extra_area_does_not_satisfy_missing_main_archive_flags() {
+        let mut rar = RAR5.to_vec();
+        rar.extend_from_slice(&[0; 4]);
+        // MAIN type, extra-area flag, one-byte extra record (size/type/payload).
+        rar.push(6); // Header data length.
+        rar.extend_from_slice(&[1, 1, 3, 2, 1, 0]);
+        let header_crc = crc32fast::hash(&rar[12..]);
+        rar[8..12].copy_from_slice(&header_crc.to_le_bytes());
+
+        let metadata = parse(&rar);
+        let FormatHeader::Rar5 {
+            first_block_header_available,
+            main_archive_flags,
+            main_extra_records_complete,
+            ..
+        } = &metadata.headers[0]
+        else {
+            panic!("expected RAR5 metadata");
+        };
+        assert!(!first_block_header_available);
+        assert_eq!(*main_archive_flags, None);
+        assert!(!main_extra_records_complete);
     }
 }
