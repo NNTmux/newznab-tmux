@@ -8,9 +8,11 @@ use App\Enums\NzbImportStatus;
 use App\Services\Nzb\NzbImportService;
 use App\Services\Releases\Verification\CandidateRepository;
 use App\Services\Releases\Verification\ManifestStore;
+use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use ReflectionMethod;
 use Tests\TestCase;
 
 class ReleaseVerificationCandidatesTest extends TestCase
@@ -83,6 +85,62 @@ class ReleaseVerificationCandidatesTest extends TestCase
         $this->assertSame(0, DB::table('parts')->count());
     }
 
+    public function test_snapshot_batches_part_reads_and_preserves_empty_files_and_segment_order(): void
+    {
+        $id = $this->collection('seed@article');
+        DB::table('parts')->delete();
+        DB::table('binaries')->delete();
+        $expected = [];
+        for ($file = 0; $file < 101; $file++) {
+            $key = md5('file:'.$file);
+            $binaryId = DB::table('binaries')->insertGetId(['collections_id' => $id,
+                'binaryhash' => hex2bin($key), 'name' => 'file'.$file.'.rar', 'totalparts' => 2]);
+            $segments = [];
+            if ($file !== 50) {
+                foreach ([2, 1] as $number) {
+                    $messageId = 'file'.$file.'.part'.$number.'@article';
+                    DB::table('parts')->insert(['binaries_id' => $binaryId, 'partnumber' => $number,
+                        'messageid' => $messageId, 'size' => $number * 5]);
+                    $segments[$number] = ['number' => $number, 'messageid' => $messageId, 'bytes' => $number * 5];
+                }
+                ksort($segments);
+            }
+            $expected[$key] = ['key' => $key, 'subject' => 'file'.$file.'.rar', 'totalparts' => 2,
+                'segments' => array_values($segments)];
+        }
+        ksort($expected);
+        $partReads = 0;
+        DB::listen(static function (QueryExecuted $query) use (&$partReads): void {
+            if (str_starts_with($query->sql, 'select') && str_contains($query->sql, 'from "parts"')) {
+                $partReads++;
+            }
+        });
+
+        $manifest = (new ReflectionMethod(CandidateRepository::class, 'snapshot'))->invoke(
+            app(CandidateRepository::class), DB::table('collections')->where('id', $id)->first());
+
+        $this->assertSame(array_values($expected), $manifest['files']);
+        $this->assertSame(2, $partReads);
+    }
+
+    public function test_batched_snapshot_rejects_oversized_metadata_without_removing_headers(): void
+    {
+        $id = $this->collection('seed@article');
+        DB::table('parts')->update(['messageid' => str_repeat('x', 16777216)]);
+        try {
+            app(CandidateRepository::class)->archive($id);
+            $this->fail('Oversized metadata must not be archived.');
+        } catch (\RuntimeException $exception) {
+            $this->assertSame('Candidate exceeds metadata budget; headers retained.', $exception->getMessage());
+        }
+
+        $this->assertSame(1, DB::table('collections')->count());
+        $this->assertSame(1, DB::table('binaries')->count());
+        $this->assertSame(1, DB::table('parts')->count());
+        $this->assertSame(0, DB::table('release_verification_candidates')->count());
+        $this->assertSame(0, (int) DB::table('release_verification_state')->value('pending_bytes'));
+    }
+
     public function test_late_segments_invalidate_a_claim_without_losing_earlier_articles(): void
     {
         $repository = app(CandidateRepository::class);
@@ -127,7 +185,7 @@ class ReleaseVerificationCandidatesTest extends TestCase
         });
         $xml = '<nzb><file subject="Release [1/1] &quot;movie.mkv&quot; (1/1)"><groups><group>alt.test</group></groups><segments><segment bytes="5" number="1">a@b</segment></segments></file></nzb>';
         $service = app(NzbImportService::class);
-        $status = (new \ReflectionMethod($service, 'insertNZB'))->invoke($service, ['verificationXml' => $xml,
+        $status = (new ReflectionMethod($service, 'insertNZB'))->invoke($service, ['verificationXml' => $xml,
             'groups_id' => 1, 'useFName' => 'Movie', 'subject' => 'Movie', 'from' => 'poster', 'postDate' => '2026-10-11 12:00:00', 'articleFingerprint' => sha1('a@b')]);
         $this->assertSame(NzbImportStatus::Queued, $status);
         $this->assertSame(0, DB::table('releases')->count());

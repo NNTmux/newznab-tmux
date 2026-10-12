@@ -214,17 +214,24 @@ final class CandidateRepository
         sort($groups);
         $files = [];
         $metadataBytes = 0;
-        foreach (DB::table('binaries')->where('collections_id', $collection->id)->orderBy('binaryhash')->cursor() as $binary) {
-            $segments = [];
-            foreach (DB::table('parts')->where('binaries_id', $binary->id)->orderBy('partnumber')->cursor() as $part) {
+        $binaries = DB::table('binaries')->where('collections_id', $collection->id)->orderBy('binaryhash')
+            ->select(['id', 'binaryhash', 'name', 'totalparts'])->cursor();
+        foreach ($binaries->chunk(100) as $batch) {
+            $segmentsByBinary = [];
+            foreach (DB::table('parts')->whereIn('binaries_id', $batch->pluck('id')->all())
+                ->orderBy('binaries_id')->orderBy('partnumber')
+                ->select(['binaries_id', 'partnumber', 'messageid', 'size'])->cursor() as $part) {
                 $metadataBytes += 128 + strlen($part->messageid);
                 if ($metadataBytes > 16777216) {
                     throw new RuntimeException('Candidate exceeds metadata budget; headers retained.');
                 }
-                $segments[] = ['number' => (int) $part->partnumber, 'messageid' => $part->messageid, 'bytes' => (int) $part->size];
+                $segmentsByBinary[$part->binaries_id][] = ['number' => (int) $part->partnumber,
+                    'messageid' => $part->messageid, 'bytes' => (int) $part->size];
             }
-            $files[] = ['key' => bin2hex($binary->binaryhash), 'subject' => $binary->name,
-                'totalparts' => (int) $binary->totalparts, 'segments' => $segments];
+            foreach ($batch as $binary) {
+                $files[] = ['key' => bin2hex($binary->binaryhash), 'subject' => $binary->name,
+                    'totalparts' => (int) $binary->totalparts, 'segments' => $segmentsByBinary[$binary->id] ?? []];
+            }
         }
 
         $expected = (int) $collection->totalfiles;
