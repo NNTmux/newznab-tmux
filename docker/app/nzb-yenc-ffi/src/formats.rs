@@ -55,6 +55,9 @@ pub enum FormatHeader {
         first_block_header_size: Option<u64>,
         first_block_extra_size: Option<u64>,
         first_block_data_size: Option<u64>,
+        main_extra_record_types: Vec<u64>,
+        main_extra_records_complete: bool,
+        main_archive_metadata_records: Vec<Rar5ArchiveMetadata>,
     },
     SevenZip {
         offset: usize,
@@ -95,6 +98,28 @@ pub enum FormatHeader {
         offset: usize,
     },
 }
+
+#[derive(Debug, Serialize)]
+pub struct Rar5ArchiveMetadata {
+    pub record_size: u64,
+    pub flags: Option<u64>,
+    pub archive_name: Option<String>,
+    pub archive_name_bytes_hex: Option<String>,
+    pub archive_name_bytes_length: Option<usize>,
+    pub archive_name_bytes_sha256: Option<String>,
+    pub archive_name_declared_length: Option<usize>,
+    pub archive_name_buffer_sha256: Option<String>,
+    pub archive_name_hex_truncated: Option<bool>,
+    pub archive_name_display_truncated: Option<bool>,
+    pub archive_name_utf8_valid: Option<bool>,
+    pub archive_creation_time_raw: Option<u64>,
+    pub archive_creation_time_encoding: Option<&'static str>,
+    pub record_fields_complete: bool,
+}
+
+const MAX_RAR5_MAIN_EXTRA_RECORDS: usize = 4096;
+const MAX_RAR5_ARCHIVE_NAME_DISPLAY_BYTES: usize = 4096;
+const MAX_RAR5_ARCHIVE_NAME_HEX_BYTES: usize = 256;
 
 const RAR4: &[u8] = b"Rar!\x1a\x07\x00";
 const RAR5: &[u8] = b"Rar!\x1a\x07\x01\x00";
@@ -244,6 +269,9 @@ fn parse_rar5(data: &[u8], offset: usize) -> FormatHeader {
     let mut kdf_count = None;
     let mut salt = None;
     let mut password_check_data = None;
+    let mut main_extra_record_types = Vec::new();
+    let mut main_extra_records_complete = extra_size.is_some() && extra_area_valid;
+    let mut main_archive_metadata_records = Vec::new();
     let mut typed_header_complete = extra_size.is_some() && data_size.is_some() && extra_area_valid;
 
     match block_type {
@@ -253,6 +281,13 @@ fn parse_rar5(data: &[u8], offset: usize) -> FormatHeader {
             if main_archive_flags.is_some_and(|flags| flags & 0x02 != 0) {
                 main_volume_number = read_vint_bounded(data, &mut cursor, typed_header_end);
                 typed_header_complete &= main_volume_number.is_some();
+            }
+            if extra_area_valid {
+                (
+                    main_extra_record_types,
+                    main_archive_metadata_records,
+                    main_extra_records_complete,
+                ) = parse_rar5_main_extra_records(data, typed_header_end, header_end);
             }
         }
         4 => {
@@ -304,6 +339,9 @@ fn parse_rar5(data: &[u8], offset: usize) -> FormatHeader {
         first_block_header_size: Some(header_size),
         first_block_extra_size: extra_size,
         first_block_data_size: data_size,
+        main_extra_record_types,
+        main_extra_records_complete,
+        main_archive_metadata_records,
     }
 }
 
@@ -330,6 +368,184 @@ fn empty_rar5(offset: usize) -> FormatHeader {
         first_block_header_size: None,
         first_block_extra_size: None,
         first_block_data_size: None,
+        main_extra_record_types: Vec::new(),
+        main_extra_records_complete: false,
+        main_archive_metadata_records: Vec::new(),
+    }
+}
+
+fn parse_rar5_main_extra_records(
+    data: &[u8],
+    start: usize,
+    end: usize,
+) -> (Vec<u64>, Vec<Rar5ArchiveMetadata>, bool) {
+    let mut cursor = start;
+    let mut record_types = Vec::new();
+    let mut metadata_records = Vec::new();
+    let mut complete = true;
+
+    while cursor < end && record_types.len() < MAX_RAR5_MAIN_EXTRA_RECORDS {
+        let Some(record_size) = read_vint_bounded(data, &mut cursor, end) else {
+            complete = false;
+            break;
+        };
+        let Some(record_end) = usize::try_from(record_size)
+            .ok()
+            .and_then(|size| cursor.checked_add(size))
+            .filter(|record_end| *record_end <= end && *record_end > cursor)
+        else {
+            complete = false;
+            break;
+        };
+        let Some(record_type) = read_vint_bounded(data, &mut cursor, record_end) else {
+            complete = false;
+            break;
+        };
+        record_types.push(record_type);
+        if record_type == 2 {
+            let metadata = parse_rar5_archive_metadata(data, cursor, record_end, record_size);
+            complete &= metadata.record_fields_complete;
+            metadata_records.push(metadata);
+        }
+        cursor = record_end;
+    }
+    if cursor < end {
+        complete = false;
+    }
+
+    (record_types, metadata_records, complete)
+}
+
+fn parse_rar5_archive_metadata(
+    data: &[u8],
+    mut cursor: usize,
+    end: usize,
+    record_size: u64,
+) -> Rar5ArchiveMetadata {
+    let Some(flags) = read_vint_bounded(data, &mut cursor, end) else {
+        return Rar5ArchiveMetadata {
+            record_size,
+            flags: None,
+            archive_name: None,
+            archive_name_bytes_hex: None,
+            archive_name_bytes_length: None,
+            archive_name_bytes_sha256: None,
+            archive_name_declared_length: None,
+            archive_name_buffer_sha256: None,
+            archive_name_hex_truncated: None,
+            archive_name_display_truncated: None,
+            archive_name_utf8_valid: None,
+            archive_creation_time_raw: None,
+            archive_creation_time_encoding: None,
+            record_fields_complete: false,
+        };
+    };
+
+    let mut archive_name = None;
+    let mut archive_name_bytes_hex = None;
+    let mut archive_name_bytes_length = None;
+    let mut archive_name_bytes_sha256 = None;
+    let mut archive_name_declared_length = None;
+    let mut archive_name_buffer_sha256 = None;
+    let mut archive_name_hex_truncated = None;
+    let mut archive_name_display_truncated = None;
+    let mut archive_name_utf8_valid = None;
+    let mut archive_creation_time_raw = None;
+    let mut archive_creation_time_encoding = None;
+    let mut complete = flags & !0x0f == 0;
+    if flags & 0x08 != 0 && flags & 0x04 == 0 {
+        complete = false;
+    }
+    let mut fields_aligned = true;
+
+    if flags & 0x01 != 0 {
+        if let Some(name_length) = read_vint_bounded(data, &mut cursor, end) {
+            if let Some(name_end) = usize::try_from(name_length)
+                .ok()
+                .and_then(|length| cursor.checked_add(length))
+                .filter(|name_end| *name_end <= end)
+            {
+                let raw_name = &data[cursor..name_end];
+                let name_end_at_nul = raw_name
+                    .iter()
+                    .position(|byte| *byte == 0)
+                    .unwrap_or(raw_name.len());
+                let name_bytes = &raw_name[..name_end_at_nul];
+                archive_name_bytes_hex = Some(hex(
+                    &name_bytes[..name_bytes.len().min(MAX_RAR5_ARCHIVE_NAME_HEX_BYTES)]
+                ));
+                archive_name_bytes_length = Some(name_bytes.len());
+                archive_name_bytes_sha256 = Some(sha256_hex(name_bytes));
+                archive_name_declared_length = Some(raw_name.len());
+                archive_name_buffer_sha256 = Some(sha256_hex(raw_name));
+                archive_name_hex_truncated =
+                    Some(name_bytes.len() > MAX_RAR5_ARCHIVE_NAME_HEX_BYTES);
+                archive_name_display_truncated =
+                    Some(name_bytes.len() > MAX_RAR5_ARCHIVE_NAME_DISPLAY_BYTES);
+                archive_name_utf8_valid = Some(std::str::from_utf8(name_bytes).is_ok());
+                if raw_name.first() != Some(&0) {
+                    archive_name = Some(
+                        String::from_utf8_lossy(
+                            &name_bytes
+                                [..name_bytes.len().min(MAX_RAR5_ARCHIVE_NAME_DISPLAY_BYTES)],
+                        )
+                        .into_owned(),
+                    );
+                }
+                cursor = name_end;
+            } else {
+                complete = false;
+                fields_aligned = false;
+            }
+        } else {
+            complete = false;
+            fields_aligned = false;
+        }
+    }
+
+    if flags & 0x02 != 0 && fields_aligned {
+        let (time_size, encoding) = if flags & 0x04 != 0 {
+            if flags & 0x08 != 0 {
+                (8, "unix_nanoseconds")
+            } else {
+                (4, "unix_seconds")
+            }
+        } else {
+            (8, "windows_filetime_100ns_since_1601")
+        };
+        if let Some(time_end) = cursor
+            .checked_add(time_size)
+            .filter(|time_end| *time_end <= end)
+        {
+            let time_bytes = &data[cursor..time_end];
+            archive_creation_time_raw = Some(if time_size == 4 {
+                u64::from(u32::from_le_bytes(
+                    time_bytes.try_into().expect("four-byte time"),
+                ))
+            } else {
+                u64::from_le_bytes(time_bytes.try_into().expect("eight-byte time"))
+            });
+            archive_creation_time_encoding = Some(encoding);
+        } else {
+            complete = false;
+        }
+    }
+
+    Rar5ArchiveMetadata {
+        record_size,
+        flags: Some(flags),
+        archive_name,
+        archive_name_bytes_hex,
+        archive_name_bytes_length,
+        archive_name_bytes_sha256,
+        archive_name_declared_length,
+        archive_name_buffer_sha256,
+        archive_name_hex_truncated,
+        archive_name_display_truncated,
+        archive_name_utf8_valid,
+        archive_creation_time_raw,
+        archive_creation_time_encoding,
+        record_fields_complete: complete,
     }
 }
 
@@ -366,6 +582,13 @@ fn hex(bytes: &[u8]) -> String {
         output.push(DIGITS[(byte & 0x0f) as usize] as char);
     }
     output
+}
+
+fn sha256_hex(bytes: &[u8]) -> String {
+    use sha2::{Digest, Sha256};
+
+    let digest = Sha256::digest(bytes);
+    hex(&digest)
 }
 
 fn parse_7z(data: &[u8], offset: usize) -> FormatHeader {

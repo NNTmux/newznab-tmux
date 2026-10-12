@@ -68,10 +68,24 @@ pub struct InputFileSliceChecksums {
     pub checksum_records_preview_hex: String,
     pub preview_slice_count: usize,
     pub preview_truncated: bool,
+    pub slice_preview: Vec<InputFileSliceChecksum>,
     pub source_file_present: bool,
     pub expected_slice_count_from_file_length: Option<u64>,
     pub slice_count_matches_file_length: Option<bool>,
     pub duplicate_conflict: bool,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct InputFileSliceChecksum {
+    pub slice_index: usize,
+    pub md5: String,
+    pub crc32: u32,
+    pub crc32_little_endian_hex: String,
+    pub source_byte_start: Option<u64>,
+    pub source_byte_end_exclusive: Option<u64>,
+    pub source_bytes_in_slice: Option<u64>,
+    pub zero_padding_bytes: Option<u64>,
+    pub source_range_valid: Option<bool>,
 }
 
 #[derive(Debug, Serialize)]
@@ -147,6 +161,7 @@ struct IfscPacket {
     records_sha256: String,
     preview_hex: String,
     preview_slice_count: usize,
+    slice_preview: Vec<InputFileSliceChecksum>,
     duplicate_conflict: bool,
 }
 
@@ -313,12 +328,28 @@ pub fn parse(data: &[u8]) -> Par2Metadata {
                 let records = &payload[16..];
                 let preview_len = records.len().min(MAX_IFSC_PREVIEW_BYTES) / 20 * 20;
                 let preview = &records[..preview_len];
+                let slice_preview = preview
+                    .chunks_exact(20)
+                    .enumerate()
+                    .map(|(slice_index, record)| InputFileSliceChecksum {
+                        slice_index,
+                        md5: hex(&record[..16]),
+                        crc32: read_u32(record, 16).unwrap_or_default(),
+                        crc32_little_endian_hex: hex(&record[16..20]),
+                        source_byte_start: None,
+                        source_byte_end_exclusive: None,
+                        source_bytes_in_slice: None,
+                        zero_padding_bytes: None,
+                        source_range_valid: None,
+                    })
+                    .collect();
                 let key = (set_id.clone(), file_id.clone());
                 let candidate = IfscPacket {
                     slice_count: records.len() / 20,
                     records_sha256: sha256_hex(records),
                     preview_hex: hex(preview),
                     preview_slice_count: preview.len() / 20,
+                    slice_preview,
                     duplicate_conflict: false,
                 };
                 if let Some(previous) = parsed.ifsc_by_set_and_file.get_mut(&key) {
@@ -429,6 +460,12 @@ pub fn parse(data: &[u8]) -> Par2Metadata {
                     .filter(|block_size| **block_size > 0)
                     .map(|block_size| source.file_length.div_ceil(*block_size))
             });
+            let block_size = parsed.block_sizes_by_set.get(set_id).copied();
+            let slice_preview = ifsc
+                .slice_preview
+                .iter()
+                .map(|slice| map_ifsc_slice_to_source(slice, source, block_size))
+                .collect();
             InputFileSliceChecksums {
                 recovery_set_id: set_id.clone(),
                 file_id: file_id.clone(),
@@ -437,6 +474,7 @@ pub fn parse(data: &[u8]) -> Par2Metadata {
                 checksum_records_preview_hex: ifsc.preview_hex.clone(),
                 preview_slice_count: ifsc.preview_slice_count,
                 preview_truncated: ifsc.preview_slice_count < ifsc.slice_count,
+                slice_preview,
                 source_file_present: source.is_some(),
                 expected_slice_count_from_file_length: expected_slice_count,
                 slice_count_matches_file_length: expected_slice_count
@@ -696,6 +734,45 @@ fn sha256_hex(bytes: &[u8]) -> String {
     use sha2::{Digest as Sha2Digest, Sha256 as Sha2};
 
     hex(&Sha2::digest(bytes))
+}
+
+fn map_ifsc_slice_to_source(
+    slice: &InputFileSliceChecksum,
+    source: Option<&SourceFile>,
+    block_size: Option<u64>,
+) -> InputFileSliceChecksum {
+    let Some((source, block_size)) = source.zip(block_size.filter(|size| *size > 0)) else {
+        return slice.clone();
+    };
+    let Some(slice_index) = u64::try_from(slice.slice_index).ok() else {
+        return slice.clone();
+    };
+    let Some(source_byte_start) = slice_index.checked_mul(block_size) else {
+        return slice.clone();
+    };
+    let expected_slice_count = source.file_length.div_ceil(block_size);
+    let source_range_valid = slice_index < expected_slice_count;
+    let source_bytes_in_slice = source_range_valid.then(|| {
+        source
+            .file_length
+            .saturating_sub(source_byte_start)
+            .min(block_size)
+    });
+    let source_byte_end_exclusive =
+        source_bytes_in_slice.and_then(|slice_bytes| source_byte_start.checked_add(slice_bytes));
+    let zero_padding_bytes = source_bytes_in_slice.map(|slice_bytes| block_size - slice_bytes);
+
+    InputFileSliceChecksum {
+        slice_index: slice.slice_index,
+        md5: slice.md5.clone(),
+        crc32: slice.crc32,
+        crc32_little_endian_hex: slice.crc32_little_endian_hex.clone(),
+        source_byte_start: Some(source_byte_start),
+        source_byte_end_exclusive,
+        source_bytes_in_slice,
+        zero_padding_bytes,
+        source_range_valid: Some(source_range_valid),
+    }
 }
 
 #[cfg(test)]
