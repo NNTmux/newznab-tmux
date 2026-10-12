@@ -73,28 +73,20 @@ class ReleasesRunner extends BaseRunner
 
         $this->headerStart('releases', $count, $maxProcesses);
 
-        // Run bounded batches through the shared worker pool
-        $batches = array_chunk($uGroups, max(1, $maxProcesses));
+        $tasks = [];
+        foreach ($uGroups as $group) {
+            $tasks[$group['id']] = $this->buildDnrCommand('releases  '.$group['id']);
+        }
 
-        foreach ($batches as $batchIndex => $batch) {
-            $tasks = [];
-            foreach ($batch as $group) {
-                $command = $this->buildDnrCommand('releases  '.$group['id']);
-                $tasks[$group['id']] = $command;
-            }
-
-            try {
-                $results = $this->runParallelCommands($tasks, $maxProcesses);
-
-                foreach ($results as $groupId => $output) {
-                    echo $output;
-                    cli()->primary('Finished performing release processing for group ID: '.$groupId);
-                }
-            } catch (\Throwable $e) {
-                Log::error('Release processing batch failed: '.$e->getMessage());
-                cli()->error('Batch '.($batchIndex + 1).' failed: '.$e->getMessage());
-                throw new RuntimeException('Worker batch failed.', 0, $e);
-            }
+        try {
+            $this->runParallelCommandsWithCompletion($tasks, $maxProcesses, static function (int|string $groupId, string $output): void {
+                echo $output;
+                cli()->primary('Finished performing release processing for group ID: '.$groupId);
+            });
+        } catch (\Throwable $e) {
+            Log::error('Release processing batch failed: '.$e->getMessage());
+            cli()->error('Release processing failed: '.$e->getMessage());
+            throw new RuntimeException('Worker batch failed.', 0, $e);
         }
     }
 
@@ -123,29 +115,21 @@ class ReleasesRunner extends BaseRunner
 
         $this->headerStart('update_per_group', $count, $maxProcesses);
 
-        // Run bounded batches through the shared worker pool
-        $batches = array_chunk($groups, max(1, $maxProcesses));
+        $tasks = [];
+        foreach ($groups as $group) {
+            $tasks[$group->id] = $this->buildDnrCommand('update_per_group  '.$group->id);
+        }
 
-        foreach ($batches as $batchIndex => $batch) {
-            $tasks = [];
-            foreach ($batch as $group) {
-                $command = $this->buildDnrCommand('update_per_group  '.$group->id);
-                $tasks[$group->id] = $command;
-            }
-
-            try {
-                $results = $this->runParallelCommands($tasks, $maxProcesses);
-
-                foreach ($results as $groupId => $output) {
-                    echo $output;
-                    $name = UsenetGroup::getNameByID($groupId);
-                    cli()->primary('Finished updating binaries, processing releases and additional postprocessing for group: '.$name);
-                }
-            } catch (\Throwable $e) {
-                Log::error('Update per group batch failed: '.$e->getMessage());
-                cli()->error('Batch '.($batchIndex + 1).' failed: '.$e->getMessage());
-                throw new RuntimeException('Worker batch failed.', 0, $e);
-            }
+        try {
+            $this->runParallelCommandsWithCompletion($tasks, $maxProcesses, static function (int|string $groupId, string $output): void {
+                echo $output;
+                $name = UsenetGroup::getNameByID($groupId);
+                cli()->primary('Finished updating binaries, processing releases and additional postprocessing for group: '.$name);
+            });
+        } catch (\Throwable $e) {
+            Log::error('Update per group batch failed: '.$e->getMessage());
+            cli()->error('Update per group failed: '.$e->getMessage());
+            throw new RuntimeException('Worker batch failed.', 0, $e);
         }
     }
 

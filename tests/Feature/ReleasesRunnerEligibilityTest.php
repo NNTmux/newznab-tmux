@@ -11,6 +11,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use PHPUnit\Framework\Attributes\DataProvider;
+use RuntimeException;
 use Tests\Support\ConfigurationTestBuilder;
 use Tests\TestCase;
 
@@ -47,6 +48,80 @@ class ReleasesRunnerEligibilityTest extends TestCase
         return ['buffered' => [false], 'streaming' => [true]];
     }
 
+    /** @return array<string, array{string}> */
+    public static function groupProcessingModes(): array
+    {
+        return ['releases' => ['releases'], 'update per group' => ['updatePerGroup']];
+    }
+
+    #[DataProvider('groupProcessingModes')]
+    public function test_buffered_group_processing_refills_a_free_slot_before_a_slow_group_finishes(string $method): void
+    {
+        config(['nntmux.stream_fork_output' => false]);
+        foreach ([1, 2, 109] as $id) {
+            DB::table('usenet_groups')->insert(['id' => $id, 'name' => 'alt.test.'.$id, 'active' => 1, 'backfill' => 0]);
+            DB::table('collections')->insert(['groups_id' => $id]);
+        }
+
+        $directory = sys_get_temp_dir().'/nntmux-release-refill-'.bin2hex(random_bytes(8));
+        mkdir($directory);
+        $runner = new RefillingEligibilityReleasesRunner($directory);
+        ob_start();
+        try {
+            $runner->{$method}();
+            $events = file($directory.'/events', FILE_IGNORE_NEW_LINES);
+            $this->assertIsArray($events);
+            $this->assertLessThan(array_search('finish:1', $events, true), array_search('start:109', $events, true));
+            foreach ([1, 2, 109] as $id) {
+                $this->assertSame(1, count(array_keys($events, 'start:'.$id, true)));
+                $this->assertSame(1, count(array_keys($events, 'finish:'.$id, true)));
+            }
+        } finally {
+            ob_end_clean();
+            foreach (glob($directory.'/*') ?: [] as $file) {
+                unlink($file);
+            }
+            rmdir($directory);
+        }
+    }
+
+    #[DataProvider('groupProcessingModes')]
+    public function test_buffered_group_processing_reports_a_worker_failure_after_running_later_groups(string $method): void
+    {
+        config(['nntmux.stream_fork_output' => false]);
+        foreach ([1, 2, 109] as $id) {
+            DB::table('usenet_groups')->insert(['id' => $id, 'name' => 'alt.test.'.$id, 'active' => 1, 'backfill' => 0]);
+            DB::table('collections')->insert(['groups_id' => $id]);
+        }
+
+        $directory = sys_get_temp_dir().'/nntmux-release-failure-'.bin2hex(random_bytes(8));
+        mkdir($directory);
+        $runner = new RefillingEligibilityReleasesRunner($directory, true);
+        ob_start();
+        try {
+            try {
+                $runner->{$method}();
+                $this->fail('A failed group must fail the runner.');
+            } catch (RuntimeException $exception) {
+                $this->assertSame('Worker batch failed.', $exception->getMessage());
+                $this->assertStringContainsString('1 failure (exit 7)', $exception->getPrevious()?->getMessage() ?? '');
+                $events = file($directory.'/events', FILE_IGNORE_NEW_LINES);
+                $this->assertIsArray($events);
+                $this->assertContains('finish:109', $events);
+                $this->assertStringContainsString(
+                    'worker-output:109',
+                    (string) ob_get_contents(),
+                );
+            }
+        } finally {
+            ob_end_clean();
+            foreach (glob($directory.'/*') ?: [] as $file) {
+                unlink($file);
+            }
+            rmdir($directory);
+        }
+    }
+
     #[DataProvider('outputModes')]
     public function test_dispatches_each_eligible_group_once_in_existing_order_with_two_selection_queries(bool $streaming): void
     {
@@ -81,7 +156,7 @@ class ReleasesRunnerEligibilityTest extends TestCase
             [PHP_BINARY, base_path('artisan'), 'releases:process', '30'],
             [PHP_BINARY, base_path('artisan'), 'releases:process', '80'],
         ], $runner->commands);
-        $this->assertSame($streaming ? [2] : [2, 2], $runner->limits);
+        $this->assertSame([2], $runner->limits);
         $this->assertSame($streaming ? ['releases'] : [], $runner->streamingDescriptions);
         $selectionQueries = array_filter($queries, static fn (array $query): bool => preg_match('/\bfrom\s+["`]?\b(?:usenet_groups|collections)\b/i', $query['query']) === 1);
         $this->assertCount(2, $selectionQueries, 'Group dispatch must not issue one collection lookup per enabled group.');
@@ -157,10 +232,44 @@ class CapturingEligibilityReleasesRunner extends ReleasesRunner
         return [];
     }
 
+    protected function runParallelCommandsWithCompletion(array $commands, int $maxProcesses, callable $onComplete): void
+    {
+        array_push($this->commands, ...array_values($commands));
+        $this->limits[] = $maxProcesses;
+    }
+
     protected function runStreamingCommands(array $commands, int $maxProcesses, string $desc): void
     {
         array_push($this->commands, ...array_values($commands));
         $this->limits[] = $maxProcesses;
         $this->streamingDescriptions[] = $desc;
+    }
+}
+
+class RefillingEligibilityReleasesRunner extends ReleasesRunner
+{
+    public function __construct(private readonly string $directory, private readonly bool $failFirst = false) {}
+
+    protected function buildDnrCommand(string $args): array
+    {
+        $id = explode('  ', trim($args))[1];
+        $worker = <<<'PHP'
+            [$script, $directory, $id, $failFirst] = $argv;
+            $event = static fn (string $phase) => file_put_contents($directory.'/events', $phase.':'.$id.PHP_EOL, FILE_APPEND | LOCK_EX);
+            $event('start');
+            if ($id === '1') {
+                $deadline = microtime(true) + 10;
+                while (!is_file($directory.'/later-started')) {
+                    if (microtime(true) >= $deadline) { exit(7); }
+                    usleep(10000);
+                }
+            }
+            if ($id === '109') { touch($directory.'/later-started'); }
+            $event('finish');
+            echo 'worker-output:'.$id.PHP_EOL;
+            if ($id === '1' && $failFirst === '1') { exit(7); }
+            PHP;
+
+        return [PHP_BINARY, '-r', $worker, $this->directory, $id, $this->failFirst ? '1' : '0'];
     }
 }

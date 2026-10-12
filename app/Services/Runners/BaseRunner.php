@@ -88,6 +88,15 @@ abstract class BaseRunner
         return $this->runWorkerPool($commands, $maxProcesses, $timeout ?? $this->concurrencyTimeout(), false);
     }
 
+    /**
+     * @param  array<string|int, string|list<string>>  $commands
+     * @param  callable(string|int, string): void  $onComplete
+     */
+    protected function runParallelCommandsWithCompletion(array $commands, int $maxProcesses, callable $onComplete): void
+    {
+        $this->runWorkerPool($commands, $maxProcesses, $this->concurrencyTimeout(), false, $onComplete);
+    }
+
     /** @param array<string|int, string|list<string>> $commands */
     protected function runStreamingCommands(array $commands, int $maxProcesses, string $desc): void
     {
@@ -103,9 +112,10 @@ abstract class BaseRunner
 
     /**
      * @param  array<string|int, string|list<string>>  $commands
+     * @param  callable(string|int, string): void|null  $onComplete
      * @return array<string|int, string>
      */
-    private function runWorkerPool(array $commands, int $maxProcesses, int $timeout, bool $stream): array
+    private function runWorkerPool(array $commands, int $maxProcesses, int $timeout, bool $stream, ?callable $onComplete = null): array
     {
         $queue = $commands;
         $running = [];
@@ -156,12 +166,18 @@ abstract class BaseRunner
                     } catch (ProcessTimedOutException) {
                         $status = 'timeout';
                     }
-                    $results[$key] = $process->getOutput();
+                    $output = $process->getOutput();
+                    if ($onComplete === null) {
+                        $results[$key] = $output;
+                    }
                     if (! $stream) {
                         echo $process->getErrorOutput();
                     }
                     $this->recordWorkerOutcome($key, $status, $process->getExitCode(), $this->outputTail($process));
                     unset($running[$key]);
+                    if ($onComplete !== null && $status === 'success') {
+                        $onComplete($key, $output);
+                    }
                 }
                 usleep(50000);
             }
