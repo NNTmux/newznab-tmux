@@ -119,14 +119,41 @@ final class Par2MetadataParser
             } elseif ($type === "PAR 2.0\0FileDesc" && strlen($payload) >= 57) {
                 $setId = bin2hex(substr($packet, 32, 16));
                 $fileSize = self::unsigned64(substr($payload, 48, 8));
-                $name = strstr(substr($payload, 56), "\0", true);
+                $filenameField = substr($payload, 56);
+                $terminator = strpos($filenameField, "\0");
+                $filename = $terminator === false ? $filenameField : substr($filenameField, 0, $terminator);
+                $padding = $terminator === false ? '' : substr($filenameField, $terminator);
+                $filenameLength = strlen($filename);
+                $filenamePrefix = substr($filename, 0, 128);
+                $filenameAsciiValid = preg_match('/[\x80-\xff]/', $filename) !== 1;
+                $expectedPaddingBytes = (4 - ($filenameLength % 4)) % 4;
+                $filenamePaddingValid = strlen($filenameField) % 4 === 0
+                    && strlen($padding) === $expectedPaddingBytes
+                    && strspn($padding, "\0") === strlen($padding);
+                $filenameBytesNonempty = $filename !== '';
+                $fileIdDerivationValid = $filenameBytesNonempty && $filenameAsciiValid && $filenamePaddingValid;
+                $derivedFileIdBytes = md5(substr($payload, 32, 16).substr($payload, 48, 8).$filename, true);
+                $advertisedFileIdBytes = substr($payload, 0, 16);
                 $source = [
                     'recovery_set_id' => $setId,
-                    'filename' => $name === false ? substr($payload, 56) : $name,
+                    'filename' => $filename,
+                    'filename_bytes_length' => $filenameLength,
+                    'filename_bytes_nonempty' => $filenameBytesNonempty,
+                    'filename_bytes_sha256' => hash('sha256', $filename),
+                    'filename_field_sha256' => hash('sha256', $filenameField),
+                    'filename_bytes_prefix_hex' => bin2hex($filenamePrefix),
+                    'filename_bytes_prefix_truncated' => $filenameLength > strlen($filenamePrefix),
+                    'filename_ascii_valid' => $filenameAsciiValid,
+                    'filename_padding_bytes' => strlen($padding),
+                    'filename_padding_valid' => $filenamePaddingValid,
                     'file_length' => $fileSize,
                     'md5' => bin2hex(substr($payload, 16, 16)),
                     'md5_first_16k' => bin2hex(substr($payload, 32, 16)),
-                    'file_id' => bin2hex(substr($payload, 0, 16)),
+                    'file_id' => bin2hex($advertisedFileIdBytes),
+                    'derived_file_id' => bin2hex($derivedFileIdBytes),
+                    'file_id_derivation_valid' => $fileIdDerivationValid,
+                    'file_id_matches_derived' => $fileIdDerivationValid
+                        ? hash_equals($advertisedFileIdBytes, $derivedFileIdBytes) : null,
                 ];
                 $sources[$source['file_id']] ??= $source;
                 $sourcesBySet[$setId][$source['file_id']] ??= $source;

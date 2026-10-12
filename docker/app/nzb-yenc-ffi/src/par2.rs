@@ -53,10 +53,22 @@ pub struct MainPacket {
 pub struct SourceFile {
     pub recovery_set_id: String,
     pub filename: String,
+    pub filename_bytes_length: usize,
+    pub filename_bytes_nonempty: bool,
+    pub filename_bytes_sha256: String,
+    pub filename_field_sha256: String,
+    pub filename_bytes_prefix_hex: String,
+    pub filename_bytes_prefix_truncated: bool,
+    pub filename_ascii_valid: bool,
+    pub filename_padding_bytes: usize,
+    pub filename_padding_valid: bool,
     pub file_length: u64,
     pub md5: String,
     pub md5_first_16k: String,
     pub file_id: String,
+    pub derived_file_id: String,
+    pub file_id_derivation_valid: bool,
+    pub file_id_matches_derived: Option<bool>,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -289,18 +301,47 @@ pub fn parse(data: &[u8]) -> Par2Metadata {
             "PAR 2.0\\0Main" => parsed.invalid_packet_count += 1,
             "PAR 2.0\\0FileDesc" if payload.len() >= 57 => {
                 let file_id = hex(&payload[0..16]);
-                let filename_raw = &payload[56..];
-                let filename = filename_raw
-                    .split(|byte| *byte == 0)
-                    .next()
-                    .unwrap_or_default();
+                let filename_field = &payload[56..];
+                let filename_end = filename_field
+                    .iter()
+                    .position(|byte| *byte == 0)
+                    .unwrap_or(filename_field.len());
+                let filename = &filename_field[..filename_end];
+                let padding = &filename_field[filename_end..];
+                let file_length_bytes = &payload[48..56];
+                let file_length = read_u64(payload, 48).unwrap_or_default();
+                let derived_file_id =
+                    hex(&md5_file_id(&payload[32..48], file_length_bytes, filename));
+                let filename_ascii_valid = filename.is_ascii();
+                let expected_padding_bytes = (4 - filename.len() % 4) % 4;
+                let filename_padding_valid = filename_field.len() % 4 == 0
+                    && padding.len() == expected_padding_bytes
+                    && padding.iter().all(|byte| *byte == 0);
+                let filename_bytes_nonempty = !filename.is_empty();
+                let file_id_derivation_valid =
+                    filename_bytes_nonempty && filename_ascii_valid && filename_padding_valid;
+                let file_id_matches_derived =
+                    file_id_derivation_valid.then(|| file_id == derived_file_id);
+                let filename_prefix = &filename[..filename.len().min(MAX_OPTIONAL_HEX_BYTES / 2)];
                 let source = SourceFile {
                     recovery_set_id: set_id.clone(),
                     filename: String::from_utf8_lossy(filename).into_owned(),
-                    file_length: read_u64(payload, 48).unwrap_or_default(),
+                    filename_bytes_length: filename.len(),
+                    filename_bytes_nonempty,
+                    filename_bytes_sha256: sha256_hex(filename),
+                    filename_field_sha256: sha256_hex(filename_field),
+                    filename_bytes_prefix_hex: hex(filename_prefix),
+                    filename_bytes_prefix_truncated: filename.len() > filename_prefix.len(),
+                    filename_ascii_valid,
+                    filename_padding_bytes: padding.len(),
+                    filename_padding_valid,
+                    file_length,
                     md5: hex(&payload[16..32]),
                     md5_first_16k: hex(&payload[32..48]),
                     file_id,
+                    file_id_matches_derived,
+                    derived_file_id,
+                    file_id_derivation_valid,
                 };
                 parsed
                     .sources_by_set
@@ -718,6 +759,14 @@ fn type_string(bytes: &[u8]) -> String {
 
 fn md5(bytes: &[u8]) -> [u8; 16] {
     Md5::digest(bytes).into()
+}
+
+fn md5_file_id(md5_first_16k: &[u8], file_length: &[u8], filename: &[u8]) -> [u8; 16] {
+    let mut digest = Md5::new();
+    digest.update(md5_first_16k);
+    digest.update(file_length);
+    digest.update(filename);
+    digest.finalize().into()
 }
 
 fn hex(bytes: &[u8]) -> String {
