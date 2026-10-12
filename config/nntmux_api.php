@@ -16,4 +16,6 @@ return [
     'trakttv_timeout' => env('TRAKTTV_TIMEOUT', 30),
     'trakttv_retry_times' => env('TRAKTTV_RETRY_TIMES', 3),
     'trakttv_retry_delay' => env('TRAKTTV_RETRY_DELAY', 100),
+    'tvmaze_timeout' => env('TVMAZE_TIMEOUT', 30),
+    'tvmaze_retry_times' => env('TVMAZE_RETRY_TIMES', 2),
 ];

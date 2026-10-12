@@ -4,144 +4,70 @@ declare(strict_types=1);
 
 namespace App\Services\TvProcessing\Pipes;
 
+use App\Services\TvProcessing\ParsedTvRelease;
+use App\Services\TvProcessing\Providers\AbstractTvProvider;
 use App\Services\TvProcessing\Providers\LocalDbProvider;
 use App\Services\TvProcessing\TvProcessingPassable;
 use App\Services\TvProcessing\TvProcessingResult;
 
 /**
  * Pipe for local database lookups.
- * Attempts to match releases against existing video data before hitting external APIs.
+ *
+ * Matches the release to an already scraped show and episode before any API is
+ * called. A show found here without the episode is handed on so the API pipes can
+ * fetch the episode with their own id for the show.
  */
 class LocalDbPipe extends AbstractTvProviderPipe
 {
-    // Video type constants (matching Videos class protected constants)
-    private const TYPE_TV = 0;
-
     protected int $priority = 10;
 
-    private ?LocalDbProvider $localDb = null;
+    public function __construct(private ?LocalDbProvider $localDb = null) {}
 
     public function getName(): string
     {
         return 'Local DB';
     }
 
-    public function getStatusCode(): int
-    {
-        return 0; // PROCESS_TVDB - Local DB processes unmatched releases first
-    }
-
-    /**
-     * Get or create the LocalDB instance.
-     */
-    private function getLocalDb(): LocalDbProvider
-    {
-        if ($this->localDb === null) {
-            $this->localDb = new LocalDbProvider;
-        }
-
-        return $this->localDb;
-    }
-
     protected function process(TvProcessingPassable $passable): TvProcessingResult
     {
-        $parsedInfo = $passable->getParsedInfo();
-        $context = $passable->context;
+        /** @var ParsedTvRelease $parsed */
+        $parsed = $passable->parsed;
+        $localDb = $this->localDb ??= new LocalDbProvider;
+        $title = $parsed->cleanName;
 
-        if ($parsedInfo === null || empty($parsedInfo['cleanname'])) {
-            return TvProcessingResult::notFound($this->getName());
+        if (! $passable->hasShow()) {
+            $videoId = $localDb->getByTitle($title, AbstractTvProvider::TYPE_TV);
+            if ($videoId <= 0) {
+                $this->outputNotFound($title);
+
+                return TvProcessingResult::notFound($this->getName(), ['title' => $title]);
+            }
+
+            $passable->setShow($videoId, $this->getName());
         }
 
-        $cleanName = $parsedInfo['cleanname'];
-        $localDb = $this->getLocalDb();
+        $videoId = $passable->videoId;
 
-        // Try to find the show in our local database by title
-        $videoId = $localDb->getByTitle($cleanName, self::TYPE_TV, 0);
+        if ($parsed->seasonPack) {
+            $passable->markSeasonPack($this->getName());
+            $this->outputSeasonPack($title);
 
-        // If not found and cleanName contains a year in parentheses, try without the year
-        if (($videoId === 0 || $videoId === false) && preg_match('/^(.+?)\s*\(\d{4}\)$/', (string) $cleanName, $yearMatch)) {
-            $nameWithoutYear = trim($yearMatch[1]);
-            $videoId = $localDb->getByTitle($nameWithoutYear, self::TYPE_TV, 0);
+            return TvProcessingResult::seasonPack($videoId, $this->getName());
         }
 
-        if ($videoId === 0 || $videoId === false) {
-            $this->outputNotFound($cleanName);
+        $episodeId = $parsed->hasEpisodeReference()
+            ? (int) $localDb->getBySeasonEp($videoId, $parsed->season ?? -1, $parsed->episode ?? 0, (string) $parsed->airdate)
+            : 0;
 
-            return TvProcessingResult::notFound($this->getName(), ['title' => $cleanName]);
-        }
-
-        // Found a matching show in local DB
-        $episodeId = false;
-        $hasEpisodeNumbers = $this->hasEpisodeNumbers($parsedInfo);
-        $hasAirdate = ! empty($parsedInfo['airdate']);
-
-        if ($hasEpisodeNumbers || $hasAirdate) {
-            // Try to find the specific episode
-            $episodeId = $localDb->getBySeasonEp(
-                $videoId,
-                (int) ($parsedInfo['season'] ?? 0),
-                (int) ($parsedInfo['episode'] ?? 0),
-                $parsedInfo['airdate'] ?? ''
-            );
-        }
-
-        if ($episodeId !== false && $episodeId > 0) {
-            // Complete match - both show and episode found
-            $localDb->setVideoIdFound($videoId, $context->releaseId, $episodeId);
-
-            $this->outputMatch(
-                $cleanName,
-                $hasEpisodeNumbers ? (int) $parsedInfo['season'] : null,
-                $hasEpisodeNumbers ? (int) $parsedInfo['episode'] : null,
-                $hasAirdate ? $parsedInfo['airdate'] : null
-            );
+        if ($episodeId > 0) {
+            $passable->markMatched($episodeId, $this->getName());
+            $this->outputMatch($title, $parsed);
 
             return TvProcessingResult::matched($videoId, $episodeId, $this->getName());
         }
 
-        // Series matched but no specific episode located
-        // Set video ID but mark episode as 0 (needs further lookup)
-        $localDb->setVideoIdFound($videoId, $context->releaseId, 0);
+        $this->outputEpisodeMissing($title, $parsed);
 
-        if ($this->echoOutput) {
-            cli()->primaryOver('    → ');
-            cli()->headerOver($this->truncateTitle($cleanName));
-            if ($hasAirdate) {
-                cli()->primaryOver(' | ');
-                cli()->warningOver($parsedInfo['airdate']);
-                cli()->headerOver(' → ');
-                cli()->notice('Series matched, airdate not in local DB');
-            } elseif ($hasEpisodeNumbers) {
-                cli()->primaryOver(' S');
-                cli()->warningOver(sprintf('%02d', (int) $parsedInfo['season']));
-                cli()->primaryOver('E');
-                cli()->warningOver(sprintf('%02d', (int) $parsedInfo['episode']));
-                cli()->headerOver(' → ');
-                cli()->notice('Series matched, episode not in local DB');
-            } else {
-                cli()->primaryOver(' → ');
-                cli()->notice('Series matched (no episode info)');
-            }
-        }
-
-        // Return not found so external APIs can try to get the episode
-        return TvProcessingResult::notFound($this->getName(), [
-            'video_id' => $videoId,
-            'series_matched' => true,
-            'episode_missing' => true,
-        ]);
-    }
-
-    /**
-     * Check if parsed info has valid episode numbers.
-     *
-     * @param  array<string, mixed>  $parsedInfo
-     */
-    private function hasEpisodeNumbers(array $parsedInfo): bool
-    {
-        return isset($parsedInfo['season'], $parsedInfo['episode'])
-            && $parsedInfo['episode'] !== 'all'
-            && (int) $parsedInfo['season'] > 0
-            && (int) $parsedInfo['episode'] > 0;
+        return TvProcessingResult::episodeMissing($videoId, $this->getName());
     }
 }

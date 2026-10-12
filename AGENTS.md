@@ -35,7 +35,7 @@ NNTP → NNTPService → BinariesRunner → ReleaseCreationService → ReleasePr
 | Pattern | Location | Example |
 |---------|----------|---------|
 | **Service Layer** | `app/Services/` | 50+ services with facades (`Search::`, `Categorization::`, `TvProcessing::`, `Yenc::`, `Elasticsearch::`) |
-| **Pipeline** | `*/Pipes/` | `TvProcessingPipeline` (TMDB→TVDB→TVMaze→Trakt), `CategorizationPipeline` (priority-driven; `Music` runs before `Book` for audiobook detection) |
+| **Pipeline** | `*/Pipes/` | `TvProcessingPipeline` (Parse→Local DB→TVDB→TVMaze→TMDB→Trakt; pipes only record findings, `TvLookupOutcomeWriter` persists them; lookup states in `App\Enums\TvLookupStatus`, due-work SQL in `TvProcessingCandidateQuery`), `CategorizationPipeline` (priority-driven; `Music` runs before `Book` for audiobook detection) |
 | **Driver** | `Search/Drivers/` | Manticore/Elasticsearch via `SEARCH_DRIVER` env var |
 | **Runners** | `Runners/` | `BinariesRunner`, `ReleasesRunner`, `BackfillRunner`, `PostProcessRunner` |
 | **DTO** | `*/DTO/`, `app/Support/DTOs/`, `app/Data/` | Internal: `NameFixResult`, `ReleaseProcessingContext`, `ReleaseCreationResult`. API responses use Spatie Laravel Data in `app/Data/Api/` (`ReleaseData`, `CategoryData`, `DetailsData`) |

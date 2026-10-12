@@ -14,18 +14,9 @@ class TvProcessingServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->singleton(TvProcessingPipeline::class, function ($app) {
-            return TvProcessingPipeline::createDefault();
-        });
-
-        $this->app->alias(TvProcessingPipeline::class, 'tv-processing');
-    }
-
-    /**
-     * Bootstrap services.
-     */
-    public function boot(): void
-    {
-        //
+        // A fresh pipeline per resolve: pipes and providers hold per-run state.
+        $this->app->bind(TvProcessingPipeline::class, static fn (): TvProcessingPipeline => TvProcessingPipeline::createDefault(
+            (bool) config('nntmux.echocli')
+        ));
     }
 }

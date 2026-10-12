@@ -7,6 +7,7 @@ namespace App\Console\Commands;
 use App\Facades\Search;
 use App\Models\Category;
 use App\Models\Release;
+use App\Services\TvProcessing\TvProcessingCandidateQuery;
 use Illuminate\Console\Command;
 
 class NntmuxResetPostProcessing extends Command
@@ -83,8 +84,7 @@ class NntmuxResetPostProcessing extends Command
                             'book_lookup_attempts' => 0,
                             'book_lookup_retry_at' => null,
                             'book_name_normalized_at' => null,
-                            'videos_id' => 0,
-                            'tv_episodes_id' => 0,
+                            ...TvProcessingCandidateQuery::resetColumns(),
                             'passwordstatus' => -1,
                             'haspreview' => -1,
                             'archive_retry_at' => null,
@@ -334,18 +334,17 @@ class NntmuxResetPostProcessing extends Command
 
     private function resetTv(): void
     {
-        $qry = Release::query()->where('videos_id', '!=', 0)->where('tv_episodes_id', '!=', 0)->whereBetween('categories_id', [Category::TV_ROOT, Category::TV_OTHER])->get();
+        $qry = Release::query()
+            ->whereBetween('categories_id', [Category::TV_ROOT, Category::TV_OTHER])
+            ->where(fn ($query) => $query->where('videos_id', '!=', 0)->orWhere('tv_episodes_id', '!=', 0)->orWhere('tv_lookup_attempts', '>', 0))
+            ->get(['id']);
         $total = $qry->count();
         if ($total > 0) {
             $bar = $this->output->createProgressBar($total);
             $bar->setOverwrite(true); // Terminal needs to support ANSI Encoding for this?
             $bar->start();
             foreach ($qry as $releases) {
-                Release::query()->where('id', $releases->id)->update(
-                    [
-                        'videos_id' => 0,
-                        'tv_episodes_id' => 0,
-                    ]);
+                Release::query()->where('id', $releases->id)->update(TvProcessingCandidateQuery::resetColumns());
                 Search::updateRelease((int) $releases->id);
                 $bar->advance();
             }

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Services\TvProcessing\TvProcessingPipeline;
-use App\Services\TvProcessor;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -19,14 +18,14 @@ class PostProcessTvPipeline extends Command
     protected $signature = 'postprocess:tv-pipeline
                             {guid : First character of release guid (a-f, 0-9)}
                             {renamed? : Process renamed only (optional)}
-                            {--mode=pipeline : Processing mode: pipeline, parallel, or laravel}';
+                            {--mode= : Deprecated and ignored; every run uses the provider pipeline}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Post process TV releases by GUID character using pipelined providers';
+    protected $description = 'Post process TV releases by GUID character through the TV provider pipeline';
 
     /**
      * Execute the console command.
@@ -35,7 +34,6 @@ class PostProcessTvPipeline extends Command
     {
         $guid = $this->argument('guid');
         $renamed = $this->argument('renamed') ?? '';
-        $mode = $this->option('mode') ?? 'pipeline';
 
         if (! $this->isValidChar($guid)) {
             $this->error('GUID character must be a-f or 0-9.');
@@ -43,22 +41,12 @@ class PostProcessTvPipeline extends Command
             return self::FAILURE;
         }
 
-        if (! in_array($mode, ['pipeline', 'parallel', 'laravel'], true)) {
-            $this->error('Mode must be either "pipeline", "parallel", or "laravel".');
-
-            return self::FAILURE;
+        if ($this->option('mode') !== null) {
+            $this->warn('The --mode option is deprecated and ignored; every run uses the provider pipeline.');
         }
 
         try {
-            if ($mode === 'laravel') {
-                // Use the new Laravel Pipeline-based processor
-                $pipeline = TvProcessingPipeline::createDefault(echoOutput: true);
-                $pipeline->process('', $guid, $renamed);
-            } else {
-                // Use the legacy processor for backward compatibility
-                $tvProcessor = new TvProcessor(true); // true = echo output
-                $tvProcessor->process('', $guid, $renamed, $mode);
-            }
+            app(TvProcessingPipeline::class)->process('', $guid, $renamed);
 
             return self::SUCCESS;
         } catch (\Throwable $e) {

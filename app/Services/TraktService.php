@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Exceptions\TvProviderException;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
@@ -50,6 +51,11 @@ class TraktService
 
     protected int $retryDelay;
 
+    /**
+     * Throw TvProviderException on rate limits, server errors and connection failures instead of returning null.
+     */
+    protected bool $throwOnTransientFailure = false;
+
     public function __construct(?string $clientId = null)
     {
         $this->clientId = trim($clientId ?? (string) config('nntmux_api.trakttv_api_key', ''));
@@ -80,6 +86,18 @@ class TraktService
     public function isConfigured(): bool
     {
         return ! empty($this->clientId);
+    }
+
+    /**
+     * A copy of this service that throws TvProviderException on transient failures. A 429 is
+     * thrown at once with its Retry-After instead of sleeping the worker before one more try.
+     */
+    public function throwingOnTransientFailure(): static
+    {
+        $service = clone $this;
+        $service->throwOnTransientFailure = true;
+
+        return $service;
     }
 
     /**
@@ -151,6 +169,15 @@ class TraktService
                 return $data;
             }
 
+            if ($this->throwOnTransientFailure && TvProviderException::isTransientStatus($response->status())) {
+                throw new TvProviderException(
+                    'trakt',
+                    sprintf('Trakt returned %d for %s', $response->status(), $endpoint),
+                    $response->status(),
+                    $response->status() === 429 ? $this->getRateLimitBackoff($response) : null,
+                );
+            }
+
             // Handle 429 (rate limit / Cloudflare 1015): back off then retry once
             if ($response->status() === 429 && ! $isRetryAfterRateLimit) {
                 $backoff = $this->getRateLimitBackoff($response);
@@ -177,12 +204,18 @@ class TraktService
             ]);
 
             return null;
+        } catch (TvProviderException $e) {
+            throw $e;
         } catch (\Throwable $e) {
             // Check if this is a 404 wrapped in an exception
             if ($e instanceof RequestException && $e->response->status() === 404) {
                 Log::debug('Trakt: Resource not found', ['endpoint' => $endpoint]);
 
                 return null;
+            }
+
+            if ($this->throwOnTransientFailure) {
+                throw new TvProviderException('trakt', 'Trakt request failed: '.$e->getMessage(), null, null, $e);
             }
 
             Log::warning('Trakt API request exception', [

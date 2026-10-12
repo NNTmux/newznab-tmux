@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Models\Release;
+use App\Services\TvProcessing\TvProcessingCandidateQuery;
 use App\Services\TvProcessing\TvProcessingPipeline;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
@@ -27,11 +28,6 @@ class ReprocessTvRelease extends Command
      * @var string
      */
     protected $description = 'Reprocess a specific TV release by GUID to rematch it against TV databases';
-
-    public function __construct()
-    {
-        parent::__construct();
-    }
 
     /**
      * Execute the console command.
@@ -65,11 +61,8 @@ class ReprocessTvRelease extends Command
         );
 
         if ($reset) {
-            $this->warn('Resetting videos_id and tv_episodes_id to 0...');
-            $release->update([
-                'videos_id' => 0,
-                'tv_episodes_id' => 0,
-            ]);
+            $this->warn('Resetting videos_id, tv_episodes_id and the lookup retry state...');
+            $release->update(TvProcessingCandidateQuery::resetColumns());
             $release->refresh();
         }
 
@@ -77,8 +70,7 @@ class ReprocessTvRelease extends Command
         $this->newLine();
 
         try {
-            $pipeline = TvProcessingPipeline::createDefault(echoOutput: true);
-            $result = $pipeline->processRelease($release, $debug);
+            $result = app(TvProcessingPipeline::class)->processRelease($release, (bool) $debug);
 
             $this->newLine();
 
@@ -88,10 +80,13 @@ class ReprocessTvRelease extends Command
                 $this->info('Video ID: '.($result['video_id'] ?? 'N/A'));
                 $this->info('Episode ID: '.($result['episode_id'] ?? 'N/A'));
             } else {
-                cli()->warning('No match found.');
+                cli()->warning('No episode match.');
                 $this->info('Status: '.($result['status'] ?? 'Unknown'));
-                if (isset($result['provider'])) {
-                    $this->info('Last provider tried: '.$result['provider']);
+                if (! empty($result['video_id'])) {
+                    $this->info('Video ID: '.$result['video_id']);
+                }
+                if (! empty($result['provider'])) {
+                    $this->info('Provider: '.$result['provider']);
                 }
             }
 
@@ -106,8 +101,8 @@ class ReprocessTvRelease extends Command
             $this->newLine();
             $this->info('Final release state:');
             $this->table(
-                ['Videos ID', 'Episode ID'],
-                [[$release->videos_id, $release->tv_episodes_id]]
+                ['Videos ID', 'Episode ID', 'Lookup attempts', 'Retry at'],
+                [[$release->videos_id, $release->tv_episodes_id, $release->tv_lookup_attempts, $release->tv_lookup_retry_at ?? '-']]
             );
 
             return self::SUCCESS;

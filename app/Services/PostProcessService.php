@@ -8,6 +8,7 @@ use App\Services\AdditionalProcessing\AdditionalProcessingOrchestrator;
 use App\Services\Configuration\ConfigurationProvider;
 use App\Services\NameFixing\NameFixingService;
 use App\Services\NNTP\NNTPService;
+use App\Services\TvProcessing\TvProcessingPipeline;
 use dariusiii\rarinfo\Par2Info;
 
 /**
@@ -35,7 +36,7 @@ final class PostProcessService
 
     private readonly Par2Processor $par2Processor;
 
-    private readonly TvProcessor $tvProcessor;
+    private readonly TvProcessingPipeline $tvPipeline;
 
     private readonly NfoProcessor $nfoProcessor;
 
@@ -56,7 +57,7 @@ final class PostProcessService
         ?Par2Info $par2Info = null,
         ?NfoService $nfo = null,
         ?Par2Processor $par2Processor = null,
-        ?TvProcessor $tvProcessor = null,
+        ?TvProcessingPipeline $tvPipeline = null,
         ?NfoProcessor $nfoProcessor = null,
         ?MoviesProcessor $moviesProcessor = null,
         ?MusicProcessor $musicProcessor = null,
@@ -81,7 +82,7 @@ final class PostProcessService
             $this->addPar2,
             $this->alternateNNTP
         );
-        $this->tvProcessor = $tvProcessor ?? new TvProcessor($this->echoOutput);
+        $this->tvPipeline = $tvPipeline ?? TvProcessingPipeline::createDefault($this->echoOutput);
         $this->nfoProcessor = $nfoProcessor ?? new NfoProcessor($this->nfo);
         $this->moviesProcessor = $moviesProcessor ?? new MoviesProcessor($this->echoOutput);
         $this->musicProcessor = $musicProcessor ?? new MusicProcessor($this->echoOutput);
@@ -202,7 +203,6 @@ final class PostProcessService
      * @param  string  $groupID  Optional group ID filter
      * @param  string  $guidChar  Optional GUID character filter
      * @param  int|string|null  $processTV  Processing mode (0=skip, 1=all, 2=renamed only, ''=check setting)
-     * @param  string  $mode  Processing mode ('pipeline' or 'parallel')
      *
      * @throws \Exception
      */
@@ -210,7 +210,6 @@ final class PostProcessService
         string $groupID = '',
         string $guidChar = '',
         int|string|null $processTV = '',
-        string $mode = 'pipeline'
     ): void {
         if ($guidChar === '') {
             $forkingService = new ForkingService;
@@ -221,7 +220,7 @@ final class PostProcessService
 
             $forkingService->processTv($renamedOnly);
         } else {
-            $this->tvProcessor->process($groupID, $guidChar, $processTV, $mode);
+            $this->tvPipeline->process($groupID, $guidChar, $processTV);
         }
     }
 

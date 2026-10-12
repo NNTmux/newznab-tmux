@@ -64,6 +64,10 @@ Schedule::call(function () {
 Schedule::command('tmux:health-check --auto-restart')->everyThirtyMinutes()->withoutOverlapping();
 Schedule::command('nntmux:check-service-health')->everyMinute()->withoutOverlapping();
 Schedule::command('nntmux:search-repair --limit=100')->everyMinute()->withoutOverlapping();
+// TV: retry episode lookups for shows whose episode wasn't available yet, and normalize
+// any release still carrying a legacy TV processor status.
+Schedule::command('tv:reprocess-missing-episodes --limit=500')->everyThirtyMinutes()->withoutOverlapping()->runInBackground();
+Schedule::command('tv:repair-links --legacy --stuck --orphans --limit=50000')->dailyAt('05:15')->withoutOverlapping();
 // Tail storage/logs into the Manticore log index used by the admin log viewer search
 Schedule::command('nntmux:index-logs')->everyMinute()->withoutOverlapping()->runInBackground()->when(static fn (): bool => (bool) config('nntmux.log_viewer.index.enabled'));
 // Keep the admin dashboard snapshot (Cache::flexible) hot so admins never pay

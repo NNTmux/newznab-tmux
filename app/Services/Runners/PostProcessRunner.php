@@ -11,6 +11,7 @@ use App\Services\BookProcessingCandidateQuery;
 use App\Services\Configuration\ConfigurationProvider;
 use App\Services\NfoService;
 use App\Services\TempWorkspaceService;
+use App\Services\TvProcessing\TvProcessingCandidateQuery;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use RuntimeException;
@@ -426,49 +427,39 @@ class PostProcessRunner extends BaseRunner
 
     public function processTv(bool $renamedOnly): void
     {
-        if ((int) app(ConfigurationProvider::class)->metadata()->tvLookup->value <= 0) {
+        $workCondition = $this->tvWorkCondition($renamedOnly);
+        if ($workCondition === null || ! $this->hasTvWork($renamedOnly)) {
             $this->headerNone();
 
             return;
         }
 
-        $condLookup = ((int) app(ConfigurationProvider::class)->metadata()->tvLookup->value === 2 ? 'AND isrenamed = 1' : '');
-        $condRenamedOnly = ($renamedOnly ? 'AND isrenamed = 1' : '');
-
-        $checkSql = '
-            SELECT id
-            FROM releases
-            WHERE categories_id BETWEEN 5000 AND 5999
-            AND categories_id != 5070
-            AND videos_id = 0
-            AND size > 1048576
-            AND tv_episodes_id BETWEEN -3 AND 0
-            '.$condLookup.' '.$condRenamedOnly.'
-            LIMIT 1';
-        if (count(DB::select($checkSql)) === 0) {
-            $this->headerNone();
-
-            return;
-        }
-
-        $renamedFlag = ($renamedOnly ? 2 : 1);
+        // Workers re-apply the configured "renamed only" mode themselves; flag 2 makes it explicit.
+        $renamedFlag = ($renamedOnly || (int) app(ConfigurationProvider::class)->metadata()->tvLookup->value === 2) ? 2 : 1;
         $bucketExpr = $this->guidBucketExpression();
         $sql = '
             SELECT DISTINCT '.$bucketExpr.' AS id, '.$renamedFlag.' AS renamed
             FROM releases
-            WHERE categories_id BETWEEN 5000 AND 5999
-            AND categories_id != 5070
-            AND videos_id = 0
-            AND tv_episodes_id BETWEEN -3 AND 0
-            AND size > 1048576
-            '.$condLookup.' '.$condRenamedOnly.'
+            WHERE '.$workCondition.'
             LIMIT 16';
         $queue = DB::select($sql);
 
         $maxProcesses = (int) app(ConfigurationProvider::class)->postProcessing()->postThreadsNon;
 
-        // Use pipelined TV processing for better efficiency
         $this->runPostProcessTvPipeline($queue, $maxProcesses, 'tv postprocessing (pipelined)', $renamedOnly);
+    }
+
+    /**
+     * SQL selecting the releases the TV workers will pick up, or null when TV lookups are disabled.
+     */
+    private function tvWorkCondition(bool $renamedOnly): ?string
+    {
+        $lookupMode = (int) app(ConfigurationProvider::class)->metadata()->tvLookup->value;
+        if ($lookupMode <= 0) {
+            return null;
+        }
+
+        return TvProcessingCandidateQuery::workCondition($renamedOnly ? 2 : $lookupMode);
     }
 
     /**
@@ -491,8 +482,7 @@ class PostProcessRunner extends BaseRunner
             foreach ($releases as $release) {
                 $char = isset($release->id) ? substr((string) $release->id, 0, 1) : '';
                 $renamed = isset($release->renamed) ? $release->renamed : '';
-                // Use the pipelined TV command
-                $commands[] = [PHP_BINARY, base_path('artisan'), 'postprocess:tv-pipeline', $char, ...($renamed ? [(string) $renamed] : []), '--mode=pipeline'];
+                $commands[] = [PHP_BINARY, base_path('artisan'), 'postprocess:tv-pipeline', $char, ...($renamed ? [(string) $renamed] : [])];
             }
             $this->runStreamingCommands($commands, $maxProcesses, $desc);
 
@@ -510,8 +500,7 @@ class PostProcessRunner extends BaseRunner
             foreach ($batch as $idx => $release) {
                 $char = isset($release->id) ? substr((string) $release->id, 0, 1) : '';
                 $renamed = isset($release->renamed) ? $release->renamed : '';
-                // Use the pipelined TV command for each GUID bucket
-                $command = [PHP_BINARY, base_path('artisan'), 'postprocess:tv-pipeline', $char, ...($renamed ? [(string) $renamed] : []), '--mode=pipeline'];
+                $command = [PHP_BINARY, base_path('artisan'), 'postprocess:tv-pipeline', $char, ...($renamed ? [(string) $renamed] : [])];
                 $tasks[$idx] = $command;
             }
 
@@ -535,25 +524,9 @@ class PostProcessRunner extends BaseRunner
      */
     public function hasTvWork(bool $renamedOnly): bool
     {
-        if ((int) app(ConfigurationProvider::class)->metadata()->tvLookup->value <= 0) {
-            return false;
-        }
+        $workCondition = $this->tvWorkCondition($renamedOnly);
 
-        $condLookup = ((int) app(ConfigurationProvider::class)->metadata()->tvLookup->value === 2 ? 'AND isrenamed = 1' : '');
-        $condRenamedOnly = ($renamedOnly ? 'AND isrenamed = 1' : '');
-
-        $checkSql = '
-            SELECT id
-            FROM releases
-            WHERE categories_id BETWEEN 5000 AND 5999
-            AND categories_id != 5070
-            AND videos_id = 0
-            AND size > 1048576
-            AND tv_episodes_id BETWEEN -3 AND 0
-            '.$condLookup.' '.$condRenamedOnly.'
-            LIMIT 1';
-
-        return count(DB::select($checkSql)) > 0;
+        return $workCondition !== null && DB::table('releases')->whereRaw($workCondition)->exists();
     }
 
     public function processAnime(): void

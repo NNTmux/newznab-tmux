@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Services\TvProcessing\Providers\TvdbProvider;
+use CanIHaveSomeCoffee\TheTVDbAPI\TheTVDbAPI;
 use Tests\TestCase;
 
 /**
@@ -14,13 +15,20 @@ class TvdbApiTest extends TestCase
 {
     private ?TvdbProvider $tvdbProvider = null;
 
+    private ?TheTVDbAPI $client = null;
+
     protected function setUp(): void
     {
         parent::setUp();
 
         try {
             $this->tvdbProvider = new TvdbProvider;
+            $this->client = $this->tvdbProvider->authorizedClient();
         } catch (\Exception $e) {
+            $this->tvdbProvider = null;
+        }
+
+        if ($this->client === null) {
             $this->tvdbProvider = null;
         }
     }
@@ -41,7 +49,7 @@ class TvdbApiTest extends TestCase
         }
 
         try {
-            $results = $this->tvdbProvider->client->search()->search('Breaking Bad', ['type' => 'series']);
+            $results = $this->client->search()->search('Breaking Bad', ['type' => 'series']);
 
             $this->assertNotEmpty($results);
             $this->assertIsArray($results);
@@ -58,14 +66,14 @@ class TvdbApiTest extends TestCase
 
         try {
             // First search for Breaking Bad
-            $results = $this->tvdbProvider->client->search()->search('Breaking Bad', ['type' => 'series']);
+            $results = $this->client->search()->search('Breaking Bad', ['type' => 'series']);
 
             if (empty($results)) {
                 $this->markTestSkipped('Could not find Breaking Bad on TVDB.');
             }
 
             $tvdbId = $results[0]->tvdb_id;
-            $episodes = $this->tvdbProvider->client->series()->episodes($tvdbId);
+            $episodes = $this->client->series()->episodes($tvdbId);
 
             $this->assertNotEmpty($episodes);
         } catch (\Throwable $e) {
@@ -81,14 +89,14 @@ class TvdbApiTest extends TestCase
 
         try {
             // Search for Breaking Bad
-            $results = $this->tvdbProvider->client->search()->search('Breaking Bad', ['type' => 'series']);
+            $results = $this->client->search()->search('Breaking Bad', ['type' => 'series']);
 
             if (empty($results)) {
                 $this->markTestSkipped('Could not find Breaking Bad on TVDB.');
             }
 
             $tvdbId = $results[0]->tvdb_id;
-            $episodes = $this->tvdbProvider->client->series()->episodes($tvdbId);
+            $episodes = $this->client->series()->episodes($tvdbId);
 
             // Find Season 1 Episode 1
             $foundEpisode = null;
@@ -112,7 +120,7 @@ class TvdbApiTest extends TestCase
         }
 
         try {
-            $results = $this->tvdbProvider->client->search()->search('xyznonexistentshow99999', ['type' => 'series']);
+            $results = $this->client->search()->search('xyznonexistentshow99999', ['type' => 'series']);
 
             // Should return empty or null for non-existent shows
             $this->assertTrue(empty($results) || $results === null);

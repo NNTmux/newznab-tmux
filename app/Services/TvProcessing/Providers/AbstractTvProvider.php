@@ -4,17 +4,19 @@ declare(strict_types=1);
 
 namespace App\Services\TvProcessing\Providers;
 
-use App\Models\Category;
-use App\Models\Release;
+use App\Enums\ImageAssetProfile;
+use App\Exceptions\TvProviderException;
 use App\Models\TvEpisode;
 use App\Models\TvInfo;
 use App\Models\Video;
-use App\Services\Configuration\ConfigurationProvider;
-use App\Services\Releases\ReleaseBrowseService;
+use App\Services\ReleaseImageService;
+use App\Services\TmdbClient;
+use App\Services\TraktService;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\QueryException;
-use Illuminate\Support\Collection;
+use Illuminate\Database\UniqueConstraintViolationException;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -24,37 +26,26 @@ use Illuminate\Support\Facades\DB;
 abstract class AbstractTvProvider extends BaseVideoProvider
 {
     // Television Sources
-    protected const SOURCE_NONE = 0;   // No Scrape source
+    public const SOURCE_NONE = 0;   // No Scrape source
 
-    protected const SOURCE_TVDB = 1;   // Scrape source was TVDB
+    public const SOURCE_TVDB = 1;   // Scrape source was TVDB
 
-    protected const SOURCE_TVMAZE = 2;   // Scrape source was TVMAZE
+    public const SOURCE_TVMAZE = 2;   // Scrape source was TVMAZE
 
-    protected const SOURCE_TMDB = 3;   // Scrape source was TMDB
+    public const SOURCE_TMDB = 3;   // Scrape source was TMDB
 
-    protected const SOURCE_TRAKT = 4;   // Scrape source was Trakt
+    public const SOURCE_TRAKT = 4;   // Scrape source was Trakt
 
-    protected const SOURCE_IMDB = 5;   // Scrape source was IMDB
+    public const SOURCE_IMDB = 5;   // Scrape source was IMDB
 
     // Anime Sources
-    protected const SOURCE_ANIDB = 10;   // Scrape source was AniDB
+    public const SOURCE_ANIDB = 10;   // Scrape source was AniDB
 
-    // Processing signifiers
-    protected const PROCESS_TVDB = 0;   // Process TVDB First
+    /** Minimum title similarity (percent) for a search result to be considered. */
+    protected const MATCH_PROBABILITY = 75;
 
-    protected const PROCESS_TVMAZE = -1;   // Process TVMaze Second
-
-    protected const PROCESS_TMDB = -2;   // Process TMDB Third
-
-    protected const PROCESS_TRAKT = -3;   // Process Trakt Fourth
-
-    protected const PROCESS_IMDB = -4;   // Process IMDB Fifth
-
-    protected const NO_MATCH_FOUND = -6;   // Failed All Methods
-
-    protected const FAILED_PARSE = -100; // Failed Parsing
-
-    public int $tvqty;
+    /** Seconds to wait for the per-show episode insert lock. */
+    private const EPISODE_LOCK_SECONDS = 120;
 
     /**
      * @string Path to Save Images
@@ -62,60 +53,49 @@ abstract class AbstractTvProvider extends BaseVideoProvider
     public string $imgSavePath;
 
     /**
-     * @var array<string, mixed> Site ID columns for TV
+     * @var list<string> Site ID columns for TV, in the order add() checks them for an existing video
      */
     public array $siteColumns;
 
     /**
-     * @var string The TV categories_id lookup SQL language
+     * URL of the poster for the show last formatted by formatShowInfo().
      */
-    public string $catWhere;
+    public string $posterUrl = '';
 
-    /**
-     * AbstractTvProvider constructor.
-     *
-     * @throws \Exception
-     */
     public function __construct()
     {
         parent::__construct();
-        $this->catWhere = 'categories_id BETWEEN '.Category::TV_ROOT.' AND '.Category::TV_OTHER.' AND categories_id != '.Category::TV_ANIME;
-        try {
-            $this->tvqty = app(ConfigurationProvider::class)->metadata()->maxTvProcessed !== '' ? (int) app(ConfigurationProvider::class)->metadata()->maxTvProcessed : 75;
-        } catch (QueryException $e) {
-            // Table doesn't exist yet (e.g., during migrations or tests)
-            $this->tvqty = 75;
-        }
         $this->imgSavePath = storage_path('covers/tvshows/');
-        $this->siteColumns = ['tvdb', 'trakt', 'tvrage', 'tvmaze', 'imdb', 'tmdb']; // @phpstan-ignore assign.propertyType
+        $this->siteColumns = ['tvdb', 'trakt', 'tvrage', 'tvmaze', 'imdb', 'tmdb'];
     }
 
     /**
-     * Retrieve banner image from site using its API.
+     * Search the provider for a show and return the best match, formatted by formatShowInfo().
+     *
+     * @param  string  $name  Show title without any year suffix.
+     * @param  int|null  $year  Year the show started, when the release name carries one.
+     * @param  string  $country  Two-letter country parsed from the release name, or ''.
+     * @return array<string, mixed>|false
+     *
+     * @throws TvProviderException on transient provider failures
      */
-    abstract public function getBanner(int $videoID, int $siteId): mixed;
+    abstract public function getShowInfo(string $name, ?int $year = null, string $country = ''): array|false;
 
     /**
-     * Retrieve info of TV episode from site using its API.
+     * Download every episode of a show and store the new ones. Returns the number stored.
      *
-     * @return array<string, mixed>|false False on failure, an array of information fields otherwise.
+     * @throws TvProviderException on transient provider failures
      */
-    abstract public function getEpisodeInfo(int|string $siteId, int|string $series, int|string $episode): array|bool;
+    abstract public function fetchAllEpisodes(int $siteId, int $videoId): int;
 
     /**
-     * Retrieve poster image for TV episode from site using its API.
+     * Look up a single episode. Returns formatEpisodeInfo() output, or false when the provider has none.
      *
-     * @param  int  $videoId  ID from videos table.
-     */
-    abstract public function getPoster(int $videoId): int;
-
-    /**
-     * Retrieve info of TV programme from site using it's API.
+     * @return array<string, mixed>|false
      *
-     * @param  string  $name  Title of programme to look up. Usually a cleaned up version from releases table.
-     * @return array<string, mixed>|false False on failure, an array of information fields otherwise.
+     * @throws TvProviderException on transient provider failures
      */
-    abstract public function getShowInfo(string $name): bool|array;
+    abstract public function fetchEpisode(int $siteId, int $season, int $episode, int $videoId = 0): array|false;
 
     /**
      * Assigns API show response values to a formatted array for insertion
@@ -134,214 +114,355 @@ abstract class AbstractTvProvider extends BaseVideoProvider
     abstract public function formatEpisodeInfo(mixed $episode): array;
 
     /**
-     * @return Release[]|Builder[]|\Illuminate\Database\Eloquent\Collection<int, mixed>|\Illuminate\Database\Query\Builder[]|Collection<int, mixed>|int
+     * Whether fetchEpisodesByAirdate() asks the provider for a single date.
      */
-    public function getTvReleases(string $groupID = '', string $guidChar = '', int $lookupSetting = 1, int $status = 0): array|\Illuminate\Database\Eloquent\Collection|int|Collection // @phpstan-ignore missingType.generics
+    public function supportsAirdateLookup(): bool
     {
-        $ret = 0;
-        if ($lookupSetting === 0) {
-            return $ret;
-        }
-
-        $qry = Release::query()
-            ->where(['videos_id' => 0, 'tv_episodes_id' => $status])
-            ->where('size', '>', 1048576)
-            ->whereBetween('categories_id', [Category::TV_ROOT, Category::TV_OTHER])
-            ->where('categories_id', '<>', Category::TV_ANIME)
-            ->orderByDesc('postdate')
-            ->limit($this->tvqty);
-        if ($groupID !== '') {
-            $qry->where('groups_id', $groupID);
-        }
-        if ($guidChar !== '') {
-            $qry->where('leftguid', $guidChar);
-        }
-        if ($lookupSetting === 2) {
-            $qry->where('isrenamed', '=', 1);
-        }
-
-        return $qry->get();
-    }
-
-    public function setVideoIdFound(int $videoId, int $releaseId, int $episodeId): void
-    {
-        // Use Eloquent model update to trigger the ReleaseObserver
-        $release = Release::find($releaseId);
-        if ($release) {
-            $release->videos_id = $videoId;
-            $release->tv_episodes_id = $episodeId;
-            $release->save();
-        }
-
-        ReleaseBrowseService::bumpCacheVersion();
+        return false;
     }
 
     /**
-     * Updates the release tv_episodes_id status when scraper match is not found.
+     * Download and store the episodes that aired on a date. Returns the number stored.
+     *
+     * @throws TvProviderException on transient provider failures
      */
-    public function setVideoNotFound(mixed $status, mixed $Id): void
+    public function fetchEpisodesByAirdate(int $siteId, int $videoId, string $airdate): int
     {
-        Release::query()
-            ->where('id', $Id)
-            ->update(['tv_episodes_id' => $status]);
+        return 0;
     }
 
     /**
-     * Inserts a new video ID into the database for TV shows
-     * If a duplicate is found it is handle by calling update instead.
+     * Save the poster at $this->posterUrl for a video.
+     */
+    public function getPoster(int $videoId): int
+    {
+        return $this->savePoster($videoId, $this->posterUrl) ? 1 : 0;
+    }
+
+    public function savePoster(int $videoId, string $url): bool
+    {
+        if ($videoId <= 0 || $url === '') {
+            return false;
+        }
+
+        $saved = (new ReleaseImageService)->saveRemoteImage(
+            (string) $videoId,
+            $url,
+            $this->imgSavePath,
+            ImageAssetProfile::Original,
+        )->success;
+
+        if ($saved) {
+            $this->setCoverFound($videoId);
+        }
+
+        return (bool) $saved;
+    }
+
+    public function hasCover(int $videoId): bool
+    {
+        return (int) TvInfo::query()->where('videos_id', $videoId)->value('image') === 1;
+    }
+
+    /**
+     * Inserts a new video for a TV show, or updates the existing one found by site ID or title.
+     *
+     * Serialised per title across workers; a lost race falls back to the row the other worker created.
      *
      * @param  array<string, mixed>  $show
      */
     public function add(array $show = []): int
     {
-        $videoId = false;
+        $lock = Cache::lock('tv:add:'.md5(mb_strtolower((string) ($show['title'] ?? ''))), 30);
 
-        // Check if the country is not a proper code and retrieve if not
-        if ($show['country'] !== '' && \strlen($show['country']) > 2) {
-            $show['country'] = countryCode($show['country']);
+        try {
+            return $lock->block(10, fn (): int => $this->addOrUpdate($show));
+        } catch (LockTimeoutException) {
+            return $this->addOrUpdate($show);
+        }
+    }
+
+    /**
+     * @param  array<string, mixed>  $show
+     */
+    private function addOrUpdate(array $show): int
+    {
+        $show['country'] = $this->normalizeCountry((string) ($show['country'] ?? ''));
+        $show['type'] = (int) ($show['type'] ?? parent::TYPE_TV);
+
+        $videoId = $this->findExistingVideo($show);
+        if ($videoId > 0) {
+            $this->update($videoId, $show);
+
+            return $videoId;
         }
 
-        // Check if video already exists based on site ID info
-        // if that fails be sure we're not inserting duplicates by checking the title
-        foreach ($this->siteColumns as $column) {
-            if ((int) $show[$column] > 0) {
-                $videoId = $this->getVideoIDFromSiteID($column, (int) $show[$column]);
-            }
-            if ($videoId !== false) {
-                break;
-            }
-        }
-
-        if ($videoId === false) {
-            $existingVideo = Video::query()->where('title', $show['title'])->first(['id']);
-            if ($existingVideo === null) {
-                // Insert the Show using Eloquent create() to trigger VideoObserver
-                $video = Video::create([
-                    'type' => $show['type'],
-                    'title' => $show['title'],
-                    'countries_id' => $show['country'] ?? '',
-                    'started' => $show['started'],
-                    'source' => $show['source'],
-                    'tvdb' => $show['tvdb'],
-                    'trakt' => $show['trakt'],
-                    'tvrage' => $show['tvrage'],
-                    'tvmaze' => $show['tvmaze'],
-                    'imdb' => $show['imdb'],
-                    'tmdb' => $show['tmdb'],
-                ]);
-                $videoId = $video->id;
-                // Insert the supplementary show info
-                TvInfo::query()->insertOrIgnore([
-                    'videos_id' => $videoId,
-                    'summary' => $show['summary'],
-                    'publisher' => $show['publisher'],
-                    'localzone' => $show['localzone'],
-                ]);
-                // If we have AKAs\aliases, insert those as well
-                if (! empty($show['aliases'])) {
-                    $this->addAliases($videoId, $show['aliases']);
-                }
-            } else {
-                // Title exists but wasn't matched by site ID — update with new info
-                $videoId = $existingVideo->id;
+        try {
+            // Eloquent create() so VideoObserver indexes the show.
+            $video = Video::create([
+                'type' => $show['type'],
+                'title' => mb_substr((string) $show['title'], 0, 180),
+                'countries_id' => $show['country'],
+                'started' => $show['started'] ?? '',
+                'source' => (int) ($show['source'] ?? self::SOURCE_NONE),
+                'tvdb' => (int) ($show['tvdb'] ?? 0),
+                'trakt' => (int) ($show['trakt'] ?? 0),
+                'tvrage' => (int) ($show['tvrage'] ?? 0),
+                'tvmaze' => (int) ($show['tvmaze'] ?? 0),
+                'imdb' => $this->normalizeImdbValue($show['imdb'] ?? '') ?: '0',
+                'tmdb' => (int) ($show['tmdb'] ?? 0),
+            ]);
+        } catch (UniqueConstraintViolationException) {
+            // Another worker inserted the same title/started/country between our lookup and insert.
+            $videoId = $this->findExistingVideo($show);
+            if ($videoId > 0) {
                 $this->update($videoId, $show);
             }
-        } else {
-            // If a local match was found, just update missing video info
-            $this->update($videoId, $show);
+
+            return $videoId;
+        }
+
+        $videoId = (int) $video->id;
+        TvInfo::query()->insertOrIgnore([
+            'videos_id' => $videoId,
+            'summary' => $this->normalizeOptionalString($show['summary'] ?? ''),
+            'publisher' => mb_substr($this->normalizeOptionalString($show['publisher'] ?? ''), 0, 50),
+            'localzone' => $this->normalizeOptionalString($show['localzone'] ?? ''),
+        ]);
+
+        if (! empty($show['aliases']) && \is_array($show['aliases'])) {
+            $this->addAliases($videoId, $show['aliases']);
         }
 
         return $videoId;
     }
 
     /**
-     * @param  array<string, mixed>  $episode
+     * @param  array<string, mixed>  $show
      */
-    public function addEpisode(int $videoId, array $episode = []): bool|int
+    private function findExistingVideo(array $show): int
     {
-        $episodeId = $this->getBySeasonEp($videoId, $episode['series'], $episode['episode'], $episode['firstaired']);
-
-        if ($episodeId === false) {
-            $episodeId = TvEpisode::query()->insertOrIgnore(
-                [
-                    'videos_id' => $videoId,
-                    'series' => $episode['series'],
-                    'episode' => $episode['episode'],
-                    'se_complete' => $episode['se_complete'],
-                    'title' => $episode['title'],
-                    'firstaired' => $episode['firstaired'] !== '' ? $episode['firstaired'] : null,
-                    'summary' => $episode['summary'],
-                ]
-            );
+        foreach ($this->siteColumns as $column) {
+            $siteId = $column === 'imdb' ? (int) $this->normalizeImdbValue($show['imdb'] ?? '') : (int) ($show[$column] ?? 0);
+            if ($siteId > 0) {
+                $videoId = $this->getVideoIDFromSiteID($column, $siteId);
+                if ($videoId !== false) {
+                    return (int) $videoId;
+                }
+            }
         }
 
-        return $episodeId;
+        return (int) Video::query()
+            ->where('title', (string) ($show['title'] ?? ''))
+            ->where('type', (int) ($show['type'] ?? parent::TYPE_TV))
+            ->orderBy('id')
+            ->value('id');
     }
 
     /**
+     * Store one episode and return its id, or false when it can't be stored.
+     *
+     * @param  array<string, mixed>  $episode
+     */
+    public function addEpisode(int $videoId, array $episode = []): int|false
+    {
+        if ($videoId <= 0) {
+            return false;
+        }
+
+        $row = $this->episodeRow($videoId, $episode);
+        if ($row === null) {
+            return false;
+        }
+
+        $existing = $this->getBySeasonEp($videoId, $row['series'], $row['episode'], (string) $row['firstaired']);
+        if ($existing !== false) {
+            return $existing;
+        }
+
+        TvEpisode::query()->insertOrIgnore($row);
+
+        return $this->getBySeasonEp($videoId, $row['series'], $row['episode'], (string) $row['firstaired']);
+    }
+
+    /**
+     * Store the episodes of a show that aren't stored yet. Returns the number inserted.
+     *
+     * @param  iterable<array<string, mixed>>  $episodes  formatEpisodeInfo() output
+     */
+    public function addEpisodes(int $videoId, iterable $episodes): int
+    {
+        if ($videoId <= 0) {
+            return 0;
+        }
+
+        $lock = Cache::lock('tv:episodes:'.$videoId, self::EPISODE_LOCK_SECONDS);
+
+        try {
+            return $lock->block(self::EPISODE_LOCK_SECONDS, fn (): int => $this->insertNewEpisodes($videoId, $episodes));
+        } catch (LockTimeoutException) {
+            return $this->insertNewEpisodes($videoId, $episodes);
+        }
+    }
+
+    /**
+     * @param  iterable<array<string, mixed>>  $episodes
+     */
+    private function insertNewEpisodes(int $videoId, iterable $episodes): int
+    {
+        $known = [];
+        foreach (TvEpisode::query()->where('videos_id', $videoId)->get(['series', 'episode', 'firstaired']) as $existing) {
+            $known[$this->episodeKey((int) $existing->series, (int) $existing->episode, (string) $existing->firstaired)] = true;
+        }
+
+        $rows = [];
+        foreach ($episodes as $episode) {
+            $row = $this->episodeRow($videoId, $episode);
+            if ($row === null) {
+                continue;
+            }
+            $key = $this->episodeKey($row['series'], $row['episode'], (string) $row['firstaired']);
+            if (isset($known[$key])) {
+                continue;
+            }
+            $known[$key] = true;
+            $rows[] = $row;
+        }
+
+        $inserted = 0;
+        foreach (array_chunk($rows, 500) as $chunk) {
+            $inserted += TvEpisode::query()->insertOrIgnore($chunk);
+        }
+
+        return $inserted;
+    }
+
+    /**
+     * Numbered episodes are keyed by season/episode; unnumbered specials by their airdate.
+     */
+    private function episodeKey(int $series, int $episode, string $firstAired): string
+    {
+        return $episode > 0 ? $series.'x'.$episode : '0x0@'.substr($firstAired, 0, 10);
+    }
+
+    /**
+     * @param  array<string, mixed>  $episode
+     * @return array{videos_id: int, series: int, episode: int, se_complete: string, title: string, firstaired: string|null, summary: string}|null
+     */
+    private function episodeRow(int $videoId, array $episode): ?array
+    {
+        $series = max(0, (int) ($episode['series'] ?? 0));
+        $number = max(0, (int) ($episode['episode'] ?? 0));
+        $firstAired = $this->normalizeAirdate($episode['firstaired'] ?? null);
+
+        // An unnumbered episode without an airdate can't be told apart from any other one.
+        if ($number === 0 && $firstAired === null) {
+            return null;
+        }
+
+        return [
+            'videos_id' => $videoId,
+            'series' => $series,
+            'episode' => $number,
+            'se_complete' => mb_substr((string) ($episode['se_complete'] ?? sprintf('S%02dE%02d', $series, $number)), 0, 10),
+            'title' => mb_substr($this->normalizeOptionalString($episode['title'] ?? ''), 0, 180),
+            'firstaired' => $firstAired,
+            'summary' => $this->normalizeOptionalString($episode['summary'] ?? ''),
+        ];
+    }
+
+    private function normalizeAirdate(mixed $value): ?string
+    {
+        $value = $this->normalizeOptionalString($value);
+        if ($value === '' || str_starts_with($value, '0000')) {
+            return null;
+        }
+
+        $timestamp = strtotime($value);
+
+        return $timestamp === false ? null : date('Y-m-d', $timestamp);
+    }
+
+    /**
+     * Fill in the video and tv_info fields that are still empty.
+     *
+     * Goes through Eloquent so VideoObserver keeps the tvshows index in sync.
+     *
      * @param  array<string, mixed>  $show
      */
     public function update(int $videoId, array $show = []): void
     {
-        if ($show['country'] !== '') {
-            $show['country'] = countryCode($show['country']);
+        /** @var Video|null $video */
+        $video = Video::query()->find($videoId);
+        if ($video === null) {
+            return;
         }
 
-        DB::update($this->buildUpdateQuery($videoId, $show));
-        if (! empty($show['aliases'])) {
+        $country = $this->normalizeCountry((string) ($show['country'] ?? ''));
+        if ($country !== '' && trim((string) $video->countries_id) === '') {
+            $video->countries_id = $country;
+        }
+
+        foreach (['tvdb', 'trakt', 'tvrage', 'tvmaze', 'tmdb'] as $column) {
+            $siteId = (int) ($show[$column] ?? 0);
+            if ($siteId > 0 && (int) $video->{$column} === 0) {
+                $video->{$column} = $siteId;
+            }
+        }
+
+        $imdb = $this->normalizeImdbValue($show['imdb'] ?? '');
+        if ($imdb !== '' && \in_array(trim((string) $video->imdb), ['', '0'], true)) {
+            $video->imdb = $imdb;
+        }
+
+        if ($video->isDirty()) {
+            $video->save();
+        }
+
+        /** @var TvInfo|null $info */
+        $info = TvInfo::query()->find($videoId);
+        $info ??= new TvInfo(['videos_id' => $videoId, 'summary' => '', 'publisher' => '', 'localzone' => '']);
+
+        $fields = [
+            'summary' => $this->normalizeOptionalString($show['summary'] ?? ''),
+            'publisher' => mb_substr($this->normalizeOptionalString($show['publisher'] ?? ''), 0, 50),
+            'localzone' => $this->normalizeOptionalString($show['localzone'] ?? ''),
+        ];
+        foreach ($fields as $column => $value) {
+            if ($value !== '' && trim((string) $info->{$column}) === '') {
+                $info->{$column} = $value;
+            }
+        }
+
+        if (! $info->exists || $info->isDirty()) {
+            $info->save();
+        }
+
+        if (! empty($show['aliases']) && \is_array($show['aliases'])) {
             $this->addAliases($videoId, $show['aliases']);
         }
     }
 
     /**
-     * @param  array<string, mixed>  $show
+     * Two-letter ISO 3166 code for a code or country name; '' when unknown.
      */
-    private function buildUpdateQuery(int $videoId, array $show): string
+    public function normalizeCountry(string $country): string
     {
-        return sprintf(
-            '
-				UPDATE videos v
-				LEFT JOIN tv_info tvi ON v.id = tvi.videos_id
-				SET v.countries_id = %s, v.tvdb = %s, v.trakt = %s, v.tvrage = %s,
-					v.tvmaze = %s, v.imdb = %s, v.tmdb = %s,
-					tvi.summary = %s, tvi.publisher = %s, tvi.localzone = %s
-				WHERE v.id = %d',
-            $this->buildEmptyStringUpdateExpression('v.countries_id', $show['country'] ?? ''),
-            $this->buildNumericIdUpdateExpression('v.tvdb', $show['tvdb'] ?? 0),
-            $this->buildNumericIdUpdateExpression('v.trakt', $show['trakt'] ?? 0),
-            $this->buildNumericIdUpdateExpression('v.tvrage', $show['tvrage'] ?? 0),
-            $this->buildNumericIdUpdateExpression('v.tvmaze', $show['tvmaze'] ?? 0),
-            $this->buildImdbUpdateExpression('v.imdb', $show['imdb'] ?? ''),
-            $this->buildNumericIdUpdateExpression('v.tmdb', $show['tmdb'] ?? 0),
-            $this->buildEmptyStringUpdateExpression('tvi.summary', $show['summary'] ?? ''),
-            $this->buildEmptyStringUpdateExpression('tvi.publisher', $show['publisher'] ?? ''),
-            $this->buildEmptyStringUpdateExpression('tvi.localzone', $show['localzone'] ?? ''),
-            $videoId
-        );
-    }
-
-    private function buildNumericIdUpdateExpression(string $column, mixed $value): string
-    {
-        return sprintf('IF(%s = 0, %d, %s)', $column, is_numeric($value) ? (int) $value : 0, $column);
-    }
-
-    private function buildEmptyStringUpdateExpression(string $column, mixed $value): string
-    {
-        return sprintf("IF(%s = '', %s, %s)", $column, escapeString($this->normalizeOptionalString($value)), $column);
-    }
-
-    private function buildImdbUpdateExpression(string $column, mixed $value): string
-    {
-        $normalizedValue = $this->normalizeImdbValue($value);
-
-        if ($normalizedValue === '') {
-            return $column;
+        $country = trim($country);
+        if ($country === '') {
+            return '';
         }
 
-        return sprintf("IF(%s IN ('', '0'), %s, %s)", $column, escapeString($normalizedValue), $column);
+        if (\strlen($country) === 2) {
+            $code = strtoupper($country);
+
+            return $code === 'UK' ? 'GB' : $code;
+        }
+
+        return countryCode($country);
     }
 
-    private function normalizeImdbValue(mixed $value): string
+    protected function normalizeImdbValue(mixed $value): string
     {
         $normalizedValue = $this->normalizeOptionalString($value);
 
@@ -356,7 +477,7 @@ abstract class AbstractTvProvider extends BaseVideoProvider
         return $normalizedValue;
     }
 
-    private function normalizeOptionalString(mixed $value): string
+    protected function normalizeOptionalString(mixed $value): string
     {
         if (is_string($value) || is_int($value) || is_float($value) || $value instanceof \Stringable) {
             $normalizedValue = trim((string) $value);
@@ -402,7 +523,7 @@ abstract class AbstractTvProvider extends BaseVideoProvider
         $video = Video::query()->where('id', $id)->first([$column]);
         if ($column === '*') {
             $return = $video;
-        } elseif ($column !== '*' && $video !== null) {
+        } elseif ($video !== null) {
             $value = $video[$column];
             $return = ($value !== null && $value !== '') ? $value : false;
         }
@@ -411,40 +532,38 @@ abstract class AbstractTvProvider extends BaseVideoProvider
     }
 
     /**
-     * Retrieves the Episode ID using the Video ID and either:
-     * season/episode numbers OR the airdate.
+     * Retrieves the Episode ID using the Video ID and either the season/episode
+     * numbers (season 0 holds specials) or the airdate.
      *
      * Returns the Episode ID or false if not found
-     *
-     * @return int|false
      */
-    public function getBySeasonEp(int|string $id, int|string $series, int|string $episode, string $airdate = ''): bool|int
+    public function getBySeasonEp(int|string $id, int|string $series, int|string $episode, string $airdate = ''): int|false
     {
-        if ($series > 0 && $episode > 0) {
-            $queryString = sprintf('tve.series = %d AND tve.episode = %d', $series, $episode);
-        } elseif (! empty($airdate)) {
-            $ts = strtotime((string) $airdate);
-            if ($ts === false) {
+        $videoId = (int) $id;
+        $season = is_numeric($series) ? (int) $series : -1;
+        $number = is_numeric($episode) ? (int) $episode : 0;
+
+        if ($videoId <= 0) {
+            return false;
+        }
+
+        $query = TvEpisode::query()->where('videos_id', $videoId);
+
+        if ($season >= 0 && $number > 0) {
+            $query->where('series', $season)->where('episode', $number);
+        } elseif ($airdate !== '') {
+            $timestamp = strtotime($airdate);
+            if ($timestamp === false) {
                 return false;
             }
-            $queryString = sprintf('DATE(tve.firstaired) = %s', escapeString(date('Y-m-d', $ts)));
+            $query->whereDate('firstaired', date('Y-m-d', $timestamp));
         } else {
             return false;
         }
 
-        $episodeArr = DB::selectOne(
-            sprintf(
-                '
-				SELECT tve.id
-				FROM tv_episodes tve
-				WHERE tve.videos_id = %d
-				AND %s',
-                $id,
-                $queryString
-            )
-        );
+        $episodeId = $query->orderBy('id')->value('id');
 
-        return $episodeArr->id ?? false;
+        return $episodeId !== null ? (int) $episodeId : false;
     }
 
     /**
@@ -452,10 +571,7 @@ abstract class AbstractTvProvider extends BaseVideoProvider
      */
     public function countEpsByVideoID(int $videoId): bool
     {
-        $count = TvEpisode::query()
-            ->where('videos_id', $videoId)->count('id');
-
-        return $count !== null && $count > 0;
+        return TvEpisode::query()->where('videos_id', $videoId)->exists();
     }
 
     /**
@@ -476,26 +592,11 @@ abstract class AbstractTvProvider extends BaseVideoProvider
             // Get the Season/Episode/Airdate
             $showInfo += $this->parseSeasonEp($relname);
 
-            // --- Post-parse correction for daily talk shows misclassified as Season = Year ---
-            if (isset($showInfo['season'], $showInfo['episode']) && ! isset($showInfo['airdate'])) {
-                if (is_numeric($showInfo['season']) && (int) $showInfo['season'] >= 1900 && (int) $showInfo['season'] <= (int) date('Y') + 1) {
-                    if (preg_match('/(?P<year>(19|20)\d{2})[.\-\/](?P<month>\d{2})[.\-\/](?P<day>\d{2})/i', $relname, $dateHits)) {
-                        $year = (int) $dateHits['year'];
-                        $month = (int) $dateHits['month'];
-                        $day = (int) $dateHits['day'];
-                        if ($month >= 1 && $month <= 12 && $day >= 1 && $day <= 31) {
-                            $showInfo['airdate'] = sprintf('%04d-%02d-%02d', $year, $month, $day);
-                            $showInfo['season'] = 0;
-                            $showInfo['episode'] = 0;
-                        }
-                    }
-                }
-            }
-
             if (isset($showInfo['season'], $showInfo['episode'])) {
                 if (! isset($showInfo['airdate'])) {
                     if (preg_match('/[^a-z0-9](?P<year>(19|20)(\d{2}))[^a-z0-9]/i', $relname, $yearMatch)) {
                         $showInfo['cleanname'] .= ' ('.$yearMatch['year'].')';
+                        $showInfo['year'] = (int) $yearMatch['year'];
                     }
                     if (\is_array($showInfo['episode'])) {
                         $showInfo['episode'] = $showInfo['episode'][0];
@@ -665,52 +766,49 @@ abstract class AbstractTvProvider extends BaseVideoProvider
             $episodeArr['season'] = (int) $hits[2];
             $episodeArr['episode'] = (int) $hits[3];
         }
+        // S01D1 and S1D1 (checked before plain S01, which would otherwise swallow it)
+        elseif (preg_match('/^(.*?)[^a-z0-9]s(\d{1,2})[^a-z0-9]?d\d[^a-z0-9]?/i', $relname, $hits)) {
+            $episodeArr['season'] = (int) $hits[2];
+            $episodeArr['episode'] = 'all';
+        }
         // S01
         elseif (preg_match('/^(.*?)[^a-z0-9]s(\d{1,2})[^a-z0-9]?/i', $relname, $hits)) {
             $episodeArr['season'] = (int) $hits[2];
             $episodeArr['episode'] = 'all';
         }
-        // S01D1 and S1D1
-        elseif (preg_match('/^(.*?)[^a-z0-9]s(\d{1,2})[^a-z0-9]?d\d{1}[^a-z0-9]?/i', $relname, $hits)) {
-            $episodeArr['season'] = (int) $hits[2];
-            $episodeArr['episode'] = 'all';
-        }
-        // 1x01 and 101
+        // 1x01
         elseif (preg_match('/^(.*?)[^a-z0-9](\d{1,2})x(\d{1,3})[^a-z0-9]?/i', $relname, $hits)) {
             $episodeArr['season'] = (int) $hits[2];
             $episodeArr['episode'] = (int) $hits[3];
         }
         // 2009.01.01 and 2009-01-01
-        elseif (preg_match('/^(.*?)[^a-z0-9](?P<airdate>(19|20)(\d{2})[.\/-](\d{2})[.\/-](\d{2}))[^a-z0-9]?/i', $relname, $hits)) {
+        elseif (preg_match('/^(.*?)[^a-z0-9](?P<year>(19|20)\d{2})[.\/-](?P<month>\d{2})[.\/-](?P<day>\d{2})[^a-z0-9]?/i', $relname, $hits)) {
             $episodeArr['season'] = 0;
             $episodeArr['episode'] = 0;
-            $ts = strtotime(preg_replace('/[^0-9]/i', '/', $hits['airdate']));
-            $episodeArr['airdate'] = ($ts !== false) ? date('Y-m-d', $ts) : '';
+            $episodeArr['airdate'] = $this->formatAirdate((int) $hits['year'], (int) $hits['month'], (int) $hits['day']);
         }
-        // 01.01.2009
-        elseif (preg_match('/^(.*?)[^a-z0-9](?P<airdate>(\d{2})[^a-z0-9](\d{2})[^a-z0-9](19|20)(\d{2}))[^a-z0-9]?/i', $relname, $hits)) {
+        // 01.01.2009 (dotted is day-first, slashed/dashed is month-first unless a value rules it out)
+        elseif (preg_match('/^(.*?)[^a-z0-9](?P<first>\d{2})(?P<sep>[.\/-])(?P<second>\d{2})(?P=sep)(?P<year>(19|20)\d{2})[^a-z0-9]?/i', $relname, $hits)) {
             $episodeArr['season'] = 0;
             $episodeArr['episode'] = 0;
-            $ts = strtotime(preg_replace('/[^0-9]/i', '/', $hits['airdate']));
-            $episodeArr['airdate'] = ($ts !== false) ? date('Y-m-d', $ts) : '';
+            $episodeArr['airdate'] = $this->dayMonthAirdate((int) $hits['first'], (int) $hits['second'], (int) $hits['year'], $hits['sep']);
         }
         // 01.01.09
-        elseif (preg_match('/^(.*?)[^a-z0-9](\d{2})[^a-z0-9](\d{2})[^a-z0-9](\d{2})[^a-z0-9]?/i', $relname, $hits)) {
-            $year = ($hits[4] <= 99 && $hits[4] > 15) ? '19'.$hits[4] : '20'.$hits[4];
-            $airdate = $year.'/'.$hits[2].'/'.$hits[3];
+        elseif (preg_match('/^(.*?)[^a-z0-9](?P<first>\d{2})(?P<sep>[.\/-])(?P<second>\d{2})(?P=sep)(?P<year>\d{2})[^a-z0-9]?/i', $relname, $hits)) {
+            $twoDigitYear = (int) $hits['year'];
+            $year = $twoDigitYear <= ((int) date('y') + 1) ? 2000 + $twoDigitYear : 1900 + $twoDigitYear;
             $episodeArr['season'] = 0;
             $episodeArr['episode'] = 0;
-            $ts = strtotime($airdate);
-            $episodeArr['airdate'] = ($ts !== false) ? date('Y-m-d', $ts) : '';
+            $episodeArr['airdate'] = $this->dayMonthAirdate((int) $hits['first'], (int) $hits['second'], $year, $hits['sep']);
         }
         // 2009.E01
-        elseif (preg_match('/^(.*?)[^a-z0-9]20(\d{2})[^a-z0-9](\d{1,3})[^a-z0-9]?/i', $relname, $hits)) {
-            $episodeArr['season'] = '20'.$hits[2];
+        elseif (preg_match('/^(.*?)[^a-z0-9](20\d{2})[^a-z0-9]E(\d{1,3})(?!\d)/i', $relname, $hits)) {
+            $episodeArr['season'] = (int) $hits[2];
             $episodeArr['episode'] = (int) $hits[3];
         }
         // 2009.Part1
         elseif (preg_match('/^(.*?)[^a-z0-9](19|20)(\d{2})[^a-z0-9]Part(\d{1,2})[^a-z0-9]?/i', $relname, $hits)) {
-            $episodeArr['season'] = $hits[2].$hits[3];
+            $episodeArr['season'] = (int) ($hits[2].$hits[3]);
             $episodeArr['episode'] = (int) $hits[4];
         }
         // Part1/Pt1
@@ -735,6 +833,32 @@ abstract class AbstractTvProvider extends BaseVideoProvider
         }
 
         return $episodeArr;
+    }
+
+    /**
+     * Resolve a two-part date whose day/month order is ambiguous.
+     *
+     * A value over 12 decides the order; otherwise dotted dates are read day-first
+     * (European style) and slashed or dashed dates month-first (US style).
+     */
+    private function dayMonthAirdate(int $first, int $second, int $year, string $separator): string
+    {
+        if ($first > 12) {
+            [$day, $month] = [$first, $second];
+        } elseif ($second > 12) {
+            [$month, $day] = [$first, $second];
+        } elseif ($separator === '.') {
+            [$day, $month] = [$first, $second];
+        } else {
+            [$month, $day] = [$first, $second];
+        }
+
+        return $this->formatAirdate($year, $month, $day);
+    }
+
+    private function formatAirdate(int $year, int $month, int $day): string
+    {
+        return checkdate($month, $day, $year) ? sprintf('%04d-%02d-%02d', $year, $month, $day) : '';
     }
 
     /**
@@ -825,6 +949,77 @@ abstract class AbstractTvProvider extends BaseVideoProvider
         return 0.0;
     }
 
+    /**
+     * Score a search result against the parsed release; 0 means "not a candidate".
+     *
+     * Title similarity (exact match = 100) plus a bonus when the start year agrees. A year
+     * more than one off rejects a fuzzy match and demotes an exact one, so "Doctor Who 2005"
+     * prefers the 2005 series over the 1963 one. A matching country breaks remaining ties.
+     */
+    public function scoreCandidate(
+        string $ourName,
+        ?int $ourYear,
+        string $candidateTitle,
+        mixed $candidateStarted = null,
+        string $ourCountry = '',
+        string $candidateCountry = '',
+    ): float {
+        $candidateYear = $this->yearOf($candidateStarted);
+        if (preg_match('/^(?P<title>.+?)\s*\((?P<year>(19|20)\d{2})\)$/', trim($candidateTitle), $titleYear) === 1) {
+            $candidateTitle = $titleYear['title'];
+            $candidateYear ??= (int) $titleYear['year'];
+        }
+
+        $ours = mb_strtolower(trim($ourName));
+        $theirs = mb_strtolower(trim($candidateTitle));
+        if ($ours === '' || $theirs === '') {
+            return 0.0;
+        }
+
+        $exact = $ours === $theirs;
+        $score = $exact ? 100.0 : $this->checkMatch($theirs, $ours, self::MATCH_PROBABILITY);
+        if ($score <= 0.0) {
+            return 0.0;
+        }
+
+        if ($ourYear !== null && $candidateYear !== null) {
+            if (abs($ourYear - $candidateYear) <= 1) {
+                $score += 10.0;
+            } elseif (! $exact) {
+                return 0.0;
+            } else {
+                $score -= 20.0;
+            }
+        }
+
+        if ($ourCountry !== '' && $candidateCountry !== ''
+            && $this->normalizeCountryCode($ourCountry) === $this->normalizeCountryCode($candidateCountry)) {
+            $score += 2.0;
+        }
+
+        return $score;
+    }
+
+    private function yearOf(mixed $date): ?int
+    {
+        if (is_int($date)) {
+            return $date >= 1900 ? $date : null;
+        }
+
+        if (! is_string($date) || preg_match('/^(?P<year>(19|20)\d{2})/', trim($date), $match) !== 1) {
+            return null;
+        }
+
+        return (int) $match['year'];
+    }
+
+    private function normalizeCountryCode(string $country): string
+    {
+        $code = strtoupper(trim($country));
+
+        return $code === 'UK' ? 'GB' : $code;
+    }
+
     protected function normalizeComparableValue(mixed $value): ?string
     {
         if (is_string($value)) {
@@ -843,64 +1038,32 @@ abstract class AbstractTvProvider extends BaseVideoProvider
     }
 
     /**
-     * Convert 2012-24-07 to 2012-07-24
-     */
-    public function checkDate(bool|string|null $date): string
-    {
-        if (! empty($date)) {
-            $chk = explode(' ', $date);
-            $chkd = explode('-', $chk[0]);
-            if ($chkd[1] > 12) {
-                $ts = strtotime($chkd[1].' '.$chkd[2].' '.$chkd[0]);
-                $date = ($ts !== false) ? date('Y-m-d H:i:s', $ts) : $date;
-            }
-        } else {
-            $date = null;
-        }
-
-        return $date;
-    }
-
-    /**
-     * Checks API response returns have all REQUIRED attributes set
+     * Checks that an API response carries the fields that identify a show or episode.
+     *
+     * Descriptive fields (overview, summary, airdate, country) are optional: new
+     * episodes and web-only shows often don't have them yet.
      */
     public function checkRequiredAttr(mixed $array, string $type): bool
     {
-        $required = ['failedToMatchType'];
+        $required = match ($type) {
+            'tvdbS' => ['tvdb_id', 'name'],
+            'tvdbE' => ['seasonNumber', 'number'],
+            'tvmazeS' => ['id', 'name'],
+            'tvmazeE' => ['season', 'number'],
+            'tmdbS' => ['id', 'name'],
+            'tmdbE' => ['season_number', 'episode_number'],
+            'traktS' => ['title', 'ids'],
+            'traktE' => ['season', 'number'],
+            default => null,
+        };
 
-        switch ($type) {
-            case 'tvdbS':
-                $required = ['tvdb_id', 'name', 'overview', 'first_air_time'];
-                break;
-            case 'tvdbE':
-                $required = ['name', 'seasonNumber', 'number', 'aired', 'overview'];
-                break;
-            case 'tvmazeS':
-                $required = ['id', 'name', 'summary', 'premiered', 'country'];
-                break;
-            case 'tvmazeE':
-                $required = ['name', 'season', 'number', 'airdate', 'summary'];
-                break;
-            case 'tmdbS':
-                $required = ['id', 'name', 'overview', 'first_air_date', 'origin_country'];
-                break;
-            case 'tmdbE':
-                $required = ['name', 'season_number', 'episode_number', 'air_date', 'overview'];
-                break;
-            case 'traktS':
-                $required = ['title', 'ids'];
-                break;
-            case 'traktE':
-                $required = ['title', 'season', 'number'];
-                break;
+        if ($required === null) {
+            return false;
         }
 
         foreach ($required as $req) {
-            if (! \in_array($type, ['tmdbS', 'tmdbE', 'traktS', 'traktE'], true)) {
-                if (! isset($array->$req)) {
-                    return false;
-                }
-            } elseif (! isset($array[$req])) {
+            $value = \is_array($array) ? ($array[$req] ?? null) : (\is_object($array) ? ($array->$req ?? null) : null);
+            if ($value === null || $value === '') {
                 return false;
             }
         }
@@ -909,14 +1072,71 @@ abstract class AbstractTvProvider extends BaseVideoProvider
     }
 
     /**
-     * Truncates title for display.
+     * Look up TMDB and Trakt IDs for a show from its TVDB and IMDB IDs.
+     *
+     * Optional enrichment: failures are swallowed so they never block a match.
+     *
+     * @param  int|string  $imdbId  IMDB ID (numeric, without 'tt' prefix)
+     * @return array{tmdb: int, trakt: int}
      */
-    protected function truncateTitle(string $title, int $maxLength = 45): string
+    protected function lookupExternalIds(int $tvdbId, int|string $imdbId): array
     {
-        if (mb_strlen($title) <= $maxLength) {
-            return $title;
+        $result = ['tmdb' => 0, 'trakt' => 0];
+
+        try {
+            $tmdbClient = app(TmdbClient::class);
+            if ($tmdbClient->isConfigured()) {
+                if ($tvdbId > 0) {
+                    $result['tmdb'] = (int) ($tmdbClient->lookupTvShowIds($tvdbId, 'tvdb')['tmdb'] ?? 0);
+                }
+                if ($result['tmdb'] === 0 && ! empty($imdbId) && imdb_id_is_valid($imdbId)) {
+                    $result['tmdb'] = (int) ($tmdbClient->lookupTvShowIds($imdbId, 'imdb')['tmdb'] ?? 0);
+                }
+            }
+
+            $traktService = app(TraktService::class);
+            if ($traktService->isConfigured()) {
+                $traktIds = null;
+                if ($tvdbId > 0) {
+                    $traktIds = $traktService->lookupShowIds($tvdbId, 'tvdb');
+                }
+                if (empty($traktIds['trakt']) && ! empty($imdbId) && imdb_id_is_valid($imdbId)) {
+                    $traktIds = $traktService->lookupShowIds($imdbId, 'imdb');
+                }
+                if (! empty($traktIds['trakt'])) {
+                    $result['trakt'] = (int) $traktIds['trakt'];
+                    if ($result['tmdb'] === 0 && ! empty($traktIds['tmdb'])) {
+                        $result['tmdb'] = (int) $traktIds['tmdb'];
+                    }
+                }
+            }
+        } catch (\Throwable) {
+            // External ID lookup is optional enrichment.
         }
 
-        return mb_substr($title, 0, $maxLength - 3).'...';
+        return $result;
+    }
+
+    /**
+     * Get all external IDs for a video from the database.
+     *
+     * @return array{trakt: int, tmdb: int, tvdb: int, imdb: string}
+     */
+    protected function getAllSiteIdsFromVideoID(int $videoId): array
+    {
+        $result = Video::query()
+            ->where('id', $videoId)
+            ->first(['trakt', 'tmdb', 'tvdb', 'imdb']);
+
+        if ($result === null) {
+            return ['trakt' => 0, 'tmdb' => 0, 'tvdb' => 0, 'imdb' => ''];
+        }
+
+        return [
+            'trakt' => (int) ($result->trakt ?? 0),
+            'tmdb' => (int) ($result->tmdb ?? 0),
+            'tvdb' => (int) ($result->tvdb ?? 0),
+            'imdb' => (string) ($result->imdb ?? ''),
+        ];
     }
 }

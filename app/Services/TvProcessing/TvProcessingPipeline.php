@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services\TvProcessing;
 
-use App\Models\Category;
 use App\Models\Release;
 use App\Services\Configuration\ConfigurationProvider;
 use App\Services\TvProcessing\Pipes\AbstractTvProviderPipe;
@@ -16,49 +15,41 @@ use App\Services\TvProcessing\Pipes\TvdbPipe;
 use App\Services\TvProcessing\Pipes\TvMazePipe;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 
 /**
- * Pipeline-based TV processing service using Laravel Pipeline.
- *
- * This service uses Laravel's Pipeline to orchestrate multiple TV data providers
- * to process TV releases and match them against video metadata from various sources.
+ * Matches TV releases to shows and episodes by passing each one through the
+ * provider pipes (parse → local DB → TVDB → TVMaze → TMDB → Trakt) and
+ * persisting the outcome with TvLookupOutcomeWriter.
  */
 class TvProcessingPipeline
 {
     /**
-     * @var Collection<AbstractTvProviderPipe>
+     * @var Collection<int, AbstractTvProviderPipe>
      */
-    protected Collection $pipes; // @phpstan-ignore missingType.generics
-
-    protected int $tvqty;
+    protected Collection $pipes;
 
     protected bool $echoOutput;
 
+    protected TvLookupOutcomeWriter $writer;
+
     /**
-     * @var array<string, mixed>
+     * @var array{processed: int, matched: int, episode_missing: int, not_found: int, deferred: int, duration: float, providers: array<string, int>}
      */
-    protected array $stats = [
-        'processed' => 0,
-        'matched' => 0,
-        'failed' => 0,
-        'skipped' => 0,
-        'duration' => 0.0,
-        'providers' => [],
-    ];
+    protected array $stats;
 
     /**
      * @param  iterable<AbstractTvProviderPipe>  $pipes
      */
-    public function __construct(iterable $pipes = [], bool $echoOutput = true)
+    public function __construct(iterable $pipes = [], bool $echoOutput = true, ?TvLookupOutcomeWriter $writer = null)
     {
         $this->pipes = collect($pipes)
-            ->sortBy(fn (AbstractTvProviderPipe $p) => $p->getPriority());
-
-        $this->tvqty = app(ConfigurationProvider::class)->metadata()->maxTvProcessed !== ''
-            ? (int) app(ConfigurationProvider::class)->metadata()->maxTvProcessed
-            : 75;
+            ->sortBy(fn (AbstractTvProviderPipe $p) => $p->getPriority())
+            ->values();
 
         $this->echoOutput = $echoOutput;
+        $this->writer = $writer ?? new TvLookupOutcomeWriter;
+        $this->resetStats();
     }
 
     /**
@@ -67,59 +58,83 @@ class TvProcessingPipeline
     public function addPipe(AbstractTvProviderPipe $pipe): self
     {
         $this->pipes->push($pipe);
-        $this->pipes = $this->pipes->sortBy(fn (AbstractTvProviderPipe $p) => $p->getPriority());
+        $this->pipes = $this->pipes->sortBy(fn (AbstractTvProviderPipe $p) => $p->getPriority())->values();
+
+        return $this;
+    }
+
+    public function setEchoOutput(bool $echoOutput): self
+    {
+        $this->echoOutput = $echoOutput;
 
         return $this;
     }
 
     /**
-     * Process a single release through the pipeline.
+     * Shared memo for a batch of releases passed to processRelease().
+     */
+    public function newRunState(): TvProcessingRunState
+    {
+        return new TvProcessingRunState;
+    }
+
+    /**
+     * Process a single release through the pipeline and persist the outcome.
      *
      * @param  array<string, mixed>|object  $release  Release data
      * @param  bool  $debug  Whether to include debug information
      * @return array<string, mixed> Processing result
      */
-    public function processRelease(array|object $release, bool $debug = false): array
+    public function processRelease(array|object $release, bool $debug = false, ?TvProcessingRunState $runState = null): array
     {
         $context = TvReleaseContext::fromRelease($release);
-        $passable = new TvProcessingPassable($context, $debug);
+        $passable = new TvProcessingPassable($context, $runState ?? $this->newRunState(), $debug);
 
-        // Set echo output on all pipes
         foreach ($this->pipes as $pipe) {
             $pipe->setEchoOutput($this->echoOutput);
         }
 
-        /** @var TvProcessingPassable $result */
-        $result = app(Pipeline::class)
-            ->send($passable)
-            ->through($this->pipes->values()->all())
-            ->thenReturn();
+        try {
+            app(Pipeline::class)
+                ->send($passable)
+                ->through($this->pipes->all())
+                ->thenReturn();
+        } catch (\Throwable $e) {
+            // One broken release must not abort the batch; the attempt cap stops it looping forever.
+            Log::error('TV processing failed for release', [
+                'release_id' => $context->releaseId,
+                'searchname' => $context->searchName,
+                'error' => $e->getMessage(),
+                'exception' => $e,
+            ]);
+            $passable->markTransient('pipeline');
+        }
 
-        return $result->toArray();
+        $this->writer->record($context, $passable->finalResult());
+
+        return $passable->toArray();
     }
 
     /**
-     * Process all TV releases matching the criteria.
+     * Process all TV releases due for a lookup.
      *
      * @param  string  $groupID  Group ID to process
      * @param  string  $guidChar  GUID character to process
-     * @param  int|string|null  $processTV  Processing setting (0/1/2 or '' to read from settings)
+     * @param  int|string|null  $processTV  0 = skip, 1 = all, 2 = renamed only, '' = use the configured lookup mode
      */
     public function process(string $groupID = '', string $guidChar = '', int|string|null $processTV = ''): void
     {
-        $processTV = (int) (is_numeric($processTV) ? $processTV : app(ConfigurationProvider::class)->metadata()->tvLookup->value);
-        if ($processTV <= 0) {
+        $configuredMode = (int) app(ConfigurationProvider::class)->metadata()->tvLookup->value;
+        $mode = is_numeric($processTV) ? (int) $processTV : $configuredMode;
+        if ($mode <= 0) {
             return;
         }
 
-        $this->resetStats();
-        $startTime = microtime(true);
+        // The configured "renamed only" mode applies even when a caller passes 1.
+        $renamedOnly = $mode === 2 || $configuredMode === 2;
 
-        // Get releases that need processing
-        $releases = $this->getTvReleases($groupID, $guidChar, $processTV);
-        $totalCount = count($releases);
-
-        if ($totalCount === 0) {
+        $releases = $this->getTvReleases($groupID, $guidChar, $renamedOnly);
+        if ($releases->isEmpty()) {
             if ($this->echoOutput) {
                 cli()->header('No TV releases to process.');
             }
@@ -128,12 +143,25 @@ class TvProcessingPipeline
         }
 
         if ($this->echoOutput) {
-            cli()->header('Processing '.$totalCount.' TV release(s).');
+            cli()->header('Processing '.$releases->count().' TV release(s).');
         }
 
+        $this->processBatch($releases);
+    }
+
+    /**
+     * Process a set of releases with one shared run state, then show the summary.
+     *
+     * @param  iterable<array<string, mixed>|object>  $releases
+     */
+    public function processBatch(iterable $releases): void
+    {
+        $this->resetStats();
+        $startTime = microtime(true);
+        $runState = $this->newRunState();
+
         foreach ($releases as $release) {
-            $result = $this->processRelease($release);
-            $this->updateStats($result);
+            $this->updateStats($this->processRelease($release, false, $runState));
         }
 
         $this->stats['duration'] = microtime(true) - $startTime;
@@ -142,31 +170,15 @@ class TvProcessingPipeline
     }
 
     /**
-     * Get TV releases that need processing.
-     *
-     * @return Collection<int, mixed>
+     * @return Collection<int, Release>
      */
-    protected function getTvReleases(string $groupID, string $guidChar, int $processTV): Collection
+    protected function getTvReleases(string $groupID, string $guidChar, bool $renamedOnly): Collection
     {
         $qry = Release::query()
-            ->select([
-                'id',
-                'guid',
-                'leftguid',
-                'groups_id',
-                'searchname',
-                'size',
-                'categories_id',
-                'videos_id',
-                'tv_episodes_id',
-                'postdate',
-            ])
-            ->where(['videos_id' => 0, 'tv_episodes_id' => 0])
-            ->where('size', '>', 1048576)
-            ->whereBetween('categories_id', [Category::TV_ROOT, Category::TV_OTHER])
-            ->where('categories_id', '<>', Category::TV_ANIME)
+            ->select(['id', 'guid', 'leftguid', 'groups_id', 'searchname', 'size', 'categories_id', 'videos_id', 'tv_episodes_id', 'postdate'])
+            ->whereRaw(TvProcessingCandidateQuery::workCondition($renamedOnly ? 2 : 1))
             ->orderByDesc('postdate')
-            ->limit($this->tvqty);
+            ->limit($this->batchSize());
 
         if ($groupID !== '') {
             $qry->where('groups_id', $groupID);
@@ -176,51 +188,47 @@ class TvProcessingPipeline
             $qry->where('leftguid', $guidChar);
         }
 
-        if ($processTV === 2) {
-            $qry->where('isrenamed', '=', 1);
-        }
-
         return $qry->get();
     }
 
+    /** Releases per worker run: the configured max_tv_processed, default 75. */
+    protected function batchSize(): int
+    {
+        $maxTvProcessed = (int) app(ConfigurationProvider::class)->metadata()->maxTvProcessed;
+
+        return $maxTvProcessed > 0 ? $maxTvProcessed : 75;
+    }
+
     /**
-     * Get all registered provider pipes.
-     *
-     * @return Collection<AbstractTvProviderPipe>
+     * @return Collection<int, AbstractTvProviderPipe>
      */
-    public function getPipes(): Collection // @phpstan-ignore missingType.generics
+    public function getPipes(): Collection
     {
         return $this->pipes;
     }
 
     /**
-     * Get processing statistics.
-     *
-     * @return array<string, mixed>
+     * @return array{processed: int, matched: int, episode_missing: int, not_found: int, deferred: int, duration: float, providers: array<string, int>}
      */
     public function getStats(): array
     {
         return $this->stats;
     }
 
-    /**
-     * Reset statistics.
-     */
     protected function resetStats(): void
     {
         $this->stats = [
             'processed' => 0,
             'matched' => 0,
-            'failed' => 0,
-            'skipped' => 0,
+            'episode_missing' => 0,
+            'not_found' => 0,
+            'deferred' => 0,
             'duration' => 0.0,
             'providers' => [],
         ];
     }
 
     /**
-     * Update statistics from a processing result.
-     *
      * @param  array<string, mixed>  $result
      */
     protected function updateStats(array $result): void
@@ -229,33 +237,26 @@ class TvProcessingPipeline
 
         switch ($result['status'] ?? '') {
             case TvProcessingResult::STATUS_MATCHED:
+            case TvProcessingResult::STATUS_SEASON_PACK:
                 $this->stats['matched']++;
-                $provider = $result['provider'] ?? 'unknown';
+                $provider = (string) ($result['provider'] ?? 'unknown');
                 $this->stats['providers'][$provider] = ($this->stats['providers'][$provider] ?? 0) + 1;
                 break;
 
-            case TvProcessingResult::STATUS_PARSE_FAILED:
-            case TvProcessingResult::STATUS_NOT_FOUND:
-                $this->stats['failed']++;
+            case TvProcessingResult::STATUS_EPISODE_MISSING:
+                $this->stats['episode_missing']++;
                 break;
 
-            case TvProcessingResult::STATUS_SKIPPED:
-                $this->stats['skipped']++;
+            case TvProcessingResult::STATUS_TRANSIENT:
+                $this->stats['deferred']++;
+                break;
+
+            default:
+                $this->stats['not_found']++;
                 break;
         }
     }
 
-    /**
-     * Display processing header.
-     */
-    protected function displayHeader(string $guidChar = ''): void
-    {
-        // Header is now shown in process() after we know the release count
-    }
-
-    /**
-     * Display processing summary.
-     */
     protected function displaySummary(): void
     {
         if (! $this->echoOutput) {
@@ -263,10 +264,12 @@ class TvProcessingPipeline
         }
 
         cli()->header(sprintf(
-            'TV processing complete: %d processed, %d matched, %d failed (%.2fs)',
+            'TV processing complete: %d processed, %d matched, %d episode missing, %d not found, %d deferred (%.2fs)',
             $this->stats['processed'],
             $this->stats['matched'],
-            $this->stats['failed'],
+            $this->stats['episode_missing'],
+            $this->stats['not_found'],
+            $this->stats['deferred'],
             $this->stats['duration']
         ));
 

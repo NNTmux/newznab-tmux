@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Exceptions\TvProviderException;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
@@ -29,6 +30,11 @@ class TmdbClient
 
     protected int $retryDelay;
 
+    /**
+     * Throw TvProviderException on rate limits, server errors and connection failures instead of returning null.
+     */
+    protected bool $throwOnTransientFailure = false;
+
     public function __construct()
     {
         $this->apiKey = (string) config('tmdb.api_key', '');
@@ -43,6 +49,18 @@ class TmdbClient
     public function isConfigured(): bool
     {
         return ! empty($this->apiKey);
+    }
+
+    /**
+     * A copy of this client that throws TvProviderException on transient failures
+     * (429, 5xx, connection errors) so callers can retry later instead of treating them as "not found".
+     */
+    public function throwingOnTransientFailure(): static
+    {
+        $client = clone $this;
+        $client->throwOnTransientFailure = true;
+
+        return $client;
     }
 
     /**
@@ -65,7 +83,10 @@ class TmdbClient
                 ->retry($this->retryTimes, $this->retryDelay, function (\Throwable $exception, PendingRequest $request, ?string $key = null) {
                     // Don't retry on 404 errors - resource simply doesn't exist
                     if ($exception instanceof RequestException) {
-                        return $exception->response->status() !== 404;
+                        $status = $exception->response->status();
+
+                        // A rate limit won't clear within the retry delay; let the caller defer instead.
+                        return $status !== 404 && ! ($status === 429 && $this->throwOnTransientFailure);
                     }
 
                     return true;
@@ -83,6 +104,15 @@ class TmdbClient
                 return null;
             }
 
+            if ($this->throwOnTransientFailure && TvProviderException::isTransientStatus($response->status())) {
+                throw new TvProviderException(
+                    'tmdb',
+                    sprintf('TMDB returned %d for %s', $response->status(), $endpoint),
+                    $response->status(),
+                    TvProviderException::parseRetryAfter($response->header('Retry-After')),
+                );
+            }
+
             Log::warning('TMDB API request failed', [
                 'endpoint' => $endpoint,
                 'status' => $response->status(),
@@ -90,12 +120,18 @@ class TmdbClient
             ]);
 
             return null;
+        } catch (TvProviderException $e) {
+            throw $e;
         } catch (\Throwable $e) {
             // Check if this is a 404 wrapped in an exception
             if ($e instanceof RequestException && $e->response->status() === 404) {
                 Log::debug('TMDB: Resource not found', ['endpoint' => $endpoint]);
 
                 return null;
+            }
+
+            if ($this->throwOnTransientFailure) {
+                throw new TvProviderException('tmdb', 'TMDB request failed: '.$e->getMessage(), null, null, $e);
             }
 
             Log::warning('TMDB API request exception', [
