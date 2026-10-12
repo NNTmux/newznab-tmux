@@ -5,6 +5,37 @@
 @endpush
 
 @section('content')
+@php
+    $validatedQuery = $listQuery ?? null;
+    $filterValue = static function (string $key, string $fallback = '') use ($validatedQuery): string {
+        $value = old($key, $validatedQuery[$key] ?? request($key, $fallback));
+        return is_scalar($value) ? (string) $value : '';
+    };
+    $searchValue = $filterValue('search', $filterValue('subject', $filterValue('id', $filterValue('searchadvr'))));
+    $selectedCategory = $filterValue('t', $filterValue('searchadvcat'));
+    $searchQuery = array_filter($validatedQuery ?? request()->query(), is_scalar(...));
+    unset($searchQuery['page']);
+    $sortValue = $filterValue('ob', 'posted_desc');
+    $allowedSorts = ['name_asc', 'name_desc', 'cat_asc', 'cat_desc', 'added_asc', 'added_desc', 'posted_asc', 'posted_desc', 'size_asc', 'size_desc', 'files_asc', 'files_desc', 'stats_asc', 'stats_desc', 'comments_asc', 'comments_desc'];
+    $sortValue = in_array($sortValue, $allowedSorts, true) ? $sortValue : 'posted_desc';
+    $advancedSearch = $filterValue('search_type') === 'adv';
+    $advancedFields = [
+        'group' => ['label' => 'Usenet Group', 'type' => 'text', 'alias' => 'searchadvgroups'],
+        'searchadvposter' => ['label' => 'Poster', 'type' => 'text'],
+        'added_from' => ['label' => 'Added From (inclusive)', 'type' => 'date'],
+        'added_to' => ['label' => 'Added To (inclusive)', 'type' => 'date'],
+        'minage' => ['label' => 'Min Posted Age (days)', 'type' => 'number', 'alias' => 'searchadvdaysnew'],
+        'maxage' => ['label' => 'Max Posted Age (days)', 'type' => 'number', 'alias' => 'searchadvdaysold'],
+        'minsize' => ['label' => 'Min Size (MB)', 'type' => 'number', 'alias' => 'searchadvsizefrom'],
+        'maxsize' => ['label' => 'Max Size (MB)', 'type' => 'number', 'alias' => 'searchadvsizeto'],
+        'minfiles' => ['label' => 'Min Files', 'type' => 'number'],
+        'maxfiles' => ['label' => 'Max Files', 'type' => 'number'],
+        'mingrabs' => ['label' => 'Min Grabs', 'type' => 'number'],
+        'maxgrabs' => ['label' => 'Max Grabs', 'type' => 'number'],
+        'mincomments' => ['label' => 'Min Comments', 'type' => 'number'],
+        'maxcomments' => ['label' => 'Max Comments', 'type' => 'number'],
+    ];
+@endphp
 <div class="surface-panel rounded-xl shadow-sm">
     <x-breadcrumb :items="[
         ['label' => 'Home', 'url' => url($site->homeLink ?? '/'), 'icon' => 'fas fa-home'],
@@ -23,7 +54,7 @@
                     <input type="text"
                            id="search"
                            name="search"
-                           value="{{ request('search') }}"
+                           value="{{ $searchValue }}"
                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                            placeholder="Enter search terms..."
                            autocomplete="off"
@@ -37,7 +68,7 @@
                 @if(isset($spellSuggestion) && !empty($spellSuggestion))
                     <div class="mt-2 text-sm">
                         <span class="text-gray-600 dark:text-gray-400">Did you mean: </span>
-                        <a href="{{ route('search', array_merge(request()->except('search'), ['search' => $spellSuggestion])) }}"
+                        <a href="{{ route('search', array_merge($searchQuery, ['search' => $spellSuggestion])) }}"
                            class="text-primary-600 dark:text-primary-400 hover:underline font-medium">
                             {{ $spellSuggestion }}
                         </a>
@@ -47,9 +78,6 @@
             </div>
 
             <!-- Category -->
-            @php
-                $selectedCategory = request('t', request('searchadvcat', ''));
-            @endphp
             <div>
                 <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Category</label>
                 <select id="category"
@@ -87,62 +115,51 @@
             </div>
         </div>
 
-        @if(request('search_type') == 'adv')
-            <!-- Hidden field to maintain advanced search mode -->
+        <input type="hidden" name="ob" value="{{ $sortValue }}">
+        @foreach(['searchadvsubject', 'searchadvfilename'] as $legacyField)
+            @php($legacyValue = $filterValue($legacyField))
+            @if($legacyValue !== '')
+                <input type="hidden" name="{{ $legacyField }}" value="{{ $legacyValue }}">
+            @endif
+        @endforeach
+        @if($errors->any())
+            <div class="mb-4 rounded-lg border border-red-300 bg-red-50 p-4 text-sm text-red-800 dark:border-red-700 dark:bg-red-950 dark:text-red-200" role="alert">
+                <ul class="list-disc pl-5">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+        @if($advancedSearch)
             <input type="hidden" name="search_type" value="adv">
-            <!-- Advanced Search Options -->
             <div class="surface-panel-alt rounded-lg p-4 mb-4 border">
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Advanced Options</h3>
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">Advanced Filters</h3>
+                <p class="mb-4 text-sm text-gray-600 dark:text-gray-400">Leave bounds blank for no limit. Minimums must not exceed maximums. Posted age is measured in days; size is measured in MB.</p>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div>
-                        <label for="group" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Usenet Group</label>
-                        <input type="text" id="group" name="group" value="{{ request('group') }}"
-                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                               placeholder="e.g., alt.binaries.teevee">
-                    </div>
-
-                    <div>
-                        <label for="minage" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Min Age (days)</label>
-                        <input type="number" id="minage" name="minage" value="{{ request('minage') }}"
-                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                               min="0">
-                    </div>
-
-                    <div>
-                        <label for="maxage" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Max Age (days)</label>
-                        <input type="number" id="maxage" name="maxage" value="{{ request('maxage') }}"
-                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                               min="0">
-                    </div>
-
-                    <div>
-                        <label for="minsize" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Min Size (MB)</label>
-                        <input type="number" id="minsize" name="minsize" value="{{ request('minsize') }}"
-                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                               min="0">
-                    </div>
-
-                    <div>
-                        <label for="maxsize" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Max Size (MB)</label>
-                        <input type="number" id="maxsize" name="maxsize" value="{{ request('maxsize') }}"
-                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                               min="0">
-                    </div>
-
-                    <div>
-                        <label for="poster" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Poster</label>
-                        <input type="text" id="poster" name="searchadvposter" value="{{ request('searchadvposter') }}"
-                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                               placeholder="e.g., poster@example.com">
-                    </div>
+                    @foreach($advancedFields as $field => $definition)
+                        <div>
+                            <label for="{{ $field }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ $definition['label'] }}</label>
+                            <input type="{{ $definition['type'] }}" id="{{ $field }}" name="{{ $field }}"
+                                   value="{{ $filterValue($field, isset($definition['alias']) ? $filterValue($definition['alias']) : '') }}"
+                                   class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                                   @if($definition['type'] === 'number') min="0" step="{{ in_array($field, ['minsize', 'maxsize'], true) ? 'any' : '1' }}" @endif>
+                        </div>
+                    @endforeach
                 </div>
             </div>
+        @else
+            @foreach($advancedFields as $field => $definition)
+                @if(isset($searchQuery[$field]))
+                    <input type="hidden" name="{{ $field }}" value="{{ $searchQuery[$field] }}">
+                @endif
+            @endforeach
         @endif
 
         <!-- Action Buttons -->
         <div class="flex flex-col sm:flex-row flex-wrap gap-2">
             <x-button type="submit" size="lg" icon="fas fa-search">Search</x-button>
-            <x-button-link href="{{ url('/search?search_type=adv') }}" size="lg" icon="fas fa-sliders-h">Advanced Search</x-button-link>
+            <x-button-link href="{{ route('search', array_merge($searchQuery, ['search_type' => 'adv'])) }}" size="lg" icon="fas fa-sliders-h" aria-label="Advanced search filters">Advanced Filters</x-button-link>
             <a href="{{ route('search') }}" class="inline-flex justify-center rounded-lg bg-gray-300 px-6 py-3 text-base font-semibold text-gray-700 transition hover:bg-gray-400 dark:bg-gray-600 dark:text-gray-100 dark:hover:bg-gray-700">
                 Clear
             </a>
@@ -151,7 +168,7 @@
 
     <!-- Search Results -->
     @if(isset($results) && ((is_array($results) && count($results) > 0) || (is_object($results) && $results->count() > 0)))
-        <x-release-results-panel :results="$results" date-field="adddate">
+        <x-release-results-panel :results="$results" date-field="adddate" :query-params="$searchQuery">
             <x-slot:summary>
                 <span class="font-semibold">{{ is_object($results) ? $results->total() : count($results) }}</span> results found
                 @if(is_object($results))
@@ -159,7 +176,7 @@
                 @endif
             </x-slot:summary>
         </x-release-results-panel>
-    @elseif(request()->has('search'))
+    @elseif($searchSubmitted ?? ($searchValue !== '' || $advancedSearch))
         <x-empty-state
             icon="fas fa-search"
             title="No results found"

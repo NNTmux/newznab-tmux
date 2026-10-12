@@ -2962,7 +2962,7 @@ class ManticoreSearchDriver implements BulkReleaseIndexUpdater, SearchDriverInte
 
             $sortField = (string) ($criteria['sort_field'] ?? 'postdate_ts');
             $sortDir = strtolower((string) ($criteria['sort_dir'] ?? 'desc'));
-            $allowedSort = ['postdate_ts', 'adddate_ts', 'size', 'totalpart', 'grabs', 'categories_id', 'id'];
+            $allowedSort = ['postdate_ts', 'adddate_ts', 'size', 'totalpart', 'grabs', 'comments', 'categories_id', 'id'];
             if (! in_array($sortField, $allowedSort, true)) {
                 $sortField = 'postdate_ts';
             }
@@ -3015,6 +3015,10 @@ class ManticoreSearchDriver implements BulkReleaseIndexUpdater, SearchDriverInte
                 'documents' => $documents,
             ];
         };
+
+        if ($hasText && (bool) ($criteria['fuzzy_only'] ?? false)) {
+            return $execute(true);
+        }
 
         if ($hasText) {
             $first = $execute(false);
@@ -3085,6 +3089,18 @@ class ManticoreSearchDriver implements BulkReleaseIndexUpdater, SearchDriverInte
      */
     private function applyManticoreReleaseIndexFilters(Search $query, array $criteria): void
     {
+        foreach (ReleaseSearchQuery::normalizeRanges($criteria['ranges'] ?? []) as $field => $bounds) {
+            foreach ($bounds as $bound => $value) {
+                $query->filter($field, $bound === 'min' ? 'gte' : 'lte', $value);
+            }
+        }
+        foreach (['min_id' => 'gte', 'max_id' => 'lte'] as $bound => $operator) {
+            $value = ReleaseSearchQuery::normalizeRangeBound($criteria[$bound] ?? null);
+            if ($value !== null) {
+                $query->filter('id', $operator, $value);
+            }
+        }
+
         $releaseIds = $criteria['release_ids'] ?? null;
         if (is_array($releaseIds) && $releaseIds !== []) {
             $valid = array_values(array_filter(

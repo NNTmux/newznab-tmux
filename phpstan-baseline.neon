@@ -808,7 +808,7 @@ parameters:
 		-
 			message: '#^Offset 0 does not exist on array\<string, mixed\>\.$#'
 			identifier: offsetAccess.notFound
-			count: 8
+			count: 7
 			path: app/Services/Releases/ReleaseSearchService.php
 
 		-

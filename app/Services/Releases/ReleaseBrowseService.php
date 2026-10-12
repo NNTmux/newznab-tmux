@@ -332,6 +332,7 @@ class ReleaseBrowseService
             'size' => 'size',
             'totalpart' => 'totalpart',
             'grabs' => 'grabs',
+            'comments' => 'comments',
             'categories_id' => 'categories_id',
             default => null,
         };
@@ -548,6 +549,7 @@ class ReleaseBrowseService
             'size' => 'size',
             'files' => 'totalpart',
             'stats' => 'grabs',
+            'comments' => 'comments',
             'added' => 'adddate',
             default => 'postdate',
         };
@@ -577,6 +579,8 @@ class ReleaseBrowseService
             'files_desc',
             'stats_asc',
             'stats_desc',
+            'comments_asc',
+            'comments_desc',
         ];
     }
 

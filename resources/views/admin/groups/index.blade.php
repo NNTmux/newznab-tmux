@@ -29,28 +29,103 @@
             </div>
         @endif
 
+        @php
+            $dateFilters = ['first_post' => 'First Post', 'last_post' => 'Last Post', 'last_updated' => 'Last Updated'];
+            $numberFilters = ['releases' => 'Releases', 'min_files' => 'Min Files', 'min_size' => 'Min Size (MB)', 'backfill_days' => 'Backfill Days'];
+            $filterValue = static function (string $field) use ($filters, $groupname): string {
+                $value = old($field, $field === 'groupname' ? $groupname : ($filters[$field] ?? ''));
+
+                return is_scalar($value) ? (string) $value : '';
+            };
+            $advancedFilters = false;
+            foreach (array_keys($dateFilters + $numberFilters) as $field) {
+                foreach (isset($dateFilters[$field]) ? ['from', 'to'] : ['min', 'max'] as $bound) {
+                    if ($filterValue($field.'_'.$bound) !== '') {
+                        $advancedFilters = true;
+                    }
+                }
+            }
+            $filterInputClass = 'w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100';
+        @endphp
+
+        <x-admin.action-bar>
+            <form name="groupsearch" method="GET" action="{{ route('admin.group-list') }}" class="w-full space-y-4">
+                <input type="hidden" name="sort" value="{{ $filters['sort'] }}">
+                <input type="hidden" name="direction" value="{{ $filters['direction'] }}">
+                @if(isset($errors) && $errors->any())
+                    <div role="alert" class="text-sm text-red-600 dark:text-red-400">
+                        @foreach($errors->all() as $error)
+                            <p>{{ $error }}</p>
+                        @endforeach
+                    </div>
+                @endif
+                <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4 xl:items-end">
+                    <div>
+                        <label for="groupname" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Group</label>
+                        <input id="groupname" type="search" name="groupname" value="{{ $filterValue('groupname') }}"
+                               class="{{ $filterInputClass }}" placeholder="Search for group...">
+                    </div>
+                    <div>
+                        <label for="active-filter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
+                        <select id="active-filter" name="active" class="{{ $filterInputClass }}">
+                            <option value="">All statuses</option>
+                            <option value="1" @selected($filterValue('active') === '1')>Active</option>
+                            <option value="0" @selected($filterValue('active') === '0')>Inactive</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="backfill-filter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Backfill</label>
+                        <select id="backfill-filter" name="backfill" class="{{ $filterInputClass }}">
+                            <option value="">All backfill states</option>
+                            <option value="1" @selected($filterValue('backfill') === '1')>Enabled</option>
+                            <option value="0" @selected($filterValue('backfill') === '0')>Disabled</option>
+                        </select>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <x-admin.button type="submit" icon="fas fa-filter">Apply filters</x-admin.button>
+                        <x-admin.button :href="route('admin.group-list')" tone="gray" icon="fas fa-xmark">Clear filters</x-admin.button>
+                    </div>
+                </div>
+                <details @if($advancedFilters) open @endif>
+                    <summary class="cursor-pointer text-sm font-medium text-blue-600 dark:text-blue-400">Date and number filters</summary>
+                    <div class="grid grid-cols-1 gap-4 mt-3 md:grid-cols-2 xl:grid-cols-3">
+                        @foreach($dateFilters as $field => $label)
+                            <fieldset class="min-w-0">
+                                <legend class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ $label }}</legend>
+                                <div class="grid grid-cols-2 gap-2">
+                                    @foreach(['from' => 'From', 'to' => 'Through'] as $bound => $boundLabel)
+                                        <div>
+                                            <label for="{{ $field }}_{{ $bound }}" class="block text-xs text-gray-500 dark:text-gray-400 mb-1">{{ $boundLabel }}</label>
+                                            <input id="{{ $field }}_{{ $bound }}" type="date" name="{{ $field }}_{{ $bound }}"
+                                                   value="{{ $filterValue($field.'_'.$bound) }}" class="{{ $filterInputClass }}">
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </fieldset>
+                        @endforeach
+                        @foreach($numberFilters as $field => $label)
+                            <fieldset class="min-w-0">
+                                <legend class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ $label }}</legend>
+                                <div class="grid grid-cols-2 gap-2">
+                                    @foreach(['min' => 'Minimum', 'max' => 'Maximum'] as $bound => $boundLabel)
+                                        <div>
+                                            <label for="{{ $field }}_{{ $bound }}" class="block text-xs text-gray-500 dark:text-gray-400 mb-1">{{ $boundLabel }}</label>
+                                            <input id="{{ $field }}_{{ $bound }}" type="number" min="0" step="{{ $field === 'min_size' ? 'any' : '1' }}"
+                                                   name="{{ $field }}_{{ $bound }}" value="{{ $filterValue($field.'_'.$bound) }}" class="{{ $filterInputClass }}">
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </fieldset>
+                        @endforeach
+                    </div>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Ranges include both endpoints. Unconfigured minimum files and sizes count as zero.</p>
+                </details>
+            </form>
+        </x-admin.action-bar>
+
         @if($grouplist && $grouplist->count() > 0)
             <x-admin.action-bar>
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                    <!-- Search Form -->
-                    <div>
-                        <form name="groupsearch" method="GET">
-                            <div class="flex gap-2">
-                                <div class="relative flex-1">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <i class="fas fa-search text-gray-400"></i>
-                                    </div>
-                                    <input id="groupname"
-                                           type="text"
-                                           name="groupname"
-                                           value="{{ $groupname ?? '' }}"
-                                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400"
-                                           placeholder="Search for group...">
-                                </div>
-                                <x-admin.button type="submit" icon="fas fa-search">Go</x-admin.button>
-                            </div>
-                        </form>
-                    </div>
+                <div class="grid w-full grid-cols-1 xl:grid-cols-2 gap-4">
 
                     <!-- Pagination -->
                     <div class="flex justify-center items-center">
@@ -100,16 +175,21 @@
                                        class="form-checkbox h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 dark:bg-gray-700"
                                        title="Select all groups on this page">
                             </x-admin.th>
-                            <x-admin.th>Group</x-admin.th>
-                            <x-admin.th>First Post</x-admin.th>
-                            <x-admin.th>Last Post</x-admin.th>
-                            <x-admin.th>Last Updated</x-admin.th>
-                            <x-admin.th align="center" class="w-32">Status</x-admin.th>
-                            <x-admin.th align="center" class="w-32">Backfill</x-admin.th>
-                            <x-admin.th align="center" class="w-24">Releases</x-admin.th>
-                            <x-admin.th align="center" class="w-24">Min Files</x-admin.th>
-                            <x-admin.th align="center" class="w-24">Min Size</x-admin.th>
-                            <x-admin.th align="center" class="w-32">Backfill Days</x-admin.th>
+                            @foreach(['name' => 'Group', 'first_post' => 'First Post', 'last_post' => 'Last Post', 'last_updated' => 'Last Updated', 'active' => 'Status', 'backfill' => 'Backfill', 'releases' => 'Releases', 'min_files' => 'Min Files', 'min_size' => 'Min Size', 'backfill_days' => 'Backfill Days'] as $field => $label)
+                                @php
+                                    $isSorted = $filters['sort'] === $field;
+                                    $nextDirection = $isSorted && $filters['direction'] === 'asc' ? 'desc' : 'asc';
+                                    $sortUrl = request()->url().'?'.http_build_query(array_replace($listQuery, ['sort' => $field, 'direction' => $nextDirection]));
+                                    $sortIcon = $isSorted ? ($filters['direction'] === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort';
+                                @endphp
+                                <x-admin.th :align="in_array($field, ['name', 'first_post', 'last_post', 'last_updated']) ? 'left' : 'center'"
+                                            :aria-sort="$isSorted ? ($filters['direction'] === 'asc' ? 'ascending' : 'descending') : 'none'">
+                                    <a href="{{ $sortUrl }}" class="inline-flex items-center gap-2 rounded hover:text-blue-600 dark:hover:text-blue-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                                       aria-label="Sort {{ $label }} {{ $nextDirection === 'asc' ? 'ascending' : 'descending' }}">
+                                        {{ $label }} <i class="fas {{ $sortIcon }}" aria-hidden="true"></i>
+                                    </a>
+                                </x-admin.th>
+                            @endforeach
                             <x-admin.th align="center" class="w-40">Actions</x-admin.th>
                 </x-slot:head>
                         @foreach($grouplist as $group)
@@ -240,7 +320,7 @@
                 </div>
             </div>
         @else
-            <x-admin.empty-state icon="fas fa-exclamation-triangle" title="No groups available" message="No groups have been added yet.">
+            <x-admin.empty-state icon="fas fa-exclamation-triangle" title="No groups match" message="Clear or adjust the filters, or add groups if none have been added yet.">
                 <x-admin.button :href="url('/admin/group-bulk')" tone="success" icon="fas fa-plus-circle" class="mt-4">Add Groups</x-admin.button>
             </x-admin.empty-state>
         @endif

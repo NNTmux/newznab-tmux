@@ -63,9 +63,11 @@ class SortDropdown extends Component
         ?string $baseUrl = null,
         ?array $queryParams = null
     ) {
-        $this->currentSort = $currentSort ?? request('ob', 'posted_desc');
+        $requestedSort = $currentSort ?? request('ob', 'posted_desc');
+        $this->currentSort = is_string($requestedSort) ? $requestedSort : 'posted_desc';
         $this->baseUrl = $baseUrl ?? request()->url();
-        $this->queryParams = $queryParams ?? request()->except(['ob', 'page']);
+        $this->queryParams = array_filter($queryParams ?? request()->query(), is_scalar(...));
+        unset($this->queryParams['ob'], $this->queryParams['page']);
 
         // Default sort options for releases
         $this->sortOptions = $options ?? [
@@ -75,13 +77,21 @@ class SortDropdown extends Component
             'added_asc' => ['label' => 'Added (Oldest)', 'icon' => 'fa-clock'],
             'name_asc' => ['label' => 'Name (A-Z)', 'icon' => 'fa-font'],
             'name_desc' => ['label' => 'Name (Z-A)', 'icon' => 'fa-font'],
+            'cat_asc' => ['label' => 'Category (Ascending)', 'icon' => 'fa-tags'],
+            'cat_desc' => ['label' => 'Category (Descending)', 'icon' => 'fa-tags'],
             'size_desc' => ['label' => 'Size (Largest)', 'icon' => 'fa-hdd'],
             'size_asc' => ['label' => 'Size (Smallest)', 'icon' => 'fa-hdd'],
             'files_desc' => ['label' => 'Files (Most)', 'icon' => 'fa-file'],
             'files_asc' => ['label' => 'Files (Least)', 'icon' => 'fa-file'],
             'stats_desc' => ['label' => 'Grabs (Most)', 'icon' => 'fa-download'],
             'stats_asc' => ['label' => 'Grabs (Least)', 'icon' => 'fa-download'],
+            'comments_desc' => ['label' => 'Comments (Most)', 'icon' => 'fa-comment'],
+            'comments_asc' => ['label' => 'Comments (Least)', 'icon' => 'fa-comment'],
         ];
+
+        if (! array_key_exists($this->currentSort, $this->sortOptions)) {
+            $this->currentSort = array_key_exists('posted_desc', $this->sortOptions) ? 'posted_desc' : (string) array_key_first($this->sortOptions);
+        }
 
         // Pre-compute current label and icon
         $this->currentLabel = $this->sortOptions[$this->currentSort]['label'] ?? 'Posted (Newest)';

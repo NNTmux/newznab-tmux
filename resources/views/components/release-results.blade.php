@@ -2,11 +2,18 @@
     'results',
     'showThumbs' => false,
     'dateField' => 'adddate',
+    'queryParams' => null,
 ])
 
 @php
     $shouldShowThumbs = filter_var($showThumbs, FILTER_VALIDATE_BOOL);
     $activeDateField = (string) $dateField;
+    $sortQuery = array_filter($queryParams ?? request()->query(), is_scalar(...));
+    unset($sortQuery['page']);
+    $requestedSort = $sortQuery['ob'] ?? 'posted_desc';
+    $currentSort = is_string($requestedSort) && preg_match('/^(name|cat|added|posted|size|files|stats|comments)_(asc|desc)$/', $requestedSort) === 1 ? $requestedSort : 'posted_desc';
+    $dateSort = $activeDateField === 'postdate' ? 'posted' : 'added';
+    $headers = ['name' => 'Name', 'cat' => 'Category', $dateSort => $dateSort === 'posted' ? 'Posted' : 'Added', 'size' => 'Size', 'files' => 'Files', 'stats' => 'Stats'];
 @endphp
 
 <!-- Results Table (Desktop) -->
@@ -18,12 +25,21 @@
                 <th scope="col" class="px-3 py-3 text-left">
                     <input type="checkbox" class="rounded border-gray-300 dark:border-gray-600 text-primary-600 dark:text-primary-500 focus:ring-primary-500 dark:focus:ring-primary-400 dark:bg-gray-700" aria-label="Select all releases" id="chkSelectAll" x-model="allChecked" @change="toggleAll()">
                 </th>
-                <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">Name</th>
-                <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">Category</th>
-                <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">Added</th>
-                <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">Size</th>
-                <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">Files</th>
-                <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">Stats</th>
+                @foreach($headers as $sortKey => $label)
+                    @php
+                        $ascending = $currentSort === $sortKey . '_asc';
+                        $descending = $currentSort === $sortKey . '_desc';
+                        $nextDirection = $ascending ? 'desc' : 'asc';
+                        $sortUrl = request()->url() . '?' . http_build_query(array_merge($sortQuery, ['ob' => $sortKey . '_' . $nextDirection]));
+                        $sortLabel = $sortKey === 'stats' ? 'Grabs' : $label;
+                    @endphp
+                    <th scope="col" data-sort="{{ $sortKey }}" aria-sort="{{ $ascending ? 'ascending' : ($descending ? 'descending' : 'none') }}" class="px-3 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                        <a href="{{ $sortUrl }}" class="inline-flex items-center gap-1 hover:text-primary-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500" aria-label="Sort {{ $sortLabel }} {{ $nextDirection === 'asc' ? 'ascending' : 'descending' }}">
+                            {{ $label }}
+                            <i class="fas {{ $ascending ? 'fa-arrow-up' : ($descending ? 'fa-arrow-down' : 'fa-sort') }}" aria-hidden="true"></i>
+                        </a>
+                    </th>
+                @endforeach
                 <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">Action</th>
             </tr>
         </thead>

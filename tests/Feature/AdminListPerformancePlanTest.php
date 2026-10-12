@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Models\UsenetGroup;
 use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use PDO;
 use Tests\TestCase;
 
@@ -86,18 +90,42 @@ class AdminListPerformancePlanTest extends TestCase
 
     public function test_group_admin_list_no_longer_groups_by_id(): void
     {
-        $modelPath = app_path('Models/UsenetGroup.php');
+        Schema::create('usenet_groups', function (Blueprint $table): void {
+            $table->increments('id');
+            $table->string('name');
+            $table->string('description')->default('');
+            foreach (['first_record_postdate', 'last_record_postdate', 'last_updated'] as $field) {
+                $table->dateTime($field)->nullable();
+            }
+            foreach (['active', 'backfill', 'minfilestoformrelease', 'minsizetoformrelease', 'backfill_target'] as $field) {
+                $table->integer($field)->default(0);
+            }
+        });
+        Schema::create('releases', function (Blueprint $table): void {
+            $table->increments('id');
+            $table->integer('groups_id')->index();
+        });
+        DB::table('usenet_groups')->insert(['name' => 'alt.binaries.z']);
+        $firstId = DB::table('usenet_groups')->insertGetId(['name' => 'alt.binaries.a']);
+        DB::table('releases')->insert(['groups_id' => $firstId]);
+        config(['nntmux.items_per_page' => 1]);
+        DB::enableQueryLog();
+        DB::flushQueryLog();
 
-        $this->assertFileExists($modelPath);
+        $page = UsenetGroup::getGroupsRange('', null, true);
+        $queries = collect(DB::getQueryLog());
+        DB::disableQueryLog();
+        $groupQuery = $queries->first(static fn (array $query): bool => str_contains($query['query'], 'from "usenet_groups"') && ! str_contains($query['query'], 'count(*)'));
+        $countQuery = $queries->first(static fn (array $query): bool => str_contains($query['query'], 'from "releases"'));
 
-        $content = file_get_contents($modelPath);
-        $methodStart = strpos($content, 'public static function getGroupsRange');
-        $this->assertIsInt($methodStart);
-        $methodBody = substr($content, $methodStart, 1200);
-
-        $this->assertStringContainsString("->select([\n                'id',", $methodBody);
-        $this->assertStringContainsString("->orderBy('name')", $methodBody);
-        $this->assertStringNotContainsString('groupBy', $methodBody);
+        $this->assertSame('alt.binaries.a', $page->items()[0]->name);
+        $this->assertSame(2, $page->total());
+        $this->assertSame(1, $page->items()[0]->num_releases);
+        $this->assertNotNull($groupQuery);
+        $this->assertStringNotContainsString('group by', strtolower($groupQuery['query']));
+        $this->assertNotNull($countQuery);
+        $this->assertSame([$firstId], $countQuery['bindings']);
+        $this->assertStringContainsString('where "groups_id" in (?)', $countQuery['query']);
     }
 
     public function test_admin_list_index_migration_contains_narrow_indexes(): void

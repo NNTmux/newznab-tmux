@@ -2960,11 +2960,8 @@ class ElasticSearchDriver implements SearchDriverInterface
 
             $sortField = (string) ($criteria['sort_field'] ?? 'postdate_ts');
             $sortDir = strtolower((string) ($criteria['sort_dir'] ?? 'desc'));
-            $allowedSort = ['postdate_ts', 'adddate_ts', 'size', 'totalpart', 'grabs', 'categories_id', 'id'];
+            $allowedSort = ['postdate_ts', 'adddate_ts', 'size', 'totalpart', 'grabs', 'comments', 'categories_id', 'id'];
             if (! in_array($sortField, $allowedSort, true)) {
-                $sortField = 'postdate_ts';
-            }
-            if ($sortField === 'id') {
                 $sortField = 'postdate_ts';
             }
             $order = $sortDir === 'asc' ? 'asc' : 'desc';
@@ -3016,6 +3013,10 @@ class ElasticSearchDriver implements SearchDriverInterface
                 return ['ids' => [], 'total' => 0, 'fuzzy' => $useFuzzy, 'available' => false];
             }
         };
+
+        if ($hasText && (bool) ($criteria['fuzzy_only'] ?? false)) {
+            return $run(true);
+        }
 
         if ($hasText) {
             $first = $run(false);
@@ -3122,6 +3123,23 @@ class ElasticSearchDriver implements SearchDriverInterface
     private function buildElasticsearchReleaseFilters(array $criteria): array
     {
         $filter = [];
+        foreach (ReleaseSearchQuery::normalizeRanges($criteria['ranges'] ?? []) as $field => $bounds) {
+            $range = [];
+            foreach ($bounds as $bound => $value) {
+                $range[$bound === 'min' ? 'gte' : 'lte'] = $value;
+            }
+            $filter[] = ['range' => [$field => $range]];
+        }
+        $idRange = [];
+        foreach (['min_id' => 'gte', 'max_id' => 'lte'] as $bound => $operator) {
+            $value = ReleaseSearchQuery::normalizeRangeBound($criteria[$bound] ?? null);
+            if ($value !== null) {
+                $idRange[$operator] = $value;
+            }
+        }
+        if ($idRange !== []) {
+            $filter[] = ['range' => ['id' => $idRange]];
+        }
 
         $releaseIds = $criteria['release_ids'] ?? null;
         if (is_array($releaseIds) && $releaseIds !== []) {

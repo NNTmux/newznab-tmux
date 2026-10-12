@@ -46,6 +46,7 @@ class ReleaseSearchService
      * @param  array<int|string, mixed>  $cat  Category IDs (list or associative)
      * @param  array<int, int>  $excludedCats
      * @param  array<string, mixed>  $orderBy
+     * @param  array<string, mixed>  $filters
      * @param  array<string, mixed>  $searchArr
      * @return array|Collection|mixed
      */
@@ -63,7 +64,8 @@ class ReleaseSearchService
         array $excludedCats = [],
         string $type = 'basic',
         array $cat = [-1],
-        int $minSize = 0
+        int $minSize = 0,
+        array $filters = []
     ): mixed {
         if (config('app.debug')) {
             Log::debug('ReleaseSearchService::search called', [
@@ -78,7 +80,7 @@ class ReleaseSearchService
             return $value !== -1 && $value !== '' && $value !== null;
         });
 
-        if ($searchFields === []) {
+        if ($searchFields === [] && ($filters['filter_only'] ?? false) !== true) {
             return collect();
         }
 
@@ -87,24 +89,28 @@ class ReleaseSearchService
             return collect();
         }
 
+        /** @var array{0:string,1:string} $orderBy */
         $orderBy = $this->getBrowseOrder($orderBy === '' ? 'posted_desc' : $orderBy);
+        $ranges = ReleaseSearchQuery::normalizeRanges($filters['ranges'] ?? []);
+
+        $groupId = null;
+        if ($groupName !== -1 && $groupName !== '-1') {
+            $resolved = UsenetGroup::getIDByName((string) $groupName);
+            if (! $resolved) {
+                return collect();
+            }
+            $groupId = (int) $resolved;
+        }
 
         if (Search::isAvailable()) {
-            $groupId = null;
-            if ((int) $groupName !== -1) {
-                $resolved = UsenetGroup::getIDByName((string) $groupName);
-                if ($resolved) {
-                    $groupId = (int) $resolved;
-                }
-            }
-
             [$sizeMinFromRange, $sizeMaxFromRange] = $this->resolveSizeRangeBounds($sizeFrom, $sizeTo);
             $minSizeCriteria = max((int) $minSize, $sizeMinFromRange);
             $maxSizeCriteria = $sizeMaxFromRange;
             [$minDateCriteria, $maxDateCriteria] = $this->resolvePostdateBounds($daysNew, $daysOld);
 
             $criteria = [
-                'phrases' => $searchFields,
+                'phrases' => $searchFields === [] ? null : $searchFields,
+                'ranges' => $ranges,
                 'category_ids' => $categoryIds,
                 'excluded_category_ids' => $excludedCats,
                 'min_size' => $minSizeCriteria,
@@ -119,52 +125,53 @@ class ReleaseSearchService
                 'try_fuzzy' => true,
             ];
 
-            $searchPage = Search::searchReleasePage(ReleaseSearchQuery::fromCriteria($criteria, $limit, $offset));
-            $filtered = $searchPage->legacy();
+            if ($orderBy[0] === 'searchname') {
+                $ids = $this->collectNameSearchIds($criteria);
+                if ($ids !== null && $ids !== []) {
+                    return $this->searchNamePage($ids, $offset, $limit, (string) $orderBy[1]);
+                }
+                if (config('nntmux.mysql_search_fallback', false) !== true) {
+                    return collect();
+                }
+            } else {
+                $searchPage = Search::searchReleasePage(ReleaseSearchQuery::fromCriteria($criteria, $limit, $offset));
+                $filtered = $searchPage->legacy();
 
-            if ($filtered['ids'] !== []) {
-                $ids = array_map(static fn (int|string $id): int => (int) $id, $filtered['ids']);
-                $idList = implode(',', $ids);
-                $baseSql = $this->buildSearchBaseSql(sprintf('WHERE r.id IN (%s)', $idList));
-                $sql = sprintf('SELECT * FROM (%s) r ORDER BY FIELD(r.id, %s)', $baseSql, $idList);
-                $cacheKey = md5($this->getCacheVersion().$sql);
-                $cachedReleases = Cache::get($cacheKey);
-                if ($cachedReleases !== null) {
-                    return $cachedReleases;
+                if ($filtered['ids'] !== []) {
+                    $ids = array_map(static fn (int|string $id): int => (int) $id, $filtered['ids']);
+                    $idList = implode(',', $ids);
+                    $baseSql = $this->buildSearchBaseSql(sprintf('WHERE r.id IN (%s)', $idList));
+                    $sql = sprintf('SELECT * FROM (%s) r ORDER BY FIELD(r.id, %s)', $baseSql, $idList);
+                    $cacheKey = md5($this->getCacheVersion().$sql.$filtered['total']);
+                    $cachedReleases = Cache::get($cacheKey);
+                    if ($cachedReleases !== null) {
+                        return $cachedReleases;
+                    }
+
+                    $releases = Release::fromQuery($sql);
+                    if ($releases->isNotEmpty()) {
+                        $releases[0]->_totalrows = (int) $filtered['total'];
+                    }
+
+                    $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
+                    Cache::put($cacheKey, $releases, $expiresAt);
+
+                    return $releases;
                 }
 
-                $releases = Release::fromQuery($sql);
-                if ($releases->isNotEmpty()) {
-                    $releases[0]->_totalrows = (int) $filtered['total'];
+                if (config('nntmux.mysql_search_fallback', false) !== true) {
+                    return collect();
                 }
-
-                $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
-                Cache::put($cacheKey, $releases, $expiresAt);
-
-                return $releases;
-            }
-
-            if (config('nntmux.mysql_search_fallback', false) !== true) {
-                return collect();
             }
         }
 
-        $searchLimit = $this->determineSearchCandidateLimit($offset, $limit);
-        $searchResult = $this->performIndexSearch($searchFields, $searchLimit);
-
-        if (config('app.debug')) {
-            Log::debug('ReleaseSearchService::search after performIndexSearch', [
-                'result_count' => count($searchResult),
-            ]);
-        }
-
-        if (count($searchResult) === 0) {
+        if (config('nntmux.mysql_search_fallback', false) !== true) {
             return collect();
         }
 
         // Build WHERE clause
         $whereSql = $this->buildSearchWhereClause(
-            $searchResult,
+            [],
             $groupName,
             $sizeFrom,
             $sizeTo,
@@ -173,35 +180,45 @@ class ReleaseSearchService
             $maxAge,
             $excludedCats,
             $cat,
-            $minSize
+            $minSize,
+            $ranges
         );
+
+        [$textConditions, $bindings] = $this->buildMysqlSearchConditions($searchFields);
+        if ($searchFields !== [] && $textConditions === []) {
+            return collect();
+        }
+        if ($textConditions !== []) {
+            $whereSql .= ' AND '.implode(' AND ', $textConditions);
+        }
 
         // Build base SQL
         $baseSql = $this->buildSearchBaseSql($whereSql);
 
         // Build final SQL with pagination
         $sql = sprintf(
-            'SELECT * FROM (%s) r ORDER BY r.%s %s LIMIT %d OFFSET %d',
+            'SELECT * FROM (%s) r ORDER BY r.%s %s, r.id %s LIMIT %d OFFSET %d',
             $baseSql,
-            $orderBy[0], // @phpstan-ignore offsetAccess.notFound
-            $orderBy[1], // @phpstan-ignore offsetAccess.notFound
+            $orderBy[0],
+            $orderBy[1],
+            $orderBy[1],
             $limit,
             $offset
         );
 
         // Check cache
-        $cacheKey = md5($this->getCacheVersion().$sql);
+        $cacheKey = md5($this->getCacheVersion().$sql.serialize($bindings));
         $releases = Cache::get($cacheKey);
         if ($releases !== null) {
             return $releases;
         }
 
         // Execute query
-        $releases = Release::fromQuery($sql);
+        $releases = Release::fromQuery($sql, $bindings);
 
         // Add total count for pagination
         if ($releases->isNotEmpty()) {
-            $releases[0]->_totalrows = $this->getPagerCount($baseSql);
+            $releases[0]->_totalrows = (int) (DB::selectOne('SELECT COUNT(*) AS count FROM releases r '.$whereSql, $bindings)->count ?? 0);
         }
 
         // Cache results
@@ -359,6 +376,165 @@ class ReleaseSearchService
         }
 
         return $this->apiSearchLegacyMysql($searchName, $groupName, $offset, $limit, $maxAge, $excludedCats, $cat, $minSize, $orderBy);
+    }
+
+    /**
+     * Freeze the highest matching ID and text mode, then enumerate the complete
+     * result with keyset windows. A failed window invalidates the whole traversal.
+     *
+     * @param  array<string, mixed>  $criteria
+     * @return list<int>|null
+     */
+    private function collectNameSearchIds(array $criteria): ?array
+    {
+        if ((int) ($criteria['max_age_days'] ?? -1) > 0) {
+            $criteria['min_date'] = max((int) ($criteria['min_date'] ?? 0), time() - ((int) $criteria['max_age_days'] * 86400));
+            $criteria['max_age_days'] = -1;
+        }
+        $criteria['sort_field'] = 'id';
+        $criteria['sort_dir'] = 'desc';
+        $criteria['include_documents'] = false;
+        $criteria['track_total'] = false;
+        $first = Search::searchReleasePage(ReleaseSearchQuery::fromCriteria($criteria, 1));
+        if (! $first->available) {
+            return null;
+        }
+        if ($first->ids === []) {
+            return [];
+        }
+
+        $watermark = max($first->ids);
+        $criteria['max_id'] = $watermark;
+        $criteria['try_fuzzy'] = false;
+        $criteria['fuzzy_only'] = $first->fuzzy;
+        $criteria['sort_dir'] = 'asc';
+        $lastId = 0;
+        $ids = [];
+        while ($lastId < $watermark) {
+            $criteria['min_id'] = $lastId + 1;
+            $page = Search::searchReleasePage(ReleaseSearchQuery::fromCriteria($criteria, 1000));
+            if (! $page->available) {
+                return null;
+            }
+            if ($page->ids === []) {
+                break;
+            }
+            foreach ($page->ids as $id) {
+                if ($id <= $lastId || $id > $watermark) {
+                    return null;
+                }
+                $ids[] = $id;
+                $lastId = $id;
+            }
+        }
+
+        return $ids;
+    }
+
+    /**
+     * @param  list<int>  $ids
+     * @return Collection<int, Release>
+     */
+    private function searchNamePage(array $ids, int $offset, int $limit, string $orderDir): Collection
+    {
+        $direction = strtolower($orderDir) === 'asc' ? 'asc' : 'desc';
+        $window = $this->nameSearchWindow($ids, $offset, $limit, $direction);
+        $total = $window['total'];
+        $pageIds = $window['ids'];
+        if ($pageIds === []) {
+            return new Collection;
+        }
+
+        $baseSql = $this->buildSearchBaseSql('WHERE r.id IN ('.implode(',', array_map('intval', $pageIds)).')');
+        $sql = sprintf('SELECT * FROM (%s) r ORDER BY r.searchname %s, r.id %s', $baseSql, $direction, $direction);
+        $releases = Release::fromQuery($sql);
+        if ($releases->isNotEmpty()) {
+            $releases[0]->_totalrows = $total;
+        }
+
+        return $releases;
+    }
+
+    /**
+     * @param  list<int>  $ids
+     * @return array{ids: list<int>, total: int}
+     */
+    private function nameSearchWindow(array $ids, int $offset, int $limit, string $direction): array
+    {
+        $direction = strtolower($direction) === 'asc' ? 'asc' : 'desc';
+        $matches = DB::table('releases as r')->whereIntegerInRaw('r.id', $ids);
+        $total = (clone $matches)->count();
+        $pageIds = $matches->orderBy('r.searchname', $direction)->orderBy('r.id', $direction)
+            ->limit($limit)->offset($offset)->pluck('r.id')->all();
+
+        return ['ids' => array_map('intval', $pageIds), 'total' => $total];
+    }
+
+    /**
+     * @param  array<string, array<string, int>>  $ranges
+     * @return list<string>
+     */
+    private function buildRangeSqlConditions(array $ranges): array
+    {
+        $conditions = [];
+        foreach (ReleaseSearchQuery::normalizeRanges($ranges) as $field => $bounds) {
+            foreach ($bounds as $bound => $value) {
+                $operator = $bound === 'min' ? '>=' : '<=';
+                $conditions[] = $field === 'adddate_ts'
+                    ? sprintf("r.adddate %s '%s'", $operator, gmdate('Y-m-d H:i:s', $value))
+                    : sprintf('r.%s %s %d', $field, $operator, $value);
+            }
+        }
+
+        return $conditions;
+    }
+
+    /**
+     * Preserve the legacy SQL fallback term matching while applying it to the
+     * full filtered query, rather than an already capped candidate list.
+     *
+     * @param  array<string, mixed>  $searchFields
+     * @return array{list<string>, list<string>}
+     */
+    private function buildMysqlSearchConditions(array $searchFields): array
+    {
+        $conditions = [];
+        $bindings = [];
+        foreach ($searchFields as $field => $value) {
+            if (! in_array($field, ['searchname', 'name', 'fromname', 'filename'], true) || ! is_string($value) || $value === '') {
+                continue;
+            }
+            $terms = preg_split('/\s+/', trim($value)) ?: [];
+            if ($field === 'filename') {
+                $fileConditions = [];
+                foreach ($terms as $term) {
+                    if (strlen(trim($term)) >= 2) {
+                        $fileConditions[] = 'rf.name LIKE ?';
+                        $bindings[] = '%'.trim($term).'%';
+                    }
+                }
+                if ($fileConditions !== []) {
+                    $conditions[] = 'EXISTS (SELECT 1 FROM release_files rf WHERE rf.releases_id = r.id AND '.implode(' AND ', $fileConditions).')';
+                }
+
+                continue;
+            }
+            foreach ($terms as $term) {
+                if (strlen(trim($term)) >= 2) {
+                    $conditions[] = 'r.'.$field.' LIKE ?';
+                    $bindings[] = '%'.trim($term).'%';
+                }
+            }
+            if ($field === 'searchname' && count($terms) > 1) {
+                $normalizedPhrase = $this->normalizeMysqlFallbackPhrase($value);
+                if ($normalizedPhrase !== '') {
+                    $conditions[] = "LOWER(REPLACE(REPLACE(REPLACE(r.searchname, '.', ' '), '-', ' '), '_', ' ')) LIKE ?";
+                    $bindings[] = $normalizedPhrase.'%';
+                }
+            }
+        }
+
+        return [$conditions, $bindings];
     }
 
     /**
@@ -1537,66 +1713,6 @@ class ReleaseSearchService
     }
 
     /**
-     * Perform index search using Elasticsearch or Manticore, with MySQL fallback
-     *
-     * @param  array<string, mixed>  $searchArr
-     * @return array<string, mixed>
-     */
-    private function performIndexSearch(array $searchArr, int $limit): array
-    {
-        // Filter out -1 values and empty strings
-        $searchFields = Arr::where($searchArr, static function ($value) {
-            return $value !== -1 && $value !== '' && $value !== null;
-        });
-
-        if (empty($searchFields)) {
-            if (config('app.debug')) {
-                Log::debug('performIndexSearch: searchFields is empty after filtering', [
-                    'original' => $searchArr,
-                ]);
-            }
-
-            return [];
-        }
-
-        if (config('app.debug')) {
-            Log::debug('performIndexSearch: starting search', [
-                'search_driver' => config('search.default'),
-                'searchFields' => $searchFields,
-                'limit' => $limit,
-            ]);
-        }
-
-        // Use the unified Search facade with fuzzy fallback
-        // This will try exact search first, then fuzzy if no results
-        $searchResult = Search::searchReleasesWithFuzzy($searchFields, $limit);
-        $result = $searchResult['ids'] ?? [];
-
-        if (config('app.debug')) {
-            Log::debug('performIndexSearch: Search result', [
-                'count' => count($result),
-                'fuzzy_used' => $searchResult['fuzzy'] ?? false,
-            ]);
-        }
-
-        // If search returned results, use them
-        if (! empty($result)) {
-            return $result;
-        }
-
-        // Fallback to MySQL LIKE search when search engine is unavailable (only if enabled)
-        if (config('nntmux.mysql_search_fallback', false) === true) {
-            if (config('app.debug')) {
-                Log::debug('performIndexSearch: Falling back to MySQL search');
-            }
-
-            return $this->performMySQLSearch($searchFields, $limit);
-        }
-
-        return [];
-    }
-
-    /**
      * SQL predicates on tv_episodes (alias tve) for season / episode / airdate, matching
      * newznab-style tvsearch parameters. Empty array means no narrowing.
      *
@@ -1875,6 +1991,7 @@ class ReleaseSearchService
     /**
      * Build WHERE clause for search query
      *
+     * @param  array<string, array<string, int>>  $ranges
      * @param  array<int|string, mixed>  $cat  Category IDs (list or associative)
      * @param  array<int, int>  $excludedCats
      * @param  array<string, mixed>  $searchResult
@@ -1889,12 +2006,17 @@ class ReleaseSearchService
         int $maxAge,
         array $excludedCats,
         array $cat,
-        int $minSize
+        int $minSize,
+        array $ranges = []
     ): string {
         $conditions = [
             sprintf('r.passwordstatus %s', $this->showPasswords()),
-            sprintf('r.id IN (%s)', implode(',', array_map('intval', $searchResult))),
         ];
+
+        if ($searchResult !== []) {
+            $conditions[] = sprintf('r.id IN (%s)', implode(',', array_map('intval', $searchResult)));
+        }
+        $conditions = array_merge($conditions, $this->buildRangeSqlConditions($ranges));
 
         // Add optional conditions
         if ($maxAge > 0) {
@@ -2164,6 +2286,7 @@ class ReleaseSearchService
             'size' => 'size',
             'files' => 'totalpart',
             'stats' => 'grabs',
+            'comments' => 'comments',
             'added' => 'adddate',
             default => 'postdate',
         };
@@ -2181,6 +2304,7 @@ class ReleaseSearchService
             'size' => 'size',
             'totalpart' => 'totalpart',
             'grabs' => 'grabs',
+            'comments' => 'comments',
             default => 'postdate_ts',
         };
     }

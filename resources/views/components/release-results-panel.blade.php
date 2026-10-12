@@ -5,11 +5,17 @@
     'showTopPagination' => false,
     'showBottomPagination' => true,
     'showSort' => true,
+    'queryParams' => null,
 ])
 
 @php
     $hasPaginatorLinks = is_object($results) && method_exists($results, 'links');
     $shouldShowThumbs = filter_var($showThumbs, FILTER_VALIDATE_BOOL);
+    $resultQuery = array_filter($queryParams ?? request()->query(), is_scalar(...));
+    unset($resultQuery['page']);
+    if ($hasPaginatorLinks) {
+        $results->appends($resultQuery);
+    }
 @endphp
 
 <form
@@ -45,7 +51,7 @@
                 @endisset
 
                 @if($showSort)
-                    <x-sort-dropdown />
+                    <x-sort-dropdown :query-params="$resultQuery" :current-sort="is_string($resultQuery['ob'] ?? null) ? $resultQuery['ob'] : null" />
                 @endif
             </div>
         </div>
@@ -57,11 +63,11 @@
         </div>
     @endif
 
-    <x-release-results :results="$results" :show-thumbs="$shouldShowThumbs" :date-field="$dateField" />
+    <x-release-results :results="$results" :show-thumbs="$shouldShowThumbs" :date-field="$dateField" :query-params="$resultQuery" />
 
     @if($showBottomPagination && $hasPaginatorLinks)
         <div class="px-4 py-3 sm:px-6 surface-panel-alt border-t">
-            {{ $results->appends(request()->query())->links() }}
+            {{ $results->links() }}
         </div>
     @endif
 </form>

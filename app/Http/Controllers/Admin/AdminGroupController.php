@@ -19,11 +19,7 @@ class AdminGroupController extends BasePageController
      */
     public function index(AdminGroupListRequest $request): mixed
     {
-        $groupname = $request->groupName();
-        $grouplist = UsenetGroup::getGroupsRange($groupname, null, true);
-        $title = 'Group List';
-
-        return view('admin.groups.index', compact('title', 'groupname', 'grouplist'));
+        return $this->groupList($request, null, 'Group List');
     }
 
     /**
@@ -122,11 +118,7 @@ class AdminGroupController extends BasePageController
      */
     public function active(AdminGroupListRequest $request): mixed
     {
-        $groupname = $request->groupName();
-        $grouplist = UsenetGroup::getGroupsRange($groupname, true, true);
-        $title = 'Active Groups';
-
-        return view('admin.groups.index', compact('title', 'groupname', 'grouplist'));
+        return $this->groupList($request, true, 'Active Groups');
     }
 
     /**
@@ -134,10 +126,19 @@ class AdminGroupController extends BasePageController
      */
     public function inactive(AdminGroupListRequest $request): mixed
     {
-        $groupname = $request->groupName();
-        $grouplist = UsenetGroup::getGroupsRange($groupname, false, true);
-        $title = 'Inactive Groups';
+        return $this->groupList($request, false, 'Inactive Groups');
+    }
 
-        return view('admin.groups.index', compact('title', 'groupname', 'grouplist'));
+    private function groupList(AdminGroupListRequest $request, ?bool $active, string $title): View
+    {
+        $groupname = $request->groupName();
+        $filters = $request->listOptions();
+        if ($active !== null) {
+            $filters['active'] = $active ? '1' : '0';
+        }
+        $listQuery = ['groupname' => $groupname] + $filters;
+        $grouplist = UsenetGroup::getGroupsRange($groupname, $active, true, $filters)->appends($listQuery);
+
+        return view('admin.groups.index', compact('title', 'groupname', 'grouplist', 'filters', 'listQuery'));
     }
 }

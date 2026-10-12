@@ -3,7 +3,6 @@
 namespace Tests\Unit;
 
 use App\Http\Controllers\BasePageController;
-use App\Http\Controllers\SearchController;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Routing\UrlGenerator as UrlGeneratorContract;
 use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
@@ -11,7 +10,6 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\RouteCollection;
 use Illuminate\Routing\UrlGenerator;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
 use Symfony\Component\HttpFoundation\Response;
 
 class UserViewRequestInputTest extends TestCase
@@ -62,17 +60,6 @@ class UserViewRequestInputTest extends TestCase
         $this->assertNull($request->input('animetitle'));
         $this->assertSame('', $this->controller()->scalar($request, 'animetitle'));
         $this->assertSame('all', $this->controller()->scalar($request, 'animetitle', 'all'));
-    }
-
-    public function test_search_category_resolution_rejects_malformed_category_values(): void
-    {
-        $reflection = new ReflectionClass(SearchController::class);
-        $controller = $reflection->newInstanceWithoutConstructor();
-        $method = $reflection->getMethod('resolveCategoryIdsFromRequest');
-
-        $this->assertSame([1000, 2000], $method->invoke($controller, Request::create('/search', 'GET', ['t' => '1000,bad,2000,1000'])));
-        $this->assertSame([-1], $method->invoke($controller, Request::create('/search', 'GET', ['t' => ['1000']])));
-        $this->assertSame([-1], $method->invoke($controller, Request::create('/search', 'GET', ['searchadvcat' => ''])));
     }
 
     public function test_local_return_url_accepts_local_targets_and_rejects_external_urls(): void

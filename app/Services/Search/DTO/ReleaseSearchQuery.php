@@ -10,6 +10,7 @@ final readonly class ReleaseSearchQuery
      * @param  array<string, mixed>|string|null  $phrases
      * @param  list<int>|null  $categoryIds
      * @param  list<int>  $excludedCategoryIds
+     * @param  array<string, array<string, int>>  $ranges
      * @param  list<int>|null  $releaseIds
      */
     public function __construct(
@@ -39,6 +40,10 @@ final readonly class ReleaseSearchQuery
         public ?SearchCursor $cursor = null,
         public bool $trackTotal = true,
         public bool $includeDocuments = false,
+        public array $ranges = [],
+        public ?int $minId = null,
+        public ?int $maxId = null,
+        public bool $fuzzyOnly = false,
     ) {}
 
     /** @param array<string, mixed> $criteria */
@@ -73,6 +78,10 @@ final readonly class ReleaseSearchQuery
             cursor: $cursor,
             trackTotal: (bool) ($criteria['track_total'] ?? true),
             includeDocuments: (bool) ($criteria['include_documents'] ?? false),
+            ranges: self::normalizeRanges($criteria['ranges'] ?? []),
+            minId: self::normalizeRangeBound($criteria['min_id'] ?? null),
+            maxId: self::normalizeRangeBound($criteria['max_id'] ?? null),
+            fuzzyOnly: (bool) ($criteria['fuzzy_only'] ?? false),
         );
     }
 
@@ -80,6 +89,10 @@ final readonly class ReleaseSearchQuery
     public function criteria(): array
     {
         return [
+            'ranges' => self::normalizeRanges($this->ranges),
+            'min_id' => $this->minId,
+            'max_id' => $this->maxId,
+            'fuzzy_only' => $this->fuzzyOnly,
             'phrases' => $this->phrases,
             'category_ids' => $this->categoryIds,
             'excluded_category_ids' => $this->excludedCategoryIds,
@@ -109,7 +122,7 @@ final readonly class ReleaseSearchQuery
 
     public function normalizedSortField(): string
     {
-        return in_array($this->sortField, ['postdate_ts', 'adddate_ts', 'size', 'totalpart', 'grabs', 'categories_id', 'id'], true)
+        return in_array($this->sortField, ['postdate_ts', 'adddate_ts', 'size', 'totalpart', 'grabs', 'comments', 'categories_id', 'id'], true)
             ? $this->sortField
             : 'postdate_ts';
     }
@@ -117,6 +130,39 @@ final readonly class ReleaseSearchQuery
     public function normalizedSortDirection(): string
     {
         return strtolower($this->sortDirection) === 'asc' ? 'asc' : 'desc';
+    }
+
+    /** @return array<string, array<string, int>> */
+    public static function normalizeRanges(mixed $ranges): array
+    {
+        if (! is_array($ranges)) {
+            return [];
+        }
+
+        $normalized = [];
+        foreach (['size', 'totalpart', 'grabs', 'comments', 'adddate_ts'] as $field) {
+            if (! is_array($ranges[$field] ?? null)) {
+                continue;
+            }
+            foreach (['min', 'max'] as $bound) {
+                $value = self::normalizeRangeBound($ranges[$field][$bound] ?? null);
+                if ($value !== null) {
+                    $normalized[$field][$bound] = $value;
+                }
+            }
+        }
+
+        return $normalized;
+    }
+
+    public static function normalizeRangeBound(mixed $value): ?int
+    {
+        if (! is_int($value) && ! is_string($value)) {
+            return null;
+        }
+        $integer = filter_var($value, FILTER_VALIDATE_INT);
+
+        return $integer !== false && $integer >= 0 ? $integer : null;
     }
 
     public static function normalizeMediaUniqueId(mixed $value): ?string
