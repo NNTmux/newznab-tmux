@@ -51,6 +51,8 @@ final class ReleasesOptimizePreflightTest extends TestCase
 
     public function test_valid_data_reports_storage_and_every_migration_data_category(): void
     {
+        DB::statement('CREATE INDEX z_preflight_test ON releases (leftguid)');
+        DB::statement('CREATE INDEX a_preflight_test ON releases (guid)');
         $this->insertRelease(1, '01234567-89ab-cdef-0123-456789abcdef', '0', [
             'nzb_password' => 'secret',
             'nzb_creation_attempts' => 1,
@@ -74,6 +76,7 @@ final class ReleasesOptimizePreflightTest extends TestCase
         $this->assertSame(1, $report['discarded_data']['releases.source']);
         $this->assertSame(1, $report['discarded_data']['release_comments.gid']);
         $this->assertNull($report['storage']['total_bytes']);
+        $this->assertSame(['a_preflight_test', 'z_preflight_test'], $report['indexes']['present']);
     }
 
     public function test_every_identifier_blocker_fails_preflight(): void

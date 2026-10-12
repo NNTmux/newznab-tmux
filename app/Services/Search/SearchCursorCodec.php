@@ -15,20 +15,20 @@ final readonly class SearchCursorCodec
 
     public function encode(SearchCursor $cursor): string
     {
-        return $this->encrypter->encryptString(json_encode([
+        return $this->encrypter->encrypt(json_encode([
             'sort' => $cursor->sortValues,
             'total' => $cursor->total,
             'query' => $cursor->queryHash,
             'driver' => $cursor->driver,
             'generation' => $cursor->indexGeneration,
             'expires' => $cursor->expiresAt,
-        ], JSON_THROW_ON_ERROR));
+        ], JSON_THROW_ON_ERROR), false);
     }
 
     public function decode(string $token): SearchCursor
     {
         try {
-            $payload = json_decode($this->encrypter->decryptString($token), true, flags: JSON_THROW_ON_ERROR);
+            $payload = json_decode($this->encrypter->decrypt($token, false), true, flags: JSON_THROW_ON_ERROR);
         } catch (DecryptException|\JsonException $e) {
             throw new InvalidArgumentException('Invalid search cursor.', previous: $e);
         }

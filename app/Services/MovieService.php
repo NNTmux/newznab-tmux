@@ -145,7 +145,7 @@ class MovieService
 
         if ($this->traktcheck !== null) {
             $data = $this->traktTv->client->getMovieSummary('tt'.$sanitized, 'full');
-            if (($data !== false) && ! empty($data['trailer'])) {
+            if ($data !== null && ! empty($data['trailer'])) {
                 return $data['trailer'];
             }
         }
@@ -833,7 +833,7 @@ class MovieService
         try {
             $resp = $this->traktTv->client->getMovieSummary('tt'.$imdbId, 'full');
 
-            if ($resp === false || empty($resp['title'])) {
+            if ($resp === null || empty($resp['title'])) {
                 Cache::put($cacheKey, false, now()->addHours(6));
 
                 return false;
@@ -1259,7 +1259,7 @@ class MovieService
 
         try {
             $data = $this->traktTv->client->getMovieSummary($movieName, 'full');
-            if ($data === false || empty($data['ids']['imdb'])) {
+            if ($data === null || empty($data['ids']['imdb'])) {
                 return false;
             }
 

@@ -357,7 +357,7 @@ class TraktService
 
         // Get the first matching show
         $show = $results[0]['show'] ?? null;
-        if ($show === null || ! isset($show['ids'])) { // @phpstan-ignore isset.offset
+        if ($show === null || ! isset($show['ids'])) {
             return null;
         }
 

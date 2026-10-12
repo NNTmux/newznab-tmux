@@ -62,7 +62,7 @@ class ReleasesOptimizePreflight extends Command
         }
 
         $indexes = array_values(array_filter(array_map(
-            static fn (array $index): ?string => isset($index['name']) ? (string) $index['name'] : null,
+            static fn (array $index): string => (string) $index['name'],
             Schema::getIndexes('releases'),
         )));
         sort($indexes);

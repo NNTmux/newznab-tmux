@@ -67,6 +67,26 @@ final class NNTPCompressedOverviewTest extends TestCase
         $this->assertFalse(\is_array($result));
     }
 
+    public function test_reads_terminator_split_across_chunks_after_stream_ends(): void
+    {
+        $line = '1'."\t".str_repeat('x', 65520);
+        $compressed = gzcompress($line."\r\n", 0);
+        $this->assertSame(65535, \strlen($compressed));
+
+        $result = $this->reader($compressed.".\r\n")->read();
+
+        $this->assertSame([$line], $result);
+    }
+
+    public function test_completed_stream_without_terminator_returns_error(): void
+    {
+        $compressed = gzcompress("1\tsubject\r\n");
+
+        $result = $this->reader($compressed)->read();
+
+        $this->assertInstanceOf(Error::class, $result);
+    }
+
     public function test_truncated_stream_returns_error(): void
     {
         [, $compressed] = $this->overviewWithTerminatorInsideCompressedData();

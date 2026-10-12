@@ -739,7 +739,7 @@ final class User extends Authenticatable implements CanResetPasswordContract, Ha
             ->orderBy('effective_date', 'asc')
             ->get();
 
-        return $stackedHistory->map(function ($history) { // @phpstan-ignore return.type
+        return $stackedHistory->map(function ($history) {
             $role = Role::find($history->new_role_id);
 
             return [

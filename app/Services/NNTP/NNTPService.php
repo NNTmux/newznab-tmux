@@ -1111,11 +1111,12 @@ class NNTPService extends NntpClient
         $parts = [];
         $bytesReceived = 0;
         $tail = '';
+        $streamEnded = false;
 
         while (true) {
             $buffer = fread($socket, 65536);
             if ($buffer === false || $buffer === '') {
-                if ((stream_get_meta_data($socket)['timed_out'] ?? false) || feof($socket)) {
+                if (stream_get_meta_data($socket)['timed_out'] || feof($socket)) {
                     $message = 'Error fetching data from usenet server while downloading OVER headers.';
                     $error = $this->throwError($this->failureMessage($message), 1000);
 
@@ -1126,7 +1127,7 @@ class NNTPService extends NntpClient
             }
             $bytesReceived += \strlen($buffer);
 
-            if (inflate_get_status($inflate) === ZLIB_STREAM_END) {
+            if ($streamEnded) {
                 $tail .= $buffer;
             } else {
                 $readBefore = inflate_get_read_len($inflate);
@@ -1138,12 +1139,13 @@ class NNTPService extends NntpClient
                     return $error;
                 }
                 $parts[] = $out;
-                if (inflate_get_status($inflate) === ZLIB_STREAM_END) {
+                $streamEnded = inflate_get_status($inflate) === ZLIB_STREAM_END;
+                if ($streamEnded) {
                     $tail = substr($buffer, inflate_get_read_len($inflate) - $readBefore);
                 }
             }
 
-            if (inflate_get_status($inflate) === ZLIB_STREAM_END && str_contains($tail, ".\r\n")) {
+            if ($streamEnded && str_contains($tail, ".\r\n")) {
                 break;
             }
         }

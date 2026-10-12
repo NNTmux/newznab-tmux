@@ -106,6 +106,93 @@ class MovieServiceTest extends ImdbScraperTestCase
     }
 
     #[Test]
+    public function it_negatively_caches_missing_trakt_movie_metadata(): void
+    {
+        $service = $this->makeMovieServiceForTraktResponse(null);
+        $log = Log::spy();
+
+        $result = $service->fetchTraktTVProperties('0137523');
+
+        $this->assertFalse($result);
+        $this->assertFalse(Cache::get('trakt_movie_'.md5('0137523')));
+        $this->assertFalse($service->fetchTraktTVProperties('0137523'));
+        $log->shouldNotHaveReceived('warning');
+    }
+
+    #[Test]
+    public function it_preserves_a_release_when_trakt_movie_search_returns_no_metadata(): void
+    {
+        $service = $this->makeMovieServiceForTraktResponse(null);
+        Release::query()->insert([
+            'id' => 7,
+            'searchname' => 'Example.Movie.2024',
+            'categories_id' => 2000,
+            'imdbid' => null,
+            'movieinfo_id' => null,
+        ]);
+        $method = new \ReflectionMethod($service, 'searchTraktTV');
+
+        $result = $method->invoke($service, 7, 'Example Movie (2024)');
+
+        $this->assertFalse($result);
+        $this->assertDatabaseHas('releases', ['id' => 7, 'imdbid' => null, 'movieinfo_id' => null]);
+        $this->assertDatabaseCount('movieinfo', 0);
+    }
+
+    #[Test]
+    public function it_updates_movie_info_from_omdb_when_trakt_has_no_metadata(): void
+    {
+        $service = $this->makeMovieServiceForTraktResponse(null, new class extends MovieService
+        {
+            public function fetchTMDBProperties(string $imdbId, bool $text = false): array|false
+            {
+                return false;
+            }
+
+            public function fetchIMDBProperties(string $imdbId): array|false
+            {
+                return false;
+            }
+
+            public function fetchOmdbAPIProperties(string $imdbId): array|false
+            {
+                return ['title' => 'Example Movie', 'year' => '2024', 'plot' => 'Fallback plot'];
+            }
+
+            protected function fetchFanartTVProperties(string $imdbId): array|false
+            {
+                return false;
+            }
+
+            protected function fetchAndSaveCoverOnly(string $imdbId): bool
+            {
+                return false;
+            }
+        });
+
+        $result = $service->updateMovieInfo('0137523');
+
+        $this->assertTrue($result);
+        $this->assertDatabaseHas('movieinfo', [
+            'imdbid' => '0137523',
+            'title' => 'Example Movie',
+            'year' => '2024',
+            'plot' => 'Fallback plot',
+            'traktid' => 0,
+        ]);
+    }
+
+    #[Test]
+    public function it_returns_a_trakt_trailer_when_the_local_movie_has_none(): void
+    {
+        $service = $this->makeMovieServiceForTraktResponse([
+            'trailer' => 'https://example.test/embed/trakt-trailer',
+        ]);
+
+        $this->assertSame('https://example.test/embed/trakt-trailer', $service->getTrailer('0137523'));
+    }
+
+    #[Test]
     public function it_finds_movie_info_for_imdb_ids_with_meaningful_leading_zeroes(): void
     {
         Cache::flush();
@@ -442,16 +529,16 @@ class MovieServiceTest extends ImdbScraperTestCase
     }
 
     /**
-     * @param  array<string, mixed>  $response
+     * @param  array<string, mixed>|null  $response
      */
-    private function makeMovieServiceForTraktResponse(array $response): MovieService
+    private function makeMovieServiceForTraktResponse(?array $response, ?MovieService $service = null): MovieService
     {
         $client = new class($response) extends TraktService
         {
             /**
-             * @param  array<string, mixed>  $response
+             * @param  array<string, mixed>|null  $response
              */
-            public function __construct(private array $response)
+            public function __construct(private ?array $response)
             {
                 parent::__construct('test_trakt_key');
             }
@@ -468,7 +555,7 @@ class MovieServiceTest extends ImdbScraperTestCase
         $provider = new TraktProvider;
         $provider->client = $client;
 
-        $service = new MovieService;
+        $service ??= new MovieService;
         $service->traktTv = $provider;
         $service->echooutput = false;
 
