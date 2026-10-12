@@ -81,6 +81,46 @@ PHPUnit only (no Pest). Create tests: `php artisan make:test --phpunit {name}`
 - Test harnesses in `tests/Support/` (e.g., `DatabaseTestCase`, `TestBinariesHarness`)
 - PHPUnit 12 — use `#[Test]` attributes or `test` prefix naming
 
+## Performance investigation and validation
+
+These procedures apply to ingestion/storage concurrency changes and performance claims. They supplement the command-execution and deployment rules above; they do not authorize containerized commands, dependency installation, production tuning, or deployment.
+
+### Tools and isolated test environments
+
+- Start with existing PHPUnit tests, the real storage handlers, MariaDB `EXPLAIN`/lock-wait metadata, and OS/container resource counters. A temporary benchmark harness is experimental until committed, reviewed, and documented; do not advertise private scratch commands as supported tooling. Consider Sysbench for a reproduced SQL transaction or PHPBench for pure PHP work only when existing tools cannot answer the question, and follow the dependency-approval rule.
+- Give each experiment one executor and a uniquely named disposable database/runtime. Concurrency or capacity benchmarks run on a separate host: container CPU/memory caps on the production host do not eliminate shared-resource interference. Keep production endpoints, credentials, bind mounts, `.env` files, and cached application configuration out of validation runtimes.
+- Before creating a MariaDB fixture, clear Laravel's connection `url` and `unix_socket` and explicitly set the private host and port. Pass the same endpoint to every child PDO/client connection. Use random fixture database names; roll back transactions, reap child processes, and drop owned fixtures in `finally`. Cleanup must target only resources created by the experiment.
+- A full-suite runtime needs the extensions and tools used by the locked application and tests, including GD/EXIF, Node, Git, make, and procps where required. Copy the complete tracked test inputs, including Docker, frontend, and monitoring fixtures, without production data or configuration. Classify missing-runtime/fixture failures before changing application code; rerun affected checks after repairing the environment.
+
+### Reproducing contention and preserving correctness
+
+- Freeze the baseline and candidate source revisions/hashes, lockfile/vendor identity, runtime image IDs, PHP/MariaDB versions, schema/indexes/collations, transaction isolation, durability settings, resource caps, storage type, and protocol/order hashes. Record differences from the deployed environment. A reduced fixture proves only its reproduced mechanism; it does not establish full-schema behavior or production capacity.
+- Reproduce a deadlock through the actual handler with deterministic synchronization and an observed competing lock wait. Record both clients' statement and transaction outcomes and the matched wait graph. Demonstrate baseline failure and candidate success; an unrelated artificial deadlock or a victim label alone is insufficient.
+- Preserve transaction boundaries, upserts, aggregate COUNT/SUM/CASE calculations, retry policy, lifecycle/deletion guards, and SQLite behavior unless a separate change explicitly covers them. Capture access-plan evidence for dense, sparse, small, and actual maximum chunk sizes. An index hint or logical ID ordering does not guarantee bounded access or physical lock order; label preflight plans separately from executed-plan evidence.
+- Independently check initial committed unique parts and bytes, binary aggregates, collection readiness, crosspost membership, and orphans. Cover conflicting duplicates/first-write behavior, replay, rollback, missing parents, and deletion races. Returned insert IDs remain provisional until commit. Replay recovery does not turn an initially exhausted batch into success.
+
+### Comparing performance
+
+- Predeclare fixture, source pair, randomized paired order, warmup, timeouts, correctness gates, and useful-effect/regression criteria. Restore identical fixture state for each observation and use independent connections/processes. Freeze the protocol before execution; protocol changes require a new comparison.
+- Measure from the start barrier through all worker joins, including retries. Capture CPU usage/throttling and database counter intervals around that measured window; keep replay and verification outside it. Record missing artifacts, setup failures, child crashes, timeouts, skips, and exhausted batches as invalid observations with their causes.
+- Retain every failure. A performance pair is eligible only when both observations satisfy initial correctness; report invalidity/reliability separately rather than ranking surviving runs as universally safe. Normalize retry/lock costs by successful unique work and distinguish retry events, distinct failed articles, and missing unique parts. Small paired screens select further experiments; they do not establish statistically supported production throughput claims.
+- Keep barrier-controlled causal tests separate from natural-schedule throughput tests. Separate CPU throttling, cache fit, storage, and lock contention before recommending concurrency, buffer-pool, or redo changes. Broad ownership refactors, index hints on other writers, insert-delta arithmetic, retry-policy changes, and database tuning each need their own evidence.
+
+### Release lifecycle and cleanup checks
+
+- Check source, runtime image, schema, and live publication separately. A successful build is not image/source parity or proof that deployed handlers executed; compare the relevant runtime source hashes with the reviewed source.
+- For release admission/reset changes, exercise the real coordinator and transaction boundaries: rollback, after-commit failures, expired claims, implicit commits, concurrent admission, and skipped sibling ranges where applicable. Distinguish simulated durable interruption from an actual process-kill test. Preserve ownership until the outer transaction commits or rolls back, and preserve filesystem terminal state on database lookup/commit failure.
+- Verify newly emitted NZBs in fresh scratch by reconstructing from their actual article IDs. Retained reconstructed files alone do not prove the emitted NZB is sufficient; validate cached article integrity before using it as evidence.
+- Cleanup must preserve active/newer versions and stable lock inodes, handle symlinks safely, and retry interrupted/failed work fairly under new arrivals. State the work bound precisely: deletion/database budgets do not bound a linear top-level metadata enumeration. Cover older direct command callers when changing dependencies or exit contracts.
+
+## Production monitoring and session coordination
+
+- Discover the live Compose working directory from container labels and storage from bind mounts; a feature worktree or validation runtime is not production. Discover actual database tables/columns before querying runtime settings. Bound indexed reads and redact credentials, article subjects, and raw sensitive logs.
+- Keep monitoring read-only unless the human authorizes a specific operational change. Do not launch processing/import jobs, change NNTP settings or concurrency, restart, or deploy as a side effect of observation. Preserve one source owner, one experiment executor, and the existing single deployment owner; communicate handoffs and frozen source identities before transferring execution.
+- Compare interval deltas of deadlocks, row-lock waits/time, log waits, and physical/logical reads where relevant; cumulative totals alone are not current incidents. `Innodb_log_waits` describes log-buffer flush waits and alone does not prove insufficient redo-file capacity. Verify service impact before alerting and distinguish retry events from unique failures.
+- Exclude documented authorized restart/cancellation cohorts, test containers, and standalone diagnostics from production failure rates; investigate repeated service failures. A queued natural cycle or a group with no eligible input is not a release stall. Verify creation with persisted release/NZB evidence and search visibility when relevant; collection deletion alone is not creation. Notify on verified actionable changes and deduplicate unchanged observations.
+- Keep experiments, passing tests, review, merge, deployment, and live verification distinct. Review the final PR head, address findings, and preserve unrelated dirty checkout/runtime settings. Existing Git authorization and deployment-guard requirements still apply.
+
 ## Project Conventions
 
 ### Models (`app/Models/`)
