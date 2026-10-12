@@ -74,6 +74,9 @@ pub enum FormatHeader {
         next_header_crc32: u32,
         header_range_within_sample: bool,
         next_header_checksum_valid: Option<bool>,
+        next_header_type: Option<u8>,
+        next_header_kind: Option<&'static str>,
+        next_header_sha256: Option<String>,
     },
     Iso9660PrimaryVolumeDescriptor {
         offset: usize,
@@ -672,17 +675,25 @@ fn parse_7z(data: &[u8], offset: usize) -> FormatHeader {
         })
         .flatten()
         .is_some_and(|end| end <= data.len() as u64);
-    let next_header_checksum_valid = if header.is_some() && header_range_within_sample {
+    let next_header = if header.is_some() && header_range_within_sample {
         archive_start
             .and_then(|base| base.checked_add(32))
             .and_then(|base| base.checked_add(next_header_offset))
             .and_then(|start| usize::try_from(start).ok())
             .zip(usize::try_from(next_header_size).ok())
             .and_then(|(start, size)| data.get(start..start.checked_add(size)?))
-            .map(|next_header| crc32fast::hash(next_header) == next_header_crc)
     } else {
         None
     };
+    let next_header_checksum_valid =
+        next_header.map(|bytes| crc32fast::hash(bytes) == next_header_crc);
+    let next_header_type = next_header.and_then(|bytes| bytes.first().copied());
+    let next_header_kind = next_header_type.map(|header_type| match header_type {
+        0x01 => "plain_header",
+        0x17 => "encoded_header",
+        _ => "other_or_invalid",
+    });
+    let next_header_sha256 = next_header.map(sha256_hex);
     FormatHeader::SevenZip {
         offset,
         start_header_available: header.is_some(),
@@ -696,6 +707,9 @@ fn parse_7z(data: &[u8], offset: usize) -> FormatHeader {
         next_header_crc32: next_header_crc,
         header_range_within_sample,
         next_header_checksum_valid,
+        next_header_type,
+        next_header_kind,
+        next_header_sha256,
     }
 }
 
