@@ -16,6 +16,7 @@ use App\Services\TvProcessing\TvProcessingCandidateQuery;
 use App\Support\ReleaseSearchIndexSync;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -117,7 +118,7 @@ class RepairTvReleaseLinks extends Command
 
     /**
      * Releases linked to a show with episode 0 or a legacy status: season packs keep the
-     * show as SeasonPack, everything else is queued for an episode lookup right away.
+     * show as SeasonPack, everything else gets one more episode lookup.
      */
     private function repairStuck(): int
     {
@@ -138,7 +139,7 @@ class RepairTvReleaseLinks extends Command
             }
 
             Release::query()->whereIn('id', $seasonPacks)->update(['tv_episodes_id' => TvLookupStatus::SeasonPack->value, 'tv_lookup_attempts' => 0, 'tv_lookup_retry_at' => null]);
-            Release::query()->whereIn('id', $missing)->update(['tv_episodes_id' => TvLookupStatus::EpisodeMissing->value, 'tv_lookup_attempts' => 0, 'tv_lookup_retry_at' => now()]);
+            Release::query()->whereIn('id', $missing)->update(self::singleRetryColumns());
         });
     }
 
@@ -229,15 +230,27 @@ class RepairTvReleaseLinks extends Command
             fn ($sub) => $sub->select(DB::raw(1))->from('videos')->whereColumn('videos.id', 'releases.videos_id')
         )->pluck('id')->all();
 
-        Release::query()->whereIn('id', $withShow)->update([
-            'tv_episodes_id' => TvLookupStatus::EpisodeMissing->value,
-            'tv_lookup_attempts' => 0,
-            'tv_lookup_retry_at' => now(),
-        ]);
+        Release::query()->whereIn('id', $withShow)->update(self::singleRetryColumns());
         Release::query()->whereIn('id', array_diff($ids, $withShow))->update(TvProcessingCandidateQuery::resetColumns());
 
         ReleaseSearchIndexSync::forIds($ids);
         $this->linksChanged = true;
+    }
+
+    /**
+     * Queue an episode lookup now, with the retry budget already spent but one: these
+     * episodes have been missing for a long time, so one fresh lookup (which also uses
+     * episodes stored since) is worth it, a week of retries per release is not.
+     *
+     * @return array{tv_episodes_id: int, tv_lookup_attempts: int, tv_lookup_retry_at: Carbon}
+     */
+    private static function singleRetryColumns(): array
+    {
+        return [
+            'tv_episodes_id' => TvLookupStatus::EpisodeMissing->value,
+            'tv_lookup_attempts' => TvProcessingCandidateQuery::MAX_EPISODE_ATTEMPTS - 1,
+            'tv_lookup_retry_at' => now(),
+        ];
     }
 
     private function repairLocalzone(): int

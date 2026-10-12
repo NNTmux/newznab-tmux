@@ -92,6 +92,34 @@ class TvProcessingPipelineTest extends TestCase
         $this->assertRelease($releaseId, $videoId, $episodeId);
     }
 
+    public function test_repaired_legacy_backlog_gets_a_single_retry(): void
+    {
+        $videoId = $this->insertVideo('Severance', ['tvdb' => 371980]);
+        $this->insertEpisode($videoId, 1, 1);
+        $releaseId = $this->insertTvRelease('Severance.S01E05.720p.WEB.h264-GRP', ['videos_id' => $videoId]);
+
+        $this->artisan('tv:repair-links', ['--stuck' => true])->assertSuccessful();
+        $this->artisan('tv:reprocess-missing-episodes')->assertSuccessful();
+
+        $this->assertRelease($releaseId, $videoId, TvLookupStatus::EpisodeMissing->value, attempts: TvProcessingCandidateQuery::MAX_EPISODE_ATTEMPTS);
+        $this->assertNull(DB::table('releases')->where('id', $releaseId)->value('tv_lookup_retry_at'));
+        $this->assertSame(0, DB::table('releases')->whereRaw(TvProcessingCandidateQuery::episodeRetryCondition())->count());
+    }
+
+    public function test_episode_retries_take_the_newest_releases_first(): void
+    {
+        $oldShow = $this->insertVideo('Old Show', ['tvdb' => 1]);
+        $newShow = $this->insertVideo('New Show', ['tvdb' => 2]);
+        $due = ['tv_episodes_id' => TvLookupStatus::EpisodeMissing->value, 'tv_lookup_retry_at' => now()->subMinute()];
+        $old = $this->insertTvRelease('Old.Show.S01E01', ['videos_id' => $oldShow, 'postdate' => now()->subYears(3), ...$due]);
+        $new = $this->insertTvRelease('New.Show.S01E01', ['videos_id' => $newShow, 'postdate' => now()->subHour(), ...$due]);
+
+        $this->artisan('tv:reprocess-missing-episodes', ['--limit' => 1])->assertSuccessful();
+
+        $this->assertSame(1, (int) DB::table('releases')->where('id', $new)->value('tv_lookup_attempts'));
+        $this->assertSame(0, (int) DB::table('releases')->where('id', $old)->value('tv_lookup_attempts'));
+    }
+
     public function test_show_no_provider_knows_is_given_up_without_retries(): void
     {
         $releaseId = $this->insertTvRelease('Nobody.Knows.This.Show.S01E01.720p.HDTV.x264-GRP');

@@ -48,12 +48,13 @@ class ReprocessMissingEpisodes extends Command
         $debug = (bool) $this->option('debug');
         $sleep = (int) $this->option('sleep');
 
-        // Ordered by show so one episode list download serves all of a show's releases.
+        // Newest first, so episodes that just aired aren't queued behind an old backlog.
+        // The run state still downloads each show's episode list only once.
         $query = Release::query()
-            ->select(['id', 'guid', 'searchname', 'videos_id', 'tv_episodes_id', 'categories_id', 'groups_id'])
+            ->select(['id', 'guid', 'searchname', 'videos_id', 'tv_episodes_id', 'categories_id', 'groups_id', 'postdate'])
             ->whereRaw(TvProcessingCandidateQuery::episodeRetryCondition((bool) $this->option('all')))
-            ->orderBy('videos_id')
-            ->orderBy('id');
+            ->orderByDesc('postdate')
+            ->orderByDesc('id');
 
         if ($videoId !== null) {
             $query->where('videos_id', (int) $videoId);
