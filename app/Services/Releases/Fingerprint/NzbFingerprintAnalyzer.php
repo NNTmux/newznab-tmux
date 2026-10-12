@@ -178,6 +178,14 @@ final class NzbFingerprintAnalyzer
      */
     public function analyzeArticle(array $rawHeaders, string $rawBody): array
     {
+        return $this->analyzeArticleAndDecodedBytes($rawHeaders, $rawBody)['metadata'];
+    }
+
+    /** @param list<string> $rawHeaders
+     *  @return array{metadata: array<string, mixed>, decoded_bytes: ?string}
+     */
+    public function analyzeArticleAndDecodedBytes(array $rawHeaders, string $rawBody): array
+    {
         $values = [];
         $orderedNames = [];
         $previousName = null;
@@ -213,8 +221,10 @@ final class NzbFingerprintAnalyzer
         $payloadLineLengths = [];
         $decodedPrefix = null;
         $formatMetadata = null;
+        $decodedBytes = null;
         if ($frame !== null) {
             $decoded = $this->yenc->decodeWithFrame($rawBody);
+            $decodedBytes = $decoded[0];
             $payload = substr($rawBody, $frame->payloadOffset, $frame->payloadLength);
             $payloadHash = hash('sha256', $payload);
             $decodedHash = hash('sha256', $decoded[0]);
@@ -369,21 +379,24 @@ final class NzbFingerprintAnalyzer
         }
 
         return [
-            'raw_headers' => array_values($rawHeaders),
-            'headers' => $values,
-            'header_profile' => ['ordered_names' => $orderedNames, 'ordered_names_sha256' => hash('sha256', implode("\n", $orderedNames))],
-            'retrieval_measurements' => [
-                'raw_header_line_count' => count($rawHeaders),
-                'raw_header_bytes_including_crlf' => $rawHeaderBytes,
-                'body_bytes_after_nntp_dot_unstuffing' => strlen($rawBody),
-                'body_line_count' => substr_count(rtrim($rawBody, "\r\n"), "\n") + ($rawBody === '' ? 0 : 1),
-                'article_bytes_after_dot_unstuffing' => $rawHeaderBytes + 2 + strlen($rawBody),
-                'measurement_basis' => 'Collector-side bytes after NNTP dot-unstuffing; excludes TCP/TLS, NNTP status lines, and any wire-level compression.',
+            'metadata' => [
+                'raw_headers' => array_values($rawHeaders),
+                'headers' => $values,
+                'header_profile' => ['ordered_names' => $orderedNames, 'ordered_names_sha256' => hash('sha256', implode("\n", $orderedNames))],
+                'retrieval_measurements' => [
+                    'raw_header_line_count' => count($rawHeaders),
+                    'raw_header_bytes_including_crlf' => $rawHeaderBytes,
+                    'body_bytes_after_nntp_dot_unstuffing' => strlen($rawBody),
+                    'body_line_count' => substr_count(rtrim($rawBody, "\r\n"), "\n") + ($rawBody === '' ? 0 : 1),
+                    'article_bytes_after_dot_unstuffing' => $rawHeaderBytes + 2 + strlen($rawBody),
+                    'measurement_basis' => 'Collector-side bytes after NNTP dot-unstuffing; excludes TCP/TLS, NNTP status lines, and any wire-level compression.',
+                ],
+                'yenc' => $yenc,
+                'decoded_format_metadata' => $formatMetadata,
+                'article_body_sha256' => hash('sha256', $rawBody),
+                'uploader_software_candidates' => $software,
             ],
-            'yenc' => $yenc,
-            'decoded_format_metadata' => $formatMetadata,
-            'article_body_sha256' => hash('sha256', $rawBody),
-            'uploader_software_candidates' => $software,
+            'decoded_bytes' => $decodedBytes,
         ];
     }
 

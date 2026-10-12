@@ -12,11 +12,15 @@ use Throwable;
 
 final class ReleaseFingerprintCollector
 {
-    public const SCHEMA_VERSION = 4;
+    public const SCHEMA_VERSION = 5;
 
     private const MAX_ARTICLE_BODY_BYTES = 2_000_000;
 
     private const MAX_PAR2_SET_BYTES = 67_108_864;
+
+    private const MAX_SEVEN_ZIP_FRAGMENT_BYTES = 16_777_216;
+
+    private const MAX_SEVEN_ZIP_FRAGMENTS_PER_RECORD = 32;
 
     private const MAX_IFSC_PREVIEW_HEX_BYTES = 8192;
 
@@ -48,6 +52,9 @@ final class ReleaseFingerprintCollector
         $decodedPar2 = [];
         $decodedPar2Bytes = 0;
         $par2BudgetExceeded = false;
+        $sevenZipCandidates = [];
+        $sevenZipRetainedBytes = 0;
+        $sevenZipOmittedSamples = 0;
         foreach ($servers as $server) {
             try {
                 $profile = $nntp->getFingerprintServerProfile($server['alternate']);
@@ -78,7 +85,9 @@ final class ReleaseFingerprintCollector
                         $supportsMessageIdOverview,
                     );
                     $retrievalDurationMs = round((hrtime(true) - $queryStart) / 1_000_000, 3);
-                    $metadata = $this->analyzer->analyzeArticle($article['headers'], $article['body']);
+                    $analysis = $this->analyzer->analyzeArticleAndDecodedBytes($article['headers'], $article['body']);
+                    $metadata = $analysis['metadata'];
+                    $decodedBytes = $analysis['decoded_bytes'];
                     $yenc = $metadata['yenc'] ?? null;
                     $metadata['yenc_nzb_part_number_matches'] = is_array($yenc) && is_int($yenc['part'] ?? null)
                         ? $yenc['part'] === $sample['segment_number'] : null;
@@ -92,6 +101,67 @@ final class ReleaseFingerprintCollector
                     $metadata['yenc_nzb_trailer_total_parts_matches'] = is_string($trailerFields['total'] ?? null)
                         && ctype_digit($trailerFields['total'])
                         ? (int) $trailerFields['total'] === count($manifest['files'][$sample['file_index']]['segments'] ?? []) : null;
+                    $decodedFileRange = $this->decodedFileRange($metadata, $decodedBytes);
+                    $metadata['decoded_file_range'] = $decodedFileRange;
+                    $providerKey = json_encode([
+                        $sample['file_index'], $server['name'], $server['alternate'] ? 'alternate' : 'primary',
+                        $server['port'], $server['tls'],
+                    ], JSON_INVALID_UTF8_SUBSTITUTE);
+                    $sevenZipAnchor = $this->sevenZipAnchor($metadata);
+                    if (is_string($providerKey) && $sample['sample_role'] === 'first'
+                        && $sevenZipAnchor !== null && ($decodedFileRange['mapping_status'] ?? null) === 'valid'
+                        && ($decodedFileRange['start_offset'] ?? null) === 0) {
+                        $sevenZipCandidates[$providerKey] = [
+                            'file_index' => $sample['file_index'],
+                            'server' => $server['name'],
+                            'provider_label' => $server['provider_label'],
+                            'server_role' => $server['alternate'] ? 'alternate' : 'primary',
+                            'server_port' => $server['port'],
+                            'server_tls' => $server['tls'],
+                            'anchor_reference' => [
+                                'message_id' => $sample['messageid'],
+                                'segment_number' => $sample['segment_number'],
+                                'sample_role' => $sample['sample_role'],
+                            ],
+                            'anchor_header' => $sevenZipAnchor,
+                            'fragments' => [],
+                            'anchor_fragment_retained' => false,
+                            'declared_file_sizes' => [],
+                            'budget_omitted_ranges' => [],
+                        ];
+                    }
+                    if (is_string($providerKey) && isset($sevenZipCandidates[$providerKey])) {
+                        if (is_int($yenc['file_size'] ?? null)) {
+                            $sevenZipCandidates[$providerKey]['declared_file_sizes'][$yenc['file_size']] = true;
+                        }
+                        if (($decodedFileRange['mapping_status'] ?? null) === 'valid' && is_string($decodedBytes)) {
+                            if ($sevenZipRetainedBytes + strlen($decodedBytes) <= self::MAX_SEVEN_ZIP_FRAGMENT_BYTES) {
+                                $sevenZipCandidates[$providerKey]['fragments'][] = [
+                                    'file_offset' => $decodedFileRange['start_offset'],
+                                    'bytes' => $decodedBytes,
+                                    'reference' => [
+                                        'message_id' => $sample['messageid'],
+                                        'segment_number' => $sample['segment_number'],
+                                        'sample_role' => $sample['sample_role'],
+                                        'source_byte_start' => $decodedFileRange['start_offset'],
+                                        'source_byte_end_exclusive' => $decodedFileRange['end_offset_exclusive'],
+                                        'integrity_status' => $decodedFileRange['integrity_status'],
+                                    ],
+                                ];
+                                $sevenZipRetainedBytes += strlen($decodedBytes);
+                                if (($sample['sample_role'] ?? null) === 'first'
+                                    && ($decodedFileRange['start_offset'] ?? null) === 0) {
+                                    $sevenZipCandidates[$providerKey]['anchor_fragment_retained'] = true;
+                                }
+                            } else {
+                                $sevenZipOmittedSamples++;
+                                $sevenZipCandidates[$providerKey]['budget_omitted_ranges'][] = [
+                                    'start' => $decodedFileRange['start_offset'],
+                                    'end_exclusive' => $decodedFileRange['end_offset_exclusive'],
+                                ];
+                            }
+                        }
+                    }
                     $overviewFormat = $serverProfileMap[$serverKey]['overview_format_raw'] ?? [];
                     $overviewFields = $this->parseOverview($article['overview_raw'], $overviewFormat);
                     $observation = [
@@ -178,6 +248,8 @@ final class ReleaseFingerprintCollector
                 }
             }
         }
+
+        $sevenZipRelationships = $this->resolveSevenZipRelationships($sevenZipCandidates);
 
         $fileRows = [];
         $yencSizes = ['rar' => 0, 'par2' => 0, 'other' => 0];
@@ -776,6 +848,15 @@ final class ReleaseFingerprintCollector
                 ],
                 'files' => $fileRows,
                 'article_observations' => $observations,
+                'archive_relationships' => [
+                    'seven_zip_next_headers' => [
+                        'relationship_count' => count($sevenZipRelationships),
+                        'retained_decoded_sample_bytes' => $sevenZipRetainedBytes,
+                        'retained_sample_byte_limit' => self::MAX_SEVEN_ZIP_FRAGMENT_BYTES,
+                        'omitted_sample_count_due_to_budget' => $sevenZipOmittedSamples,
+                        'records' => $sevenZipRelationships,
+                    ],
+                ],
                 'provider_comparisons' => $comparisons,
                 'posting_timeline_estimate' => $timing,
                 'par2' => [
@@ -843,6 +924,206 @@ final class ReleaseFingerprintCollector
                 ],
             ],
         ];
+    }
+
+    /** @param array<string, mixed> $metadata
+     *  @return array<string, mixed>
+     */
+    private function decodedFileRange(array $metadata, ?string $decodedBytes): array
+    {
+        $yenc = $metadata['yenc'] ?? null;
+        if (! is_array($yenc) || ! is_string($decodedBytes)) {
+            return ['mapping_status' => 'unavailable', 'integrity_status' => 'unavailable'];
+        }
+
+        $decodedSize = strlen($decodedBytes);
+        $fileSize = $yenc['file_size'] ?? null;
+        $multipart = ($yenc['multipart'] ?? false) === true;
+        $rangeValid = $multipart
+            ? ($yenc['ypart_range_valid'] ?? false) === true
+                && is_int($yenc['begin'] ?? null) && is_int($yenc['end'] ?? null)
+                && $yenc['begin'] >= 1 && $yenc['end'] >= $yenc['begin']
+                && $decodedSize === $yenc['end'] - $yenc['begin'] + 1
+            : is_int($fileSize) && $fileSize === $decodedSize
+                && ($yenc['decoded_size_matches_yend_size'] ?? null) !== false;
+        if (! $rangeValid || ! is_int($fileSize) || $fileSize < 0) {
+            return ['mapping_status' => 'invalid', 'integrity_status' => 'range_or_size_mismatch'];
+        }
+
+        $partMatches = ($metadata['yenc_nzb_part_number_matches'] ?? null) === true;
+        $totalMatches = ($metadata['yenc_nzb_total_parts_matches'] ?? null) !== false
+            && ($metadata['yenc_nzb_trailer_part_number_matches'] ?? null) !== false
+            && ($metadata['yenc_nzb_trailer_total_parts_matches'] ?? null) !== false;
+        $sizeMatches = ($yenc['header_numeric_fields_valid'] ?? false) === true
+            && ($yenc['trailer_numeric_fields_valid'] ?? false) === true
+            && ($yenc['trailer_size_is_decimal'] ?? false) === true
+            && ($yenc['decoded_size_matches_yenc'] ?? null) === true
+            && ($yenc['decoded_size_matches_yend_size'] ?? null) === true;
+        $crcSyntaxValid = ($yenc['all_declared_crc32_fields_are_hex'] ?? false) === true;
+        $observedCrc = $yenc['observed_decoded_crc32'] ?? null;
+        $crcValuesMatch = is_string($observedCrc);
+        foreach (['pcrc32', 'crc32'] as $crcField) {
+            $declaredCrc = $yenc[$crcField] ?? null;
+            if ($declaredCrc !== null && (! is_string($declaredCrc)
+                || preg_match('/\A[0-9a-f]{1,8}\z/i', $declaredCrc) !== 1
+                || ! is_string($observedCrc)
+                || strcasecmp(str_pad($declaredCrc, 8, '0', STR_PAD_LEFT), $observedCrc) !== 0)) {
+                $crcValuesMatch = false;
+            }
+        }
+        $crcValid = ($yenc['declared_crc32_matches'] ?? null) === true && ($multipart || $crcValuesMatch);
+        $crcDeclared = ($yenc['segment_crc32_basis'] ?? null) !== 'missing-pcrc32'
+            && ($yenc['segment_crc32_basis'] ?? null) !== 'missing-crc32';
+        $integrityValid = $sizeMatches && $totalMatches && $crcSyntaxValid
+            && (! $multipart || ($partMatches && $crcValid))
+            && ($multipart || ! $crcDeclared || $crcValid)
+            && ($multipart || ($yenc['part'] ?? null) === null);
+        if (! $integrityValid) {
+            return ['mapping_status' => 'invalid', 'integrity_status' => 'yenc_integrity_mismatch'];
+        }
+
+        $start = $multipart ? $yenc['begin'] - 1 : 0;
+        $end = $multipart ? $yenc['end'] : $decodedSize;
+
+        return [
+            'mapping_status' => 'valid',
+            'start_offset' => $start,
+            'end_offset_exclusive' => $end,
+            'file_size' => $fileSize,
+            'integrity_status' => $crcValid ? 'yenc_crc_valid' : 'yenc_crc_not_declared',
+        ];
+    }
+
+    /** @param array<string, mixed> $metadata
+     *  @return array<string, mixed>|null
+     */
+    private function sevenZipAnchor(array $metadata): ?array
+    {
+        $headers = $metadata['decoded_format_metadata']['headers'] ?? null;
+        if (! is_array($headers)) {
+            return null;
+        }
+        foreach ($headers as $header) {
+            if (is_array($header) && ($header['format'] ?? null) === 'seven_zip' && ($header['offset'] ?? null) === 0) {
+                return $header;
+            }
+        }
+
+        return null;
+    }
+
+    /** @param array<string, array<string, mixed>> $candidates
+     *  @return list<array<string, mixed>>
+     */
+    private function resolveSevenZipRelationships(array $candidates): array
+    {
+        $relationships = [];
+        $native = new NativeMetadataParser;
+        foreach ($candidates as $candidate) {
+            $fragments = $candidate['fragments'] ?? [];
+            $declaredSizes = array_keys($candidate['declared_file_sizes'] ?? []);
+            $base = [
+                'relationship' => 'seven_zip_next_header_from_sampled_articles',
+                'nzb_file_index' => $candidate['file_index'],
+                'provider' => [
+                    'server' => $candidate['server'],
+                    'label' => $candidate['provider_label'],
+                    'role' => $candidate['server_role'],
+                    'port' => $candidate['server_port'],
+                    'tls' => $candidate['server_tls'],
+                ],
+                'anchor_observation' => $candidate['anchor_reference'],
+                'anchor_header' => $candidate['anchor_header'],
+                'sampled_fragment_refs' => array_column($fragments, 'reference'),
+            ];
+            if (count($declaredSizes) !== 1 || ! is_int($declaredSizes[0])) {
+                $relationships[] = $base + [
+                    'resolution_status' => 'inconsistent_or_unavailable_declared_file_size',
+                    'declared_file_sizes' => array_values($declaredSizes),
+                    'omitted_ranges' => $candidate['budget_omitted_ranges'],
+                ];
+                continue;
+            }
+            if (($candidate['anchor_fragment_retained'] ?? false) !== true) {
+                $relationships[] = $base + [
+                    'resolution_status' => 'budget_exceeded',
+                    'declared_file_size' => $declaredSizes[0],
+                    'omitted_ranges' => $candidate['budget_omitted_ranges'],
+                    'budget_reason' => 'The first 7-Zip header sample was omitted from the release-wide decoded-byte budget.',
+                ];
+                continue;
+            }
+            if (count($fragments) > self::MAX_SEVEN_ZIP_FRAGMENTS_PER_RECORD) {
+                $relationships[] = $base + [
+                    'resolution_status' => 'fragment_count_budget_exceeded',
+                    'declared_file_size' => $declaredSizes[0],
+                    'omitted_ranges' => $candidate['budget_omitted_ranges'],
+                ];
+                continue;
+            }
+
+            $packed = pack('V', count($fragments)).$this->packUint64($declaredSizes[0]);
+            foreach ($fragments as $fragment) {
+                $bytes = $fragment['bytes'] ?? null;
+                $offset = $fragment['file_offset'] ?? null;
+                if (! is_string($bytes) || ! is_int($offset) || $offset < 0 || strlen($bytes) > 0xFFFFFFFF) {
+                    $relationships[] = $base + [
+                        'resolution_status' => 'invalid_fragment',
+                        'declared_file_size' => $declaredSizes[0],
+                        'omitted_ranges' => $candidate['budget_omitted_ranges'],
+                    ];
+                    continue 2;
+                }
+                $packed .= $this->packUint64($offset).pack('V', strlen($bytes)).$bytes;
+            }
+            $resolution = $native->resolveSevenZipRanges($packed);
+            $references = $base + [
+                'declared_file_size' => $declaredSizes[0],
+                'omitted_ranges' => $candidate['budget_omitted_ranges'],
+            ];
+            if (! is_array($resolution)) {
+                $relationships[] = $references + ['resolution_status' => 'native_resolver_unavailable'];
+                continue;
+            }
+            $contributorIndexes = $resolution['source_fragment_indexes'] ?? [];
+            $resolution['contributing_observations'] = array_values(array_filter(
+                array_map(static fn (mixed $index): mixed => is_int($index) ? ($fragments[$index]['reference'] ?? null) : null, $contributorIndexes),
+                'is_array',
+            ));
+            unset($resolution['source_fragment_indexes']);
+            if (($resolution['missing_ranges'] ?? []) !== [] && $this->omittedRangesIntersect(
+                $candidate['budget_omitted_ranges'] ?? [],
+                $resolution['missing_ranges'],
+            )) {
+                $resolution['underlying_resolution_status'] = $resolution['resolution_status'] ?? null;
+                $resolution['resolution_status'] = 'budget_exceeded';
+            }
+            $relationships[] = $references + $resolution;
+        }
+
+        return $relationships;
+    }
+
+    private function packUint64(int $value): string
+    {
+        return pack('V2', $value & 0xFFFFFFFF, intdiv($value, 4_294_967_296));
+    }
+
+    /** @param list<array{start: int, end_exclusive: int}> $omittedRanges
+     *  @param list<array{start: int, end_exclusive: int}> $missingRanges
+     */
+    private function omittedRangesIntersect(array $omittedRanges, array $missingRanges): bool
+    {
+        foreach ($omittedRanges as $omitted) {
+            foreach ($missingRanges as $missing) {
+                if (($omitted['start'] ?? 0) < ($missing['end_exclusive'] ?? 0)
+                    && ($missing['start'] ?? 0) < ($omitted['end_exclusive'] ?? 0)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /** @param list<array<string, mixed>> $sourceFiles

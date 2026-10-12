@@ -20,6 +20,7 @@ use std::slice;
 
 mod formats;
 mod par2;
+mod seven_zip_ranges;
 
 /// nzb-decode 0.1.3, packed as RapidYenc packs its version (major << 16 | minor << 8 | patch).
 const VERSION: c_int = 3 | (1 << 8);
@@ -31,6 +32,7 @@ const DECODE_FAILED: usize = usize::MAX;
 const HEADER: &[u8] = b"=ybegin line=128 name=payload\r\n";
 const FOOTER: &[u8] = b"\r\n=yend\r\n";
 const MAX_METADATA_INPUT_BYTES: usize = 67_108_864;
+const MAX_SEVEN_ZIP_RANGE_INPUT_BYTES: usize = 16 * 1024 * 1024 + 4096;
 
 /// Decode a yEnc payload (CR/LF line endings are skipped, `=X` escapes resolved).
 pub fn decode_payload(payload: &[u8]) -> Option<Vec<u8>> {
@@ -119,6 +121,34 @@ pub unsafe extern "C" fn nntmux_format_metadata_json(
     let encoded = catch_unwind(|| serde_json::to_string(&formats::parse(input)));
     match encoded {
         Ok(Ok(json)) => CString::new(json)
+            .map(CString::into_raw)
+            .unwrap_or(ptr::null_mut()),
+        _ => ptr::null_mut(),
+    }
+}
+
+/// Resolve one 7-Zip next-header range from a compact list of sampled file ranges.
+/// Input is: fragment count (u32 LE), declared file size (u64 LE), then repeated
+/// file offset (u64 LE), byte length (u32 LE), and raw decoded bytes.
+/// The caller must release the returned UTF-8 JSON with `nntmux_metadata_string_free`.
+///
+/// # Safety
+/// `data` must be readable for `length` bytes. Inputs over the range budget are rejected.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn nntmux_seven_zip_ranges_json(
+    data: *const u8,
+    length: usize,
+) -> *mut c_char {
+    if length > MAX_SEVEN_ZIP_RANGE_INPUT_BYTES || data.is_null() || length == 0 {
+        return ptr::null_mut();
+    }
+    // SAFETY: the caller guarantees `data` is readable for `length` bytes.
+    let input = unsafe { slice::from_raw_parts(data, length) };
+    let encoded = catch_unwind(|| {
+        seven_zip_ranges::parse(input).and_then(|metadata| serde_json::to_string(&metadata).ok())
+    });
+    match encoded {
+        Ok(Some(json)) => CString::new(json)
             .map(CString::into_raw)
             .unwrap_or(ptr::null_mut()),
         _ => ptr::null_mut(),
