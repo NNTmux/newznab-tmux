@@ -829,14 +829,16 @@ dialog.app-modal::backdrop {
 }
 
 .release-inspection-actions,
-.release-detail-actions {
+.release-detail-actions,
+.movie-release-row .release-row-actions {
     @apply inline-flex max-w-full flex-wrap items-center gap-0.5 rounded-lg border p-0.5;
     border-color: var(--border-default);
     background-color: var(--surface-panel-alt);
 }
 
 .dark .release-inspection-actions,
-.dark .release-detail-actions {
+.dark .release-detail-actions,
+.dark .movie-release-row .release-row-actions {
     border-color: var(--border-default-dark);
     background-color: var(--surface-panel-alt-dark);
 }
@@ -963,11 +965,23 @@ dialog.app-modal::backdrop {
     margin: 0;
 }
 
+.movie-release-row .release-row-actions {
+    margin-top: 0;
+}
+
+.movie-release-row .release-row-actions > a,
+.movie-release-row .release-row-actions > button {
+    min-height: 2rem;
+    min-width: 2rem;
+}
+
 @media (pointer: coarse) {
     .release-bulk-actions__button,
     .release-inspection-actions__button,
     .release-row-actions > a,
-    .release-row-actions > button {
+    .release-row-actions > button,
+    .movie-release-row .release-row-actions > a,
+    .movie-release-row .release-row-actions > button {
         min-height: 2.75rem;
         min-width: 2.75rem;
     }

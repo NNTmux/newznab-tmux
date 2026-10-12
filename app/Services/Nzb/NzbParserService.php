@@ -92,11 +92,22 @@ class NzbParserService
             }
 
             // File size.
+            $segments = [];
             foreach ($file->segments->segment as $segment) {
-                $result[$i]['segments'][] = (string) $segment;
+                $number = $segment->attributes()->number;
+                $segments[] = [$number === null ? null : (int) $number, (string) $segment];
                 $fileSize += $segment->attributes()->bytes;
                 $numSegments++;
             }
+            // Segments may be listed out of order; readers expect them in file order.
+            if (! in_array(null, array_column($segments, 0), true)) {
+                usort($segments, static fn (array $a, array $b): int => $a[0] <=> $b[0]);
+            }
+            if (! isset($result[$i]['firstsegment'])) {
+                // Segment 1 holds the file header; without it the file can't be inspected.
+                $result[$i]['firstsegment'] = $segments === [] || ($segments[0][0] ?? 1) === 1;
+            }
+            array_push($result[$i]['segments'], ...array_column($segments, 1));
             $result[$i]['size'] = $fileSize;
 
             // File completion.

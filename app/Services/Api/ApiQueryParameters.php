@@ -11,8 +11,6 @@ use Illuminate\Http\Request;
 
 final class ApiQueryParameters
 {
-    public const int MAX_LIMIT = 100;
-
     /** @return array<int, string|int> */
     public function categories(Request $request): array
     {
@@ -60,13 +58,29 @@ final class ApiQueryParameters
     }
 
     /**
-     * Page size, clamped to 1..MAX_LIMIT (the maximum advertised in capabilities).
+     * Page size, clamped to 1..maxLimit(); defaultLimit() when the request omits it.
      */
     public function limit(Request $request): int
     {
         return $request->has('limit') && is_numeric($request->input('limit'))
-            ? max(1, min(self::MAX_LIMIT, (int) $request->input('limit')))
-            : self::MAX_LIMIT;
+            ? max(1, min($this->maxLimit(), (int) $request->input('limit')))
+            : $this->defaultLimit();
+    }
+
+    /**
+     * Largest page size served, advertised in capabilities as <limits max>.
+     */
+    public function maxLimit(): int
+    {
+        return max(1, (int) config('nntmux.api.max_limit', 500));
+    }
+
+    /**
+     * Page size used when the request omits limit, advertised in capabilities as <limits default>.
+     */
+    public function defaultLimit(): int
+    {
+        return max(1, min($this->maxLimit(), (int) config('nntmux.api.default_limit', 250)));
     }
 
     public function offset(Request $request): int

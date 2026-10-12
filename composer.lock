@@ -12775,16 +12775,16 @@
         },
         {
             "name": "laravel/mcp",
-            "version": "v1.0.1",
+            "version": "v1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/mcp.git",
-                "reference": "92987a9d03847801299ff4abe909ba7686147dde"
+                "reference": "26c7803551028653beab49af0e672ae38607b772"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/mcp/zipball/92987a9d03847801299ff4abe909ba7686147dde",
-                "reference": "92987a9d03847801299ff4abe909ba7686147dde",
+                "url": "https://api.github.com/repos/laravel/mcp/zipball/26c7803551028653beab49af0e672ae38607b772",
+                "reference": "26c7803551028653beab49af0e672ae38607b772",
                 "shasum": ""
             },
             "require": {
@@ -12802,6 +12802,7 @@
                 "symfony/process": "^7.4.5|^8.0.5"
             },
             "require-dev": {
+                "jasonmccreary/double": "^1.0",
                 "laravel/pint": "^1.20",
                 "orchestra/testbench": "^9.15|^10.8|^11.0",
                 "pestphp/pest": "^3.8.5|^4.3.2",
@@ -12845,7 +12846,7 @@
                 "issues": "https://github.com/laravel/mcp/issues",
                 "source": "https://github.com/laravel/mcp"
             },
-            "time": "2026-09-24T10:45:09+00:00"
+            "time": "2026-10-11T20:52:46+00:00"
         },
         {
             "name": "laravel/pao",
@@ -14034,16 +14035,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "12.5.38",
+            "version": "12.5.39",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "1e87ad87fe57665a7f6e99a6e467329c11e851cc"
+                "reference": "4e8cbead3741cc57f16d142f4c5dc73c2747820a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/1e87ad87fe57665a7f6e99a6e467329c11e851cc",
-                "reference": "1e87ad87fe57665a7f6e99a6e467329c11e851cc",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/4e8cbead3741cc57f16d142f4c5dc73c2747820a",
+                "reference": "4e8cbead3741cc57f16d142f4c5dc73c2747820a",
                 "shasum": ""
             },
             "require": {
@@ -14112,7 +14113,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/12.5.38"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/12.5.39"
             },
             "funding": [
                 {
@@ -14120,7 +14121,7 @@
                     "type": "other"
                 }
             ],
-            "time": "2026-10-05T05:49:30+00:00"
+            "time": "2026-10-12T15:27:27+00:00"
         },
         {
             "name": "rector/rector",

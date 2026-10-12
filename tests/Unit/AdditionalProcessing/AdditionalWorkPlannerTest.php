@@ -333,4 +333,54 @@ class AdditionalWorkPlannerTest extends TestCase
             array_map(static fn ($candidate): string => $candidate->title, $plan->imageCandidates),
         );
     }
+
+    #[Test]
+    public function it_inspects_the_earliest_rar_volume_that_has_its_first_segment(): void
+    {
+        $planner = new AdditionalWorkPlanner($this->makeConfig());
+        $titles = static fn (array $candidates): array => array_map(
+            static fn (ArchiveCandidate $candidate): string => $candidate->title,
+            $candidates,
+        );
+
+        $plan = $planner->plan([
+            ['title' => '"release.part01.rar" yEnc (2/50)', 'segments' => ['<p1-2>', '<p1-3>'], 'firstsegment' => false],
+            ['title' => '"release.part02.rar" yEnc (2/50)', 'segments' => ['<p2-2>'], 'firstsegment' => false],
+            ['title' => '"release.part03.rar" yEnc (1/50)', 'segments' => ['<p3-1>', '<p3-2>'], 'firstsegment' => true],
+            ['title' => '"release.part04.rar" yEnc (1/50)', 'segments' => ['<p4-1>'], 'firstsegment' => true],
+        ], 'alt.binaries.test');
+        $oldStyle = $planner->plan([
+            ['title' => 'release.rar yEnc (2/50)', 'segments' => ['<rar-2>'], 'firstsegment' => false],
+            ['title' => 'release.r00 yEnc (1/50)', 'segments' => ['<r00-1>'], 'firstsegment' => true],
+        ], 'alt.binaries.test');
+
+        $this->assertSame(
+            ['"release.part03.rar" yEnc (1/50)', '"release.part01.rar" yEnc (2/50)', '"release.part02.rar" yEnc (2/50)', '"release.part04.rar" yEnc (1/50)'],
+            $titles($plan->prioritizedArchiveCandidates()),
+        );
+        $this->assertSame(['<p3-1>', '<p3-2>'], $plan->prioritizedArchiveCandidates()[0]->messageIds);
+        $this->assertSame(['release.r00 yEnc (1/50)', 'release.rar yEnc (2/50)'], $titles($oldStyle->prioritizedArchiveCandidates()));
+    }
+
+    #[Test]
+    public function it_keeps_the_first_rar_volume_when_it_has_its_first_segment_or_no_volume_does(): void
+    {
+        $planner = new AdditionalWorkPlanner($this->makeConfig());
+
+        $complete = $planner->plan([
+            ['title' => '"release.part01.rar" yEnc (1/50)', 'segments' => ['<p1-1>'], 'firstsegment' => true],
+            ['title' => '"release.part02.rar" yEnc (1/50)', 'segments' => ['<p2-1>'], 'firstsegment' => true],
+        ], 'alt.binaries.test');
+        $noneComplete = $planner->plan([
+            ['title' => '"release.part01.rar" yEnc (2/50)', 'segments' => ['<p1-2>'], 'firstsegment' => false],
+            ['title' => '"release.part02.rar" yEnc (2/50)', 'segments' => ['<p2-2>'], 'firstsegment' => false],
+        ], 'alt.binaries.test');
+
+        foreach ([$complete, $noneComplete] as $plan) {
+            [$first, $second] = $plan->prioritizedArchiveCandidates();
+            $this->assertStringStartsWith('"release.part01.rar"', $first->title);
+            $this->assertTrue($first->likelyFirstVolume);
+            $this->assertFalse($second->likelyFirstVolume);
+        }
+    }
 }

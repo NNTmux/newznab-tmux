@@ -81,6 +81,10 @@ return [
         'metrics_sample_rate' => (float) env('API_METRICS_SAMPLE_RATE', 0.01),
         // Max JSON body for HTTP QUERY API requests; nginx bounds QUERY bodies before PHP decodes them.
         'query_max_body_bytes' => (int) env('API_QUERY_MAX_BODY_BYTES', 8192),
+        // Rows per search page, advertised in caps as <limits max default>; clients such as
+        // Lidarr and Prowlarr page with the advertised default.
+        'max_limit' => (int) env('API_MAX_LIMIT', 500),
+        'default_limit' => (int) env('API_DEFAULT_LIMIT', 250),
     ],
     'block_proxy_indexer_apps' => (bool) env('BLOCK_PROXY_INDEXER_APPS', false),
     'block_proxy_indexer_app_user_agents' => env('BLOCK_PROXY_INDEXER_APP_USER_AGENTS', 'Prowlarr/,NZBHydra2'),

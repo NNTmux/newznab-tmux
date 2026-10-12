@@ -266,7 +266,7 @@ class ApiV2Controller extends BasePageController
     {
         if ($request->has('limit')
             && (! $this->isNonNegativeInteger($request->input('limit')) || (int) $request->input('limit') < 1)) {
-            return $this->jsonResponse(['error' => 'Incorrect parameter (limit must be a positive integer, at most '.ApiQueryParameters::MAX_LIMIT.' results are returned)'], 400);
+            return $this->jsonResponse(['error' => 'Incorrect parameter (limit must be a positive integer, at most '.$this->queryParameters->maxLimit().' results are returned)'], 400);
         }
 
         return $this->queryParameters->limit($request);

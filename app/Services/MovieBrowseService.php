@@ -101,7 +101,7 @@ class MovieBrowseService
             .$whereExcluded;
 
         // Build a cache key from all the query parameters
-        $cacheKey = md5('movie_range_'.$baseWhere.$order[0].$order[1].$start.$num.$page);
+        $cacheKey = md5('movie_range_v2_'.$baseWhere.$order[0].$order[1].$start.$num.$page);
 
         $cached = Cache::get($cacheKey);
         if ($cached !== null) {
@@ -176,8 +176,9 @@ class MovieBrowseService
         foreach ($movieImdbIds as $id) {
             $quotedId = escapeString((string) $id);
             $unionParts[] = '(SELECT r.id, r.imdbid, r.guid, r.searchname, '
-                .'r.size, r.postdate, r.adddate, r.haspreview '
+                .'r.size, r.postdate, r.adddate, r.haspreview, r.jpgstatus, r.nfostatus, re.releases_id AS reid '
                 .'FROM releases r '
+                .'LEFT JOIN video_data re ON re.releases_id = r.id '
                 .'WHERE r.imdbid = '.$quotedId.' '
                 ."AND r.passwordstatus {$this->showPasswords} "
                 .$catFilter
@@ -221,8 +222,10 @@ class MovieBrowseService
         $whereExcluded = count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : '';
         $quotedId = escapeString($imdbid);
 
-        $sql = 'SELECT r.id, r.guid, r.searchname, r.size, r.postdate, r.adddate, r.haspreview '
+        $sql = 'SELECT r.id, r.guid, r.searchname, r.size, r.postdate, r.adddate, r.haspreview, '
+            .'r.jpgstatus, r.nfostatus, re.releases_id AS reid '
             .'FROM releases r '
+            .'LEFT JOIN video_data re ON re.releases_id = r.id '
             .'WHERE r.imdbid = '.$quotedId.' '
             ."AND r.passwordstatus {$this->showPasswords} "
             .$whereExcluded.' '
