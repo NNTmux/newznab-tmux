@@ -5,14 +5,17 @@ declare(strict_types=1);
 namespace App\Services\Releases\Verification;
 
 use App\Facades\Search;
+use App\Jobs\CollectReleaseFingerprintMetadata;
 use App\Models\Release;
 use App\Models\ReleaseRegex;
 use App\Services\Nzb\NzbService;
 use App\Services\Releases\ReleaseDuplicateFinder;
 use App\Services\Releases\ReleaseGroupResolver;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use RuntimeException;
+use Throwable;
 
 final class VerifiedReleasePublisher
 {
@@ -97,6 +100,16 @@ final class VerifiedReleasePublisher
             }
             ReleaseRegex::insertOrIgnore(['releases_id' => $id, 'collection_regex_id' => $manifest['regex_id'],
                 'naming_regex_id' => $metadata['naming_regex_id']]);
+            DB::afterCommit(static function () use ($id): void {
+                try {
+                    CollectReleaseFingerprintMetadata::dispatch((int) $id);
+                } catch (Throwable $dispatchException) {
+                    Log::warning('Could not queue verified release fingerprint metadata collection.', [
+                        'release_id' => $id,
+                        'exception' => $dispatchException::class,
+                    ]);
+                }
+            });
             $this->recordGroups((int) $id, $manifest['groups']);
             app(CandidateRepository::class)->heartbeat((int) $claim->id, $claim->lease_token);
             $this->markPublished($candidate->id, (int) $id, $result);

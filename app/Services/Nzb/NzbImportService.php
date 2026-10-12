@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Nzb;
 
 use App\Enums\NzbImportStatus;
+use App\Jobs\CollectReleaseFingerprintMetadata;
 use App\Models\Category;
 use App\Models\Predb;
 use App\Models\Release;
@@ -271,6 +272,16 @@ class NzbImportService
                         $nzbsSkipped++;
                     } else {
                         $reportResult($nzbFilePath, NzbImportStatus::Inserted, $this->relId, $this->relGuid);
+                        if ($this->relId !== null) {
+                            try {
+                                CollectReleaseFingerprintMetadata::dispatch($this->relId);
+                            } catch (\Throwable $dispatchException) {
+                                Log::warning('Could not queue imported release fingerprint metadata collection.', [
+                                    'release_id' => $this->relId,
+                                    'exception' => $dispatchException::class,
+                                ]);
+                            }
+                        }
 
                         if ($delete) {
                             // Remove the nzb file.

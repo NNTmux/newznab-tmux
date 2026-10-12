@@ -55,3 +55,7 @@ Dockerfile		-binary text
 # Reviewable, mergeable text despite the repository-wide `* binary` default
 docker/bin/deploy-guard	-binary text eol=lf
 docker/Makefile		-binary text eol=lf
+/scripts/nzb_fingerprint.py	-binary text eol=lf
+/docker/app/nzb-yenc-ffi/Cargo.toml	-binary text eol=lf
+/docker/app/nzb-yenc-ffi/Cargo.lock	-binary text eol=lf
+/docker/app/nzb-yenc-ffi/src/*.rs	-binary text eol=lf

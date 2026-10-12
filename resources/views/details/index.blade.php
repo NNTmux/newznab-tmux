@@ -38,6 +38,8 @@
 
             @include('details.partials.media-metadata')
 
+            @include('details.partials.fingerprint-metadata')
+
             @include('details.partials.predb-info')
 
             @include('details.partials.comments')

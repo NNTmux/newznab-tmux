@@ -13,10 +13,13 @@
 //! leading `=y` escapes there are decoded before handing over the rest. Removing
 //! them first also joins escapes split across a line break, as the PHP decoder does.
 
-use std::ffi::{c_int, c_void};
+use std::ffi::{CString, c_char, c_int, c_void};
 use std::panic::catch_unwind;
 use std::ptr;
 use std::slice;
+
+mod formats;
+mod par2;
 
 /// nzb-decode 0.1.3, packed as RapidYenc packs its version (major << 16 | minor << 8 | patch).
 const VERSION: c_int = 3 | (1 << 8);
@@ -27,6 +30,7 @@ const DECODE_FAILED: usize = usize::MAX;
 
 const HEADER: &[u8] = b"=ybegin line=128 name=payload\r\n";
 const FOOTER: &[u8] = b"\r\n=yend\r\n";
+const MAX_METADATA_INPUT_BYTES: usize = 67_108_864;
 
 /// Decode a yEnc payload (CR/LF line endings are skipped, `=X` escapes resolved).
 pub fn decode_payload(payload: &[u8]) -> Option<Vec<u8>> {
@@ -64,6 +68,73 @@ pub extern "C" fn rapidyenc_decode_init() {}
 #[unsafe(no_mangle)]
 pub extern "C" fn rapidyenc_version() -> c_int {
     VERSION
+}
+
+/// Return PAR2 packet metadata as a newly allocated UTF-8 JSON C string.
+/// The caller must release it with `nntmux_metadata_string_free`.
+///
+/// # Safety
+/// `data` must be readable for `length` bytes. Inputs over the bounded parser
+/// budget are rejected by returning a null pointer.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn nntmux_par2_metadata_json(data: *const u8, length: usize) -> *mut c_char {
+    if length > MAX_METADATA_INPUT_BYTES || (length > 0 && data.is_null()) {
+        return ptr::null_mut();
+    }
+    let input = if length == 0 {
+        &[]
+    } else {
+        // SAFETY: the caller guarantees `data` is readable for `length` bytes.
+        unsafe { slice::from_raw_parts(data, length) }
+    };
+    let encoded = catch_unwind(|| serde_json::to_string(&par2::parse(input)));
+    match encoded {
+        Ok(Ok(json)) => CString::new(json)
+            .map(CString::into_raw)
+            .unwrap_or(ptr::null_mut()),
+        _ => ptr::null_mut(),
+    }
+}
+
+/// Return bounded format-signature and header metadata as UTF-8 JSON.
+/// The caller must release it with `nntmux_metadata_string_free`.
+///
+/// # Safety
+/// `data` must be readable for `length` bytes. Inputs over the bounded parser
+/// budget are rejected by returning a null pointer.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn nntmux_format_metadata_json(
+    data: *const u8,
+    length: usize,
+) -> *mut c_char {
+    if length > MAX_METADATA_INPUT_BYTES || (length > 0 && data.is_null()) {
+        return ptr::null_mut();
+    }
+    let input = if length == 0 {
+        &[]
+    } else {
+        // SAFETY: the caller guarantees `data` is readable for `length` bytes.
+        unsafe { slice::from_raw_parts(data, length) }
+    };
+    let encoded = catch_unwind(|| serde_json::to_string(&formats::parse(input)));
+    match encoded {
+        Ok(Ok(json)) => CString::new(json)
+            .map(CString::into_raw)
+            .unwrap_or(ptr::null_mut()),
+        _ => ptr::null_mut(),
+    }
+}
+
+/// Release a metadata JSON string returned by this library.
+///
+/// # Safety
+/// `value` must be null or a pointer returned by one of the metadata functions.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn nntmux_metadata_string_free(value: *mut c_char) {
+    if !value.is_null() {
+        // SAFETY: the pointer was produced by `CString::into_raw` in this library.
+        unsafe { drop(CString::from_raw(value)) };
+    }
 }
 
 /// Decode `src_length` bytes from `src` into `dest` and return the decoded length.

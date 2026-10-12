@@ -8,6 +8,7 @@ use App\Models\Country;
 use App\Models\DnzbFailure;
 use App\Models\Predb;
 use App\Models\Release;
+use App\Models\ReleaseFingerprintMetadata;
 use App\Models\ReleaseComment;
 use App\Models\ReleaseRegex;
 use App\Models\ReleaseReport;
@@ -158,6 +159,7 @@ class DetailsController extends BasePageController
         }
 
         $pre = Predb::getForRelease($data['predb_id']);
+        $fingerprintMetadata = ReleaseFingerprintMetadata::query()->find((int) $data['id']);
 
         // Resolve AniDB country code to a Country model/name here so the view stays query-free
         $anidbCountryCode = null;
@@ -175,6 +177,7 @@ class DetailsController extends BasePageController
 
         $this->viewData = array_merge($this->viewData, [
             'release' => $data,
+            'fingerprintMetadata' => $fingerprintMetadata,
             'reVideo' => $reVideo,
             'reAudio' => $reAudio,
             'reSubs' => $reSubs,

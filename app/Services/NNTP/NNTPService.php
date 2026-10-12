@@ -1051,6 +1051,177 @@ class NNTPService extends NntpClient
     }
 
     /**
+     * Read raw HEAD fields and a bounded raw BODY for a known article ID.
+     * The alternate provider is queried directly instead of only as a fallback.
+     *
+     * @return array{headers: list<string>, body: string, overview_response_code: int|null, overview_raw: string|null, command_results: list<array<string, mixed>>}
+     */
+    public function getFingerprintArticleByMessageID(string $identifier, int $maximumBodyBytes = 2_000_000,
+        int $maximumHeaderBytes = 65_536, bool $alternate = false, bool $includeOverview = false): array
+    {
+        $identifier = self::verificationMessageId($identifier, $maximumBodyBytes);
+        $connection = $this;
+        if ($alternate) {
+            $connection = $this->previewAlternateConnection();
+            $connected = $this->_currentServer === $this->_configServer
+                ? $connection->doConnect($this->_configCompressedHeaders, true) : $connection->doConnect();
+        } else {
+            $connected = $connection->_checkConnection(false);
+        }
+        if ($connected !== true) {
+            throw new \RuntimeException('Unable to connect to the requested NNTP provider.');
+        }
+
+        try {
+            $overviewCode = null;
+            $overviewRaw = null;
+            if ($includeOverview) {
+                $overviewCode = $connection->_sendCommand('OVER <'.$identifier.'>');
+                if ($overviewCode === 224) {
+                    $overviewLines = $connection->readFingerprintMultiline(32_768);
+                    $overviewRaw = $overviewLines[0] ?? null;
+                }
+            }
+            $headers = $connection->readFingerprintArticleHeaders($identifier, $maximumHeaderBytes);
+            $body = $connection->verificationArticle($identifier, $maximumBodyBytes);
+
+            return [
+                'headers' => $headers,
+                'body' => $body,
+                'overview_response_code' => is_numeric($overviewCode) ? (int) $overviewCode : null,
+                'overview_raw' => $overviewRaw,
+                'command_results' => [
+                    ...($includeOverview ? [[
+                        'command' => 'OVER MSGID',
+                        'response_code' => is_numeric($overviewCode) ? (int) $overviewCode : null,
+                        'available' => $overviewCode === 224,
+                    ]] : []),
+                    ['command' => 'HEAD', 'response_code' => 221, 'available' => true],
+                    ['command' => 'BODY', 'response_code' => 222, 'available' => true],
+                ],
+            ];
+        } finally {
+            if ($alternate) {
+                try {
+                    $connection->doQuit();
+                } catch (\Throwable) {
+                    // Preserve the article result when alternate cleanup fails.
+                }
+            }
+        }
+    }
+
+    /**
+     * Capture the responding NNTP server's advertised capabilities and overview schema.
+     *
+     * @return array<string, mixed>
+     */
+    public function getFingerprintServerProfile(bool $alternate = false): array
+    {
+        $connection = $alternate ? $this->previewAlternateConnection() : $this;
+        $connected = $alternate
+            ? $connection->doConnect($this->_configCompressedHeaders, true)
+            : $connection->_checkConnection(false);
+        if ($connected !== true) {
+            throw new \RuntimeException('Unable to connect to the requested NNTP provider.');
+        }
+
+        try {
+            $capabilityCode = $connection->_sendCommand('CAPABILITIES');
+            $capabilities = $capabilityCode === 101 ? $connection->readFingerprintMultiline(65_536) : [];
+            $supportsOverview = count(array_filter($capabilities, static fn (string $line): bool => str_starts_with(strtoupper($line), 'OVER'))) > 0;
+            $overviewCode = null;
+            $overviewFormat = [];
+            if ($supportsOverview) {
+                $overviewCode = $connection->_sendCommand('LIST OVERVIEW.FMT');
+                if ($overviewCode === 215) {
+                    $overviewFormat = $connection->readFingerprintMultiline(32_768);
+                }
+            }
+
+            return [
+                'capabilities_response_code' => is_numeric($capabilityCode) ? (int) $capabilityCode : null,
+                'capabilities_error_type' => is_numeric($capabilityCode) ? null : class_basename($capabilityCode),
+                'capabilities_raw' => $capabilities,
+                'implementation' => current(array_values(array_filter($capabilities, static fn (string $line): bool => str_starts_with(strtoupper($line), 'IMPLEMENTATION ')))) ?: null,
+                'overview_format_response_code' => is_numeric($overviewCode) ? (int) $overviewCode : null,
+                'overview_format_error_type' => $overviewCode === null || is_numeric($overviewCode) ? null : class_basename($overviewCode),
+                'overview_format_raw' => $overviewFormat,
+                'profiled_at_utc' => now()->utc()->toIso8601String(),
+            ];
+        } finally {
+            if ($alternate) {
+                try {
+                    $connection->doQuit();
+                } catch (\Throwable) {
+                    // Preserve the profile if alternate cleanup fails.
+                }
+            }
+        }
+    }
+
+    /** @return list<string> */
+    private function readFingerprintMultiline(int $maximumBytes): array
+    {
+        $lines = [];
+        $bytes = 0;
+        while (($line = fgets($this->_socket, 16_385)) !== false) {
+            if ($line === ".\r\n" || $line === ".\n") {
+                return $lines;
+            }
+            if (! str_ends_with($line, "\n") || strlen($line) > 16_384) {
+                $this->doQuit(true);
+                throw new \RuntimeException('NNTP server profile line is truncated or oversized.');
+            }
+            if (str_starts_with($line, '..')) {
+                $line = substr($line, 1);
+            }
+            $bytes += strlen($line);
+            if ($bytes > $maximumBytes) {
+                $this->doQuit(true);
+                throw new \RuntimeException('NNTP server profile exceeds the metadata memory budget.');
+            }
+            $lines[] = rtrim($line, "\r\n");
+        }
+
+        $this->doQuit(true);
+        throw new \RuntimeException('NNTP server profile response was truncated.');
+    }
+
+    /** @return list<string> */
+    private function readFingerprintArticleHeaders(string $identifier, int $maximumBytes): array
+    {
+        $response = $this->_sendCommand('HEAD <'.$identifier.'>');
+        if ($response !== 221) {
+            throw new \RuntimeException('Article headers are unavailable.');
+        }
+
+        $headers = [];
+        $bytes = 0;
+        while (($line = fgets($this->_socket, 16_385)) !== false) {
+            if ($line === ".\r\n" || $line === ".\n") {
+                return $headers;
+            }
+            if (! str_ends_with($line, "\n") || strlen($line) > 16_384) {
+                $this->doQuit(true);
+                throw new \RuntimeException('Article header line is truncated or oversized.');
+            }
+            if (str_starts_with($line, '..')) {
+                $line = substr($line, 1);
+            }
+            $bytes += strlen($line);
+            if ($bytes > $maximumBytes) {
+                $this->doQuit(true);
+                throw new \RuntimeException('Article headers exceed the metadata memory budget.');
+            }
+            $headers[] = $line;
+        }
+
+        $this->doQuit(true);
+        throw new \RuntimeException('Article header response was truncated.');
+    }
+
+    /**
      * Fetch one complete preview article while counting every BODY byte read, including failures.
      * The primary and optional alternate share the allowance; a partial BODY closes its connection.
      *

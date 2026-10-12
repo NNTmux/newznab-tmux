@@ -91,14 +91,16 @@ final readonly class ArticleFrame
     {
         $line = rtrim($line, "\r");
         $fields = [];
-        if ($withName && preg_match('/(?:^|[ \t])name=/i', $line, $match, PREG_OFFSET_CAPTURE)) {
-            $nameOffset = $match[0][1] + strlen($match[0][0]);
-            $fields['name'] = substr($line, $nameOffset);
-            $line = substr($line, 0, $match[0][1]);
-        }
-        preg_match_all('/(?:^|[ \t])([a-z][a-z0-9]*)=([^ \t]*)/i', $line, $matches, PREG_SET_ORDER);
+        preg_match_all('/(?:^|[ \t])([a-z][a-z0-9_-]*)=([^ \t]*)/i', $line, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE);
         foreach ($matches as $match) {
-            $fields[strtolower($match[1])] = $match[2];
+            $key = strtolower($match[1][0]);
+            if ($withName && $key === 'name') {
+                $nameOffset = $match[1][1] + strlen($match[1][0]) + 1;
+                $fields[$key] = substr($line, $nameOffset);
+
+                break;
+            }
+            $fields[$key] = $match[2][0];
         }
 
         return $fields;

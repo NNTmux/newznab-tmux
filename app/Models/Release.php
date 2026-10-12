@@ -146,6 +146,12 @@ class Release extends Model
         return $this->hasOne(ReleaseNzbCreationFailure::class, 'releases_id');
     }
 
+    /** @return HasOne<ReleaseFingerprintMetadata, $this> */
+    public function fingerprintMetadata(): HasOne
+    {
+        return $this->hasOne(ReleaseFingerprintMetadata::class, 'releases_id');
+    }
+
     /**
      * @return HasMany<ReleaseComment, $this>
      */
