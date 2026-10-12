@@ -371,15 +371,25 @@ final class CandidateRepository
      */
     public function claim(?callable $acquireCandidate = null): ?object
     {
-        return DB::transaction(function () use ($acquireCandidate): ?object {
-            $query = DB::table('release_verification_candidates')->whereNull('release_id')
-                ->whereIn('status', ['pending', 'unknown', 'verifying'])->where('next_attempt_at', '<=', now())
-                ->where(fn ($q) => $q->whereNull('lease_until')->orWhere('lease_until', '<', now()))
-                ->orderBy('next_attempt_at')->orderBy('id')->lockForUpdate();
-            $rows = $acquireCandidate === null ? [$query->first()] : $query->limit(100)->get();
-            foreach ($rows as $row) {
-                if ($row === null || ($acquireCandidate !== null && ! $acquireCandidate((int) $row->id))) {
-                    continue;
+        $ids = $this->claimableCandidates()->orderBy('next_attempt_at')->orderBy('id')->limit(100)->pluck('id');
+        foreach ($ids as $id) {
+            $acquired = false;
+            $claimed = DB::transaction(function () use ($id, $acquireCandidate, &$acquired): ?object {
+                $query = $this->claimableCandidates()->where('id', $id);
+                if (in_array(DB::getDriverName(), ['mysql', 'mariadb'], true)) {
+                    $query->forceIndex('PRIMARY')->lock('for update skip locked');
+                } else {
+                    $query->lockForUpdate();
+                }
+                $row = $query->first();
+                if ($row === null) {
+                    return null;
+                }
+                if ($acquireCandidate !== null) {
+                    if (! $acquireCandidate((int) $row->id)) {
+                        return null;
+                    }
+                    $acquired = true;
                 }
                 $token = (string) Str::uuid();
                 DB::table('release_verification_candidates')->where('id', $row->id)->update([
@@ -389,10 +399,21 @@ final class CandidateRepository
                 $row->lease_token = $token;
 
                 return $row;
+            }, 5);
+            // A rolled-back lease may still own its file mutex; let the caller release it.
+            if ($claimed !== null || $acquired) {
+                return $claimed;
             }
+        }
 
-            return null;
-        }, 5);
+        return null;
+    }
+
+    private function claimableCandidates(): Builder
+    {
+        return DB::table('release_verification_candidates')->whereNull('release_id')
+            ->whereIn('status', ['pending', 'unknown', 'verifying'])->where('next_attempt_at', '<=', now())
+            ->where(fn ($query) => $query->whereNull('lease_until')->orWhere('lease_until', '<', now()));
     }
 
     public function heartbeat(int $id, string $token): void

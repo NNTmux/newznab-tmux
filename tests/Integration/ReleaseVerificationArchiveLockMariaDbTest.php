@@ -220,6 +220,89 @@ final class ReleaseVerificationArchiveLockMariaDbTest extends TestCase
         }
     }
 
+    public function test_claim_skips_locked_due_head_and_leaves_capacity_available(): void
+    {
+        $repository = app(CandidateRepository::class);
+        foreach (['first', 'second'] as $name) {
+            $repository->enqueue(['identity' => sha1($name), 'groups_id' => 1, 'files' => []]);
+        }
+        $ids = DB::table('release_verification_candidates')->orderBy('id')->pluck('id')->all();
+        $bytes = (int) DB::table('release_verification_state')->value('pending_bytes');
+        $other = $this->connection();
+        $other->beginTransaction();
+        $statement = $other->prepare('SELECT id FROM release_verification_candidates FORCE INDEX (PRIMARY) WHERE id = ? FOR UPDATE');
+        $statement->execute([$ids[0]]);
+        $statement->fetchAll();
+        $other->query('SELECT id FROM release_verification_state WHERE id = 1 FOR UPDATE')->fetchAll();
+        try {
+            $claim = $repository->claim();
+            $this->assertSame((int) $ids[1], (int) $claim->id);
+            $statement = $other->prepare('UPDATE release_verification_candidates SET status = ? WHERE id = ?');
+            $statement->execute(['unknown', $ids[0]]);
+        } finally {
+            $other->commit();
+        }
+        $next = $repository->claim();
+        $this->assertSame((int) $ids[0], (int) $next->id);
+        $this->assertNotSame($claim->lease_token, $next->lease_token);
+        $this->assertNull($repository->claim());
+        $this->assertSame($bytes, (int) DB::table('release_verification_state')->value('pending_bytes'));
+    }
+
+    public function test_refused_claim_releases_its_row_before_trying_another_candidate(): void
+    {
+        $repository = app(CandidateRepository::class);
+        foreach (['first', 'second'] as $name) {
+            $repository->enqueue(['identity' => sha1($name), 'groups_id' => 1, 'files' => []]);
+        }
+        $ids = DB::table('release_verification_candidates')->orderBy('id')->pluck('id')->all();
+        $other = $this->connection();
+        $claim = $repository->claim(static function (int $id) use ($ids, $other): bool {
+            if ($id === (int) $ids[0]) {
+                return false;
+            }
+            $statement = $other->prepare('UPDATE release_verification_candidates SET next_attempt_at = ? WHERE id = ?');
+            $statement->execute([now()->addHour()->format('Y-m-d H:i:s'), $ids[0]]);
+
+            return true;
+        });
+
+        $this->assertSame((int) $ids[1], (int) $claim->id);
+        $this->assertNull(DB::table('release_verification_candidates')->where('id', $ids[0])->value('lease_token'));
+    }
+
+    public function test_claim_revalidates_selected_ids_and_uses_primary_locking_plan(): void
+    {
+        $repository = app(CandidateRepository::class);
+        foreach (['first', 'second'] as $name) {
+            $repository->enqueue(['identity' => sha1($name), 'groups_id' => 1, 'files' => []]);
+        }
+        $ids = DB::table('release_verification_candidates')->orderBy('id')->pluck('id')->all();
+        $other = $this->connection();
+        $changed = false;
+        $keys = [];
+        DB::listen(static function (QueryExecuted $query) use ($ids, $other, &$changed, &$keys): void {
+            if (! $changed && str_starts_with($query->sql, 'select `id` from `release_verification_candidates`')) {
+                $changed = true;
+                $statement = $other->prepare('UPDATE release_verification_candidates SET lease_until = ? WHERE id = ?');
+                $statement->execute([now()->addHour()->format('Y-m-d H:i:s'), $ids[0]]);
+            }
+            if (str_starts_with($query->sql, 'select') && str_contains($query->sql, 'release_verification_candidates')
+                && str_contains($query->sql, 'for update')) {
+                $plan = DB::selectOne('EXPLAIN '.$query->sql, $query->bindings);
+                if ($plan->key !== null) {
+                    $keys[] = $plan->key;
+                }
+            }
+        });
+
+        $claim = $repository->claim();
+
+        $this->assertTrue($changed);
+        $this->assertSame((int) $ids[1], (int) $claim->id);
+        $this->assertSame(['PRIMARY'], array_values(array_unique($keys)));
+    }
+
     private function connection(): PDO
     {
         $pdo = new PDO('mysql:host='.$this->host.';dbname='.$this->database.';charset=utf8mb4', $this->username, $this->password);
