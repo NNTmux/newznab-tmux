@@ -70,14 +70,25 @@ class ReleaseResultsViewTest extends TestCase
 
         foreach (['.release-result-row', '.release-result-card'] as $selector) {
             $view = $document->querySelector($selector);
+            $actions = $view->querySelector('.release-row-actions');
+            $this->assertSame('group', $actions->getAttribute('role'));
+            $this->assertSame('Release actions', $actions->getAttribute('aria-label'));
+            foreach ($actions->querySelectorAll('a, button') as $action) {
+                $this->assertNotEmpty($action->getAttribute('title'));
+            }
             $this->assertSame('Select '.$result->searchname, $view->querySelector('.chkRelease')->getAttribute('aria-label'));
             $this->assertStringEndsWith('/getnzb/'.$result->guid, $view->querySelector('.download-nzb')->getAttribute('href'));
             $this->assertSame('button', $view->querySelector('.add-to-cart')->getAttribute('type'));
             $this->assertSame($result->guid, $view->querySelector('.add-to-cart')->getAttribute('data-guid'));
             $this->assertSame('17', $view->querySelector('.report-trigger')->getAttribute('data-report-release-id'));
             $this->assertSame(1, $view->querySelectorAll('a[title="Add to My Movies"]')->length);
+            $tools = $view->querySelector('.release-inspection-actions');
+            $this->assertSame('group', $tools->getAttribute('role'));
+            $this->assertSame('Release tools', $tools->getAttribute('aria-label'));
             foreach (['nfo-badge', 'preview-badge', 'sample-badge'] as $badge) {
-                $this->assertSame($result->guid, $view->querySelector('.'.$badge)->getAttribute('data-guid'));
+                $tool = $tools->querySelector('.'.$badge);
+                $this->assertSame($result->guid, $tool->getAttribute('data-guid'));
+                $this->assertSame('button', $tool->getAttribute('type'));
             }
             $this->assertSame('17', $view->querySelector('.mediainfo-badge')->getAttribute('data-release-id'));
             $this->assertStringContainsString('Reported (2)', $view->textContent);
@@ -113,9 +124,14 @@ class ReleaseResultsViewTest extends TestCase
         $document = HTMLDocument::createFromString('<!doctype html><html><head><title>Release</title></head><body>'.$html.'</body></html>');
 
         $this->assertSame($release->searchname, $document->querySelector('h2')->textContent);
+        $actions = $document->querySelector('.release-detail-actions');
+        $this->assertSame('group', $actions->getAttribute('role'));
+        $this->assertSame('Release actions', $actions->getAttribute('aria-label'));
         $this->assertStringEndsWith('/getnzb/'.$release->guid, $document->querySelector('.download-nzb')->getAttribute('href'));
         foreach (['nfo-badge', 'filelist-badge', 'add-to-cart'] as $action) {
-            $this->assertSame($release->guid, $document->querySelector('.'.$action)->getAttribute('data-guid'));
+            $button = $actions->querySelector('.'.$action);
+            $this->assertSame($release->guid, $button->getAttribute('data-guid'));
+            $this->assertSame('button', $button->getAttribute('type'));
         }
         $this->assertSame(0, $document->querySelectorAll('.report-trigger')->length);
     }

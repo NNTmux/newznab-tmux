@@ -107,11 +107,10 @@ class ReleaseResultsComponentTest extends TestCase
         }
 
         $this->assertStringContainsString(':variant="$compact ? \'icon\' : \'button\'"', $rowActions);
-        $this->assertStringContainsString('min-height: 2rem;', $stylesheet);
-        $this->assertStringContainsString('.release-row-actions--compact > .report-trigger', $stylesheet);
-        $this->assertStringContainsString('nzb_multi_operations_download release-bulk-actions__button bg-green-600', $bulkActions);
-        $this->assertStringContainsString('nzb_multi_operations_cart release-bulk-actions__button bg-primary-600', $bulkActions);
-        $this->assertStringContainsString('nzb_multi_operations_delete release-bulk-actions__button bg-red-600', $bulkActions);
+        $this->assertStringContainsString('role="group" aria-label="Release actions"', $rowActions);
+        $this->assertStringContainsString('nzb_multi_operations_download release-bulk-actions__button release-bulk-actions__download', $bulkActions);
+        $this->assertStringContainsString('nzb_multi_operations_cart release-bulk-actions__button release-bulk-actions__basket', $bulkActions);
+        $this->assertStringContainsString('nzb_multi_operations_delete release-bulk-actions__button release-bulk-actions__delete', $bulkActions);
     }
 
     public function test_release_categories_link_to_the_matching_browse_filter(): void

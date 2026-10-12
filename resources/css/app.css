@@ -735,13 +735,59 @@ dialog.app-modal::backdrop {
     z-index: 1;
 }
 
+.release-bulk-actions {
+    @apply inline-flex max-w-full flex-wrap items-center gap-1 rounded-lg border p-1;
+    border-color: var(--border-default);
+    background-color: var(--surface-card);
+}
+
+.dark .release-bulk-actions {
+    border-color: var(--border-default-dark);
+    background-color: var(--surface-card-dark);
+}
+
+.release-bulk-actions__label {
+    @apply px-2 text-xs font-medium;
+    border-inline-end: 1px solid var(--border-default);
+    color: var(--text-muted);
+}
+
+.dark .release-bulk-actions__label {
+    border-color: var(--border-default-dark);
+    color: var(--text-muted-dark);
+}
+
 .release-bulk-actions__button {
-    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors;
+    @apply inline-flex min-h-8 items-center justify-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium transition-colors;
+}
+
+.release-bulk-actions__download {
+    @apply bg-green-50 text-green-700 hover:bg-green-100;
+}
+
+.dark .release-bulk-actions__download {
+    @apply bg-green-400/10 text-green-400 hover:bg-green-400/20;
+}
+
+.release-bulk-actions__basket {
+    @apply text-primary-700 hover:bg-primary-50;
+}
+
+.dark .release-bulk-actions__basket {
+    @apply text-primary-300 hover:bg-primary-400/10;
+}
+
+.release-bulk-actions__delete {
+    @apply text-red-700 hover:bg-red-50;
+}
+
+.dark .release-bulk-actions__delete {
+    @apply text-red-400 hover:bg-red-400/10;
 }
 
 .release-bulk-actions__button:focus-visible {
     outline: 2px solid var(--color-primary-500);
-    outline-offset: 3px;
+    outline-offset: 2px;
 }
 
 .release-results-toolbar__filters {
@@ -773,105 +819,140 @@ dialog.app-modal::backdrop {
     overflow-wrap: anywhere;
 }
 
-.release-badges:has(> *) {
+.release-badges:has(span, button, a) {
     margin-top: 0.5rem;
 }
 
-.release-badges:not(:has(> *)) {
+.release-badges:not(:has(span, button, a)),
+.release-inspection-actions:not(:has(> *)) {
     display: none;
 }
 
-.release-badges > button,
-.release-badges > a {
-    min-height: 2rem;
+.release-inspection-actions,
+.release-detail-actions {
+    @apply inline-flex max-w-full flex-wrap items-center gap-0.5 rounded-lg border p-0.5;
+    border-color: var(--border-default);
+    background-color: var(--surface-panel-alt);
+}
+
+.dark .release-inspection-actions,
+.dark .release-detail-actions {
+    border-color: var(--border-default-dark);
+    background-color: var(--surface-panel-alt-dark);
+}
+
+.release-inspection-actions__button {
+    @apply inline-flex min-h-7 items-center justify-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium transition-colors;
+}
+
+.release-inspection-actions__preview {
+    @apply text-purple-700 hover:bg-purple-50;
+}
+
+.dark .release-inspection-actions__preview {
+    @apply text-purple-400 hover:bg-purple-400/10;
+}
+
+.release-inspection-actions__sample {
+    @apply text-green-700 hover:bg-green-50;
+}
+
+.dark .release-inspection-actions__sample {
+    @apply text-green-400 hover:bg-green-400/10;
+}
+
+.release-inspection-actions__media,
+.release-inspection-actions__series {
+    @apply text-primary-700 hover:bg-primary-50;
+}
+
+.dark .release-inspection-actions__media,
+.dark .release-inspection-actions__series {
+    @apply text-primary-300 hover:bg-primary-400/10;
+}
+
+.release-inspection-actions__nfo {
+    @apply text-amber-700 hover:bg-amber-50;
+}
+
+.dark .release-inspection-actions__nfo {
+    @apply text-amber-400 hover:bg-amber-400/10;
 }
 
 .release-row-actions {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.5rem;
+    @apply flex flex-wrap items-center gap-1;
     margin-top: 1rem;
 }
 
 .release-row-actions > a,
-.release-row-actions > button {
-    @apply inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-lg border px-3 py-2 text-xs font-medium transition-colors;
-    border-color: var(--border-default);
+.release-row-actions > button,
+.release-detail-actions > a,
+.release-detail-actions > button {
+    @apply inline-flex min-h-9 min-w-9 items-center justify-center gap-1.5 rounded-md border border-transparent bg-transparent px-2 py-1 text-xs font-medium transition-colors;
 }
 
-.dark .release-row-actions > a,
-.dark .release-row-actions > button {
-    border-color: var(--border-default-dark);
+.release-row-actions > a.release-row-actions__download,
+.release-detail-actions > .download-nzb {
+    @apply text-green-700 hover:bg-green-50;
 }
 
-.release-row-actions > a.release-row-actions__download {
-    background-color: var(--color-green-600);
-    border-color: transparent;
-    color: white;
+.dark .release-row-actions > a.release-row-actions__download,
+.dark .release-detail-actions > .download-nzb {
+    @apply text-green-400 hover:bg-green-400/10;
 }
 
-.release-row-actions > a.release-row-actions__download:hover {
-    background-color: var(--color-green-700);
+.release-row-actions > a.release-row-actions__details,
+.release-detail-actions > .add-to-cart,
+.release-detail-actions > .release-detail-actions__edit {
+    @apply text-primary-700 hover:bg-primary-50;
 }
 
-.dark .release-row-actions > a.release-row-actions__download {
-    background-color: var(--color-green-700);
+.dark .release-row-actions > a.release-row-actions__details,
+.dark .release-detail-actions > .add-to-cart,
+.dark .release-detail-actions > .release-detail-actions__edit {
+    @apply text-primary-300 hover:bg-primary-400/10;
 }
 
-.dark .release-row-actions > a.release-row-actions__download:hover {
-    background-color: var(--color-green-800);
+.release-row-actions > button.release-row-actions__basket,
+.release-detail-actions > .filelist-badge {
+    @apply text-gray-600 hover:bg-gray-100;
 }
 
-.release-row-actions > a.release-row-actions__details {
-    background-color: var(--color-primary-600);
-    border-color: transparent;
-    color: white;
-}
-
-.release-row-actions > a.release-row-actions__details:hover {
-    background-color: var(--color-primary-700);
-}
-
-.dark .release-row-actions > a.release-row-actions__details {
-    background-color: var(--color-primary-700);
-}
-
-.dark .release-row-actions > a.release-row-actions__details:hover {
-    background-color: var(--color-primary-800);
-}
-
-.release-row-actions > button.release-row-actions__basket {
-    @apply border-transparent bg-gray-200 text-gray-700 hover:bg-gray-300;
-}
-
-.dark .release-row-actions > button.release-row-actions__basket {
-    @apply bg-gray-700 text-gray-200 hover:bg-gray-600;
+.dark .release-row-actions > button.release-row-actions__basket,
+.dark .release-detail-actions > .filelist-badge {
+    @apply text-gray-300 hover:bg-white/5;
 }
 
 .release-row-actions > a.release-row-actions__movies {
-    @apply border-transparent bg-purple-600 text-white hover:bg-purple-700;
+    @apply text-purple-700 hover:bg-purple-50;
 }
 
 .dark .release-row-actions > a.release-row-actions__movies {
-    @apply bg-purple-700 hover:bg-purple-800;
+    @apply text-purple-400 hover:bg-purple-400/10;
+}
+
+.release-row-actions > .report-trigger:hover,
+.release-detail-actions > .report-trigger:hover {
+    background-color: color-mix(in srgb, currentColor 10%, transparent);
 }
 
 .release-row-actions--compact {
-    flex-wrap: nowrap;
-    gap: 0.25rem;
+    @apply inline-flex flex-nowrap gap-0.5 rounded-lg border p-0.5;
     margin-top: 0;
+    border-color: var(--border-default);
+    background-color: var(--surface-panel-alt);
+}
+
+.dark .release-row-actions--compact {
+    border-color: var(--border-default-dark);
+    background-color: var(--surface-panel-alt-dark);
 }
 
 .release-row-actions--compact > a,
 .release-row-actions--compact > button {
-    min-height: 2rem;
-    min-width: 2rem;
-    padding: 0.375rem;
-}
-
-.release-row-actions--compact > .report-trigger {
-    border-color: transparent;
+    min-height: 1.75rem;
+    min-width: 1.75rem;
+    padding: 0.25rem;
 }
 
 .release-row-actions--compact .report-label {
@@ -880,6 +961,16 @@ dialog.app-modal::backdrop {
 
 .release-row-actions--compact .report-trigger i {
     margin: 0;
+}
+
+@media (pointer: coarse) {
+    .release-bulk-actions__button,
+    .release-inspection-actions__button,
+    .release-row-actions > a,
+    .release-row-actions > button {
+        min-height: 2.75rem;
+        min-width: 2.75rem;
+    }
 }
 
 .release-result-card:has(.chkRelease:checked) {
@@ -892,14 +983,28 @@ dialog.app-modal::backdrop {
 }
 
 .release-row-actions > :focus-visible,
-.release-badges > :focus-visible {
+.release-detail-actions > :focus-visible,
+.release-inspection-actions > :focus-visible {
     outline: 2px solid var(--color-primary-500);
     outline-offset: 3px;
 }
 
 .release-detail-actions > a,
 .release-detail-actions > button {
-    min-height: 2.75rem;
+    min-height: 2rem;
+    min-width: 2rem;
+}
+
+.release-detail-actions > .report-trigger i {
+    margin: 0;
+}
+
+@media (pointer: coarse) {
+    .release-detail-actions > a,
+    .release-detail-actions > button {
+        min-height: 2.75rem;
+        min-width: 2.75rem;
+    }
 }
 
 .workspace-page-header::after {

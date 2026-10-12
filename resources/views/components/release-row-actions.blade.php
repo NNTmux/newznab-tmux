@@ -4,7 +4,7 @@
     $reportedCount = (int) ($result->total_report_count ?? $result->report_count ?? 0);
 @endphp
 
-<div @class(['release-row-actions', 'release-row-actions--compact' => $compact])>
+<div @class(['release-row-actions', 'release-row-actions--compact' => $compact]) role="group" aria-label="Release actions">
     <a href="{{ url('/getnzb/' . $result->guid) }}" class="download-nzb release-row-actions__download" title="Download NZB">
         <i class="fa fa-download" aria-hidden="true"></i>
         <span @class(['sr-only' => $compact])>Download</span>
