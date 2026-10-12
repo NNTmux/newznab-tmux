@@ -6,6 +6,7 @@ namespace App\Console\Commands;
 
 use App\Jobs\CollectReleaseFingerprintMetadata;
 use App\Models\Release;
+use App\Services\Releases\Fingerprint\ReleaseFingerprintCollector;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -30,7 +31,9 @@ final class BackfillReleaseFingerprintMetadata extends Command
             ->where(function (Builder $query): void {
                 $query->whereDoesntHave('fingerprintMetadata')
                     ->orWhereHas('fingerprintMetadata', static function (Builder $metadata): void {
-                        $metadata->where('status', '!=', 'complete');
+                        $metadata->where('status', '!=', 'complete')
+                            ->orWhere('metadata->schema_version', '<', ReleaseFingerprintCollector::SCHEMA_VERSION)
+                            ->orWhereNull('metadata->schema_version');
                     });
             })
             ->orderBy('id')

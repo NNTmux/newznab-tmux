@@ -52,7 +52,8 @@ final class NativeMetadataParser
             return null;
         }
 
-        $decoded = json_decode($encoded, true);
+        // Preserve exact Rust u64 values that exceed PHP_INT_MAX instead of rounding them to floats.
+        $decoded = json_decode($encoded, true, 512, JSON_BIGINT_AS_STRING);
 
         return is_array($decoded) ? $decoded : null;
     }

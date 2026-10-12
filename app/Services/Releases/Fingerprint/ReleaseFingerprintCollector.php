@@ -12,9 +12,19 @@ use Throwable;
 
 final class ReleaseFingerprintCollector
 {
+    public const SCHEMA_VERSION = 2;
+
     private const MAX_ARTICLE_BODY_BYTES = 2_000_000;
 
     private const MAX_PAR2_SET_BYTES = 67_108_864;
+
+    private const MAX_IFSC_PREVIEW_HEX_BYTES = 8192;
+
+    private const MAX_IFSC_STRUCTURED_PREVIEW_SLICES = 16;
+
+    private const MAX_RELEASE_IFSC_RECORDS = 20_000;
+
+    private const MAX_RELEASE_IFSC_PREVIEW_RECORDS = 4096;
 
     public function __construct(private readonly NzbService $nzb, private readonly NzbFingerprintAnalyzer $analyzer,
         private readonly Par2MetadataParser $par2, private readonly YencService $yenc) {}
@@ -413,17 +423,77 @@ final class ReleaseFingerprintCollector
         $par2RecoveryExponentsBySet = [];
         $par2SetIds = [];
         $par2SetMainPackets = [];
+        $par2SetMainPacketConflicts = [];
+        $par2SetMainDefinitionHashes = [];
         $par2SetSources = [];
+        $par2SetSourceConflicts = [];
+        $par2SetSourceDefinitionHashes = [];
         $par2SetBlockSizes = [];
+        $par2SetBlockSizeConflicts = [];
+        $par2IfscObservations = [];
+        $par2IfscObservationsOmitted = 0;
+        $par2IfscObservationCount = 0;
         $par2RecoverySlicePayloadHashesBySet = [];
         $par2RecoverySliceConflicts = [];
         $par2PackedLayout = false;
         $par2FileCount = count(array_filter($manifest['files'], static fn (array $file): bool => $file['kind'] === 'par2'));
         foreach ($assembledPar2 as $par2File) {
-            if (($par2File['metadata_valid'] ?? false) !== true || ! is_array($par2File['metadata'] ?? null)) {
+            if (! is_array($par2File['metadata'] ?? null)) {
                 continue;
             }
             $metadata = $par2File['metadata'];
+            $validIfscPacketKeys = [];
+            foreach ($metadata['packet_summaries'] ?? [] as $packet) {
+                $setId = $packet['set_id'] ?? null;
+                $payloadPrefix = $packet['payload_prefix_hex'] ?? null;
+                if (($packet['checksum_valid'] ?? false) !== true
+                    || ($packet['packet_type'] ?? null) !== 'PAR 2.0\\0IFSC'
+                    || ! is_string($setId)
+                    || ! is_string($payloadPrefix)) {
+                    continue;
+                }
+                $fileId = strtolower(substr($payloadPrefix, 0, 32));
+                if (preg_match('/\\A[a-f0-9]{32}\\z/', $fileId) === 1) {
+                    $validIfscPacketKeys[$setId.':'.$fileId] = true;
+                }
+            }
+            foreach ($metadata['input_file_slice_checksums'] ?? [] as $ifsc) {
+                $setId = $ifsc['recovery_set_id'] ?? null;
+                $fileId = $ifsc['file_id'] ?? null;
+                if (! is_string($setId) || preg_match('/\\A[a-f0-9]{32}\\z/i', $setId) !== 1
+                    || ! is_string($fileId) || preg_match('/\\A[a-f0-9]{32}\\z/i', $fileId) !== 1) {
+                    continue;
+                }
+                if (! isset($validIfscPacketKeys[$setId.':'.strtolower($fileId)])) {
+                    continue;
+                }
+                if ($par2IfscObservationCount >= self::MAX_RELEASE_IFSC_RECORDS) {
+                    $par2IfscObservationsOmitted++;
+                    continue;
+                }
+                $par2IfscObservationCount++;
+                $previewHex = is_string($ifsc['checksum_records_preview_hex'] ?? null)
+                    ? strtolower($ifsc['checksum_records_preview_hex']) : null;
+                $previewSliceCount = is_int($ifsc['preview_slice_count'] ?? null) ? $ifsc['preview_slice_count'] : null;
+                $boundedPreviewSliceCount = $previewSliceCount === null
+                    ? null : min($previewSliceCount, self::MAX_IFSC_STRUCTURED_PREVIEW_SLICES);
+                $par2SetIds[$setId] = true;
+                $par2IfscObservations[$setId][$fileId][] = [
+                    'slice_count' => is_int($ifsc['slice_count'] ?? null) ? $ifsc['slice_count'] : null,
+                    'checksum_records_sha256' => is_string($ifsc['checksum_records_sha256'] ?? null)
+                        ? strtolower($ifsc['checksum_records_sha256']) : null,
+                    'checksum_records_preview_hex' => is_string($previewHex)
+                        ? substr($previewHex, 0, self::MAX_IFSC_STRUCTURED_PREVIEW_SLICES * 40) : null,
+                    'preview_slice_count' => $boundedPreviewSliceCount,
+                    'preview_truncated' => ($ifsc['preview_truncated'] ?? false) === true
+                        || ($previewSliceCount !== null && $previewSliceCount > self::MAX_IFSC_STRUCTURED_PREVIEW_SLICES),
+                    'duplicate_conflict' => ($ifsc['duplicate_conflict'] ?? false) === true,
+                    'origin' => [
+                        'file_index' => $par2File['file_index'],
+                        'subject' => $par2File['subject'],
+                    ],
+                ];
+            }
             $fileSetIds = array_values(array_unique(array_column(array_filter(
                 $metadata['packet_summaries'] ?? [],
                 static fn (array $packet): bool => ($packet['checksum_valid'] ?? false) === true,
@@ -434,9 +504,26 @@ final class ReleaseFingerprintCollector
             }
             $setId = $fileSetIds[0];
             $par2SetIds[$setId] = true;
+            foreach ($metadata['packet_summaries'] ?? [] as $packet) {
+                if (($packet['checksum_valid'] ?? false) !== true
+                    || ($packet['set_id'] ?? null) !== $setId
+                    || ! is_string($packet['payload_sha256'] ?? null)) {
+                    continue;
+                }
+                if (($packet['packet_type'] ?? null) === 'PAR 2.0\\0Main') {
+                    $par2SetMainDefinitionHashes[$setId][$packet['payload_sha256']] = true;
+                } elseif (($packet['packet_type'] ?? null) === 'PAR 2.0\\0FileDesc'
+                    && is_string($packet['payload_prefix_hex'] ?? null)) {
+                    $fileId = strtolower(substr($packet['payload_prefix_hex'], 0, 32));
+                    if (preg_match('/\\A[a-f0-9]{32}\\z/i', $fileId) === 1) {
+                        $par2SetSourceDefinitionHashes[$setId][$fileId][$packet['payload_sha256']] = true;
+                    }
+                }
+            }
             if (is_array($metadata['main_packet'] ?? null)) {
                 $main = $metadata['main_packet'];
                 if (isset($par2SetMainPackets[$setId]) && $par2SetMainPackets[$setId] !== $main) {
+                    $par2SetMainPacketConflicts[$setId] = true;
                     $par2Complete = false;
                 } else {
                     $par2SetMainPackets[$setId] = $main;
@@ -445,6 +532,7 @@ final class ReleaseFingerprintCollector
             if (is_int($metadata['source_block_size'] ?? null)) {
                 $candidateBlockSize = $metadata['source_block_size'];
                 if (isset($par2SetBlockSizes[$setId]) && $par2SetBlockSizes[$setId] !== $candidateBlockSize) {
+                    $par2SetBlockSizeConflicts[$setId] = true;
                     $par2Complete = false;
                 } else {
                     $par2SetBlockSizes[$setId] = $candidateBlockSize;
@@ -456,10 +544,14 @@ final class ReleaseFingerprintCollector
                     continue;
                 }
                 if (isset($par2SetSources[$setId][$fileId]) && $par2SetSources[$setId][$fileId] !== $sourceFile) {
+                    $par2SetSourceConflicts[$setId][$fileId] = true;
                     $par2Complete = false;
                 } else {
                     $par2SetSources[$setId][$fileId] = $sourceFile;
                 }
+            }
+            if (($par2File['metadata_valid'] ?? false) !== true) {
+                continue;
             }
             foreach ($par2File['metadata']['packet_summaries'] ?? [] as $packet) {
                 if (($packet['checksum_valid'] ?? false) === true && is_string($packet['set_id'] ?? null)) {
@@ -490,6 +582,40 @@ final class ReleaseFingerprintCollector
             }
             $par2PackedLayout = $par2PackedLayout || (bool) ($par2File['metadata']['packed_layout_present'] ?? false);
         }
+        foreach ($par2SetMainDefinitionHashes as $setId => $definitionHashes) {
+            if (count($definitionHashes) > 1) {
+                $par2SetMainPacketConflicts[$setId] = true;
+                $par2Complete = false;
+            }
+        }
+        foreach ($par2SetSourceDefinitionHashes as $setId => $definitionsByFile) {
+            foreach ($definitionsByFile as $fileId => $definitionHashes) {
+                if (count($definitionHashes) > 1) {
+                    $par2SetSourceConflicts[$setId][$fileId] = true;
+                    $par2Complete = false;
+                }
+            }
+        }
+        if ($par2IfscObservationsOmitted > 0) {
+            $par2Complete = false;
+        }
+        $par2MainDefinitionConflicts = [];
+        foreach (array_keys($par2SetMainPacketConflicts) as $setId) {
+            $par2MainDefinitionConflicts[] = [
+                'recovery_set_id' => $setId,
+                'payload_sha256_variants' => array_keys($par2SetMainDefinitionHashes[$setId] ?? []),
+            ];
+        }
+        $par2SourceDefinitionConflicts = [];
+        foreach ($par2SetSourceConflicts as $setId => $filesWithConflicts) {
+            foreach (array_keys($filesWithConflicts) as $fileId) {
+                $par2SourceDefinitionConflicts[] = [
+                    'recovery_set_id' => $setId,
+                    'file_id' => $fileId,
+                    'payload_sha256_variants' => array_keys($par2SetSourceDefinitionHashes[$setId][$fileId] ?? []),
+                ];
+            }
+        }
         foreach (array_keys($par2SetIds) as $setId) {
             $main = $par2SetMainPackets[$setId] ?? null;
             $sourceFiles = $par2SetSources[$setId] ?? [];
@@ -515,26 +641,66 @@ final class ReleaseFingerprintCollector
                 }
             }
             foreach ($sourceFiles as $fileId => $sourceFile) {
+                if (($par2SetSourceConflicts[$setId][$fileId] ?? false) === true) {
+                    continue;
+                }
                 $par2Sources[$setId.':'.$fileId] = $sourceFile;
             }
         }
+        $par2IfscPreviewBudget = self::MAX_RELEASE_IFSC_PREVIEW_RECORDS;
+        $par2Ifsc = $this->mergeInputFileSliceChecksums(
+            $par2IfscObservations,
+            $par2SetMainPackets,
+            $par2SetMainPacketConflicts,
+            $par2SetSources,
+            $par2SetSourceConflicts,
+            $par2SetBlockSizes,
+            $par2SetBlockSizeConflicts,
+            $par2IfscObservationsOmitted === 0,
+            $par2Complete,
+            $par2IfscPreviewBudget,
+        );
+        foreach ($assembledPar2 as &$par2File) {
+            if (! is_array($par2File['metadata'] ?? null)) {
+                continue;
+            }
+            unset($par2File['metadata']['input_file_slice_checksums']);
+            if (is_array($par2File['metadata']['recovery_sets'] ?? null)) {
+                foreach (array_keys($par2File['metadata']['recovery_sets']) as $recoverySetIndex) {
+                    unset($par2File['metadata']['recovery_sets'][$recoverySetIndex]['input_file_slice_checksums']);
+                }
+            }
+        }
+        unset($par2File);
         $multiplePar2Sets = count($par2SetIds) > 1;
         $par2RecoveryExponents = $multiplePar2Sets ? [] : ($par2RecoveryExponentsBySet[array_key_first($par2SetIds)] ?? []);
         $recoveryCount = count($par2RecoveryExponents);
         $parsedRecoveryAcrossSets = array_sum(array_map('count', $par2RecoveryExponentsBySet));
-        $par2SourceBlocks = 0;
+        $par2SourceBlocks = null;
         if (! $multiplePar2Sets && $par2SetIds !== []) {
             $singleSetId = array_key_first($par2SetIds);
-            $main = $par2SetMainPackets[$singleSetId] ?? [];
-            $recoverableIds = $main['recoverable_file_ids'] ?? [];
+            $main = $par2SetMainPackets[$singleSetId] ?? null;
             $blockSize = (int) ($par2SetBlockSizes[$singleSetId] ?? 0);
-            if ($blockSize > 0) {
-                foreach ($recoverableIds as $fileId) {
-                    $fileSize = (int) ($par2SetSources[$singleSetId][$fileId]['file_length'] ?? 0);
-                    if ($fileSize > 0) {
-                        $par2SourceBlocks += (int) ceil($fileSize / $blockSize);
+            $denominatorIsDefined = is_array($main)
+                && ($par2SetMainPacketConflicts[$singleSetId] ?? false) !== true
+                && ($par2SetBlockSizeConflicts[$singleSetId] ?? false) !== true
+                && $blockSize > 0;
+            $sourceBlockCount = 0;
+            if ($denominatorIsDefined) {
+                foreach ($main['recoverable_file_ids'] ?? [] as $fileId) {
+                    if (! is_string($fileId)
+                        || ($par2SetSourceConflicts[$singleSetId][$fileId] ?? false) === true
+                        || ! is_int($par2SetSources[$singleSetId][$fileId]['file_length'] ?? null)
+                        || $par2SetSources[$singleSetId][$fileId]['file_length'] < 0) {
+                        $denominatorIsDefined = false;
+                        break;
                     }
+                    $fileSize = $par2SetSources[$singleSetId][$fileId]['file_length'];
+                    $sourceBlockCount += intdiv($fileSize, $blockSize) + (($fileSize % $blockSize) === 0 ? 0 : 1);
                 }
+            }
+            if ($denominatorIsDefined) {
+                $par2SourceBlocks = $sourceBlockCount;
             }
         }
         $par2SourceFiles = array_values($par2Sources);
@@ -542,7 +708,7 @@ final class ReleaseFingerprintCollector
             '/(?:\.part\d+\.rar|\.rar|\.r\d{2,})\z/i',
             (string) ($sourceFile['filename'] ?? ''),
         ) === 1));
-        $par2RecoveryPercent = $par2Complete && $par2RecoverySliceConflicts === [] && ! $multiplePar2Sets && $par2SourceBlocks > 0 && ! $par2PackedLayout
+        $par2RecoveryPercent = $par2Complete && $par2RecoverySliceConflicts === [] && ! $multiplePar2Sets && is_int($par2SourceBlocks) && $par2SourceBlocks > 0 && ! $par2PackedLayout
             ? round($recoveryCount / $par2SourceBlocks * 100, 3)
             : null;
         $yencFileLengthPercent = $yencSizeCounts['rar'] > 0 && $yencSizeCounts['par2'] > 0 && $yencSizes['rar'] > 0
@@ -581,7 +747,7 @@ final class ReleaseFingerprintCollector
         return [
             'status' => $status,
             'data' => [
-                'schema_version' => 1,
+                'schema_version' => self::SCHEMA_VERSION,
                 'collection_policy' => [
                     'all_nzb_files_listed' => true,
                     'non_par2_article_samples_per_file' => 'first, middle, and last segment; repeated Message-IDs are deduplicated within each NZB file',
@@ -610,12 +776,37 @@ final class ReleaseFingerprintCollector
                     'multiple_recovery_sets' => $multiplePar2Sets,
                     'source_files' => $par2SourceFiles,
                     'source_file_total_bytes' => array_sum(array_column($par2SourceFiles, 'file_length')),
+                    'main_definition_conflicts' => $par2MainDefinitionConflicts,
+                    'source_file_definition_conflicts' => $par2SourceDefinitionConflicts,
                     'source_rar_files' => $par2SourceRarFiles,
                     'source_rar_total_bytes' => array_sum(array_column($par2SourceRarFiles, 'file_length')),
+                    'input_file_slice_checksums' => $par2Ifsc['files'],
+                    'ifsc_conflicts' => $par2Ifsc['conflicts'],
+                    'ifsc_slice_count_mismatches' => $par2Ifsc['slice_count_mismatches'],
+                    'ifsc_unvalidated_file_ids' => $par2Ifsc['unvalidated_file_ids'],
+                    'missing_recoverable_ifsc_file_ids' => $par2Ifsc['missing_recoverable_file_ids'],
+                    'ifsc_observations_omitted' => $par2IfscObservationsOmitted,
+                    'ifsc_aggregation_complete' => $par2IfscObservationsOmitted === 0,
+                    'ifsc_coverage_complete' => $par2Ifsc['coverage_complete'],
+                    'ifsc_preview_record_budget' => [
+                        'maximum' => self::MAX_RELEASE_IFSC_PREVIEW_RECORDS,
+                        'used' => self::MAX_RELEASE_IFSC_PREVIEW_RECORDS - $par2IfscPreviewBudget,
+                        'omitted' => $par2Ifsc['preview_records_omitted'],
+                        'truncated_variants' => $par2Ifsc['preview_variants_truncated'],
+                    ],
+                    'ifsc_file_count' => count($par2Ifsc['files']),
+                    'ifsc_conflict_count' => count(array_filter(
+                        $par2Ifsc['files'],
+                        static fn (array $ifsc): bool => $ifsc['duplicate_conflict'] === true,
+                    )),
+                    'ifsc_validated_count' => count(array_filter(
+                        $par2Ifsc['files'],
+                        static fn (array $ifsc): bool => $ifsc['validation_status'] === 'validated',
+                    )),
                     'unique_recovery_slices' => $multiplePar2Sets ? null : $recoveryCount,
                     'parsed_recovery_exponents_across_sets' => $multiplePar2Sets ? $parsedRecoveryAcrossSets : null,
                     'recovery_slice_conflicts' => array_values($par2RecoverySliceConflicts),
-                    'source_block_count' => $multiplePar2Sets ? null : ($par2SourceBlocks ?: null),
+                    'source_block_count' => $par2SourceBlocks ?: null,
                     'recovery_percent' => $par2RecoveryPercent,
                     'packed_layout_present' => $par2PackedLayout,
                     'complete' => $par2FileCount > 0 ? $par2Complete : null,
@@ -642,6 +833,245 @@ final class ReleaseFingerprintCollector
                 ],
             ],
         ];
+    }
+
+    /**
+     * Merge per-volume IFSC records against the release-wide PAR2 definitions.
+     * Repeated packets describe the same complete checksum sequence; they are
+     * never concatenated.
+     *
+     * @return array{files: list<array<string, mixed>>, conflicts: list<array<string, mixed>>, slice_count_mismatches: list<array<string, mixed>>, unvalidated_file_ids: list<array{recovery_set_id: string, file_id: string}>, missing_recoverable_file_ids: list<array{recovery_set_id: string, file_id: string}>, coverage_complete: bool, preview_records_omitted: int, preview_variants_truncated: int}
+     */
+    private function mergeInputFileSliceChecksums(
+        array $observations,
+        array $mainPackets,
+        array $mainPacketConflicts,
+        array $sourceFiles,
+        array $sourceFileConflicts,
+        array $blockSizes,
+        array $blockSizeConflicts,
+        bool $observationsComplete,
+        bool &$par2Complete,
+        int &$previewRecordsRemaining,
+    ): array {
+        $files = [];
+        $conflicts = [];
+        $sliceCountMismatches = [];
+        $unvalidatedFileIds = [];
+        $missingRecoverableFileIds = [];
+        $previewRecordsOmitted = 0;
+        $previewVariantsTruncated = 0;
+
+        foreach ($observations as $setId => $filesById) {
+            foreach ($filesById as $fileId => $fileObservations) {
+                $variants = [];
+                $localConflict = false;
+                foreach ($fileObservations as $observation) {
+                    $sliceCount = $observation['slice_count'];
+                    $digest = $observation['checksum_records_sha256'];
+                    if (! is_int($sliceCount) || $sliceCount < 0
+                        || ! is_string($digest) || preg_match('/\\A[a-f0-9]{64}\\z/i', $digest) !== 1) {
+                        $localConflict = true;
+                        continue;
+                    }
+                    $variantKey = $sliceCount.':'.strtolower($digest);
+                    $variants[$variantKey] ??= [
+                        'slice_count' => $sliceCount,
+                        'checksum_records_sha256' => strtolower($digest),
+                        'checksum_records_preview_hex' => $observation['checksum_records_preview_hex'],
+                        'preview_slice_count' => $observation['preview_slice_count'],
+                        'preview_truncated' => $observation['preview_truncated'],
+                        'source_file_indices' => [],
+                        'origins' => [],
+                    ];
+                    $variants[$variantKey]['source_file_indices'][] = $observation['origin']['file_index'];
+                    $variants[$variantKey]['origins'][] = $observation['origin'];
+                    $localConflict = $localConflict || $observation['duplicate_conflict'];
+                    if ($variants[$variantKey]['checksum_records_preview_hex'] === null
+                        && is_string($observation['checksum_records_preview_hex'])) {
+                        $variants[$variantKey]['checksum_records_preview_hex'] = $observation['checksum_records_preview_hex'];
+                        $variants[$variantKey]['preview_slice_count'] = $observation['preview_slice_count'];
+                        $variants[$variantKey]['preview_truncated'] = $observation['preview_truncated'];
+                    }
+                }
+
+                foreach ($variants as &$variant) {
+                    $variant['source_file_indices'] = array_values(array_unique($variant['source_file_indices']));
+                }
+                unset($variant);
+
+                $mainConflict = ($mainPacketConflicts[$setId] ?? false) === true;
+                $sourceConflict = ($sourceFileConflicts[$setId][$fileId] ?? false) === true;
+                $blockConflict = ($blockSizeConflicts[$setId] ?? false) === true;
+                $main = $mainConflict ? null : ($mainPackets[$setId] ?? null);
+                $source = $sourceConflict ? null : ($sourceFiles[$setId][$fileId] ?? null);
+                $blockSize = ($blockConflict || $mainConflict) ? null : ($blockSizes[$setId] ?? null);
+                $recoverableIds = is_array($main) ? ($main['recoverable_file_ids'] ?? []) : [];
+                $nonRecoverableIds = is_array($main) ? ($main['non_recoverable_file_ids'] ?? []) : [];
+                $allMainIds = is_array($main) ? ($main['all_file_ids'] ?? [...$recoverableIds, ...$nonRecoverableIds]) : [];
+                $mainMembership = $mainConflict ? 'definition_conflict' : (! is_array($main)
+                    ? 'unknown'
+                    : (in_array($fileId, $recoverableIds, true) ? 'recoverable'
+                        : (in_array($fileId, $nonRecoverableIds, true) ? 'non_recoverable'
+                            : (in_array($fileId, $allMainIds, true) ? 'non_recoverable' : 'unlisted'))));
+                $fileLength = is_array($source) && is_int($source['file_length'] ?? null)
+                    ? $source['file_length'] : null;
+                $validBlockSize = is_int($blockSize) && $blockSize > 0 ? $blockSize : null;
+                $expectedSliceCount = $fileLength !== null && $validBlockSize !== null
+                    ? intdiv($fileLength, $validBlockSize) + (($fileLength % $validBlockSize) === 0 ? 0 : 1)
+                    : null;
+                $sliceCountMismatch = false;
+                foreach ($variants as &$variant) {
+                    $variant['slice_count_matches_file_length'] = $expectedSliceCount === null
+                        ? null : $variant['slice_count'] === $expectedSliceCount;
+                    $variant['slice_preview'] = $this->mapIfscPreviewToSource(
+                        $variant['checksum_records_preview_hex'],
+                        $fileLength,
+                        $validBlockSize,
+                        min(self::MAX_IFSC_STRUCTURED_PREVIEW_SLICES, $previewRecordsRemaining),
+                    );
+                    $previewedSliceCount = count($variant['slice_preview']);
+                    $previewRecordsRemaining -= $previewedSliceCount;
+                    $previewRecordsOmitted += max(0, $variant['slice_count'] - $previewedSliceCount);
+                    $variant['slice_preview_truncated'] = $previewedSliceCount < $variant['slice_count']
+                        || $variant['preview_truncated'];
+                    if ($variant['slice_preview_truncated']) {
+                        $previewVariantsTruncated++;
+                    }
+                    unset($variant['checksum_records_preview_hex']);
+                    if ($variant['slice_count_matches_file_length'] === false) {
+                        $sliceCountMismatch = true;
+                    }
+                }
+                unset($variant);
+
+                $duplicateConflict = $localConflict || count($variants) > 1;
+                $definitionConflict = $mainConflict || $sourceConflict || $blockConflict;
+                $invalid = $duplicateConflict || $mainMembership === 'unlisted' || $sliceCountMismatch;
+                $validationStatus = $invalid ? 'invalid'
+                    : ($mainMembership !== 'unknown' && $source !== null && $validBlockSize !== null
+                        && count($variants) === 1 && $expectedSliceCount !== null
+                        && ($variants[array_key_first($variants)]['slice_count_matches_file_length'] ?? null) === true
+                        && ! $definitionConflict ? 'validated' : 'unvalidated');
+                if ($invalid) {
+                    $par2Complete = false;
+                }
+
+                $variants = array_values($variants);
+                $sourceFileIndices = $variants === [] ? [] : array_values(array_unique(array_merge(...array_map(
+                    static fn (array $variant): array => $variant['source_file_indices'],
+                    $variants,
+                ))));
+                $entry = [
+                    'recovery_set_id' => $setId,
+                    'file_id' => $fileId,
+                    'source_file_indices' => $sourceFileIndices,
+                    'variants' => $variants,
+                    'duplicate_conflict' => $duplicateConflict,
+                    'definition_conflict' => $definitionConflict,
+                    'source_file_present' => $sourceConflict ? null : is_array($source),
+                    'source_file_length' => $fileLength,
+                    'main_membership' => $mainMembership,
+                    'source_block_size' => $validBlockSize,
+                    'expected_slice_count_from_file_length' => $expectedSliceCount,
+                    'slice_count_matches_file_length' => count($variants) === 1
+                        ? ($variants[0]['slice_count_matches_file_length'] ?? null) : null,
+                    'validation_status' => $validationStatus,
+                ];
+                $files[] = $entry;
+                if ($duplicateConflict) {
+                    $conflicts[] = [
+                        'recovery_set_id' => $setId,
+                        'file_id' => $fileId,
+                        'variant_count' => count($variants),
+                        'source_file_indices' => $sourceFileIndices,
+                    ];
+                }
+                if ($sliceCountMismatch) {
+                    $sliceCountMismatches[] = [
+                        'recovery_set_id' => $setId,
+                        'file_id' => $fileId,
+                        'expected_slice_count' => $expectedSliceCount,
+                        'observed_slice_counts' => array_values(array_unique(array_column($variants, 'slice_count'))),
+                    ];
+                }
+                if ($validationStatus === 'unvalidated') {
+                    $unvalidatedFileIds[] = ['recovery_set_id' => $setId, 'file_id' => $fileId];
+                }
+            }
+        }
+
+        if ($observationsComplete) {
+            foreach ($mainPackets as $setId => $main) {
+                if (($mainPacketConflicts[$setId] ?? false) === true) {
+                    continue;
+                }
+                foreach ($main['recoverable_file_ids'] ?? [] as $fileId) {
+                    if (is_string($fileId) && ! isset($observations[$setId][$fileId])) {
+                        $missingRecoverableFileIds[] = ['recovery_set_id' => $setId, 'file_id' => $fileId];
+                    }
+                }
+            }
+        }
+
+        return [
+            'files' => $files,
+            'conflicts' => $conflicts,
+            'slice_count_mismatches' => $sliceCountMismatches,
+            'unvalidated_file_ids' => $unvalidatedFileIds,
+            'missing_recoverable_file_ids' => $missingRecoverableFileIds,
+            'coverage_complete' => $observationsComplete && $missingRecoverableFileIds === [],
+            'preview_records_omitted' => $previewRecordsOmitted,
+            'preview_variants_truncated' => $previewVariantsTruncated,
+        ];
+    }
+
+    /** @return list<array<string, int|string|bool|null>> */
+    private function mapIfscPreviewToSource(?string $previewHex, ?int $fileLength, ?int $blockSize, int $maximumSlices): array
+    {
+        if ($maximumSlices < 1 || ! is_string($previewHex) || $previewHex === '' || strlen($previewHex) > self::MAX_IFSC_PREVIEW_HEX_BYTES
+            || strlen($previewHex) % 40 !== 0 || preg_match('/\\A[a-f0-9]*\\z/i', $previewHex) !== 1) {
+            return [];
+        }
+        $slices = [];
+        $expectedSliceCount = $fileLength !== null && $blockSize !== null && $blockSize > 0
+            ? intdiv($fileLength, $blockSize) + (($fileLength % $blockSize) === 0 ? 0 : 1)
+            : null;
+        foreach (array_slice(str_split($previewHex, 40), 0, $maximumSlices, true) as $sliceIndex => $recordHex) {
+            $sourceStart = null;
+            $sourceEndExclusive = null;
+            $sourceBytesInSlice = null;
+            $zeroPaddingBytes = null;
+            $sourceRangeValid = null;
+            if ($fileLength !== null && $blockSize !== null && $blockSize > 0
+                && $sliceIndex <= intdiv(PHP_INT_MAX, $blockSize)) {
+                $candidateStart = $sliceIndex * $blockSize;
+                if ($candidateStart < $fileLength && $sliceIndex < $expectedSliceCount) {
+                    $sourceStart = $candidateStart;
+                    $sourceBytesInSlice = min($blockSize, $fileLength - $candidateStart);
+                    $sourceEndExclusive = $candidateStart + $sourceBytesInSlice;
+                    $zeroPaddingBytes = $blockSize - $sourceBytesInSlice;
+                    $sourceRangeValid = true;
+                } else {
+                    $sourceRangeValid = false;
+                }
+            }
+            $crcBytes = hex2bin(substr($recordHex, 32, 8));
+            $crc32 = is_string($crcBytes) ? unpack('Vcrc32', $crcBytes)['crc32'] : null;
+            $slices[] = [
+                'slice_index' => $sliceIndex,
+                'md5' => substr($recordHex, 0, 32),
+                'crc32' => $crc32,
+                'crc32_little_endian_hex' => substr($recordHex, 32, 8),
+                'source_byte_start' => $sourceStart,
+                'source_byte_end_exclusive' => $sourceEndExclusive,
+                'source_bytes_in_slice' => $sourceBytesInSlice,
+                'zero_padding_bytes' => $zeroPaddingBytes,
+                'source_range_valid' => $sourceRangeValid,
+            ];
+        }
+
+        return $slices;
     }
 
     /** @param list<array<string, mixed>> $observations */
