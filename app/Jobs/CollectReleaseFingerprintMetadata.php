@@ -45,7 +45,8 @@ final class CollectReleaseFingerprintMetadata implements ShouldBeUnique, ShouldQ
             ['releases_id' => $this->releaseId],
             ['status' => 'pending'],
         );
-        if ($record->status === 'complete') {
+        if ($record->status === 'complete'
+            && (int) ($record->metadata['schema_version'] ?? 0) >= ReleaseFingerprintMetadata::CURRENT_SCHEMA_VERSION) {
             return;
         }
         $record->update(['status' => 'processing', 'last_error' => null]);

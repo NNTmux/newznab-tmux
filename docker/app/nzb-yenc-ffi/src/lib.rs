@@ -18,6 +18,7 @@ use std::panic::catch_unwind;
 use std::ptr;
 use std::slice;
 
+mod article_identity;
 mod formats;
 mod par2;
 
@@ -31,6 +32,7 @@ const DECODE_FAILED: usize = usize::MAX;
 const HEADER: &[u8] = b"=ybegin line=128 name=payload\r\n";
 const FOOTER: &[u8] = b"\r\n=yend\r\n";
 const MAX_METADATA_INPUT_BYTES: usize = 67_108_864;
+const MAX_ARTICLE_IDENTITY_INPUT_BYTES: usize = 131_072;
 
 /// Decode a yEnc payload (CR/LF line endings are skipped, `=X` escapes resolved).
 pub fn decode_payload(payload: &[u8]) -> Option<Vec<u8>> {
@@ -117,6 +119,44 @@ pub unsafe extern "C" fn nntmux_format_metadata_json(
         unsafe { slice::from_raw_parts(data, length) }
     };
     let encoded = catch_unwind(|| serde_json::to_string(&formats::parse(input)));
+    match encoded {
+        Ok(Ok(json)) => CString::new(json)
+            .map(CString::into_raw)
+            .unwrap_or(ptr::null_mut()),
+        _ => ptr::null_mut(),
+    }
+}
+
+/// Parse the relationship between a requested Message-ID, a HEAD field, and
+/// the mandatory Message-ID column in an OVER response. `data` is AI01 followed
+/// by three little-endian length-prefixed byte strings; u32::MAX means absent.
+/// The caller must release the result with `nntmux_metadata_string_free`.
+///
+/// # Safety
+/// `data` must be readable for `length` bytes. Oversized inputs are rejected.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn nntmux_article_identity_json(
+    data: *const u8,
+    length: usize,
+    overview_response_code: i32,
+    overview_attempted: i32,
+) -> *mut c_char {
+    if length > MAX_ARTICLE_IDENTITY_INPUT_BYTES || (length > 0 && data.is_null()) {
+        return ptr::null_mut();
+    }
+    let input = if length == 0 {
+        &[]
+    } else {
+        // SAFETY: the caller guarantees `data` is readable for `length` bytes.
+        unsafe { slice::from_raw_parts(data, length) }
+    };
+    let encoded = catch_unwind(|| {
+        serde_json::to_string(&article_identity::parse(
+            input,
+            overview_response_code,
+            overview_attempted != 0,
+        ))
+    });
     match encoded {
         Ok(Ok(json)) => CString::new(json)
             .map(CString::into_raw)

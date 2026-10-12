@@ -16,6 +16,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 final class ReleaseFingerprintMetadata extends Model
 {
+    public const CURRENT_SCHEMA_VERSION = 2;
+
     protected $primaryKey = 'releases_id';
 
     public $incrementing = false;

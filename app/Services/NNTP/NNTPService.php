@@ -1054,7 +1054,7 @@ class NNTPService extends NntpClient
      * Read raw HEAD fields and a bounded raw BODY for a known article ID.
      * The alternate provider is queried directly instead of only as a fallback.
      *
-     * @return array{headers: list<string>, body: string, overview_response_code: int|null, overview_raw: string|null, command_results: list<array<string, mixed>>}
+     * @return array{headers: list<string>, body: string, overview_response_code: int|null, overview_raw: string|null, overview_rows: list<string>, overview_row_count: int, overview_attempted: bool, command_results: list<array<string, mixed>>}
      */
     public function getFingerprintArticleByMessageID(string $identifier, int $maximumBodyBytes = 2_000_000,
         int $maximumHeaderBytes = 65_536, bool $alternate = false, bool $includeOverview = false): array
@@ -1075,6 +1075,8 @@ class NNTPService extends NntpClient
         try {
             $overviewCode = null;
             $overviewRaw = null;
+            $overviewLines = [];
+            $overviewAttempted = $includeOverview;
             if ($includeOverview) {
                 $overviewCode = $connection->_sendCommand('OVER <'.$identifier.'>');
                 if ($overviewCode === 224) {
@@ -1090,14 +1092,19 @@ class NNTPService extends NntpClient
                 'body' => $body,
                 'overview_response_code' => is_numeric($overviewCode) ? (int) $overviewCode : null,
                 'overview_raw' => $overviewRaw,
+                'overview_rows' => $overviewLines,
+                'overview_row_count' => count($overviewLines),
+                'overview_attempted' => $overviewAttempted,
                 'command_results' => [
                     ...($includeOverview ? [[
                         'command' => 'OVER MSGID',
+                        'attempted' => true,
                         'response_code' => is_numeric($overviewCode) ? (int) $overviewCode : null,
                         'available' => $overviewCode === 224,
+                        'error_type' => is_numeric($overviewCode) ? null : class_basename($overviewCode),
                     ]] : []),
-                    ['command' => 'HEAD', 'response_code' => 221, 'available' => true],
-                    ['command' => 'BODY', 'response_code' => 222, 'available' => true],
+                    ['command' => 'HEAD', 'attempted' => true, 'response_code' => 221, 'available' => true],
+                    ['command' => 'BODY', 'attempted' => true, 'response_code' => 222, 'available' => true],
                 ],
             ];
         } finally {
