@@ -1,0 +1,275 @@
+{
+  "supplement": "real HeaderStorageService semantic fixture; separate from and does not alter the immutable 400-epoch report",
+  "status": "passed for both baseline and candidate",
+  "source": {
+    "shared_application_revision": "a282ca24990fb11c586cb9544ae4bf2833e73c18",
+    "baseline_parent_revision": "5c9b5f63f6003ee03e77afdc1d3482626f1ad347",
+    "baseline_collection_handler_sha256": "a252e507b50f1c80ffbac5e2f21d38ba26ed381b30b10145476ba279cd55de88",
+    "candidate_collection_handler_sha256": "7d58bf1cd097be7c22a3ecaec175b35166bd4ee7109dab76d1117f4b52768474",
+    "only_runtime_overlay_varied": "app/Services/Binaries/CollectionHandler.php",
+    "full_source_archive_sha256": "26c399a83019bf73cb3177e77a9fce0a4c6f0d10bc659784c0f7072ebb00db59",
+    "fixture_script_sha256": "481a9e06d3f8d20918d70b77b895ab3d646022a536981ce7e63ac1e30f2090eb",
+    "schema_sha256": "940179ec775e9c13e765d56aaee47db1d3a82f250d1696b12ef32bac1a74cada",
+    "vendor_manifest_sha256": "c6e66d8d0a3b0b68b9a1a27fc24b6c4693279a7af70dc8e65e10246ebefb66fd",
+    "durable_source_archive": "raw/2026-10-11-metadata-semantic-source.tar.gz",
+    "git_tree_oid": "b86e26bad77203cf07be3cc08eb2b9b02879b100",
+    "source_archive_tracked_file_verification": {
+      "compared_files": 2563,
+      "mismatches": 0,
+      "against_revision": "a282ca24990fb11c586cb9544ae4bf2833e73c18"
+    }
+  },
+  "runtime": {
+    "host": "192.168.1.93 Linux",
+    "php_runtime_image": "sha256:370880898f81aae668379868b1e318f6289170f560f62861d88e89b1da812352",
+    "php_version": "8.5.11",
+    "database_image": "sha256:bc474f00629f0123c10f9e1bca193a45d18af15a274cf0656acda64f1086c3b6",
+    "database": "MariaDB 11.4.8",
+    "application_limits": "1 CPU, 2 GiB",
+    "database_limits": "1 CPU, 512 MiB, tmpfs datadir",
+    "network": "Docker internal network, no published ports or external routes",
+    "configuration": "APP_ENV=testing, generated fake APP_KEY, private random database; API credentials blank; no .env or production mounts",
+    "cleanup": "both random fixture databases dropped; app runs exited; private DB container and internal network removed"
+  },
+  "fixture": {
+    "real_handler": "App\\Services\\Binaries\\HeaderStorageService::store with real CollectionHandler, BinaryHandler, PartHandler, and HeaderStorageTransaction",
+    "initial_and_replay_headers_each": 16,
+    "collections": 2,
+    "binaries": 8,
+    "parts": 16,
+    "xref_inputs": "Initial a+b; duplicate exact a token and uppercase A token. Replay same article numbers/Message-IDs/subjects/bytes with a+b+c, duplicate exact a, uppercase A and C variants.",
+    "membership_assertion": "Exact (collection ID, lowercase-normalized group name) pairs asserted; initial a+b for each ID, replay a+b+c for each ID.",
+    "replay_assertions": "Same collection IDs; no failed article IDs; part identity/number/message-ID/bytes snapshot unchanged; binary counts, sums, part flags and readiness unchanged; collection sums/readiness unchanged; no orphans; dateadded preserved.",
+    "controlled_time": "Laravel Carbon test clock and MariaDB session SET timestamp each set to 2026-10-12 03:00:00 then 03:02:00; SQL NOW() verified both times. last_seen_at advanced for both collections."
+  },
+  "variants": {
+    "baseline": {
+      "status": "passed",
+      "variant": "baseline",
+      "source_revision": "a282ca24990fb11c586cb9544ae4bf2833e73c18",
+      "collection_handler_sha256": "a252e507b50f1c80ffbac5e2f21d38ba26ed381b30b10145476ba279cd55de88",
+      "schema_sha256": "940179ec775e9c13e765d56aaee47db1d3a82f250d1696b12ef32bac1a74cada",
+      "private_database": "created and dropped in this run",
+      "clock_control": {
+        "php_carbon_test_now": [
+          "2026-10-12 03:00:00",
+          "2026-10-12 03:02:00"
+        ],
+        "mariadb_session_set_timestamp": [
+          "2026-10-12 03:00:00",
+          "2026-10-12 03:02:00"
+        ],
+        "verified_sql_now": true
+      },
+      "fixture": {
+        "collections": 2,
+        "binaries": 8,
+        "parts": 16,
+        "headers_each_pass": 16,
+        "initial_groups_per_collection": [
+          "alt.binaries.a",
+          "alt.binaries.b"
+        ],
+        "replay_groups_per_collection": [
+          "alt.binaries.a",
+          "alt.binaries.b",
+          "alt.binaries.c"
+        ],
+        "duplicate_and_case_variant_xref_tokens": true
+      },
+      "initial": {
+        "collection_ids": {
+          "Semantic Alpha": 1,
+          "Semantic Beta": 2
+        },
+        "expected_group_pairs": {
+          "1": [
+            "alt.binaries.a",
+            "alt.binaries.b"
+          ],
+          "2": [
+            "alt.binaries.a",
+            "alt.binaries.b"
+          ]
+        },
+        "actual_normalized_group_pairs": {
+          "1": [
+            "alt.binaries.a",
+            "alt.binaries.b"
+          ],
+          "2": [
+            "alt.binaries.a",
+            "alt.binaries.b"
+          ]
+        },
+        "failed_articles": [],
+        "last_seen_at": {
+          "Semantic Alpha": "2026-10-12 03:00:00",
+          "Semantic Beta": "2026-10-12 03:00:00"
+        },
+        "parts_sha256": "5d161d7bfba36acf6e285ac144ffbca32537ccaae1c3cdaef6f49549dfaa50fd"
+      },
+      "replay": {
+        "collection_ids": {
+          "Semantic Alpha": 1,
+          "Semantic Beta": 2
+        },
+        "expected_group_pairs": {
+          "1": [
+            "alt.binaries.a",
+            "alt.binaries.b",
+            "alt.binaries.c"
+          ],
+          "2": [
+            "alt.binaries.a",
+            "alt.binaries.b",
+            "alt.binaries.c"
+          ]
+        },
+        "actual_normalized_group_pairs": {
+          "1": [
+            "alt.binaries.a",
+            "alt.binaries.b",
+            "alt.binaries.c"
+          ],
+          "2": [
+            "alt.binaries.a",
+            "alt.binaries.b",
+            "alt.binaries.c"
+          ]
+        },
+        "failed_articles": [],
+        "last_seen_at": {
+          "Semantic Alpha": "2026-10-12 03:02:00",
+          "Semantic Beta": "2026-10-12 03:02:00"
+        },
+        "dateadded_preserved": true,
+        "parts_unchanged": true,
+        "parts_sha256": "5d161d7bfba36acf6e285ac144ffbca32537ccaae1c3cdaef6f49549dfaa50fd"
+      },
+      "invariants": {
+        "collections_ready": 2,
+        "binary_aggregate_rows": 8,
+        "no_orphans": true,
+        "replay_did_not_duplicate_parts": true
+      }
+    },
+    "candidate": {
+      "status": "passed",
+      "variant": "candidate",
+      "source_revision": "a282ca24990fb11c586cb9544ae4bf2833e73c18",
+      "collection_handler_sha256": "7d58bf1cd097be7c22a3ecaec175b35166bd4ee7109dab76d1117f4b52768474",
+      "schema_sha256": "940179ec775e9c13e765d56aaee47db1d3a82f250d1696b12ef32bac1a74cada",
+      "private_database": "created and dropped in this run",
+      "clock_control": {
+        "php_carbon_test_now": [
+          "2026-10-12 03:00:00",
+          "2026-10-12 03:02:00"
+        ],
+        "mariadb_session_set_timestamp": [
+          "2026-10-12 03:00:00",
+          "2026-10-12 03:02:00"
+        ],
+        "verified_sql_now": true
+      },
+      "fixture": {
+        "collections": 2,
+        "binaries": 8,
+        "parts": 16,
+        "headers_each_pass": 16,
+        "initial_groups_per_collection": [
+          "alt.binaries.a",
+          "alt.binaries.b"
+        ],
+        "replay_groups_per_collection": [
+          "alt.binaries.a",
+          "alt.binaries.b",
+          "alt.binaries.c"
+        ],
+        "duplicate_and_case_variant_xref_tokens": true
+      },
+      "initial": {
+        "collection_ids": {
+          "Semantic Alpha": 1,
+          "Semantic Beta": 2
+        },
+        "expected_group_pairs": {
+          "1": [
+            "alt.binaries.a",
+            "alt.binaries.b"
+          ],
+          "2": [
+            "alt.binaries.a",
+            "alt.binaries.b"
+          ]
+        },
+        "actual_normalized_group_pairs": {
+          "1": [
+            "alt.binaries.a",
+            "alt.binaries.b"
+          ],
+          "2": [
+            "alt.binaries.a",
+            "alt.binaries.b"
+          ]
+        },
+        "failed_articles": [],
+        "last_seen_at": {
+          "Semantic Alpha": "2026-10-12 03:00:00",
+          "Semantic Beta": "2026-10-12 03:00:00"
+        },
+        "parts_sha256": "5d161d7bfba36acf6e285ac144ffbca32537ccaae1c3cdaef6f49549dfaa50fd"
+      },
+      "replay": {
+        "collection_ids": {
+          "Semantic Alpha": 1,
+          "Semantic Beta": 2
+        },
+        "expected_group_pairs": {
+          "1": [
+            "alt.binaries.a",
+            "alt.binaries.b",
+            "alt.binaries.c"
+          ],
+          "2": [
+            "alt.binaries.a",
+            "alt.binaries.b",
+            "alt.binaries.c"
+          ]
+        },
+        "actual_normalized_group_pairs": {
+          "1": [
+            "alt.binaries.a",
+            "alt.binaries.b",
+            "alt.binaries.c"
+          ],
+          "2": [
+            "alt.binaries.a",
+            "alt.binaries.b",
+            "alt.binaries.c"
+          ]
+        },
+        "failed_articles": [],
+        "last_seen_at": {
+          "Semantic Alpha": "2026-10-12 03:02:00",
+          "Semantic Beta": "2026-10-12 03:02:00"
+        },
+        "dateadded_preserved": true,
+        "parts_unchanged": true,
+        "parts_sha256": "5d161d7bfba36acf6e285ac144ffbca32537ccaae1c3cdaef6f49549dfaa50fd"
+      },
+      "invariants": {
+        "collections_ready": 2,
+        "binary_aggregate_rows": 8,
+        "no_orphans": true,
+        "replay_did_not_duplicate_parts": true
+      }
+    }
+  },
+  "raw_artifacts": {
+    "baseline_stdout_sha256": "e727a51bd11169fc15d9e046854c49e949ecb6898fe69fc22e734eb2874c574c",
+    "candidate_stdout_sha256": "7231dbfba996542f285de4dbdacafe15e7e5d21e40b22dfbff53513fc605ce07",
+    "fixture_script_sha256": "481a9e06d3f8d20918d70b77b895ab3d646022a536981ce7e63ac1e30f2090eb"
+  },
+  "scope_limit": "Semantic correctness only; not a throughput or production-capacity measurement."
+}

@@ -1,0 +1,276 @@
+{
+  "local_date": "2026-10-11",
+  "interval_utc": [
+    "2026-10-12T01:05:17Z",
+    "2026-10-12T01:17:46Z"
+  ],
+  "source_revision": "54c140d7dc4c2500bf69115047b3aabfac6942f0",
+  "candidate_sha256": "7d58bf1cd097be7c22a3ecaec175b35166bd4ee7109dab76d1117f4b52768474",
+  "statistical_unit": "outer paired block; matched epoch-log effects averaged within block",
+  "fixed_design": {
+    "hot_pairs": 20,
+    "measured_epochs_each_arm": 8,
+    "spread_pairs": 4,
+    "spread_epochs_each_arm": 4,
+    "warmup_each_arm": 1,
+    "measured_epochs": 352,
+    "warmups": 48,
+    "total_epochs": 400
+  },
+  "source_order": "hot10/10,spread2/2 source-first balanced; fixedseed10413",
+  "all400initial_correct_replay_firstwrite_normal_exits": true,
+  "hot_primary": {
+    "role": "primary_hot_nonregression",
+    "primary_budget_evaluated": true,
+    "planned_outer_pairs": 20,
+    "measured_epochs_per_arm": 8,
+    "invalid_pairs": [],
+    "throughput": {
+      "geomean": 1.0017989319436675,
+      "ci95": [
+        0.986403534847181,
+        1.0174346143223791
+      ],
+      "independent_outer_pairs": 20,
+      "df": 19,
+      "assumptions": "approximately independent normal outer block log effects; nested epochs not statistical units"
+    },
+    "p95": {
+      "geomean": 0.9897107638382046,
+      "ci95": [
+        0.9679764783279384,
+        1.0119330562135318
+      ],
+      "independent_outer_pairs": 20,
+      "df": 19,
+      "assumptions": "approximately independent normal outer block log effects; nested epochs not statistical units"
+    },
+    "budget_passed": true,
+    "blocks": [
+      {
+        "pair": "long-b1-c2-w4-h500",
+        "mean_epoch_log_throughput": -0.012463092180542826,
+        "mean_epoch_log_p95": 0.010521245110233888,
+        "secondary_aggregate_throughput_ratio": 0.9871626596664212,
+        "secondary_pooled_p95_ratio": 1.031346540717168
+      },
+      {
+        "pair": "long-b2-c2-w4-h500",
+        "mean_epoch_log_throughput": -0.023215202223654717,
+        "mean_epoch_log_p95": 0.0009695558186928364,
+        "secondary_aggregate_throughput_ratio": 0.9769948569492778,
+        "secondary_pooled_p95_ratio": 1.0065946909593926
+      },
+      {
+        "pair": "long-b3-c2-w4-h500",
+        "mean_epoch_log_throughput": 0.011317463131279251,
+        "mean_epoch_log_p95": -0.02989847906401278,
+        "secondary_aggregate_throughput_ratio": 1.0114719727837336,
+        "secondary_pooled_p95_ratio": 0.965959554044481
+      },
+      {
+        "pair": "long-b4-c2-w4-h500",
+        "mean_epoch_log_throughput": -0.07818691614393519,
+        "mean_epoch_log_p95": 0.0798594356645859,
+        "secondary_aggregate_throughput_ratio": 0.9343408637093301,
+        "secondary_pooled_p95_ratio": 1.0227352356282817
+      },
+      {
+        "pair": "long-b5-c2-w4-h500",
+        "mean_epoch_log_throughput": 0.019855002439723445,
+        "mean_epoch_log_p95": -0.062216305266636275,
+        "secondary_aggregate_throughput_ratio": 1.0205606887200025,
+        "secondary_pooled_p95_ratio": 0.9395658729880422
+      },
+      {
+        "pair": "long-b6-c2-w4-h500",
+        "mean_epoch_log_throughput": 0.06952428168833885,
+        "mean_epoch_log_p95": -0.11405245432743502,
+        "secondary_aggregate_throughput_ratio": 1.0824748763506915,
+        "secondary_pooled_p95_ratio": 0.662009479585208
+      },
+      {
+        "pair": "long-b7-c2-w4-h500",
+        "mean_epoch_log_throughput": -0.07207307118517621,
+        "mean_epoch_log_p95": 0.08575361980028648,
+        "secondary_aggregate_throughput_ratio": 0.9273969430291801,
+        "secondary_pooled_p95_ratio": 1.179087112715867
+      },
+      {
+        "pair": "long-b8-c2-w4-h500",
+        "mean_epoch_log_throughput": 0.02895383338230392,
+        "mean_epoch_log_p95": -0.05636535487097664,
+        "secondary_aggregate_throughput_ratio": 1.029231101645214,
+        "secondary_pooled_p95_ratio": 0.9769998779114722
+      },
+      {
+        "pair": "long-b9-c2-w4-h500",
+        "mean_epoch_log_throughput": 0.012232746877017853,
+        "mean_epoch_log_p95": -0.03358391354281767,
+        "secondary_aggregate_throughput_ratio": 1.0125312490111074,
+        "secondary_pooled_p95_ratio": 0.9469397637712385
+      },
+      {
+        "pair": "long-b10-c2-w4-h500",
+        "mean_epoch_log_throughput": 0.03675187296153831,
+        "mean_epoch_log_p95": -0.046662395267848954,
+        "secondary_aggregate_throughput_ratio": 1.0388892419139606,
+        "secondary_pooled_p95_ratio": 0.9031755022930771
+      },
+      {
+        "pair": "long-b11-c2-w4-h500",
+        "mean_epoch_log_throughput": 0.010026458744855648,
+        "mean_epoch_log_p95": -0.018821772032931165,
+        "secondary_aggregate_throughput_ratio": 1.0100434572670207,
+        "secondary_pooled_p95_ratio": 0.9633670584469852
+      },
+      {
+        "pair": "long-b12-c2-w4-h500",
+        "mean_epoch_log_throughput": 0.00193173391436724,
+        "mean_epoch_log_p95": 0.005231197544610535,
+        "secondary_aggregate_throughput_ratio": 1.0019948071686404,
+        "secondary_pooled_p95_ratio": 1.037733612974588
+      },
+      {
+        "pair": "long-b13-c2-w4-h500",
+        "mean_epoch_log_throughput": -0.009051604308292709,
+        "mean_epoch_log_p95": 0.020284054165625533,
+        "secondary_aggregate_throughput_ratio": 0.9907351967982856,
+        "secondary_pooled_p95_ratio": 1.0459800699313804
+      },
+      {
+        "pair": "long-b14-c2-w4-h500",
+        "mean_epoch_log_throughput": 0.011711645132865019,
+        "mean_epoch_log_p95": -0.03322126262873328,
+        "secondary_aggregate_throughput_ratio": 1.0118597345983718,
+        "secondary_pooled_p95_ratio": 0.956058014396693
+      },
+      {
+        "pair": "long-b15-c2-w4-h500",
+        "mean_epoch_log_throughput": 0.00896747726560497,
+        "mean_epoch_log_p95": 0.014085895141463672,
+        "secondary_aggregate_throughput_ratio": 1.0091147065316808,
+        "secondary_pooled_p95_ratio": 0.9926514615426487
+      },
+      {
+        "pair": "long-b16-c2-w4-h500",
+        "mean_epoch_log_throughput": 0.012124231767765942,
+        "mean_epoch_log_p95": -0.001769650639391479,
+        "secondary_aggregate_throughput_ratio": 1.0121007863906275,
+        "secondary_pooled_p95_ratio": 1.0295012751269348
+      },
+      {
+        "pair": "long-b17-c2-w4-h500",
+        "mean_epoch_log_throughput": -0.007375962507219306,
+        "mean_epoch_log_p95": 0.024289647685464617,
+        "secondary_aggregate_throughput_ratio": 0.9923995313044305,
+        "secondary_pooled_p95_ratio": 1.0595882781454402
+      },
+      {
+        "pair": "long-b18-c2-w4-h500",
+        "mean_epoch_log_throughput": -0.002671277646925646,
+        "mean_epoch_log_p95": 0.008002467959729637,
+        "secondary_aggregate_throughput_ratio": 0.9973599484867998,
+        "secondary_pooled_p95_ratio": 1.0138290049154313
+      },
+      {
+        "pair": "long-b19-c2-w4-h500",
+        "mean_epoch_log_throughput": -0.005460016285672118,
+        "mean_epoch_log_p95": 0.0043062527412398985,
+        "secondary_aggregate_throughput_ratio": 0.9945416241062308,
+        "secondary_pooled_p95_ratio": 1.0049062256485524
+      },
+      {
+        "pair": "long-b20-c2-w4-h500",
+        "mean_epoch_log_throughput": 0.023046711246272115,
+        "mean_epoch_log_p95": -0.06356250957265647,
+        "secondary_aggregate_throughput_ratio": 1.0244948928948803,
+        "secondary_pooled_p95_ratio": 0.933171543175648
+      }
+    ]
+  },
+  "spread_secondary": {
+    "role": "secondary_spread_safeguard",
+    "primary_budget_evaluated": false,
+    "planned_outer_pairs": 4,
+    "measured_epochs_per_arm": 4,
+    "invalid_pairs": [],
+    "throughput": {
+      "geomean": 2.0479032885007524,
+      "ci95": [
+        1.7941095693972522,
+        2.337598522737482
+      ],
+      "independent_outer_pairs": 4,
+      "df": 3,
+      "assumptions": "approximately independent normal outer block log effects; nested epochs not statistical units"
+    },
+    "p95": {
+      "geomean": 0.1461709551683861,
+      "ci95": [
+        0.11564503250633201,
+        0.18475456897526896
+      ],
+      "independent_outer_pairs": 4,
+      "df": 3,
+      "assumptions": "approximately independent normal outer block log effects; nested epochs not statistical units"
+    },
+    "budget_passed": true,
+    "blocks": [
+      {
+        "pair": "long-b1-c32-w4-h500",
+        "mean_epoch_log_throughput": 0.7031222926427219,
+        "mean_epoch_log_p95": -1.8866116721554393,
+        "secondary_aggregate_throughput_ratio": 2.052184740774281,
+        "secondary_pooled_p95_ratio": 0.13053674731609105
+      },
+      {
+        "pair": "long-b2-c32-w4-h500",
+        "mean_epoch_log_throughput": 0.7543491255310111,
+        "mean_epoch_log_p95": -1.9190518789045563,
+        "secondary_aggregate_throughput_ratio": 2.1347483637170432,
+        "secondary_pooled_p95_ratio": 0.14266575055062594
+      },
+      {
+        "pair": "long-b3-c32-w4-h500",
+        "mean_epoch_log_throughput": 0.6077875282242998,
+        "mean_epoch_log_p95": -1.7658304364171657,
+        "secondary_aggregate_throughput_ratio": 1.8630486113713882,
+        "secondary_pooled_p95_ratio": 0.1501875532326377
+      },
+      {
+        "pair": "long-b4-c32-w4-h500",
+        "mean_epoch_log_throughput": 0.8020069882039923,
+        "mean_epoch_log_p95": -2.120419678370416,
+        "secondary_aggregate_throughput_ratio": 2.232081264450593,
+        "secondary_pooled_p95_ratio": 0.12274805157093278
+      }
+    ]
+  },
+  "measured_deadlocks": {
+    "baseline": 147,
+    "candidate": 0
+  },
+  "measured_lock_wait_ms": {
+    "baseline": 173072,
+    "candidate": 197071
+  },
+  "hot_gc_runs_measured": {
+    "baseline": 0,
+    "candidate": 0
+  },
+  "profile": "CPU-pinned app11/core5 andDB10/core4;512MiB each,pool128MiB,tmpfs,PHP8.5.11x86NTS/MariaDB11.4.8;not production capacity proof",
+  "source_changes_during_investigation": false,
+  "decision": "Declared10%hot nonregression budget passed; original12%screen penalty not persistent in controlled fixed study; safePRIMARYlocking retained. No unhinted fallback or weakenedlocks.",
+  "report_sha256": "338c98ff2a355d33e3b7dc995827ac62d27c51bc56fc47a930e6c76a4599a66c",
+  "analysis_sha256": "6f44d76fa373bcc9d3870a870531e414afd1a42610321f2cd48e62b303cca262",
+  "superseding_validation_sha256": "035d0b297321f862b4fff180be7ff7a7bef0a19d2b331487d2689e4c6591ab14",
+  "recorded_correctness_scope": {
+    "storage_and_aggregate_checks": true,
+    "crosspost_total_row_count": true,
+    "exact_crosspost_membership_checked": false,
+    "canonical_replay_checked": true,
+    "replay_only_membership_or_timestamp_update_checked": false,
+    "interpretation": "Historical passed flags apply to the recorded checks only; supplemental semantic checks do not expand the original epoch coverage."
+  }
+}

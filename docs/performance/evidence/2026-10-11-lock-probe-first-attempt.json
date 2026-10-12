@@ -1,0 +1,21 @@
+{
+  "start_utc": "2026-10-11T23:03:15Z",
+  "end_utc": "2026-10-11T23:03:37Z",
+  "cleanup_exit": 0,
+  "complete": false,
+  "classification": "harness_invalid",
+  "failure": "observer equality-query EXPLAIN timed out during open worker transactions",
+  "completed_controls": [
+    {
+      "variant": "natural",
+      "deadlock": true,
+      "final_count": "32"
+    },
+    {
+      "variant": "forced_primary_range",
+      "deadlock": false,
+      "final_count": "32"
+    }
+  ],
+  "excluded_from_complete_comparison": true
+}

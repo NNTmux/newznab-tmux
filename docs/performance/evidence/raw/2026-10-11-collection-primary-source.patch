@@ -1,0 +1,143 @@
+diff --git a/app/Services/Binaries/CollectionHandler.php b/app/Services/Binaries/CollectionHandler.php
+index e7748125e..9a4bd2a28 100644
+--- a/app/Services/Binaries/CollectionHandler.php
++++ b/app/Services/Binaries/CollectionHandler.php
+@@ -659,7 +659,8 @@ final class CollectionHandler
+             sort($collectionIds);
+             $statusPlaceholders = implode(',', array_fill(0, \count($inProgressStatuses), '?'));
+             foreach (array_chunk($collectionIds, $chunkSize) as $chunk) {
+-                DB::table('collections')->whereIn('id', $chunk)->orderBy('id')->lockForUpdate()->pluck('id');
++                // A covering secondary scan can lock tentative duplicate inserts outside this ID set.
++                DB::table('collections')->forceIndex('PRIMARY')->whereIn('id', $chunk)->orderBy('id')->lockForUpdate()->pluck('id');
+                 $aggregates = DB::table('binaries')
+                     ->whereIn('collections_id', $chunk)
+                     ->groupBy('collections_id')
+diff --git a/tests/Feature/BinariesStorageInternalsTest.php b/tests/Feature/BinariesStorageInternalsTest.php
+index ba2f35d2e..900db295d 100644
+--- a/tests/Feature/BinariesStorageInternalsTest.php
++++ b/tests/Feature/BinariesStorageInternalsTest.php
+@@ -19,10 +19,124 @@ use Illuminate\Support\Facades\DB;
+ use Illuminate\Support\Facades\Log;
+ use Mockery;
+ use PHPUnit\Framework\Attributes\DataProvider;
++use Symfony\Component\Process\Process;
+ use Tests\TestCase;
+ 
+ class BinariesStorageInternalsTest extends TestCase
+ {
++    public function test_collection_aggregate_locking_ignores_a_tentative_duplicate_outside_the_requested_ids(): void
++    {
++        $host = getenv('TEST_MARIADB_HOST');
++        if ($host === false) {
++            $this->markTestSkipped('Requires the isolated MariaDB validation service.');
++        }
++        $database = 'nntmux_aggregate_lock_'.bin2hex(random_bytes(8));
++        config(['database.default' => 'mysql', 'database.connections.mysql.url' => null,
++            'database.connections.mysql.host' => $host, 'database.connections.mysql.port' => 3306,
++            'database.connections.mysql.unix_socket' => '',
++            'database.connections.mysql.database' => 'information_schema',
++            'database.connections.mysql.username' => 'root',
++            'database.connections.mysql.password' => 'isolated-validation']);
++        DB::purge();
++        DB::reconnect();
++        $duplicate = null;
++        $createdDatabase = false;
++        try {
++            DB::statement('CREATE DATABASE `'.$database.'`');
++            $createdDatabase = true;
++            config(['database.connections.mysql.database' => $database]);
++            DB::purge('mysql');
++            DB::reconnect();
++            DB::statement('CREATE TABLE collections (
++                id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
++                subject VARCHAR(255), fromname VARCHAR(255), xref VARCHAR(2000),
++                collectionhash BINARY(20) NOT NULL, filler VARCHAR(500),
++                totalfiles INT NOT NULL DEFAULT 1, filecheck INT NOT NULL DEFAULT 0,
++                filesize BIGINT NOT NULL DEFAULT 0, last_seen_at DATETIME NULL,
++                UNIQUE KEY ix_collection_collectionhash(collectionhash)
++            ) ENGINE=InnoDB');
++            DB::statement('CREATE TABLE binaries (
++                id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY, collections_id INT UNSIGNED NOT NULL,
++                partcheck INT NOT NULL, partsize BIGINT NOT NULL,
++                FOREIGN KEY (collections_id) REFERENCES collections(id) ON DELETE CASCADE
++            ) ENGINE=InnoDB');
++            $hashes = array_map(static fn (int $id): string => sha1('fixture-'.$id, true), range(0, 31));
++            sort($hashes, SORT_STRING);
++            foreach ($hashes as $offset => $hash) {
++                DB::table('collections')->insert(['id' => $offset + 1, 'subject' => 'fixture',
++                    'fromname' => 'synthetic', 'xref' => 'mock', 'collectionhash' => $hash, 'filler' => 'payload']);
++                DB::table('binaries')->insert(['collections_id' => $offset + 1, 'partcheck' => 1, 'partsize' => 1024]);
++            }
++            DB::statement('SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED');
++            DB::beginTransaction();
++            $values = implode(',', array_fill(0, 32, '(?, ?, ?, ?, ?)'));
++            $bindings = [];
++            foreach ($hashes as $hash) {
++                array_push($bindings, 'fixture', 'synthetic', 'mock', $hash, 'payload');
++            }
++            DB::statement('INSERT INTO collections (subject, fromname, xref, collectionhash, filler) VALUES '
++                .$values.' ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id)', $bindings);
++
++            $child = <<<'PHP'
++                $pdo = new PDO('mysql:host='.$argv[1].';port=3306;dbname='.$argv[3], 'root', 'isolated-validation', [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
++                $pdo->exec('SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED');
++                $pdo->beginTransaction();
++                echo 'connection:'.$pdo->query('SELECT CONNECTION_ID()')->fetchColumn().PHP_EOL;
++                fflush(STDOUT);
++                $query = $pdo->prepare('INSERT INTO collections(subject, collectionhash) VALUES (?, UNHEX(?)) ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id)');
++                $query->execute(['duplicate', $argv[2]]);
++                $pdo->commit();
++                echo 'duplicate_done'.PHP_EOL;
++                PHP;
++            $duplicate = new Process([PHP_BINARY, '-r', $child, $host, bin2hex($hashes[0]), $database]);
++            $duplicate->setTimeout(15);
++            $duplicate->start();
++            $deadline = microtime(true) + 8;
++            $wait = null;
++            do {
++                if (preg_match('/connection:(\d+)/', $duplicate->getOutput(), $match) === 1) {
++                    $wait = DB::selectOne('SELECT l.lock_index AS lock_index FROM information_schema.INNODB_LOCK_WAITS w
++                        JOIN information_schema.INNODB_TRX t ON t.trx_id = w.requesting_trx_id
++                        JOIN information_schema.INNODB_LOCKS l ON l.lock_id = w.requested_lock_id
++                        WHERE t.trx_mysql_thread_id = ?', [(int) $match[1]]);
++                }
++                if ($wait !== null || ! $duplicate->isRunning()) {
++                    break;
++                }
++                usleep(10000);
++            } while (microtime(true) < $deadline);
++            $this->assertNotNull($wait, 'The competing duplicate must be waiting before aggregate locking starts.');
++            $this->assertSame('ix_collection_collectionhash', $wait->lock_index);
++
++            $this->assertTrue((new CollectionHandler)->refreshAggregates(range(1, 32)),
++                'Aggregate locking must not visit the competing insert’s tentative, out-of-set primary key.');
++            DB::commit();
++            $this->assertSame(0, $duplicate->wait(), $duplicate->getErrorOutput());
++            $this->assertStringContainsString('duplicate_done', $duplicate->getOutput());
++            $this->assertSame(32, DB::table('collections')->count());
++            $this->assertSame(32, DB::table('collections')->where('filesize', 1024)->where('filecheck', 3)->count());
++        } finally {
++            try {
++                while (DB::transactionLevel() > 0) {
++                    DB::rollBack();
++                }
++            } finally {
++                try {
++                    if ($duplicate !== null && $duplicate->isRunning()) {
++                        $duplicate->stop(0);
++                    }
++                } finally {
++                    if ($createdDatabase) {
++                        config(['database.connections.mysql.database' => 'information_schema']);
++                        DB::purge('mysql');
++                        DB::reconnect();
++                        DB::statement('DROP DATABASE `'.$database.'`');
++                    }
++                }
++            }
++        }
++    }
++
+     protected function setUp(): void
+     {
+         parent::setUp();

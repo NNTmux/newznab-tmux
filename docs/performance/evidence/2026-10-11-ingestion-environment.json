@@ -1,0 +1,18 @@
+{
+  "host_architecture": "x86_64",
+  "php_image": "php:8.5.11-cli-bookworm",
+  "php_image_id": "sha256:819080ed413631f6ec564184dd9acd08d9425bd863b9f8b5876b5ea2147d55e7",
+  "db_image": "mariadb:11.4.8",
+  "db_image_id": "sha256:bc474f00629f0123c10f9e1bca193a45d18af15a274cf0656acda64f1086c3b6",
+  "db_cpu_limit": 0.75,
+  "app_cpu_limit": 0.5,
+  "db_memory_MiB": 512,
+  "app_memory_MiB": 512,
+  "db_buffer_pool_MiB": 128,
+  "db_log_file_MiB": 64,
+  "network": "private internal, no published ports",
+  "input": "synthetic only, no production data or configuration",
+  "normalization": "deterministic fixture cleaner; real storage classes",
+  "setup_start_utc": "2026-10-11T22:33:34.805157+00:00",
+  "complete": true
+}

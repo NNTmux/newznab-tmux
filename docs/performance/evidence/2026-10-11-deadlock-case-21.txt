@@ -1,0 +1,259 @@
+InnoDB\n\n
+=====================================
+2026-10-11 22:35:15 0x7cb16435f6c0 INNODB MONITOR OUTPUT
+=====================================
+Per second averages calculated from the last 49 seconds
+-----------------
+BACKGROUND THREAD
+-----------------
+srv_master_thread loops: 0 srv_active, 95 srv_idle
+srv_master_thread log flush and writes: 95
+----------
+SEMAPHORES
+----------
+------------------------
+LATEST DETECTED DEADLOCK
+------------------------
+2026-10-11 22:35:15 0x7cb1642336c0
+*** (1) TRANSACTION:
+TRANSACTION 8554, ACTIVE 0 sec fetching rows
+mysql tables in use 1, locked 1
+LOCK WAIT 72 lock struct(s), heap size 8312, 545 row lock(s), undo log entries 449
+MariaDB thread id 179, OS thread handle 137101331084992, query id 306770 172.30.0.3 root Creating sort index
+select `id` from `collections` where `id` in (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) order by `id` asc for update
+*** WAITING FOR THIS LOCK TO BE GRANTED:
+RECORD LOCKS space id 136 page no 3 n bits 104 index PRIMARY of table `bench`.`collections` trx id 8554 lock_mode X locks rec but not gap waiting
+Record lock, heap no 37 PHYSICAL RECORD: n_fields 16; compact format; info bits 0
+ 0: len 4; hex 00000b6b; asc    k;;
+ 1: len 6; hex 00000000216b; asc     !k;;
+ 2: len 7; hex b20000010d01ca; asc        ;;
+ 3: len 30; hex 42656e63682e436f6c6c656374696f6e2e3136205b342f345d2066696c65; asc Bench.Collection.16 [4/4] file; (total 35 bytes);
+ 4: len 22; hex 73796e746865746963406578616d706c652e74657374; asc synthetic@example.test;;
+ 5: len 5; hex 99bb174500; asc    E ;;
+ 6: len 30; hex 616c742e62696e61726965732e62656e63682e613a31303137373620616c; asc alt.binaries.bench.a:101776 al; (total 55 bytes);
+ 7: len 4; hex 00000002; asc     ;;
+ 8: len 4; hex 00000004; asc     ;;
+ 9: len 20; hex 14be5b91894072302b613a86d46121bfd42c1db8; asc   [  @r0+a:  a!  ,  ;;
+ 10: len 4; hex 80000000; asc     ;;
+ 11: len 5; hex 99bb1768cf; asc    h ;;
+ 12: SQL NULL;
+ 13: len 1; hex 80; asc  ;;
+ 14: len 8; hex 0000000000000000; asc         ;;
+ 15: len 30; hex 353330303662656631393034333338352020202020202020202020202020; asc 53006bef19043385              ; (total 32 bytes);
+
+*** CONFLICTING WITH:
+RECORD LOCKS space id 136 page no 3 n bits 320 index PRIMARY of table `bench`.`collections` trx id 8555 lock_mode X locks rec but not gap
+Record lock, heap no 37 PHYSICAL RECORD: n_fields 16; compact format; info bits 0
+ 0: len 4; hex 00000b6b; asc    k;;
+ 1: len 6; hex 00000000216b; asc     !k;;
+ 2: len 7; hex b20000010d01ca; asc        ;;
+ 3: len 30; hex 42656e63682e436f6c6c656374696f6e2e3136205b342f345d2066696c65; asc Bench.Collection.16 [4/4] file; (total 35 bytes);
+ 4: len 22; hex 73796e746865746963406578616d706c652e74657374; asc synthetic@example.test;;
+ 5: len 5; hex 99bb174500; asc    E ;;
+ 6: len 30; hex 616c742e62696e61726965732e62656e63682e613a31303137373620616c; asc alt.binaries.bench.a:101776 al; (total 55 bytes);
+ 7: len 4; hex 00000002; asc     ;;
+ 8: len 4; hex 00000004; asc     ;;
+ 9: len 20; hex 14be5b91894072302b613a86d46121bfd42c1db8; asc   [  @r0+a:  a!  ,  ;;
+ 10: len 4; hex 80000000; asc     ;;
+ 11: len 5; hex 99bb1768cf; asc    h ;;
+ 12: SQL NULL;
+ 13: len 1; hex 80; asc  ;;
+ 14: len 8; hex 0000000000000000; asc         ;;
+ 15: len 30; hex 353330303662656631393034333338352020202020202020202020202020; asc 53006bef19043385              ; (total 32 bytes);
+
+
+*** (2) TRANSACTION:
+TRANSACTION 8555, ACTIVE 0 sec inserting
+mysql tables in use 1, locked 1
+LOCK WAIT 3 lock struct(s), heap size 1128, 2 row lock(s), undo log entries 1
+MariaDB thread id 190, OS thread handle 137101332620992, query id 306650 172.30.0.3 root Update
+INSERT INTO collections (subject, fromname, date, xref, groups_id, totalfiles, collectionhash, collection_regexes_id, dateadded, noise) VALUES (?, ?, FROM_UNIXTIME(?), ?, ?, ?, ?, ?, NOW(), ?),(?, ?, FROM_UNIXTIME(?), ?, ?, ?, ?, ?, NOW(), ?),(?, ?, FROM_UNIXTIME(?), ?, ?, ?, ?, ?, NOW(), ?),(?, ?, FROM_UNIXTIME(?), ?, ?, ?, ?, ?, NOW(), ?),(?, ?, FROM_UNIXTIME(?), ?, ?, ?, ?, ?, NOW(), ?),(?, ?, FROM_UNIXTIME(?), ?, ?, ?, ?, ?, NOW(), ?),(?, ?, FROM_UNIXTIME(?), ?, ?, ?, ?, ?, NOW(), ?),(?, ?, FROM_UNIXTIME(?), ?, ?, ?, ?, ?, NOW(), ?),(?, ?, FROM_UNIXTIME(?), ?, ?, ?, ?, ?, NOW(), ?),(?, ?, FROM_UNIXTIME(?), ?, ?, ?, ?, ?, NOW(), ?),(?, ?, FROM_UNIXTIME(?), ?, ?, ?, ?, ?, NOW(), ?),(?, ?, FROM_UNIXTIME(?), ?, ?, ?, ?, ?, NOW(), ?),(?, ?, FROM_UNIXTIME(?), ?, ?, ?, ?, ?, NOW(), ?),(?, ?, FROM_UNIXTIME(?), ?, ?, ?, ?, ?, NOW(), ?),(?, ?, FROM_UNIXTIME(?), ?, ?, ?, ?, ?, NOW(), ?),(?, ?, FROM_UNIXTIME(?), ?, ?, ?, ?, ?, NOW(), ?),(?, ?, FROM_UNIXTIME(?), ?, ?, ?, ?, ?, NOW(), ?),(?, ?, FROM_UNIXTIME(?), ?, ?, ?, ?, ?, NOW(), ?),(?, ?, FROM_UNIXTIME(?), ?, ?, ?, ?, ?, NOW(), ?),(?, ?, FROM_UNIXTIME(?), ?, ?, ?, ?, ?, NOW(), ?),(?, ?, FROM_UNIXTIME(?), ?, ?, ?, ?, ?, NOW(), ?),(?, ?, FROM_UNIXTIME(?), ?, ?, ?, ?, ?, NOW(), ?),(?, ?, FROM_UNIXTIME(?), ?, ?, ?, ?, ?, NOW(), ?),(?, ?, FROM_UNIXTIME(?), ?, ?, ?, ?, ?, NOW(), ?),(?, ?, FROM_UNIXTIME(?), ?, ?, ?, ?, ?, NOW(), ?),(?, ?, FROM_UNIXTIME(?), ?, ?, ?, ?, ?, NOW(), ?),(?, ?, FROM_UNIXTIME(?), ?, ?, ?, ?, ?, NOW(), ?),(?, ?, FROM_UNIXTIME(?), ?, ?, ?, ?, ?, NOW(), ?),(?, ?, FROM_UNIXTIME(?), ?, ?, ?, ?, ?, NOW(), ?),(?, ?, FROM_UNIXTIME(?), ?, ?, ?, ?, ?, NOW(), ?),(?, ?, FROM_UNIXTIME(?), ?, ?, ?, ?, ?, NOW(), ?),(?, ?, FROM_UNIXTIME(?), ?, ?, ?, ?, ?, NOW(), ?) ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id)
+*** WAITING FOR THIS LOCK TO BE GRANTED:
+RECORD LOCKS space id 136 page no 4 n bits 320 index ix_collection_collectionhash of table `bench`.`collections` trx id 8555 lock_mode X waiting
+Record lock, heap no 2 PHYSICAL RECORD: n_fields 2; compact format; info bits 0
+ 0: len 20; hex 14be5b91894072302b613a86d46121bfd42c1db8; asc   [  @r0+a:  a!  ,  ;;
+ 1: len 4; hex 00000001; asc     ;;
+
+*** CONFLICTING WITH:
+RECORD LOCKS space id 136 page no 4 n bits 320 index ix_collection_collectionhash of table `bench`.`collections` trx id 8554 lock_mode X
+Record lock, heap no 2 PHYSICAL RECORD: n_fields 2; compact format; info bits 0
+ 0: len 20; hex 14be5b91894072302b613a86d46121bfd42c1db8; asc   [  @r0+a:  a!  ,  ;;
+ 1: len 4; hex 00000001; asc     ;;
+
+Record lock, heap no 3 PHYSICAL RECORD: n_fields 2; compact format; info bits 0
+ 0: len 20; hex 23c5d9a13b4ac0911fdcdb627814804d6da51270; asc #   ;J     bx  Mm  p;;
+ 1: len 4; hex 00000002; asc     ;;
+
+Record lock, heap no 4 PHYSICAL RECORD: n_fields 2; compact format; info bits 0
+ 0: len 20; hex 322b2ea51f9bf844b5fe84437ebbf2ef64906480; asc 2+.    D   C~   d d ;;
+ 1: len 4; hex 00000003; asc     ;;
+
+Record lock, heap no 5 PHYSICAL RECORD: n_fields 2; compact format; info bits 0
+ 0: len 20; hex 3477c9696fba416be4742de947be67dc44e4ce87; asc 4w io Ak t- G g D   ;;
+ 1: len 4; hex 00000004; asc     ;;
+
+Record lock, heap no 6 PHYSICAL RECORD: n_fields 2; compact format; info bits 0
+ 0: len 20; hex 41a3a59231edb905a045285ff6dfb3068d19a302; asc A   1    E(_        ;;
+ 1: len 4; hex 00000005; asc     ;;
+
+Record lock, heap no 7 PHYSICAL RECORD: n_fields 2; compact format; info bits 0
+ 0: len 20; hex 61b1873d98962c7ae30cbb9f1443a1e278dc9ddd; asc a  =  ,z     C  x   ;;
+ 1: len 4; hex 00000006; asc     ;;
+
+Record lock, heap no 8 PHYSICAL RECORD: n_fields 2; compact format; info bits 0
+ 0: len 20; hex 67901d09e0af2bc818ce3cd9eb0e36732714f7e7; asc g     +   <   6s'   ;;
+ 1: len 4; hex 00000007; asc     ;;
+
+Record lock, heap no 9 PHYSICAL RECORD: n_fields 2; compact format; info bits 0
+ 0: len 20; hex 6dbdecb038bb63f0918670b22f717a3e3a216839; asc m   8 c   p /qz>:!h9;;
+ 1: len 4; hex 00000008; asc     ;;
+
+Record lock, heap no 10 PHYSICAL RECORD: n_fields 2; compact format; info bits 0
+ 0: len 20; hex 6dc931604fcfd5498d805f182af81ef5d7d1240f; asc m 1`O  I  _ *     $ ;;
+ 1: len 4; hex 00000009; asc     ;;
+
+Record lock, heap no 11 PHYSICAL RECORD: n_fields 2; compact format; info bits 0
+ 0: len 20; hex 793b8412925747740a65e865b2a7932bd8990348; asc y;   WGt e e   +   H;;
+ 1: len 4; hex 0000000a; asc     ;;
+
+Record lock, heap no 12 PHYSICAL RECORD: n_fields 2; compact format; info bits 0
+ 0: len 20; hex 83f21782accaa0012794e91a6b7b03d6dbad5097; asc         '   k{    P ;;
+ 1: len 4; hex 0000000b; asc     ;;
+
+Record lock, heap no 13 PHYSICAL RECORD: n_fields 2; compact format; info bits 0
+ 0: len 20; hex 8b1db15dc6bbeabed93b5c5cc26eed7793e37620; asc    ]     ;\\ n w  v ;;
+ 1: len 4; hex 0000000c; asc     ;;
+
+Record lock, heap no 14 PHYSICAL RECORD: n_fields 2; compact format; info bits 0
+ 0: len 20; hex 8e556393b4009b37a419707ad85c6f0026cf2f55; asc  Uc    7  pz \o & /U;;
+ 1: len 4; hex 0000000d; asc     ;;
+
+Record lock, heap no 15 PHYSICAL RECORD: n_fields 2; compact format; info bits 0
+ 0: len 20; hex 91d6d50efe5dd4a0375197cc40f3ed01a84e221f; asc      ]  7Q  @    N" ;;
+ 1: len 4; hex 0000000e; asc     ;;
+
+Record lock, heap no 16 PHYSICAL RECORD: n_fields 2; compact format; info bits 0
+ 0: len 20; hex 9bc4a74b4b7d0d49bddedba9bb8d607c8c06ecdf; asc    KK} I      `|    ;;
+ 1: len 4; hex 0000000f; asc     ;;
+
+Record lock, heap no 17 PHYSICAL RECORD: n_fields 2; compact format; info bits 0
+ 0: len 20; hex afaa538e4a75d9fbb054b2871a43e0f56ca7d0c9; asc   S Ju   T   C  l   ;;
+ 1: len 4; hex 00000010; asc     ;;
+
+Record lock, heap no 18 PHYSICAL RECORD: n_fields 2; compact format; info bits 0
+ 0: len 20; hex b8204fa81ff6ca5a3edafb9edc80aadfac777b28; asc   O    Z>        w{(;;
+ 1: len 4; hex 00000011; asc     ;;
+
+Record lock, heap no 19 PHYSICAL RECORD: n_fields 2; compact format; info bits 0
+ 0: len 20; hex bfd82834bac7ed44467ff4ab25f518920675914f; asc   (4   DF   %    u O;;
+ 1: len 4; hex 00000012; asc     ;;
+
+Record lock, heap no 20 PHYSICAL RECORD: n_fields 2; compact format; info bits 0
+ 0: len 20; hex c3ed4d07910fdf29b686ee4821cca49034aa4f4a; asc   M    )   H!   4 OJ;;
+ 1: len 4; hex 00000013; asc     ;;
+
+Record lock, heap no 21 PHYSICAL RECORD: n_fields 2; compact format; info bits 0
+ 0: len 20; hex cb2efa15cfd59a3d6be0b35d71fa02ca0f95c213; asc  .     =k  ]q       ;;
+ 1: len 4; hex 00000014; asc     ;;
+
+Record lock, heap no 22 PHYSICAL RECORD: n_fields 2; compact format; info bits 0
+ 0: len 20; hex ccf757d9a1a595bcc84c72a63f9e6c9e517d9553; asc   W      Lr ? l Q} S;;
+ 1: len 4; hex 00000015; asc     ;;
+
+Record lock, heap no 23 PHYSICAL RECORD: n_fields 2; compact format; info bits 0
+ 0: len 20; hex cecbd2143669aa70000acea54d368ac14235538d; asc     6i p    M6  B5S ;;
+ 1: len 4; hex 00000016; asc     ;;
+
+Record lock, heap no 24 PHYSICAL RECORD: n_fields 2; compact format; info bits 0
+ 0: len 20; hex d4046c0d1cdf5f4223eefbe1f42b412f9fdc3b2c; asc   l   _B#    +A/  ;,;;
+ 1: len 4; hex 00000017; asc     ;;
+
+Record lock, heap no 25 PHYSICAL RECORD: n_fields 2; compact format; info bits 0
+ 0: len 20; hex d723335492a99162a2e9b88e6c250e1c253ce033; asc  #3T   b    l%  %< 3;;
+ 1: len 4; hex 00000018; asc     ;;
+
+Record lock, heap no 26 PHYSICAL RECORD: n_fields 2; compact format; info bits 0
+ 0: len 20; hex e3a1875ada6b5080ff0f733aa381a1adde9b685c; asc    Z kP   s:      h\;;
+ 1: len 4; hex 00000019; asc     ;;
+
+Record lock, heap no 27 PHYSICAL RECORD: n_fields 2; compact format; info bits 0
+ 0: len 20; hex e49057f31ade2cac6ec8863de78311a96c5388c2; asc   W   , n  =    lS  ;;
+ 1: len 4; hex 0000001a; asc     ;;
+
+Record lock, heap no 28 PHYSICAL RECORD: n_fields 2; compact format; info bits 0
+ 0: len 20; hex e6c04cfe0291d4aa87d4a8fc55b457ef29761088; asc   L         U W )v  ;;
+ 1: len 4; hex 0000001b; asc     ;;
+
+Record lock, heap no 29 PHYSICAL RECORD: n_fields 2; compact format; info bits 0
+ 0: len 20; hex ec8915fb1c18a5a3f53237547a8443ed5d562276; asc          27Tz C ]V"v;;
+ 1: len 4; hex 0000001c; asc     ;;
+
+Record lock, heap no 30 PHYSICAL RECORD: n_fields 2; compact format; info bits 0
+ 0: len 20; hex f290f0f75043056cabba7c00fba4217c6b3cdd95; asc     PC l  |   !|k<  ;;
+ 1: len 4; hex 0000001d; asc     ;;
+
+Record lock, heap no 31 PHYSICAL RECORD: n_fields 2; compact format; info bits 0
+ 0: len 20; hex f5f8b751c0062c3347199c1e8611be2f98598493; asc    Q  ,3G      / Y  ;;
+ 1: len 4; hex 0000001e; asc     ;;
+
+Record lock, heap no 32 PHYSICAL RECORD: n_fields 2; compact format; info bits 0
+ 0: len 20; hex f6a7cda5d770a5708cb076b86b4ec8148ae41528; asc      p p  v kN     (;;
+ 1: len 4; hex 0000001f; asc     ;;
+
+Record lock, heap no 33 PHYSICAL RECORD: n_fields 2; compact format; info bits 0
+ 0: len 20; hex fee3014166a79d00ce6ec2245ff1aefa7cf303d4; asc    Af    n $_   |   ;;
+ 1: len 4; hex 00000020; asc     ;;
+
+*** WE ROLL BACK TRANSACTION (1)
+------------
+TRANSACTIONS
+------------
+Trx id counter 8564
+Purge done for trx's n:o < 8550 undo n:o < 0 state: running
+History list length 5
+LIST OF TRANSACTIONS FOR EACH SESSION:
+---TRANSACTION (0x7cb1679bfb80), not started
+0 lock struct(s), heap size 1128, 0 row lock(s)
+--------
+FILE I/O
+--------
+Pending flushes (fsync): 0
+166 OS file reads, 636 OS file writes, 2959 OS fsyncs
+0.00 reads/s, 0 avg bytes/read, 12.98 writes/s, 36.45 fsyncs/s
+---
+LOG
+---
+Log sequence number 100708648
+Log flushed up to   100288254
+Pages flushed up to 93948337
+Last checkpoint at  93948337
+----------------------
+BUFFER POOL AND MEMORY
+----------------------
+Total large memory allocated 167772160
+Dictionary memory allocated 864936
+Buffer pool size   8112
+Free buffers       7412
+Database pages     700
+Old database pages 238
+Modified db pages  509
+Percent of dirty pages(LRU & free pages): 6.274
+Max dirty pages percent: 90.000
+Pending reads 0
+Pending writes: LRU 0, flush list 0
+Pages made young 768, not young 0
+15.67 youngs/s, 0.00 non-youngs/s
+Pages read 152, created 3448, written 628
+0.00 reads/s, 39.98 creates/s, 12.82 writes/s
+Buffer pool hit rate 1000 / 1000, young-making rate 0 / 1000 not 0 / 1000
+Pages read ahead 0.00/s, evicted without access 0.00/s, Random read ahead 0.00/s
+LRU len: 700, unzip_LRU len: 0
+I/O sum[628]:cur[0], unzip sum[0]:cur[0]
+--------------
+ROW OPERATIONS
+--------------
+0 read views open inside InnoDB
+state: sleeping
+----------------------------
+END OF INNODB MONITOR OUTPUT
+============================

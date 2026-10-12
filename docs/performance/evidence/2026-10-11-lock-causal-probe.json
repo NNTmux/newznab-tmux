@@ -1,0 +1,518 @@
+{
+  "name": "nntmux-lock-cause-a86ec21b",
+  "image": "mariadb:11.4.8",
+  "cpu": 1,
+  "memory_MiB": 512,
+  "pool_MiB": 64,
+  "network": "none",
+  "start_utc": "2026-10-11T23:04:02Z",
+  "cases": [
+    {
+      "variant": "natural",
+      "first_observed_wait": "25\t24\tix_collection_collectionhash\t0x001EB9CC5B3F9FBE41A8E05C7E97CAA9CA216CE7\n",
+      "explain": "{\\n  \"query_block\": {\\n    \"select_id\": 1,\\n    \"cost\": 0.031855842,\\n    \"nested_loop\": [\\n      {\\n        \"read_sorted_file\": {\\n          \"filesort\": {\\n            \"sort_key\": \"bench.collections.`id`\",\\n            \"table\": {\\n              \"table_name\": \"collections\",\\n              \"access_type\": \"index\",\\n              \"possible_keys\": [\"PRIMARY\"],\\n              \"key\": \"ix_collection_collectionhash\",\\n              \"key_length\": \"20\",\\n              \"used_key_parts\": [\"collectionhash\"],\\n              \"loops\": 1,\\n              \"rows\": 32,\\n              \"cost\": 0.01133984,\\n              \"filtered\": 100,\\n              \"attached_condition\": \"bench.collections.`id` in (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32)\",\\n              \"using_index\": true\\n            }\\n          }\\n        }\\n      }\\n    ]\\n  }\\n}\n",
+      "aggregate_output": [
+        "ERROR 1213 (40001) at line 2: Deadlock found when trying to get lock; try restarting transaction",
+        "aggregate_done"
+      ],
+      "duplicate_output": [
+        "duplicate_done"
+      ],
+      "deadlock": true,
+      "snapshot": "InnoDB\t\t\\n=====================================\\n2026-10-11 23:04:09 0x7387e07126c0 INNODB MONITOR OUTPUT\\n=====================================\\nPer second averages calculated from the last 3 seconds\\n-----------------\\nBACKGROUND THREAD\\n-----------------\\nsrv_master_thread loops: 0 srv_active, 4 srv_idle\\nsrv_master_thread log flush and writes: 4\\n----------\\nSEMAPHORES\\n----------\\n------------------------\\nLATEST DETECTED DEADLOCK\\n------------------------\\n2026-10-11 23:04:09 0x7387f40626c0\\n*** (1) TRANSACTION:\\nTRANSACTION 24, ACTIVE 0 sec fetching rows\\nmysql tables in use 1, locked 1\\nLOCK WAIT 4 lock struct(s), heap size 1128, 65 row lock(s)\\nMariaDB thread id 9, OS thread handle 127027751823040, query id 21 localhost root Creating sort index\\nSELECT id FROM bench.collections WHERE id IN (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32) ORDER BY id FOR UPDATE\\n*** WAITING FOR THIS LOCK TO BE GRANTED:\\nRECORD LOCKS space id 8 page no 3 n bits 320 index PRIMARY of table `bench`.`collections` trx id 24 lock_mode X locks rec but not gap waiting\\nRecord lock, heap no 34 PHYSICAL RECORD: n_fields 8; compact format; info bits 0\\n 0: len 4; hex 00000041; asc    A;;\\n 1: len 6; hex 000000000019; asc       ;;\\n 2: len 7; hex 870000002f0110; asc     /  ;;\\n 3: len 9; hex 6475706c6963617465; asc duplicate;;\\n 4: SQL NULL;\\n 5: SQL NULL;\\n 6: len 20; hex 001eb9cc5b3f9fbe41a8e05c7e97caa9ca216ce7; asc     [?  A  \\\\~    !l ;;\\n 7: SQL NULL;\\n\\n*** CONFLICTING WITH:\\nRECORD LOCKS space id 8 page no 3 n bits 320 index PRIMARY of table `bench`.`collections` trx id 25 lock_mode X locks rec but not gap\\nRecord lock, heap no 34 PHYSICAL RECORD: n_fields 8; compact format; info bits 0\\n 0: len 4; hex 00000041; asc    A;;\\n 1: len 6; hex 000000000019; asc       ;;\\n 2: len 7; hex 870000002f0110; asc     /  ;;\\n 3: len 9; hex 6475706c6963617465; asc duplicate;;\\n 4: SQL NULL;\\n 5: SQL NULL;\\n 6: len 20; hex 001eb9cc5b3f9fbe41a8e05c7e97caa9ca216ce7; asc     [?  A  \\\\~    !l ;;\\n 7: SQL NULL;\\n\\n\\n*** (2) TRANSACTION:\\nTRANSACTION 25, ACTIVE 0 sec inserting\\nmysql tables in use 1, locked 1\\nLOCK WAIT 3 lock struct(s), heap size 1128, 2 row lock(s), undo log entries 1\\nMariaDB thread id 8, OS thread handle 127027752130240, query id 18 localhost root Update\\nINSERT INTO bench.collections(subject,collectionhash) VALUES ('duplicate',UNHEX('001eb9cc5b3f9fbe41a8e05c7e97caa9ca216ce7')) ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id)\\n*** WAITING FOR THIS LOCK TO BE GRANTED:\\nRECORD LOCKS space id 8 page no 4 n bits 320 index ix_collection_collectionhash of table `bench`.`collections` trx id 25 lock_mode X waiting\\nRecord lock, heap no 2 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\\n 0: len 20; hex 001eb9cc5b3f9fbe41a8e05c7e97caa9ca216ce7; asc     [?  A  \\\\~    !l ;;\\n 1: len 4; hex 00000001; asc     ;;\\n\\n*** CONFLICTING WITH:\\nRECORD LOCKS space id 8 page no 4 n bits 320 index ix_collection_collectionhash of table `bench`.`collections` trx id 24 lock_mode X\\nRecord lock, heap no 2 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\\n 0: len 20; hex 001eb9cc5b3f9fbe41a8e05c7e97caa9ca216ce7; asc     [?  A  \\\\~    !l ;;\\n 1: len 4; hex 00000001; asc     ;;\\n\\nRecord lock, heap no 3 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\\n 0: len 20; hex 0160e55413f6a42b12dea77946343b3af4e23a26; asc  ` T   +   yF4;:  :&;;\\n 1: len 4; hex 00000002; asc     ;;\\n\\nRecord lock, heap no 4 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\\n 0: len 20; hex 0cf6a0048ea1c355212b6630ebcd34f463691845; asc        U!+f0  4 ci E;;\\n 1: len 4; hex 00000003; asc     ;;\\n\\nRecord lock, heap no 5 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\\n 0: len 20; hex 16b2f4289dade3409ad6bcbaf44fd766f7889c26; asc    (   @     O f   &;;\\n 1: len 4; hex 00000004; asc     ;;\\n\\nRecord lock, heap no 6 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\\n 0: len 20; hex 17d20ffda073bc843e57ebbea50406c289ced33a; asc      s  >W         :;;\\n 1: len 4; hex 00000005; asc     ;;\\n\\nRecord lock, heap no 7 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\\n 0: len 20; hex 1bd7053ddbb9101d3c490d7db7350081a866a8e1; asc    =    <I } 5   f  ;;\\n 1: len 4; hex 00000006; asc     ;;\\n\\nRecord lock, heap no 8 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\\n 0: len 20; hex 229e409ab193b8f262595e1cb23680beba1ecafc; asc \" @     bY^  6      ;;\\n 1: len 4; hex 00000007; asc     ;;\\n\\nRecord lock, heap no 9 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\\n 0: len 20; hex 2369c52955b3e692a8124536d50dfac3533eccbb; asc #i )U     E6    S>  ;;\\n 1: len 4; hex 00000008; asc     ;;\\n\\nRecord lock, heap no 10 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\\n 0: len 20; hex 2cfb071471b3677fb3a58693c9872b8c4a16f9ba; asc ,   q g       + J   ;;\\n 1: len 4; hex 00000009; asc     ;;\\n\\nRecord lock, heap no 11 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\\n 0: len 20; hex 326f37fef4752d7afcd11162fe50dd63f40e6eb0; asc 2o7  u-z   b P c  n ;;\\n 1: len 4; hex 0000000a; asc     ;;\\n\\nRecord lock, heap no 12 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\\n 0: len 20; hex 36fb82f3f1f293952de977884140f5fd8a9a3c37; asc 6       - w A@    <7;;\\n 1: len 4; hex 0000000b; asc     ;;\\n\\nRecord lock, heap no 13 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\\n 0: len 20; hex 3ce45e53555a6ea386a2567b658282f8ff8c691c; asc < ^SUZn   V{e     i ;;\\n 1: len 4; hex 0000000c; asc     ;;\\n\\nRecord lock, heap no 14 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\\n 0: len 20; hex 458d943aa996a24a59080fc361679fc784cb24b2; asc E  :   JY   ag    $ ;;\\n 1: len 4; hex 0000000d; asc     ;;\\n\\nRecord lock, heap no 15 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\\n 0: len 20; hex 4ca3c90db05e786e65a1e753bc5ada1fff3c7c1a; asc L    ^xne  S Z   <| ;;\\n 1: len 4; hex 0000000e; asc     ;;\\n\\nRecord lock, heap no 16 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\\n 0: len 20; hex 50f957cf1b2ebcacb7b7e7c9288a926da428e6b7; asc P W  .      (  m (  ;;\\n 1: len 4; hex 0000000f; asc     ;;\\n\\nRecord lock, heap no 17 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\\n 0: len 20; hex 5e8c8671afcd13782a733bc9d58e8388c5f5c7c3; asc ^  q   x*s;         ;;\\n 1: len 4; hex 00000010; asc     ;;\\n\\nRecord lock, heap no 18 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\\n 0: len 20; hex 6ae7a6553a4db5795776f8e7323b06b136c91626; asc j  U:M yWv  2;  6  &;;\\n 1: len 4; hex 00000011; asc     ;;\\n\\nRecord lock, heap no 19 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\\n 0: len 20; hex 6cd8d9c318182ea01857331f7cee7bc8b0740384; asc l     .  W3 | {  t  ;;\\n 1: len 4; hex 00000012; asc     ;;\\n\\nRecord lock, heap no 20 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\\n 0: len 20; hex 734e9c6e00150299ddfbae14f1464aa3f80963d4; asc sN n         FJ   c ;;\\n 1: len 4; hex 00000013; asc     ;;\\n\\nRecord lock, heap no 21 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\\n 0: len 20; hex 7f76a3ee92aa63bf9f9e3228edc4ab81527fee37; asc  v    c   2(    R  7;;\\n 1: len 4; hex 00000014; asc     ;;\\n\\nRecord lock, heap no 22 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\\n 0: len 20; hex 8ce7b11c2dd45cff7312998dd2881e5b98007d57; asc     - \\\\ s      [  }W;;\\n 1: len 4; hex 00000015; asc     ;;\\n\\nRecord lock, heap no 23 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\\n 0: len 20; hex 919fffcca5df2062718bdbab9d41cc2b365a51e7; asc        bq    A +6ZQ ;;\\n 1: len 4; hex 00000016; asc     ;;\\n\\nRecord lock, heap no 24 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\\n 0: len 20; hex a4949193244030917b007644756ac0bd50ceec6d; asc     $@0 { vDuj  P  m;;\\n 1: len 4; hex 00000017; asc     ;;\\n\\nRecord lock, heap no 25 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\\n 0: len 20; hex a544af123662c61ae0664b4d41457639d24ed7f1; asc  D  6b   fKMAEv9 N  ;;\\n 1: len 4; hex 00000018; asc     ;;\\n\\nRecord lock, heap no 26 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\\n 0: len 20; hex a8a7490a5d00b30b589db3d3d16f81fb7a7fe7d0; asc   I ]   X    o  z   ;;\\n 1: len 4; hex 00000019; asc     ;;\\n\\nRecord lock, heap no 27 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\\n 0: len 20; hex aba252fcf22ae1ab4fb5aaec87b4a3ac78158c45; asc   R  *  O       x  E;;\\n 1: len 4; hex 0000001a; asc     ;;\\n\\nRecord lock, heap no 28 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\\n 0: len 20; hex b69b7b18d3b0a89bc6eb97f7a9ffd7d487e6790d; asc   {               y ;;\\n 1: len 4; hex 0000001b; asc     ;;\\n\\nRecord lock, heap no 29 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\\n 0: len 20; hex c3c791596ce8b8c72c508fb5cc9730218b81ae1b; asc    Yl   ,P    0!    ;;\\n 1: len 4; hex 0000001c; asc     ;;\\n\\nRecord lock, heap no 30 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\\n 0: len 20; hex d45a0e993c76384531cc4f1693317d255cd5cd6d; asc  Z  <v8E1 O  1}%\\\\  m;;\\n 1: len 4; hex 0000001d; asc     ;;\\n\\nRecord lock, heap no 31 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\\n 0: len 20; hex d814e9aba60ad5cc3fc7f52be8835c4160fd55e3; asc         ?  +  \\\\A` U ;;\\n 1: len 4; hex 0000001e; asc     ;;\\n\\nRecord lock, heap no 32 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\\n 0: len 20; hex e8de0f78e3809a4527de8851a47d2bca85fc9079; asc    x   E'  Q }+    y;;\\n 1: len 4; hex 0000001f; asc     ;;\\n\\nRecord lock, heap no 33 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\\n 0: len 20; hex fa5592b076a0b6f0f5ad26ebe69151dddbf4d169; asc  U  v     &   Q    i;;\\n 1: len 4; hex 00000020; asc     ;;\\n\\n*** WE ROLL BACK TRANSACTION (2)\\n------------\\nTRANSACTIONS\\n------------\\nTrx id counter 27\\nPurge done for trx's n:o < 24 undo n:o < 0 state: running\\nHistory list length 2\\nLIST OF TRANSACTIONS FOR EACH SESSION:\\n---TRANSACTION 25, ACTIVE 0 sec\\n4 lock struct(s), heap size 1128, 3 row lock(s)\\nMariaDB thread id 8, OS thread handle 127027752130240, query id 23 localhost root \\n---TRANSACTION (0x7387e191ab80), not started\\n0 lock struct(s), heap size 1128, 0 row lock(s)\\n--------\\nFILE I/O\\n--------\\nPending flushes (fsync): 0\\n166 OS file reads, 0 OS file writes, 7 OS fsyncs\\n0.00 reads/s, 28425 avg bytes/read, 0.00 writes/s, 0.00 fsyncs/s\\n---\\nLOG\\n---\\nLog sequence number 62698\\nLog flushed up to   58133\\nPages flushed up to 47859\\nLast checkpoint at  47843\\n----------------------\\nBUFFER POOL AND MEMORY\\n----------------------\\nTotal large memory allocated 100663296\\nDictionary memory allocated 439872\\nBuffer pool size   4056\\nFree buffers       3764\\nDatabase pages     292\\nOld database pages 0\\nModified db pages  29\\nPercent of dirty pages(LRU & free pages): 0.715\\nMax dirty pages percent: 90.000\\nPending reads 0\\nPending writes: LRU 0, flush list 0\\nPages made young 0, not young 0\\n0.00 youngs/s, 0.00 non-youngs/s\\nPages read 152, created 140, written 0\\n50.65 reads/s, 46.65 creates/s, 0.00 writes/s\\nBuffer pool hit rate 909 / 1000, young-making rate 0 / 1000 not 0 / 1000\\nPages read ahead 0.00/s, evicted without access 0.00/s, Random read ahead 0.00/s\\nLRU len: 292, unzip_LRU len: 0\\nI/O sum[0]:cur[0], unzip sum[0]:cur[0]\\n--------------\\nROW OPERATIONS\\n--------------\\n0 read views open inside InnoDB\\nstate: sleeping\\n----------------------------\\nEND OF INNODB MONITOR OUTPUT\\n============================\\n\n",
+      "final_count": "32",
+      "explain_decoded": {
+        "query_block": {
+          "select_id": 1,
+          "cost": 0.031855842,
+          "nested_loop": [
+            {
+              "read_sorted_file": {
+                "filesort": {
+                  "sort_key": "bench.collections.`id`",
+                  "table": {
+                    "table_name": "collections",
+                    "access_type": "index",
+                    "possible_keys": [
+                      "PRIMARY"
+                    ],
+                    "key": "ix_collection_collectionhash",
+                    "key_length": "20",
+                    "used_key_parts": [
+                      "collectionhash"
+                    ],
+                    "loops": 1,
+                    "rows": 32,
+                    "cost": 0.01133984,
+                    "filtered": 100,
+                    "attached_condition": "bench.collections.`id` in (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32)",
+                    "using_index": true
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "snapshot_decoded": "InnoDB\t\t\n=====================================\n2026-10-11 23:04:09 0x7387e07126c0 INNODB MONITOR OUTPUT\n=====================================\nPer second averages calculated from the last 3 seconds\n-----------------\nBACKGROUND THREAD\n-----------------\nsrv_master_thread loops: 0 srv_active, 4 srv_idle\nsrv_master_thread log flush and writes: 4\n----------\nSEMAPHORES\n----------\n------------------------\nLATEST DETECTED DEADLOCK\n------------------------\n2026-10-11 23:04:09 0x7387f40626c0\n*** (1) TRANSACTION:\nTRANSACTION 24, ACTIVE 0 sec fetching rows\nmysql tables in use 1, locked 1\nLOCK WAIT 4 lock struct(s), heap size 1128, 65 row lock(s)\nMariaDB thread id 9, OS thread handle 127027751823040, query id 21 localhost root Creating sort index\nSELECT id FROM bench.collections WHERE id IN (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32) ORDER BY id FOR UPDATE\n*** WAITING FOR THIS LOCK TO BE GRANTED:\nRECORD LOCKS space id 8 page no 3 n bits 320 index PRIMARY of table `bench`.`collections` trx id 24 lock_mode X locks rec but not gap waiting\nRecord lock, heap no 34 PHYSICAL RECORD: n_fields 8; compact format; info bits 0\n 0: len 4; hex 00000041; asc    A;;\n 1: len 6; hex 000000000019; asc       ;;\n 2: len 7; hex 870000002f0110; asc     /  ;;\n 3: len 9; hex 6475706c6963617465; asc duplicate;;\n 4: SQL NULL;\n 5: SQL NULL;\n 6: len 20; hex 001eb9cc5b3f9fbe41a8e05c7e97caa9ca216ce7; asc     [?  A  \\\\~    !l ;;\n 7: SQL NULL;\n\n*** CONFLICTING WITH:\nRECORD LOCKS space id 8 page no 3 n bits 320 index PRIMARY of table `bench`.`collections` trx id 25 lock_mode X locks rec but not gap\nRecord lock, heap no 34 PHYSICAL RECORD: n_fields 8; compact format; info bits 0\n 0: len 4; hex 00000041; asc    A;;\n 1: len 6; hex 000000000019; asc       ;;\n 2: len 7; hex 870000002f0110; asc     /  ;;\n 3: len 9; hex 6475706c6963617465; asc duplicate;;\n 4: SQL NULL;\n 5: SQL NULL;\n 6: len 20; hex 001eb9cc5b3f9fbe41a8e05c7e97caa9ca216ce7; asc     [?  A  \\\\~    !l ;;\n 7: SQL NULL;\n\n\n*** (2) TRANSACTION:\nTRANSACTION 25, ACTIVE 0 sec inserting\nmysql tables in use 1, locked 1\nLOCK WAIT 3 lock struct(s), heap size 1128, 2 row lock(s), undo log entries 1\nMariaDB thread id 8, OS thread handle 127027752130240, query id 18 localhost root Update\nINSERT INTO bench.collections(subject,collectionhash) VALUES ('duplicate',UNHEX('001eb9cc5b3f9fbe41a8e05c7e97caa9ca216ce7')) ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id)\n*** WAITING FOR THIS LOCK TO BE GRANTED:\nRECORD LOCKS space id 8 page no 4 n bits 320 index ix_collection_collectionhash of table `bench`.`collections` trx id 25 lock_mode X waiting\nRecord lock, heap no 2 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\n 0: len 20; hex 001eb9cc5b3f9fbe41a8e05c7e97caa9ca216ce7; asc     [?  A  \\\\~    !l ;;\n 1: len 4; hex 00000001; asc     ;;\n\n*** CONFLICTING WITH:\nRECORD LOCKS space id 8 page no 4 n bits 320 index ix_collection_collectionhash of table `bench`.`collections` trx id 24 lock_mode X\nRecord lock, heap no 2 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\n 0: len 20; hex 001eb9cc5b3f9fbe41a8e05c7e97caa9ca216ce7; asc     [?  A  \\\\~    !l ;;\n 1: len 4; hex 00000001; asc     ;;\n\nRecord lock, heap no 3 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\n 0: len 20; hex 0160e55413f6a42b12dea77946343b3af4e23a26; asc  ` T   +   yF4;:  :&;;\n 1: len 4; hex 00000002; asc     ;;\n\nRecord lock, heap no 4 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\n 0: len 20; hex 0cf6a0048ea1c355212b6630ebcd34f463691845; asc        U!+f0  4 ci E;;\n 1: len 4; hex 00000003; asc     ;;\n\nRecord lock, heap no 5 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\n 0: len 20; hex 16b2f4289dade3409ad6bcbaf44fd766f7889c26; asc    (   @     O f   &;;\n 1: len 4; hex 00000004; asc     ;;\n\nRecord lock, heap no 6 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\n 0: len 20; hex 17d20ffda073bc843e57ebbea50406c289ced33a; asc      s  >W         :;;\n 1: len 4; hex 00000005; asc     ;;\n\nRecord lock, heap no 7 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\n 0: len 20; hex 1bd7053ddbb9101d3c490d7db7350081a866a8e1; asc    =    <I } 5   f  ;;\n 1: len 4; hex 00000006; asc     ;;\n\nRecord lock, heap no 8 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\n 0: len 20; hex 229e409ab193b8f262595e1cb23680beba1ecafc; asc \" @     bY^  6      ;;\n 1: len 4; hex 00000007; asc     ;;\n\nRecord lock, heap no 9 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\n 0: len 20; hex 2369c52955b3e692a8124536d50dfac3533eccbb; asc #i )U     E6    S>  ;;\n 1: len 4; hex 00000008; asc     ;;\n\nRecord lock, heap no 10 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\n 0: len 20; hex 2cfb071471b3677fb3a58693c9872b8c4a16f9ba; asc ,   q g       + J   ;;\n 1: len 4; hex 00000009; asc     ;;\n\nRecord lock, heap no 11 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\n 0: len 20; hex 326f37fef4752d7afcd11162fe50dd63f40e6eb0; asc 2o7  u-z   b P c  n ;;\n 1: len 4; hex 0000000a; asc     ;;\n\nRecord lock, heap no 12 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\n 0: len 20; hex 36fb82f3f1f293952de977884140f5fd8a9a3c37; asc 6       - w A@    <7;;\n 1: len 4; hex 0000000b; asc     ;;\n\nRecord lock, heap no 13 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\n 0: len 20; hex 3ce45e53555a6ea386a2567b658282f8ff8c691c; asc < ^SUZn   V{e     i ;;\n 1: len 4; hex 0000000c; asc     ;;\n\nRecord lock, heap no 14 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\n 0: len 20; hex 458d943aa996a24a59080fc361679fc784cb24b2; asc E  :   JY   ag    $ ;;\n 1: len 4; hex 0000000d; asc     ;;\n\nRecord lock, heap no 15 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\n 0: len 20; hex 4ca3c90db05e786e65a1e753bc5ada1fff3c7c1a; asc L    ^xne  S Z   <| ;;\n 1: len 4; hex 0000000e; asc     ;;\n\nRecord lock, heap no 16 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\n 0: len 20; hex 50f957cf1b2ebcacb7b7e7c9288a926da428e6b7; asc P W  .      (  m (  ;;\n 1: len 4; hex 0000000f; asc     ;;\n\nRecord lock, heap no 17 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\n 0: len 20; hex 5e8c8671afcd13782a733bc9d58e8388c5f5c7c3; asc ^  q   x*s;         ;;\n 1: len 4; hex 00000010; asc     ;;\n\nRecord lock, heap no 18 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\n 0: len 20; hex 6ae7a6553a4db5795776f8e7323b06b136c91626; asc j  U:M yWv  2;  6  &;;\n 1: len 4; hex 00000011; asc     ;;\n\nRecord lock, heap no 19 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\n 0: len 20; hex 6cd8d9c318182ea01857331f7cee7bc8b0740384; asc l     .  W3 | {  t  ;;\n 1: len 4; hex 00000012; asc     ;;\n\nRecord lock, heap no 20 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\n 0: len 20; hex 734e9c6e00150299ddfbae14f1464aa3f80963d4; asc sN n         FJ   c ;;\n 1: len 4; hex 00000013; asc     ;;\n\nRecord lock, heap no 21 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\n 0: len 20; hex 7f76a3ee92aa63bf9f9e3228edc4ab81527fee37; asc  v    c   2(    R  7;;\n 1: len 4; hex 00000014; asc     ;;\n\nRecord lock, heap no 22 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\n 0: len 20; hex 8ce7b11c2dd45cff7312998dd2881e5b98007d57; asc     - \\\\ s      [  }W;;\n 1: len 4; hex 00000015; asc     ;;\n\nRecord lock, heap no 23 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\n 0: len 20; hex 919fffcca5df2062718bdbab9d41cc2b365a51e7; asc        bq    A +6ZQ ;;\n 1: len 4; hex 00000016; asc     ;;\n\nRecord lock, heap no 24 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\n 0: len 20; hex a4949193244030917b007644756ac0bd50ceec6d; asc     $@0 { vDuj  P  m;;\n 1: len 4; hex 00000017; asc     ;;\n\nRecord lock, heap no 25 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\n 0: len 20; hex a544af123662c61ae0664b4d41457639d24ed7f1; asc  D  6b   fKMAEv9 N  ;;\n 1: len 4; hex 00000018; asc     ;;\n\nRecord lock, heap no 26 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\n 0: len 20; hex a8a7490a5d00b30b589db3d3d16f81fb7a7fe7d0; asc   I ]   X    o  z   ;;\n 1: len 4; hex 00000019; asc     ;;\n\nRecord lock, heap no 27 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\n 0: len 20; hex aba252fcf22ae1ab4fb5aaec87b4a3ac78158c45; asc   R  *  O       x  E;;\n 1: len 4; hex 0000001a; asc     ;;\n\nRecord lock, heap no 28 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\n 0: len 20; hex b69b7b18d3b0a89bc6eb97f7a9ffd7d487e6790d; asc   {               y ;;\n 1: len 4; hex 0000001b; asc     ;;\n\nRecord lock, heap no 29 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\n 0: len 20; hex c3c791596ce8b8c72c508fb5cc9730218b81ae1b; asc    Yl   ,P    0!    ;;\n 1: len 4; hex 0000001c; asc     ;;\n\nRecord lock, heap no 30 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\n 0: len 20; hex d45a0e993c76384531cc4f1693317d255cd5cd6d; asc  Z  <v8E1 O  1}%\\\\  m;;\n 1: len 4; hex 0000001d; asc     ;;\n\nRecord lock, heap no 31 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\n 0: len 20; hex d814e9aba60ad5cc3fc7f52be8835c4160fd55e3; asc         ?  +  \\\\A` U ;;\n 1: len 4; hex 0000001e; asc     ;;\n\nRecord lock, heap no 32 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\n 0: len 20; hex e8de0f78e3809a4527de8851a47d2bca85fc9079; asc    x   E'  Q }+    y;;\n 1: len 4; hex 0000001f; asc     ;;\n\nRecord lock, heap no 33 PHYSICAL RECORD: n_fields 2; compact format; info bits 0\n 0: len 20; hex fa5592b076a0b6f0f5ad26ebe69151dddbf4d169; asc  U  v     &   Q    i;;\n 1: len 4; hex 00000020; asc     ;;\n\n*** WE ROLL BACK TRANSACTION (2)\n------------\nTRANSACTIONS\n------------\nTrx id counter 27\nPurge done for trx's n:o < 24 undo n:o < 0 state: running\nHistory list length 2\nLIST OF TRANSACTIONS FOR EACH SESSION:\n---TRANSACTION 25, ACTIVE 0 sec\n4 lock struct(s), heap size 1128, 3 row lock(s)\nMariaDB thread id 8, OS thread handle 127027752130240, query id 23 localhost root \n---TRANSACTION (0x7387e191ab80), not started\n0 lock struct(s), heap size 1128, 0 row lock(s)\n--------\nFILE I/O\n--------\nPending flushes (fsync): 0\n166 OS file reads, 0 OS file writes, 7 OS fsyncs\n0.00 reads/s, 28425 avg bytes/read, 0.00 writes/s, 0.00 fsyncs/s\n---\nLOG\n---\nLog sequence number 62698\nLog flushed up to   58133\nPages flushed up to 47859\nLast checkpoint at  47843\n----------------------\nBUFFER POOL AND MEMORY\n----------------------\nTotal large memory allocated 100663296\nDictionary memory allocated 439872\nBuffer pool size   4056\nFree buffers       3764\nDatabase pages     292\nOld database pages 0\nModified db pages  29\nPercent of dirty pages(LRU & free pages): 0.715\nMax dirty pages percent: 90.000\nPending reads 0\nPending writes: LRU 0, flush list 0\nPages made young 0, not young 0\n0.00 youngs/s, 0.00 non-youngs/s\nPages read 152, created 140, written 0\n50.65 reads/s, 46.65 creates/s, 0.00 writes/s\nBuffer pool hit rate 909 / 1000, young-making rate 0 / 1000 not 0 / 1000\nPages read ahead 0.00/s, evicted without access 0.00/s, Random read ahead 0.00/s\nLRU len: 292, unzip_LRU len: 0\nI/O sum[0]:cur[0], unzip sum[0]:cur[0]\n--------------\nROW OPERATIONS\n--------------\n0 read views open inside InnoDB\nstate: sleeping\n----------------------------\nEND OF INNODB MONITOR OUTPUT\n============================\n\n"
+    },
+    {
+      "variant": "forced_primary_range",
+      "first_observed_wait": "39\t38\tix_collection_collectionhash\t0x001EB9CC5B3F9FBE41A8E05C7E97CAA9CA216CE7\n",
+      "explain": "{\\n  \"query_block\": {\\n    \"select_id\": 1,\\n    \"cost\": 0.076948402,\\n    \"nested_loop\": [\\n      {\\n        \"table\": {\\n          \"table_name\": \"collections\",\\n          \"access_type\": \"range\",\\n          \"possible_keys\": [\"PRIMARY\"],\\n          \"key\": \"PRIMARY\",\\n          \"key_length\": \"4\",\\n          \"used_key_parts\": [\"id\"],\\n          \"loops\": 1,\\n          \"rows\": 32,\\n          \"cost\": 0.0564324,\\n          \"filtered\": 100,\\n          \"attached_condition\": \"bench.collections.`id` in (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32)\"\\n        }\\n      }\\n    ]\\n  }\\n}\n",
+      "aggregate_output": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12",
+        "13",
+        "14",
+        "15",
+        "16",
+        "17",
+        "18",
+        "19",
+        "20",
+        "21",
+        "22",
+        "23",
+        "24",
+        "25",
+        "26",
+        "27",
+        "28",
+        "29",
+        "30",
+        "31",
+        "32",
+        "aggregate_done"
+      ],
+      "duplicate_output": [
+        "duplicate_done"
+      ],
+      "deadlock": false,
+      "snapshot": "",
+      "final_count": "32",
+      "explain_decoded": {
+        "query_block": {
+          "select_id": 1,
+          "cost": 0.076948402,
+          "nested_loop": [
+            {
+              "table": {
+                "table_name": "collections",
+                "access_type": "range",
+                "possible_keys": [
+                  "PRIMARY"
+                ],
+                "key": "PRIMARY",
+                "key_length": "4",
+                "used_key_parts": [
+                  "id"
+                ],
+                "loops": 1,
+                "rows": 32,
+                "cost": 0.0564324,
+                "filtered": 100,
+                "attached_condition": "bench.collections.`id` in (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32)"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "variant": "individual_primary",
+      "first_observed_wait": "54\t53\tix_collection_collectionhash\t0x001EB9CC5B3F9FBE41A8E05C7E97CAA9CA216CE7\n",
+      "explain": "{\\n  \"query_block\": {\\n    \"select_id\": 1,\\n    \"nested_loop\": [\\n      {\\n        \"table\": {\\n          \"table_name\": \"collections\",\\n          \"access_type\": \"const\",\\n          \"possible_keys\": [\"PRIMARY\"],\\n          \"key\": \"PRIMARY\",\\n          \"key_length\": \"4\",\\n          \"used_key_parts\": [\"id\"],\\n          \"ref\": [\"const\"],\\n          \"rows\": 1,\\n          \"filtered\": 100\\n        }\\n      }\\n    ]\\n  }\\n}\n",
+      "aggregate_output": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12",
+        "13",
+        "14",
+        "15",
+        "16",
+        "17",
+        "18",
+        "19",
+        "20",
+        "21",
+        "22",
+        "23",
+        "24",
+        "25",
+        "26",
+        "27",
+        "28",
+        "29",
+        "30",
+        "31",
+        "32",
+        "aggregate_done"
+      ],
+      "duplicate_output": [
+        "duplicate_done"
+      ],
+      "deadlock": false,
+      "snapshot": "",
+      "final_count": "32",
+      "explain_decoded": {
+        "query_block": {
+          "select_id": 1,
+          "nested_loop": [
+            {
+              "table": {
+                "table_name": "collections",
+                "access_type": "const",
+                "possible_keys": [
+                  "PRIMARY"
+                ],
+                "key": "PRIMARY",
+                "key_length": "4",
+                "used_key_parts": [
+                  "id"
+                ],
+                "ref": [
+                  "const"
+                ],
+                "rows": 1,
+                "filtered": 100
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "complete": true,
+  "cleanup_exit": 0,
+  "events": [
+    {
+      "worker": "natural-T1",
+      "event": "sent",
+      "marker": "hold_secondary",
+      "sql": "SET TRANSACTION ISOLATION LEVEL READ COMMITTED; START TRANSACTION; INSERT INTO bench.collections(subject,fromname,xref,collectionhash,filler) VALUES ('fixture','synthetic','mock',UNHEX('001eb9cc5b3f9fbe41a8e05c7e97caa9ca216ce7'),'payload'),('fixture','synthetic','mock',UNHEX('0160e55413f6a42b12dea77946343b3af4e23a26'),'payload'),('fixture','synthetic','mock',UNHEX('0cf6a0048ea1c355212b6630ebcd34f463691845'),'payload'),('fixture','synthetic','mock',UNHEX('16b2f4289dade3409ad6bcbaf44fd766f7889c26'),'payload'),('fixture','synthetic','mock',UNHEX('17d20ffda073bc843e57ebbea50406c289ced33a'),'payload'),('fixture','synthetic','mock',UNHEX('1bd7053ddbb9101d3c490d7db7350081a866a8e1'),'payload'),('fixture','synthetic','mock',UNHEX('229e409ab193b8f262595e1cb23680beba1ecafc'),'payload'),('fixture','synthetic','mock',UNHEX('2369c52955b3e692a8124536d50dfac3533eccbb'),'payload'),('fixture','synthetic','mock',UNHEX('2cfb071471b3677fb3a58693c9872b8c4a16f9ba'),'payload'),('fixture','synthetic','mock',UNHEX('326f37fef4752d7afcd11162fe50dd63f40e6eb0'),'payload'),('fixture','synthetic','mock',UNHEX('36fb82f3f1f293952de977884140f5fd8a9a3c37'),'payload'),('fixture','synthetic','mock',UNHEX('3ce45e53555a6ea386a2567b658282f8ff8c691c'),'payload'),('fixture','synthetic','mock',UNHEX('458d943aa996a24a59080fc361679fc784cb24b2'),'payload'),('fixture','synthetic','mock',UNHEX('4ca3c90db05e786e65a1e753bc5ada1fff3c7c1a'),'payload'),('fixture','synthetic','mock',UNHEX('50f957cf1b2ebcacb7b7e7c9288a926da428e6b7'),'payload'),('fixture','synthetic','mock',UNHEX('5e8c8671afcd13782a733bc9d58e8388c5f5c7c3'),'payload'),('fixture','synthetic','mock',UNHEX('6ae7a6553a4db5795776f8e7323b06b136c91626'),'payload'),('fixture','synthetic','mock',UNHEX('6cd8d9c318182ea01857331f7cee7bc8b0740384'),'payload'),('fixture','synthetic','mock',UNHEX('734e9c6e00150299ddfbae14f1464aa3f80963d4'),'payload'),('fixture','synthetic','mock',UNHEX('7f76a3ee92aa63bf9f9e3228edc4ab81527fee37'),'payload'),('fixture','synthetic','mock',UNHEX('8ce7b11c2dd45cff7312998dd2881e5b98007d57'),'payload'),('fixture','synthetic','mock',UNHEX('919fffcca5df2062718bdbab9d41cc2b365a51e7'),'payload'),('fixture','synthetic','mock',UNHEX('a4949193244030917b007644756ac0bd50ceec6d'),'payload'),('fixture','synthetic','mock',UNHEX('a544af123662c61ae0664b4d41457639d24ed7f1'),'payload'),('fixture','synthetic','mock',UNHEX('a8a7490a5d00b30b589db3d3d16f81fb7a7fe7d0'),'payload'),('fixture','synthetic','mock',UNHEX('aba252fcf22ae1ab4fb5aaec87b4a3ac78158c45'),'payload'),('fixture','synthetic','mock',UNHEX('b69b7b18d3b0a89bc6eb97f7a9ffd7d487e6790d'),'payload'),('fixture','synthetic','mock',UNHEX('c3c791596ce8b8c72c508fb5cc9730218b81ae1b'),'payload'),('fixture','synthetic','mock',UNHEX('d45a0e993c76384531cc4f1693317d255cd5cd6d'),'payload'),('fixture','synthetic','mock',UNHEX('d814e9aba60ad5cc3fc7f52be8835c4160fd55e3'),'payload'),('fixture','synthetic','mock',UNHEX('e8de0f78e3809a4527de8851a47d2bca85fc9079'),'payload'),('fixture','synthetic','mock',UNHEX('fa5592b076a0b6f0f5ad26ebe69151dddbf4d169'),'payload') ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id)",
+      "monotonic": 5095447.624557725
+    },
+    {
+      "worker": "natural-T1",
+      "event": "completed",
+      "marker": "hold_secondary",
+      "output": [
+        "hold_secondary"
+      ],
+      "monotonic": 5095447.750340406
+    },
+    {
+      "worker": "natural-T2",
+      "event": "sent",
+      "marker": "duplicate_done",
+      "sql": "SET TRANSACTION ISOLATION LEVEL READ COMMITTED; START TRANSACTION; INSERT INTO bench.collections(subject,collectionhash) VALUES ('duplicate',UNHEX('001eb9cc5b3f9fbe41a8e05c7e97caa9ca216ce7')) ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id)",
+      "monotonic": 5095447.75034589
+    },
+    {
+      "worker": "natural-T1",
+      "event": "sent",
+      "marker": "aggregate_done",
+      "sql": "SELECT id FROM bench.collections WHERE id IN (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32) ORDER BY id FOR UPDATE",
+      "monotonic": 5095447.875339287
+    },
+    {
+      "worker": "natural-T1",
+      "event": "completed",
+      "marker": "aggregate_done",
+      "output": [
+        "ERROR 1213 (40001) at line 2: Deadlock found when trying to get lock; try restarting transaction",
+        "aggregate_done"
+      ],
+      "monotonic": 5095447.876273967
+    },
+    {
+      "worker": "natural-T1",
+      "event": "sent",
+      "marker": "committed",
+      "sql": "COMMIT",
+      "monotonic": 5095447.95784407
+    },
+    {
+      "worker": "natural-T1",
+      "event": "completed",
+      "marker": "committed",
+      "output": [
+        "committed"
+      ],
+      "monotonic": 5095447.958203448
+    },
+    {
+      "worker": "natural-T2",
+      "event": "completed",
+      "marker": "duplicate_done",
+      "output": [
+        "duplicate_done"
+      ],
+      "monotonic": 5095447.958209712
+    },
+    {
+      "worker": "natural-T2",
+      "event": "sent",
+      "marker": "committed_b",
+      "sql": "COMMIT",
+      "monotonic": 5095447.958210701
+    },
+    {
+      "worker": "natural-T2",
+      "event": "completed",
+      "marker": "committed_b",
+      "output": [
+        "committed_b"
+      ],
+      "monotonic": 5095447.958499474
+    },
+    {
+      "worker": "forced_primary_range-T1",
+      "event": "sent",
+      "marker": "hold_secondary",
+      "sql": "SET TRANSACTION ISOLATION LEVEL READ COMMITTED; START TRANSACTION; INSERT INTO bench.collections(subject,fromname,xref,collectionhash,filler) VALUES ('fixture','synthetic','mock',UNHEX('001eb9cc5b3f9fbe41a8e05c7e97caa9ca216ce7'),'payload'),('fixture','synthetic','mock',UNHEX('0160e55413f6a42b12dea77946343b3af4e23a26'),'payload'),('fixture','synthetic','mock',UNHEX('0cf6a0048ea1c355212b6630ebcd34f463691845'),'payload'),('fixture','synthetic','mock',UNHEX('16b2f4289dade3409ad6bcbaf44fd766f7889c26'),'payload'),('fixture','synthetic','mock',UNHEX('17d20ffda073bc843e57ebbea50406c289ced33a'),'payload'),('fixture','synthetic','mock',UNHEX('1bd7053ddbb9101d3c490d7db7350081a866a8e1'),'payload'),('fixture','synthetic','mock',UNHEX('229e409ab193b8f262595e1cb23680beba1ecafc'),'payload'),('fixture','synthetic','mock',UNHEX('2369c52955b3e692a8124536d50dfac3533eccbb'),'payload'),('fixture','synthetic','mock',UNHEX('2cfb071471b3677fb3a58693c9872b8c4a16f9ba'),'payload'),('fixture','synthetic','mock',UNHEX('326f37fef4752d7afcd11162fe50dd63f40e6eb0'),'payload'),('fixture','synthetic','mock',UNHEX('36fb82f3f1f293952de977884140f5fd8a9a3c37'),'payload'),('fixture','synthetic','mock',UNHEX('3ce45e53555a6ea386a2567b658282f8ff8c691c'),'payload'),('fixture','synthetic','mock',UNHEX('458d943aa996a24a59080fc361679fc784cb24b2'),'payload'),('fixture','synthetic','mock',UNHEX('4ca3c90db05e786e65a1e753bc5ada1fff3c7c1a'),'payload'),('fixture','synthetic','mock',UNHEX('50f957cf1b2ebcacb7b7e7c9288a926da428e6b7'),'payload'),('fixture','synthetic','mock',UNHEX('5e8c8671afcd13782a733bc9d58e8388c5f5c7c3'),'payload'),('fixture','synthetic','mock',UNHEX('6ae7a6553a4db5795776f8e7323b06b136c91626'),'payload'),('fixture','synthetic','mock',UNHEX('6cd8d9c318182ea01857331f7cee7bc8b0740384'),'payload'),('fixture','synthetic','mock',UNHEX('734e9c6e00150299ddfbae14f1464aa3f80963d4'),'payload'),('fixture','synthetic','mock',UNHEX('7f76a3ee92aa63bf9f9e3228edc4ab81527fee37'),'payload'),('fixture','synthetic','mock',UNHEX('8ce7b11c2dd45cff7312998dd2881e5b98007d57'),'payload'),('fixture','synthetic','mock',UNHEX('919fffcca5df2062718bdbab9d41cc2b365a51e7'),'payload'),('fixture','synthetic','mock',UNHEX('a4949193244030917b007644756ac0bd50ceec6d'),'payload'),('fixture','synthetic','mock',UNHEX('a544af123662c61ae0664b4d41457639d24ed7f1'),'payload'),('fixture','synthetic','mock',UNHEX('a8a7490a5d00b30b589db3d3d16f81fb7a7fe7d0'),'payload'),('fixture','synthetic','mock',UNHEX('aba252fcf22ae1ab4fb5aaec87b4a3ac78158c45'),'payload'),('fixture','synthetic','mock',UNHEX('b69b7b18d3b0a89bc6eb97f7a9ffd7d487e6790d'),'payload'),('fixture','synthetic','mock',UNHEX('c3c791596ce8b8c72c508fb5cc9730218b81ae1b'),'payload'),('fixture','synthetic','mock',UNHEX('d45a0e993c76384531cc4f1693317d255cd5cd6d'),'payload'),('fixture','synthetic','mock',UNHEX('d814e9aba60ad5cc3fc7f52be8835c4160fd55e3'),'payload'),('fixture','synthetic','mock',UNHEX('e8de0f78e3809a4527de8851a47d2bca85fc9079'),'payload'),('fixture','synthetic','mock',UNHEX('fa5592b076a0b6f0f5ad26ebe69151dddbf4d169'),'payload') ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id)",
+      "monotonic": 5095448.288289516
+    },
+    {
+      "worker": "forced_primary_range-T1",
+      "event": "completed",
+      "marker": "hold_secondary",
+      "output": [
+        "hold_secondary"
+      ],
+      "monotonic": 5095448.36478004
+    },
+    {
+      "worker": "forced_primary_range-T2",
+      "event": "sent",
+      "marker": "duplicate_done",
+      "sql": "SET TRANSACTION ISOLATION LEVEL READ COMMITTED; START TRANSACTION; INSERT INTO bench.collections(subject,collectionhash) VALUES ('duplicate',UNHEX('001eb9cc5b3f9fbe41a8e05c7e97caa9ca216ce7')) ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id)",
+      "monotonic": 5095448.364784575
+    },
+    {
+      "worker": "forced_primary_range-T1",
+      "event": "sent",
+      "marker": "aggregate_done",
+      "sql": "SELECT id FROM bench.collections FORCE INDEX(PRIMARY) WHERE id IN (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32) ORDER BY id FOR UPDATE",
+      "monotonic": 5095448.445430304
+    },
+    {
+      "worker": "forced_primary_range-T1",
+      "event": "completed",
+      "marker": "aggregate_done",
+      "output": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12",
+        "13",
+        "14",
+        "15",
+        "16",
+        "17",
+        "18",
+        "19",
+        "20",
+        "21",
+        "22",
+        "23",
+        "24",
+        "25",
+        "26",
+        "27",
+        "28",
+        "29",
+        "30",
+        "31",
+        "32",
+        "aggregate_done"
+      ],
+      "monotonic": 5095448.446158487
+    },
+    {
+      "worker": "forced_primary_range-T1",
+      "event": "sent",
+      "marker": "committed",
+      "sql": "COMMIT",
+      "monotonic": 5095448.446164098
+    },
+    {
+      "worker": "forced_primary_range-T1",
+      "event": "completed",
+      "marker": "committed",
+      "output": [
+        "committed"
+      ],
+      "monotonic": 5095448.446454992
+    },
+    {
+      "worker": "forced_primary_range-T2",
+      "event": "completed",
+      "marker": "duplicate_done",
+      "output": [
+        "duplicate_done"
+      ],
+      "monotonic": 5095448.446483975
+    },
+    {
+      "worker": "forced_primary_range-T2",
+      "event": "sent",
+      "marker": "committed_b",
+      "sql": "COMMIT",
+      "monotonic": 5095448.446485251
+    },
+    {
+      "worker": "forced_primary_range-T2",
+      "event": "completed",
+      "marker": "committed_b",
+      "output": [
+        "committed_b"
+      ],
+      "monotonic": 5095448.446651907
+    },
+    {
+      "worker": "individual_primary-T1",
+      "event": "sent",
+      "marker": "hold_secondary",
+      "sql": "SET TRANSACTION ISOLATION LEVEL READ COMMITTED; START TRANSACTION; INSERT INTO bench.collections(subject,fromname,xref,collectionhash,filler) VALUES ('fixture','synthetic','mock',UNHEX('001eb9cc5b3f9fbe41a8e05c7e97caa9ca216ce7'),'payload'),('fixture','synthetic','mock',UNHEX('0160e55413f6a42b12dea77946343b3af4e23a26'),'payload'),('fixture','synthetic','mock',UNHEX('0cf6a0048ea1c355212b6630ebcd34f463691845'),'payload'),('fixture','synthetic','mock',UNHEX('16b2f4289dade3409ad6bcbaf44fd766f7889c26'),'payload'),('fixture','synthetic','mock',UNHEX('17d20ffda073bc843e57ebbea50406c289ced33a'),'payload'),('fixture','synthetic','mock',UNHEX('1bd7053ddbb9101d3c490d7db7350081a866a8e1'),'payload'),('fixture','synthetic','mock',UNHEX('229e409ab193b8f262595e1cb23680beba1ecafc'),'payload'),('fixture','synthetic','mock',UNHEX('2369c52955b3e692a8124536d50dfac3533eccbb'),'payload'),('fixture','synthetic','mock',UNHEX('2cfb071471b3677fb3a58693c9872b8c4a16f9ba'),'payload'),('fixture','synthetic','mock',UNHEX('326f37fef4752d7afcd11162fe50dd63f40e6eb0'),'payload'),('fixture','synthetic','mock',UNHEX('36fb82f3f1f293952de977884140f5fd8a9a3c37'),'payload'),('fixture','synthetic','mock',UNHEX('3ce45e53555a6ea386a2567b658282f8ff8c691c'),'payload'),('fixture','synthetic','mock',UNHEX('458d943aa996a24a59080fc361679fc784cb24b2'),'payload'),('fixture','synthetic','mock',UNHEX('4ca3c90db05e786e65a1e753bc5ada1fff3c7c1a'),'payload'),('fixture','synthetic','mock',UNHEX('50f957cf1b2ebcacb7b7e7c9288a926da428e6b7'),'payload'),('fixture','synthetic','mock',UNHEX('5e8c8671afcd13782a733bc9d58e8388c5f5c7c3'),'payload'),('fixture','synthetic','mock',UNHEX('6ae7a6553a4db5795776f8e7323b06b136c91626'),'payload'),('fixture','synthetic','mock',UNHEX('6cd8d9c318182ea01857331f7cee7bc8b0740384'),'payload'),('fixture','synthetic','mock',UNHEX('734e9c6e00150299ddfbae14f1464aa3f80963d4'),'payload'),('fixture','synthetic','mock',UNHEX('7f76a3ee92aa63bf9f9e3228edc4ab81527fee37'),'payload'),('fixture','synthetic','mock',UNHEX('8ce7b11c2dd45cff7312998dd2881e5b98007d57'),'payload'),('fixture','synthetic','mock',UNHEX('919fffcca5df2062718bdbab9d41cc2b365a51e7'),'payload'),('fixture','synthetic','mock',UNHEX('a4949193244030917b007644756ac0bd50ceec6d'),'payload'),('fixture','synthetic','mock',UNHEX('a544af123662c61ae0664b4d41457639d24ed7f1'),'payload'),('fixture','synthetic','mock',UNHEX('a8a7490a5d00b30b589db3d3d16f81fb7a7fe7d0'),'payload'),('fixture','synthetic','mock',UNHEX('aba252fcf22ae1ab4fb5aaec87b4a3ac78158c45'),'payload'),('fixture','synthetic','mock',UNHEX('b69b7b18d3b0a89bc6eb97f7a9ffd7d487e6790d'),'payload'),('fixture','synthetic','mock',UNHEX('c3c791596ce8b8c72c508fb5cc9730218b81ae1b'),'payload'),('fixture','synthetic','mock',UNHEX('d45a0e993c76384531cc4f1693317d255cd5cd6d'),'payload'),('fixture','synthetic','mock',UNHEX('d814e9aba60ad5cc3fc7f52be8835c4160fd55e3'),'payload'),('fixture','synthetic','mock',UNHEX('e8de0f78e3809a4527de8851a47d2bca85fc9079'),'payload'),('fixture','synthetic','mock',UNHEX('fa5592b076a0b6f0f5ad26ebe69151dddbf4d169'),'payload') ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id)",
+      "monotonic": 5095448.772259383
+    },
+    {
+      "worker": "individual_primary-T1",
+      "event": "completed",
+      "marker": "hold_secondary",
+      "output": [
+        "hold_secondary"
+      ],
+      "monotonic": 5095448.860016668
+    },
+    {
+      "worker": "individual_primary-T2",
+      "event": "sent",
+      "marker": "duplicate_done",
+      "sql": "SET TRANSACTION ISOLATION LEVEL READ COMMITTED; START TRANSACTION; INSERT INTO bench.collections(subject,collectionhash) VALUES ('duplicate',UNHEX('001eb9cc5b3f9fbe41a8e05c7e97caa9ca216ce7')) ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id)",
+      "monotonic": 5095448.860021839
+    },
+    {
+      "worker": "individual_primary-T1",
+      "event": "sent",
+      "marker": "aggregate_done",
+      "sql": "SELECT id FROM bench.collections WHERE id=1 FOR UPDATE; SELECT id FROM bench.collections WHERE id=2 FOR UPDATE; SELECT id FROM bench.collections WHERE id=3 FOR UPDATE; SELECT id FROM bench.collections WHERE id=4 FOR UPDATE; SELECT id FROM bench.collections WHERE id=5 FOR UPDATE; SELECT id FROM bench.collections WHERE id=6 FOR UPDATE; SELECT id FROM bench.collections WHERE id=7 FOR UPDATE; SELECT id FROM bench.collections WHERE id=8 FOR UPDATE; SELECT id FROM bench.collections WHERE id=9 FOR UPDATE; SELECT id FROM bench.collections WHERE id=10 FOR UPDATE; SELECT id FROM bench.collections WHERE id=11 FOR UPDATE; SELECT id FROM bench.collections WHERE id=12 FOR UPDATE; SELECT id FROM bench.collections WHERE id=13 FOR UPDATE; SELECT id FROM bench.collections WHERE id=14 FOR UPDATE; SELECT id FROM bench.collections WHERE id=15 FOR UPDATE; SELECT id FROM bench.collections WHERE id=16 FOR UPDATE; SELECT id FROM bench.collections WHERE id=17 FOR UPDATE; SELECT id FROM bench.collections WHERE id=18 FOR UPDATE; SELECT id FROM bench.collections WHERE id=19 FOR UPDATE; SELECT id FROM bench.collections WHERE id=20 FOR UPDATE; SELECT id FROM bench.collections WHERE id=21 FOR UPDATE; SELECT id FROM bench.collections WHERE id=22 FOR UPDATE; SELECT id FROM bench.collections WHERE id=23 FOR UPDATE; SELECT id FROM bench.collections WHERE id=24 FOR UPDATE; SELECT id FROM bench.collections WHERE id=25 FOR UPDATE; SELECT id FROM bench.collections WHERE id=26 FOR UPDATE; SELECT id FROM bench.collections WHERE id=27 FOR UPDATE; SELECT id FROM bench.collections WHERE id=28 FOR UPDATE; SELECT id FROM bench.collections WHERE id=29 FOR UPDATE; SELECT id FROM bench.collections WHERE id=30 FOR UPDATE; SELECT id FROM bench.collections WHERE id=31 FOR UPDATE; SELECT id FROM bench.collections WHERE id=32 FOR UPDATE",
+      "monotonic": 5095448.9382115
+    },
+    {
+      "worker": "individual_primary-T1",
+      "event": "completed",
+      "marker": "aggregate_done",
+      "output": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12",
+        "13",
+        "14",
+        "15",
+        "16",
+        "17",
+        "18",
+        "19",
+        "20",
+        "21",
+        "22",
+        "23",
+        "24",
+        "25",
+        "26",
+        "27",
+        "28",
+        "29",
+        "30",
+        "31",
+        "32",
+        "aggregate_done"
+      ],
+      "monotonic": 5095448.940813973
+    },
+    {
+      "worker": "individual_primary-T1",
+      "event": "sent",
+      "marker": "committed",
+      "sql": "COMMIT",
+      "monotonic": 5095448.940822342
+    },
+    {
+      "worker": "individual_primary-T1",
+      "event": "completed",
+      "marker": "committed",
+      "output": [
+        "committed"
+      ],
+      "monotonic": 5095448.940991578
+    },
+    {
+      "worker": "individual_primary-T2",
+      "event": "completed",
+      "marker": "duplicate_done",
+      "output": [
+        "duplicate_done"
+      ],
+      "monotonic": 5095448.941147052
+    },
+    {
+      "worker": "individual_primary-T2",
+      "event": "sent",
+      "marker": "committed_b",
+      "sql": "COMMIT",
+      "monotonic": 5095448.941148386
+    },
+    {
+      "worker": "individual_primary-T2",
+      "event": "completed",
+      "marker": "committed_b",
+      "output": [
+        "committed_b"
+      ],
+      "monotonic": 5095448.941346255
+    }
+  ],
+  "end_utc": "2026-10-11T23:04:11Z",
+  "protocol_sha256": "23ce0b0f4b6444b436a599c2e01458a6c2df1b49bdee86384735b4a53539fd25",
+  "preflight_image_inspect_id": "sha256:bc474f00629f0123c10f9e1bca193a45d18af15a274cf0656acda64f1086c3b6",
+  "provenance_note": "Run used cached image tag; preflight inspect observed this identity. No in-container server version query recorded."
+}

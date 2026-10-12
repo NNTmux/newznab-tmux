@@ -1,0 +1,321 @@
+{
+  "local_date": "2026-10-11",
+  "start_utc": "2026-10-12T00:03:57Z",
+  "end_utc": "2026-10-12T00:07:31Z",
+  "stage": "screen only; two independent pairs per configuration",
+  "source_revision": "54c140d7dc4c2500bf69115047b3aabfac6942f0",
+  "candidate_sha256": "7d58bf1cd097be7c22a3ecaec175b35166bd4ee7109dab76d1117f4b52768474",
+  "test_sha256": "ca0568868fcfc217e63731f3a7fb80a37198ea360ca31ed2f239de2110e8ce84",
+  "runtime_and_protocol": {
+    "schema_sha256": "940179ec775e9c13e765d56aaee47db1d3a82f250d1696b12ef32bac1a74cada",
+    "protocol_sha256": "5bf5c566d7375735c0c37a7c10c7a871a6054fbd380f5ddf0b27c9d54beb51eb",
+    "baseline_collection_sha256": "a252e507b50f1c80ffbac5e2f21d38ba26ed381b30b10145476ba279cd55de88",
+    "candidate_collection_sha256": "7d58bf1cd097be7c22a3ecaec175b35166bd4ee7109dab76d1117f4b52768474",
+    "php_runtime_image": "sha256:370880898f81aae668379868b1e318f6289170f560f62861d88e89b1da812352",
+    "db_image": "sha256:bc474f00629f0123c10f9e1bca193a45d18af15a274cf0656acda64f1086c3b6",
+    "vendor_manifest_sha256": "c6e66d8d0a3b0b68b9a1a27fc24b6c4693279a7af70dc8e65e10246ebefb66fd"
+  },
+  "original_validation_handoff_sha256": "48f469701c19a902586e94e3c17373308b683bb14abf2fdd07e0231d60140ba4",
+  "archive_sha256": "db36944b8ad9a8f134fcff213a47f42f1d66d6d4725ee81b4e6bc4ed5a5545f1",
+  "storage": "tmpfs; historical matched caps; cache-fit synthetic data",
+  "plan_cases": 32,
+  "semantic_gates": "real missing-parent 1452 retry and atomic rollback/replay passed for both sources",
+  "candidate_initial_valid": 24,
+  "baseline_initial_valid": 23,
+  "all_replay_firstwrite_and_normal_exits": true,
+  "deadlocks": {
+    "baseline": 416,
+    "candidate": 6
+  },
+  "cumulative_lock_wait_ms": {
+    "baseline": 115134,
+    "candidate": 185913
+  },
+  "configuration_comparisons": [
+    {
+      "configuration": [
+        2,
+        4,
+        100
+      ],
+      "valid_pairs": 2,
+      "pairs": 2,
+      "rank_eligible": true,
+      "throughput_ratio_geomean": 0.8984587916574346,
+      "pair_ratios": [
+        1.049064595834804,
+        0.7694742568870865
+      ],
+      "baseline_deadlocks": [
+        0,
+        0
+      ],
+      "candidate_deadlocks": [
+        0,
+        0
+      ]
+    },
+    {
+      "configuration": [
+        2,
+        4,
+        500
+      ],
+      "valid_pairs": 2,
+      "pairs": 2,
+      "rank_eligible": true,
+      "throughput_ratio_geomean": 0.8789122069660323,
+      "pair_ratios": [
+        0.9112474437627812,
+        0.8477243726074011
+      ],
+      "baseline_deadlocks": [
+        0,
+        0
+      ],
+      "candidate_deadlocks": [
+        0,
+        0
+      ]
+    },
+    {
+      "configuration": [
+        2,
+        6,
+        100
+      ],
+      "valid_pairs": 2,
+      "pairs": 2,
+      "rank_eligible": true,
+      "throughput_ratio_geomean": 0.874485867748906,
+      "pair_ratios": [
+        0.9154017405383525,
+        0.8353988189303835
+      ],
+      "baseline_deadlocks": [
+        0,
+        0
+      ],
+      "candidate_deadlocks": [
+        0,
+        0
+      ]
+    },
+    {
+      "configuration": [
+        2,
+        6,
+        500
+      ],
+      "valid_pairs": 2,
+      "pairs": 2,
+      "rank_eligible": true,
+      "throughput_ratio_geomean": 1.1566719444327294,
+      "pair_ratios": [
+        1.0009856100926475,
+        1.336572647546812
+      ],
+      "baseline_deadlocks": [
+        0,
+        0
+      ],
+      "candidate_deadlocks": [
+        0,
+        0
+      ]
+    },
+    {
+      "configuration": [
+        2,
+        12,
+        100
+      ],
+      "valid_pairs": 2,
+      "pairs": 2,
+      "rank_eligible": true,
+      "throughput_ratio_geomean": 1.8179448444119066,
+      "pair_ratios": [
+        2.926009986382206,
+        1.1294983519212534
+      ],
+      "baseline_deadlocks": [
+        0,
+        0
+      ],
+      "candidate_deadlocks": [
+        0,
+        0
+      ]
+    },
+    {
+      "configuration": [
+        2,
+        12,
+        500
+      ],
+      "valid_pairs": 2,
+      "pairs": 2,
+      "rank_eligible": true,
+      "throughput_ratio_geomean": 1.0477507727111097,
+      "pair_ratios": [
+        0.9884545833912923,
+        1.1106040683734242
+      ],
+      "baseline_deadlocks": [
+        0,
+        0
+      ],
+      "candidate_deadlocks": [
+        0,
+        0
+      ]
+    },
+    {
+      "configuration": [
+        32,
+        4,
+        100
+      ],
+      "valid_pairs": 2,
+      "pairs": 2,
+      "rank_eligible": true,
+      "throughput_ratio_geomean": 1.1235836925819018,
+      "pair_ratios": [
+        1.0410560688117234,
+        1.2126535275635533
+      ],
+      "baseline_deadlocks": [
+        19,
+        17
+      ],
+      "candidate_deadlocks": [
+        0,
+        2
+      ]
+    },
+    {
+      "configuration": [
+        32,
+        4,
+        500
+      ],
+      "valid_pairs": 2,
+      "pairs": 2,
+      "rank_eligible": true,
+      "throughput_ratio_geomean": 1.6524692670582142,
+      "pair_ratios": [
+        1.4908557457212714,
+        1.8316022099447513
+      ],
+      "baseline_deadlocks": [
+        9,
+        9
+      ],
+      "candidate_deadlocks": [
+        0,
+        0
+      ]
+    },
+    {
+      "configuration": [
+        32,
+        6,
+        100
+      ],
+      "valid_pairs": 2,
+      "pairs": 2,
+      "rank_eligible": true,
+      "throughput_ratio_geomean": 1.3601898489289725,
+      "pair_ratios": [
+        1.5363107624993328,
+        1.2042592360152296
+      ],
+      "baseline_deadlocks": [
+        23,
+        21
+      ],
+      "candidate_deadlocks": [
+        0,
+        4
+      ]
+    },
+    {
+      "configuration": [
+        32,
+        6,
+        500
+      ],
+      "valid_pairs": 2,
+      "pairs": 2,
+      "rank_eligible": true,
+      "throughput_ratio_geomean": 2.22443958315104,
+      "pair_ratios": [
+        2.5615349887133183,
+        1.9317055909412597
+      ],
+      "baseline_deadlocks": [
+        20,
+        15
+      ],
+      "candidate_deadlocks": [
+        0,
+        0
+      ]
+    },
+    {
+      "configuration": [
+        32,
+        12,
+        100
+      ],
+      "valid_pairs": 2,
+      "pairs": 2,
+      "rank_eligible": true,
+      "throughput_ratio_geomean": 1.8544072107511504,
+      "pair_ratios": [
+        2.2482960849579965,
+        1.5295254598773662
+      ],
+      "baseline_deadlocks": [
+        70,
+        92
+      ],
+      "candidate_deadlocks": [
+        0,
+        0
+      ]
+    },
+    {
+      "configuration": [
+        32,
+        12,
+        500
+      ],
+      "valid_pairs": 1,
+      "pairs": 2,
+      "rank_eligible": false,
+      "throughput_ratio_geomean": null,
+      "pair_ratios": [
+        4.351304122710505
+      ],
+      "baseline_deadlocks": [
+        53,
+        68
+      ],
+      "candidate_deadlocks": [
+        0,
+        0
+      ]
+    }
+  ],
+  "failed_pair": "r2-c32-w12-h500; excluded entirely from speed estimates",
+  "failed_baseline": {
+    "new_unique_parts": 8546,
+    "intended_new_unique_parts": 9216,
+    "unique_failed_article_ids": 983,
+    "driver_code": 1213,
+    "exhausted_chunks": 2,
+    "total_attempts_each": 10
+  },
+  "acceptance": "not established: workload-dependent speed, hot-4-writer point regression, short CPU-throttled runs, only two pairs; full isolated suite was not passing"
+}
