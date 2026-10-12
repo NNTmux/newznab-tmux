@@ -53,6 +53,8 @@ pub enum FormatHeader {
         password_check_present: Option<bool>,
         password_check_data_hex: Option<String>,
         first_block_header_size: Option<u64>,
+        first_block_header_size_vint_bytes: Option<u8>,
+        first_block_header_size_encoding_valid: Option<bool>,
         first_block_extra_size: Option<u64>,
         first_block_data_size: Option<u64>,
         main_extra_record_types: Vec<u64>,
@@ -225,26 +227,58 @@ fn parse_rar4(data: &[u8], offset: usize) -> FormatHeader {
 fn parse_rar5(data: &[u8], offset: usize) -> FormatHeader {
     let block_start = offset + RAR5.len();
     let Some(crc_bytes) = data.get(block_start..block_start + 4) else {
-        return empty_rar5(offset);
+        return empty_rar5(offset, None, None, None);
     };
     let expected_crc = u32::from_le_bytes(crc_bytes.try_into().expect("four-byte CRC"));
     let mut cursor = block_start + 4;
-    let Some(header_size) = read_vint(data, &mut cursor) else {
-        return empty_rar5(offset);
+    let Some((header_size, header_size_vint_bytes)) = read_vint_with_len(data, &mut cursor) else {
+        return empty_rar5(offset, None, None, None);
     };
+    // The RAR5 specification limits this vint to three bytes (2 MiB maximum).
+    let header_size_encoding_valid = header_size_vint_bytes <= 3 && header_size <= 0x1f_ffff;
+    if !header_size_encoding_valid {
+        return empty_rar5(
+            offset,
+            Some(header_size),
+            Some(header_size_vint_bytes),
+            Some(false),
+        );
+    }
     let Ok(header_size_usize) = usize::try_from(header_size) else {
-        return empty_rar5(offset);
+        return empty_rar5(
+            offset,
+            Some(header_size),
+            Some(header_size_vint_bytes),
+            Some(true),
+        );
     };
     let header_end = match cursor.checked_add(header_size_usize) {
         Some(end) if end <= data.len() => end,
-        _ => return empty_rar5(offset),
+        _ => {
+            return empty_rar5(
+                offset,
+                Some(header_size),
+                Some(header_size_vint_bytes),
+                Some(true),
+            );
+        }
     };
     let calculated_crc = crc32fast::hash(&data[block_start + 4..header_end]);
     let Some(block_type) = read_vint_bounded(data, &mut cursor, header_end) else {
-        return empty_rar5(offset);
+        return empty_rar5(
+            offset,
+            Some(header_size),
+            Some(header_size_vint_bytes),
+            Some(true),
+        );
     };
     let Some(block_flags) = read_vint_bounded(data, &mut cursor, header_end) else {
-        return empty_rar5(offset);
+        return empty_rar5(
+            offset,
+            Some(header_size),
+            Some(header_size_vint_bytes),
+            Some(true),
+        );
     };
     let extra_size = if block_flags & 0x01 != 0 {
         read_vint_bounded(data, &mut cursor, header_end)
@@ -337,6 +371,8 @@ fn parse_rar5(data: &[u8], offset: usize) -> FormatHeader {
         password_check_present: encryption_flags.map(|flags| flags & 0x01 != 0),
         password_check_data_hex: password_check_data,
         first_block_header_size: Some(header_size),
+        first_block_header_size_vint_bytes: Some(header_size_vint_bytes),
+        first_block_header_size_encoding_valid: Some(true),
         first_block_extra_size: extra_size,
         first_block_data_size: data_size,
         main_extra_record_types,
@@ -345,7 +381,12 @@ fn parse_rar5(data: &[u8], offset: usize) -> FormatHeader {
     }
 }
 
-fn empty_rar5(offset: usize) -> FormatHeader {
+fn empty_rar5(
+    offset: usize,
+    header_size: Option<u64>,
+    header_size_vint_bytes: Option<u8>,
+    header_size_encoding_valid: Option<bool>,
+) -> FormatHeader {
     FormatHeader::Rar5 {
         offset,
         first_block_header_available: false,
@@ -365,7 +406,9 @@ fn empty_rar5(offset: usize) -> FormatHeader {
         header_encryption_salt_hex: None,
         password_check_present: None,
         password_check_data_hex: None,
-        first_block_header_size: None,
+        first_block_header_size: header_size,
+        first_block_header_size_vint_bytes: header_size_vint_bytes,
+        first_block_header_size_encoding_valid: header_size_encoding_valid,
         first_block_extra_size: None,
         first_block_data_size: None,
         main_extra_record_types: Vec::new(),
@@ -550,8 +593,12 @@ fn parse_rar5_archive_metadata(
 }
 
 fn read_vint(data: &[u8], cursor: &mut usize) -> Option<u64> {
+    read_vint_with_len(data, cursor).map(|(value, _)| value)
+}
+
+fn read_vint_with_len(data: &[u8], cursor: &mut usize) -> Option<(u64, u8)> {
     let mut value = 0u64;
-    for shift in (0..70).step_by(7) {
+    for (index, shift) in (0..70).step_by(7).enumerate() {
         let byte = *data.get(*cursor)?;
         *cursor = cursor.checked_add(1)?;
         let part = byte & 0x7f;
@@ -560,7 +607,7 @@ fn read_vint(data: &[u8], cursor: &mut usize) -> Option<u64> {
         }
         value |= u64::from(part) << shift;
         if byte & 0x80 == 0 {
-            return Some(value);
+            return Some((value, u8::try_from(index + 1).ok()?));
         }
     }
     None
