@@ -322,7 +322,11 @@ class ManticoreSearchQueryTest extends TestCase
 
         $this->assertIsString($driverSource);
         $this->assertStringContainsString(
-            "\$terms[] = '@@relaxed '.self::scopeReleaseSearchQuery((string) \$value, \$prepared, '@'.\$key);",
+            '$prepared = self::prepareReleaseFieldSearchQuery($key, $rawValue);',
+            $driverSource
+        );
+        $this->assertStringContainsString(
+            "\$terms[] = '@@relaxed '.self::scopeReleaseSearchQuery(\$rawValue, \$prepared, '@'.\$key);",
             $driverSource
         );
         $this->assertStringNotContainsString(
