@@ -24,7 +24,7 @@ from collections import Counter, defaultdict
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, NoReturn
 
 
 YENC_RE = re.compile(r"=ybegin\s+(?P<attrs>[^\r\n]+)", re.IGNORECASE)
@@ -34,6 +34,15 @@ RAR_RE = re.compile(r"\.part(?P<part>\d+)\.rar\b|\.rar\b", re.IGNORECASE)
 PAR_RE = re.compile(r"\.vol(?P<first>\d+)[+-](?P<count>\d+)\.par2\b|\.par2\b", re.IGNORECASE)
 ID_RE = re.compile(r"<[^<>\s]+>")
 PAR_MAGIC = b"PAR2\x00PKT"
+NNTP_RESPONSE_LINE_LIMIT = 8192
+NNTP_HEADER_LINE_LIMIT = 1_048_576
+NNTP_HEADER_TOTAL_LIMIT = 4_194_304
+NNTP_MULTILINE_LINE_LIMIT = 1_048_576
+NNTP_MULTILINE_TOTAL_LIMIT = 16_777_216
+NNTP_MULTILINE_COUNT_LIMIT = 100_000
+NNTP_ARTICLE_LINE_LIMIT = 16_777_216
+NNTP_ARTICLE_BODY_LIMIT = 268_435_456
+NNTP_ARTICLE_LINE_COUNT_LIMIT = 2_000_000
 
 
 def attrs(text: str) -> dict[str, str]:
@@ -127,6 +136,7 @@ class Nntp:
     timeout: float = 12.0
 
     def __post_init__(self) -> None:
+        self.poisoned = False
         raw = socket.create_connection((self.host, self.port), timeout=self.timeout)
         self.sock = ssl.create_default_context().wrap_socket(raw, server_hostname=self.host) if self.tls else raw
         self.file = self.sock.makefile("rwb", buffering=0)
@@ -146,11 +156,46 @@ class Nntp:
                 raise RuntimeError(f"NNTP authentication failed with response {auth_code}")
 
     def _response(self) -> tuple[int, str]:
-        line = self.file.readline(8192).decode("utf-8", "replace").rstrip("\r\n")
+        line = self._read_line(NNTP_RESPONSE_LINE_LIMIT, "NNTP response").decode("utf-8", "replace").rstrip("\r\n")
         match = re.match(r"(\d{3})\s?(.*)", line)
         if not match:
-            raise RuntimeError("Invalid NNTP response")
+            self._fail_connection("Invalid NNTP response")
         return int(match.group(1)), match.group(2)
+
+    def _fail_connection(self, message: str) -> NoReturn:
+        self.poisoned = True
+        raise RuntimeError(message)
+
+    def _read_line(self, maximum_bytes: int, description: str) -> bytes:
+        if self.poisoned:
+            raise RuntimeError("NNTP connection is unusable after a framing or response-limit failure")
+        try:
+            line = self.file.readline(maximum_bytes + 1)
+        except OSError:
+            self.poisoned = True
+            raise
+        if not line:
+            self._fail_connection(f"Truncated {description}")
+        if len(line) > maximum_bytes or not line.endswith(b"\n"):
+            self._fail_connection(f"{description} line exceeded its {maximum_bytes}-byte limit")
+        return line
+
+    def _read_multiline(self, description: str, *, maximum_line_bytes: int = NNTP_MULTILINE_LINE_LIMIT,
+                        maximum_total_bytes: int = NNTP_MULTILINE_TOTAL_LIMIT) -> list[bytes]:
+        lines: list[bytes] = []
+        total_bytes = 0
+        while True:
+            line = self._read_line(maximum_line_bytes, description)
+            total_bytes += len(line)
+            if total_bytes > maximum_total_bytes:
+                self._fail_connection(f"{description} exceeded its {maximum_total_bytes}-byte limit")
+            if line == b".\r\n":
+                return lines
+            if line.startswith(b".."):
+                line = line[1:]
+            lines.append(line)
+            if len(lines) > NNTP_MULTILINE_COUNT_LIMIT:
+                self._fail_connection(f"{description} exceeded its {NNTP_MULTILINE_COUNT_LIMIT}-line limit")
 
     def command(self, command: str, accepted: tuple[int, ...] = (281, 381, 250, 223)) -> str:
         self.file.write(command.encode("ascii") + b"\r\n")
@@ -167,17 +212,9 @@ class Nntp:
         found = (verb == "STAT" and code == 223) or (verb == "HEAD" and code == 221)
         result: dict[str, Any] = {"code": code, "message": message, "available": found}
         if found and verb == "HEAD":
-            lines = []
-            while True:
-                line = self.file.readline(8192)
-                if not line:
-                    raise RuntimeError("Truncated NNTP HEAD response")
-                if line == b".\r\n":
-                    break
-                if line.startswith(b".."):
-                    line = line[1:]
-                lines.append(line.decode("utf-8", "replace").rstrip("\r\n"))
-            result["header_lines"] = lines
+            lines = self._read_multiline("NNTP HEAD response", maximum_line_bytes=NNTP_HEADER_LINE_LIMIT,
+                                         maximum_total_bytes=NNTP_HEADER_TOTAL_LIMIT)
+            result["header_lines"] = [line.decode("utf-8", "replace").rstrip("\r\n") for line in lines]
         return result
 
     def capabilities(self) -> list[str]:
@@ -185,30 +222,18 @@ class Nntp:
         code, _ = self._response()
         if code != 101:
             return []
-        values = []
-        while True:
-            line = self.file.readline(8192)
-            if not line:
-                raise RuntimeError("Truncated NNTP capability response")
-            if line == b".\r\n":
-                break
-            values.append(line.decode("ascii", "replace").strip())
-        return values
+        lines = self._read_multiline("NNTP capability response", maximum_line_bytes=NNTP_RESPONSE_LINE_LIMIT,
+                                     maximum_total_bytes=NNTP_HEADER_TOTAL_LIMIT)
+        return [line.decode("ascii", "replace").strip() for line in lines]
 
     def overview_format(self) -> list[str]:
         self.file.write(b"LIST OVERVIEW.FMT\r\n")
         code, _ = self._response()
         if code != 215:
             return []
-        values = []
-        while True:
-            line = self.file.readline(8192)
-            if not line:
-                raise RuntimeError("Truncated NNTP overview format response")
-            if line == b".\r\n":
-                break
-            values.append(line.decode("utf-8", "replace").strip())
-        return values
+        lines = self._read_multiline("NNTP overview format response", maximum_line_bytes=NNTP_RESPONSE_LINE_LIMIT,
+                                     maximum_total_bytes=NNTP_HEADER_TOTAL_LIMIT)
+        return [line.decode("utf-8", "replace").strip() for line in lines]
 
     def overview(self, group: str, article_number: int, format_fields: list[str]) -> dict[str, Any]:
         if not re.fullmatch(r"[A-Za-z0-9+._-]+", group):
@@ -223,14 +248,8 @@ class Nntp:
         over_code, _ = self._response()
         rows = []
         if over_code == 224:
-            while True:
-                line = self.file.readline(65536)
-                if not line:
-                    raise RuntimeError("Truncated NNTP overview response")
-                if line == b".\r\n":
-                    break
-                if line.startswith(b".."): line = line[1:]
-                rows.append(line.decode("utf-8", "replace").rstrip("\r\n"))
+            lines = self._read_multiline("NNTP overview response")
+            rows = [line.decode("utf-8", "replace").rstrip("\r\n") for line in lines]
         values = rows[0].split("\t") if rows else []
         field_names = []
         for value in format_fields:
@@ -257,14 +276,8 @@ class Nntp:
         code, _ = self._response()
         if code != 224:
             return {"group": group, "available": False, "overview_response": code}
-        rows = []
-        while True:
-            line = self.file.readline(65536)
-            if not line:
-                raise RuntimeError("Truncated NNTP OVER MSGID response")
-            if line == b".\r\n":
-                break
-            rows.append(line.decode("utf-8", "replace").rstrip("\r\n"))
+        lines = self._read_multiline("NNTP OVER MSGID response")
+        rows = [line.decode("utf-8", "replace").rstrip("\r\n") for line in lines]
         if not rows:
             return {"group": group, "available": False, "overview_response": code}
         row = rows[0]
@@ -287,17 +300,23 @@ class Nntp:
         body = bytearray()
         body_hash = hashlib.sha256()
         body_bytes = 0
+        header_bytes = 0
+        line_count = 0
         in_headers = True
         while True:
-            line = self.file.readline(16_777_217)
-            if not line:
-                raise RuntimeError("Truncated NNTP ARTICLE response")
-            if not line.endswith(b"\n"):
-                raise RuntimeError("NNTP ARTICLE line exceeded the 16 MiB safety limit")
+            line = self._read_line(NNTP_ARTICLE_LINE_LIMIT, "NNTP ARTICLE")
+            line_count += 1
+            if line_count > NNTP_ARTICLE_LINE_COUNT_LIMIT:
+                self._fail_connection(f"NNTP ARTICLE exceeded its {NNTP_ARTICLE_LINE_COUNT_LIMIT}-line limit")
             if line == b".\r\n":
                 break
             if line.startswith(b".."): line = line[1:]
             if in_headers:
+                header_bytes += len(line)
+                if header_bytes > NNTP_HEADER_TOTAL_LIMIT:
+                    self._fail_connection(f"NNTP ARTICLE headers exceeded their {NNTP_HEADER_TOTAL_LIMIT}-byte limit")
+                if len(header_lines) >= NNTP_MULTILINE_COUNT_LIMIT:
+                    self._fail_connection(f"NNTP ARTICLE headers exceeded their {NNTP_MULTILINE_COUNT_LIMIT}-line limit")
                 if line in (b"\r\n", b"\n"):
                     in_headers = False
                 elif line[:1] in (b" ", b"\t") and header_lines:
@@ -318,6 +337,8 @@ class Nntp:
             else:
                 body_hash.update(line)
                 body_bytes += len(line)
+                if body_bytes > NNTP_ARTICLE_BODY_LIMIT:
+                    self._fail_connection(f"NNTP ARTICLE body exceeded its {NNTP_ARTICLE_BODY_LIMIT}-byte limit")
                 if len(body) < limit:
                     body.extend(line[:limit - len(body)])
         headers["__raw_order"] = "\n".join(header_lines)
@@ -326,10 +347,11 @@ class Nntp:
         return headers, bytes(body)
 
     def close(self) -> None:
-        try:
-            self.command("QUIT", accepted=(205,))
-        except Exception:
-            pass
+        if not self.poisoned:
+            try:
+                self.command("QUIT", accepted=(205,))
+            except Exception:
+                pass
         self.file.close()
         self.sock.close()
 
@@ -728,7 +750,7 @@ def main() -> int:
     parser.add_argument("--files-per-kind", type=int, default=12, help="Evenly sample this many RAR/other NZB files; all PAR2 files are included")
     parser.add_argument("--all-files", action="store_true", help="Inspect article metadata for every NZB file (still samples segment positions unless --all-segments is set)")
     parser.add_argument("--all-segments", action="store_true", help="Retrieve every segment of every selected file; can make many NNTP requests")
-    parser.add_argument("--max-article-bytes", type=int, default=2_000_000, help="Maximum body bytes retained for decoding per sample; the NNTP response is drained to its terminator")
+    parser.add_argument("--max-article-bytes", type=int, default=2_000_000, help="Maximum body bytes retained for decoding per sample (hard article response cap: 256 MiB)")
     parser.add_argument("--timeout", type=float, default=12.0)
     parser.add_argument("--output", type=Path, help="Write JSON to this path; otherwise stdout")
     args = parser.parse_args()
@@ -775,7 +797,8 @@ def main() -> int:
                                     group_number = int(group_match.group(1)) if group_match else None
                                 overview_rows.append(server.overview(group_name, group_number, overview_fields) if group_number else
                                                      {"group": group_name, "available": False, "error": "article number unavailable in selected group"})
-                        headers, body = server.article(message_id, max(1024, args.max_article_bytes))
+                        retained_body_limit = min(max(1024, args.max_article_bytes), NNTP_ARTICLE_BODY_LIMIT)
+                        headers, body = server.article(message_id, retained_body_limit)
                         sample = {"id": message_id, "message_id_profile": message_id_profile(message_id),
                                   "file_index": file_index, "nzb_subject": _subject, "segment_number": segment_number,
                                   "server": config["name"], "available": bool(headers or body),
@@ -787,7 +810,9 @@ def main() -> int:
                         server_samples.append(sample)
                     except Exception as exc:
                         errors.append(f"NNTP sample failed on {config['name']} ({type(exc).__name__})")
-                server_summaries.append({"name": config["name"], "host": config["host"], "port": config["port"], "tls": config["tls"], "greeting": server.greeting, "sampled_articles": len(server_samples), "capabilities": server_capabilities, "overview_format": overview_fields})
+                        if server.poisoned:
+                            break
+                server_summaries.append({"name": config["name"], "host": config["host"], "port": config["port"], "tls": config["tls"], "greeting": server.greeting, "sampled_articles": len(server_samples), "connection_stopped_early": server.poisoned, "capabilities": server_capabilities, "overview_format": overview_fields})
                 samples.extend(server_samples)
             except (OSError, RuntimeError) as exc:
                 errors.append(f"NNTP connection failed on {config['name']} ({type(exc).__name__})")
