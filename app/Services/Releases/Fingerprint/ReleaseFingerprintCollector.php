@@ -839,7 +839,7 @@ final class ReleaseFingerprintCollector
 
     /** @param list<array<string, mixed>> $sourceFiles
      *  @param list<array<string, mixed>> $observations
-     *  @return array{basis: string, matched_count: int, ambiguous_count: int, unmatched_count: int, contradictory_length_count: int, insufficient_prefix_count: int, length_unavailable_count: int, matches: list<array<string, mixed>>}
+     *  @return array{basis: string, matched_prefix_and_length_count: int, ambiguous_count: int, unmatched_count: int, contradictory_length_count: int, insufficient_prefix_count: int, length_unavailable_count: int, matches: list<array<string, mixed>>}
      */
     private function matchPar2SourcesToNzbFiles(array $sourceFiles, array $observations): array
     {
@@ -881,7 +881,7 @@ final class ReleaseFingerprintCollector
                 || ($unknownLengthCandidateCount > 0 && count($exactLengthCandidates) === 1)) {
                 $matchStatus = 'length_unavailable';
             } elseif (count($exactLengthCandidates) === 1) {
-                $matchStatus = 'matched';
+                $matchStatus = 'matched_prefix_and_length';
             } elseif (count($exactLengthCandidates) > 1) {
                 $matchStatus = 'ambiguous';
             } elseif ($unknownLengthCandidateCount > 0) {
@@ -894,7 +894,7 @@ final class ReleaseFingerprintCollector
             if ($messageId === '') {
                 continue;
             }
-            $relationshipSources = $matchStatus === 'matched' ? $exactLengthCandidates : $hashCandidates;
+            $relationshipSources = $matchStatus === 'matched_prefix_and_length' ? $exactLengthCandidates : $hashCandidates;
             $candidateIds = array_map(
                 static fn (array $sourceFile): string => (string) ($sourceFile['recovery_set_id'] ?? '').':'.strtolower((string) ($sourceFile['file_id'] ?? '')),
                 $relationshipSources,
@@ -942,8 +942,8 @@ final class ReleaseFingerprintCollector
         unset($match);
 
         return [
-            'basis' => 'Compare PAR2 FileDesc md5_first_16k with the first 16384 decoded bytes from NZB segment 1; multipart yEnc samples must declare a valid range beginning at byte 1. A unique hash and whole-file length match is labeled matched; prefix-only or ambiguous evidence is kept separate.',
-            'matched_count' => count(array_filter($matches, static fn (array $match): bool => $match['status'] === 'matched')),
+            'basis' => 'Compare PAR2 FileDesc md5_first_16k with the first 16384 decoded bytes from NZB segment 1; multipart yEnc samples must declare a valid range beginning at byte 1. A unique prefix-hash and whole-file length match is labeled matched_prefix_and_length; this does not verify the remaining file bytes.',
+            'matched_prefix_and_length_count' => count(array_filter($matches, static fn (array $match): bool => $match['status'] === 'matched_prefix_and_length')),
             'ambiguous_count' => count(array_filter($matches, static fn (array $match): bool => $match['status'] === 'ambiguous')),
             'unmatched_count' => count(array_filter($matches, static fn (array $match): bool => $match['status'] === 'unmatched')),
             'contradictory_length_count' => count(array_filter($matches, static fn (array $match): bool => $match['status'] === 'contradictory_length')),
