@@ -20,6 +20,7 @@ use std::slice;
 
 mod formats;
 mod par2;
+mod par2_source_ranges;
 mod seven_zip_ranges;
 
 /// nzb-decode 0.1.3, packed as RapidYenc packs its version (major << 16 | minor << 8 | patch).
@@ -33,6 +34,7 @@ const HEADER: &[u8] = b"=ybegin line=128 name=payload\r\n";
 const FOOTER: &[u8] = b"\r\n=yend\r\n";
 const MAX_METADATA_INPUT_BYTES: usize = 67_108_864;
 const MAX_SEVEN_ZIP_RANGE_INPUT_BYTES: usize = 16 * 1024 * 1024 + 4096;
+const MAX_PAR2_SOURCE_RANGE_INPUT_BYTES: usize = 16 * 1024 * 1024 + 16 * 1024;
 
 /// Decode a yEnc payload (CR/LF line endings are skipped, `=X` escapes resolved).
 pub fn decode_payload(payload: &[u8]) -> Option<Vec<u8>> {
@@ -146,6 +148,32 @@ pub unsafe extern "C" fn nntmux_seven_zip_ranges_json(
     let input = unsafe { slice::from_raw_parts(data, length) };
     let encoded = catch_unwind(|| {
         seven_zip_ranges::parse(input).and_then(|metadata| serde_json::to_string(&metadata).ok())
+    });
+    match encoded {
+        Ok(Some(json)) => CString::new(json)
+            .map(CString::into_raw)
+            .unwrap_or(ptr::null_mut()),
+        _ => ptr::null_mut(),
+    }
+}
+
+/// Verify bounded PAR2 IFSC slices against decoded yEnc article fragments.
+/// The input is a packed P2SR record; the caller must free the returned JSON.
+///
+/// # Safety
+/// `data` must be readable for `length` bytes. Inputs over the range budget are rejected.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn nntmux_par2_source_ranges_json(
+    data: *const u8,
+    length: usize,
+) -> *mut c_char {
+    if length > MAX_PAR2_SOURCE_RANGE_INPUT_BYTES || data.is_null() || length == 0 {
+        return ptr::null_mut();
+    }
+    // SAFETY: the caller guarantees `data` is readable for `length` bytes.
+    let input = unsafe { slice::from_raw_parts(data, length) };
+    let encoded = catch_unwind(|| {
+        par2_source_ranges::parse(input).and_then(|metadata| serde_json::to_string(&metadata).ok())
     });
     match encoded {
         Ok(Some(json)) => CString::new(json)

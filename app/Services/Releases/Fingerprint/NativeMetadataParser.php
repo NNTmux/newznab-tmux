@@ -31,6 +31,12 @@ final class NativeMetadataParser
     }
 
     /** @return array<string, mixed>|null */
+    public function resolvePar2SourceRanges(string $packedRanges): ?array
+    {
+        return $this->parseJson('nntmux_par2_source_ranges_json', $packedRanges);
+    }
+
+    /** @return array<string, mixed>|null */
     private function parseJson(string $function, string $bytes): ?array
     {
         $library = $this->library();
@@ -84,6 +90,7 @@ final class NativeMetadataParser
                 char* nntmux_par2_metadata_json(const unsigned char* data, size_t length);
                 char* nntmux_format_metadata_json(const unsigned char* data, size_t length);
                 char* nntmux_seven_zip_ranges_json(const unsigned char* data, size_t length);
+                char* nntmux_par2_source_ranges_json(const unsigned char* data, size_t length);
                 void nntmux_metadata_string_free(char* value);
                 C, $resolved);
         } catch (Throwable) {

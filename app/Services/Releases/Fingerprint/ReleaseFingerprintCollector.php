@@ -12,7 +12,7 @@ use Throwable;
 
 final class ReleaseFingerprintCollector
 {
-    public const SCHEMA_VERSION = 5;
+    public const SCHEMA_VERSION = 6;
 
     private const MAX_ARTICLE_BODY_BYTES = 2_000_000;
 
@@ -21,6 +21,14 @@ final class ReleaseFingerprintCollector
     private const MAX_SEVEN_ZIP_FRAGMENT_BYTES = 16_777_216;
 
     private const MAX_SEVEN_ZIP_FRAGMENTS_PER_RECORD = 32;
+
+    private const MAX_PAR2_SOURCE_SAMPLE_BYTES = 16_777_216;
+
+    private const MAX_PAR2_SOURCE_RESOLUTION_WORK_BYTES = 33_554_432;
+
+    private const MAX_PAR2_SOURCE_FRAGMENTS_PER_RECORD = 32;
+
+    private const MAX_PAR2_SOURCE_RELATIONSHIPS = 512;
 
     private const MAX_IFSC_PREVIEW_HEX_BYTES = 8192;
 
@@ -55,6 +63,9 @@ final class ReleaseFingerprintCollector
         $sevenZipCandidates = [];
         $sevenZipRetainedBytes = 0;
         $sevenZipOmittedSamples = 0;
+        $par2SourceSamples = [];
+        $par2SourceSampleRetainedBytes = 0;
+        $par2SourceSampleOmittedCount = 0;
         foreach ($servers as $server) {
             try {
                 $profile = $nntp->getFingerprintServerProfile($server['alternate']);
@@ -107,6 +118,59 @@ final class ReleaseFingerprintCollector
                         $sample['file_index'], $server['name'], $server['alternate'] ? 'alternate' : 'primary',
                         $server['port'], $server['tls'],
                     ], JSON_INVALID_UTF8_SUBSTITUTE);
+                    if (is_string($providerKey) && $sample['kind'] !== 'par2'
+                        && ($decodedFileRange['mapping_status'] ?? null) === 'valid'
+                        && is_string($decodedBytes) && $decodedBytes !== '') {
+                        $par2SourceSamples[$providerKey] ??= [
+                            'file_index' => $sample['file_index'],
+                            'kind' => $sample['kind'],
+                            'subject' => $sample['subject'],
+                            'provider' => [
+                                'server' => $server['name'],
+                                'label' => $server['provider_label'],
+                                'role' => $server['alternate'] ? 'alternate' : 'primary',
+                                'port' => $server['port'],
+                                'tls' => $server['tls'],
+                            ],
+                            'first_sample' => null,
+                            'fragments' => [],
+                            'budget_omitted_ranges' => [],
+                            'omitted_sample_count_due_to_budget' => 0,
+                        ];
+                        $par2SourceSamples[$providerKey]['declared_file_sizes'][$decodedFileRange['file_size']] = true;
+                        if (($sample['sample_role'] ?? null) === 'first' && ($sample['segment_number'] ?? null) === 1) {
+                            $par2SourceSamples[$providerKey]['first_sample'] = [
+                                'message_id' => $sample['messageid'],
+                                'prefix_md5' => strtolower((string) ($yenc['par2_first_16k_md5_candidate'] ?? '')),
+                                'file_length' => $decodedFileRange['file_size'],
+                                'integrity_status' => $decodedFileRange['integrity_status'],
+                            ];
+                        }
+                        $decodedFragmentLength = strlen($decodedBytes);
+                        if (count($par2SourceSamples[$providerKey]['fragments']) < self::MAX_PAR2_SOURCE_FRAGMENTS_PER_RECORD
+                            && $par2SourceSampleRetainedBytes + $decodedFragmentLength <= self::MAX_PAR2_SOURCE_SAMPLE_BYTES) {
+                            $par2SourceSamples[$providerKey]['fragments'][] = [
+                                'file_offset' => $decodedFileRange['start_offset'],
+                                'bytes' => $decodedBytes,
+                                'reference' => [
+                                    'message_id' => $sample['messageid'],
+                                    'segment_number' => $sample['segment_number'],
+                                    'sample_role' => $sample['sample_role'],
+                                    'source_byte_start' => $decodedFileRange['start_offset'],
+                                    'source_byte_end_exclusive' => $decodedFileRange['end_offset_exclusive'],
+                                    'yenc_integrity_status' => $decodedFileRange['integrity_status'],
+                                ],
+                            ];
+                            $par2SourceSampleRetainedBytes += $decodedFragmentLength;
+                        } else {
+                            $par2SourceSamples[$providerKey]['budget_omitted_ranges'][] = [
+                                'start' => $decodedFileRange['start_offset'],
+                                'end_exclusive' => $decodedFileRange['end_offset_exclusive'],
+                            ];
+                            $par2SourceSamples[$providerKey]['omitted_sample_count_due_to_budget']++;
+                            $par2SourceSampleOmittedCount++;
+                        }
+                    }
                     $sevenZipAnchor = $this->sevenZipAnchor($metadata);
                     if (is_string($providerKey) && $sample['sample_role'] === 'first'
                         && $sevenZipAnchor !== null && ($decodedFileRange['mapping_status'] ?? null) === 'valid'
@@ -789,6 +853,14 @@ final class ReleaseFingerprintCollector
             (string) ($sourceFile['filename'] ?? ''),
         ) === 1));
         $par2SourceArticleMatches = $this->matchPar2SourcesToNzbFiles($par2SourceFiles, $observations);
+        $par2SourceSliceRelationships = $this->resolvePar2SourceSliceRelationships(
+            $par2SourceFiles,
+            $par2Ifsc['files'],
+            $par2SourceSamples,
+            $observations,
+            $par2SourceSampleRetainedBytes,
+            $par2SourceSampleOmittedCount,
+        );
         $par2RecoveryPercent = $par2Complete && $par2RecoverySliceConflicts === [] && ! $multiplePar2Sets && is_int($par2SourceBlocks) && $par2SourceBlocks > 0 && ! $par2PackedLayout
             ? round($recoveryCount / $par2SourceBlocks * 100, 3)
             : null;
@@ -849,6 +921,7 @@ final class ReleaseFingerprintCollector
                 'files' => $fileRows,
                 'article_observations' => $observations,
                 'archive_relationships' => [
+                    'par2_source_slices' => $par2SourceSliceRelationships,
                     'seven_zip_next_headers' => [
                         'relationship_count' => count($sevenZipRelationships),
                         'retained_decoded_sample_bytes' => $sevenZipRetainedBytes,
@@ -1124,6 +1197,241 @@ final class ReleaseFingerprintCollector
         }
 
         return false;
+    }
+
+    private function resolvePar2SourceSliceRelationships(
+        array $sourceFiles,
+        array $ifscFiles,
+        array $sampledFiles,
+        array $observations,
+        int $retainedBytes,
+        int $omittedSamples,
+    ): array {
+        $sourcesByPrefix = [];
+        foreach ($sourceFiles as $sourceFile) {
+            $prefixMd5 = strtolower((string) ($sourceFile['md5_first_16k'] ?? ''));
+            if (preg_match('/\A[a-f0-9]{32}\z/D', $prefixMd5) === 1) {
+                $sourcesByPrefix[$prefixMd5][] = $sourceFile;
+            }
+        }
+
+        $ifscBySource = [];
+        foreach ($ifscFiles as $ifscFile) {
+            if (! is_array($ifscFile) || ! is_string($ifscFile['recovery_set_id'] ?? null)
+                || ! is_string($ifscFile['file_id'] ?? null)) {
+                continue;
+            }
+            $ifscBySource[strtolower($ifscFile['recovery_set_id'].':'.$ifscFile['file_id'])] = $ifscFile;
+        }
+
+        $native = new NativeMetadataParser;
+        $records = [];
+        $omittedRelationshipCount = 0;
+        $resolutionWorkBytes = 0;
+        $resolutionWorkBudgetOmittedCount = 0;
+        foreach ($sampledFiles as $sampledFile) {
+            if (count($records) >= self::MAX_PAR2_SOURCE_RELATIONSHIPS || ! is_array($sampledFile)) {
+                $omittedRelationshipCount++;
+                continue;
+            }
+            $firstSample = $sampledFile['first_sample'] ?? null;
+            $prefixMd5 = is_array($firstSample) ? strtolower((string) ($firstSample['prefix_md5'] ?? '')) : '';
+            $fileLength = is_array($firstSample) && is_int($firstSample['file_length'] ?? null)
+                ? $firstSample['file_length'] : null;
+            $prefixCandidates = preg_match('/\A[a-f0-9]{32}\z/D', $prefixMd5) === 1
+                ? ($sourcesByPrefix[$prefixMd5] ?? []) : [];
+            $lengthCandidates = array_values(array_filter(
+                $prefixCandidates,
+                static fn (array $sourceFile): bool => $fileLength !== null
+                    && is_int($sourceFile['file_length'] ?? null)
+                    && $sourceFile['file_length'] === $fileLength,
+            ));
+            $unknownLengthCandidateCount = count(array_filter(
+                $prefixCandidates,
+                static fn (array $sourceFile): bool => ! is_int($sourceFile['file_length'] ?? null),
+            ));
+            $declaredFileSizes = array_map('intval', array_keys($sampledFile['declared_file_sizes'] ?? []));
+            $sampleFileLengthConflict = count(array_unique($declaredFileSizes)) > 1
+                || ($fileLength !== null && $declaredFileSizes !== [] && ! in_array($fileLength, $declaredFileSizes, true));
+            $sourceStatus = $sampleFileLengthConflict ? 'contradictory_sample_file_lengths'
+                : ($prefixMd5 === '' ? 'insufficient_prefix'
+                : ($prefixCandidates === [] ? 'unmatched'
+                    : ($fileLength === null || $unknownLengthCandidateCount > 0 ? 'length_unavailable'
+                        : (count($lengthCandidates) === 1 ? 'matched_prefix_and_length'
+                            : (count($lengthCandidates) > 1 ? 'ambiguous' : 'contradictory_length')))));
+            $matchedSource = $sourceStatus === 'matched_prefix_and_length' ? $lengthCandidates[0] : null;
+            $ifscKey = is_array($matchedSource)
+                ? strtolower((string) ($matchedSource['recovery_set_id'] ?? '').':'.(string) ($matchedSource['file_id'] ?? ''))
+                : null;
+            $ifsc = is_string($ifscKey) ? ($ifscBySource[$ifscKey] ?? null) : null;
+            $variant = is_array($ifsc) && count($ifsc['variants'] ?? []) === 1
+                ? $ifsc['variants'][0] : null;
+            $ifscStatus = ! is_array($ifsc) ? 'ifsc_unavailable'
+                : (($ifsc['validation_status'] ?? null) !== 'validated' ? (string) ($ifsc['validation_status'] ?? 'unvalidated')
+                    : (($ifsc['duplicate_conflict'] ?? false) === true || ($ifsc['definition_conflict'] ?? false) === true
+                        ? 'definition_conflict'
+                        : (! is_array($variant) ? 'ifsc_variant_unavailable' : 'validated')));
+            $slices = is_array($variant) && is_array($variant['slice_preview'] ?? null)
+                ? $variant['slice_preview'] : [];
+            $usableSlices = array_values(array_filter($slices, static fn (array $slice): bool =>
+                ($slice['source_range_valid'] ?? false) === true
+                && is_int($slice['slice_index'] ?? null)
+                && is_int($slice['source_byte_start'] ?? null)
+                && is_int($slice['source_byte_end_exclusive'] ?? null)
+                && is_int($slice['zero_padding_bytes'] ?? null)
+                && is_string($slice['md5'] ?? null)
+                && is_int($slice['crc32'] ?? null)));
+            $resolution = null;
+            $resolutionWorkBudgetExceeded = false;
+            if ($sourceStatus === 'matched_prefix_and_length' && $ifscStatus === 'validated'
+                && $fileLength !== null && $usableSlices !== []) {
+                $sliceWorkBytes = array_reduce($usableSlices, static function (int $total, array $slice): int {
+                    $sourceBytes = max(0, $slice['source_byte_end_exclusive'] - $slice['source_byte_start']);
+                    $workBytes = $sourceBytes + max(0, $slice['zero_padding_bytes']);
+
+                    return $total > self::MAX_PAR2_SOURCE_RESOLUTION_WORK_BYTES - $workBytes
+                        ? self::MAX_PAR2_SOURCE_RESOLUTION_WORK_BYTES + 1
+                        : $total + $workBytes;
+                }, 0);
+                if ($sliceWorkBytes <= self::MAX_PAR2_SOURCE_RESOLUTION_WORK_BYTES - $resolutionWorkBytes) {
+                    $packed = $this->packPar2SourceRangeInput(
+                        $fileLength,
+                        $sampledFile['fragments'] ?? [],
+                        $usableSlices,
+                    );
+                    if (is_string($packed)) {
+                        $resolutionWorkBytes += $sliceWorkBytes;
+                        $resolution = $native->resolvePar2SourceRanges($packed);
+                    }
+                } else {
+                    $resolutionWorkBudgetExceeded = true;
+                    $resolutionWorkBudgetOmittedCount++;
+                }
+            }
+
+            $sliceResults = is_array($resolution['slices'] ?? null) ? $resolution['slices'] : [];
+            foreach ($sliceResults as &$sliceResult) {
+                if (! is_array($sliceResult)) {
+                    continue;
+                }
+                $references = [];
+                foreach ($sliceResult['source_fragment_indexes'] ?? [] as $fragmentIndex) {
+                    if (is_int($fragmentIndex) && is_array($sampledFile['fragments'][$fragmentIndex]['reference'] ?? null)) {
+                        $references[] = $sampledFile['fragments'][$fragmentIndex]['reference'];
+                    }
+                }
+                $sliceResult['source_article_references'] = $references;
+            }
+            unset($sliceResult);
+            $ifscOrigins = $ifsc['variants'][0]['origins'] ?? [];
+            foreach ($ifscOrigins as &$origin) {
+                if (! is_array($origin) || ! is_int($origin['file_index'] ?? null)) {
+                    continue;
+                }
+                $originFileIndex = $origin['file_index'];
+                $originArticles = array_values(array_filter($observations, static fn (array $observation): bool =>
+                    ($observation['file_index'] ?? null) === $originFileIndex
+                    && ($observation['kind'] ?? null) === 'par2'
+                    && ($observation['server_role'] ?? null) === 'primary'));
+                $origin['article_references'] = array_map(static fn (array $observation): array => [
+                    'message_id' => $observation['message_id'] ?? null,
+                    'segment_number' => $observation['segment_number'] ?? null,
+                    'server' => $observation['server'] ?? null,
+                    'provider_label' => $observation['provider_label'] ?? null,
+                    'server_port' => $observation['server_port'] ?? null,
+                    'server_tls' => $observation['server_tls'] ?? null,
+                ], $originArticles);
+            }
+            unset($origin);
+
+            $records[] = [
+                'relationship' => 'par2_ifsc_slice_to_sampled_source_bytes',
+                'source_relationship_status' => $sourceStatus,
+                'ifsc_definition_status' => $ifscStatus,
+                'recovery_set_id' => is_array($matchedSource) ? ($matchedSource['recovery_set_id'] ?? null) : null,
+                'file_id' => is_array($matchedSource) ? ($matchedSource['file_id'] ?? null) : null,
+                'par2_filename' => is_array($matchedSource) ? ($matchedSource['filename'] ?? null) : null,
+                'source_candidates' => array_map(static fn (array $sourceFile): array => [
+                    'recovery_set_id' => $sourceFile['recovery_set_id'] ?? null,
+                    'file_id' => $sourceFile['file_id'] ?? null,
+                    'filename' => $sourceFile['filename'] ?? null,
+                    'file_length' => $sourceFile['file_length'] ?? null,
+                ], $prefixCandidates),
+                'nzb_file_index' => $sampledFile['file_index'] ?? null,
+                'nzb_kind' => $sampledFile['kind'] ?? null,
+                'nzb_subject' => $sampledFile['subject'] ?? null,
+                'sampled_yenc_declared_file_sizes' => $declaredFileSizes,
+                'provider' => $sampledFile['provider'] ?? null,
+                'source_file_length' => $fileLength,
+                'source_block_size' => $ifsc['source_block_size'] ?? null,
+                'observed_first_16k_md5' => preg_match('/\A[a-f0-9]{32}\z/D', $prefixMd5) === 1 ? $prefixMd5 : null,
+                'ifsc_origins' => $ifscOrigins,
+                'preview_scope' => [
+                    'available_slices' => count($slices),
+                    'omitted_slices' => is_array($variant) ? max(0, (int) ($variant['slice_count'] ?? 0) - count($slices)) : 0,
+                    'truncated' => is_array($variant) && ($variant['slice_preview_truncated'] ?? false) === true,
+                ],
+                'sampled_fragment_count' => count($sampledFile['fragments'] ?? []),
+                'sampled_ranges_omitted_due_to_budget' => $sampledFile['budget_omitted_ranges'] ?? [],
+                'resolution_status' => is_array($resolution)
+                    ? ($resolution['resolution_status'] ?? 'native_resolution_incomplete')
+                    : ($resolutionWorkBudgetExceeded ? 'resolution_work_budget_exceeded'
+                        : ($sourceStatus !== 'matched_prefix_and_length' ? 'source_unresolved'
+                        : ($ifscStatus !== 'validated' ? 'ifsc_unvalidated'
+                            : ($usableSlices === [] ? 'ifsc_preview_unavailable' : 'native_resolution_unavailable')))),
+                'verified_slice_count' => count(array_filter($sliceResults, static fn (array $slice): bool => ($slice['status'] ?? null) === 'resolved_checksum_valid')),
+                'mismatched_slice_count' => count(array_filter($sliceResults, static fn (array $slice): bool => ($slice['status'] ?? null) === 'resolved_checksum_mismatch')),
+                'slice_results' => $sliceResults,
+            ];
+        }
+
+        return [
+            'basis' => 'A unique PAR2 FileDesc match requires the first decoded 16 KiB MD5 candidate and whole-file length. Rust compares available provider-local decoded yEnc ranges against validated PAR2 IFSC MD5 and CRC32 records; incomplete coverage is reported without padding missing bytes. Zero padding is applied only after the exact source-file end for the final PAR2 slice.',
+            'retained_decoded_sample_bytes' => $retainedBytes,
+            'retained_sample_byte_limit' => self::MAX_PAR2_SOURCE_SAMPLE_BYTES,
+            'resolution_work_bytes' => $resolutionWorkBytes,
+            'resolution_work_byte_limit' => self::MAX_PAR2_SOURCE_RESOLUTION_WORK_BYTES,
+            'resolution_work_budget_omitted_count' => $resolutionWorkBudgetOmittedCount,
+            'omitted_sample_count_due_to_budget' => $omittedSamples,
+            'omitted_relationship_count' => $omittedRelationshipCount,
+            'maximum_relationships' => self::MAX_PAR2_SOURCE_RELATIONSHIPS,
+            'records' => $records,
+        ];
+    }
+
+    /** @param list<array<string, mixed>> $fragments
+     *  @param list<array<string, mixed>> $slices
+     */
+    private function packPar2SourceRangeInput(int $fileLength, array $fragments, array $slices): ?string
+    {
+        if ($fileLength < 1 || count($fragments) > self::MAX_PAR2_SOURCE_FRAGMENTS_PER_RECORD
+            || $slices === [] || count($slices) > self::MAX_IFSC_STRUCTURED_PREVIEW_SLICES) {
+            return null;
+        }
+        $packed = 'P2SR'.pack('V2P', count($fragments), count($slices), $fileLength);
+        foreach ($fragments as $fragment) {
+            $bytes = $fragment['bytes'] ?? null;
+            $start = $fragment['file_offset'] ?? null;
+            if (! is_string($bytes) || ! is_int($start) || $start < 0 || strlen($bytes) > 0xFFFFFFFF) {
+                return null;
+            }
+            $packed .= pack('PV', $start, strlen($bytes)).$bytes;
+        }
+        foreach ($slices as $slice) {
+            $md5 = $slice['md5'] ?? null;
+            $index = $slice['slice_index'] ?? null;
+            $start = $slice['source_byte_start'] ?? null;
+            $end = $slice['source_byte_end_exclusive'] ?? null;
+            $padding = $slice['zero_padding_bytes'] ?? null;
+            $crc32 = $slice['crc32'] ?? null;
+            if (! is_string($md5) || preg_match('/\A[a-f0-9]{32}\z/i', $md5) !== 1
+                || ! is_int($index) || ! is_int($start) || ! is_int($end) || ! is_int($padding) || ! is_int($crc32)) {
+                return null;
+            }
+            $packed .= pack('VPPP', $index, $start, $end, $padding).hex2bin($md5).pack('V', $crc32);
+        }
+
+        return strlen($packed) <= self::MAX_PAR2_SOURCE_SAMPLE_BYTES + 16_384 ? $packed : null;
     }
 
     /** @param list<array<string, mixed>> $sourceFiles
