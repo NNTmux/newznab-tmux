@@ -195,11 +195,15 @@ fn parse_rar4(data: &[u8], offset: usize) -> FormatHeader {
     let full_header = header_end.and_then(|end| data.get(header..end));
     let header_type = data.get(header + 2).copied();
     let checksum_valid = full_header.and_then(|block| {
-        (block.len() >= 13 && header_type == Some(0x73)).then(|| {
-            let expected = u16::from_le_bytes([block[0], block[1]]);
-            let calculated = crc32fast::hash(&block[2..13]) as u16;
-            expected == calculated
-        })
+        if block.len() < 13 || header_type != Some(0x73) {
+            return None;
+        }
+        let expected = u16::from_le_bytes([block[0], block[1]]);
+        let flags = u16::from_le_bytes([block[3], block[4]]);
+        // Legacy embedded comments are excluded from the main-header CRC.
+        // Other main headers checksum all bytes declared by HEAD_SIZE.
+        let checksum_end = if flags & 0x0002 != 0 { 13 } else { block.len() };
+        Some(crc32fast::hash(&block[2..checksum_end]) as u16 == expected)
     });
     let flags = full_header
         .filter(|block| block.len() >= 13 && header_type == Some(0x73))
