@@ -44,6 +44,9 @@ return [
 
     'enabled' => env('PULSE_ENABLED', true),
 
+    // High-volume processing commands already emit logs and Prometheus metrics.
+    'processing_enabled' => env('PULSE_PROCESSING_ENABLED', false),
+
     /*
     |--------------------------------------------------------------------------
     | Pulse Storage Driver
