@@ -155,7 +155,7 @@ class ReleaseResultsViewTest extends TestCase
         $submitterLink = $document->querySelector('a[aria-label="View all posts by '.$submitter.'"]');
 
         $this->assertNotNull($submitterLink);
-        $this->assertSame(route('search', ['searchadvposter' => $submitter]), $submitterLink->getAttribute('href'));
-        $this->assertSame($submitter, $submitterLink->textContent);
+        $this->assertSame(route('search', ['searchadvposter' => $submitter, 'search_type' => 'adv']), $submitterLink->getAttribute('href'));
+        $this->assertSame($submitter, trim($submitterLink->textContent));
     }
 }
