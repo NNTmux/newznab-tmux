@@ -22,6 +22,7 @@ use App\Services\AdditionalProcessing\State\PersistenceMetricsCollector;
 use App\Services\AdditionalProcessing\State\ReleaseProcessingContext;
 use App\Services\AdditionalProcessing\UsenetDownloadService;
 use App\Services\Categorization\CategorizationService;
+use App\Services\NNTP\NNTPService;
 use App\Services\ReleaseExtraService;
 use App\Services\ReleaseImageService;
 use App\Services\Releases\ReleaseBrowseService;
@@ -1159,10 +1160,10 @@ class ReleaseProcessorTest extends TestCase
 
         $downloadService = Mockery::mock(UsenetDownloadService::class);
         $this->expectDownloadScope($downloadService);
-        $downloadService->shouldReceive('download')->once()->ordered()->with(DownloadKind::Jpg, ['<s1>', '<s2>'], '', 1)
-            ->andReturn(['success' => true, 'data' => 'BROKEN', 'groupUnavailable' => false, 'error' => null]);
-        $downloadService->shouldReceive('download')->once()->ordered()->with(DownloadKind::Jpg, ['<cover>'], '', 1)
-            ->andReturn(['success' => true, 'data' => 'GOOD', 'groupUnavailable' => false, 'error' => null]);
+        $downloadService->shouldReceive('downloadBounded')->once()->ordered()->with(DownloadKind::Jpg, ['<s1>', '<s2>'], 8388608, '', 1)
+            ->andReturn(['success' => true, 'data' => 'BROKEN', 'groupUnavailable' => false, 'error' => null, 'bytesDownloaded' => 6]);
+        $downloadService->shouldReceive('downloadBounded')->once()->ordered()->with(DownloadKind::Jpg, ['<cover>'], 8388608, '', 1)
+            ->andReturn(['success' => true, 'data' => 'GOOD', 'groupUnavailable' => false, 'error' => null, 'bytesDownloaded' => 4]);
 
         $media = Mockery::mock(MediaExtractionService::class);
         $media->shouldReceive('isUsableImage')->twice()->andReturnUsing(static fn (string $path): bool => file_get_contents($path) === 'GOOD');
@@ -1193,6 +1194,56 @@ class ReleaseProcessorTest extends TestCase
         $processor->process($context, '/tmp/main/');
 
         $this->assertTrue($context->foundJPGSample);
+    }
+
+    #[Test]
+    #[DataProvider('imageByteBudgets')]
+    public function failed_ranked_images_share_the_preview_budget_and_report_every_consumed_byte(int $limit): void
+    {
+        $tmpPath = $this->useRealFilesystem();
+        $config = $this->makeConfig(['processJPGSample' => true, 'mediaMaxBytes' => $limit]);
+        $nzbParser = Mockery::mock(NzbContentParser::class);
+        $contents = [];
+        foreach (range(1, 3) as $number) {
+            $contents[] = ['title' => '"movie.screens'.$number.'.jpg" yEnc (1/1)', 'segments' => ['image'.$number.'@test'], 'size' => 8388608, 'filecount' => 1];
+        }
+        $nzbParser->shouldReceive('parseNzb')->once()->andReturn(['error' => null, 'contents' => $contents]);
+        $nntp = Mockery::mock(NNTPService::class);
+        $nntp->shouldNotReceive('getMessagesByMessageID');
+        $nntp->shouldReceive('getBoundedArticleByMessageID')->once()->ordered()->with('image1@test', 8388608, false)
+            ->andReturn(['data' => 'UNUSABLE', 'bytesDownloaded' => 8388608, 'error' => null]);
+        $nntp->shouldReceive('getBoundedArticleByMessageID')->once()->ordered()->with('image2@test', $limit - 8388608, false)
+            ->andReturn(['data' => null, 'bytesDownloaded' => $limit - 8388608, 'error' => 'Truncated article']);
+        $download = new UsenetDownloadService($config, $nntp);
+        $media = Mockery::mock(MediaExtractionService::class);
+        $media->shouldReceive('isUsableImage')->once()->andReturnFalse();
+        $manager = Mockery::mock(ReleaseFileManager::class);
+        $manager->shouldReceive('processReleaseNameFromNzbContents')->once()->andReturnFalse();
+        $manager->shouldReceive('finalizeRelease')->once()->andReturnNull();
+        $processor = new ReleaseProcessor($config, $nzbParser, new AdditionalWorkPlanner($config),
+            Mockery::mock(ArchiveExtractionService::class), $media, $download, $manager,
+            Mockery::mock(ReleaseFilesArchiveFallback::class)->shouldNotReceive('processJpgFromReleaseFiles')->getMock(),
+            Mockery::mock(TempWorkspaceService::class)->shouldReceive('createReleaseTempFolder')->once()->andReturn($tmpPath)
+                ->shouldReceive('clearDirectory')->once()->andReturnNull()->getMock(),
+            Mockery::mock(ConsoleOutputService::class)->shouldIgnoreMissing());
+        $context = $this->makeContext();
+        $context->release->nfostatus = 1;
+
+        $result = $processor->process($context, '/tmp/main/');
+
+        $this->assertFalse($context->foundJPGSample);
+        $this->assertLessThanOrEqual($limit, $result->downloadMetrics?->bytesDownloaded);
+        $this->assertSame(0, $context->mediaBudget?->remaining());
+        $this->assertSame($limit, $result->downloadMetrics?->bytesDownloaded);
+        $this->assertSame($limit, $result->downloadMetrics?->mediaBytesDownloaded);
+        $this->assertSame(2, $result->downloadMetrics?->networkRequests);
+    }
+
+    /** @return iterable<string, array{int}> */
+    public static function imageByteBudgets(): iterable
+    {
+        yield 'two full attempts' => [16777216];
+        yield 'second attempt capped to remaining' => [10485760];
     }
 
     #[Test]

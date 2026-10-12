@@ -14,6 +14,8 @@ use App\Services\Categorization\CategorizationService;
 use App\Services\Configuration\ConfigurationProvider;
 use App\Services\ReleaseCleaningService;
 use App\Services\Releases\ReleaseDuplicateFinder;
+use App\Services\Releases\Verification\CandidateRepository;
+use App\Services\Releases\Verification\NzbManifestReader;
 use App\Support\Utf8;
 use Illuminate\Cache\Lock;
 use Illuminate\Contracts\Cache\LockProvider;
@@ -66,6 +68,8 @@ class NzbImportService
 
     protected ?int $relId = null;
 
+    protected ?string $verificationCandidateIdentity = null;
+
     public mixed $echoCLI;
 
     public NzbService $nzb;
@@ -102,7 +106,7 @@ class NzbImportService
     /**
      * Begin importing NZB files.
      *
-     * @param  null|callable(array{path:string,status:NzbImportStatus,release_id:int|null,release_guid:string|null}):void  $resultCallback
+     * @param  null|callable(array{path:string,status:NzbImportStatus,release_id:int|null,release_guid:string|null,candidate_identity:string|null}):void  $resultCallback
      *
      * @throws FileNotFoundException
      */
@@ -155,6 +159,7 @@ class NzbImportService
             NzbImportStatus $status,
             ?int $releaseId = null,
             ?string $releaseGuid = null,
+            ?string $candidateIdentity = null,
         ) use ($resultCallback): void {
             if ($resultCallback === null) {
                 return;
@@ -165,6 +170,7 @@ class NzbImportService
                 'status' => $status,
                 'release_id' => $status === NzbImportStatus::Inserted ? $releaseId : null,
                 'release_guid' => $status === NzbImportStatus::Inserted ? $releaseGuid : null,
+                'candidate_identity' => $status === NzbImportStatus::Queued ? $candidateIdentity : null,
             ]);
         };
 
@@ -174,6 +180,7 @@ class NzbImportService
             if (File::isFile($nzbFilePath)) {
                 $this->relGuid = '';
                 $this->relId = null;
+                $this->verificationCandidateIdentity = null;
 
                 // Get the contents of the NZB file as a string.
                 if (Str::endsWith(strtolower($nzbFilePath), '.nzb.gz')) {
@@ -246,7 +253,13 @@ class NzbImportService
                     $importStatus = NzbImportStatus::Failed;
                 }
 
-                if ($importStatus === NzbImportStatus::Inserted) {
+                if ($importStatus === NzbImportStatus::Queued) {
+                    $reportResult($nzbFilePath, $importStatus, candidateIdentity: $this->verificationCandidateIdentity);
+                    $nzbsImported++;
+                    if ($delete) {
+                        File::delete($nzbFilePath);
+                    }
+                } elseif ($importStatus === NzbImportStatus::Inserted) {
                     if (! $stored) {
                         $destination = $path ?? $this->relGuid;
                         $this->echoOut('ERROR: Problem compressing NZB file to: '.$destination);
@@ -507,6 +520,7 @@ class NzbImportService
                 'totalSize' => $totalSize,
                 'nzbCategoryId' => $this->resolveNzbCategoryId($nzbXML),
                 'articleFingerprint' => NzbArticleFingerprint::fromXml($nzbXML),
+                'verificationXml' => config('release_verification.required', true) ? $nzbXML->asXML() : null,
             ]
         );
     }
@@ -681,13 +695,33 @@ class NzbImportService
      */
     protected function insertNZB(mixed $nzbDetails): NzbImportStatus
     {
+        if (config('release_verification.required', true)) {
+            if (! is_string($nzbDetails['verificationXml'] ?? null)) {
+                throw new \RuntimeException('NZB must be queued for download verification before publication.');
+            }
+            $subject = $this->normalizeImportedSubject((string) $nzbDetails['subject']);
+            $info = (object) ['groups_id' => $nzbDetails['groups_id'],
+                'searchname' => $nzbDetails['useFName'] !== '' ? $nzbDetails['useFName'] : $subject,
+                'fromname' => $nzbDetails['from'], 'postdate' => $nzbDetails['postDate'], 'metadata_source' => 'import',
+                'import_name_override' => $nzbDetails['useFName'] !== '', 'original_subject' => $subject];
+            $categoryId = $nzbDetails['nzbCategoryId'] ?? null;
+            if (is_int($categoryId) && $categoryId > 0
+                && Category::query()->where('id', $categoryId)->where('status', Category::STATUS_ACTIVE)->exists()) {
+                $info->categories_id = $categoryId;
+            }
+            $manifest = app(NzbManifestReader::class)->read($nzbDetails['verificationXml'], $info);
+            $manifest['identity'] = sha1('import:'.($nzbDetails['articleFingerprint'] ?? $nzbDetails['verificationXml']));
+            app(CandidateRepository::class)->enqueue($manifest);
+            $this->verificationCandidateIdentity = $manifest['identity'];
+            $this->echoOut('NZB queued for download verification.');
+
+            return NzbImportStatus::Queued;
+        }
+
         // Make up a GUID for the release.
         $this->relGuid = Str::uuid()->toString();
 
-        // Remove part count from subject.
-        $partLess = preg_replace('/(\(\d+\/\d+\))*$/', 'yEnc', $nzbDetails['subject']);
-        // Remove added yEnc from above and anything after.
-        $subject = mb_convert_encoding(trim(preg_replace('/yEnc.*$/i', 'yEnc', $partLess)), 'UTF-8', mb_list_encodings());
+        $subject = $this->normalizeImportedSubject((string) $nzbDetails['subject']);
 
         $renamed = 0;
         $cleanedMeta = null;
@@ -793,6 +827,13 @@ class NzbImportService
         $this->persistArticleFingerprint($this->relId, $nzbDetails['articleFingerprint'] ?? null);
 
         return NzbImportStatus::Inserted;
+    }
+
+    protected function normalizeImportedSubject(string $subject): string
+    {
+        $partLess = preg_replace('/(\(\d+\/\d+\))*$/', 'yEnc', $subject) ?? $subject;
+
+        return mb_convert_encoding(trim(preg_replace('/yEnc.*$/i', 'yEnc', $partLess) ?? $partLess), 'UTF-8', mb_list_encodings());
     }
 
     protected function normalizeGroupName(\SimpleXMLElement|string $group): string

@@ -61,3 +61,6 @@ docker/.deploy.lock
 docker/.deploy.lock.claim
 docker/.deploy.log
 docker/.deploy.stamp
+
+# Agent research, live samples and validation artifacts are never runtime assets.
+.superpowers/

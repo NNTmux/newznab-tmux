@@ -5,11 +5,14 @@ namespace Tests\Feature;
 use App\Enums\CollectionFileCheckStatus;
 use App\Enums\ConfigurationDomain;
 use App\Models\Release;
+use App\Services\Binaries\BinariesConfig;
 use App\Services\CollectionCleanupService;
 use App\Services\Nzb\NzbService;
 use App\Services\ReleaseCleaningService;
 use App\Services\ReleaseCreationService;
 use App\Services\Releases\ReleaseDuplicateFinder;
+use App\Services\Releases\Verification\ManifestStore;
+use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Tests\Support\ConfigurationTestBuilder;
@@ -17,9 +20,12 @@ use Tests\TestCase;
 
 class CbpCleanupServiceTest extends TestCase
 {
+    private ?string $verificationDirectory = null;
+
     protected function setUp(): void
     {
         parent::setUp();
+        config(['release_verification.required' => false]);
 
         config(['database.default' => 'sqlite', 'database.connections.sqlite.database' => ':memory:']);
         DB::purge();
@@ -42,6 +48,271 @@ class CbpCleanupServiceTest extends TestCase
 
         $this->createTables();
         $this->seedConfiguration();
+    }
+
+    protected function tearDown(): void
+    {
+        if ($this->verificationDirectory !== null) {
+            app('files')->deleteDirectory($this->verificationDirectory);
+        }
+        parent::tearDown();
+    }
+
+    public function test_retention_discards_unusable_and_terminal_collections_without_queueing_them(): void
+    {
+        $this->enableVerification();
+        $this->insertStalePayload(1, CollectionFileCheckStatus::Delete->value);
+        $this->insertStalePayload(2, CollectionFileCheckStatus::Inserted->value);
+        $this->insertStalePayload(3, 99);
+        $this->insertStalePayload(4, CollectionFileCheckStatus::Sized->value, bytes: 0);
+        $this->insertStalePayload(5, CollectionFileCheckStatus::Default->value, messageId: '');
+        $this->insertStalePayload(6, CollectionFileCheckStatus::Default->value);
+        DB::table('parts')->where('binaries_id', 6)->delete();
+        $this->insertRecentCollection(7);
+        DB::table('collections')->where('id', 7)->update(['dateadded' => now()->subHours(2)]);
+
+        app(CollectionCleanupService::class)->deleteFinishedAndOrphans(false);
+
+        $this->assertSame(0, DB::table('release_verification_candidates')->count());
+        $this->assertSame(0, DB::table('collections')->count());
+        $this->assertSame(0, DB::table('binaries')->count());
+        $this->assertSame(0, DB::table('parts')->count());
+    }
+
+    public function test_retention_preserves_incomplete_and_parity_only_payloads_for_verification(): void
+    {
+        $this->enableVerification();
+        $this->insertStalePayload(1, CollectionFileCheckStatus::Default->value);
+        $this->insertStalePayload(2, CollectionFileCheckStatus::ZeroPart->value, subject: 'Recovery.vol00+01.par2');
+        DB::table('collections')->update(['filesize' => 0, 'totalfiles' => 10]);
+        DB::table('binaries')->update(['totalparts' => 20]);
+
+        app(CollectionCleanupService::class)->deleteFinishedAndOrphans(false);
+
+        $candidates = DB::table('release_verification_candidates')->orderBy('id')->get();
+        $this->assertCount(2, $candidates);
+        foreach ($candidates as $candidate) {
+            $manifest = app(ManifestStore::class)->read($candidate->manifest_path);
+            $this->assertSame('pending', $candidate->status);
+            $this->assertSame(10, $manifest['expected_files']);
+            $this->assertSame(20, $manifest['files'][0]['totalparts']);
+            $this->assertCount(1, $manifest['files'][0]['segments']);
+        }
+        $this->assertSame(0, DB::table('collections')->count());
+    }
+
+    public function test_retention_verification_handoff_is_bounded_per_pass(): void
+    {
+        $this->enableVerification();
+        foreach (range(1, 5) as $id) {
+            $this->insertStalePayload($id, CollectionFileCheckStatus::Default->value);
+        }
+        $cleanup = new CollectionCleanupService(new BinariesConfig(sqlChunkSize: 2));
+
+        $cleanup->deleteFinishedAndOrphans(false);
+
+        $this->assertSame(2, DB::table('release_verification_candidates')->count());
+        $this->assertSame([3, 4, 5], $this->collectionIds());
+    }
+
+    public function test_retention_keeps_source_articles_when_verification_handoff_fails(): void
+    {
+        $this->enableVerification();
+        config(['release_verification.pending_bytes' => 0]);
+        $this->insertStalePayload(1, CollectionFileCheckStatus::Default->value);
+
+        app(CollectionCleanupService::class)->deleteFinishedAndOrphans(false);
+
+        $this->assertSame([1], $this->collectionIds());
+        $this->assertSame(1, DB::table('binaries')->count());
+        $this->assertSame(1, DB::table('parts')->count());
+        $this->assertSame(0, DB::table('release_verification_candidates')->count());
+        $lock = Cache::lock('cbp:verification-old-sweep:lock', 60);
+        $this->assertTrue($lock->get());
+        $lock->release();
+    }
+
+    public function test_permanent_archival_failure_keeps_original_articles_and_continues_later_stale_inputs(): void
+    {
+        $this->enableVerification();
+        $this->insertStalePayload(1, CollectionFileCheckStatus::Default->value);
+        $this->insertStalePayload(2, CollectionFileCheckStatus::Default->value);
+        $this->breakCandidateManifest(1);
+
+        app(CollectionCleanupService::class)->deleteFinishedAndOrphans(false);
+
+        $this->assertSame([1], $this->collectionIds());
+        $this->assertSame([1], DB::table('parts')->pluck('binaries_id')->all());
+        $candidate = DB::table('release_verification_candidates')->where('source_identity', bin2hex('orphan-hash-2'))->first();
+        $this->assertNotNull($candidate);
+        $this->assertFileExists(app(ManifestStore::class)->path($candidate->manifest_path));
+    }
+
+    public function test_retained_low_id_cannot_monopolize_stale_windows_and_snapshot_ceiling_stays_fixed(): void
+    {
+        $this->enableVerification();
+        foreach (range(1, 3) as $id) {
+            $this->insertStalePayload($id, CollectionFileCheckStatus::Default->value);
+        }
+        $this->breakCandidateManifest(1);
+        $cleanup = new CollectionCleanupService(new BinariesConfig(sqlChunkSize: 1));
+        $cleanup->deleteFinishedAndOrphans(false);
+        $this->assertSame(['last_id' => 1, 'max_id' => 3], Cache::get('cbp:verification-old-sweep:cursor'));
+        $this->insertStalePayload(4, CollectionFileCheckStatus::Default->value);
+        $cleanup->deleteFinishedAndOrphans(false);
+        $this->assertSame([1, 3, 4], $this->collectionIds());
+        $this->assertSame(['last_id' => 2, 'max_id' => 3], Cache::get('cbp:verification-old-sweep:cursor'));
+        $cleanup->deleteFinishedAndOrphans(false);
+        $this->assertSame([1, 4], $this->collectionIds());
+        $this->assertNull(Cache::get('cbp:verification-old-sweep:cursor'));
+        $cleanup->deleteFinishedAndOrphans(false);
+        $this->assertSame([1, 4], $this->collectionIds());
+        $this->assertSame(['last_id' => 1, 'max_id' => 4], Cache::get('cbp:verification-old-sweep:cursor'));
+        $cleanup->deleteFinishedAndOrphans(false);
+        $this->assertSame([1], $this->collectionIds());
+    }
+
+    public function test_global_stale_handoff_skips_when_another_worker_holds_lock_then_releases_its_lock(): void
+    {
+        $this->enableVerification();
+        $this->insertStalePayload(1, CollectionFileCheckStatus::Default->value);
+        $lock = Cache::lock('cbp:verification-old-sweep:lock', 60);
+        $this->assertTrue($lock->get());
+        app(CollectionCleanupService::class)->deleteFinishedAndOrphans(false);
+        $this->assertSame([1], $this->collectionIds());
+        $this->assertSame(0, DB::table('release_verification_candidates')->count());
+        $lock->release();
+        app(CollectionCleanupService::class)->deleteFinishedAndOrphans(false);
+        $this->assertSame([], $this->collectionIds());
+        $nextLock = Cache::lock('cbp:verification-old-sweep:lock', 60);
+        $this->assertTrue($nextLock->get());
+        $nextLock->release();
+    }
+
+    public function test_stale_handoff_uses_a_small_page_even_when_sql_chunk_size_is_large(): void
+    {
+        $this->enableVerification();
+        foreach (range(1, 26) as $id) {
+            $this->insertStalePayload($id, CollectionFileCheckStatus::Default->value);
+        }
+        app(CollectionCleanupService::class)->deleteFinishedAndOrphans(false);
+        $this->assertSame(25, DB::table('release_verification_candidates')->count());
+        $this->assertSame([26], $this->collectionIds());
+    }
+
+    public function test_failed_retrievable_input_is_not_deleted_by_legacy_nzb_missed_cleanup(): void
+    {
+        $this->enableVerification();
+        $this->insertStalePayload(1, CollectionFileCheckStatus::Sized->value);
+        $this->breakCandidateManifest(1);
+        DB::table('releases')->insert(['id' => 7, 'name' => 'Legacy NZB', 'nzbstatus' => NzbService::NZB_ADDED]);
+        DB::table('collections')->where('id', 1)->update(['releases_id' => 7]);
+
+        app(CollectionCleanupService::class)->deleteFinishedAndOrphans(false);
+
+        $this->assertSame([1], $this->collectionIds());
+        $this->assertSame(1, DB::table('binaries')->count());
+        $this->assertSame(1, DB::table('parts')->count());
+    }
+
+    private function breakCandidateManifest(int $collectionId): void
+    {
+        $identity = bin2hex((string) DB::table('collections')->where('id', $collectionId)->value('collectionhash'));
+        DB::table('release_verification_candidates')->insert(['identity' => $identity, 'source_identity' => $identity, 'groups_id' => 1,
+            'manifest_path' => 'invalid-reference.json.gz', 'manifest_hash' => str_repeat('a', 64), 'manifest_bytes' => 0,
+            'last_unique_at' => now(), 'next_attempt_at' => now()]);
+    }
+
+    public function test_new_usable_part_after_stale_eligibility_selection_is_preserved_before_plain_deletion(): void
+    {
+        $this->enableVerification();
+        $this->insertStalePayload(1, CollectionFileCheckStatus::Default->value, bytes: 0);
+        $injected = false;
+        DB::listen(static function (QueryExecuted $event) use (&$injected): void {
+            if (! $injected && str_starts_with($event->sql, 'select "id" from "collections"')
+                && str_contains($event->sql, '"parts" as "p"')) {
+                $injected = true;
+                DB::table('parts')->where('binaries_id', 1)->update(['size' => 5]);
+            }
+        });
+        app(CollectionCleanupService::class)->deleteFinishedAndOrphans(false);
+        $this->assertTrue($injected);
+        $this->assertSame([1], $this->collectionIds());
+        $this->assertSame(5, (int) DB::table('parts')->value('size'));
+    }
+
+    public function test_new_binary_and_part_after_orphan_selection_are_preserved(): void
+    {
+        $this->enableVerification();
+        $this->insertRecentCollection(1);
+        $injected = false;
+        DB::listen(static function (QueryExecuted $event) use (&$injected): void {
+            if (! $injected && str_starts_with($event->sql, 'select "c"."id" from "collections" as "c"')
+                && str_contains($event->sql, 'not exists') && str_contains($event->sql, '"binaries" as "b"')) {
+                $injected = true;
+                DB::table('binaries')->insert(['id' => 1, 'collections_id' => 1, 'name' => 'new.rar', 'totalparts' => 1, 'binaryhash' => 'new-binary']);
+                DB::table('parts')->insert(['binaries_id' => 1, 'number' => 1, 'messageid' => 'new@example.test', 'partnumber' => 1, 'size' => 5]);
+            }
+        });
+        app(CollectionCleanupService::class)->deleteFinishedAndOrphans(false);
+        $this->assertTrue($injected);
+        $this->assertSame([1], $this->collectionIds());
+        $this->assertSame('new@example.test', DB::table('parts')->value('messageid'));
+    }
+
+    public function test_new_eligible_state_after_missed_nzb_selection_is_preserved(): void
+    {
+        $this->enableVerification();
+        $this->insertStalePayload(1, CollectionFileCheckStatus::Delete->value, bytes: 0);
+        DB::table('collections')->where('id', 1)->update(['dateadded' => now(), 'releases_id' => 7]);
+        DB::table('releases')->insert(['id' => 7, 'name' => 'Published legacy release', 'nzbstatus' => NzbService::NZB_ADDED]);
+        $injected = false;
+        DB::listen(static function (QueryExecuted $event) use (&$injected): void {
+            if (! $injected && str_starts_with($event->sql, 'select "c"."id" from "collections" as "c"')
+                && str_contains($event->sql, '"releases" as "r"')) {
+                $injected = true;
+                DB::table('collections')->where('id', 1)->update(['filecheck' => CollectionFileCheckStatus::Sized->value]);
+                DB::table('parts')->where('binaries_id', 1)->update(['size' => 5]);
+            }
+        });
+        app(CollectionCleanupService::class)->deleteFinishedAndOrphans(false);
+        $this->assertTrue($injected);
+        $this->assertSame([1], $this->collectionIds());
+        $this->assertSame(1, DB::table('parts')->count());
+    }
+
+    public function test_release_creation_skips_unusable_sized_rows_before_applying_the_batch_limit(): void
+    {
+        $this->enableVerification();
+        $this->insertStalePayload(1, CollectionFileCheckStatus::Sized->value, bytes: 0);
+        $this->insertStalePayload(2, CollectionFileCheckStatus::Sized->value, messageId: '');
+        $this->insertStalePayload(3, CollectionFileCheckStatus::Sized->value);
+        DB::table('collections')->where('id', 3)->update(['filesize' => 0]);
+
+        $result = app(ReleaseCreationService::class)->createReleases(1, 1, false);
+
+        $this->assertSame(['added' => 0, 'dupes' => 0], $result);
+        $candidate = DB::table('release_verification_candidates')->sole();
+        $manifest = app(ManifestStore::class)->read($candidate->manifest_path);
+        $this->assertSame('Orphan.3', $manifest['subject']);
+        $this->assertSame([1, 2], $this->collectionIds());
+        $this->assertSame(0, DB::table('releases')->count());
+    }
+
+    private function enableVerification(): void
+    {
+        $this->verificationDirectory = sys_get_temp_dir().'/nntmux-cleanup-'.bin2hex(random_bytes(12));
+        config(['release_verification.required' => true, 'release_verification.storage_path' => $this->verificationDirectory]);
+        (require database_path('migrations/2026_10_11_154028_create_release_verification_candidates_table.php'))->up();
+        DB::statement('ALTER TABLE binaries ADD COLUMN binaryhash VARCHAR(255)');
+    }
+
+    private function insertStalePayload(int $id, int $status, int $bytes = 100, string $messageId = 'payload@example.com', string $subject = 'Payload.part01.rar'): void
+    {
+        $this->insertRecentCollection($id);
+        DB::table('collections')->where('id', $id)->update(['dateadded' => now()->subHours(2), 'added' => now()->subHours(2), 'filecheck' => $status]);
+        DB::table('binaries')->insert(['id' => $id, 'collections_id' => $id, 'binaryhash' => 'binary-'.$id, 'name' => $subject, 'totalparts' => 1]);
+        DB::table('parts')->insert(['binaries_id' => $id, 'number' => $id, 'messageid' => $messageId, 'partnumber' => 1, 'size' => $bytes]);
     }
 
     public function test_retention_cleanup_deletes_parts_binaries_and_collections_without_fk_cascades(): void

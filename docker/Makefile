@@ -55,8 +55,8 @@ build-images:
 	docker build -t nntmux/app:local -f $(CURDIR)/app/Dockerfile $(REPO)
 
 .PHONY: deploy
-deploy: ## Build when changed, then start/recreate the stack, under one lock (DEPLOY_BY=name)
-	@FORCE="$(FORCE)" $(GUARD) run deploy -- sh -c '$(MAKE) --no-print-directory -C $(CURDIR) build && $(CURDIR)/bin/deploy-guard verify && $(MAKE) --no-print-directory -C $(CURDIR) up'
+deploy: ## Build, pause app writers, migrate, then recreate the stack under one lock (DEPLOY_BY=name)
+	@FORCE="$(FORCE)" $(GUARD) run deploy -- sh -c '$(MAKE) --no-print-directory -C $(CURDIR) build && $(CURDIR)/bin/deploy-guard verify && $(DC) stop web scheduler indexer horizon && $(APP_RUN) php artisan migrate --force --no-interaction && $(MAKE) --no-print-directory -C $(CURDIR) up'
 
 .PHONY: init
 init: env dirs build ## First-time install: build, migrate+seed, indexes, groups, tuning, predb seed, start

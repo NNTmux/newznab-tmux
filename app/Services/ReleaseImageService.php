@@ -198,6 +198,12 @@ class ReleaseImageService
     /** Delete all generated assets for a release, including legacy images. */
     public function delete(string $guid): void
     {
+        File::delete($this->releaseFiles($guid));
+    }
+
+    /** @return list<string> */
+    public function releaseFiles(string $guid): array
+    {
         $files = [
             $this->audSavePath.$guid.'.ogg',
             $this->vidSavePath.$guid.'.ogv',
@@ -208,7 +214,7 @@ class ReleaseImageService
             $files[] = $this->jpgSavePath.$guid.'_thumb.'.$extension;
         }
 
-        File::delete($files);
+        return $files;
     }
 
     /** @return array{success: bool, contents: string, reason: string} */

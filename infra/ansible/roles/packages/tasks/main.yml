@@ -58,6 +58,7 @@
       - nodejs
       - tmux
       - unrar
+      - par2
       - unzip
       - ffmpeg
       - lame

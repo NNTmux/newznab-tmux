@@ -6,8 +6,10 @@ namespace App\Console\Commands;
 
 use App\Models\Release;
 use App\Models\UsenetGroup;
+use App\Services\Releases\Verification\VerificationResetService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class NntmuxResetTruncate extends Command
 {
@@ -38,19 +40,35 @@ class NntmuxResetTruncate extends Command
     /**
      * Execute the console command.
      */
-    public function handle(): void
+    public function handle(VerificationResetService $verification): int
+    {
+        try {
+            $verification->run(fn () => $this->resetDatabase());
+        } catch (Throwable $error) {
+            $this->error('Database reset stopped: '.$error->getMessage());
+
+            return self::FAILURE;
+        }
+
+        return self::SUCCESS;
+    }
+
+    private function resetDatabase(): void
     {
         UsenetGroup::query()->update(['first_record' => 0, 'first_record_postdate' => null, 'last_record' => 0, 'last_record_postdate' => null, 'last_updated' => null]);
         $this->info('Reseting all groups completed.');
         DB::statement('SET FOREIGN_KEY_CHECKS = 0;');
+        try {
 
-        foreach (['parts', 'missed_parts', 'binaries', 'collections'] as &$value) {
-            DB::statement("TRUNCATE TABLE $value");
-            $this->info("Truncating $value completed.");
+            foreach (['parts', 'missed_parts', 'binaries', 'collections'] as &$value) {
+                DB::statement("TRUNCATE TABLE $value");
+                $this->info("Truncating $value completed.");
+            }
+            unset($value);
+
+        } finally {
+            DB::statement('SET FOREIGN_KEY_CHECKS = 1;');
         }
-        unset($value);
-
-        DB::statement('SET FOREIGN_KEY_CHECKS = 1;');
         $delcount = Release::query()->where('nzbstatus', '=', 0)->delete();
         $this->info($delcount.' releases had no nzb, deleted.');
     }

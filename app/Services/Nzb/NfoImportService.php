@@ -29,7 +29,7 @@ final class NfoImportService
         $nfoPath = null;
 
         try {
-            $manifest = $this->manifests->read($manifestPath);
+            $manifest = $this->manifests->reconcilePending($manifestPath);
             $state = $manifest['state'];
 
             if ($state === NzbUploadManifestService::STATE_NFO_IMPORTED) {
@@ -39,6 +39,7 @@ final class NfoImportService
             if (in_array($state, [
                 NzbUploadManifestService::STATE_NZB_DUPLICATE,
                 NzbUploadManifestService::STATE_NZB_FAILED,
+                NzbUploadManifestService::STATE_NZB_REJECTED,
             ], true)) {
                 if ($deleteFailed && is_array($manifest['nfo'] ?? null)) {
                     try {
@@ -113,7 +114,9 @@ final class NfoImportService
             return ['status' => 'imported', 'message' => "Imported {$manifest['nfo']['filename']}"];
         } catch (Throwable $exception) {
             try {
-                $this->manifests->recordNfoOutcome($manifestPath, false, $exception->getMessage());
+                if (isset($manifest) && in_array($manifest['state'], [NzbUploadManifestService::STATE_NZB_IMPORTED, NzbUploadManifestService::STATE_NFO_FAILED], true)) {
+                    $this->manifests->recordNfoOutcome($manifestPath, false, $exception->getMessage());
+                }
             } catch (Throwable $manifestException) {
                 Log::channel('nzb_upload')->error('Failed to record NFO import failure', [
                     'manifest' => $manifestPath,

@@ -7,6 +7,7 @@ namespace App\Services\Backfill;
 use App\Models\UsenetGroup;
 use App\Services\Binaries\BinariesService;
 use App\Services\NNTP\NNTPService;
+use App\Services\Releases\Verification\CandidateRepository;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -83,6 +84,9 @@ final class BackfillService
      */
     public function backfillGroup(array $groupArr, int $remainingGroups, int|string $articles = ''): void
     {
+        if (! app(CandidateRepository::class)->capacityAvailable()) {
+            return;
+        }
         $startTime = now();
         $this->binaries->logIndexerStart();
 
@@ -269,6 +273,9 @@ final class BackfillService
         $first = max($last - $messageBuffer + 1, $targetPost);
 
         while (true) {
+            if (! app(CandidateRepository::class)->capacityAvailable()) {
+                return;
+            }
             $this->logChunkProgress($first, $last, $shortGroupName, $remainingGroups, $targetPost);
 
             flush();

@@ -21,6 +21,50 @@ use DariusIII\NetNntp\Protocol\ResponseCode;
  */
 class NNTPService extends NntpClient
 {
+    public static function verificationMessageId(string $messageId, int $maximumBytes): string
+    {
+        $messageId = trim($messageId, '<>');
+        if ($maximumBytes < 1 || preg_match('/\A[^\s<>\x00-\x1f\x7f]+\z/D', $messageId) !== 1) {
+            throw new \RuntimeException('Invalid verification article request.');
+        }
+
+        return $messageId;
+    }
+
+    /**
+     * Read one bounded, undecoded article for integrity verification.
+     *
+     * @throws \RuntimeException
+     */
+    public function verificationArticle(string $messageId, int $maximumBytes): string
+    {
+        $messageId = self::verificationMessageId($messageId, $maximumBytes);
+        $response = $this->_sendCommand('BODY <'.$messageId.'>');
+        if ($response !== ResponseCode::BodyFollows->value) {
+            throw new \RuntimeException('Article is unavailable; retry verification later.');
+        }
+        $raw = '';
+        while (($line = fgets($this->_socket, max(4, min($maximumBytes, 65534) + 2))) !== false) {
+            if ($line === ".\r\n" || $line === ".\n") {
+                return $raw;
+            }
+            if (! str_ends_with($line, "\n")) {
+                $this->doQuit();
+                throw new \RuntimeException('Verification article line is truncated or oversized.');
+            }
+            if (str_starts_with($line, '..')) {
+                $line = substr($line, 1);
+            }
+            if (strlen($raw) + strlen($line) > $maximumBytes) {
+                $this->doQuit();
+                throw new \RuntimeException('Article exceeds verification memory budget.');
+            }
+            $raw .= $line;
+        }
+        $this->doQuit();
+        throw new \RuntimeException('Truncated article response.');
+    }
+
     protected bool $_debugBool;
 
     protected bool $_echo;
@@ -831,6 +875,98 @@ class NNTPService extends NntpClient
         [$data, $part] = $this->_yencService->decodeWithFrame($raw);
 
         return ['data' => $data, 'part' => $part];
+    }
+
+    /**
+     * Fetch one complete preview article while counting every BODY byte read, including failures.
+     * The primary and optional alternate share the allowance; a partial BODY closes its connection.
+     *
+     * @return array{data: string|null, bytesDownloaded: int, error: string|null}
+     */
+    public function getBoundedArticleByMessageID(string $identifier, int $maximumBytes, bool $alternate = false): array
+    {
+        $bytes = 0;
+        $raw = null;
+        $error = null;
+        try {
+            $identifier = self::verificationMessageId($identifier, $maximumBytes);
+        } catch (\RuntimeException $exception) {
+            return ['data' => null, 'bytesDownloaded' => 0, 'error' => $exception->getMessage()];
+        }
+        try {
+            $connected = $this->_checkConnection(false);
+            if ($connected !== true) {
+                throw new \RuntimeException('Unable to connect to usenet.');
+            }
+            $raw = $this->readBoundedPreviewBody($identifier, $maximumBytes, $bytes);
+        } catch (\Exception) {
+            $error = 'Preview article unavailable or incomplete.';
+        }
+
+        if ($raw === null && $alternate && $bytes < $maximumBytes) {
+            $alt = null;
+            try {
+                $alt = $this->previewAlternateConnection();
+                $connected = $this->_currentServer === $this->_configServer
+                    ? $alt->doConnect($this->_configCompressedHeaders, true) : $alt->doConnect();
+                if ($connected === true) {
+                    $raw = $alt->readBoundedPreviewBody($identifier, $maximumBytes, $bytes);
+                }
+            } catch (\Exception) {
+                $error = 'Preview article unavailable or incomplete.';
+            } finally {
+                try {
+                    $alt?->doQuit();
+                } catch (\Exception) {
+                    // Cleanup must not discard the bytes already charged to this attempt.
+                }
+            }
+        }
+        if ($raw === null) {
+            return ['data' => null, 'bytesDownloaded' => $bytes, 'error' => $error ?? 'Article unavailable.'];
+        }
+        try {
+            $this->_yencService ??= app(YencService::class);
+            [$data] = $this->_yencService->decodeWithFrame($raw);
+
+            return ['data' => $data, 'bytesDownloaded' => $bytes, 'error' => null];
+        } catch (\Exception) {
+            return ['data' => null, 'bytesDownloaded' => $bytes, 'error' => 'Preview article could not be decoded.'];
+        }
+    }
+
+    protected function previewAlternateConnection(): self
+    {
+        return new self;
+    }
+
+    private function readBoundedPreviewBody(string $identifier, int $maximumBytes, int &$bytes): string
+    {
+        $response = $this->_sendCommand('BODY <'.$identifier.'>');
+        if ($response !== ResponseCode::BodyFollows->value) {
+            throw new \RuntimeException('Preview article unavailable.');
+        }
+        $raw = '';
+        try {
+            while ($bytes < $maximumBytes) {
+                $line = fgets($this->_socket, min(65536, $maximumBytes - $bytes + 1));
+                if ($line === false) {
+                    throw new \RuntimeException('Truncated preview article.');
+                }
+                $bytes += strlen($line);
+                if ($line === ".\r\n" || $line === ".\n") {
+                    return $raw;
+                }
+                if (! str_ends_with($line, "\n")) {
+                    throw new \RuntimeException('Preview article exceeds byte or line limit.');
+                }
+                $raw .= str_starts_with($line, '..') ? substr($line, 1) : $line;
+            }
+            throw new \RuntimeException('Preview article exceeds byte budget.');
+        } catch (\Exception $exception) {
+            $this->doQuit();
+            throw $exception;
+        }
     }
 
     /**

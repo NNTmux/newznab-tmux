@@ -68,6 +68,23 @@ class MediaArticleFetcherTest extends TestCase
     }
 
     #[Test]
+    public function exhausted_image_budget_blocks_video_articles_even_without_a_size_estimate(): void
+    {
+        $download = Mockery::mock(UsenetDownloadService::class);
+        $download->shouldNotReceive('downloadArticle');
+        $budget = new MediaByteBudget(8);
+        $budget->spend(8);
+
+        $written = (new MediaArticleFetcher($download))->append(
+            new ReleaseProcessingContext(new Release(['id' => 1, 'guid' => 'guid-1'])),
+            ['video@test'], 0, 0, 100, $this->path, $budget, hrtime(true) / 1e9 + 60, 0,
+        );
+
+        $this->assertSame(0, $written);
+        $this->assertFileDoesNotExist($this->path);
+    }
+
+    #[Test]
     public function it_places_a_cached_first_article_at_the_start_of_the_file(): void
     {
         $download = Mockery::mock(UsenetDownloadService::class);

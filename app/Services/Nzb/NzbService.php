@@ -99,6 +99,9 @@ class NzbService
 
     public function createNzbForRelease(Release $release): NzbCreationResult
     {
+        if (config('release_verification.required', true)) {
+            return NzbCreationResult::transient('Release verification must publish the verified NZB; header-only creation is disabled.');
+        }
         try {
             $collections = Collection::whereReleasesId($release->id)
                 ->join('usenet_groups', 'collections.groups_id', '=', 'usenet_groups.id')

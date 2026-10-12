@@ -25,6 +25,7 @@ class CbpReleaseEligibilityTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        config(['release_verification.required' => false]);
         $this->configureDatabase();
         $this->travelTo(now()->startOfSecond());
         config(['nntmux.echocli' => false]);
@@ -46,6 +47,16 @@ class CbpReleaseEligibilityTest extends TestCase
             }
         }
         parent::tearDown();
+    }
+
+    public function test_verification_mode_preserves_declared_inventory_when_stale(): void
+    {
+        config(['release_verification.required' => true]);
+        $id = $this->collection(1, now()->subHours(3)->format('Y-m-d H:i:s'));
+        $this->process(1);
+        $collection = DB::table('collections')->where('id', $id)->first();
+        $this->assertSame(2, (int) $collection->totalfiles);
+        $this->assertSame(CollectionFileCheckStatus::Sized->value, (int) $collection->filecheck);
     }
 
     public function test_duplicate_ingestion_does_not_postpone_unknown_file_count_collection(): void

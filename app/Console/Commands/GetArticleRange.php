@@ -9,6 +9,7 @@ use App\Services\Binaries\BinariesService;
 use App\Services\Binaries\MissedPartHandler;
 use App\Services\Configuration\ConfigurationProvider;
 use App\Services\NNTP\NNTPService;
+use App\Services\Releases\Verification\CandidateRepository;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -40,13 +41,30 @@ class GetArticleRange extends Command
     {
         $mode = $this->argument('mode');
         $groupName = $this->argument('group');
-        $firstArticle = (int) $this->argument('first');
-        $lastArticle = (int) $this->argument('last');
+        $firstArticle = filter_var($this->argument('first'), FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+        $lastArticle = filter_var($this->argument('last'), FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
 
         if (! \in_array($mode, ['binaries', 'backfill'], true)) {
             $this->error('Mode must be either "binaries" or "backfill".');
 
             return self::FAILURE;
+        }
+
+        if ($firstArticle === false || $lastArticle === false || $lastArticle < $firstArticle) {
+            $this->error('Article range must contain positive integers with first no greater than last.');
+
+            return self::FAILURE;
+        }
+
+        if (! app(CandidateRepository::class)->capacityAvailable()) {
+            if (! $this->queueRangeForRepair($groupName, $firstArticle, $lastArticle)) {
+                $this->error('Verification backlog is full and this range could not be queued for repair; retry this worker.');
+
+                return self::FAILURE;
+            }
+            $this->warn('Verification backlog is full; this range was deferred to part repair.');
+
+            return self::SUCCESS;
         }
 
         // Ranges run in parallel and each success moves the group's cursor to its own end, so a range
@@ -102,17 +120,21 @@ class GetArticleRange extends Command
     /**
      * Queue the whole range in the group's part repair list so a later pass fetches it.
      */
-    private function queueRangeForRepair(string $groupName, int $first, int $last): void
+    private function queueRangeForRepair(string $groupName, int $first, int $last): bool
     {
         try {
             $groupId = (int) (UsenetGroup::query()->where('name', $groupName)->value('id') ?? 0);
             if ($groupId > 0) {
                 (new MissedPartHandler)->addMissingRange($first, $last, $groupId);
                 $this->warn("Queued articles {$first}-{$last} of {$groupName} for part repair.");
+
+                return true;
             }
         } catch (\Throwable $e) {
             Log::error('Unable to queue a failed article range for part repair: '.$e->getMessage());
         }
+
+        return false;
     }
 
     /**

@@ -81,3 +81,7 @@ Schedule::command('predb:check 3 --quiet')->everyTenMinutes()->withoutOverlappin
 // TMUX_FIX_NAMES_PREDBFT=false still turns the pass off entirely.
 Schedule::command('multiprocessing:fixrelnames predbft')->everyFiveMinutes()->withoutOverlapping()->runInBackground()
     ->when(static fn (): bool => (bool) config('tmux.fix_names.predbft') && (bool) config('tmux.fix_names.predbft_scheduled'));
+
+// The verifier's worker.lock guards concurrency; a stale scheduler cache mutex must not suppress crash recovery.
+Schedule::command('releases:verify-candidates --limit=1')->everyMinute()->runInBackground()
+    ->when(static fn (): bool => (bool) config('release_verification.scheduled'));

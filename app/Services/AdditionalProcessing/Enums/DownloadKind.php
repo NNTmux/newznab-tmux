@@ -19,6 +19,6 @@ enum DownloadKind: string
      */
     public function isPreviewSource(): bool
     {
-        return $this === self::Par2Index || $this === self::MediaSource;
+        return $this === self::Par2Index || $this === self::MediaSource || $this === self::Jpg;
     }
 }

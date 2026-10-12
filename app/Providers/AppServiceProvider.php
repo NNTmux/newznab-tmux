@@ -40,6 +40,7 @@ use App\Services\Monitoring\Collectors\ApplicationCollector;
 use App\Services\Monitoring\Collectors\FailedJobsCollector;
 use App\Services\Monitoring\Collectors\HorizonCollector;
 use App\Services\Monitoring\Collectors\MetricsCollector;
+use App\Services\Monitoring\Collectors\ReleaseVerificationCollector;
 use App\Services\Monitoring\Collectors\ServiceStatusCollector;
 use App\Services\Monitoring\Collectors\TmuxSnapshotCollector;
 use App\Services\Monitoring\Prometheus\TextFormatter;
@@ -128,6 +129,7 @@ class AppServiceProvider extends ServiceProvider
             TmuxSnapshotCollector::class,
             HorizonCollector::class,
             FailedJobsCollector::class,
+            ReleaseVerificationCollector::class,
             ServiceStatusCollector::class,
         ], MetricsCollector::TAG);
 

@@ -28,6 +28,7 @@ class ReleaseDuplicateFinderTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        config(['release_verification.required' => false]);
 
         config([
             'database.default' => 'sqlite',

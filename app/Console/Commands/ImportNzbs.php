@@ -63,6 +63,11 @@ class ImportNzbs extends Command
                 File::allFiles($importFolder),
                 static function (SplFileInfo $file) use ($manifests): bool {
                     $path = $file->getPathname();
+                    if ($file->getFilename() === NzbUploadManifestService::FILENAME) {
+                        $manifests->reconcilePending($path);
+
+                        return false;
+                    }
                     if (! Str::endsWith(strtolower($path), ['.nzb', '.nzb.gz'])) {
                         return true;
                     }
@@ -87,6 +92,7 @@ class ImportNzbs extends Command
                         $status,
                         $result['release_id'],
                         $result['release_guid'],
+                        candidateIdentity: $result['candidate_identity'] ?? null,
                     );
                 }
             );

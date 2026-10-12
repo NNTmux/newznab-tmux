@@ -304,9 +304,10 @@ final class ReleaseProcessingService
         $limit = max(1, $this->settings->releaseCreationLimit);
         $windowSize = min(self::BATCH_SIZE, $limit);
         $normalizedGroupId = $this->normalizeGroupId($groupID);
-        $candidateQuery = Collection::query()
-            ->where('filecheck', CollectionFileCheckStatus::Sized->value)
-            ->when($normalizedGroupId !== null, static fn ($q) => $q->where('groups_id', $normalizedGroupId));
+        $candidateQuery = config('release_verification.required', true)
+            ? $this->collectionCleanupService->verificationReadyCollections()
+            : Collection::query()->where('filecheck', CollectionFileCheckStatus::Sized->value);
+        $candidateQuery->when($normalizedGroupId !== null, static fn ($q) => $q->where('groups_id', $normalizedGroupId));
         $cursorKey = self::COLLECTION_WINDOW_CURSOR_PREFIX.($normalizedGroupId === null ? 'all' : 'group:'.$normalizedGroupId);
         $savedWindow = Cache::get($cursorKey);
         if (is_array($savedWindow)
@@ -487,7 +488,11 @@ final class ReleaseProcessingService
 
     private function hasReleaseCreationWork(?int $groupId): bool
     {
-        return Collection::query()->where('filecheck', CollectionFileCheckStatus::Sized->value)
+        $query = config('release_verification.required', true)
+            ? $this->collectionCleanupService->verificationReadyCollections()
+            : Collection::query()->where('filecheck', CollectionFileCheckStatus::Sized->value);
+
+        return $query
             ->when($groupId !== null, static fn ($q) => $q->where('groups_id', $groupId))->exists()
             || NzbCreationCandidateQuery::baseBuilder($groupId)->exists();
     }
@@ -934,7 +939,8 @@ final class ReleaseProcessingService
             $stale = $createdAt !== null
                 && (string) $createdAt < $staleBefore
                 && \in_array((int) $collection->filecheck, [0, 1, 10], true);
-            $totalFiles = $stale ? $currentFiles : (int) $collection->totalfiles;
+            $totalFiles = $stale && ! config('release_verification.required', true)
+                ? $currentFiles : (int) $collection->totalfiles;
             $ready = $totalFiles > 0
                 && \in_array($currentFiles, [$totalFiles, $totalFiles + 1], true)
                 && (int) ($aggregate->completefiles ?? 0) >= $totalFiles;
@@ -1010,6 +1016,10 @@ final class ReleaseProcessingService
         }
         if ($windowIds !== null && count($windowIds) > self::BATCH_SIZE) {
             throw new \InvalidArgumentException('Collection validation windows must contain at most 500 IDs.');
+        }
+
+        if (config('release_verification.required', true)) {
+            return [];
         }
 
         $rejectedIds = $windowIds === null ? null : [];
@@ -1514,6 +1524,9 @@ final class ReleaseProcessingService
      */
     private function processStuckCollections(int $groupID): void
     {
+        if (config('release_verification.required', true)) {
+            return;
+        }
         $totalDeleted = 0;
 
         do {

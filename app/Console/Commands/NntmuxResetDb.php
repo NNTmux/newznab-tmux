@@ -7,12 +7,14 @@ namespace App\Console\Commands;
 use App\Facades\Elasticsearch;
 use App\Facades\Search;
 use App\Models\UsenetGroup;
+use App\Services\Releases\Verification\VerificationResetService;
 use App\Services\Search\Support\ElasticsearchResponseHelper;
 use App\Support\PredbSearchDocument;
 use Elastic\Elasticsearch\Client as ElasticsearchClient;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Throwable;
 
 class NntmuxResetDb extends Command
 {
@@ -43,18 +45,35 @@ class NntmuxResetDb extends Command
     /**
      * @throws \Exception
      */
-    public function handle(): void
+    public function handle(VerificationResetService $verification): int
     {
         // Allow database reset only if app environment is local
         if (app()->environment() !== 'local') {
             $this->error('This command can only be run in local environment');
 
-            return;
+            return self::SUCCESS;
         }
         if ($this->confirm('This command removes all releases, nzb files, samples, previews , nfos, truncates all article tables and resets all groups. Are you sure you want reset the DB?')) {
-            $timestart = now();
+            try {
+                $verification->run(fn () => $this->resetDatabase());
+            } catch (Throwable $error) {
+                $this->error('Database reset stopped: '.$error->getMessage());
 
-            DB::statement('SET FOREIGN_KEY_CHECKS = 0;');
+                return self::FAILURE;
+            }
+        } else {
+            $this->info('Script execution stopped');
+        }
+
+        return self::SUCCESS;
+    }
+
+    private function resetDatabase(): void
+    {
+        $timestart = now();
+
+        DB::statement('SET FOREIGN_KEY_CHECKS = 0;');
+        try {
 
             UsenetGroup::query()->update([
                 'first_record' => 0,
@@ -300,9 +319,8 @@ class NntmuxResetDb extends Command
             $this->call('cache:clear');
 
             $this->info('Deleted all releases, images, previews and samples. This script finished '.now()->diffForHumans($timestart).' start');
+        } finally {
             DB::statement('SET FOREIGN_KEY_CHECKS = 1;');
-        } else {
-            $this->info('Script execution stopped');
         }
     }
 }

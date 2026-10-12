@@ -65,6 +65,7 @@ class NzbCreationReliabilityTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        config(['release_verification.required' => false]);
 
         $this->tempNzbPath = sys_get_temp_dir().'/nntmux-nzb-reliability-'.uniqid('', true);
         mkdir($this->tempNzbPath, 0777, true);
@@ -91,6 +92,40 @@ class NzbCreationReliabilityTest extends TestCase
         foreach ($this->originalEnvironment as $key => $value) {
             $this->setEnvironmentValue($key, $value === false ? null : $value);
         }
+    }
+
+    public function test_required_verification_does_not_claim_legacy_header_only_nzb_backlog(): void
+    {
+        $this->insertRelease(1, 'v');
+        config(['release_verification.required' => true]);
+
+        $this->assertSame(0, NzbCreationCandidateQuery::baseBuilder()->count());
+        $this->assertCount(0, NzbCreationCandidateQuery::claimBatch(null, 10, 'verification-required', ['id']));
+        $this->assertSame(0, $this->releaseProcessingService(NzbCreationResult::success('unused', []))->createNZBs(null));
+        $release = DB::table('releases')->where('id', 1)->first();
+        $this->assertSame(NzbService::NZB_NONE, $release->nzbstatus);
+        $this->assertNull($release->nzb_creation_claim_token);
+        $this->assertSame(0, DB::table('release_nzb_creation_failures')->count());
+    }
+
+    public function test_required_verification_rejects_direct_header_only_writer_without_destroying_inputs(): void
+    {
+        $this->insertRelease(1, 'v');
+        $this->insertWritableCbp(200, 2000, 1);
+        $release = Release::query()->findOrFail(1);
+        $release->setRelation('category', (object) ['title' => 'Misc', 'parent' => (object) ['title' => 'Other']]);
+        config(['release_verification.required' => true]);
+        $nzb = new NzbService(app(CollectionCleanupService::class));
+
+        $result = $nzb->createNzbForRelease($release);
+        $this->assertFalse($result->success);
+        $this->assertStringContainsString('verification', $result->reason);
+        $this->assertFalse($nzb->writeNzbForReleaseId($release));
+        $this->assertFileDoesNotExist($nzb->getNzbPath($release->guid));
+        $this->assertSame(NzbService::NZB_NONE, (int) DB::table('releases')->where('id', 1)->value('nzbstatus'));
+        $this->assertSame(1, DB::table('collections')->count());
+        $this->assertSame(1, DB::table('binaries')->count());
+        $this->assertSame(1, DB::table('parts')->count());
     }
 
     public function test_a_release_pass_indexes_each_new_release_once_in_bulk(): void

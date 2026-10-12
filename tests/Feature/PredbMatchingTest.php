@@ -25,6 +25,7 @@ use Elastic\Elasticsearch\ClientBuilder;
 use GuzzleHttp\Psr7\Response as HttpResponse;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
@@ -68,6 +69,7 @@ final class PredbMatchingTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        config(['release_verification.required' => false]);
         config(['database.default' => 'sqlite', 'database.connections.sqlite.database' => $this->databasePath, 'nntmux.echocli' => false]);
         DB::purge();
         DB::reconnect();
@@ -355,14 +357,21 @@ final class PredbMatchingTest extends TestCase
         $this->mockElasticIndexCreation($created);
         $this->app->detectEnvironment(static fn (): string => 'local');
         config(['search.default' => 'elasticsearch', 'nntmux_settings.path_to_nzbs' => '/unused']);
-        DB::partialMock()->shouldReceive('statement')->andReturnTrue();
-        File::shouldReceive('allFiles')->twice()->andReturn([]);
+        $verificationRoot = storage_path('framework/testing/reset-es-'.bin2hex(random_bytes(6)));
+        config(['release_verification.storage_path' => $verificationRoot]);
+        DB::swap($manager = Mockery::mock(DB::getFacadeRoot()));
+        $manager->shouldReceive('statement')->andReturnTrue();
+        File::partialMock()->shouldReceive('allFiles')->twice()->andReturn([]);
         File::shouldReceive('delete')->once()->with([])->andReturnTrue();
         File::shouldReceive('exists')->andReturnFalse();
 
-        $this->artisan('nntmux:resetdb')
-            ->expectsConfirmation('This command removes all releases, nzb files, samples, previews , nfos, truncates all article tables and resets all groups. Are you sure you want reset the DB?', 'yes')
-            ->assertSuccessful();
+        try {
+            $this->artisan('nntmux:resetdb')
+                ->expectsConfirmation('This command removes all releases, nzb files, samples, previews , nfos, truncates all article tables and resets all groups. Are you sure you want reset the DB?', 'yes')
+                ->assertSuccessful();
+        } finally {
+            (new Filesystem)->deleteDirectory($verificationRoot);
+        }
 
         self::assertArrayNotHasKey('predb', $created);
         self::assertSame(['type' => 'keyword'], $created['custom_pre']['mappings']['properties']['title_exact']);

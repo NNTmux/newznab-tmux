@@ -39,7 +39,7 @@ class MediaArticleFetcher
         $written = 0;
 
         for ($index = max(0, $fromSegment); $index < count($segments) && $written < $maxBytes; $index++) {
-            if ($context->groupUnavailable || hrtime(true) / 1e9 >= $deadline || ! $budget->allows($articleEstimate)) {
+            if ($context->groupUnavailable || $budget->exhausted() || hrtime(true) / 1e9 >= $deadline || ! $budget->allows($articleEstimate)) {
                 break;
             }
 

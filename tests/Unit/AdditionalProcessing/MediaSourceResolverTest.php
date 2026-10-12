@@ -9,6 +9,7 @@ use App\Services\AdditionalProcessing\AdditionalWorkPlanner;
 use App\Services\AdditionalProcessing\Enums\DownloadKind;
 use App\Services\AdditionalProcessing\Enums\MappingConfidence;
 use App\Services\AdditionalProcessing\Media\MediaSourceResolver;
+use App\Services\AdditionalProcessing\State\MediaByteBudget;
 use App\Services\AdditionalProcessing\State\ReleaseProcessingContext;
 use App\Services\AdditionalProcessing\UsenetDownloadService;
 use App\Services\Yenc\YencPart;
@@ -99,6 +100,19 @@ class MediaSourceResolverTest extends TestCase
         $download->shouldNotReceive('download');
 
         $this->assertNull($this->resolver($context, $download, ['mediaMaxBytes' => 100])->resolve($context));
+    }
+
+    #[Test]
+    public function exhausted_image_budget_blocks_par2_even_without_a_size_estimate(): void
+    {
+        $context = $this->contextFor([$this->entry('<index>', 0), $this->entry('<a>', 5000)]);
+        $context->mediaBudget = new MediaByteBudget(8);
+        $context->mediaBudget->spend(8);
+        $download = Mockery::mock(UsenetDownloadService::class);
+        $download->shouldNotReceive('download');
+        $download->shouldNotReceive('downloadArticle');
+
+        $this->assertNull($this->resolver($context, $download)->resolve($context));
     }
 
     #[Test]

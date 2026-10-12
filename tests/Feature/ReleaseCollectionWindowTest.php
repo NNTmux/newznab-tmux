@@ -33,7 +33,8 @@ class ReleaseCollectionWindowTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        config(['database.default' => 'sqlite', 'database.connections.sqlite.database' => ':memory:', 'nntmux.echocli' => false]);
+        config(['database.default' => 'sqlite', 'database.connections.sqlite.database' => ':memory:', 'nntmux.echocli' => false,
+            'release_verification.required' => false]);
         DB::purge();
         DB::reconnect();
         DB::connection()->getPdo()->sqliteCreateFunction('REGEXP', static fn (string $pattern, ?string $value): int => (int) preg_match('~'.str_replace('\\\\', '\\', $pattern).'~', (string) $value));
@@ -97,9 +98,9 @@ class ReleaseCollectionWindowTest extends TestCase
         $this->seedMixedCollections();
         $cleanup = new class extends CollectionCleanupService
         {
-            public function deleteCollectionsAndDescendants(array $collectionIds, string $label = 'CBP cleanup', bool $echoCLI = false): int
+            public function deleteCollectionsAndDescendants(array $collectionIds, string $label = 'CBP cleanup', bool $echoCLI = false, bool $manifestArchived = false): int
             {
-                return parent::deleteCollectionsAndDescendants([reset($collectionIds)], $label, $echoCLI);
+                return parent::deleteCollectionsAndDescendants([reset($collectionIds)], $label, $echoCLI, $manifestArchived);
             }
         };
         $service = $this->service(new WindowTestReleaseCreationService, $cleanup);
@@ -117,7 +118,7 @@ class ReleaseCollectionWindowTest extends TestCase
         $this->seedMixedCollections();
         $cleanup = new class extends CollectionCleanupService
         {
-            public function deleteCollectionsAndDescendants(array $collectionIds, string $label = 'CBP cleanup', bool $echoCLI = false): int
+            public function deleteCollectionsAndDescendants(array $collectionIds, string $label = 'CBP cleanup', bool $echoCLI = false, bool $manifestArchived = false): int
             {
                 return 0;
             }
@@ -376,7 +377,7 @@ class ReleaseCollectionWindowTest extends TestCase
         $this->seedMixedCollections();
         $cleanup = new class extends CollectionCleanupService
         {
-            public function deleteCollectionsAndDescendants(array $collectionIds, string $label = 'CBP cleanup', bool $echoCLI = false): int
+            public function deleteCollectionsAndDescendants(array $collectionIds, string $label = 'CBP cleanup', bool $echoCLI = false, bool $manifestArchived = false): int
             {
                 return 0;
             }

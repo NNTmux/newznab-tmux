@@ -233,6 +233,49 @@ class UsenetDownloadService
     }
 
     /**
+     * Read a complete preview file within a hard BODY-byte allowance, including failed attempts.
+     * Partial files are never returned as successful images and bounded requests bypass the cache.
+     *
+     * @param  list<string>  $messageIds
+     * @return array{success: bool, data: string|null, groupUnavailable: bool, error: string|null, bytesDownloaded: int}
+     */
+    public function downloadBounded(DownloadKind $kind, array $messageIds, int $maximumBytes, string $groupName = '', ?int $releaseId = null): array
+    {
+        $result = ['success' => false, 'data' => null, 'groupUnavailable' => false, 'error' => null, 'bytesDownloaded' => 0];
+        if ($maximumBytes <= 0 || $messageIds === []) {
+            return [...$result, 'error' => 'No preview download allowance or message IDs.'];
+        }
+        if ($this->releaseScopeActive) {
+            $this->logicalRequests++;
+        }
+        $data = '';
+        foreach ($messageIds as $messageId) {
+            $remaining = $maximumBytes - $result['bytesDownloaded'];
+            if ($remaining <= 0) {
+                return [...$result, 'error' => 'Preview download byte budget exhausted.'];
+            }
+            if ($this->releaseScopeActive) {
+                $this->networkRequests++;
+            }
+            $article = $this->nntp->getBoundedArticleByMessageID($messageId, $remaining, $this->config->alternateNNTP);
+            $result['bytesDownloaded'] += $article['bytesDownloaded'];
+            if ($this->releaseScopeActive) {
+                $this->bytesDownloaded += $article['bytesDownloaded'];
+                if ($kind->isPreviewSource()) {
+                    $this->mediaBytesDownloaded += $article['bytesDownloaded'];
+                }
+            }
+            if ($article['data'] === null) {
+                return [...$result, 'error' => $article['error'],
+                    'groupUnavailable' => $article['error'] !== null && $this->isGroupUnavailableMessage($article['error'])];
+            }
+            $data .= $article['data'];
+        }
+
+        return [...$result, 'success' => $data !== '', 'data' => $data];
+    }
+
+    /**
      * Download one article together with what its yEnc header says about its file.
      *
      * A cached copy is reused, but the article is never added to the release cache,

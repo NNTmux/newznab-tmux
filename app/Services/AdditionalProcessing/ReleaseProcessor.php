@@ -17,6 +17,7 @@ use App\Services\AdditionalProcessing\Media\ImageCandidateRanker;
 use App\Services\AdditionalProcessing\Media\MediaArticleFetcher;
 use App\Services\AdditionalProcessing\Media\MediaSourceResolver;
 use App\Services\AdditionalProcessing\Media\MediaSourceStage;
+use App\Services\AdditionalProcessing\State\MediaByteBudget;
 use App\Services\AdditionalProcessing\State\PersistenceMetricsCollector;
 use App\Services\AdditionalProcessing\State\ProcessingMetrics;
 use App\Services\AdditionalProcessing\State\ReleaseProcessingContext;
@@ -251,7 +252,7 @@ class ReleaseProcessor
                 }
 
                 $metrics->measure(ProcessingStage::ArchiveFallbacks, function () use ($context): void {
-                    if (! $context->foundJPGSample && $this->config->processJPGSample) {
+                    if (! $context->foundJPGSample && $this->config->processJPGSample && ! ($context->mediaBudget?->exhausted() ?? false)) {
                         $this->archiveFallback->processJpgFromReleaseFiles($context);
                     }
 
@@ -653,22 +654,25 @@ class ReleaseProcessor
      */
     private function processImageDownloads(ReleaseProcessingContext $context): void
     {
+        $budget = $context->mediaBudget ??= new MediaByteBudget($this->config->mediaMaxBytes);
         $candidates = $context->workPlan->imageCandidates ?? [];
         $messageIdLists = $candidates !== []
             ? array_map(static fn ($candidate): array => $candidate->messageIds, $candidates)
             : [$context->jpgMessageIDs];
 
         foreach ($messageIdLists as $messageIds) {
-            if ($context->foundJPGSample || $context->groupUnavailable) {
+            if ($context->foundJPGSample || $context->groupUnavailable || $budget->exhausted()) {
                 return;
             }
 
-            $result = $this->downloadService->download(
+            $result = $this->downloadService->downloadBounded(
                 DownloadKind::Jpg,
                 $messageIds,
+                min($this->config->mediaImageMaxBytes, $budget->remaining()),
                 $context->releaseGroupName,
                 $context->release->id
             );
+            $budget->spend($result['bytesDownloaded']);
             if ($result['groupUnavailable']) {
                 $context->groupUnavailable = true;
             }

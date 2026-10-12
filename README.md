@@ -46,8 +46,11 @@ This project is a fork of [newznab plus](https://github.com/anth0/nnplus) and [n
 - Composer 2.x
 - Node.js 18+ and npm for frontend assets
 - nginx or Apache web server
+- PAR2 executable (`par2`) for the enabled-by-default release publication verifier
 - Optional: tmux (for multi-threaded processing)
 - Optional: unrar, 7zip, ffmpeg, mediainfo (for post-processing)
+
+For native Ubuntu/Debian installations, install PAR2 with `sudo apt-get install par2` before starting release processing. If the executable has a different name, set `RELEASE_VERIFICATION_PAR2_BINARY` accordingly. The managed bare-metal installer provisions PAR2 and checks executable availability before activating processing services; Docker images include it.
 
 ### Recommended Hardware
 

@@ -30,6 +30,12 @@ final class NzbCreationCandidateQuery
             ->from('releases as r')
             ->where('r.nzbstatus', NzbService::NZB_NONE);
 
+        // Successful verification writes the exact NZB directly. Header-only
+        // legacy rows must not be claimed or retried into public availability.
+        if (config('release_verification.required', true)) {
+            return $query->whereRaw('1 = 0');
+        }
+
         if ($groupID !== null && $groupID !== '' && $groupID !== 0 && $groupID !== '0') {
             $query->where('r.groups_id', $groupID);
         }

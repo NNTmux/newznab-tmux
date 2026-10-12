@@ -20,8 +20,11 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: dom, curl, ffi, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite
+          extensions: dom, curl, ffi, intl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite
           coverage: none
+
+      - name: Install archive and PAR2 verification tools
+        run: sudo apt-get update -qq && sudo apt-get install -y par2 unrar
 
       - name: Copy env file
         run:
@@ -55,4 +58,4 @@ jobs:
         run: python3 deploy/cloud/tests/test_configuration.py
 
       - name: Run tests
-        run: vendor/bin/phpunit
+        run: php -d memory_limit=2G vendor/bin/phpunit

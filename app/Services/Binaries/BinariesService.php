@@ -7,6 +7,7 @@ namespace App\Services\Binaries;
 use App\Models\UsenetGroup;
 use App\Services\Configuration\ProcessingRuntimeStateRepository;
 use App\Services\NNTP\NNTPService;
+use App\Services\Releases\Verification\CandidateRepository;
 use App\Services\Tmux\CollectionDowntimeCompensator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -200,6 +201,9 @@ class BinariesService
      */
     public function updateGroup(array $groupMySQL, int $maxHeaders = 0): void
     {
+        if (! app(CandidateRepository::class)->capacityAvailable()) {
+            return;
+        }
         $startGroup = now();
         // Ingestion is live even when the group turns out to be caught up (the early
         // returns below), so a monitor-only recovery doesn't count this as downtime.
@@ -275,6 +279,12 @@ class BinariesService
      */
     public function scan(array $groupMySQL, int $first, int $last, string $type = 'update', ?array $missingParts = null): array
     {
+        if (! app(CandidateRepository::class)->capacityAvailable()) {
+            if ($type !== 'partrepair') {
+                $this->missedPartHandler->addMissingRange($first, $last, (int) $groupMySQL['id']);
+            }
+            throw new \RuntimeException('Verification backlog is full; scan paused before downloading headers.');
+        }
         $this->startLoop = Carbon::now();
         $this->groupMySQL = $groupMySQL;
         $this->last = $last;

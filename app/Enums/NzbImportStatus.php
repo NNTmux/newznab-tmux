@@ -11,6 +11,8 @@ enum NzbImportStatus: string
 {
     case Inserted = 'inserted';
 
+    case Queued = 'queued';
+
     case Duplicate = 'duplicate';
 
     case Blacklisted = 'blacklisted';

@@ -18,6 +18,7 @@ use App\Services\Nzb\NzbParserService;
 use App\Services\Nzb\NzbService;
 use App\Services\Par2Processor;
 use App\Services\PostProcessService;
+use App\Services\Releases\Verification\VerificationResetService;
 use App\Support\Par2RenameProgress;
 use DariusIII\NetNntp\Error;
 use dariusiii\rarinfo\Par2Info;
@@ -26,6 +27,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
+use Mockery\MockInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
 use SimpleXMLElement;
@@ -534,6 +536,8 @@ PHP;
 
     public function test_article_reset_cascades_checkpoint_cleanup_for_deleted_releases(): void
     {
+        $verificationRoot = sys_get_temp_dir().'/par2-reset-'.bin2hex(random_bytes(8));
+        config(['release_verification.storage_path' => $verificationRoot]);
         $this->addGroupResetColumns();
         $removed = $this->pendingPar2Release(['nzbstatus' => 0]);
         $retained = $this->pendingPar2Release(['nzbstatus' => 1]);
@@ -549,21 +553,25 @@ PHP;
 
             return true;
         });
+        /** @var NntmuxResetTruncate&MockInterface $command */
         $command = \Mockery::mock(NntmuxResetTruncate::class)->makePartial();
         $command->shouldReceive('info');
         try {
-            $command->handle();
+            $this->assertSame(0, $command->handle(app(VerificationResetService::class)));
             $this->assertNull($removed->fresh());
             $this->assertNull(Par2RenameProgress::get($removed->id));
             $this->assertNotNull($retained->fresh());
             $this->assertNotNull(Par2RenameProgress::get($retained->id));
         } finally {
             DB::connection()->statement('PRAGMA foreign_keys = ON');
+            File::deleteDirectory($verificationRoot);
         }
     }
 
     public function test_full_reset_removes_checkpoints_even_while_foreign_keys_are_disabled(): void
     {
+        $verificationRoot = sys_get_temp_dir().'/par2-reset-'.bin2hex(random_bytes(8));
+        config(['release_verification.storage_path' => $verificationRoot]);
         $this->addGroupResetColumns();
         $release = $this->release();
         Par2RenameProgress::save($release->id, 'signature', 1, [0]);
@@ -583,20 +591,20 @@ PHP;
 
             return true;
         });
+        /** @var NntmuxResetDb&MockInterface $command */
         $command = \Mockery::mock(NntmuxResetDb::class)->makePartial();
         $command->shouldReceive('confirm')->once()->andReturn(true);
         $command->shouldReceive('info');
+        $command->shouldReceive('error')->once()->with('Database reset stopped: Stop before unrelated search and filesystem reset');
         $this->app['env'] = 'local';
         try {
-            $command->handle();
-            $this->fail('Expected to stop after releases were cleared');
-        } catch (RuntimeException $e) {
-            $this->assertSame('Stop before unrelated search and filesystem reset', $e->getMessage());
+            $this->assertSame(1, $command->handle(app(VerificationResetService::class)));
             $this->assertNull($release->fresh());
             $this->assertNull(Par2RenameProgress::get($release->id));
         } finally {
             $this->app['env'] = 'testing';
             DB::connection()->statement('PRAGMA foreign_keys = ON');
+            File::deleteDirectory($verificationRoot);
         }
     }
 

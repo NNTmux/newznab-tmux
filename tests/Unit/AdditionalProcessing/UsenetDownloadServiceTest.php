@@ -6,6 +6,7 @@ use App\Services\AdditionalProcessing\Enums\DownloadKind;
 use App\Services\AdditionalProcessing\UsenetDownloadService;
 use App\Services\NNTP\NNTPService;
 use App\Services\Yenc\YencPart;
+use App\Services\YencService;
 use DariusIII\NetNntp\Error as NntpError;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
@@ -19,6 +20,78 @@ class UsenetDownloadServiceTest extends TestCase
     {
         Mockery::close();
         parent::tearDown();
+    }
+
+    #[Test]
+    public function bounded_preview_reader_counts_wire_bytes_and_never_reads_past_its_allowance(): void
+    {
+        $nntp = new PreviewNntpHarness("..abc\r\n.\r\nNEXT\r\n");
+        $result = $nntp->getBoundedArticleByMessageID('image@test', 10);
+        $this->assertSame(".abc\r\n", $result['data']);
+        $this->assertSame(10, $result['bytesDownloaded']);
+        $this->assertSame("NEXT\r\n", $nntp->nextLine());
+
+        $limited = new PreviewNntpHarness("..abc\r\n.\r\nNEXT\r\n");
+        $result = $limited->getBoundedArticleByMessageID('image@test', 9);
+        $this->assertNull($result['data']);
+        $this->assertSame(9, $result['bytesDownloaded']);
+        $this->assertSame(1, $limited->quits);
+    }
+
+    #[Test]
+    public function failed_bounded_preview_keeps_partial_bytes_in_download_and_media_metrics(): void
+    {
+        $nntp = new PreviewNntpHarness("partial\r\n");
+        $service = new UsenetDownloadService($this->makeConfig(), $nntp);
+        $service->beginReleaseScope();
+
+        $result = $service->downloadBounded(DownloadKind::Jpg, ['image@test'], 100);
+        $metrics = $service->finishReleaseScope();
+
+        $this->assertFalse($result['success']);
+        $this->assertNull($result['data']);
+        $this->assertSame(9, $result['bytesDownloaded']);
+        $this->assertSame(9, $metrics->bytesDownloaded);
+        $this->assertSame(9, $metrics->mediaBytesDownloaded);
+    }
+
+    #[Test]
+    public function missing_later_image_article_does_not_discard_consumed_byte_accounting(): void
+    {
+        $nntp = new PreviewNntpHarness("part\r\n.\r\n", [222, 430]);
+        $service = new UsenetDownloadService($this->makeConfig(), $nntp);
+        $service->beginReleaseScope();
+        $result = $service->downloadBounded(DownloadKind::Jpg, ['first@test', 'missing@test'], 20);
+        $metrics = $service->finishReleaseScope();
+        $this->assertFalse($result['success']);
+        $this->assertNull($result['data']);
+        $this->assertSame(9, $result['bytesDownloaded']);
+        $this->assertSame(9, $metrics->mediaBytesDownloaded);
+        $this->assertSame(2, $metrics->networkRequests);
+    }
+
+    #[Test]
+    public function multipart_preview_applies_only_the_remaining_allowance_to_the_next_article(): void
+    {
+        $nntp = new PreviewNntpHarness("part\r\n.\r\nrest\r\n.\r\n");
+        $service = new UsenetDownloadService($this->makeConfig(), $nntp);
+        $result = $service->downloadBounded(DownloadKind::Jpg, ['first@test', 'second@test', 'third@test'], 12);
+        $this->assertFalse($result['success']);
+        $this->assertNull($result['data']);
+        $this->assertSame(12, $result['bytesDownloaded']);
+        $this->assertSame(['BODY <first@test>', 'BODY <second@test>'], $nntp->commands);
+    }
+
+    #[Test]
+    public function bounded_preview_fallback_charges_primary_and_alternate_bytes_to_one_allowance(): void
+    {
+        $primary = new PreviewNntpHarness("partial\r\n");
+        $alternate = new PreviewNntpHarness("ok\r\n.\r\n");
+        $primary->alternate = $alternate;
+        $result = $primary->getBoundedArticleByMessageID('image@test', 14, true);
+        $this->assertNull($result['data']);
+        $this->assertSame(14, $result['bytesDownloaded']);
+        $this->assertSame(['BODY <image@test>'], $alternate->commands);
     }
 
     #[Test]
@@ -233,5 +306,64 @@ class UsenetDownloadServiceTest extends TestCase
         $service->download(DownloadKind::MediaSource, ['<mid>'], cache: false);
 
         $this->assertSame(0, $service->finishReleaseScope()->cacheHits);
+    }
+}
+
+final class PreviewNntpHarness extends NNTPService
+{
+    public int $quits = 0;
+
+    /** @var list<string> */
+    public array $commands = [];
+
+    public ?self $alternate = null;
+
+    /** @param list<int> $responses */
+    public function __construct(string $wire, private array $responses = [222])
+    {
+        $this->_socket = fopen('php://memory', 'w+');
+        fwrite($this->_socket, $wire);
+        rewind($this->_socket);
+        $this->_yencService = new YencService;
+        $this->_configServer = $this->_currentServer = 'fixture';
+        $this->_configCompressedHeaders = false;
+    }
+
+    protected function _checkConnection(bool $reSelectGroup = true): mixed
+    {
+        return true;
+    }
+
+    protected function _sendCommand(string $cmd): mixed
+    {
+        $this->commands[] = $cmd;
+
+        return array_shift($this->responses) ?? 222;
+    }
+
+    protected function previewAlternateConnection(): NNTPService
+    {
+        return $this->alternate ?? throw new \RuntimeException('No fixture alternate.');
+    }
+
+    public function doConnect(bool $compression = true, bool $alternate = false): mixed
+    {
+        return true;
+    }
+
+    public function doQuit(bool $force = false): mixed
+    {
+        $this->quits++;
+        if (is_resource($this->_socket)) {
+            fclose($this->_socket);
+        }
+        $this->_socket = null;
+
+        return true;
+    }
+
+    public function nextLine(): string|false
+    {
+        return fgets($this->_socket);
     }
 }
