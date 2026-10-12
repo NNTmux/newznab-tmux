@@ -61,6 +61,7 @@ pub enum FormatHeader {
         first_block_data_size: Option<u64>,
         main_extra_record_types: Vec<u64>,
         main_extra_records_complete: bool,
+        main_locator_records: Vec<Rar5LocatorRecord>,
         main_archive_metadata_records: Vec<Rar5ArchiveMetadata>,
     },
     SevenZip {
@@ -232,6 +233,17 @@ pub struct IsoVolumeDates {
     pub effective_ascii_digits_valid: bool,
     pub effective_unspecified: bool,
     pub effective_timezone_quarters: Option<i8>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct Rar5LocatorRecord {
+    pub record_size: u64,
+    pub flags: Option<u64>,
+    pub quick_open_offset_relative_to_main_header: Option<u64>,
+    pub quick_open_target_sample_offset: Option<u64>,
+    pub recovery_record_offset_relative_to_main_header: Option<u64>,
+    pub recovery_record_target_sample_offset: Option<u64>,
+    pub record_fields_complete: bool,
 }
 
 #[derive(Debug, Serialize)]
@@ -457,6 +469,7 @@ fn parse_rar5(data: &[u8], offset: usize) -> FormatHeader {
     let mut password_check_data = None;
     let mut main_extra_record_types = Vec::new();
     let mut main_extra_records_complete = extra_size.is_some() && extra_area_valid;
+    let mut main_locator_records = Vec::new();
     let mut main_archive_metadata_records = Vec::new();
     let mut typed_header_complete = extra_size.is_some() && data_size.is_some() && extra_area_valid;
 
@@ -471,9 +484,10 @@ fn parse_rar5(data: &[u8], offset: usize) -> FormatHeader {
             if extra_area_valid {
                 (
                     main_extra_record_types,
+                    main_locator_records,
                     main_archive_metadata_records,
                     main_extra_records_complete,
-                ) = parse_rar5_main_extra_records(data, typed_header_end, header_end);
+                ) = parse_rar5_main_extra_records(data, typed_header_end, header_end, block_start);
             }
         }
         4 => {
@@ -529,6 +543,7 @@ fn parse_rar5(data: &[u8], offset: usize) -> FormatHeader {
         first_block_data_size: data_size,
         main_extra_record_types,
         main_extra_records_complete,
+        main_locator_records,
         main_archive_metadata_records,
     }
 }
@@ -565,6 +580,7 @@ fn empty_rar5(
         first_block_data_size: None,
         main_extra_record_types: Vec::new(),
         main_extra_records_complete: false,
+        main_locator_records: Vec::new(),
         main_archive_metadata_records: Vec::new(),
     }
 }
@@ -573,9 +589,16 @@ fn parse_rar5_main_extra_records(
     data: &[u8],
     start: usize,
     end: usize,
-) -> (Vec<u64>, Vec<Rar5ArchiveMetadata>, bool) {
+    main_header_offset: usize,
+) -> (
+    Vec<u64>,
+    Vec<Rar5LocatorRecord>,
+    Vec<Rar5ArchiveMetadata>,
+    bool,
+) {
     let mut cursor = start;
     let mut record_types = Vec::new();
+    let mut locator_records = Vec::new();
     let mut metadata_records = Vec::new();
     let mut complete = true;
 
@@ -597,10 +620,24 @@ fn parse_rar5_main_extra_records(
             break;
         };
         record_types.push(record_type);
-        if record_type == 2 {
-            let metadata = parse_rar5_archive_metadata(data, cursor, record_end, record_size);
-            complete &= metadata.record_fields_complete;
-            metadata_records.push(metadata);
+        match record_type {
+            1 => {
+                let locator = parse_rar5_locator_record(
+                    data,
+                    cursor,
+                    record_end,
+                    record_size,
+                    main_header_offset,
+                );
+                complete &= locator.record_fields_complete;
+                locator_records.push(locator);
+            }
+            2 => {
+                let metadata = parse_rar5_archive_metadata(data, cursor, record_end, record_size);
+                complete &= metadata.record_fields_complete;
+                metadata_records.push(metadata);
+            }
+            _ => {}
         }
         cursor = record_end;
     }
@@ -608,7 +645,46 @@ fn parse_rar5_main_extra_records(
         complete = false;
     }
 
-    (record_types, metadata_records, complete)
+    (record_types, locator_records, metadata_records, complete)
+}
+
+fn parse_rar5_locator_record(
+    data: &[u8],
+    mut cursor: usize,
+    end: usize,
+    record_size: u64,
+    main_header_offset: usize,
+) -> Rar5LocatorRecord {
+    let flags = read_vint_bounded(data, &mut cursor, end);
+    let quick_open_offset = match flags.filter(|value| value & 0x01 != 0) {
+        Some(_) => read_vint_bounded(data, &mut cursor, end),
+        None => None,
+    };
+    let recovery_record_offset = match flags.filter(|value| value & 0x02 != 0) {
+        Some(_) if quick_open_offset.is_some() || flags.is_some_and(|value| value & 0x01 == 0) => {
+            read_vint_bounded(data, &mut cursor, end)
+        }
+        _ => None,
+    };
+    let record_fields_complete = flags.is_some_and(|value| value & !0x03 == 0)
+        && (flags.is_none_or(|value| value & 0x01 == 0) || quick_open_offset.is_some())
+        && (flags.is_none_or(|value| value & 0x02 == 0) || recovery_record_offset.is_some())
+        && cursor == end;
+    let sample_target = |offset: Option<u64>| {
+        offset
+            .filter(|value| *value > 0)
+            .and_then(|value| u64::try_from(main_header_offset).ok()?.checked_add(value))
+    };
+
+    Rar5LocatorRecord {
+        record_size,
+        flags,
+        quick_open_offset_relative_to_main_header: quick_open_offset,
+        quick_open_target_sample_offset: sample_target(quick_open_offset),
+        recovery_record_offset_relative_to_main_header: recovery_record_offset,
+        recovery_record_target_sample_offset: sample_target(recovery_record_offset),
+        record_fields_complete,
+    }
 }
 
 fn parse_rar5_archive_metadata(
