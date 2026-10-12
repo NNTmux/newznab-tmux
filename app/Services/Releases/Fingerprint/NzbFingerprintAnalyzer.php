@@ -244,6 +244,23 @@ final class NzbFingerprintAnalyzer
             $trailerExpectedDecodedSize = isset($frame->trailer['size']) && ctype_digit($frame->trailer['size'])
                 ? (int) $frame->trailer['size'] : null;
             $trailerSizeIsDecimal = ! isset($frame->trailer['size']) || ctype_digit($frame->trailer['size']);
+            $trailerNumericFieldsValid = true;
+            foreach (['part', 'total'] as $numericField) {
+                if (isset($frame->trailer[$numericField])
+                    && (! ctype_digit($frame->trailer[$numericField]) || (int) $frame->trailer[$numericField] < 1)) {
+                    $trailerNumericFieldsValid = false;
+                }
+            }
+            $trailerPartMatchesHeader = null;
+            if (isset($frame->trailer['part'], $frame->header['part'])
+                && ctype_digit($frame->trailer['part']) && ctype_digit($frame->header['part'])) {
+                $trailerPartMatchesHeader = (int) $frame->trailer['part'] === (int) $frame->header['part'];
+            }
+            $trailerTotalMatchesHeader = null;
+            if (isset($frame->trailer['total'], $frame->header['total'])
+                && ctype_digit($frame->trailer['total']) && ctype_digit($frame->header['total'])) {
+                $trailerTotalMatchesHeader = (int) $frame->trailer['total'] === (int) $frame->header['total'];
+            }
             $headerNumericFieldsValid = true;
             foreach (['line', 'size', 'part', 'total'] as $numericField) {
                 if (isset($frame->header[$numericField])
@@ -263,6 +280,14 @@ final class NzbFingerprintAnalyzer
             $expectedCrc = $multipart
                 ? ($frame->trailer['pcrc32'] ?? null)
                 : ($frame->trailer['crc32'] ?? $frame->trailer['pcrc32'] ?? null);
+            $allDeclaredCrc32FieldsAreHex = true;
+            foreach (['pcrc32', 'crc32'] as $crcField) {
+                if (isset($frame->trailer[$crcField])
+                    && (! is_string($frame->trailer[$crcField])
+                        || preg_match('/\A[0-9a-f]{1,8}\z/i', $frame->trailer[$crcField]) !== 1)) {
+                    $allDeclaredCrc32FieldsAreHex = false;
+                }
+            }
             $observedCrc = hash('crc32b', $decoded[0]);
             $knownHeaderFields = ['line', 'size', 'part', 'total', 'name'];
             $knownPartFields = ['begin', 'end'];
@@ -292,6 +317,9 @@ final class NzbFingerprintAnalyzer
                 'ypart_range_valid' => $rangeIsValid,
                 'ypart_range_decoded_size' => $ypartExpectedDecodedSize,
                 'trailer_size' => isset($frame->trailer['size']) ? (int) $frame->trailer['size'] : null,
+                'trailer_numeric_fields_valid' => $trailerNumericFieldsValid,
+                'trailer_part_matches_header' => $trailerPartMatchesHeader,
+                'trailer_total_matches_header' => $trailerTotalMatchesHeader,
                 'header_size' => $headerExpectedDecodedSize,
                 'decoded_size_matches_header_size' => $headerExpectedDecodedSize === null ? null
                     : ($multipart ? ($rangeEnd !== null && $rangeEnd <= $headerExpectedDecodedSize) : $decodedSize === $headerExpectedDecodedSize),
@@ -323,6 +351,7 @@ final class NzbFingerprintAnalyzer
                 'observed_decoded_crc32' => strtoupper($observedCrc),
                 'segment_crc32_basis' => $multipart ? ($expectedCrc === null ? 'missing-pcrc32' : 'pcrc32') : ($expectedCrc === null ? 'missing-crc32' : 'crc32'),
                 'declared_crc32_is_hex' => is_string($expectedCrc) ? preg_match('/\A[0-9a-f]{1,8}\z/i', $expectedCrc) === 1 : null,
+                'all_declared_crc32_fields_are_hex' => $allDeclaredCrc32FieldsAreHex,
                 'declared_crc32_matches' => is_string($expectedCrc) && preg_match('/\A[0-9a-f]{1,8}\z/i', $expectedCrc) === 1
                     ? strcasecmp(str_pad($expectedCrc, 8, '0', STR_PAD_LEFT), $observedCrc) === 0 : null,
                 'escape_sequence_count' => substr_count($payload, '='),

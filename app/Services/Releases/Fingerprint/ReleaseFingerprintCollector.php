@@ -12,7 +12,7 @@ use Throwable;
 
 final class ReleaseFingerprintCollector
 {
-    public const SCHEMA_VERSION = 3;
+    public const SCHEMA_VERSION = 4;
 
     private const MAX_ARTICLE_BODY_BYTES = 2_000_000;
 
@@ -84,6 +84,14 @@ final class ReleaseFingerprintCollector
                         ? $yenc['part'] === $sample['segment_number'] : null;
                     $metadata['yenc_nzb_total_parts_matches'] = is_array($yenc) && is_int($yenc['total_parts'] ?? null)
                         ? $yenc['total_parts'] === count($manifest['files'][$sample['file_index']]['segments'] ?? []) : null;
+                    $trailerFields = is_array($yenc) && is_array($yenc['trailer_fields'] ?? null)
+                        ? $yenc['trailer_fields'] : [];
+                    $metadata['yenc_nzb_trailer_part_number_matches'] = is_string($trailerFields['part'] ?? null)
+                        && ctype_digit($trailerFields['part'])
+                        ? (int) $trailerFields['part'] === $sample['segment_number'] : null;
+                    $metadata['yenc_nzb_trailer_total_parts_matches'] = is_string($trailerFields['total'] ?? null)
+                        && ctype_digit($trailerFields['total'])
+                        ? (int) $trailerFields['total'] === count($manifest['files'][$sample['file_index']]['segments'] ?? []) : null;
                     $overviewFormat = $serverProfileMap[$serverKey]['overview_format_raw'] ?? [];
                     $overviewFields = $this->parseOverview($article['overview_raw'], $overviewFormat);
                     $observation = [
@@ -839,7 +847,7 @@ final class ReleaseFingerprintCollector
 
     /** @param list<array<string, mixed>> $sourceFiles
      *  @param list<array<string, mixed>> $observations
-     *  @return array{basis: string, matched_prefix_and_length_count: int, ambiguous_count: int, unmatched_count: int, contradictory_length_count: int, insufficient_prefix_count: int, length_unavailable_count: int, matches: list<array<string, mixed>>}
+     *  @return array{basis: string, matched_prefix_and_length_count: int, ambiguous_count: int, unmatched_count: int, contradictory_length_count: int, insufficient_prefix_count: int, length_unavailable_count: int, integrity_conflict_count: int, matches: list<array<string, mixed>>}
      */
     private function matchPar2SourcesToNzbFiles(array $sourceFiles, array $observations): array
     {
@@ -871,6 +879,35 @@ final class ReleaseFingerprintCollector
                 continue;
             }
             $yenc = $observation['metadata']['yenc'] ?? null;
+            $integrityConflicts = [];
+            if (is_array($yenc)) {
+                foreach ([
+                    'header_numeric_fields_valid' => 'invalid_yenc_numeric_fields',
+                    'trailer_numeric_fields_valid' => 'invalid_yend_numeric_fields',
+                    'decoded_size_matches_header_size' => 'decoded_size_header_size_mismatch',
+                    'decoded_size_matches_ypart_range' => 'decoded_size_ypart_range_mismatch',
+                    'decoded_size_matches_yend_size' => 'decoded_size_yend_size_mismatch',
+                    'trailer_size_is_decimal' => 'invalid_yend_size',
+                    'all_declared_crc32_fields_are_hex' => 'invalid_declared_crc32_field',
+                    'declared_crc32_matches' => 'declared_crc32_mismatch',
+                    'trailer_part_matches_header' => 'yend_part_header_mismatch',
+                    'trailer_total_matches_header' => 'yend_total_header_mismatch',
+                ] as $field => $conflict) {
+                    if (($yenc[$field] ?? null) === false) {
+                        $integrityConflicts[] = $conflict;
+                    }
+                }
+            }
+            foreach ([
+                'yenc_nzb_part_number_matches' => 'yenc_part_number_nzb_mismatch',
+                'yenc_nzb_total_parts_matches' => 'yenc_total_parts_nzb_mismatch',
+                'yenc_nzb_trailer_part_number_matches' => 'yend_part_number_nzb_mismatch',
+                'yenc_nzb_trailer_total_parts_matches' => 'yend_total_parts_nzb_mismatch',
+            ] as $field => $conflict) {
+                if (($observation['metadata'][$field] ?? null) === false) {
+                    $integrityConflicts[] = $conflict;
+                }
+            }
             $prefixMd5 = is_array($yenc) ? strtolower((string) ($yenc['par2_first_16k_md5_candidate'] ?? '')) : '';
             $hasPrefixMd5 = preg_match('/\A[a-f0-9]{32}\z/D', $prefixMd5) === 1;
             $hashCandidates = $hasPrefixMd5 ? ($sourcesByPrefixMd5[$prefixMd5] ?? []) : [];
@@ -900,12 +937,17 @@ final class ReleaseFingerprintCollector
             } else {
                 $matchStatus = 'contradictory_length';
             }
+            $prefixAndLengthStatus = $matchStatus;
+            if ($integrityConflicts !== []) {
+                $matchStatus = 'integrity_conflict';
+            }
 
             $messageId = (string) ($observation['message_id'] ?? '');
             if ($messageId === '') {
                 continue;
             }
-            $relationshipSources = $matchStatus === 'matched_prefix_and_length' ? $exactLengthCandidates : $hashCandidates;
+            $relationshipSources = $prefixAndLengthStatus === 'matched_prefix_and_length'
+                ? $exactLengthCandidates : $hashCandidates;
             $candidateIds = array_map(
                 static fn (array $sourceFile): string => (string) ($sourceFile['recovery_set_id'] ?? '').':'.strtolower((string) ($sourceFile['file_id'] ?? '')),
                 $relationshipSources,
@@ -917,11 +959,14 @@ final class ReleaseFingerprintCollector
                 $expectedLength === null ? 'length-unknown' : (string) $expectedLength,
                 $hasPrefixMd5 ? $prefixMd5 : 'insufficient-prefix',
                 $matchStatus,
+                implode(',', $integrityConflicts),
                 implode(',', $candidateIds),
             ]);
             $matches[$key] ??= [
                 'relationship' => 'par2_source_file_to_nzb_rar',
                 'status' => $matchStatus,
+                'prefix_and_length_status' => $prefixAndLengthStatus,
+                'integrity_conflicts' => $integrityConflicts,
                 'nzb_file_index' => $observation['file_index'],
                 'nzb_subject' => $observation['nzb_subject'] ?? null,
                 'message_id' => $messageId,
@@ -954,13 +999,14 @@ final class ReleaseFingerprintCollector
         unset($match);
 
         return [
-            'basis' => 'Compare PAR2 FileDesc md5_first_16k with the first 16384 decoded bytes from NZB segment 1; multipart yEnc samples must declare a valid range beginning at byte 1. A unique prefix-hash and whole-file length match is labeled matched_prefix_and_length; this does not verify the remaining file bytes.',
+            'basis' => 'Compare PAR2 FileDesc md5_first_16k with the first 16384 decoded bytes from NZB segment 1; multipart yEnc samples must declare a valid range beginning at byte 1. A unique prefix-hash and whole-file length match is labeled matched_prefix_and_length only when available yEnc part numbering, numeric fields, size fields, and declared CRC checks have no contradiction; this does not verify the remaining file bytes.',
             'matched_prefix_and_length_count' => count(array_filter($matches, static fn (array $match): bool => $match['status'] === 'matched_prefix_and_length')),
             'ambiguous_count' => count(array_filter($matches, static fn (array $match): bool => $match['status'] === 'ambiguous')),
             'unmatched_count' => count(array_filter($matches, static fn (array $match): bool => $match['status'] === 'unmatched')),
             'contradictory_length_count' => count(array_filter($matches, static fn (array $match): bool => $match['status'] === 'contradictory_length')),
             'insufficient_prefix_count' => count(array_filter($matches, static fn (array $match): bool => $match['status'] === 'insufficient_prefix')),
             'length_unavailable_count' => count(array_filter($matches, static fn (array $match): bool => $match['status'] === 'length_unavailable')),
+            'integrity_conflict_count' => count(array_filter($matches, static fn (array $match): bool => $match['status'] === 'integrity_conflict')),
             'matches' => array_values($matches),
         ];
     }

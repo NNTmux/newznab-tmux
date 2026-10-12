@@ -84,15 +84,41 @@ pub enum FormatHeader {
         offset: usize,
         version: u8,
         system_identifier: String,
+        system_identifier_bytes_sha256: String,
         volume_identifier: String,
+        volume_identifier_bytes_sha256: String,
         volume_space_blocks: Option<u32>,
         dual_endian_volume_space_match: Option<bool>,
+        volume_space_bytes: Option<u64>,
+        volume_set_size: Option<u16>,
+        dual_endian_volume_set_size_match: Option<bool>,
+        volume_sequence_number: Option<u16>,
+        dual_endian_volume_sequence_number_match: Option<bool>,
         logical_block_size: Option<u16>,
         dual_endian_logical_block_size_match: Option<bool>,
+        path_table_size: Option<u32>,
+        dual_endian_path_table_size_match: Option<bool>,
+        type_l_path_table_location: Option<u32>,
+        type_l_path_table_offset_bytes: Option<u64>,
+        optional_type_l_path_table_location: Option<u32>,
+        optional_type_l_path_table_offset_bytes: Option<u64>,
+        type_m_path_table_location: Option<u32>,
+        type_m_path_table_offset_bytes: Option<u64>,
+        optional_type_m_path_table_location: Option<u32>,
+        optional_type_m_path_table_offset_bytes: Option<u64>,
+        root_directory_record: IsoRootDirectoryRecord,
         volume_set_identifier: String,
+        volume_set_identifier_bytes_sha256: String,
         publisher_identifier: String,
         preparer_identifier: String,
         application_identifier: String,
+        copyright_file_identifier: String,
+        abstract_file_identifier: String,
+        bibliographic_file_identifier: String,
+        volume_dates: IsoVolumeDates,
+        file_structure_version: Option<u8>,
+        application_use_sha256: String,
+        application_use_prefix_hex: String,
     },
     Zip {
         offset: usize,
@@ -162,6 +188,50 @@ pub enum FormatHeader {
         calculated_header_crc32: Option<u32>,
         header_crc32_valid: Option<bool>,
     },
+}
+
+#[derive(Debug, Serialize)]
+pub struct IsoRootDirectoryRecord {
+    pub available: bool,
+    pub record_length: Option<u8>,
+    pub extended_attribute_record_length: Option<u8>,
+    pub extent_location: Option<u32>,
+    pub extent_offset_bytes: Option<u64>,
+    pub dual_endian_extent_location_match: Option<bool>,
+    pub data_length: Option<u32>,
+    pub dual_endian_data_length_match: Option<bool>,
+    pub recording_date_bytes_hex: Option<String>,
+    pub file_flags: Option<u8>,
+    pub directory_flag_set: Option<bool>,
+    pub reserved_flags_clear: Option<bool>,
+    pub file_unit_size: Option<u8>,
+    pub interleave_gap_size: Option<u8>,
+    pub volume_sequence_number: Option<u16>,
+    pub dual_endian_volume_sequence_number_match: Option<bool>,
+    pub file_identifier_length: Option<u8>,
+    pub file_identifier_hex: Option<String>,
+    pub is_root_directory_identifier: Option<bool>,
+    pub basic_structure_checks_pass: bool,
+}
+
+#[derive(Debug, Serialize)]
+pub struct IsoVolumeDates {
+    pub creation_raw_bytes_hex: String,
+    pub creation_ascii_digits_valid: bool,
+    pub creation_unspecified: bool,
+    pub creation_timezone_quarters: Option<i8>,
+    pub modification_raw_bytes_hex: String,
+    pub modification_ascii_digits_valid: bool,
+    pub modification_unspecified: bool,
+    pub modification_timezone_quarters: Option<i8>,
+    pub expiration_raw_bytes_hex: String,
+    pub expiration_ascii_digits_valid: bool,
+    pub expiration_unspecified: bool,
+    pub expiration_timezone_quarters: Option<i8>,
+    pub effective_raw_bytes_hex: String,
+    pub effective_ascii_digits_valid: bool,
+    pub effective_unspecified: bool,
+    pub effective_timezone_quarters: Option<i8>,
 }
 
 #[derive(Debug, Serialize)]
@@ -246,7 +316,7 @@ pub fn parse(data: &[u8]) -> FormatMetadata {
         signatures.push(SignatureMatch {
             format: "ISO 9660 primary volume descriptor",
             offset,
-            basis: "validated type-1 descriptor in the bounded ISO descriptor sequence",
+            basis: "type-1 descriptor with CD001 identifier and version 1 in the bounded descriptor sequence; detailed field validity is reported separately",
         });
         headers.push(parse_iso_pvd(data, offset));
     }
@@ -1047,13 +1117,15 @@ fn find_iso_pvd(data: &[u8]) -> Option<usize> {
         let Some(descriptor) = data.get(offset..offset.saturating_add(2048)) else {
             break;
         };
-        if &descriptor[1..6] != b"CD001" || descriptor[6] != 1 {
+        if &descriptor[1..6] != b"CD001" {
             return None;
         }
         match descriptor[0] {
-            1 => return Some(offset),
-            255 => return None,
-            _ => {}
+            1 if descriptor[6] == 1 => return Some(offset),
+            2 if matches!(descriptor[6], 1 | 2) => {}
+            0 | 3 if descriptor[6] == 1 => {}
+            255 if descriptor[6] == 1 => return None,
+            _ => return None,
         }
     }
     None
@@ -1065,7 +1137,9 @@ fn parse_iso_pvd(data: &[u8], offset: usize) -> FormatHeader {
         offset,
         version: pvd.get(6).copied().unwrap_or_default(),
         system_identifier: ascii_field(pvd, 8, 32),
+        system_identifier_bytes_sha256: sha256_hex(pvd.get(8..40).unwrap_or_default()),
         volume_identifier: ascii_field(pvd, 40, 32),
+        volume_identifier_bytes_sha256: sha256_hex(pvd.get(40..72).unwrap_or_default()),
         volume_space_blocks: pvd
             .get(80..84)
             .map(|bytes| u32::from_le_bytes(bytes.try_into().expect("four-byte ISO field"))),
@@ -1073,17 +1147,217 @@ fn parse_iso_pvd(data: &[u8], offset: usize) -> FormatHeader {
             u32::from_le_bytes(bytes[0..4].try_into().expect("four-byte ISO field"))
                 == u32::from_be_bytes(bytes[4..8].try_into().expect("four-byte ISO field"))
         }),
+        volume_space_bytes: iso_block_offset(
+            pvd.get(80..84)
+                .map(|bytes| u32::from_le_bytes(bytes.try_into().expect("four-byte ISO field"))),
+            pvd.get(128..130)
+                .map(|bytes| u16::from_le_bytes([bytes[0], bytes[1]])),
+        ),
+        volume_set_size: pvd
+            .get(120..122)
+            .map(|bytes| u16::from_le_bytes([bytes[0], bytes[1]])),
+        dual_endian_volume_set_size_match: pvd.get(120..124).map(|bytes| {
+            u16::from_le_bytes([bytes[0], bytes[1]]) == u16::from_be_bytes([bytes[2], bytes[3]])
+        }),
+        volume_sequence_number: pvd
+            .get(124..126)
+            .map(|bytes| u16::from_le_bytes([bytes[0], bytes[1]])),
+        dual_endian_volume_sequence_number_match: pvd.get(124..128).map(|bytes| {
+            u16::from_le_bytes([bytes[0], bytes[1]]) == u16::from_be_bytes([bytes[2], bytes[3]])
+        }),
         logical_block_size: pvd
             .get(128..130)
             .map(|bytes| u16::from_le_bytes([bytes[0], bytes[1]])),
         dual_endian_logical_block_size_match: pvd.get(128..132).map(|bytes| {
             u16::from_le_bytes([bytes[0], bytes[1]]) == u16::from_be_bytes([bytes[2], bytes[3]])
         }),
+        path_table_size: pvd
+            .get(132..136)
+            .map(|bytes| u32::from_le_bytes(bytes.try_into().expect("four-byte ISO field"))),
+        dual_endian_path_table_size_match: pvd.get(132..140).map(|bytes| {
+            u32::from_le_bytes(bytes[0..4].try_into().expect("four-byte ISO field"))
+                == u32::from_be_bytes(bytes[4..8].try_into().expect("four-byte ISO field"))
+        }),
+        type_l_path_table_location: pvd
+            .get(140..144)
+            .map(|bytes| u32::from_le_bytes(bytes.try_into().expect("four-byte ISO field"))),
+        type_l_path_table_offset_bytes: iso_block_offset(
+            pvd.get(140..144)
+                .map(|bytes| u32::from_le_bytes(bytes.try_into().expect("four-byte ISO field"))),
+            pvd.get(128..130)
+                .map(|bytes| u16::from_le_bytes([bytes[0], bytes[1]])),
+        ),
+        optional_type_l_path_table_location: pvd
+            .get(144..148)
+            .map(|bytes| u32::from_le_bytes(bytes.try_into().expect("four-byte ISO field"))),
+        optional_type_l_path_table_offset_bytes: iso_block_offset(
+            pvd.get(144..148)
+                .map(|bytes| u32::from_le_bytes(bytes.try_into().expect("four-byte ISO field"))),
+            pvd.get(128..130)
+                .map(|bytes| u16::from_le_bytes([bytes[0], bytes[1]])),
+        ),
+        type_m_path_table_location: pvd
+            .get(148..152)
+            .map(|bytes| u32::from_be_bytes(bytes.try_into().expect("four-byte ISO field"))),
+        type_m_path_table_offset_bytes: iso_block_offset(
+            pvd.get(148..152)
+                .map(|bytes| u32::from_be_bytes(bytes.try_into().expect("four-byte ISO field"))),
+            pvd.get(128..130)
+                .map(|bytes| u16::from_le_bytes([bytes[0], bytes[1]])),
+        ),
+        optional_type_m_path_table_location: pvd
+            .get(152..156)
+            .map(|bytes| u32::from_be_bytes(bytes.try_into().expect("four-byte ISO field"))),
+        optional_type_m_path_table_offset_bytes: iso_block_offset(
+            pvd.get(152..156)
+                .map(|bytes| u32::from_be_bytes(bytes.try_into().expect("four-byte ISO field"))),
+            pvd.get(128..130)
+                .map(|bytes| u16::from_le_bytes([bytes[0], bytes[1]])),
+        ),
+        root_directory_record: parse_iso_root_directory_record(pvd),
         volume_set_identifier: ascii_field(pvd, 190, 128),
+        volume_set_identifier_bytes_sha256: sha256_hex(pvd.get(190..318).unwrap_or_default()),
         publisher_identifier: ascii_field(pvd, 318, 128),
         preparer_identifier: ascii_field(pvd, 446, 128),
         application_identifier: ascii_field(pvd, 574, 128),
+        copyright_file_identifier: ascii_field(pvd, 702, 37),
+        abstract_file_identifier: ascii_field(pvd, 739, 37),
+        bibliographic_file_identifier: ascii_field(pvd, 776, 37),
+        volume_dates: parse_iso_volume_dates(pvd),
+        file_structure_version: pvd.get(881).copied(),
+        application_use_sha256: sha256_hex(pvd.get(883..1395).unwrap_or_default()),
+        application_use_prefix_hex: hex_prefix(pvd.get(883..1395).unwrap_or_default(), 64),
     }
+}
+
+fn parse_iso_root_directory_record(pvd: &[u8]) -> IsoRootDirectoryRecord {
+    let record = pvd.get(156..190);
+    let logical_block_size = pvd
+        .get(128..130)
+        .map(|bytes| u16::from_le_bytes([bytes[0], bytes[1]]));
+    let record_length = record.and_then(|bytes| bytes.first().copied());
+    let file_identifier_length = record.and_then(|bytes| bytes.get(32).copied());
+    let file_identifier = record.and_then(|bytes| {
+        file_identifier_length.and_then(|length| {
+            let end = 33 + usize::from(length);
+            (end <= bytes.len()).then(|| &bytes[33..end])
+        })
+    });
+    let extent_match = record.and_then(|bytes| bytes.get(2..10)).map(|bytes| {
+        u32::from_le_bytes(bytes[0..4].try_into().expect("four-byte ISO field"))
+            == u32::from_be_bytes(bytes[4..8].try_into().expect("four-byte ISO field"))
+    });
+    let data_length_match = record.and_then(|bytes| bytes.get(10..18)).map(|bytes| {
+        u32::from_le_bytes(bytes[0..4].try_into().expect("four-byte ISO field"))
+            == u32::from_be_bytes(bytes[4..8].try_into().expect("four-byte ISO field"))
+    });
+    let volume_sequence_match = record.and_then(|bytes| bytes.get(28..32)).map(|bytes| {
+        u16::from_le_bytes([bytes[0], bytes[1]]) == u16::from_be_bytes([bytes[2], bytes[3]])
+    });
+    let flags = record.and_then(|bytes| bytes.get(25).copied());
+    let directory_flag_set = flags.map(|value| value & 0x02 != 0);
+    let reserved_flags_clear = flags.map(|value| value & 0x60 == 0);
+    let basic_structure_checks_pass = record.is_some_and(|bytes| {
+        bytes.len() == 34
+            && record_length == Some(34)
+            && extent_match == Some(true)
+            && data_length_match == Some(true)
+            && volume_sequence_match == Some(true)
+            && file_identifier_length == Some(1)
+            && file_identifier == Some(&[0][..])
+            && directory_flag_set == Some(true)
+            && reserved_flags_clear == Some(true)
+    });
+
+    IsoRootDirectoryRecord {
+        available: record.is_some(),
+        record_length,
+        extended_attribute_record_length: record.and_then(|bytes| bytes.get(1).copied()),
+        extent_location: record.and_then(|bytes| {
+            bytes
+                .get(2..6)
+                .map(|value| u32::from_le_bytes(value.try_into().expect("four-byte ISO field")))
+        }),
+        extent_offset_bytes: iso_block_offset(
+            record.and_then(|bytes| {
+                bytes
+                    .get(2..6)
+                    .map(|value| u32::from_le_bytes(value.try_into().expect("four-byte ISO field")))
+            }),
+            logical_block_size,
+        ),
+        dual_endian_extent_location_match: extent_match,
+        data_length: record.and_then(|bytes| {
+            bytes
+                .get(10..14)
+                .map(|value| u32::from_le_bytes(value.try_into().expect("four-byte ISO field")))
+        }),
+        dual_endian_data_length_match: data_length_match,
+        recording_date_bytes_hex: record.and_then(|bytes| bytes.get(18..25)).map(hex),
+        file_flags: flags,
+        directory_flag_set,
+        reserved_flags_clear,
+        file_unit_size: record.and_then(|bytes| bytes.get(26).copied()),
+        interleave_gap_size: record.and_then(|bytes| bytes.get(27).copied()),
+        volume_sequence_number: record.and_then(|bytes| {
+            bytes
+                .get(28..30)
+                .map(|value| u16::from_le_bytes([value[0], value[1]]))
+        }),
+        dual_endian_volume_sequence_number_match: volume_sequence_match,
+        file_identifier_length,
+        file_identifier_hex: file_identifier.map(hex),
+        is_root_directory_identifier: file_identifier.map(|value| value == [0]),
+        basic_structure_checks_pass,
+    }
+}
+
+fn iso_block_offset(location: Option<u32>, logical_block_size: Option<u16>) -> Option<u64> {
+    Some(u64::from(location?).checked_mul(u64::from(logical_block_size?))?)
+}
+
+fn parse_iso_volume_dates(pvd: &[u8]) -> IsoVolumeDates {
+    let creation = parse_iso_volume_date(pvd.get(813..830).unwrap_or_default());
+    let modification = parse_iso_volume_date(pvd.get(830..847).unwrap_or_default());
+    let expiration = parse_iso_volume_date(pvd.get(847..864).unwrap_or_default());
+    let effective = parse_iso_volume_date(pvd.get(864..881).unwrap_or_default());
+    IsoVolumeDates {
+        creation_raw_bytes_hex: creation.0,
+        creation_ascii_digits_valid: creation.1,
+        creation_unspecified: creation.2,
+        creation_timezone_quarters: creation.3,
+        modification_raw_bytes_hex: modification.0,
+        modification_ascii_digits_valid: modification.1,
+        modification_unspecified: modification.2,
+        modification_timezone_quarters: modification.3,
+        expiration_raw_bytes_hex: expiration.0,
+        expiration_ascii_digits_valid: expiration.1,
+        expiration_unspecified: expiration.2,
+        expiration_timezone_quarters: expiration.3,
+        effective_raw_bytes_hex: effective.0,
+        effective_ascii_digits_valid: effective.1,
+        effective_unspecified: effective.2,
+        effective_timezone_quarters: effective.3,
+    }
+}
+
+fn parse_iso_volume_date(value: &[u8]) -> (String, bool, bool, Option<i8>) {
+    let raw = hex(value);
+    let digits = value.get(..16);
+    let digits_valid =
+        value.len() == 17 && digits.is_some_and(|bytes| bytes.iter().all(u8::is_ascii_digit));
+    let unspecified = digits_valid
+        && digits.is_some_and(|bytes| bytes.iter().all(|byte| *byte == b'0'))
+        && value[16] == 0;
+    let timezone = value
+        .get(16)
+        .map(|offset| *offset as i8)
+        .filter(|offset| (-48..=52).contains(offset));
+    (raw, digits_valid, unspecified, timezone)
+}
+
+fn hex_prefix(bytes: &[u8], maximum_bytes: usize) -> String {
+    hex(&bytes[..bytes.len().min(maximum_bytes)])
 }
 
 fn ascii_field(data: &[u8], offset: usize, length: usize) -> String {
