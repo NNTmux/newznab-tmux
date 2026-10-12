@@ -12,7 +12,7 @@ use Throwable;
 
 final class ReleaseFingerprintCollector
 {
-    public const SCHEMA_VERSION = 6;
+    public const SCHEMA_VERSION = 7;
 
     private const MAX_ARTICLE_BODY_BYTES = 2_000_000;
 
@@ -1164,6 +1164,32 @@ final class ReleaseFingerprintCollector
                 'is_array',
             ));
             unset($resolution['source_fragment_indexes']);
+            $packInfo = $resolution['encoded_header_pack_info'] ?? null;
+            if (is_array($packInfo) && is_array($packInfo['streams'] ?? null)) {
+                foreach ($packInfo['streams'] as $streamIndex => $stream) {
+                    if (! is_array($stream)) {
+                        continue;
+                    }
+                    $streamContributorIndexes = $stream['source_fragment_indexes'] ?? [];
+                    $stream['contributing_observations'] = array_values(array_filter(
+                        array_map(
+                            static fn (mixed $index): mixed => is_int($index) ? ($fragments[$index]['reference'] ?? null) : null,
+                            is_array($streamContributorIndexes) ? $streamContributorIndexes : [],
+                        ),
+                        'is_array',
+                    ));
+                    unset($stream['source_fragment_indexes']);
+                    if (($stream['missing_ranges'] ?? []) !== [] && $this->omittedRangesIntersect(
+                        $candidate['budget_omitted_ranges'] ?? [],
+                        $stream['missing_ranges'],
+                    )) {
+                        $stream['underlying_resolution_status'] = $stream['resolution_status'] ?? null;
+                        $stream['resolution_status'] = 'budget_exceeded';
+                    }
+                    $packInfo['streams'][$streamIndex] = $stream;
+                }
+                $resolution['encoded_header_pack_info'] = $packInfo;
+            }
             if (($resolution['missing_ranges'] ?? []) !== [] && $this->omittedRangesIntersect(
                 $candidate['budget_omitted_ranges'] ?? [],
                 $resolution['missing_ranges'],

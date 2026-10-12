@@ -129,9 +129,10 @@ pub unsafe extern "C" fn nntmux_format_metadata_json(
     }
 }
 
-/// Resolve one 7-Zip next-header range from a compact list of sampled file ranges.
-/// Input is: fragment count (u32 LE), declared file size (u64 LE), then repeated
-/// file offset (u64 LE), byte length (u32 LE), and raw decoded bytes.
+/// Resolve one 7-Zip next-header range and any encoded-header PackInfo ranges
+/// from a compact list of sampled file ranges. Input is: fragment count (u32 LE),
+/// declared file size (u64 LE), then repeated file offset (u64 LE), byte length
+/// (u32 LE), and raw decoded bytes.
 /// The caller must release the returned UTF-8 JSON with `nntmux_metadata_string_free`.
 ///
 /// # Safety
