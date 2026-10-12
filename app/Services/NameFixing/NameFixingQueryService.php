@@ -74,13 +74,17 @@ final class NameFixingQueryService
     {
         $sources = [];
         foreach (self::STATUS_COLUMNS as $source => $column) {
+            if ($source === self::SOURCE_PAR2) {
+                continue;
+            }
             $sources[] = '(r.'.$column.' = 0 AND ('.self::SOURCE_EXISTS[$source].'))';
         }
 
         $condition = 'r.predb_id = 0 AND (r.isrenamed = 0 OR r.categories_id IN ('
             .Category::OTHER_MISC.', '.Category::OTHER_HASHED.'))'
             .' AND r.categories_id IN ('.implode(',', Category::OTHERS_GROUP).')'
-            .' AND ('.implode(' OR ', $sources).')';
+            .' AND (CASE WHEN r.proc_par2 = 0 AND ('.self::SOURCE_EXISTS[self::SOURCE_PAR2].') THEN 1'
+            .' WHEN '.implode(' OR ', $sources).' THEN 1 ELSE 0 END = 1)';
 
         if (! (bool) config('tmux.fix_names.full_backlog', true)) {
             $cutoff = DB::getDriverName() === 'sqlite'

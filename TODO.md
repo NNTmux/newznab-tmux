@@ -89,3 +89,11 @@ Monitor baseline for the next comparison (2026-10-11 22:46:54 UTC): the Renames 
 Monitor comparison captured 2026-10-11 22:52:44 UTC: 465,869 unmatched (+34 versus baseline) and 24,334 matched (+17). In this short window names continue to recover, but unmatched rename work is still growing; measuring arrival rate and historical probe efficiency remains the next operational priority.
 
 Follow-up correction verification: all ten PHPStan findings are cleared; full analysis of 849 files reports zero errors with no added baseline entries. The complete local PHPUnit suite passes 2,671 tests and 21,108 assertions, with 93 existing skips and 54 PHPUnit notices. Pint, PHP syntax lint, and independent source review pass. The correction batch is prepared on `codex/phpstan-backlog-cleanup` and remains separate from the deployed rename redesign. The correction batch is published in [PR #59](https://github.com/xbmc4lyfe/newznab-tmux/pull/59); current-head CI/review and release delivery are tracked above.
+
+## Retest SQL contention repairs (2026-10-12)
+
+Expedited shipping was requested with GitHub CI/CD skipped. Run the full regression suite and deployment qualification later; focused checks and live observations are recorded on each repair PR.
+
+- [ ] Rerun the full PHPUnit suite, native decoder parity, and required CI checks for the expedited SQL repairs.
+- [ ] Recheck rename-count equality across PAR2, metadata-only, missing-source, NZB-less, already renamed, and recent-only releases. The PAR2 fast path must skip metadata probes while preserving eligibility and counting a release once.
+- [ ] Compare monitor query durations and scheduling gaps under the same workload, plus net rename backlog, actual recovered names, arrivals, and DB row-lock wait rates over an hour. The bounded SQL probe is not a sustained throughput benchmark.

@@ -191,6 +191,29 @@ class TmuxProcessingBacklogTest extends TestCase
         $this->assertSame(9, (int) $this->counts()->processrenames);
     }
 
+    public function test_pending_par2_count_does_not_probe_metadata_sources(): void
+    {
+        DB::table('releases')->insert(['id' => 1, 'proc_par2' => 0, 'proc_nfo' => 0]);
+        DB::table('release_nfos')->insert(['releases_id' => 99]);
+        DB::statement('ALTER TABLE release_nfos RENAME TO stored_release_nfos');
+        $probes = 0;
+        /** @var PDO $pdo */
+        $pdo = DB::connection()->getPdo();
+        $pdo->sqliteCreateFunction('count_metadata_probe', static function (int $id) use (&$probes): int {
+            $probes++;
+
+            return $id;
+        }, 1);
+        DB::statement('CREATE VIEW release_nfos AS SELECT count_metadata_probe(releases_id) AS releases_id FROM stored_release_nfos');
+
+        $this->assertSame(1, (int) $this->counts()->processrenames);
+        $this->assertSame(0, $probes);
+
+        DB::table('releases')->where('id', 1)->update(['proc_par2' => 1]);
+        $this->assertSame(0, (int) $this->counts()->processrenames);
+        $this->assertGreaterThan(0, $probes);
+    }
+
     public function test_par2_work_without_an_nzb_is_neither_counted_nor_selected(): void
     {
         DB::table('releases')->insert([
