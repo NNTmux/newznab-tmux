@@ -17,7 +17,10 @@ use Illuminate\Support\Facades\Schema;
 
 final readonly class ApiCapabilitiesService
 {
-    public function __construct(private RegistrationStatusService $registrationStatus) {}
+    public function __construct(
+        private RegistrationStatusService $registrationStatus,
+        private ApiQueryParameters $queryParameters,
+    ) {}
 
     /** @return array<string, mixed> */
     public function v1(bool $includeCatalogs): array
@@ -31,7 +34,6 @@ final readonly class ApiCapabilitiesService
                 'url' => url('/'),
                 'image' => url('/').'/assets/images/tmux_logo.png',
             ],
-            'limits' => ['max' => 100, 'default' => 100],
             'searching' => [
                 'search' => ['available' => 'yes', 'supportedParams' => 'q,group,minsize,maxsize,maxage,cat,limit,offset,attrs,extended,del,sort'],
                 'tv-search' => ['available' => 'yes', 'supportedParams' => 'q,vid,tvdbid,traktid,rid,tvmazeid,imdbid,tmdbid,season,ep,cat,minsize,maxsize,maxage,limit,offset,attrs,extended,del,sort'],
@@ -42,6 +44,7 @@ final readonly class ApiCapabilitiesService
             ],
         ]);
 
+        $data = ['server' => $data['server'], 'limits' => $this->limits()] + $data;
         $status = $this->registrationStatus();
         $data['registration'] = $this->registration($status);
         $data['categories'] = $includeCatalogs ? Category::getForMenu() : null;
@@ -62,7 +65,6 @@ final readonly class ApiCapabilitiesService
                     'email' => config('mail.from.address'),
                     'url' => url('/'),
                 ],
-                'limits' => ['max' => ApiQueryParameters::MAX_LIMIT, 'default' => ApiQueryParameters::MAX_LIMIT],
                 'searching' => [
                     'search' => ['available' => 'yes', 'supportedParams' => 'id,group,minsize,maxage,cat,limit,offset,cursor,sort'],
                     'tv-search' => ['available' => 'yes', 'supportedParams' => 'id,vid,tvdbid,traktid,rid,tvmazeid,imdbid,tmdbid,season,ep,cat,minsize,maxage,limit,offset,cursor,sort'],
@@ -79,10 +81,21 @@ final readonly class ApiCapabilitiesService
             ];
         });
 
+        $data = ['server' => $data['server'], 'limits' => $this->limits()] + $data;
         $status = $this->registrationStatus();
         $data['registration'] = $this->registration($status);
 
         return $data;
+    }
+
+    /**
+     * Read outside the capabilities cache so changed limits are advertised immediately.
+     *
+     * @return array{max: int, default: int}
+     */
+    private function limits(): array
+    {
+        return ['max' => $this->queryParameters->maxLimit(), 'default' => $this->queryParameters->defaultLimit()];
     }
 
     /** @return list<array<string, mixed>> */

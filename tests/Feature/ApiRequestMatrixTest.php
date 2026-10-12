@@ -192,7 +192,7 @@ class ApiRequestMatrixTest extends TestCase
         $releaseSearchService = Mockery::mock(ReleaseSearchService::class);
         $releaseSearchService->shouldReceive('apiSearch')
             ->once()
-            ->with('ubuntu', -1, 0, 100, -1, [5030], [-1], 0, 'posted_desc', null)
+            ->with('ubuntu', -1, 0, 250, -1, [5030], [-1], 0, 'posted_desc', null)
             ->andReturn(collect());
 
         $releaseBrowseService = Mockery::mock(ReleaseBrowseService::class);
@@ -220,7 +220,7 @@ class ApiRequestMatrixTest extends TestCase
         $releaseSearchService = Mockery::mock(ReleaseSearchService::class);
         $releaseSearchService->shouldReceive('apiSearch')
             ->once()
-            ->with('ubuntu', -1, 0, 100, -1, [5030], [-1], 0, 'posted_desc', null)
+            ->with('ubuntu', -1, 0, 250, -1, [5030], [-1], 0, 'posted_desc', null)
             ->andReturn(collect([
                 (object) [
                     '_totalrows' => 1,
@@ -266,7 +266,7 @@ class ApiRequestMatrixTest extends TestCase
         $releaseSearchService = Mockery::mock(ReleaseSearchService::class);
         $releaseSearchService->shouldReceive('apiSearch')
             ->once()
-            ->with('ubuntu', -1, 0, 100, -1, [5030], [-1], 0, 'posted_desc')
+            ->with('ubuntu', -1, 0, 250, -1, [5030], [-1], 0, 'posted_desc')
             ->andReturn(collect([
                 (object) [
                     '_totalrows' => 1,
@@ -310,7 +310,7 @@ class ApiRequestMatrixTest extends TestCase
         $releaseSearchService = Mockery::mock(ReleaseSearchService::class);
         $releaseSearchService->shouldReceive('apiSearch')
             ->once()
-            ->with('ubuntu', -1, 0, 100, -1, [5030], [-1], 0, 'posted_desc')
+            ->with('ubuntu', -1, 0, 250, -1, [5030], [-1], 0, 'posted_desc')
             ->andReturn(collect());
 
         $releaseBrowseService = Mockery::mock(ReleaseBrowseService::class);
@@ -442,7 +442,7 @@ class ApiRequestMatrixTest extends TestCase
                 1,
                 ['3000', '3010', '3020', '3030', '3040', '3050', '3060', '3999'],
                 0,
-                100,
+                250,
                 'posted_desc',
                 -1,
                 [5030],
@@ -495,7 +495,7 @@ class ApiRequestMatrixTest extends TestCase
                 1,
                 ['3030', '7020', '8010'],
                 0,
-                100,
+                250,
                 'posted_desc',
                 -1,
                 [5030],
@@ -550,7 +550,7 @@ class ApiRequestMatrixTest extends TestCase
                     1,
                     $expectedCategory,
                     0,
-                    100,
+                    250,
                     'posted_desc',
                     -1,
                     [5030],
@@ -592,7 +592,7 @@ class ApiRequestMatrixTest extends TestCase
                 1,
                 ['3000', '3010', '3020', '3030', '3040', '3050', '3060', '3999'],
                 0,
-                100,
+                250,
                 'posted_desc',
                 -1,
                 [5030],
@@ -626,7 +626,7 @@ class ApiRequestMatrixTest extends TestCase
                 1,
                 ['3030', '7020', '8010'],
                 0,
-                100,
+                250,
                 'posted_desc',
                 -1,
                 [5030],
@@ -663,7 +663,7 @@ class ApiRequestMatrixTest extends TestCase
                     1,
                     $expectation['category'],
                     0,
-                    100,
+                    250,
                     'posted_desc',
                     -1,
                     [5030],
@@ -718,6 +718,19 @@ class ApiRequestMatrixTest extends TestCase
             ->assertOk()
             ->assertJsonPath('groups.0.name', 'alt.binaries.test')
             ->assertJsonPath('genres.0.name', 'Test Genre');
+    }
+
+    public function test_caps_advertise_the_configured_page_limits(): void
+    {
+        $this->assertStringContainsString('<limits max="500" default="250"/>', $this->get('/api/v1/api?t=caps')->assertOk()->getContent());
+        $this->getJson('/api/v2/capabilities')
+            ->assertOk()
+            ->assertJsonPath('limits', ['max' => 500, 'default' => 250]);
+
+        config(['nntmux.api.max_limit' => 300, 'nntmux.api.default_limit' => 400]);
+
+        $this->assertStringContainsString('<limits max="300" default="300"/>', $this->get('/api/v1/api?t=caps')->assertOk()->getContent());
+        $this->getJson('/api/v2/capabilities')->assertJsonPath('limits', ['max' => 300, 'default' => 300]);
     }
 
     public function test_v2_details_response_shape_is_unchanged(): void
@@ -857,7 +870,7 @@ class ApiRequestMatrixTest extends TestCase
         $search = $this->bindSearchMocks();
         $search->shouldReceive('apiSearch')
             ->once()
-            ->with('ubuntu', -1, 0, 100, -1, [5030], ['2000', '5030'], 0, 'posted_desc', null)
+            ->with('ubuntu', -1, 0, 250, -1, [5030], ['2000', '5030'], 0, 'posted_desc', null)
             ->andReturn(collect([$this->releaseRow(1)]));
 
         $query = $this->queryJson('/api/v2/search', ['api_token' => $token, 'id' => 'ubuntu', 'cat' => [2000, 5030]]);
@@ -875,7 +888,7 @@ class ApiRequestMatrixTest extends TestCase
         $search = $this->bindSearchMocks();
         $search->shouldReceive('apiSearch')
             ->once()
-            ->with('ubuntu', -1, 0, 100, -1, [5030], [-1], 0, 'posted_desc')
+            ->with('ubuntu', -1, 0, 250, -1, [5030], [-1], 0, 'posted_desc')
             ->andReturn(collect());
 
         $response = $this->queryJson('/api/v1/api', ['t' => 'search', 'apikey' => $this->apiToken(), 'q' => 'ubuntu']);
@@ -1025,7 +1038,7 @@ class ApiRequestMatrixTest extends TestCase
         $token = $this->apiToken();
         $this->bindSearchMocks()->shouldReceive('apiSearch')
             ->once()
-            ->with(null, -1, 0, 100, -1, [5030], [-1], 0, 'posted_desc', null)
+            ->with(null, -1, 0, 250, -1, [5030], [-1], 0, 'posted_desc', null)
             ->andReturn(collect());
 
         $this->getJson('/api/v2/search?api_token='.$token.'&id=')->assertOk();
@@ -1260,8 +1273,8 @@ class ApiRequestMatrixTest extends TestCase
     public static function invalidV2PaginationProvider(): array
     {
         return [
-            'zero limit' => ['limit=0', 'Incorrect parameter (limit must be a positive integer, at most 100 results are returned)'],
-            'non-numeric limit' => ['limit=ten', 'Incorrect parameter (limit must be a positive integer, at most 100 results are returned)'],
+            'zero limit' => ['limit=0', 'Incorrect parameter (limit must be a positive integer, at most 500 results are returned)'],
+            'non-numeric limit' => ['limit=ten', 'Incorrect parameter (limit must be a positive integer, at most 500 results are returned)'],
             'negative offset' => ['offset=-5', 'Incorrect parameter (offset must be a non-negative integer)'],
             'fractional offset' => ['offset=1.5', 'Incorrect parameter (offset must be a non-negative integer)'],
         ];
@@ -1281,7 +1294,7 @@ class ApiRequestMatrixTest extends TestCase
     {
         $this->bindSearchMocks()->shouldReceive('apiSearch')
             ->once()
-            ->with('ubuntu', -1, 0, 100, -1, [5030], [-1], 0, 'posted_desc', null)
+            ->with('ubuntu', -1, 0, 500, -1, [5030], [-1], 0, 'posted_desc', null)
             ->andReturn(collect());
 
         $this->getJson('/api/v2/search?api_token='.$this->apiToken().'&id=ubuntu&limit=5000')->assertOk();
@@ -1302,7 +1315,7 @@ class ApiRequestMatrixTest extends TestCase
     {
         $this->bindSearchMocks()->shouldReceive('animeSearch')
             ->once()
-            ->with(-1, 0, 100, 'naruto', [-1], -1, [5030], -1, 'posted_desc', 1024)
+            ->with(-1, 0, 250, 'naruto', [-1], -1, [5030], -1, 'posted_desc', 1024)
             ->andReturn(collect());
 
         $this->getJson('/api/v2/anime?api_token='.$this->apiToken().'&id=naruto&minsize=1024')->assertOk();

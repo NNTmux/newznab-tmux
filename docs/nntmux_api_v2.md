@@ -48,7 +48,7 @@ Common auth/rate-limit statuses:
 |---|---|---:|---|
 | `api_token` | string | - | Required except `capabilities`. |
 | `id` | string | `""` | Search text/fallback identifier on search endpoints. |
-| `limit` | int | `100` | Rows per page. Values above `100` are capped at `100`; `0`, negative or non-integer values return JSON `400`. |
+| `limit` | int | `250` | Rows per page. Values above `500` are capped at `500`; `0`, negative or non-integer values return JSON `400`. The server's actual default and cap are reported in `/capabilities` `limits` (`API_DEFAULT_LIMIT` / `API_MAX_LIMIT`). |
 | `offset` | int | `0` | Zero-based pagination offset. Negative or non-integer values return JSON `400`. |
 | `cat` | csv string | `-1` | Category filter; `TV_WEBDL` auto-add can apply when `TV_HD` is requested. |
 | `group` | string | `-1` | Usenet group filter (where supported). |
@@ -220,7 +220,7 @@ Test with a production-equivalent proxy setup first:
 Returns:
 
 - `server`
-- `limits`
+- `limits` (`max` and `default` rows per page)
 - `searching`
 - `registration`
 - `categories`
