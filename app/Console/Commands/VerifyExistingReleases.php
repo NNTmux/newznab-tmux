@@ -11,7 +11,9 @@ use App\Services\Releases\Verification\AuditReleaseDeletion;
 use App\Services\Releases\Verification\NntpArticleSource;
 use App\Services\Releases\Verification\NzbManifestReader;
 use App\Services\Releases\Verification\PayloadVerifier;
+use App\Services\Releases\Verification\ScratchBudget;
 use App\Services\Releases\Verification\ScratchInventory;
+use App\Services\YencService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -25,10 +27,20 @@ class VerifyExistingReleases extends Command
 
     protected $description = 'Download and audit existing NZBs with resumable progress; unknown results are retained';
 
-    public function handle(NzbService $nzb, NzbManifestReader $reader, ScratchInventory $scratchInventory, AuditReleaseDeletion $deletion): int
+    public function handle(NzbService $nzb, NzbManifestReader $reader, ScratchInventory $scratchInventory,
+        AuditReleaseDeletion $deletion, ScratchBudget $scratchBudget, YencService $decoder): int
     {
         $root = (string) config('release_verification.storage_path');
         File::ensureDirectoryExists($root, 0700);
+        $scratch = $root.'/scratch';
+        if (is_link($scratch) || (file_exists($scratch) && (! is_dir($scratch) || ! is_readable($scratch) || ! is_executable($scratch)))) {
+            throw new \RuntimeException('Audit scratch root is inaccessible or linked.');
+        }
+        if (! $scratchBudget->initialize()) {
+            $this->warn('Scratch budget initialization is waiting for active verification workers.');
+
+            return self::SUCCESS;
+        }
         $lock = fopen($root.'/worker.lock', 'c');
         if ($lock === false || ! flock($lock, LOCK_EX | LOCK_NB)) {
             $this->warn('The new-release verifier has priority; retry the audit later.');
@@ -56,7 +68,7 @@ class VerifyExistingReleases extends Command
             $retryIds = $resume ? DB::table('release_verification_audit_retries')->where('next_attempt_at', '<=', now())
                 ->orderBy('next_attempt_at')->orderBy('release_id')->limit($limit)->pluck('release_id')->all() : [];
             $retryTurn = (bool) $state->audit_retry_turn;
-            $verifier = new PayloadVerifier(new NntpArticleSource(app(NNTPService::class)), (array) config('release_verification'));
+            $source = new NntpArticleSource(app(NNTPService::class), decoder: $decoder);
             $attempted = 0;
             while ($attempted < $limit && ($freshIds !== [] || $retryIds !== [])) {
                 if ($this->newCandidatesAreDue()) {
@@ -78,6 +90,8 @@ class VerifyExistingReleases extends Command
                 $attempted++;
                 $scratchEntry = $scratchInventory->registerAudit((int) $release->id);
                 $directory = $root.'/scratch/'.$scratchInventory->directoryName($scratchEntry);
+                $verifier = new PayloadVerifier($source, (array) config('release_verification'),
+                    decoder: $decoder, scratchBudget: $scratchBudget->forEntry((int) $scratchEntry->id));
                 try {
                     $xml = $nzb->readNzbContents($release->guid);
                     if ($xml === false) {

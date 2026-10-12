@@ -20,7 +20,7 @@ final readonly class VerifiedArticle
         public ?string $fileChecksum,
     ) {}
 
-    public static function decode(string $raw): self
+    public static function decode(string $raw, ?YencService $decoder = null): self
     {
         $frame = ArticleFrame::parse($raw);
         if ($frame === null) {
@@ -48,7 +48,7 @@ final readonly class VerifiedArticle
             throw new RuntimeException('Article checksum is required.');
         }
         try {
-            $decoded = (new YencService)->decode($raw);
+            $decoded = ($decoder ?? new YencService)->decode($raw);
         } catch (RuntimeException $error) {
             if ($error->getMessage() === 'CRC32 checksums do not match. The file is probably corrupt.') {
                 throw new ArticleIntegrityFailure($error->getMessage(), previous: $error);

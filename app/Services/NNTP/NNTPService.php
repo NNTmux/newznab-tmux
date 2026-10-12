@@ -65,6 +65,179 @@ class NNTPService extends NntpClient
         throw new \RuntimeException('Truncated article response.');
     }
 
+    /**
+     * Pipeline bounded BODY requests and drain independent connections concurrently.
+     * Every response remains attached to its request position; a damaged frame closes that connection.
+     *
+     * @param  list<array{connection: NNTPService, ids: list<string>}>  $batches
+     * @return array<string, string|\RuntimeException>
+     */
+    public static function verificationArticleBatch(array $batches, int $maximumBytes, int $bufferBytes, callable $heartbeat): array
+    {
+        if ($maximumBytes < 1 || $bufferBytes < $maximumBytes || count($batches) > 8) {
+            throw new \RuntimeException('Invalid verification pipeline budget.');
+        }
+        $states = [];
+        $results = [];
+        $bytes = 0;
+        $count = 0;
+        foreach ($batches as $batch) {
+            $count += count($batch['ids']);
+            if (count($batch['ids']) > 16 || $count > intdiv($bufferBytes, $maximumBytes)) {
+                throw new \RuntimeException('Verification pipeline exceeds its buffer budget.');
+            }
+            foreach ($batch['ids'] as $id) {
+                self::verificationMessageId($id, $maximumBytes);
+            }
+        }
+        $fail = static function (array &$state, \RuntimeException $error) use (&$results): void {
+            foreach (array_slice($state['ids'], $state['position']) as $id) {
+                $results[$id] = $error;
+            }
+            if (is_resource($state['socket'])) {
+                fclose($state['socket']);
+            }
+            $state['connection']->_resetProperties();
+            $state['done'] = true;
+        };
+        try {
+            foreach ($batches as $index => $batch) {
+                $connection = $batch['connection'];
+                $socket = $connection->_socket;
+                if (! is_resource($socket) || $connection->_compressionEnabled) {
+                    foreach ($batch['ids'] as $id) {
+                        $results[$id] = new \RuntimeException('Raw verification connection is unavailable.');
+                    }
+
+                    continue;
+                }
+                $heartbeat();
+                $command = implode('', array_map(static fn (string $id): string => 'BODY <'.$id.">\r\n", $batch['ids']));
+                $states[$index] = ['connection' => $connection, 'socket' => $socket, 'ids' => $batch['ids'],
+                    'position' => 0, 'body' => false, 'raw' => '', 'buffer' => '', 'done' => $batch['ids'] === [], 'last' => microtime(true)];
+                if (fwrite($socket, $command) !== strlen($command)) {
+                    $fail($states[$index], new \RuntimeException('Cannot send verification pipeline.'));
+
+                    continue;
+                }
+                stream_set_blocking($socket, false);
+            }
+            $lastHeartbeat = microtime(true);
+            while (array_filter($states, static fn (array $state): bool => ! $state['done']) !== []) {
+                if (microtime(true) - $lastHeartbeat >= 1.0) {
+                    $heartbeat();
+                    $lastHeartbeat = microtime(true);
+                }
+                $read = [];
+                foreach ($states as &$state) {
+                    if (! $state['done']) {
+                        if (microtime(true) - $state['last'] > $state['connection']->_socketTimeout) {
+                            $fail($state, new \RuntimeException('Verification pipeline timed out.'));
+                        } else {
+                            $read[] = $state['socket'];
+                        }
+                    }
+                }
+                unset($state);
+                if ($read === []) {
+                    break;
+                }
+                $write = $except = [];
+                if (stream_select($read, $write, $except, 1) === false) {
+                    throw new \RuntimeException('Cannot poll verification connections.');
+                }
+                foreach ($states as &$state) {
+                    if ($state['done'] || ! in_array($state['socket'], $read, true)) {
+                        continue;
+                    }
+                    $chunk = fread($state['socket'], 65536);
+                    if ($chunk === false || ($chunk === '' && feof($state['socket']))) {
+                        $fail($state, new \RuntimeException('Truncated verification pipeline.'));
+
+                        continue;
+                    }
+                    if ($chunk === '') {
+                        continue;
+                    }
+                    $state['last'] = microtime(true);
+                    $state['buffer'] .= $chunk;
+                    while (($end = strpos($state['buffer'], "\n")) !== false && ! $state['done']) {
+                        $line = substr($state['buffer'], 0, $end + 1);
+                        $state['buffer'] = substr($state['buffer'], $end + 1);
+                        $id = $state['ids'][$state['position']];
+                        if (strlen($line) > 65536) {
+                            $fail($state, new \RuntimeException('Verification pipeline line exceeds its limit.'));
+                            break;
+                        }
+                        if (! $state['body']) {
+                            if (preg_match('/\A(\d{3})(?:\s|$)/', $line, $status) !== 1) {
+                                $fail($state, new \RuntimeException('Invalid verification pipeline status.'));
+                                break;
+                            }
+                            if ((int) $status[1] === 222) {
+                                if (preg_match('/<([^<>]+)>/', $line, $identity) !== 1 || $identity[1] !== $id) {
+                                    $fail($state, new \RuntimeException('Verification response identity differs from its request.'));
+                                    break;
+                                }
+                                $state['body'] = true;
+                            } elseif (in_array((int) $status[1], [430, 423], true)) {
+                                $results[$id] = new \RuntimeException('Verification article is unavailable.');
+                                $state['position']++;
+                            } else {
+                                $fail($state, new \RuntimeException('Unexpected verification pipeline status.'));
+                                break;
+                            }
+                        } elseif ($line === ".\r\n" || $line === ".\n") {
+                            $results[$id] = $state['raw'];
+                            $state['raw'] = '';
+                            $state['body'] = false;
+                            $state['position']++;
+                        } else {
+                            if (str_starts_with($line, '..')) {
+                                $line = substr($line, 1);
+                            }
+                            if (strlen($state['raw']) + strlen($line) > $maximumBytes || $bytes + strlen($line) > $bufferBytes) {
+                                $fail($state, new \RuntimeException('Verification pipeline exceeds its byte budget.'));
+                                break;
+                            }
+                            $state['raw'] .= $line;
+                            $bytes += strlen($line);
+                        }
+                        $state['done'] = $state['position'] >= count($state['ids']);
+                    }
+                    if (! $state['done'] && strlen($state['buffer']) >= 65536) {
+                        $fail($state, new \RuntimeException('Verification pipeline line is truncated or oversized.'));
+                    }
+                    if ($state['done'] && $state['buffer'] !== '') {
+                        $fail($state, new \RuntimeException('Unexpected data after verification pipeline.'));
+                    }
+                }
+                unset($state);
+            }
+        } catch (\Throwable $error) {
+            foreach ($states as &$state) {
+                if (! $state['done']) {
+                    $fail($state, new \RuntimeException('Verification pipeline interrupted.', previous: $error));
+                }
+            }
+            unset($state);
+            throw $error;
+        } finally {
+            foreach ($states as $state) {
+                if (is_resource($state['socket'])) {
+                    stream_set_blocking($state['socket'], true);
+                }
+            }
+        }
+
+        return $results;
+    }
+
+    public function verificationPipelineAvailable(): bool
+    {
+        return is_resource($this->_socket) && ! $this->_compressionEnabled;
+    }
+
     protected bool $_debugBool;
 
     protected bool $_echo;

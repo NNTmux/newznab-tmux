@@ -27,12 +27,13 @@ class ReleaseVerificationSchedulerRecoveryTest extends TestCase
         $this->directory = storage_path('framework/testing/scheduler-recovery-'.bin2hex(random_bytes(8)));
         config(['database.default' => 'sqlite', 'database.connections.sqlite.database' => ':memory:',
             'release_verification.storage_path' => $this->directory, 'release_verification.scheduled' => true,
-            'release_verification.free_bytes' => 0, 'release_verification.bytes_per_second' => 0,
+            'release_verification.candidate_workers' => 1, 'release_verification.free_bytes' => 0, 'release_verification.bytes_per_second' => 0,
             'cache.default' => 'array']);
         DB::purge();
         foreach (['2026_10_11_154028_create_release_verification_candidates_table.php',
             '2026_10_11_175742_create_release_verification_audit_retries_table.php',
-            '2026_10_12_004819_create_release_verification_scratch_table.php'] as $migration) {
+            '2026_10_12_004819_create_release_verification_scratch_table.php',
+            '2026_10_12_053000_add_shared_verification_scratch_budget.php'] as $migration) {
             (require database_path('migrations/'.$migration))->up();
         }
         Schema::create('usenet_groups', static function (Blueprint $table): void {

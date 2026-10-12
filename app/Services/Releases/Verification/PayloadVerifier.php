@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Releases\Verification;
 
+use App\Services\YencService;
 use dariusiii\rarinfo\Par2Info;
 use RuntimeException;
 use Symfony\Component\Process\Process;
@@ -20,7 +21,8 @@ final class PayloadVerifier
      * @param  (\Closure(string): (float|false))|null  $diskFreeSpace
      */
     public function __construct(private readonly ArticleSource $source, private readonly array $options,
-        private readonly ?\Closure $diskFreeSpace = null) {}
+        private readonly ?\Closure $diskFreeSpace = null, private readonly ?YencService $decoder = null,
+        private readonly ?ScratchBudget $scratchBudget = null) {}
 
     /** @param array<string, mixed> $manifest */
     public function verify(array $manifest, string $directory, callable $heartbeat): VerificationResult
@@ -84,7 +86,7 @@ final class PayloadVerifier
         $files = [];
         $filenameIdentities = [];
         $available = $manifest;
-        $scratchRoot = dirname($directory);
+        $scratchRoot = $this->scratchBudget === null ? dirname($directory) : $directory;
         $this->initialScratchBytes = $this->directoryBytes($scratchRoot, $heartbeat);
         $allocated = $this->initialScratchBytes;
         $this->materializedCacheBytes = 0;
@@ -100,8 +102,23 @@ final class PayloadVerifier
             $totalParts = (int) $file['totalparts'];
             $inferredParts = ($file['totalparts_inferred'] ?? false) === true;
             $available['files'][$index]['segments'] = [];
-            foreach ($file['segments'] as $segment) {
+            $batchSize = $this->source instanceof NntpArticleSource ? $this->source->batchSize() : 1;
+            $batchStarted = 0.0;
+            $batchBytes = 0;
+            foreach ($file['segments'] as $segmentIndex => $segment) {
                 $heartbeat();
+                if ($batchSize > 1 && $this->source instanceof NntpArticleSource && $segmentIndex % $batchSize === 0) {
+                    $ids = [];
+                    foreach (array_slice($file['segments'], $segmentIndex, $batchSize) as $pendingSegment) {
+                        $pendingId = (string) $pendingSegment['messageid'];
+                        if (! is_file($cache.'/'.hash('sha256', $pendingId))) {
+                            $ids[] = $pendingId;
+                        }
+                    }
+                    $batchStarted = microtime(true);
+                    $batchBytes = 0;
+                    $this->source->prefetch($ids, $heartbeat);
+                }
                 $number = (int) $segment['number'];
                 if ($number < 1 || isset($partNumbers[$number])) {
                     throw new RuntimeException('Invalid or duplicate article part number.');
@@ -116,7 +133,7 @@ final class PayloadVerifier
                     $raw = file_get_contents($path, false, null, 0, (int) $this->options['article_bytes'] + 1);
                     if ($raw !== false && strlen($raw) <= (int) $this->options['article_bytes']) {
                         try {
-                            $decoded = VerifiedArticle::decode($raw);
+                            $decoded = VerifiedArticle::decode($raw, $this->decoder);
                             $validate($decoded);
                             $article = $decoded;
                         } catch (RuntimeException) {
@@ -129,8 +146,13 @@ final class PayloadVerifier
                 if ($article === null) {
                     try {
                         $start = microtime(true);
-                        $raw = $this->source instanceof NntpArticleSource
-                            ? $this->source->fetchValidated($id, $validate) : $this->source->fetch($id);
+                        if ($this->source instanceof NntpArticleSource) {
+                            $fetched = $this->source->fetchVerified($id, $validate);
+                            $raw = $fetched->raw;
+                            $article = $fetched->article;
+                        } else {
+                            $raw = $this->source->fetch($id);
+                        }
                     } catch (RuntimeException) {
                         $networkFailure = true;
 
@@ -140,7 +162,7 @@ final class PayloadVerifier
                         throw new RuntimeException('Article exceeds memory budget.');
                     }
                     try {
-                        $article = VerifiedArticle::decode($raw);
+                        $article ??= VerifiedArticle::decode($raw, $this->decoder);
                     } catch (ArticleIntegrityFailure) {
                         $networkFailure = true;
 
@@ -162,7 +184,9 @@ final class PayloadVerifier
                     $this->materializedCacheBytes += strlen($raw);
                     $rate = (int) $this->options['bytes_per_second'];
                     if ($rate > 0) {
-                        $wait = strlen($raw) / $rate - (microtime(true) - $start);
+                        $batchBytes += strlen($raw);
+                        $wait = $batchSize > 1 ? $batchBytes / $rate - (microtime(true) - $batchStarted)
+                            : strlen($raw) / $rate - (microtime(true) - $start);
                         while ($wait > 0) {
                             $heartbeat();
                             $pause = min(1.0, $wait);
@@ -480,6 +504,11 @@ final class PayloadVerifier
 
     private function reserve(string $directory, int $bytes): void
     {
+        if ($this->scratchBudget !== null) {
+            $this->scratchBudget->reserveOwned($bytes);
+
+            return;
+        }
         $free = $this->diskFreeSpace === null ? disk_free_space($directory) : ($this->diskFreeSpace)($directory);
         if ($bytes > (int) $this->options['scratch_bytes'] || $free === false
             || $free < (int) $this->options['free_bytes'] + max(0, $bytes - $this->initialScratchBytes - $this->materializedCacheBytes)) {

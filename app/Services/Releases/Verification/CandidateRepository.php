@@ -337,25 +337,34 @@ final class CandidateRepository
         }
     }
 
-    public function claim(): ?object
+    /**
+     * @param  (callable(int): bool)|null  $acquireCandidate
+     *
+     * @phpstan-impure
+     */
+    public function claim(?callable $acquireCandidate = null): ?object
     {
-        return DB::transaction(function (): ?object {
+        return DB::transaction(function () use ($acquireCandidate): ?object {
             $query = DB::table('release_verification_candidates')->whereNull('release_id')
                 ->whereIn('status', ['pending', 'unknown', 'verifying'])->where('next_attempt_at', '<=', now())
                 ->where(fn ($q) => $q->whereNull('lease_until')->orWhere('lease_until', '<', now()))
                 ->orderBy('next_attempt_at')->orderBy('id')->lockForUpdate();
-            $row = $query->first();
-            if ($row === null) {
-                return null;
-            }
-            $token = (string) Str::uuid();
-            DB::table('release_verification_candidates')->where('id', $row->id)->update([
-                'status' => 'verifying', 'lease_token' => $token,
-                'lease_until' => now()->addSeconds((int) config('release_verification.lease_seconds')),
-            ]);
-            $row->lease_token = $token;
+            $rows = $acquireCandidate === null ? [$query->first()] : $query->limit(100)->get();
+            foreach ($rows as $row) {
+                if ($row === null || ($acquireCandidate !== null && ! $acquireCandidate((int) $row->id))) {
+                    continue;
+                }
+                $token = (string) Str::uuid();
+                DB::table('release_verification_candidates')->where('id', $row->id)->update([
+                    'status' => 'verifying', 'lease_token' => $token,
+                    'lease_until' => now()->addSeconds((int) config('release_verification.lease_seconds')),
+                ]);
+                $row->lease_token = $token;
 
-            return $row;
+                return $row;
+            }
+
+            return null;
         }, 5);
     }
 

@@ -6,6 +6,7 @@ namespace App\Services\Releases\Verification;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * Candidate and audit scratch are registered under the worker lock before creation.
@@ -56,6 +57,10 @@ final class ScratchInventory
 
     public function forget(int $id): void
     {
-        DB::table('release_verification_scratch')->where('id', $id)->delete();
+        if (Schema::hasTable('release_verification_scratch_budget')) {
+            app(ScratchBudget::class)->forget($id);
+        } else {
+            DB::table('release_verification_scratch')->where('id', $id)->delete();
+        }
     }
 }

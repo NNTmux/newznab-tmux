@@ -9,8 +9,12 @@ use App\Services\Releases\Verification\ArticleIntegrityFailure;
 use App\Services\Releases\Verification\NntpArticleSource;
 use App\Services\Releases\Verification\PayloadVerifier;
 use App\Services\Releases\Verification\VerifiedArticle;
+use App\Services\Yenc\PayloadDecoder;
+use App\Services\Yenc\PhpPayloadDecoder;
+use App\Services\YencService;
 use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
+use Illuminate\Filesystem\Filesystem;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -32,6 +36,171 @@ final class NntpVerificationArticleSourceTest extends TestCase
     protected function tearDown(): void
     {
         Container::setInstance($this->previousContainer);
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function pipelineFrames(): iterable
+    {
+        yield 'ordered dot-stuffed responses and missing middle article' => ['valid'];
+        yield 'wrong response identity disconnects only that connection' => ['identity'];
+        yield 'oversized body disconnects only that connection' => ['oversized'];
+    }
+
+    #[DataProvider('pipelineFrames')]
+    public function test_actual_socket_pipelines_are_dispatched_concurrently_and_keep_bounded_response_correlation(string $fault): void
+    {
+        if (! function_exists('pcntl_fork')) {
+            $this->markTestSkipped('Socket server fixture needs pcntl.');
+        }
+        $pairs = [stream_socket_pair(STREAM_PF_UNIX, STREAM_SOCK_STREAM, STREAM_IPPROTO_IP),
+            stream_socket_pair(STREAM_PF_UNIX, STREAM_SOCK_STREAM, STREAM_IPPROTO_IP)];
+        $ids = [['a@example', 'missing@example', 'b@example'], ['c@example', 'd@example']];
+        $child = pcntl_fork();
+        if ($child === 0) {
+            foreach ($pairs as $index => $pair) {
+                fclose($pair[0]);
+                stream_set_timeout($pair[1], 5);
+                foreach ($ids[$index] as $id) {
+                    if (fgets($pair[1]) !== 'BODY <'.$id.">\r\n") {
+                        exit(2);
+                    }
+                }
+            }
+            // Neither connection gets a response until all pipeline commands reached both sockets.
+            foreach ($pairs as $index => $pair) {
+                foreach ($ids[$index] as $id) {
+                    if ($id === 'missing@example') {
+                        fwrite($pair[1], "430 missing\r\n");
+                    } else {
+                        $responseId = $index === 0 && $fault === 'identity' ? 'wrong@example' : $id;
+                        $body = $index === 0 && $fault === 'oversized' ? str_repeat('x', 65) : '..'.$id;
+                        @fwrite($pair[1], '222 0 <'.$responseId."> body\r\n".$body."\r\n.\r\n");
+                    }
+                }
+                fclose($pair[1]);
+            }
+            exit(0);
+        }
+        $this->assertGreaterThan(0, $child);
+        $connections = [];
+        foreach ($pairs as $pair) {
+            fclose($pair[1]);
+            $connections[] = new PipelineSocketNntpHarness($pair[0]);
+        }
+        $beats = 0;
+        try {
+            $results = NNTPService::verificationArticleBatch([
+                ['connection' => $connections[0], 'ids' => $ids[0]], ['connection' => $connections[1], 'ids' => $ids[1]],
+            ], 64, 320, static function () use (&$beats): void {
+                $beats++;
+            });
+            $this->assertSame(".c@example\r\n", $results['c@example']);
+            $this->assertSame(".d@example\r\n", $results['d@example']);
+            if ($fault === 'valid') {
+                $this->assertSame(".a@example\r\n", $results['a@example']);
+                $this->assertInstanceOf(RuntimeException::class, $results['missing@example']);
+                $this->assertSame(".b@example\r\n", $results['b@example']);
+            } else {
+                foreach ($ids[0] as $id) {
+                    $this->assertInstanceOf(RuntimeException::class, $results[$id]);
+                }
+                $this->assertFalse($connections[0]->isConnected());
+            }
+            $this->assertGreaterThan(0, $beats);
+        } finally {
+            foreach ($connections as $connection) {
+                $connection->closeFixture();
+            }
+            pcntl_waitpid($child, $status);
+            $this->assertSame(0, pcntl_wexitstatus($status));
+        }
+    }
+
+    public function test_prefetched_primary_semantic_mismatch_uses_corrected_alternate_before_checkpointing(): void
+    {
+        config(['release_verification.article_bytes' => 1024, 'release_verification.download_buffer_bytes' => 4096,
+            'release_verification.download_connections' => 1, 'release_verification.pipeline_window' => 2]);
+        $pair = stream_socket_pair(STREAM_PF_UNIX, STREAM_SOCK_STREAM, STREAM_IPPROTO_IP);
+        $first = YencArticles::part('hell', 'movie.mkv', 8, 1, 1, 2);
+        $tail = YencArticles::part('tail', 'movie.mkv', 8, 2, 5, 2);
+        $bad = YencArticles::part('hell', 'movie.mkv', 8, 2, 1, 2);
+        $child = pcntl_fork();
+        if ($child === 0) {
+            fclose($pair[0]);
+            stream_set_timeout($pair[1], 5);
+            if (fgets($pair[1]) !== "BODY <first@example>\r\n" || fgets($pair[1]) !== "BODY <tail@example>\r\n") {
+                exit(2);
+            }
+            fwrite($pair[1], "222 0 <first@example> body\r\n".$bad."\r\n.\r\n222 0 <tail@example> body\r\n".$tail."\r\n.\r\n");
+            fclose($pair[1]);
+            exit(0);
+        }
+        fclose($pair[1]);
+        $primary = new PipelineSocketNntpHarness($pair[0]);
+        $alternate = new VerificationNntpHarness($first."\r\n.\r\n");
+        $source = new NntpArticleSource($primary, $alternate);
+        $this->assertSame(2, $source->batchSize());
+        $verifier = new PayloadVerifier($source,
+            ['scratch_bytes' => 1048576, 'free_bytes' => 0, 'article_bytes' => 1024, 'bytes_per_second' => 0, 'par2_binary' => 'par2']);
+        $scratch = sys_get_temp_dir().'/prefetched-copy-'.bin2hex(random_bytes(8)).'/candidate';
+        $manifest = ['expected_files' => 1, 'files' => [['key' => 'source', 'subject' => 'movie.mkv', 'totalparts' => 2,
+            'segments' => [['number' => 1, 'messageid' => 'first@example', 'bytes' => 4],
+                ['number' => 2, 'messageid' => 'tail@example', 'bytes' => 4]]]]];
+        try {
+            $result = $verifier->verify($manifest, $scratch, static function (): void {});
+            $this->assertTrue($result->passed(), $result->reason);
+            $this->assertSame('helltail', file_get_contents($scratch.'/data/movie.mkv'));
+            $this->assertSame(['BODY <first@example>'], $alternate->commands);
+            $this->assertSame(1, VerifiedArticle::decode(file_get_contents($scratch.'/articles/'.hash('sha256', 'first@example')))->part);
+            $this->assertTrue($verifier->verify($manifest, $scratch, static function (): void {})->passed());
+            $this->assertSame(['BODY <first@example>'], $alternate->commands, 'Valid resumed cache must not download again.');
+        } finally {
+            $primary->closeFixture();
+            pcntl_waitpid($child, $status);
+            $this->assertSame(0, pcntl_wexitstatus($status));
+            $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($scratch, \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::CHILD_FIRST);
+            foreach ($iterator as $entry) {
+                $entry->isDir() ? rmdir($entry->getPathname()) : unlink($entry->getPathname());
+            }
+            rmdir($scratch);
+            rmdir(dirname($scratch));
+        }
+    }
+
+    public function test_verified_fetch_decodes_once_and_cached_resume_revalidates_with_the_same_decoder(): void
+    {
+        $decoder = new class implements PayloadDecoder
+        {
+            public int $calls = 0;
+
+            public function decode(string $payload): string
+            {
+                $this->calls++;
+
+                return (new PhpPayloadDecoder)->decode($payload);
+            }
+        };
+        $yenc = new YencService($decoder);
+        $primary = new VerificationNntpHarness(YencArticles::article('hello')."\r\n.\r\n");
+        $source = new NntpArticleSource($primary, decoder: $yenc);
+        $verifier = new PayloadVerifier($source,
+            ['scratch_bytes' => 1048576, 'free_bytes' => 0, 'article_bytes' => 1048576, 'bytes_per_second' => 0, 'par2_binary' => 'par2'],
+            decoder: $yenc);
+        $root = sys_get_temp_dir().'/single-decode-'.bin2hex(random_bytes(8));
+        $manifest = ['expected_files' => 1, 'files' => [['key' => 'file', 'subject' => 'fixture file.bin', 'totalparts' => 1,
+            'segments' => [['number' => 1, 'messageid' => 'once@example', 'bytes' => 5]]]]];
+        try {
+            $first = $verifier->verify($manifest, $root.'/candidate', static function (): void {});
+            $this->assertSame('complete', $first->verdict, $first->reason);
+            $this->assertSame(1, $decoder->calls, 'Network integrity and file verification must share the decoded result.');
+            $second = $verifier->verify($manifest, $root.'/candidate', static function (): void {});
+            $this->assertSame('complete', $second->verdict, $second->reason);
+            $this->assertSame(2, $decoder->calls, 'A resumed raw checkpoint must still be decoded and revalidated.');
+            $this->assertSame(['BODY <once@example>'], $primary->commands);
+            $this->assertSame('hello', file_get_contents($root.'/candidate/data/fixture file.bin'));
+        } finally {
+            (new Filesystem)->deleteDirectory($root);
+        }
     }
 
     public function test_primary_connect_failure_fetches_raw_body_from_alternate_without_group_selection(): void
@@ -334,6 +503,36 @@ final class NntpVerificationArticleSourceTest extends TestCase
             $this->assertSame([], $primary->commands);
             $this->assertSame([], $alternate->commands);
         }
+    }
+}
+
+class PipelineSocketNntpHarness extends NNTPService
+{
+    /** @param resource $socket */
+    public function __construct($socket)
+    {
+        $this->_socket = $socket;
+        $this->_socketTimeout = 5;
+    }
+
+    public function closeFixture(): void
+    {
+        if (is_resource($this->_socket)) {
+            fclose($this->_socket);
+        }
+        $this->_socket = null;
+    }
+
+    public function doConnect(bool $compression = true, bool $alternate = false): mixed
+    {
+        return $this->isConnected();
+    }
+
+    public function doQuit(bool $force = false): mixed
+    {
+        $this->closeFixture();
+
+        return true;
     }
 }
 

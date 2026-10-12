@@ -59,6 +59,10 @@ final class VerificationResetService
                     DB::table($table)->delete();
                 }
             }
+            if (Schema::hasTable('release_verification_scratch_budget')) {
+                DB::table('release_verification_scratch_budget')->delete();
+                DB::table('release_verification_scratch_budget')->insert(['id' => 1]);
+            }
             if (Schema::hasTable('release_verification_state')) {
                 DB::table('release_verification_state')->delete();
                 $state = ['id' => 1, 'pending_bytes' => 0, 'audit_cursor' => 0];
@@ -71,7 +75,7 @@ final class VerificationResetService
 
         $root = (string) config('release_verification.storage_path');
         foreach (new \FilesystemIterator($root, \FilesystemIterator::SKIP_DOTS) as $entry) {
-            if (in_array($entry->getFilename(), ['worker.lock', 'reset.lock', '.gitignore'], true)) {
+            if (in_array($entry->getFilename(), ['worker.lock', 'reset.lock', 'locks', '.gitignore'], true)) {
                 continue;
             }
             $deleted = $entry->isDir() && ! $entry->isLink()

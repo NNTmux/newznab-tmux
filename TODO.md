@@ -1,5 +1,18 @@
 # To do
 
+## Retest verification and throughput PRs after the expedited rollout
+
+The 2026-10-12 throughput rollout was explicitly requested with minimal targeted checks and no PR review. Complete the deferred review and testing for PR #53, upstream PR #68 integration, and [PR #70](https://github.com/xbmc4lyfe/newznab-tmux/pull/70) (article concurrency/pipelining, candidate workers, and native decoding) before treating the expedited changes as fully qualified.
+
+- [ ] Review the final merged diffs and run the complete PHPUnit and native suites.
+- [ ] Retest pipelined BODY response ordering, missing/truncated/oversized articles, dot-stuffing, disconnects, cancellation, and alternate-provider retries.
+- [ ] Retest overlapping worker claims, lease expiry, candidate-version changes, shared scratch reservations, failed cleanup, audit exclusion, and reset exclusion.
+- [ ] Verify native/PHP decoding parity, corruption rejection, and reuse of decoded results without skipping manifest-identity checks.
+- [ ] Reconstruct newly emitted complete and repaired NZBs from their actual article IDs in fresh scratch.
+- [ ] Measure sustained admitted payload bytes versus verified payload bytes and queue growth; run capacity comparisons on an isolated host and preserve all failures.
+- [ ] Check the deployed image/source/schema and live release/NZB/search evidence again after fixes.
+
+
 ## Turn the paused groups back on
 
 On 2026-10-11 these groups were turned off (`active = 0`, `backfill = 0`) to cut collection churn while the backlog clears. Their files are posted with random names and random posters, so header-based grouping never completes a release. Together they held about 4.2M of the 14.1M collections, for about 270 releases over 50 MB a day.

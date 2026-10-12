@@ -10,9 +10,12 @@ use App\Services\Releases\Verification\CandidateRepository;
 use App\Services\Releases\Verification\ManifestStore;
 use App\Services\Releases\Verification\NntpArticleSource;
 use App\Services\Releases\Verification\PayloadVerifier;
+use App\Services\Releases\Verification\ScratchBudget;
 use App\Services\Releases\Verification\ScratchInventory;
 use App\Services\Releases\Verification\VerificationResult;
+use App\Services\Releases\Verification\VerificationWorkerLocks;
 use App\Services\Releases\Verification\VerifiedReleasePublisher;
+use App\Services\YencService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -21,17 +24,28 @@ use Throwable;
 
 class VerifyReleaseCandidates extends Command
 {
-    protected $signature = 'releases:verify-candidates {--limit=1 : Maximum candidates in this run}';
+    protected $signature = 'releases:verify-candidates {--limit=1 : Maximum candidates in this run} {--slot=0 : Worker slot; zero selects a free slot}';
 
     protected $description = 'Download and verify pending candidates before publishing their NZBs';
 
-    public function handle(CandidateRepository $repository, ManifestStore $store, VerifiedReleasePublisher $publisher, ScratchInventory $scratchInventory): int
+    public function handle(CandidateRepository $repository, ManifestStore $store, VerifiedReleasePublisher $publisher, ScratchInventory $scratchInventory, ScratchBudget $scratchBudget): int
     {
         $root = (string) config('release_verification.storage_path');
         File::ensureDirectoryExists($root, 0700);
-        $lock = fopen($root.'/worker.lock', 'c');
-        if ($lock === false || ! flock($lock, LOCK_EX | LOCK_NB)) {
-            $this->info('Verification worker is already running.');
+        try {
+            if (! $scratchBudget->initialize()) {
+                $this->info('Verification scratch accounting is waiting for exclusive access.');
+
+                return self::SUCCESS;
+            }
+        } catch (Throwable $error) {
+            $this->error($error->getMessage());
+
+            return self::FAILURE;
+        }
+        $locks = new VerificationWorkerLocks;
+        if (! $locks->start(max(0, (int) $this->option('slot')))) {
+            $this->info('Verification worker slots are occupied or exclusive maintenance is running.');
 
             return self::SUCCESS;
         }
@@ -41,11 +55,17 @@ class VerifyReleaseCandidates extends Command
 
                 return self::FAILURE;
             }
-            $this->cleanupTerminalScratch($root);
-            $repository->expire();
-            $verifier = new PayloadVerifier(new NntpArticleSource(app(NNTPService::class)), (array) config('release_verification'));
+            if ($locks->tryGc()) {
+                try {
+                    $this->cleanupTerminalScratch($root, $locks);
+                    $repository->expire();
+                } finally {
+                    $locks->releaseGc();
+                }
+            }
+            $decoder = app(YencService::class);
             for ($index = 0; $index < max(1, (int) $this->option('limit')); $index++) {
-                $claim = $repository->claim();
+                $claim = $repository->claim(fn (int $id): bool => $locks->tryCandidate($id));
                 if ($claim === null) {
                     break;
                 }
@@ -54,6 +74,11 @@ class VerifyReleaseCandidates extends Command
                     $heartbeat = static fn () => $repository->heartbeat((int) $claim->id, $claim->lease_token);
                     $heartbeat();
                     $scratchInventory->register((int) $claim->id, (int) $claim->version);
+                    $scratchEntryId = (int) DB::table('release_verification_scratch')->where('candidate_id', $claim->id)
+                        ->where('version', $claim->version)->value('id');
+                    $scratchBudget->reconcile($scratchEntryId, $locks, $heartbeat);
+                    $verifier = new PayloadVerifier(new NntpArticleSource(app(NNTPService::class), decoder: $decoder),
+                        (array) config('release_verification'), decoder: $decoder, scratchBudget: $scratchBudget->forEntry($scratchEntryId));
                     foreach ($scratchInventory->olderVersions((int) $claim->id, (int) $claim->version) as $old) {
                         $oldDirectory = $root.'/scratch/'.$old->candidate_id.'-'.$old->version;
                         $heartbeat();
@@ -72,15 +97,24 @@ class VerifyReleaseCandidates extends Command
                         if ($publisher->publish($claim, $result) === null) {
                             $result = $this->filteredResult($claim) ?? throw new RuntimeException('Publication did not produce a verified current release.');
                         }
-                        File::deleteDirectory($directory);
+                        if (File::deleteDirectory($directory) || (! file_exists($directory) && ! is_link($directory))) {
+                            $scratchInventory->forget($scratchEntryId);
+                        }
                     } else {
                         $repository->finish($claim, $result);
                     }
                     $bytes = $result->passed() ? (int) ($result->manifest['verified_bytes'] ?? 0) : 0;
                     $snapshot = json_encode(['verified_bytes_per_second' => $bytes / max(0.001, microtime(true) - $started),
                         'scratch_bytes' => null, 'scratch_bytes_status' => 'unknown'], JSON_THROW_ON_ERROR);
-                    if (file_put_contents($root.'/status.json.tmp', $snapshot, LOCK_EX) !== false) {
-                        rename($root.'/status.json.tmp', $root.'/status.json');
+                    $statusTemporary = $root.'/status-'.bin2hex(random_bytes(8)).'.tmp';
+                    try {
+                        if (file_put_contents($statusTemporary, $snapshot, LOCK_EX) !== false) {
+                            rename($statusTemporary, $root.'/status.json');
+                        }
+                    } finally {
+                        if (is_file($statusTemporary)) {
+                            unlink($statusTemporary);
+                        }
                     }
                     $this->line($claim->id.': '.$result->verdict.' — '.$result->reason);
                 } catch (Throwable $error) {
@@ -91,6 +125,8 @@ class VerifyReleaseCandidates extends Command
                         $repository->finish($claim, new VerificationResult('unknown', $error->getMessage()));
                         $this->warn($claim->id.': retry pending — '.$error->getMessage());
                     }
+                } finally {
+                    $locks->releaseCandidate();
                 }
             }
             $counts = DB::table('release_verification_candidates')->selectRaw('status, COUNT(*) AS count')->groupBy('status')->get();
@@ -98,15 +134,14 @@ class VerifyReleaseCandidates extends Command
                 $this->line($count->status.': '.$count->count);
             }
         } finally {
-            flock($lock, LOCK_UN);
-            fclose($lock);
+            $locks->close();
         }
 
         return self::SUCCESS;
     }
 
     /** Recover interrupted terminal cleanup without delaying claims indefinitely. */
-    private function cleanupTerminalScratch(string $root): void
+    private function cleanupTerminalScratch(string $root, VerificationWorkerLocks $locks): void
     {
         $scratch = $root.'/scratch';
         if (! $this->scratchRootIsSafe($scratch)) {
@@ -127,48 +162,57 @@ class VerifyReleaseCandidates extends Command
         $remaining = 1000;
         $exhausted = false;
         foreach ($entries as $entry) {
-            $directory = $scratch.'/'.app(ScratchInventory::class)->directoryName($entry);
-            if ($entry->delete_guid !== null) {
-                try {
-                    app(AuditReleaseDeletion::class)->cleanup($entry);
-                } catch (Throwable $error) {
-                    $this->warn('Terminal audit cleanup will retry: '.$error->getMessage());
-                    $after = (int) $entry->id;
+            if ($entry->candidate_id !== null && ! $locks->tryCandidate((int) $entry->candidate_id)) {
+                $after = (int) $entry->id;
 
-                    continue;
-                }
+                continue;
             }
-            if (! file_exists($directory) && ! is_link($directory)) {
-                app(ScratchInventory::class)->forget((int) $entry->id);
-            } elseif (is_dir($directory) && ! is_link($directory)) {
-                $terminal = $entry->audit_release_id !== null ? (bool) $entry->terminal
-                    : DB::table('release_verification_candidates')->where('id', $entry->candidate_id)
-                        ->where('version', '>=', $entry->version)
-                        ->where(function ($query): void {
-                            $query->whereIn('status', ['expired', 'filtered'])
-                                ->orWhere(fn ($published) => $published->whereNotNull('release_id')->whereIn('status', ['complete', 'repaired']));
-                        })
-                        ->where(fn ($query) => $query->whereNull('lease_until')->orWhere('lease_until', '<', now()))
-                        ->exists();
-                if ($terminal) {
+            try {
+                $directory = $scratch.'/'.app(ScratchInventory::class)->directoryName($entry);
+                if ($entry->delete_guid !== null) {
                     try {
-                        $this->deleteStaleScratch($directory, static function () use (&$remaining, &$exhausted): void {
-                            if ($remaining-- <= 0) {
-                                $exhausted = true;
-                                throw new RuntimeException('Terminal scratch cleanup will resume on the next run.');
-                            }
-                        });
-                        app(ScratchInventory::class)->forget((int) $entry->id);
+                        app(AuditReleaseDeletion::class)->cleanup($entry);
                     } catch (Throwable $error) {
-                        if ($exhausted) {
-                            $after = (int) $entry->id;
-                            break;
-                        }
-                        $this->warn('Terminal scratch cleanup will retry: '.$error->getMessage());
+                        $this->warn('Terminal audit cleanup will retry: '.$error->getMessage());
+                        $after = (int) $entry->id;
+
+                        continue;
                     }
                 }
+                if (! file_exists($directory) && ! is_link($directory)) {
+                    app(ScratchInventory::class)->forget((int) $entry->id);
+                } elseif (is_dir($directory) && ! is_link($directory)) {
+                    $terminal = $entry->audit_release_id !== null ? (bool) $entry->terminal
+                        : DB::table('release_verification_candidates')->where('id', $entry->candidate_id)
+                            ->where('version', '>=', $entry->version)
+                            ->where(function ($query): void {
+                                $query->whereIn('status', ['expired', 'filtered'])
+                                    ->orWhere(fn ($published) => $published->whereNotNull('release_id')->whereIn('status', ['complete', 'repaired']));
+                            })
+                            ->where(fn ($query) => $query->whereNull('lease_until')->orWhere('lease_until', '<', now()))
+                            ->exists();
+                    if ($terminal) {
+                        try {
+                            $this->deleteStaleScratch($directory, static function () use (&$remaining, &$exhausted): void {
+                                if ($remaining-- <= 0) {
+                                    $exhausted = true;
+                                    throw new RuntimeException('Terminal scratch cleanup will resume on the next run.');
+                                }
+                            });
+                            app(ScratchInventory::class)->forget((int) $entry->id);
+                        } catch (Throwable $error) {
+                            if ($exhausted) {
+                                $after = (int) $entry->id;
+                                break;
+                            }
+                            $this->warn('Terminal scratch cleanup will retry: '.$error->getMessage());
+                        }
+                    }
+                }
+                $after = (int) $entry->id;
+            } finally {
+                $locks->releaseCandidate();
             }
-            $after = (int) $entry->id;
         }
         if ((! $exhausted && $entries->count() < 100) || $after >= $ceiling) {
             $after = 0;
