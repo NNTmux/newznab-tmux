@@ -53,6 +53,8 @@ pub enum FormatHeader {
         password_check_present: Option<bool>,
         password_check_data_hex: Option<String>,
         first_block_header_size: Option<u64>,
+        first_block_extra_size: Option<u64>,
+        first_block_data_size: Option<u64>,
     },
     SevenZip {
         offset: usize,
@@ -229,6 +231,12 @@ fn parse_rar5(data: &[u8], offset: usize) -> FormatHeader {
     } else {
         Some(0)
     };
+    let typed_header_end = extra_size
+        .and_then(|size| usize::try_from(size).ok())
+        .and_then(|size| header_end.checked_sub(size))
+        .filter(|end| *end >= cursor);
+    let extra_area_valid = typed_header_end.is_some();
+    let typed_header_end = typed_header_end.unwrap_or(cursor);
     let mut main_archive_flags = None;
     let mut main_volume_number = None;
     let mut algorithm_version = None;
@@ -236,30 +244,30 @@ fn parse_rar5(data: &[u8], offset: usize) -> FormatHeader {
     let mut kdf_count = None;
     let mut salt = None;
     let mut password_check_data = None;
-    let mut typed_header_complete = extra_size.is_some() && data_size.is_some();
+    let mut typed_header_complete = extra_size.is_some() && data_size.is_some() && extra_area_valid;
 
     match block_type {
         1 => {
-            main_archive_flags = read_vint_bounded(data, &mut cursor, header_end);
+            main_archive_flags = read_vint_bounded(data, &mut cursor, typed_header_end);
             typed_header_complete &= main_archive_flags.is_some();
             if main_archive_flags.is_some_and(|flags| flags & 0x02 != 0) {
-                main_volume_number = read_vint_bounded(data, &mut cursor, header_end);
+                main_volume_number = read_vint_bounded(data, &mut cursor, typed_header_end);
                 typed_header_complete &= main_volume_number.is_some();
             }
         }
         4 => {
-            algorithm_version = read_vint_bounded(data, &mut cursor, header_end);
-            encryption_flags = read_vint_bounded(data, &mut cursor, header_end);
-            if cursor < header_end {
+            algorithm_version = read_vint_bounded(data, &mut cursor, typed_header_end);
+            encryption_flags = read_vint_bounded(data, &mut cursor, typed_header_end);
+            if cursor < typed_header_end {
                 kdf_count = data.get(cursor).copied();
                 cursor = cursor.saturating_add(1);
             }
-            if cursor.saturating_add(16) <= header_end {
+            if cursor.saturating_add(16) <= typed_header_end {
                 salt = Some(hex(&data[cursor..cursor + 16]));
                 cursor += 16;
             }
             if encryption_flags.is_some_and(|flags| flags & 0x01 != 0)
-                && cursor.saturating_add(12) <= header_end
+                && cursor.saturating_add(12) <= typed_header_end
             {
                 password_check_data = Some(hex(&data[cursor..cursor + 12]));
             }
@@ -294,6 +302,8 @@ fn parse_rar5(data: &[u8], offset: usize) -> FormatHeader {
         password_check_present: encryption_flags.map(|flags| flags & 0x01 != 0),
         password_check_data_hex: password_check_data,
         first_block_header_size: Some(header_size),
+        first_block_extra_size: extra_size,
+        first_block_data_size: data_size,
     }
 }
 
@@ -318,6 +328,8 @@ fn empty_rar5(offset: usize) -> FormatHeader {
         password_check_present: None,
         password_check_data_hex: None,
         first_block_header_size: None,
+        first_block_extra_size: None,
+        first_block_data_size: None,
     }
 }
 
@@ -342,8 +354,8 @@ fn read_vint_bounded(data: &[u8], cursor: &mut usize, end: usize) -> Option<u64>
     if *cursor >= end {
         return None;
     }
-    let value = read_vint(data, cursor)?;
-    (*cursor <= end).then_some(value)
+    let bounded_data = data.get(..end)?;
+    read_vint(bounded_data, cursor)
 }
 
 fn hex(bytes: &[u8]) -> String {

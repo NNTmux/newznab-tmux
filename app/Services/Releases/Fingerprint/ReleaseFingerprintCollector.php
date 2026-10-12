@@ -415,6 +415,8 @@ final class ReleaseFingerprintCollector
         $par2SetMainPackets = [];
         $par2SetSources = [];
         $par2SetBlockSizes = [];
+        $par2RecoverySlicePayloadHashesBySet = [];
+        $par2RecoverySliceConflicts = [];
         $par2PackedLayout = false;
         $par2FileCount = count(array_filter($manifest['files'], static fn (array $file): bool => $file['kind'] === 'par2'));
         foreach ($assembledPar2 as $par2File) {
@@ -462,6 +464,25 @@ final class ReleaseFingerprintCollector
             foreach ($par2File['metadata']['packet_summaries'] ?? [] as $packet) {
                 if (($packet['checksum_valid'] ?? false) === true && is_string($packet['set_id'] ?? null)) {
                     $par2SetIds[$packet['set_id']] = true;
+                }
+                if (($packet['checksum_valid'] ?? false) !== true
+                    || ($packet['packet_type'] ?? null) !== 'PAR 2.0\\0RecvSlic'
+                    || ! is_string($packet['set_id'] ?? null)
+                    || ! is_int($packet['recovery_exponent'] ?? null)
+                    || ! is_string($packet['recovery_data_sha256'] ?? null)) {
+                    continue;
+                }
+                $setId = $packet['set_id'];
+                $exponent = $packet['recovery_exponent'] === 65535 ? 0 : $packet['recovery_exponent'];
+                if (isset($par2RecoverySlicePayloadHashesBySet[$setId][$exponent])
+                    && $par2RecoverySlicePayloadHashesBySet[$setId][$exponent] !== $packet['recovery_data_sha256']) {
+                    $par2RecoverySliceConflicts[$setId.':'.$exponent] = [
+                        'recovery_set_id' => $setId,
+                        'exponent' => $exponent,
+                    ];
+                    $par2Complete = false;
+                } else {
+                    $par2RecoverySlicePayloadHashesBySet[$setId][$exponent] = $packet['recovery_data_sha256'];
                 }
             }
             foreach ($par2File['metadata']['recovery_exponents'] ?? [] as $exponent) {
@@ -521,7 +542,7 @@ final class ReleaseFingerprintCollector
             '/(?:\.part\d+\.rar|\.rar|\.r\d{2,})\z/i',
             (string) ($sourceFile['filename'] ?? ''),
         ) === 1));
-        $par2RecoveryPercent = $par2Complete && ! $multiplePar2Sets && $par2SourceBlocks > 0 && ! $par2PackedLayout
+        $par2RecoveryPercent = $par2Complete && $par2RecoverySliceConflicts === [] && ! $multiplePar2Sets && $par2SourceBlocks > 0 && ! $par2PackedLayout
             ? round($recoveryCount / $par2SourceBlocks * 100, 3)
             : null;
         $yencFileLengthPercent = $yencSizeCounts['rar'] > 0 && $yencSizeCounts['par2'] > 0 && $yencSizes['rar'] > 0
@@ -593,6 +614,7 @@ final class ReleaseFingerprintCollector
                     'source_rar_total_bytes' => array_sum(array_column($par2SourceRarFiles, 'file_length')),
                     'unique_recovery_slices' => $multiplePar2Sets ? null : $recoveryCount,
                     'parsed_recovery_exponents_across_sets' => $multiplePar2Sets ? $parsedRecoveryAcrossSets : null,
+                    'recovery_slice_conflicts' => array_values($par2RecoverySliceConflicts),
                     'source_block_count' => $multiplePar2Sets ? null : ($par2SourceBlocks ?: null),
                     'recovery_percent' => $par2RecoveryPercent,
                     'packed_layout_present' => $par2PackedLayout,

@@ -26,10 +26,13 @@ pub struct Par2Metadata {
     pub source_file_bytes: u64,
     pub source_files: Vec<SourceFile>,
     pub input_file_slice_checksums: Vec<InputFileSliceChecksums>,
+    pub ifsc_slice_count_mismatch_count: usize,
     pub recovery_set_ids: Vec<String>,
     pub recovery_sets: Vec<RecoverySetInventory>,
-    pub unique_recovery_slice_count: usize,
-    pub recovery_exponents: Vec<u32>,
+    pub unique_recovery_slice_count: Option<usize>,
+    pub recovery_exponents: Option<Vec<u32>>,
+    pub recovery_slice_conflict_count: usize,
+    pub recovery_slice_length_unvalidated_count: usize,
     pub recovery_to_source_percent: Option<f64>,
     pub packed_layout_present: bool,
     pub recovery_percentage_basis: &'static str,
@@ -75,6 +78,7 @@ pub struct InputFileSliceChecksums {
 pub struct RecoverySetInventory {
     pub recovery_set_id: String,
     pub source_block_size: Option<u64>,
+    pub source_block_count: Option<u64>,
     pub main_packet: Option<MainPacket>,
     pub source_inventory_complete: bool,
     pub missing_file_description_ids: Vec<String>,
@@ -83,8 +87,12 @@ pub struct RecoverySetInventory {
     pub source_file_bytes: u64,
     pub source_files: Vec<SourceFile>,
     pub input_file_slice_checksums: Vec<InputFileSliceChecksums>,
+    pub ifsc_slice_count_mismatch_count: usize,
     pub unique_recovery_slice_count: usize,
     pub recovery_exponents: Vec<u32>,
+    pub recovery_exponents_observed: Vec<u32>,
+    pub recovery_slice_conflict_count: usize,
+    pub recovery_slice_length_unvalidated_count: usize,
 }
 
 #[derive(Debug, Serialize)]
@@ -107,6 +115,8 @@ pub struct PacketSummary {
     pub payload_sha256: String,
     pub payload_prefix_hex: String,
     pub payload_prefix_truncated: bool,
+    pub recovery_exponent: Option<u32>,
+    pub recovery_data_sha256: Option<String>,
 }
 
 #[derive(Default)]
@@ -116,9 +126,12 @@ struct Parsed {
     block_sizes_by_set: BTreeMap<String, u64>,
     mains_by_set: BTreeMap<String, MainPacket>,
     ifsc_by_set_and_file: BTreeMap<(String, String), IfscPacket>,
-    recovery_exponents: BTreeSet<u32>,
     recovery_exponents_by_set: BTreeMap<String, BTreeSet<u32>>,
-    recovery_packets: Vec<(String, u32, usize)>,
+    recovery_packets: Vec<(String, u32, usize, String)>,
+    recovery_slice_hashes_by_set: BTreeMap<(String, u32), String>,
+    recovery_slice_conflicts_by_set: BTreeMap<String, BTreeSet<u32>>,
+    recovery_slice_lengths_unvalidated_by_set: BTreeMap<String, usize>,
+    recovery_exponents_observed_by_set: BTreeMap<String, BTreeSet<u32>>,
     packet_definitions: BTreeMap<String, String>,
     optional_packets: BTreeMap<String, Vec<OptionalPacketSummary>>,
     packet_summaries: Vec<PacketSummary>,
@@ -173,6 +186,11 @@ pub fn parse(data: &[u8]) -> Par2Metadata {
         let packet_md5 = hex(&packet[16..32]);
         let checksum_valid = md5(&packet[32..]) == packet[16..32];
         let payload = &packet[64..];
+        let recovery_exponent = (packet_type == "PAR 2.0\\0RecvSlic")
+            .then(|| read_u32(payload, 0))
+            .flatten();
+        let recovery_data_sha256 = (packet_type == "PAR 2.0\\0RecvSlic" && payload.len() >= 4)
+            .then(|| sha256_hex(&payload[4..]));
 
         parsed.packet_count += 1;
         *parsed
@@ -191,6 +209,8 @@ pub fn parse(data: &[u8]) -> Par2Metadata {
             payload_sha256: sha256_hex(payload),
             payload_prefix_hex: hex(payload_prefix),
             payload_prefix_truncated: payload.len() > MAX_OPTIONAL_HEX_BYTES,
+            recovery_exponent,
+            recovery_data_sha256: recovery_data_sha256.clone(),
         });
 
         if !checksum_valid {
@@ -225,9 +245,11 @@ pub fn parse(data: &[u8]) -> Par2Metadata {
                 let block_size = read_u64(payload, 0).unwrap_or_default();
                 let recoverable_file_count = read_u32(payload, 8).unwrap_or_default();
                 let ids = payload[12..].chunks_exact(16).map(hex).collect::<Vec<_>>();
+                let file_ids_unique = ids.iter().collect::<BTreeSet<_>>().len() == ids.len();
                 if block_size > 0
                     && block_size % 4 == 0
                     && payload.len().saturating_sub(12) % 16 == 0
+                    && file_ids_unique
                     && usize::try_from(recoverable_file_count).is_ok_and(|count| count <= ids.len())
                 {
                     let recoverable_count = recoverable_file_count as usize;
@@ -272,10 +294,13 @@ pub fn parse(data: &[u8]) -> Par2Metadata {
             }
             "PAR 2.0\\0FileDesc" => parsed.invalid_packet_count += 1,
             "PAR 2.0\\0RecvSlic" if payload.len() >= 4 => {
-                if let Some(exponent) = read_u32(payload, 0) {
-                    parsed
-                        .recovery_packets
-                        .push((set_id.clone(), exponent, payload.len()));
+                if let Some(exponent) = recovery_exponent {
+                    parsed.recovery_packets.push((
+                        set_id.clone(),
+                        exponent,
+                        payload.len(),
+                        recovery_data_sha256.unwrap_or_default(),
+                    ));
                 }
             }
             "PAR 2.0\\0RecvSlic" => parsed.invalid_packet_count += 1,
@@ -334,17 +359,56 @@ pub fn parse(data: &[u8]) -> Par2Metadata {
         .filter(|packet| packet.checksum_valid)
         .map(|packet| packet.set_id.clone())
         .collect::<BTreeSet<_>>();
-    for (set_id, exponent, payload_len) in parsed.recovery_packets.clone() {
-        let block_size_matches = parsed
-            .block_sizes_by_set
-            .get(&set_id)
-            .and_then(|block_size| block_size.checked_add(4))
-            .is_some_and(|expected| u64::try_from(payload_len).ok() == Some(expected));
-        if !block_size_matches {
+    for (set_id, raw_exponent, payload_len, recovery_data_sha256) in parsed.recovery_packets.clone()
+    {
+        parsed
+            .recovery_exponents_observed_by_set
+            .entry(set_id.clone())
+            .or_default()
+            .insert(raw_exponent);
+        if raw_exponent > u16::MAX as u32 {
             parsed.invalid_packet_count += 1;
             continue;
         }
-        parsed.recovery_exponents.insert(exponent);
+        let exponent = if raw_exponent == u16::MAX as u32 {
+            0
+        } else {
+            raw_exponent
+        };
+        match parsed
+            .block_sizes_by_set
+            .get(&set_id)
+            .and_then(|block_size| block_size.checked_add(4))
+        {
+            Some(expected) if u64::try_from(payload_len).ok() == Some(expected) => {}
+            Some(_) => {
+                parsed.invalid_packet_count += 1;
+                continue;
+            }
+            None => {
+                *parsed
+                    .recovery_slice_lengths_unvalidated_by_set
+                    .entry(set_id.clone())
+                    .or_default() += 1;
+            }
+        }
+        let recovery_key = (set_id.clone(), exponent);
+        if let Some(previous_hash) = parsed.recovery_slice_hashes_by_set.get(&recovery_key) {
+            if previous_hash != &recovery_data_sha256 {
+                let new_conflict = parsed
+                    .recovery_slice_conflicts_by_set
+                    .entry(set_id.clone())
+                    .or_default()
+                    .insert(exponent);
+                if new_conflict {
+                    parsed.invalid_packet_count += 1;
+                }
+            }
+        } else {
+            parsed
+                .recovery_slice_hashes_by_set
+                .insert(recovery_key, recovery_data_sha256);
+        }
         parsed
             .recovery_exponents_by_set
             .entry(set_id)
@@ -381,6 +445,20 @@ pub fn parse(data: &[u8]) -> Par2Metadata {
             }
         })
         .collect::<Vec<_>>();
+    let ifsc_slice_count_mismatch_count = input_file_slice_checksums
+        .iter()
+        .filter(|ifsc| ifsc.slice_count_matches_file_length == Some(false))
+        .count();
+    parsed.invalid_packet_count = parsed
+        .invalid_packet_count
+        .saturating_add(ifsc_slice_count_mismatch_count);
+    let ifsc_slice_count_mismatches_by_set = input_file_slice_checksums
+        .iter()
+        .filter(|ifsc| ifsc.slice_count_matches_file_length == Some(false))
+        .fold(BTreeMap::<String, usize>::new(), |mut counts, ifsc| {
+            *counts.entry(ifsc.recovery_set_id.clone()).or_default() += 1;
+            counts
+        });
     let recovery_sets = recovery_set_ids
         .iter()
         .map(|set_id| {
@@ -410,6 +488,26 @@ pub fn parse(data: &[u8]) -> Par2Metadata {
             let source_inventory_complete = main_packet.is_some()
                 && missing_file_description_ids.is_empty()
                 && unexpected_file_description_ids.is_empty();
+            let source_block_count = if source_inventory_complete {
+                let recoverable_file_ids = main_packet
+                    .as_ref()
+                    .map(|main| main.recoverable_file_ids.iter().collect::<BTreeSet<_>>())
+                    .unwrap_or_default();
+                parsed
+                    .block_sizes_by_set
+                    .get(set_id)
+                    .filter(|size| **size > 0)
+                    .map(|block_size| {
+                        source_files
+                            .iter()
+                            .filter(|source| recoverable_file_ids.contains(&source.file_id))
+                            .map(|source| source.file_length.div_ceil(*block_size))
+                            .sum::<u64>()
+                    })
+                    .filter(|count| *count > 0)
+            } else {
+                None
+            };
             let set_slice_checksums = input_file_slice_checksums
                 .iter()
                 .filter(|ifsc| &ifsc.recovery_set_id == set_id)
@@ -418,6 +516,7 @@ pub fn parse(data: &[u8]) -> Par2Metadata {
             RecoverySetInventory {
                 recovery_set_id: set_id.clone(),
                 source_block_size: parsed.block_sizes_by_set.get(set_id).copied(),
+                source_block_count,
                 main_packet,
                 source_inventory_complete,
                 missing_file_description_ids,
@@ -426,6 +525,9 @@ pub fn parse(data: &[u8]) -> Par2Metadata {
                 source_file_bytes: source_files.iter().map(|source| source.file_length).sum(),
                 source_files,
                 input_file_slice_checksums: set_slice_checksums,
+                ifsc_slice_count_mismatch_count: *ifsc_slice_count_mismatches_by_set
+                    .get(set_id)
+                    .unwrap_or(&0),
                 unique_recovery_slice_count: parsed
                     .recovery_exponents_by_set
                     .get(set_id)
@@ -434,6 +536,18 @@ pub fn parse(data: &[u8]) -> Par2Metadata {
                     .recovery_exponents_by_set
                     .get(set_id)
                     .map_or_else(Vec::new, |exponents| exponents.iter().copied().collect()),
+                recovery_exponents_observed: parsed
+                    .recovery_exponents_observed_by_set
+                    .get(set_id)
+                    .map_or_else(Vec::new, |exponents| exponents.iter().copied().collect()),
+                recovery_slice_conflict_count: parsed
+                    .recovery_slice_conflicts_by_set
+                    .get(set_id)
+                    .map_or(0, BTreeSet::len),
+                recovery_slice_length_unvalidated_count: *parsed
+                    .recovery_slice_lengths_unvalidated_by_set
+                    .get(set_id)
+                    .unwrap_or(&0),
             }
         })
         .collect::<Vec<_>>();
@@ -453,32 +567,38 @@ pub fn parse(data: &[u8]) -> Par2Metadata {
         .iter()
         .flat_map(|set| set.source_files.iter().cloned())
         .collect::<Vec<_>>();
-    let source_block_count = single_set.map_or(0, |set| {
-        let recoverable_file_ids = set
-            .main_packet
-            .as_ref()
-            .map(|main| main.recoverable_file_ids.iter().collect::<BTreeSet<_>>())
-            .unwrap_or_default();
-        set.source_block_size
-            .filter(|size| *size > 0)
-            .map_or(0, |block_size| {
-                set.source_files
-                    .iter()
-                    .filter(|source| recoverable_file_ids.contains(&source.file_id))
-                    .map(|source| source.file_length.div_ceil(block_size))
-                    .sum()
-            })
+    let source_block_count = single_set.and_then(|set| set.source_block_count);
+    let recovery_count = (!recovery_sets.is_empty()).then(|| {
+        recovery_sets
+            .iter()
+            .map(|set| set.unique_recovery_slice_count)
+            .sum()
     });
-    let recovery_count = parsed.recovery_exponents.len();
+    let recovery_exponents = single_set.map(|set| set.recovery_exponents.clone());
+    let recovery_slice_conflict_count = parsed
+        .recovery_slice_conflicts_by_set
+        .values()
+        .map(BTreeSet::len)
+        .sum();
+    let recovery_slice_length_unvalidated_count = parsed
+        .recovery_slice_lengths_unvalidated_by_set
+        .values()
+        .copied()
+        .sum();
     let packed_layout_present = parsed.optional_packets.contains_key("PAR 2.0\\0PkdMain")
         || parsed.optional_packets.contains_key("PAR 2.0\\0PkdRecvS");
-    let recovery_percent = (source_block_count > 0
-        && source_inventory_complete
-        && main_packet.is_some()
-        && parsed.invalid_packet_count == 0
-        && !(parsed.packet_count >= MAX_PACKETS && offset < data.len())
-        && !packed_layout_present)
-        .then(|| (recovery_count as f64 / source_block_count as f64) * 100.0);
+    let recovery_percent =
+        recovery_count
+            .zip(source_block_count)
+            .and_then(|(recovery_count, source_block_count)| {
+                (source_block_count > 0
+                    && source_inventory_complete
+                    && main_packet.is_some()
+                    && parsed.invalid_packet_count == 0
+                    && !(parsed.packet_count >= MAX_PACKETS && offset < data.len())
+                    && !packed_layout_present)
+                    .then(|| (recovery_count as f64 / source_block_count as f64) * 100.0)
+            });
 
     Par2Metadata {
         parser_engine: "nntmux-rust-ffi",
@@ -489,7 +609,7 @@ pub fn parse(data: &[u8]) -> Par2Metadata {
         unparsed_bytes: parsed.unparsed_bytes,
         invalid_packet_count: parsed.invalid_packet_count,
         source_block_size,
-        source_block_count: (source_block_count > 0).then_some(source_block_count),
+        source_block_count,
         main_packet,
         source_inventory_complete,
         missing_file_description_ids,
@@ -498,10 +618,13 @@ pub fn parse(data: &[u8]) -> Par2Metadata {
         source_file_bytes,
         source_files,
         input_file_slice_checksums,
+        ifsc_slice_count_mismatch_count,
         recovery_set_ids: recovery_set_ids.into_iter().collect(),
         recovery_sets,
         unique_recovery_slice_count: recovery_count,
-        recovery_exponents: parsed.recovery_exponents.into_iter().collect(),
+        recovery_exponents,
+        recovery_slice_conflict_count,
+        recovery_slice_length_unvalidated_count,
         recovery_to_source_percent: recovery_percent,
         packed_layout_present,
         recovery_percentage_basis: if packed_layout_present {

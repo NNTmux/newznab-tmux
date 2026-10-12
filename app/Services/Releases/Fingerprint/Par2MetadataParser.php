@@ -23,8 +23,11 @@ final class Par2MetadataParser
         $mainsBySet = [];
         $ifscBySetAndFile = [];
         $main = null;
-        $recoveryExponents = [];
         $recoveryExponentsBySet = [];
+        $recoverySliceHashesBySet = [];
+        $recoverySliceConflictsBySet = [];
+        $recoveryExponentsObservedBySet = [];
+        $recoverySliceLengthsUnvalidatedBySet = [];
         $recoveryPacketLengths = [];
         $optionalPackets = [];
         $packetTypeCounts = [];
@@ -58,6 +61,8 @@ final class Par2MetadataParser
             $packetCount++;
             $type = rtrim(substr($packet, 48, 16), "\0");
             $payload = substr($packet, 64);
+            $recoveryExponent = $type === "PAR 2.0\0RecvSlic" && strlen($payload) >= 4
+                ? (int) (unpack('V', substr($payload, 0, 4))[1] ?? 0) : null;
             $checksumValid = hash_equals(substr($packet, 16, 16), md5(substr($packet, 32), true));
             $packetTypeCounts[$type] = ($packetTypeCounts[$type] ?? 0) + 1;
             $packetSummaries[] = [
@@ -71,6 +76,8 @@ final class Par2MetadataParser
                 'payload_sha256' => hash('sha256', $payload),
                 'payload_prefix_hex' => bin2hex(substr($payload, 0, 256)),
                 'payload_prefix_truncated' => strlen($payload) > 256,
+                'recovery_exponent' => $recoveryExponent,
+                'recovery_data_sha256' => $recoveryExponent === null ? null : hash('sha256', substr($payload, 4)),
             ];
             if (! $checksumValid) {
                 $invalidPacketCount++;
@@ -93,7 +100,7 @@ final class Par2MetadataParser
                 $recoverableFileCount = (int) (unpack('V', substr($payload, 8, 4))[1] ?? 0);
                 $fileIdsBytes = substr($payload, 12);
                 $fileIds = strlen($fileIdsBytes) % 16 === 0 ? array_map('bin2hex', str_split($fileIdsBytes, 16)) : [];
-                if ($candidateBlockSize < 1 || $candidateBlockSize % 4 !== 0 || strlen($fileIdsBytes) % 16 !== 0 || $recoverableFileCount > count($fileIds)) {
+                if ($candidateBlockSize < 1 || $candidateBlockSize % 4 !== 0 || strlen($fileIdsBytes) % 16 !== 0 || $recoverableFileCount > count($fileIds) || count(array_unique($fileIds)) !== count($fileIds)) {
                     $invalidPacketCount++;
                     $offset += (int) $packetLength;
 
@@ -121,8 +128,8 @@ final class Par2MetadataParser
                     'md5_first_16k' => bin2hex(substr($payload, 32, 16)),
                     'file_id' => bin2hex(substr($payload, 0, 16)),
                 ];
-                $sources[$source['file_id']] = $source;
-                $sourcesBySet[$setId][$source['file_id']] = $source;
+                $sources[$source['file_id']] ??= $source;
+                $sourcesBySet[$setId][$source['file_id']] ??= $source;
             } elseif ($type === "PAR 2.0\0IFSC") {
                 $setId = bin2hex(substr($packet, 32, 16));
                 if (strlen($payload) < 16 || (strlen($payload) - 16) % 20 !== 0) {
@@ -155,7 +162,7 @@ final class Par2MetadataParser
             } elseif ($type === "PAR 2.0\0Main" || $type === "PAR 2.0\0FileDesc") {
                 $invalidPacketCount++;
             } elseif ($type === "PAR 2.0\0RecvSlic" && strlen($payload) >= 4) {
-                $recoveryPacketLengths[] = [bin2hex(substr($packet, 32, 16)), (int) (unpack('V', substr($payload, 0, 4))[1] ?? 0), strlen($payload)];
+                $recoveryPacketLengths[] = [bin2hex(substr($packet, 32, 16)), (int) (unpack('V', substr($payload, 0, 4))[1] ?? 0), strlen($payload), hash('sha256', substr($payload, 4))];
             } elseif ($type === "PAR 2.0\0Creator") {
                 $creator = trim(strtok($payload, "\0") ?: $payload);
             } elseif (in_array($type, ["PAR 2.0\0UniFileN", "PAR 2.0\0CommASCI", "PAR 2.0\0CommUni", "PAR 2.0\0FileSlic", "PAR 2.0\0RFSC", "PAR 2.0\0PkdMain", "PAR 2.0\0PkdRecvS"], true)) {
@@ -189,14 +196,38 @@ final class Par2MetadataParser
                 ];
             }
         }
-        foreach ($recoveryPacketLengths as [$setId, $exponent, $payloadLength]) {
-            $setBlockSize = $blockSizesBySet[$setId] ?? null;
-            if (is_int($setBlockSize) && $payloadLength === $setBlockSize + 4) {
-                $recoveryExponentsBySet[$setId][$exponent] = true;
-                $recoveryExponents[$exponent] = true;
-            } else {
+        $ifscSliceCountMismatchesBySet = [];
+        foreach ($inputFileSliceChecksums as $ifsc) {
+            if (($ifsc['slice_count_matches_file_length'] ?? null) === false) {
+                $setId = $ifsc['recovery_set_id'];
+                $ifscSliceCountMismatchesBySet[$setId] = ($ifscSliceCountMismatchesBySet[$setId] ?? 0) + 1;
                 $invalidPacketCount++;
             }
+        }
+        foreach ($recoveryPacketLengths as [$setId, $exponent, $payloadLength, $recoveryDataHash]) {
+            $recoveryExponentsObservedBySet[$setId][$exponent] = true;
+            if ($exponent > 65535) {
+                $invalidPacketCount++;
+                continue;
+            }
+            $exponentIdentity = $exponent === 65535 ? 0 : $exponent;
+            $setBlockSize = $blockSizesBySet[$setId] ?? null;
+            if (! is_int($setBlockSize) || $setBlockSize < 1) {
+                $recoverySliceLengthsUnvalidatedBySet[$setId] = ($recoverySliceLengthsUnvalidatedBySet[$setId] ?? 0) + 1;
+            } elseif ($payloadLength !== $setBlockSize + 4) {
+                $invalidPacketCount++;
+                continue;
+            }
+            $previousHash = $recoverySliceHashesBySet[$setId][$exponentIdentity] ?? null;
+            if (is_string($previousHash)) {
+                if ($previousHash !== $recoveryDataHash && ! isset($recoverySliceConflictsBySet[$setId][$exponentIdentity])) {
+                    $recoverySliceConflictsBySet[$setId][$exponentIdentity] = true;
+                    $invalidPacketCount++;
+                }
+            } else {
+                $recoverySliceHashesBySet[$setId][$exponentIdentity] = $recoveryDataHash;
+            }
+            $recoveryExponentsBySet[$setId][$exponentIdentity] = true;
         }
         $recoverySets = [];
         foreach ($recoverySetIds as $setId) {
@@ -208,27 +239,35 @@ final class Par2MetadataParser
             $setUnexpectedFileIds = array_values(array_diff($setDescribedFileIds, $setMainFileIds));
             $setBlockSize = $blockSizesBySet[$setId] ?? null;
             $setRecoverableIds = $setMain['recoverable_file_ids'] ?? [];
+            $setInventoryComplete = $setMain !== null && $setMissingFileIds === [] && $setUnexpectedFileIds === [];
             $setSourceBlockCount = 0;
             foreach ($setSources as $fileId => $source) {
                 if (in_array($fileId, $setRecoverableIds, true) && is_int($setBlockSize) && $setBlockSize > 0) {
                     $setSourceBlockCount += (int) ceil($source['file_length'] / $setBlockSize);
                 }
             }
+            if (! $setInventoryComplete || $setSourceBlockCount === 0) {
+                $setSourceBlockCount = null;
+            }
             $setIfsc = array_values(array_filter($inputFileSliceChecksums, static fn (array $ifsc): bool => $ifsc['recovery_set_id'] === $setId));
             $recoverySets[] = [
                 'recovery_set_id' => $setId,
                 'source_block_size' => $setBlockSize,
-                'source_block_count' => $setSourceBlockCount ?: null,
+                'source_block_count' => $setSourceBlockCount,
                 'main_packet' => $setMain,
-                'source_inventory_complete' => $setMain !== null && $setMissingFileIds === [] && $setUnexpectedFileIds === [],
+                'source_inventory_complete' => $setInventoryComplete,
                 'missing_file_description_ids' => $setMissingFileIds,
                 'unexpected_file_description_ids' => $setUnexpectedFileIds,
                 'source_file_count' => count($setSources),
                 'source_file_bytes' => array_sum(array_column($setSources, 'file_length')),
                 'source_files' => array_values($setSources),
                 'input_file_slice_checksums' => $setIfsc,
+                'ifsc_slice_count_mismatch_count' => $ifscSliceCountMismatchesBySet[$setId] ?? 0,
                 'unique_recovery_slice_count' => count($recoveryExponentsBySet[$setId] ?? []),
                 'recovery_exponents' => array_map('intval', array_keys($recoveryExponentsBySet[$setId] ?? [])),
+                'recovery_exponents_observed' => array_map('intval', array_keys($recoveryExponentsObservedBySet[$setId] ?? [])),
+                'recovery_slice_conflict_count' => count($recoverySliceConflictsBySet[$setId] ?? []),
+                'recovery_slice_length_unvalidated_count' => $recoverySliceLengthsUnvalidatedBySet[$setId] ?? 0,
             ];
         }
         $singleSet = count($recoverySets) === 1 ? $recoverySets[0] : null;
@@ -239,7 +278,9 @@ final class Par2MetadataParser
         $missingFileDescriptionIds = $singleSet['missing_file_description_ids'] ?? [];
         $unexpectedFileDescriptionIds = $singleSet['unexpected_file_description_ids'] ?? [];
         $sourceBytes = array_sum(array_map(static fn (array $set): int => $set['source_file_bytes'], $recoverySets));
-        $recoveryCount = count($recoveryExponents);
+        $recoveryCount = $recoverySets === [] ? null : array_sum(array_column($recoverySets, 'unique_recovery_slice_count'));
+        $recoverySliceConflictCount = array_sum(array_map('count', $recoverySliceConflictsBySet));
+        $recoverySliceLengthUnvalidatedCount = array_sum($recoverySliceLengthsUnvalidatedBySet);
         $flatSources = array_reduce(
             $recoverySets,
             static fn (array $files, array $set): array => array_merge($files, $set['source_files']),
@@ -265,11 +306,14 @@ final class Par2MetadataParser
             'source_file_bytes' => $sourceBytes,
             'source_files' => $flatSources,
             'input_file_slice_checksums' => $inputFileSliceChecksums,
+            'ifsc_slice_count_mismatch_count' => array_sum($ifscSliceCountMismatchesBySet),
             'recovery_set_ids' => $recoverySetIds,
             'recovery_sets' => $recoverySets,
             'unique_recovery_slice_count' => $recoveryCount,
-            'recovery_exponents' => array_map('intval', array_keys($recoveryExponents)),
-            'recovery_to_source_percent' => is_int($sourceBlockCount) && $sourceBlockCount > 0 && $main !== null && $sourceInventoryComplete && $invalidPacketCount === 0
+            'recovery_exponents' => $singleSet === null ? null : $singleSet['recovery_exponents'],
+            'recovery_slice_conflict_count' => $recoverySliceConflictCount,
+            'recovery_slice_length_unvalidated_count' => $recoverySliceLengthUnvalidatedCount,
+            'recovery_to_source_percent' => is_int($recoveryCount) && is_int($sourceBlockCount) && $sourceBlockCount > 0 && $main !== null && $sourceInventoryComplete && $invalidPacketCount === 0
                 && ! ($packetCount >= $maximumPackets && $offset < $length) && ! $packedLayoutPresent
                 ? round($recoveryCount / $sourceBlockCount * 100, 3) : null,
             'packed_layout_present' => $packedLayoutPresent,
