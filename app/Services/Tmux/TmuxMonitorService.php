@@ -281,7 +281,11 @@ class TmuxMonitorService
             // rows claimed by active workers. `work_available` is the scheduler
             // gate, excluding fresh claims so tmux does not respawn duplicate
             // additional workers while a claimed batch is still running.
-            $additionalBacklog = AdditionalCandidateQuery::backlogCounts();
+            $sequential = (int) ($this->runVar['constants']['sequential'] ?? 0) === 2;
+            $additionalEnabled = $sequential || in_array((int) ($this->runVar['settings']['post'] ?? 0), [1, 3], true);
+            $additionalBacklog = $additionalEnabled
+                ? AdditionalCandidateQuery::backlogCounts(sequential: $sequential)
+                : ['total' => 0, 'available' => 0];
             $this->runVar['counts']['now']['work'] = $additionalBacklog['total'];
             $this->runVar['counts']['now']['work_available'] = $additionalBacklog['available'];
 
@@ -426,7 +430,7 @@ class TmuxMonitorService
         $this->runVar['counts']['percent'] = array_replace($this->defaultPercentValues(), $this->runVar['counts']['percent'] ?? []);
 
         // Calculate total work
-        $this->runVar['counts']['now']['total_work'] = 0;
+        $this->runVar['counts']['now']['total_work'] = (int) $this->runVar['counts']['now']['work'];
 
         foreach ($this->runVar['counts']['now'] as $key => $value) {
             if (str_starts_with($key, 'process')) {

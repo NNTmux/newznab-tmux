@@ -242,6 +242,7 @@ class BookProcessingRetryTest extends TestCase
 
     public function test_tmux_count_matches_ready_work_including_audiobooks_and_normalization(): void
     {
+        ConfigurationTestBuilder::update(ConfigurationDomain::Tmux, ['post_amazon_mode' => 1]);
         DB::table('releases')->insert([
             ['id' => 1, 'categories_id' => Category::BOOKS_EBOOK, 'bookinfo_id' => null, 'book_lookup_retry_at' => null, 'book_name_normalized_at' => now()],
             ['id' => 2, 'categories_id' => Category::MUSIC_AUDIOBOOK, 'bookinfo_id' => null, 'book_lookup_retry_at' => null, 'book_name_normalized_at' => now()],

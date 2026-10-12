@@ -240,10 +240,14 @@ final class AdditionalCandidateQuery
     /**
      * @return array{total: int, available: int}
      */
-    public static function backlogCounts(): array
+    public static function backlogCounts(bool $sequential = false): array
     {
         $query = self::baseBuilder(includeClaimed: true)
             ->selectRaw('COUNT(*) AS total_count');
+
+        if ($sequential) {
+            $query->whereRaw(self::sequentialGroupCondition());
+        }
 
         if (self::supportsClaims()) {
             $query->selectRaw(
@@ -261,6 +265,13 @@ final class AdditionalCandidateQuery
             'total' => (int) ($counts->total_count ?? 0),
             'available' => (int) ($counts->available_count ?? 0),
         ];
+    }
+
+    /** Groups selected by the stripped-mode update-per-group runner. */
+    public static function sequentialGroupCondition(): string
+    {
+        return 'EXISTS (SELECT 1 FROM usenet_groups sequential_group'
+            .' WHERE sequential_group.id = r.groups_id AND (sequential_group.active = 1 OR sequential_group.backfill = 1))';
     }
 
     /**

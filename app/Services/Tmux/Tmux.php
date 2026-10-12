@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace App\Services\Tmux;
 
 use App\Models\Category;
+use App\Services\AdditionalProcessing\AdditionalCandidateQuery;
 use App\Services\BookProcessingCandidateQuery;
 use App\Services\Configuration\ConfigurationProvider;
 use App\Services\Configuration\ProcessingRuntimeStateRepository;
-use App\Services\NameFixing\NameFixingService;
+use App\Services\NameFixing\NameFixingQueryService;
 use App\Services\NfoService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -280,60 +281,55 @@ class Tmux
 
         switch ((int) $qry) {
             case 1:
-                $movieLookupSql = imdb_id_needs_lookup_sql('imdbid');
-                $lookupMovies = (int) app(ConfigurationProvider::class)->metadata()->movieLookup->value;
-                $bookWorkSql = BookProcessingCandidateQuery::workCondition(
-                    (int) $this->configuration->metadata()->bookLookup->value
-                );
+                $metadata = $this->configuration->metadata();
+                $tmux = $this->configuration->tmux();
+                $postProcessing = $this->configuration->postProcessing();
+                $hasPostPanes = $tmux->sequentialMode !== 2;
+                $nonAmazonEnabled = $hasPostPanes && $tmux->postNonMode > 0;
+                $amazonEnabled = $tmux->postAmazonMode > 0;
 
-                if ($lookupMovies <= 0) {
-                    $movieLookupSql = '0 = 1';
-                } elseif ($lookupMovies === 2) {
-                    $movieLookupSql .= ' AND isrenamed = 1';
+                $conditions = [
+                    'processtv' => $this->readyLookupCondition(
+                        'categories_id BETWEEN '.Category::TV_ROOT.' AND '.Category::TV_OTHER.' AND categories_id != '.Category::TV_ANIME.' AND videos_id = 0 AND tv_episodes_id BETWEEN -3 AND 0 AND size > 1048576',
+                        $metadata->tvLookup->value, $nonAmazonEnabled,
+                    ),
+                    'processanime' => $this->readyLookupCondition(
+                        'categories_id = '.Category::TV_ANIME.' AND anidbid IS NULL',
+                        $metadata->animeLookup->value, $nonAmazonEnabled, renamedOnly: false,
+                    ),
+                    'processmovies' => $this->readyLookupCondition(
+                        'categories_id BETWEEN '.Category::MOVIE_ROOT.' AND '.Category::MOVIE_OTHER.' AND '.imdb_id_needs_lookup_sql('imdbid'),
+                        $metadata->movieLookup->value, $nonAmazonEnabled,
+                    ),
+                    'processmusic' => $this->readyLookupCondition(
+                        'categories_id IN ('.Category::MUSIC_MP3.', '.Category::MUSIC_LOSSLESS.', '.Category::MUSIC_OTHER.') AND musicinfo_id IS NULL',
+                        $metadata->musicLookup->value, $amazonEnabled,
+                    ),
+                    'processconsole' => $this->readyLookupCondition(
+                        'categories_id BETWEEN '.Category::GAME_ROOT.' AND '.Category::GAME_OTHER.' AND consoleinfo_id IS NULL',
+                        $metadata->gameLookup->value, $amazonEnabled,
+                    ),
+                    'processbooks' => $amazonEnabled ? BookProcessingCandidateQuery::workCondition($metadata->bookLookup->value) : '0 = 1',
+                    'processgames' => $this->readyLookupCondition(
+                        'categories_id = '.Category::PC_GAMES.' AND gamesinfo_id = 0',
+                        $metadata->gameLookup->value, $amazonEnabled,
+                    ),
+                    'processnfo' => ! $hasPostPanes
+                        ? '1=1 '.NfoService::NfoQueryString().' AND '.AdditionalCandidateQuery::sequentialGroupCondition()
+                        : (in_array($tmux->postMode, [2, 3], true) && $postProcessing->lookupNfo
+                            ? '1=1 '.NfoService::NfoQueryString() : '0 = 1'),
+                    'processrenames' => $tmux->fixNamesEnabled ? NameFixingQueryService::pendingWorkCondition() : '0 = 1',
+                    'renamed' => 'isrenamed = 1',
+                    'nfo' => 'nfostatus = 1',
+                    'predb_matched' => 'predb_id > 0',
+                ];
+                $aggregates = [];
+                foreach ($conditions as $name => $condition) {
+                    $aggregates[] = 'COALESCE(SUM(CASE WHEN '.$condition.' THEN 1 ELSE 0 END), 0) AS '.$name;
                 }
+                $aggregates[] = 'COUNT(DISTINCT(predb_id)) AS distinct_predb_matched';
 
-                return sprintf(
-                    '
-					SELECT
-					SUM(IF(categories_id BETWEEN %d AND %d AND categories_id != %d AND videos_id = 0 AND tv_episodes_id BETWEEN -3 AND 0 AND size > 1048576,1,0)) AS processtv,
-					SUM(IF(categories_id = %d AND anidbid IS NULL,1,0)) AS processanime,
-                      SUM(IF(categories_id BETWEEN %d AND %d AND '.$movieLookupSql.',1,0)) AS processmovies,
-					SUM(IF(categories_id IN (%d, %d, %d) AND musicinfo_id IS NULL,1,0)) AS processmusic,
-					SUM(IF(categories_id BETWEEN %d AND %d AND consoleinfo_id IS NULL,1,0)) AS processconsole,
-					SUM(IF(%s,1,0)) AS processbooks,
-					SUM(IF(categories_id = %d AND gamesinfo_id = 0,1,0)) AS processgames,
-					SUM(IF(1=1 %s,1,0)) AS processnfo,
-					SUM(IF(isrenamed = %d AND predb_id = 0 AND passwordstatus >= 0 AND nfostatus > %d
-						AND ((nfostatus = %d AND proc_nfo = %d) OR proc_files = %d OR proc_par2 = %d) AND categories_id IN (%s),1,0)) AS processrenames,
-					SUM(IF(isrenamed = %d,1,0)) AS renamed,
-          SUM(IF(nfostatus = %d,1,0)) AS nfo,
-					SUM(IF(predb_id > 0,1,0)) AS predb_matched,
-					COUNT(DISTINCT(predb_id)) AS distinct_predb_matched
-					FROM releases r',
-                    Category::TV_ROOT,
-                    Category::TV_OTHER,
-                    Category::TV_ANIME,
-                    Category::TV_ANIME,
-                    Category::MOVIE_ROOT,
-                    Category::MOVIE_OTHER,
-                    Category::MUSIC_MP3,
-                    Category::MUSIC_LOSSLESS,
-                    Category::MUSIC_OTHER,
-                    Category::GAME_ROOT,
-                    Category::GAME_OTHER,
-                    $bookWorkSql,
-                    Category::PC_GAMES,
-                    NfoService::NfoQueryString(),
-                    NameFixingService::IS_RENAMED_NONE,
-                    NfoService::NFO_UNPROC,
-                    NfoService::NFO_FOUND,
-                    NameFixingService::PROC_NFO_NONE,
-                    NameFixingService::PROC_FILES_NONE,
-                    NameFixingService::PROC_PAR2_NONE,
-                    Category::getCategoryOthersGroup(),
-                    NameFixingService::IS_RENAMED_DONE,
-                    NfoService::NFO_FOUND
-                );
+                return "SELECT\n".implode(",\n", $aggregates).' FROM releases r';
 
             case 2:
                 // NOTE: the "Misc In Process" / `work` count was previously computed here
@@ -376,6 +372,15 @@ class Tmux
             default:
                 return false;
         }
+    }
+
+    private function readyLookupCondition(string $condition, int $lookupMode, bool $enabled, bool $renamedOnly = true): string
+    {
+        if (! $enabled || $lookupMode <= 0) {
+            return '0 = 1';
+        }
+
+        return $condition.($renamedOnly && $lookupMode === 2 ? ' AND isrenamed = 1' : '');
     }
 
     /**

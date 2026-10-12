@@ -59,7 +59,7 @@ final class NameFixingQueryService
         self::SOURCE_CRC => "EXISTS (SELECT 1 FROM release_files source_crc WHERE source_crc.releases_id = r.id AND source_crc.crc32 IS NOT NULL AND source_crc.crc32 != '')",
         self::SOURCE_UID => "EXISTS (SELECT 1 FROM media_infos source_media WHERE source_media.releases_id = r.id AND source_media.unique_id IS NOT NULL AND source_media.unique_id != '')",
         self::SOURCE_HASH => "EXISTS (SELECT 1 FROM par_hashes source_hash WHERE source_hash.releases_id = r.id AND source_hash.hash != '')",
-        self::SOURCE_PAR2 => '1 = 1',
+        self::SOURCE_PAR2 => 'r.nzbstatus = 1',
         self::SOURCE_XXX => "EXISTS (SELECT 1 FROM release_files source_xxx WHERE source_xxx.releases_id = r.id AND source_xxx.name LIKE '%SDPORN%')",
         self::SOURCE_MEDIA_MOVIE => "EXISTS (SELECT 1 FROM media_infos source_movie WHERE source_movie.releases_id = r.id AND source_movie.movie_name IS NOT NULL AND source_movie.movie_name != '')",
     ];
@@ -67,6 +67,29 @@ final class NameFixingQueryService
     public function __construct(?ConnectionInterface $database = null)
     {
         $this->database = $database ?? DB::connection();
+    }
+
+    /** Pending sources inspected by the scheduled fix-names passes, counted once per release. */
+    public static function pendingWorkCondition(): string
+    {
+        $sources = [];
+        foreach (self::STATUS_COLUMNS as $source => $column) {
+            $sources[] = '(r.'.$column.' = 0 AND ('.self::SOURCE_EXISTS[$source].'))';
+        }
+
+        $condition = 'r.predb_id = 0 AND (r.isrenamed = 0 OR r.categories_id IN ('
+            .Category::OTHER_MISC.', '.Category::OTHER_HASHED.'))'
+            .' AND r.categories_id IN ('.implode(',', Category::OTHERS_GROUP).')'
+            .' AND ('.implode(' OR ', $sources).')';
+
+        if (! (bool) config('tmux.fix_names.full_backlog', true)) {
+            $cutoff = DB::getDriverName() === 'sqlite'
+                ? "datetime(CURRENT_TIMESTAMP, '-6 hours')"
+                : 'CURRENT_TIMESTAMP - INTERVAL 6 HOUR';
+            $condition .= ' AND r.adddate > '.$cutoff;
+        }
+
+        return $condition;
     }
 
     /**
