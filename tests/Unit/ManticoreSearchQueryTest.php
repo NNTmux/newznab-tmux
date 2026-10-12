@@ -131,6 +131,17 @@ class ManticoreSearchQueryTest extends TestCase
     }
 
     #[Test]
+    public function it_treats_poster_search_values_as_literals(): void
+    {
+        $reflection = new ReflectionClass(ManticoreSearchDriver::class);
+        $method = $reflection->getMethod('prepareReleaseFieldSearchQuery');
+
+        $this->assertSame('\\-VIP\\- <poster\\@example.test>', $method->invoke(null, 'fromname', '-VIP- <poster@example.test>'));
+        $this->assertSame('\\!poster', $method->invoke(null, 'fromname', '!poster'));
+        $this->assertSame('-VIP\\-', $method->invoke(null, 'searchname', '-VIP-'));
+    }
+
+    #[Test]
     public function it_scopes_multi_word_queries_to_the_requested_field(): void
     {
         $reflection = new ReflectionClass(ManticoreSearchDriver::class);

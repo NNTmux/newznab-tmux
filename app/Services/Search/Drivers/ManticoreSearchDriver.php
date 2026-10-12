@@ -732,6 +732,23 @@ class ManticoreSearchDriver implements SearchDriverInterface
         return trim($string);
     }
 
+    private static function prepareReleaseFieldSearchQuery(string $field, string $query): string
+    {
+        if ($field !== 'fromname') {
+            return self::prepareUserSearchQuery($query);
+        }
+
+        $query = trim($query);
+        if ($query === '' || $query === '*') {
+            return '';
+        }
+
+        $escapeFrom = ['\\', '@', '~', '&', '/', '$', '=', "'", '[', ']', '"', '!', '-'];
+        $escapeTo = ['\\\\', '\\@', '\\~', '\\&', '\\/', '\\$', '\\=', "\\'", '\\[', '\\]', '\\"', '\\!', '\\-'];
+
+        return str_replace($escapeFrom, $escapeTo, $query);
+    }
+
     /**
      * Prepares a user search query for ManticoreSearch, preserving search operators.
      *
@@ -2724,9 +2741,10 @@ class ManticoreSearchDriver implements SearchDriverInterface
                         if (! is_string($key) || ! in_array($key, self::RELEASE_FIELD_SEARCH_FIELDS, true) || $value === '' || $value === null) {
                             continue;
                         }
-                        $prepared = self::prepareUserSearchQuery((string) $value);
+                        $rawValue = (string) $value;
+                        $prepared = self::prepareReleaseFieldSearchQuery($key, $rawValue);
                         if ($prepared !== '') {
-                            $terms[] = '@@relaxed '.self::scopeReleaseSearchQuery((string) $value, $prepared, '@'.$key);
+                            $terms[] = '@@relaxed '.self::scopeReleaseSearchQuery($rawValue, $prepared, '@'.$key);
                         }
                     }
                     if ($terms === []) {
