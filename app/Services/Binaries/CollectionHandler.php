@@ -659,7 +659,8 @@ final class CollectionHandler
             sort($collectionIds);
             $statusPlaceholders = implode(',', array_fill(0, \count($inProgressStatuses), '?'));
             foreach (array_chunk($collectionIds, $chunkSize) as $chunk) {
-                DB::table('collections')->whereIn('id', $chunk)->orderBy('id')->lockForUpdate()->pluck('id');
+                // A covering secondary scan can lock tentative duplicate inserts outside this ID set.
+                DB::table('collections')->forceIndex('PRIMARY')->whereIn('id', $chunk)->orderBy('id')->lockForUpdate()->pluck('id');
                 $aggregates = DB::table('binaries')
                     ->whereIn('collections_id', $chunk)
                     ->groupBy('collections_id')
