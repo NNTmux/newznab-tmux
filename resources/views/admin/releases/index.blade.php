@@ -114,14 +114,7 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ $release->id }}</td>
                         <td class="px-6 py-4 text-sm">
-                            <div class="text-gray-900 dark:text-gray-100 font-medium max-w-md wrap-break-word break-all" title="{{ $release->searchname }}">
-                                {{ $release->searchname }}
-                            </div>
-                            @if($release->name && $release->name !== $release->searchname)
-                                <div class="text-gray-500 dark:text-gray-400 text-xs mt-1 max-w-md truncate" title="{{ $release->name }}">
-                                    {{ $release->name }}
-                                </div>
-                            @endif
+                            <x-admin.release-name :release="$release" />
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300">
