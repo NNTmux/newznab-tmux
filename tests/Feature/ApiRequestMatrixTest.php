@@ -1685,6 +1685,14 @@ class ApiRequestMatrixTest extends TestCase
             $table->unsignedInteger('updated_by')->nullable();
             $table->timestamps();
         });
+
+        Schema::create('content', function (Blueprint $table): void {
+            $table->increments('id');
+            $table->integer('contenttype');
+            $table->integer('status');
+            $table->integer('ordinal')->nullable();
+            $table->integer('role')->default(0);
+        });
     }
 
     private function findStagedFile(string $filename): ?string
