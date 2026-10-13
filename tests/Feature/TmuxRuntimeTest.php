@@ -180,8 +180,9 @@ class TmuxRuntimeTest extends TestCase
         $this->assertFalse($panes->respawnPane($id, [PHP_BINARY, '-r', 'exit(0);']));
         $this->await(function () use ($panes, $id, $marker): bool {
             $panes->refresh();
+            $pane = $panes->paneSnapshot()[$id];
 
-            return $panes->paneSnapshot()[$id]['dead'] && file_get_contents($marker) === 'finished';
+            return $pane['dead'] && $pane['exit_code'] !== null && file_get_contents($marker) === 'finished';
         });
         $this->assertSame(0, $panes->paneSnapshot()[$id]['exit_code']);
     }
