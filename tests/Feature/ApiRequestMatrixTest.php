@@ -1535,6 +1535,7 @@ class ApiRequestMatrixTest extends TestCase
             $table->string('api_token')->nullable()->index();
             $table->string('host')->nullable();
             $table->timestamp('apiaccess')->nullable();
+            $table->timestamp('lastlogin')->nullable();
             $table->boolean('verified')->default(true);
             $table->timestamp('email_verified_at')->nullable();
             $table->integer('rate_limit')->default(60);
