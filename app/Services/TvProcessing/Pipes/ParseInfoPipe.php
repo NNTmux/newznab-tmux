@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\TvProcessing\Pipes;
 
+use App\Services\TvProcessing\ParsedTvRelease;
 use App\Services\TvProcessing\Providers\LocalDbProvider;
 use App\Services\TvProcessing\TvProcessingPassable;
 use App\Services\TvProcessing\TvProcessingResult;
@@ -17,64 +18,38 @@ class ParseInfoPipe extends AbstractTvProviderPipe
 {
     protected int $priority = 1;
 
-    private ?LocalDbProvider $localDb = null;
+    public function __construct(private ?LocalDbProvider $parser = null) {}
 
     public function getName(): string
     {
         return 'ParseInfo';
     }
 
-    public function getStatusCode(): int
-    {
-        return 0;
-    }
-
-    /**
-     * Get or create the LocalDB instance for parsing.
-     */
-    private function getLocalDb(): LocalDbProvider
-    {
-        if ($this->localDb === null) {
-            $this->localDb = new LocalDbProvider;
-        }
-
-        return $this->localDb;
-    }
-
-    /**
-     * Override handle to perform parsing before the standard processing flow.
-     */
     public function handle(TvProcessingPassable $passable, Closure $next): TvProcessingPassable
     {
-        $parsedInfo = $this->getLocalDb()->parseInfo($passable->context->searchName);
+        $this->parser ??= new LocalDbProvider;
+        $parsed = ParsedTvRelease::fromParseInfo($this->parser->parseInfo($passable->context->searchName));
 
-        if ($parsedInfo === false || empty($parsedInfo['name'])) {
-            // Mark as parse failed
-            $passable->setParsedInfo(null);
-            $passable->updateResult(
-                TvProcessingResult::parseFailed(['search_name' => $passable->context->searchName]),
-                $this->getName()
-            );
+        if ($parsed === null) {
+            $passable->markParseFailed();
+            $passable->recordProviderResult($this->getName(), TvProcessingResult::parseFailed());
 
             if ($this->echoOutput) {
-                cli()->error(sprintf(
-                    '  ✗ Parse failed: %s',
-                    mb_substr($passable->context->searchName, 0, 50)
-                ));
+                cli()->error(sprintf('  ✗ Parse failed: %s', mb_substr($passable->context->searchName, 0, 50)));
             }
 
-            // Don't continue to other pipes - can't process without parsed info
+            // Nothing else can work without parsed info.
             return $passable;
         }
 
-        $passable->setParsedInfo($parsedInfo);
+        $passable->setParsed($parsed);
 
         return $next($passable);
     }
 
     protected function process(TvProcessingPassable $passable): TvProcessingResult
     {
-        // Not used - we override handle() instead
+        // Not used - handle() does the parsing.
         return TvProcessingResult::pending();
     }
 }

@@ -4,500 +4,201 @@ declare(strict_types=1);
 
 namespace App\Services\TvProcessing\Providers;
 
-use App\Enums\ImageAssetProfile;
-use App\Services\FanartTvService;
-use App\Services\ReleaseImageService;
-use App\Services\TmdbClient;
-use App\Services\TraktService;
+use App\Exceptions\TvProviderException;
 use App\Support\MetadataSources;
-use CanIHaveSomeCoffee\TheTVDbAPI\Exception\ParseException;
 use CanIHaveSomeCoffee\TheTVDbAPI\Exception\ResourceNotFoundException;
 use CanIHaveSomeCoffee\TheTVDbAPI\Exception\UnauthorizedException;
+use CanIHaveSomeCoffee\TheTVDbAPI\Model\SeriesExtendedRecord;
 use CanIHaveSomeCoffee\TheTVDbAPI\TheTVDbAPI;
-use Symfony\Component\Serializer\Exception\ExceptionInterface;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Support\Facades\Log;
 
 /**
- * Class TvdbProvider -- functions used to post process releases against TVDB.
+ * Class TvdbProvider -- functions used to post process releases against TVDB (API v4).
  */
 class TvdbProvider extends AbstractTvProvider
 {
-    private const MATCH_PROBABILITY = 75;
-
     public TheTVDbAPI $client;
 
     /**
-     * @var string Authorization token for TVDB v2 API
+     * @var string Authorization token for the TVDB API
      */
     public string $token = '';
 
-    /**
-     * @string URL for show poster art
-     */
-    public string $posterUrl = '';
+    /** True when TVDB is unconfigured or rejected our credentials. */
+    private bool $local = false;
+
+    private bool $authorized = false;
 
     /**
-     * @bool Do a local lookup only if server is down
+     * One client per process: the library's RouteFactory caches its route objects
+     * statically, so every route keeps using the first TheTVDbAPI instance it saw.
      */
-    private bool $local;
+    private static ?TheTVDbAPI $sharedClient = null;
 
-    private FanartTvService $fanart;
-
-    private mixed $fanartapikey;
-
-    /**
-     * TvdbProvider constructor.
-     *
-     * @throws \Exception
-     */
-    public function __construct()
+    public function __construct(?TheTVDbAPI $client = null)
     {
         parent::__construct();
-        $this->client = new TheTVDbAPI;
-        $this->local = false;
-        $this->authorizeTvdb();
-
-        $this->fanartapikey = config('nntmux_api.fanarttv_api_key');
-        $this->fanart = new FanartTvService($this->fanartapikey);
+        $this->client = $client ?? self::$sharedClient ??= new TheTVDbAPI('eng', '', new Client([
+            'base_uri' => TheTVDbAPI::API_BASE_URI,
+            'timeout' => (int) config('tvdb.timeout', 30),
+            'connect_timeout' => 10,
+            'headers' => ['accept' => 'application/json'],
+        ]));
+        $this->local = ! MetadataSources::isAvailable(MetadataSources::TVDB);
     }
 
     /**
-     * Main processing director function for scrapers
-     * Calls work query function and initiates processing.
+     * @return array<string, mixed>|false
      */
-    public function processSite(mixed $groupID, mixed $guidChar, mixed $process, bool $local = false): void
+    public function getShowInfo(string $name, ?int $year = null, string $country = ''): array|false
     {
-        $res = $this->getTvReleases($groupID, $guidChar, $process, parent::PROCESS_TVDB);
+        $name = (string) preg_replace('# \((19|20)\d{2}\)$#', '', $name);
 
-        $tvCount = \count($res);
-
-        if ($tvCount === 0) {
-            return;
+        $response = $year !== null
+            ? $this->call(fn (TheTVDbAPI $client) => $client->search()->search($name, ['type' => 'series', 'year' => $year]))
+            : null;
+        if (empty($response)) {
+            $response = $this->call(fn (TheTVDbAPI $client) => $client->search()->search($name, ['type' => 'series']));
         }
 
-        $this->titleCache = [];
-        $processed = 0;
-        $matched = 0;
-        $skipped = 0;
+        if (! \is_array($response)) {
+            return false;
+        }
 
-        foreach ($res as $row) {
-            $processed++;
-            $siteId = false;
-            $this->posterUrl = '';
+        $highestScore = 0.0;
+        $highest = null;
+        foreach ($response as $show) {
+            if (! $this->checkRequiredAttr($show, 'tvdbS')) {
+                continue;
+            }
 
-            $release = $this->parseInfo($row['searchname']);
-            if (\is_array($release) && $release['name'] !== '') {
-                if (\in_array($release['cleanname'], $this->titleCache, false)) {
-                    if ($this->echooutput) {
-                        cli()->primaryOver('    → ');
-                        cli()->alternateOver($this->truncateTitle($release['cleanname']));
-                        cli()->primaryOver(' → ');
-                        cli()->alternate('Skipped (previously failed)');
-                    }
-                    $this->setVideoNotFound(parent::PROCESS_TVMAZE, $row['id']);
-                    $skipped++;
-
-                    continue;
+            $names = [(string) $show->name];
+            foreach (\is_array($show->aliases ?? null) ? $show->aliases : [] as $alias) {
+                if (\is_string($alias) && $alias !== '') {
+                    $names[] = $alias;
                 }
+            }
 
-                $videoId = $this->getByTitle($release['cleanname'], parent::TYPE_TV);
-
-                if ($videoId !== 0) {
-                    $siteId = $this->getSiteByID('tvdb', (int) $videoId);
-                }
-
-                $lookupSetting = true;
-                if ($local === true || $this->local) {
-                    $lookupSetting = false;
-                }
-
-                if ($siteId === false && $lookupSetting) {
-                    if ($this->echooutput) {
-                        cli()->primaryOver('    → ');
-                        cli()->headerOver($this->truncateTitle($release['cleanname']));
-                        cli()->primaryOver(' → ');
-                        cli()->info('Searching TVDB...');
-                    }
-
-                    $country = (
-                        isset($release['country']) && \strlen($release['country']) === 2
-                            ? (string) $release['country']
-                            : ''
-                    );
-
-                    $tvdbShow = $this->getShowInfo((string) $release['cleanname']);
-
-                    if (\is_array($tvdbShow)) {
-                        $tvdbShow['country'] = $country;
-                        $videoId = $this->add($tvdbShow);
-                        $siteId = (int) $tvdbShow['tvdb'];
-                    }
-                } elseif ($this->echooutput && $siteId !== false) {
-                    cli()->primaryOver('    → ');
-                    cli()->headerOver($this->truncateTitle($release['cleanname']));
-                    cli()->primaryOver(' → ');
-                    cli()->info('Found in DB');
-                }
-
-                if ((int) $videoId > 0 && (int) $siteId > 0) {
-                    if (! empty($tvdbShow['poster'])) {
-                        $this->getPoster($videoId);
-                    } elseif ($this->fanart->isConfigured()) {
-                        $posterUrl = $this->fanart->getBestTvPoster($siteId);
-                        if (! empty($posterUrl)) {
-                            $this->posterUrl = $posterUrl;
-                            $this->getPoster($videoId);
-                        }
-                    }
-
-                    $seriesNo = (! empty($release['season']) ? preg_replace('/^S0*/i', '', (string) $release['season']) : '');
-                    $episodeNo = (! empty($release['episode']) ? preg_replace('/^E0*/i', '', (string) $release['episode']) : '');
-                    $hasAirdate = ! empty($release['airdate']);
-
-                    if ($episodeNo === 'all') {
-                        $this->setVideoIdFound($videoId, $row['id'], 0);
-                        if ($this->echooutput) {
-                            cli()->primaryOver('    → ');
-                            cli()->headerOver($this->truncateTitle($release['cleanname']));
-                            cli()->primaryOver(' → ');
-                            cli()->primary('Full Season matched');
-                        }
-                        $matched++;
-
-                        continue;
-                    }
-
-                    if (! $this->countEpsByVideoID($videoId)) {
-                        $this->getEpisodeInfo($siteId, -1, -1, $videoId);
-                    }
-
-                    $episode = $this->getBySeasonEp($videoId, $seriesNo, $episodeNo, $release['airdate']);
-
-                    if ($episode === false && $lookupSetting) {
-                        if ($seriesNo !== '' && $episodeNo !== '') {
-                            $tvdbEpisode = $this->getEpisodeInfo($siteId, (int) $seriesNo, (int) $episodeNo, $videoId);
-                            if ($tvdbEpisode) {
-                                $episode = $this->addEpisode($videoId, $tvdbEpisode);
-                            }
-                        }
-
-                        if ($episode === false && $hasAirdate) {
-                            $this->getEpisodeInfo($siteId, -1, -1, $videoId);
-                            $episode = $this->getBySeasonEp($videoId, 0, 0, $release['airdate']);
-                        }
-                    }
-
-                    if ($episode !== false && is_numeric($episode) && $episode > 0) {
-                        $this->setVideoIdFound($videoId, $row['id'], $episode);
-                        if ($this->echooutput) {
-                            cli()->primaryOver('    → ');
-                            cli()->headerOver($this->truncateTitle($release['cleanname']));
-                            if ($seriesNo !== '' && $episodeNo !== '') {
-                                cli()->primaryOver(' S');
-                                cli()->warningOver(sprintf('%02d', $seriesNo));
-                                cli()->primaryOver('E');
-                                cli()->warningOver(sprintf('%02d', $episodeNo));
-                            } elseif ($hasAirdate) {
-                                cli()->primaryOver(' | ');
-                                cli()->warningOver($release['airdate']);
-                            }
-                            cli()->primaryOver(' ✓ ');
-                            cli()->primary('MATCHED (TVDB)');
-                        }
-                        $matched++;
-                    } else {
-                        $this->setVideoIdFound($videoId, $row['id'], 0);
-                        $this->setVideoNotFound(parent::PROCESS_TVMAZE, $row['id']);
-                        if ($this->echooutput) {
-                            cli()->primaryOver('    → ');
-                            cli()->alternateOver($this->truncateTitle($release['cleanname']));
-                            if ($hasAirdate) {
-                                cli()->primaryOver(' | ');
-                                cli()->warningOver($release['airdate']);
-                            }
-                            cli()->primaryOver(' → ');
-                            cli()->warning('Episode not found');
-                        }
-                    }
-                } else {
-                    $this->setVideoNotFound(parent::PROCESS_TVMAZE, $row['id']);
-                    $this->titleCache[] = $release['cleanname'] ?? null;
-                    if ($this->echooutput) {
-                        cli()->primaryOver('    → ');
-                        cli()->alternateOver($this->truncateTitle($release['cleanname']));
-                        cli()->primaryOver(' → ');
-                        cli()->warning('Not found');
-                    }
-                }
-            } else {
-                $this->setVideoNotFound(parent::FAILED_PARSE, $row['id']);
-                $this->titleCache[] = $release['cleanname'] ?? null;
-                if ($this->echooutput) {
-                    cli()->error(sprintf(
-                        '  ✗ [%d/%d] Parse failed: %s',
-                        $processed,
-                        $tvCount,
-                        mb_substr($row['searchname'], 0, 50)
-                    ));
+            foreach ($names as $candidateName) {
+                $score = $this->scoreCandidate($name, $year, $candidateName, $show->first_air_time ?? ($show->year ?? null), $country, (string) ($show->country ?? ''));
+                if ($score > $highestScore) {
+                    $highestScore = $score;
+                    $highest = $show;
                 }
             }
         }
 
-        if ($this->echooutput && $matched > 0) {
-            echo "\n";
-            cli()->primaryOver('  ✓ TVDB: ');
-            cli()->primary(sprintf('%d matched, %d skipped', $matched, $skipped));
-        }
+        return $highest !== null ? $this->formatShowInfo($highest) : false;
     }
 
-    public function getBanner(mixed $videoID, mixed $siteId): bool
+    public function fetchAllEpisodes(int $siteId, int $videoId): int
     {
+        if ($siteId <= 0 || $videoId <= 0) {
+            return 0;
+        }
+
+        $episodes = $this->call(fn (TheTVDbAPI $client) => $client->series()->allEpisodes($siteId));
+        if (! \is_array($episodes)) {
+            return 0;
+        }
+
+        $formatted = [];
+        foreach ($episodes as $episode) {
+            if ($this->checkRequiredAttr($episode, 'tvdbE')) {
+                $formatted[] = $this->formatEpisodeInfo($episode);
+            }
+        }
+
+        return $this->addEpisodes($videoId, $formatted);
+    }
+
+    public function supportsAirdateLookup(): bool
+    {
+        return true;
+    }
+
+    public function fetchEpisodesByAirdate(int $siteId, int $videoId, string $airdate): int
+    {
+        $date = \DateTime::createFromFormat('!Y-m-d', $airdate);
+        if ($siteId <= 0 || $videoId <= 0 || $date === false) {
+            return 0;
+        }
+
+        $episodes = $this->call(fn (TheTVDbAPI $client) => $client->series()->episodes($siteId, 0, 0, 'default', '', -1, $date));
+        if (! \is_array($episodes)) {
+            return 0;
+        }
+
+        $formatted = [];
+        foreach ($episodes as $episode) {
+            if ($this->checkRequiredAttr($episode, 'tvdbE')) {
+                $formatted[] = $this->formatEpisodeInfo($episode);
+            }
+        }
+
+        return $this->addEpisodes($videoId, $formatted);
+    }
+
+    /**
+     * @return array<string, mixed>|false
+     */
+    public function fetchEpisode(int $siteId, int $season, int $episode, int $videoId = 0): array|false
+    {
+        if ($siteId <= 0 || $season < 0 || $episode <= 0) {
+            return false;
+        }
+
+        $episodes = $this->call(fn (TheTVDbAPI $client) => $client->series()->episodes($siteId, $season, 0, 'default', '', $episode));
+        foreach (\is_array($episodes) ? $episodes : [] as $record) {
+            if ($this->checkRequiredAttr($record, 'tvdbE') && (int) $record->seasonNumber === $season && (int) $record->number === $episode) {
+                return $this->formatEpisodeInfo($record);
+            }
+        }
+
         return false;
     }
 
     /**
      * @return array<string, mixed>
-     *
-     * @throws UnauthorizedException
-     * @throws ParseException
-     * @throws ExceptionInterface
-     */
-    public function getShowInfo(string $name): bool|array
-    {
-        $return = $response = false;
-        $highestMatch = 0;
-        try {
-            $response = $this->client->search()->search($name, ['type' => 'series']);
-        } catch (ResourceNotFoundException $e) {
-            $response = false;
-            cli()->error('Show not found on TVDB');
-        } catch (UnauthorizedException $e) {
-            try {
-                $this->authorizeTvdb();
-            } catch (UnauthorizedException $error) {
-                cli()->error('Not authorized to access TVDB');
-            }
-        }
-
-        sleep(1);
-
-        if (\is_array($response)) {
-            foreach ($response as $show) {
-                if ($this->checkRequiredAttr($show, 'tvdbS')) {
-                    if (strtolower($show->name) === strtolower($name)) {
-                        $highest = $show;
-                        break;
-                    }
-
-                    $matchPercent = $this->checkMatch(strtolower($show->name), strtolower($name), self::MATCH_PROBABILITY);
-
-                    if ($matchPercent > $highestMatch) {
-                        $highestMatch = $matchPercent;
-                        $highest = $show;
-                    }
-
-                    if (! empty($show->aliases)) {
-                        foreach ($show->aliases as $akaIndex => $akaName) {
-                            $aliasPercent = $this->checkMatch(strtolower($akaName), strtolower($name), self::MATCH_PROBABILITY);
-                            if ($aliasPercent > $highestMatch) {
-                                $highestMatch = $aliasPercent;
-                                $highest = $show;
-                            }
-                        }
-                    }
-                }
-            }
-            if (! empty($highest)) {
-                $return = $this->formatShowInfo($highest);
-            }
-        }
-
-        return $return;
-    }
-
-    public function getPoster(int $videoId): int
-    {
-        $ri = new ReleaseImageService;
-        $hasCover = 0;
-
-        if (! empty($this->posterUrl)) {
-            $hasCover = (int) $ri->saveRemoteImage(
-                (string) $videoId,
-                $this->posterUrl,
-                $this->imgSavePath,
-                ImageAssetProfile::Original,
-            )->success;
-            if ($hasCover === 1) {
-                $this->setCoverFound($videoId);
-            }
-        }
-
-        return $hasCover;
-    }
-
-    /**
-     * @return array<string, mixed>
-     *
-     * @throws ParseException
-     * @throws UnauthorizedException
-     * @throws ExceptionInterface
-     */
-    public function getEpisodeInfo(int|string $siteId, int|string $series, int|string $episode, int $videoId = 0): bool|array
-    {
-        $return = $response = false;
-
-        if (! $this->local) {
-            if ($videoId > 0) {
-                try {
-                    $response = $this->client->series()->allEpisodes($siteId);
-                } catch (ResourceNotFoundException $error) {
-                    return false;
-                } catch (UnauthorizedException $error) {
-                    try {
-                        $this->authorizeTvdb();
-                    } catch (UnauthorizedException $error) {
-                        cli()->error('Not authorized to access TVDB');
-                    }
-                }
-            } else {
-                try {
-                    foreach ($this->client->series()->episodes($siteId) as $episodeBaseRecord) {
-                        if ($episodeBaseRecord->seasonNumber === $series && $episodeBaseRecord->number === $episode) {
-                            $response = $episodeBaseRecord;
-                        }
-                    }
-                } catch (ResourceNotFoundException $error) {
-                    return false;
-                }
-            }
-
-            sleep(1);
-
-            if (\is_object($response)) {
-                if ($this->checkRequiredAttr($response, 'tvdbE')) {
-                    $return = $this->formatEpisodeInfo($response);
-                }
-            } elseif ($videoId > 0 && \is_array($response)) {
-                foreach ($response as $singleEpisode) {
-                    if ($this->checkRequiredAttr($singleEpisode, 'tvdbE')) {
-                        $this->addEpisode($videoId, $this->formatEpisodeInfo($singleEpisode));
-                    }
-                }
-            }
-        }
-
-        return $return;
-    }
-
-    /**
-     * @return array<string, mixed>
-     *
-     * @throws ExceptionInterface
-     * @throws ParseException
      */
     public function formatShowInfo(mixed $show): array
     {
-        try {
-            $poster = $this->client->series()->artworks((int) $show->tvdb_id);
-            $poster = collect($poster)->where('type', 2)->sortByDesc('score')->first();
-            $this->posterUrl = ! empty($poster->image) ? $poster->image : '';
-        } catch (ResourceNotFoundException $e) {
-            cli()->error('Poster image not found on TVDB');
-        } catch (UnauthorizedException $error) {
-            try {
-                $this->authorizeTvdb();
-            } catch (UnauthorizedException $error) {
-                cli()->error('Not authorized to access TVDB');
-            }
-        }
+        $this->posterUrl = '';
+        $tvdbId = (int) $show->tvdb_id;
+
+        $artworks = $this->callQuietly(fn (TheTVDbAPI $client) => $client->series()->artworks($tvdbId));
+        $poster = collect(\is_array($artworks) ? $artworks : [])->where('type', 2)->sortByDesc('score')->first();
+        $this->posterUrl = ! empty($poster->image) ? (string) $poster->image : '';
 
         $imdbId = '';
-        $imdbIdObj = null;
-        try {
-            $imdbIdObj = $this->client->series()->extended((int) $show->tvdb_id);
-            preg_match('/tt(?P<imdbid>\d{6,})$/i', (string) ($imdbIdObj->getIMDBId() ?? ''), $imdb);
+        $extended = $this->callQuietly(fn (TheTVDbAPI $client) => $client->series()->extended($tvdbId));
+        if (\is_object($extended)) {
+            preg_match('/tt(?P<imdbid>\d{6,})$/i', (string) ($extended->getIMDBId() ?? ''), $imdb);
             $imdbId = (string) ($imdb['imdbid'] ?? '');
-        } catch (ResourceNotFoundException $e) {
-            cli()->error('Show ImdbId not found on TVDB');
-        } catch (\Exception) {
-            cli()->error('Error on TVDB, aborting');
         }
 
-        // Look up TMDB and Trakt IDs using available external IDs
-        $externalIds = $this->lookupExternalIds((int) $show->tvdb_id, $imdbId);
+        $externalIds = $this->lookupExternalIds($tvdbId, $imdbId);
 
         return [
             'type' => parent::TYPE_TV,
-            'title' => $show->name,
-            'summary' => $show->overview,
-            'started' => $show->first_air_time,
-            'publisher' => $imdbIdObj->originalNetwork->name ?? '',
+            'title' => (string) $show->name,
+            'summary' => (string) ($show->overview ?? ''),
+            'started' => (string) ($show->first_air_time ?? ''),
+            'publisher' => \is_object($extended) ? (string) ($extended->originalNetwork->name ?? '') : '',
+            'country' => (string) ($show->country ?? ''),
             'poster' => $this->posterUrl,
             'source' => parent::SOURCE_TVDB,
             'imdb' => $imdbId,
-            'tvdb' => $show->tvdb_id,
+            'tvdb' => $tvdbId,
             'trakt' => $externalIds['trakt'],
             'tvrage' => 0,
             'tvmaze' => 0,
             'tmdb' => $externalIds['tmdb'],
             'aliases' => ! empty($show->aliases) ? $show->aliases : '',
-            'localzone' => "''",
+            'localzone' => '',
         ];
-    }
-
-    /**
-     * Look up TMDB and Trakt IDs using TVDB ID and IMDB ID.
-     *
-     * @param  int  $tvdbId  TVDB show ID
-     * @param  int|string  $imdbId  IMDB ID (numeric, without 'tt' prefix)
-     * @return array<string, mixed> ['tmdb' => int, 'trakt' => int]
-     */
-    protected function lookupExternalIds(int $tvdbId, int|string $imdbId): array
-    {
-        $result = ['tmdb' => 0, 'trakt' => 0];
-
-        try {
-            // Try to get TMDB ID and other IDs via TMDB's find endpoint
-            $tmdbClient = app(TmdbClient::class);
-            if ($tmdbClient->isConfigured() && $tvdbId > 0) {
-                $tmdbIds = $tmdbClient->lookupTvShowIds($tvdbId, 'tvdb');
-                if ($tmdbIds !== null) {
-                    $result['tmdb'] = $tmdbIds['tmdb'] ?? 0;
-                }
-            }
-
-            // Try to get Trakt ID via Trakt's search endpoint
-            $traktService = app(TraktService::class);
-            if ($traktService->isConfigured()) {
-                // Try TVDB ID first
-                if ($tvdbId > 0) {
-                    $traktIds = $traktService->lookupShowIds($tvdbId, 'tvdb');
-                    if ($traktIds !== null && ! empty($traktIds['trakt'])) {
-                        $result['trakt'] = (int) $traktIds['trakt'];
-                        // Also get TMDB if we didn't find it above
-                        if ($result['tmdb'] === 0 && ! empty($traktIds['tmdb'])) {
-                            $result['tmdb'] = (int) $traktIds['tmdb'];
-                        }
-
-                        return $result;
-                    }
-                }
-
-                // Try IMDB ID as fallback
-                if (! empty($imdbId) && imdb_id_is_valid($imdbId)) {
-                    $traktIds = $traktService->lookupShowIds($imdbId, 'imdb');
-                    if ($traktIds !== null && ! empty($traktIds['trakt'])) {
-                        $result['trakt'] = (int) $traktIds['trakt'];
-                        if ($result['tmdb'] === 0 && ! empty($traktIds['tmdb'])) {
-                            $result['tmdb'] = (int) $traktIds['tmdb'];
-                        }
-                    }
-                }
-            }
-        } catch (\Throwable $e) {
-            // Silently fail - external ID lookup is optional enrichment
-        }
-
-        return $result;
     }
 
     /**
@@ -506,32 +207,125 @@ class TvdbProvider extends AbstractTvProvider
     public function formatEpisodeInfo(mixed $episode): array
     {
         return [
-            'title' => (string) $episode->name,
+            'title' => (string) ($episode->name ?? ''),
             'series' => (int) $episode->seasonNumber,
             'episode' => (int) $episode->number,
             'se_complete' => 'S'.sprintf('%02d', $episode->seasonNumber).'E'.sprintf('%02d', $episode->number),
-            'firstaired' => $episode->aired,
-            'summary' => (string) $episode->overview,
+            'firstaired' => (string) ($episode->aired ?? ''),
+            'summary' => (string) ($episode->overview ?? ''),
         ];
     }
 
-    protected function authorizeTvdb(): void
+    /**
+     * The library client, logged in; null when TVDB is unconfigured or rejected the credentials.
+     */
+    public function authorizedClient(): ?TheTVDbAPI
     {
-        $this->token = '';
-        if (! MetadataSources::isAvailable(MetadataSources::TVDB)) {
-            cli()->warning('TVDB API key or user pin not set. Running in local mode only!', true);
-            $this->local = true;
-        } else {
-            try {
-                $this->token = $this->client->authentication()->login(config('tvdb.api_key'), config('tvdb.user_pin'));
-            } catch (UnauthorizedException $error) {
-                cli()->warning('Could not reach TVDB API. Running in local mode only!', true);
-                $this->local = true;
+        return $this->authorize() ? $this->client : null;
+    }
+
+    /**
+     * The extended record of a series, or null when TVDB has none.
+     */
+    public function seriesExtended(int $tvdbId): ?SeriesExtendedRecord
+    {
+        return $this->call(fn (TheTVDbAPI $client) => $client->series()->extended($tvdbId));
+    }
+
+    /**
+     * Run a TVDB request: null when TVDB has nothing (404) or is unusable here.
+     *
+     * Re-authorises once on 401. Rate limits, server errors and connection
+     * failures surface as TvProviderException so the release is retried later.
+     *
+     * @template T
+     *
+     * @param  callable(TheTVDbAPI): T  $request
+     * @return T|null
+     */
+    private function call(callable $request): mixed
+    {
+        for ($attempt = 0; $attempt < 2; $attempt++) {
+            if (! $this->authorize($attempt > 0)) {
+                return null;
             }
 
-            if ($this->token !== '') {
-                $this->client->setToken($this->token);
+            try {
+                return $request($this->client);
+            } catch (ResourceNotFoundException) {
+                return null;
+            } catch (UnauthorizedException) {
+                $this->authorized = false;
+
+                continue;
+            } catch (GuzzleException $e) {
+                throw new TvProviderException('tvdb', 'TVDB request failed: '.$e->getMessage(), null, null, $e);
+            } catch (\Exception $e) {
+                if (preg_match('/Got status code (\d{3})/', $e->getMessage(), $status) === 1
+                    && TvProviderException::isTransientStatus((int) $status[1])) {
+                    throw new TvProviderException('tvdb', $e->getMessage(), (int) $status[1], null, $e);
+                }
+
+                Log::warning('TVDB request failed', ['error' => $e->getMessage()]);
+
+                return null;
             }
         }
+
+        return null;
+    }
+
+    /**
+     * Like call(), for optional enrichment: transient failures are logged instead of thrown.
+     *
+     * @template T
+     *
+     * @param  callable(TheTVDbAPI): T  $request
+     * @return T|null
+     */
+    private function callQuietly(callable $request): mixed
+    {
+        try {
+            return $this->call($request);
+        } catch (TvProviderException $e) {
+            Log::info('TVDB enrichment request failed', ['error' => $e->getMessage()]);
+
+            return null;
+        }
+    }
+
+    /**
+     * Log in on first use, or again when $force is set after a 401.
+     */
+    private function authorize(bool $force = false): bool
+    {
+        if ($this->local) {
+            return false;
+        }
+
+        if ($this->authorized && ! $force) {
+            return true;
+        }
+
+        $pin = config('tvdb.user_pin');
+
+        try {
+            $this->token = $this->client->authentication()->login(
+                (string) config('tvdb.api_key'),
+                \is_string($pin) && $pin !== '' ? $pin : null,
+            );
+        } catch (UnauthorizedException|ResourceNotFoundException $e) {
+            Log::warning('TVDB rejected the configured credentials; TVDB lookups are disabled for this run.', ['error' => $e->getMessage()]);
+            $this->local = true;
+
+            return false;
+        } catch (GuzzleException $e) {
+            throw new TvProviderException('tvdb', 'TVDB login failed: '.$e->getMessage(), null, null, $e);
+        }
+
+        $this->client->setToken($this->token);
+        $this->authorized = true;
+
+        return true;
     }
 }

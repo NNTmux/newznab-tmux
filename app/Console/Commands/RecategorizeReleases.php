@@ -8,6 +8,7 @@ use App\Facades\Search;
 use App\Models\Category;
 use App\Models\Release;
 use App\Services\Categorization\CategorizationService;
+use App\Services\TvProcessing\TvProcessingCandidateQuery;
 use Illuminate\Console\Command;
 
 class RecategorizeReleases extends Command
@@ -82,8 +83,7 @@ class RecategorizeReleases extends Command
                 } else {
                     Release::query()->where('id', $result->id)->update([
                         'iscategorized' => 1,
-                        'videos_id' => 0,
-                        'tv_episodes_id' => 0,
+                        ...TvProcessingCandidateQuery::resetColumns(),
                         'imdbid' => null,
                         'musicinfo_id' => null,
                         'consoleinfo_id' => null,

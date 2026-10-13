@@ -56,8 +56,8 @@ class UnconfiguredMetadataSourceTest extends TestCase
 
         $started = microtime(true);
         $this->assertFalse($provider->getShowInfo('Breaking Bad'));
-        $this->assertFalse($provider->getEpisodeInfo(1390, 1, 1));
-        $this->assertFalse($provider->getEpisodeInfo(1390, -1, -1, 5));
+        $this->assertFalse($provider->fetchEpisode(1390, 1, 1));
+        $this->assertSame(0, $provider->fetchAllEpisodes(1390, 5));
 
         $this->assertLessThan(1.0, microtime(true) - $started);
         Http::assertNothingSent();

@@ -8,6 +8,7 @@ use App\Facades\Search;
 use App\Models\Release;
 use App\Services\Categorization\CategorizationService;
 use App\Services\NameFixing\NzbSplitUnwrapper;
+use App\Services\TvProcessing\TvProcessingCandidateQuery;
 use Illuminate\Console\Command;
 
 class FixNzbSplitNames extends Command
@@ -92,8 +93,7 @@ class FixNzbSplitNames extends Command
                         'categories_id' => $newCategoryId,
                         'isrenamed' => 1,
                         'iscategorized' => 1,
-                        'videos_id' => 0,
-                        'tv_episodes_id' => 0,
+                        ...TvProcessingCandidateQuery::resetColumns(),
                         'imdbid' => null,
                         'musicinfo_id' => null,
                         'consoleinfo_id' => null,

@@ -12,6 +12,7 @@ use App\Services\AdditionalProcessing\ReleaseSearchSyncCoordinator;
 use App\Services\AdditionalProcessing\State\PersistenceMetricsCollector;
 use App\Services\Categorization\CategorizationService;
 use App\Services\ReleaseCleaningService;
+use App\Services\TvProcessing\TvProcessingCandidateQuery;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
@@ -290,8 +291,7 @@ class ReleaseUpdateService
                 $status = $this->getStatusColumnsForType($type);
 
                 $updateColumns = [
-                    'videos_id' => 0,
-                    'tv_episodes_id' => 0,
+                    ...TvProcessingCandidateQuery::resetColumns(),
                     'imdbid' => null,
                     'musicinfo_id' => '',
                     'consoleinfo_id' => '',
@@ -317,8 +317,7 @@ class ReleaseUpdateService
                 Release::query()
                     ->where('id', $release->releases_id)
                     ->update([
-                        'videos_id' => 0,
-                        'tv_episodes_id' => 0,
+                        ...TvProcessingCandidateQuery::resetColumns(),
                         'imdbid' => null,
                         'musicinfo_id' => null,
                         'consoleinfo_id' => null,

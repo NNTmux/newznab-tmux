@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\TvProcessing\Pipes;
 
+use App\Services\TvProcessing\ParsedTvRelease;
 use App\Services\TvProcessing\TvProcessingPassable;
 use App\Services\TvProcessing\TvProcessingResult;
 use Closure;
@@ -11,7 +12,8 @@ use Closure;
 /**
  * Base class for TV processing pipe handlers.
  *
- * Each pipe is responsible for processing releases through a specific provider.
+ * Each pipe records what it found on the passable and hands it on; nothing
+ * further runs once a release is resolved (episode matched, season pack or parse failure).
  */
 abstract class AbstractTvProviderPipe
 {
@@ -20,42 +22,15 @@ abstract class AbstractTvProviderPipe
     protected bool $echoOutput = true;
 
     /**
-     * @var array<string, mixed>
-     */
-    protected array $titleCache = [];
-
-    public function __construct() {}
-
-    /**
      * Handle the TV processing request.
      */
     public function handle(TvProcessingPassable $passable, Closure $next): TvProcessingPassable
     {
-        // If we already have a match, skip processing
-        if ($passable->shouldStopProcessing()) {
+        if ($passable->isResolved() || $passable->parsed === null) {
             return $next($passable);
         }
 
-        // Skip if we don't have valid parsed info
-        if (! $passable->hasValidParsedInfo()) {
-            return $next($passable);
-        }
-
-        // Skip if this provider shouldn't process this release
-        if ($this->shouldSkip($passable)) {
-            $passable->updateResult(
-                TvProcessingResult::skipped('Provider skipped', $this->getName()),
-                $this->getName()
-            );
-
-            return $next($passable);
-        }
-
-        // Attempt to process with this provider
-        $result = $this->process($passable);
-
-        // Update the result
-        $passable->updateResult($result, $this->getName());
+        $passable->recordProviderResult($this->getName(), $this->process($passable));
 
         return $next($passable);
     }
@@ -74,26 +49,10 @@ abstract class AbstractTvProviderPipe
     abstract public function getName(): string;
 
     /**
-     * Get the status code for releases awaiting this provider.
-     */
-    abstract public function getStatusCode(): int;
-
-    /**
      * Attempt to process the release through this provider.
      */
     abstract protected function process(TvProcessingPassable $passable): TvProcessingResult;
 
-    /**
-     * Check if this provider should be skipped for the given passable.
-     */
-    protected function shouldSkip(TvProcessingPassable $passable): bool
-    {
-        return false;
-    }
-
-    /**
-     * Set echo output flag.
-     */
     public function setEchoOutput(bool $echo): self
     {
         $this->echoOutput = $echo;
@@ -101,33 +60,6 @@ abstract class AbstractTvProviderPipe
         return $this;
     }
 
-    /**
-     * Check if a title is in the failure cache.
-     */
-    protected function isInTitleCache(string $title): bool
-    {
-        return in_array($title, $this->titleCache, true);
-    }
-
-    /**
-     * Add a title to the failure cache.
-     */
-    protected function addToTitleCache(string $title): void
-    {
-        $this->titleCache[] = $title;
-    }
-
-    /**
-     * Clear the title cache.
-     */
-    public function clearTitleCache(): void
-    {
-        $this->titleCache = [];
-    }
-
-    /**
-     * Truncate title for display purposes.
-     */
     protected function truncateTitle(string $title, int $maxLength = 45): string
     {
         if (mb_strlen($title) <= $maxLength) {
@@ -137,89 +69,105 @@ abstract class AbstractTvProviderPipe
         return mb_substr($title, 0, $maxLength - 3).'...';
     }
 
-    /**
-     * Output match success message.
-     */
-    protected function outputMatch(string $title, ?int $season = null, ?int $episode = null, ?string $airdate = null): void
+    protected function outputMatch(string $title, ParsedTvRelease $parsed): void
     {
         if (! $this->echoOutput) {
             return;
         }
 
-        cli()->primaryOver('    → ');
-        cli()->headerOver($this->truncateTitle($title));
-
-        if ($airdate !== null) {
-            cli()->primaryOver(' | ');
-            cli()->warningOver($airdate);
-        } elseif ($season !== null && $episode !== null) {
-            cli()->primaryOver(' S');
-            cli()->warningOver(sprintf('%02d', $season));
-            cli()->primaryOver('E');
-            cli()->warningOver(sprintf('%02d', $episode));
-        }
-
+        $this->outputTitle($title, true);
+        $this->outputEpisodeReference($parsed);
         cli()->primaryOver(' ✓ ');
         cli()->primary('MATCHED ('.$this->getName().')');
     }
 
-    /**
-     * Output not found message.
-     */
+    protected function outputSeasonPack(string $title): void
+    {
+        if (! $this->echoOutput) {
+            return;
+        }
+
+        $this->outputTitle($title, true);
+        cli()->primaryOver(' → ');
+        cli()->primary('Full season matched ('.$this->getName().')');
+    }
+
+    protected function outputEpisodeMissing(string $title, ParsedTvRelease $parsed): void
+    {
+        if (! $this->echoOutput) {
+            return;
+        }
+
+        $this->outputTitle($title, false);
+        $this->outputEpisodeReference($parsed);
+        cli()->primaryOver(' → ');
+        cli()->warning('Episode not found in '.$this->getName());
+    }
+
     protected function outputNotFound(string $title): void
     {
         if (! $this->echoOutput) {
             return;
         }
 
-        cli()->primaryOver('    → ');
-        cli()->alternateOver($this->truncateTitle($title));
+        $this->outputTitle($title, false);
         cli()->primaryOver(' → ');
         cli()->alternate('Not found in '.$this->getName());
     }
 
-    /**
-     * Output skipped message.
-     */
-    protected function outputSkipped(string $title): void
+    protected function outputSkipped(string $title, string $reason): void
     {
         if (! $this->echoOutput) {
             return;
         }
 
-        cli()->primaryOver('    → ');
-        cli()->alternateOver($this->truncateTitle($title));
+        $this->outputTitle($title, false);
         cli()->primaryOver(' → ');
-        cli()->alternate('Skipped (previously failed)');
+        cli()->alternate('Skipped in '.$this->getName().' ('.$reason.')');
     }
 
-    /**
-     * Output searching message.
-     */
     protected function outputSearching(string $title): void
     {
         if (! $this->echoOutput) {
             return;
         }
 
-        cli()->primaryOver('    → ');
-        cli()->headerOver($this->truncateTitle($title));
+        $this->outputTitle($title, true);
         cli()->primaryOver(' → ');
         cli()->info('Searching '.$this->getName().'...');
     }
 
-    /**
-     * Output found in DB message.
-     */
-    protected function outputFoundInDb(string $title): void
+    protected function outputTransient(string $title, string $error): void
     {
         if (! $this->echoOutput) {
             return;
         }
 
-        cli()->primaryOver('    → ');
-        cli()->headerOver($this->truncateTitle($title));
+        $this->outputTitle($title, false);
         cli()->primaryOver(' → ');
-        cli()->info('Found in DB');
+        cli()->warning($this->getName().' unavailable, will retry: '.$this->truncateTitle($error, 80));
+    }
+
+    private function outputTitle(string $title, bool $highlight): void
+    {
+        cli()->primaryOver('    → ');
+        if ($highlight) {
+            cli()->headerOver($this->truncateTitle($title));
+        } else {
+            cli()->alternateOver($this->truncateTitle($title));
+        }
+    }
+
+    private function outputEpisodeReference(ParsedTvRelease $parsed): void
+    {
+        if ($parsed->hasEpisodeNumbers()) {
+            cli()->primaryOver(' S');
+            cli()->warningOver(sprintf('%02d', $parsed->season));
+            cli()->primaryOver('E');
+            cli()->warningOver(sprintf('%02d', $parsed->episode));
+        } elseif ($parsed->hasAirdate()) {
+            cli()->primaryOver(' | ');
+            cli()->warningOver((string) $parsed->airdate);
+        }
     }
 }

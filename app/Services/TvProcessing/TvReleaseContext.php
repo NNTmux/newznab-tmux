@@ -47,12 +47,4 @@ class TvReleaseContext
             leftGuid: $data['leftguid'] ?? null,
         );
     }
-
-    /**
-     * Check if the release name matches a pattern.
-     */
-    public function matchesPattern(string $pattern): bool
-    {
-        return (bool) preg_match($pattern, (string) $this->searchName);
-    }
 }

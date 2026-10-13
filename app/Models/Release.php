@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Facades\Search;
 use App\Services\Configuration\ConfigurationProvider;
+use App\Services\TvProcessing\TvProcessingCandidateQuery;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -313,7 +314,7 @@ class Release extends Model
     public static function removeVideoIdFromReleases(mixed $videoId): int
     {
         $ids = self::whereVideosId($videoId)->pluck('id');
-        $updated = self::whereVideosId($videoId)->update(['videos_id' => 0, 'tv_episodes_id' => 0]);
+        $updated = self::whereVideosId($videoId)->update(TvProcessingCandidateQuery::resetColumns());
         foreach ($ids as $id) {
             self::syncSearchIndexAfterCommit((int) $id);
         }

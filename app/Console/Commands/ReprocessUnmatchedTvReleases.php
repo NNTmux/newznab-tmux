@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use App\Models\Category;
+use App\Enums\TvLookupStatus;
 use App\Models\Release;
+use App\Services\TvProcessing\TvProcessingCandidateQuery;
 use App\Services\TvProcessing\TvProcessingPipeline;
+use App\Services\TvProcessing\TvProcessingResult;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -20,6 +22,7 @@ class ReprocessUnmatchedTvReleases extends Command
     protected $signature = 'tv:reprocess-unmatched
                             {--limit=0 : Limit the number of releases to process (0 = no limit)}
                             {--dry-run : Show how many releases would be processed without making changes}
+                            {--parse-failed : Also retry releases whose names could not be parsed}
                             {--debug : Show detailed debug information for each release}
                             {--sleep=0 : Sleep time in milliseconds between processing each release}';
 
@@ -28,12 +31,7 @@ class ReprocessUnmatchedTvReleases extends Command
      *
      * @var string
      */
-    protected $description = 'Reprocess all TV releases that are not matched to any show in the database (videos_id = 0)';
-
-    public function __construct()
-    {
-        parent::__construct();
-    }
+    protected $description = 'Reprocess TV releases that are not matched to any show (pending or show not found)';
 
     /**
      * Execute the console command.
@@ -45,11 +43,17 @@ class ReprocessUnmatchedTvReleases extends Command
         $debug = (bool) $this->option('debug');
         $sleep = (int) $this->option('sleep');
 
+        $statuses = [TvLookupStatus::Pending->value, TvLookupStatus::ShowNotFound->value];
+        if ($this->option('parse-failed')) {
+            $statuses[] = TvLookupStatus::ParseFailed->value;
+        }
+
         // Build query for unmatched TV releases (newest to oldest by adddate, then postdate)
         $query = Release::query()
             ->select(['id', 'guid', 'searchname', 'videos_id', 'tv_episodes_id', 'categories_id', 'adddate', 'postdate'])
+            ->whereRaw(TvProcessingCandidateQuery::categoryCondition())
             ->where('videos_id', 0)
-            ->whereBetween('categories_id', [Category::TV_ROOT, Category::TV_OTHER])
+            ->whereIn('tv_episodes_id', $statuses)
             ->orderBy('adddate', 'desc')
             ->orderBy('postdate', 'desc');
 
@@ -105,7 +109,8 @@ class ReprocessUnmatchedTvReleases extends Command
         $processed = 0;
 
         try {
-            $pipeline = TvProcessingPipeline::createDefault(echoOutput: false);
+            $pipeline = app(TvProcessingPipeline::class)->setEchoOutput(false);
+            $runState = $pipeline->newRunState();
 
             // Use cursor to iterate without chunking issues when ordering by non-id columns
             $cursor = $query->cursor();
@@ -116,9 +121,9 @@ class ReprocessUnmatchedTvReleases extends Command
                 }
 
                 try {
-                    $result = $pipeline->processRelease($release, $debug);
+                    $result = $pipeline->processRelease($release, $debug, $runState);
 
-                    if ($result['matched']) {
+                    if (\in_array($result['status'], [TvProcessingResult::STATUS_MATCHED, TvProcessingResult::STATUS_SEASON_PACK, TvProcessingResult::STATUS_EPISODE_MISSING], true)) {
                         $matched++;
                         if ($debug) {
                             $this->newLine();

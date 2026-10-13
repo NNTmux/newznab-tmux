@@ -7,12 +7,13 @@ namespace App\Services\TvProcessing;
 use App\Models\Video;
 use App\Services\TmdbClient;
 use App\Services\TraktService;
+use App\Services\TvMazeClient;
 use App\Services\TvProcessing\Providers\AbstractTvProvider;
 use App\Services\TvProcessing\Providers\TmdbProvider;
 use App\Services\TvProcessing\Providers\TraktProvider;
 use App\Services\TvProcessing\Providers\TvdbProvider;
 use App\Services\TvProcessing\Providers\TvMazeProvider;
-use DariusIII\TVMaze\TVMaze as TVMazeClient;
+use DariusIII\TVMaze\TVShow;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
@@ -133,10 +134,14 @@ class TvShowAdder
     private function fetchTvdb(TvdbProvider $provider, int $tvdbId): ?object
     {
         try {
-            $extended = $provider->client->series()->extended($tvdbId);
+            $extended = $provider->seriesExtended($tvdbId);
         } catch (\Throwable $e) {
             Log::warning('TvShowAdder: TVDB lookup failed', ['id' => $tvdbId, 'error' => $e->getMessage()]);
 
+            return null;
+        }
+
+        if ($extended === null) {
             return null;
         }
 
@@ -185,25 +190,20 @@ class TvShowAdder
     // -------------------------------------------------------------------------
 
     /**
-     * @return array<string, mixed>|null
+     * @param  string  $kind  'tvmaze' for a TVMaze id, otherwise the lookup site ('thetvdb', 'tvrage' or 'imdb')
      */
-    private function fetchTvMaze(int|string $id, string $kind): ?array
+    private function fetchTvMaze(int|string $id, string $kind): ?TVShow
     {
         try {
-            $client = new TVMazeClient;
-            if ($kind === 'tvmaze') {
-                $show = $client->getShowByShowID((int) $id);
-            } else {
-                // 'tvrage' | 'thetvdb' | 'imdb'
-                $show = $client->getShowBySiteID($kind, $id);
-            }
+            $client = app(TvMazeClient::class);
+            $show = $kind === 'tvmaze' ? $client->showById((int) $id) : $client->lookup($kind, $id);
         } catch (\Throwable $e) {
             Log::warning('TvShowAdder: TVMaze lookup failed', ['id' => $id, 'kind' => $kind, 'error' => $e->getMessage()]);
 
             return null;
         }
 
-        return is_array($show) ? $show : null;
+        return $show !== null && ! $show->isEmpty() ? $show : null;
     }
 
     /**
@@ -440,7 +440,7 @@ class TvShowAdder
         $data += [
             'country' => '',
             'aliases' => '',
-            'localzone' => "''",
+            'localzone' => '',
             'imdb' => '',
             'tvdb' => 0,
             'trakt' => 0,

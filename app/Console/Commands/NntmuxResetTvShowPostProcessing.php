@@ -8,6 +8,7 @@ use App\Facades\Search;
 use App\Models\Category;
 use App\Models\Release;
 use App\Models\Video;
+use App\Services\TvProcessing\TvProcessingCandidateQuery;
 use Illuminate\Console\Command;
 
 class NntmuxResetTvShowPostProcessing extends Command
@@ -67,11 +68,8 @@ class NntmuxResetTvShowPostProcessing extends Command
         // Chunk through releases to avoid loading all models simultaneously
         $baseQuery->chunkById(1000, function ($chunk) use ($bar) {
             foreach ($chunk as $release) {
-                Release::query()->where('id', $release->id)->update([
-                    // Reset association so TV pipeline picks them up again
-                    'videos_id' => 0,
-                    'tv_episodes_id' => 0,
-                ]);
+                // Reset association so TV pipeline picks them up again
+                Release::query()->where('id', $release->id)->update(TvProcessingCandidateQuery::resetColumns());
                 Search::updateRelease((int) $release->id);
                 $bar->advance();
             }

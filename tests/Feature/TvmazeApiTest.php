@@ -29,7 +29,7 @@ class TvmazeApiTest extends TestCase
     public function test_can_search_for_shows(): void
     {
         try {
-            $results = $this->tvmazeProvider->client->search('Breaking Bad');
+            $results = $this->tvmazeProvider->client->searchShows('Breaking Bad');
 
             $this->assertNotEmpty($results);
             $this->assertIsArray($results);
@@ -42,7 +42,7 @@ class TvmazeApiTest extends TestCase
     {
         try {
             // First search for Breaking Bad
-            $results = $this->tvmazeProvider->client->search('Breaking Bad');
+            $results = $this->tvmazeProvider->client->searchShows('Breaking Bad');
 
             if (empty($results)) {
                 $this->markTestSkipped('Could not find Breaking Bad on TVMaze.');
@@ -51,7 +51,7 @@ class TvmazeApiTest extends TestCase
             $showId = $results[0]->id;
 
             // Get Season 1, Episode 1
-            $episode = $this->tvmazeProvider->client->getEpisodeByNumber($showId, 1, 1);
+            $episode = $this->tvmazeProvider->client->episodeByNumber($showId, 1, 1);
 
             $this->assertNotNull($episode);
             $this->assertEquals('Pilot', $episode->name);
@@ -64,14 +64,14 @@ class TvmazeApiTest extends TestCase
     {
         try {
             // First search for Breaking Bad
-            $results = $this->tvmazeProvider->client->search('Breaking Bad');
+            $results = $this->tvmazeProvider->client->searchShows('Breaking Bad');
 
             if (empty($results)) {
                 $this->markTestSkipped('Could not find Breaking Bad on TVMaze.');
             }
 
             $showId = $results[0]->id;
-            $episodes = $this->tvmazeProvider->client->getEpisodesByShowID($showId);
+            $episodes = $this->tvmazeProvider->client->episodesByShow($showId);
 
             $this->assertNotEmpty($episodes);
             $this->assertIsArray($episodes);
@@ -85,7 +85,7 @@ class TvmazeApiTest extends TestCase
     public function test_search_returns_empty_for_nonexistent_show(): void
     {
         try {
-            $results = $this->tvmazeProvider->client->search('xyznonexistentshow99999');
+            $results = $this->tvmazeProvider->client->searchShows('xyznonexistentshow99999');
 
             $this->assertEmpty($results);
         } catch (\Exception $e) {
@@ -97,7 +97,7 @@ class TvmazeApiTest extends TestCase
     public function test_first_search_result_has_expected_properties(): void
     {
         try {
-            $results = $this->tvmazeProvider->client->search('Breaking Bad');
+            $results = $this->tvmazeProvider->client->searchShows('Breaking Bad');
 
             if (empty($results)) {
                 $this->markTestSkipped('Could not find Breaking Bad on TVMaze.');

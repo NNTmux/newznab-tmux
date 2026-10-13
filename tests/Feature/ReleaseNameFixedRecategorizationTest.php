@@ -96,6 +96,9 @@ class ReleaseNameFixedRecategorizationTest extends TestCase
             'book_lookup_attempts' => 5,
             'book_lookup_retry_at' => now()->addDay(),
             'book_name_normalized_at' => now(),
+            'tv_episodes_id' => -10,
+            'tv_lookup_attempts' => 3,
+            'tv_lookup_retry_at' => now()->addDay(),
             'fromname' => 'poster@example.com',
             'groups_id' => $group->id,
             'categories_id' => Category::OTHER_HASHED,
@@ -125,6 +128,9 @@ class ReleaseNameFixedRecategorizationTest extends TestCase
         $this->assertSame(0, (int) $release->book_lookup_attempts);
         $this->assertNull($release->book_lookup_retry_at);
         $this->assertNull($release->book_name_normalized_at);
+        $this->assertSame(0, (int) $release->tv_episodes_id);
+        $this->assertSame(0, (int) $release->tv_lookup_attempts);
+        $this->assertNull($release->tv_lookup_retry_at);
         $this->assertSame(Category::TV_HD, $release->categories_id);
         $this->assertSame(1, (int) $release->iscategorized);
         $this->assertSame(1, (int) $release->isrenamed);
@@ -347,6 +353,8 @@ class ReleaseNameFixedRecategorizationTest extends TestCase
                 $table->integer('categories_id')->default(Category::OTHER_MISC);
                 $table->unsignedInteger('videos_id')->default(0);
                 $table->integer('tv_episodes_id')->default(0);
+                $table->unsignedTinyInteger('tv_lookup_attempts')->default(0);
+                $table->dateTime('tv_lookup_retry_at')->nullable();
                 $table->string('imdbid')->nullable();
                 $table->integer('musicinfo_id')->nullable();
                 $table->integer('consoleinfo_id')->nullable();

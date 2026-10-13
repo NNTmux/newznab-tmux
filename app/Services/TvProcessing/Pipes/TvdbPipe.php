@@ -4,300 +4,34 @@ declare(strict_types=1);
 
 namespace App\Services\TvProcessing\Pipes;
 
-use App\Services\FanartTvService;
+use App\Services\TvProcessing\Providers\AbstractTvProvider;
 use App\Services\TvProcessing\Providers\TvdbProvider;
-use App\Services\TvProcessing\TvProcessingPassable;
-use App\Services\TvProcessing\TvProcessingResult;
+use App\Support\MetadataSources;
 
 /**
  * Pipe for TVDB API lookups.
  */
-class TvdbPipe extends AbstractTvProviderPipe
+class TvdbPipe extends AbstractApiProviderPipe
 {
-    // Video type constants (matching Videos class protected constants)
-    private const TYPE_TV = 0;
-
     protected int $priority = 20;
-
-    private ?TvdbProvider $tvdb = null;
-
-    private ?FanartTvService $fanart = null;
 
     public function getName(): string
     {
         return 'TVDB';
     }
 
-    public function getStatusCode(): int
+    protected function siteColumn(): string
     {
-        return 0; // PROCESS_TVDB
+        return 'tvdb';
     }
 
-    /**
-     * Get or create the TVDB instance.
-     */
-    private function getTvdb(): TvdbProvider
+    protected function createProvider(): AbstractTvProvider
     {
-        if ($this->tvdb === null) {
-            $this->tvdb = new TvdbProvider;
-        }
-
-        return $this->tvdb;
+        return new TvdbProvider;
     }
 
-    protected function process(TvProcessingPassable $passable): TvProcessingResult
+    protected function isAvailable(): bool
     {
-        $parsedInfo = $passable->getParsedInfo();
-        $context = $passable->context;
-
-        if ($parsedInfo === null || empty($parsedInfo['cleanname'])) {
-            return TvProcessingResult::notFound($this->getName());
-        }
-
-        $cleanName = $parsedInfo['cleanname'];
-
-        // Check if we've already failed this title
-        if ($this->isInTitleCache($cleanName)) {
-            $this->outputSkipped($cleanName);
-
-            return TvProcessingResult::skipped('previously failed', $this->getName());
-        }
-
-        $tvdb = $this->getTvdb();
-        $siteId = false;
-        $posterUrl = '';
-
-        // Find the Video ID if it already exists by checking the title
-        $videoId = $tvdb->getByTitle($cleanName, self::TYPE_TV);
-
-        // If not found and cleanName contains a year in parentheses, try without the year
-        if ($videoId === 0 && preg_match('/^(.+?)\s*\(\d{4}\)$/', (string) $cleanName, $yearMatch)) {
-            $nameWithoutYear = trim($yearMatch[1]);
-            $videoId = $tvdb->getByTitle($nameWithoutYear, self::TYPE_TV);
-        }
-
-        if ($videoId !== 0) {
-            $siteId = $tvdb->getSiteByID('tvdb', (int) $videoId);
-            // If show exists in local DB but doesn't have a TVDB ID, use the existing video
-            // and process episode matching without trying to search TVDB API
-            if ($siteId === false || $siteId === 0) {
-                // Show exists in our DB (likely from another source like TMDB)
-                // Skip TVDB API search and proceed to episode matching
-                $this->outputFoundInDb($cleanName);
-
-                return $this->processEpisodeForExistingVideo($passable, $tvdb, $videoId, $parsedInfo);
-            }
-        }
-
-        // Check if we have a valid country
-        $country = (
-            isset($parsedInfo['country']) && strlen((string) $parsedInfo['country']) === 2
-                ? (string) $parsedInfo['country']
-                : ''
-        );
-
-        if ($siteId === false || $siteId === 0) { // @phpstan-ignore identical.alwaysFalse
-            // Not in local DB, search TVDB
-            $this->outputSearching($cleanName);
-
-            $tvdbShow = $tvdb->getShowInfo((string) $cleanName);
-
-            // If not found and cleanName contains a year in parentheses, try without the year
-            if ($tvdbShow === false && preg_match('/^(.+?)\s*\(\d{4}\)$/', (string) $cleanName, $yearMatch)) {
-                $nameWithoutYear = trim($yearMatch[1]);
-                $tvdbShow = $tvdb->getShowInfo($nameWithoutYear);
-            }
-
-            if (is_array($tvdbShow)) {
-                $tvdbShow['country'] = $country;
-                $videoId = $tvdb->add($tvdbShow);
-                $siteId = (int) $tvdbShow['tvdb'];
-                $posterUrl = $tvdbShow['poster'] ?? '';
-            }
-        } else {
-            $this->outputFoundInDb($cleanName);
-        }
-
-        if ((int) $videoId === 0 || (int) $siteId === 0) {
-            // Show not found
-            $this->addToTitleCache($cleanName);
-            $this->outputNotFound($cleanName);
-
-            return TvProcessingResult::notFound($this->getName(), ['title' => $cleanName]);
-        }
-
-        // Fetch poster if available
-        if (! empty($posterUrl)) {
-            $tvdb->getPoster($videoId);
-        } else {
-            $this->fetchFanartPoster($videoId, $siteId);
-        }
-
-        // Process episode
-        $seriesNo = ! empty($parsedInfo['season']) ? preg_replace('/^S0*/i', '', (string) $parsedInfo['season']) : '';
-        $episodeNo = ! empty($parsedInfo['episode']) ? preg_replace('/^E0*/i', '', (string) $parsedInfo['episode']) : '';
-        $hasAirdate = ! empty($parsedInfo['airdate']);
-
-        if ($episodeNo === 'all') {
-            // Full season release
-            $tvdb->setVideoIdFound($videoId, $context->releaseId, 0);
-            $this->outputFullSeason($cleanName);
-
-            return TvProcessingResult::matched($videoId, 0, $this->getName(), ['full_season' => true]);
-        }
-
-        // Download all episodes if new show to reduce API/bandwidth usage
-        if (! $tvdb->countEpsByVideoID($videoId)) {
-            $tvdb->getEpisodeInfo($siteId, -1, -1, $videoId);
-        }
-
-        // Check if we have the episode for this video ID
-        $episode = $tvdb->getBySeasonEp($videoId, $seriesNo, $episodeNo, $parsedInfo['airdate'] ?? '');
-
-        if ($episode === false) {
-            if ($seriesNo !== '' && $episodeNo !== '') {
-                // Try to get episode from TVDB
-                $tvdbEpisode = $tvdb->getEpisodeInfo($siteId, (int) $seriesNo, (int) $episodeNo, $videoId);
-
-                if ($tvdbEpisode) {
-                    $episode = $tvdb->addEpisode($videoId, $tvdbEpisode);
-                }
-            }
-
-            if ($episode === false && $hasAirdate) {
-                // Refresh episode cache and attempt airdate match
-                $tvdb->getEpisodeInfo($siteId, -1, -1, $videoId);
-                $episode = $tvdb->getBySeasonEp($videoId, 0, 0, $parsedInfo['airdate']);
-            }
-        }
-
-        if ($episode !== false && is_numeric($episode) && $episode > 0) {
-            // Success!
-            $tvdb->setVideoIdFound($videoId, $context->releaseId, $episode);
-            $this->outputMatch(
-                $cleanName,
-                $seriesNo !== '' ? (int) $seriesNo : null,
-                $episodeNo !== '' ? (int) $episodeNo : null,
-                $hasAirdate ? $parsedInfo['airdate'] : null
-            );
-
-            return TvProcessingResult::matched($videoId, (int) $episode, $this->getName());
-        }
-
-        // Episode not found
-        $tvdb->setVideoIdFound($videoId, $context->releaseId, 0);
-
-        if ($this->echoOutput) {
-            cli()->primaryOver('    → ');
-            cli()->alternateOver($this->truncateTitle($cleanName));
-            if ($hasAirdate) {
-                cli()->primaryOver(' | ');
-                cli()->warningOver($parsedInfo['airdate']);
-            }
-            cli()->primaryOver(' → ');
-            cli()->warning('Episode not found');
-        }
-
-        return TvProcessingResult::notFound($this->getName(), [
-            'video_id' => $videoId,
-            'episode_not_found' => true,
-        ]);
-    }
-
-    /**
-     * Fetch poster from Fanart.tv.
-     */
-    private function fetchFanartPoster(int $videoId, int $siteId): void
-    {
-        if ($this->fanart === null) {
-            $this->fanart = new FanartTvService;
-        }
-
-        if (! $this->fanart->isConfigured()) {
-            return;
-        }
-
-        $posterUrl = $this->fanart->getBestTvPoster($siteId);
-        if (! empty($posterUrl)) {
-            $this->getTvdb()->posterUrl = $posterUrl;
-            $this->getTvdb()->getPoster($videoId);
-        }
-    }
-
-    /**
-     * Output full season match message.
-     */
-    private function outputFullSeason(string $title): void
-    {
-        if (! $this->echoOutput) {
-            return;
-        }
-
-        cli()->primaryOver('    → ');
-        cli()->headerOver($this->truncateTitle($title));
-        cli()->primaryOver(' → ');
-        cli()->primary('Full Season matched');
-    }
-
-    /**
-     * Process episode matching for a video that already exists in local DB.
-     * This is used when the show was added from another source (e.g., TMDB) and doesn't have a TVDB ID.
-     *
-     * @param  array<string, mixed>  $parsedInfo
-     */
-    private function processEpisodeForExistingVideo(
-        TvProcessingPassable $passable,
-        TvdbProvider $tvdb,
-        int $videoId,
-        array $parsedInfo
-    ): TvProcessingResult {
-        $context = $passable->context;
-        $cleanName = $parsedInfo['cleanname'];
-
-        $seriesNo = ! empty($parsedInfo['season']) ? preg_replace('/^S0*/i', '', (string) $parsedInfo['season']) : '';
-        $episodeNo = ! empty($parsedInfo['episode']) ? preg_replace('/^E0*/i', '', (string) $parsedInfo['episode']) : '';
-        $hasAirdate = ! empty($parsedInfo['airdate']);
-
-        if ($episodeNo === 'all') {
-            // Full season release
-            $tvdb->setVideoIdFound($videoId, $context->releaseId, 0);
-            $this->outputFullSeason($cleanName);
-
-            return TvProcessingResult::matched($videoId, 0, $this->getName(), ['full_season' => true]);
-        }
-
-        // Try to find episode in local DB
-        $episode = $tvdb->getBySeasonEp($videoId, $seriesNo, $episodeNo, $parsedInfo['airdate'] ?? '');
-
-        if ($episode !== false && is_numeric($episode) && $episode > 0) {
-            $tvdb->setVideoIdFound($videoId, $context->releaseId, $episode);
-            $this->outputMatch(
-                $cleanName,
-                $seriesNo !== '' ? (int) $seriesNo : null,
-                $episodeNo !== '' ? (int) $episodeNo : null,
-                $hasAirdate ? $parsedInfo['airdate'] : null
-            );
-
-            return TvProcessingResult::matched($videoId, (int) $episode, $this->getName());
-        }
-
-        // Episode not found in local DB - mark video but episode not matched
-        $tvdb->setVideoIdFound($videoId, $context->releaseId, 0);
-
-        if ($this->echoOutput) {
-            cli()->primaryOver('    → ');
-            cli()->alternateOver($this->truncateTitle($cleanName));
-            if ($hasAirdate) {
-                cli()->primaryOver(' | ');
-                cli()->warningOver($parsedInfo['airdate']);
-            }
-            cli()->primaryOver(' → ');
-            cli()->warning('Episode not in local DB');
-        }
-
-        return TvProcessingResult::notFound($this->getName(), [
-            'video_id' => $videoId,
-            'episode_not_found' => true,
-        ]);
+        return MetadataSources::isAvailable(MetadataSources::TVDB);
     }
 }
