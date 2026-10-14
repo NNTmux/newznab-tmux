@@ -50,6 +50,9 @@ class ReleaseProcessingContext
 
     public bool $releaseHasPassword = false;
 
+    /** An archive listing was cut off or had unreadable records, so some entries were never checked for a password. */
+    public bool $archiveListingIncomplete = false;
+
     // NFO state
     public bool $releaseHasNoNFO = false;
 
@@ -222,6 +225,7 @@ class ReleaseProcessingContext
     {
         $this->passwordStatus = 0;
         $this->releaseHasPassword = false;
+        $this->archiveListingIncomplete = false;
         $this->nzbHasCompressedFile = false;
         $this->groupUnavailable = false;
         $this->workPlan = null;

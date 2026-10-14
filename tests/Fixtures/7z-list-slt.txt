@@ -1,0 +1,40 @@
+Path = Extras
+Size = 0
+Packed Size = 0
+Modified = 2026-10-10 15:46:58.4180048
+Attributes = D drwxr-xr-x
+CRC = 
+Encrypted = -
+Method = 
+Block = 
+
+Path = Extras/Some.Movie.nfo
+Size = 4
+Packed Size = 10
+Modified = 2026-10-10 15:46:58.4180048
+Attributes = A -rw-r--r--
+CRC = B45776C8
+Encrypted = -
+Method = LZMA2:12
+Block = 0
+
+Path = Extras/naïve – notes.txt
+Size = 2
+Packed Size = 
+Modified = 2026-10-10 15:46:58.4180048
+Attributes = A -rw-r--r--
+CRC = 46EA081F
+Encrypted = -
+Method = LZMA2:12
+Block = 0
+
+Path = Some.Movie.2024.1080p.WEB-DL.mkv
+Size = 2000
+Packed Size = 2016
+Modified = 2026-10-10 15:46:58.4170048
+Attributes = A -rw-r--r--
+CRC = 47DBD17E
+Encrypted = +
+Method = LZMA2:12 7zAES:19
+Block = 1
+

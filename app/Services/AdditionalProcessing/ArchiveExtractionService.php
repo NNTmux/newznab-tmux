@@ -13,6 +13,7 @@ use dariusiii\rarinfo\SzipInfo;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Process;
+use Symfony\Component\Process\Process as SymfonyProcess;
 
 /**
  * Service for extracting and processing archive files (RAR, ZIP, 7z).
@@ -21,6 +22,14 @@ use Illuminate\Support\Facades\Process;
  */
 class ArchiveExtractionService
 {
+    /** Largest 7z volume the start header may describe before it is treated as corrupt. */
+    public const SEVENZIP_MAX_ARCHIVE_BYTES = 1 << 40;
+
+    /** Stop reading a `7z l` listing after this many bytes or file entries. */
+    public const SEVENZIP_LISTING_MAX_BYTES = 4 << 20;
+
+    public const SEVENZIP_LISTING_MAX_ENTRIES = 1000;
+
     private ArchiveInfo $archiveInfo;
 
     private Par2Info $par2Info;
@@ -328,6 +337,184 @@ class ArchiveExtractionService
     }
 
     /**
+     * List a 7z whose end header is compressed, which rarinfo can't decode, with the 7-Zip client.
+     *
+     * The client gets a sparse copy of the archive holding only the downloaded first and
+     * last bytes at their real offsets; that is enough when the packed header stream lies
+     * inside them, as 7-Zip writes it just before the end header. Without a tail the whole
+     * archive, end header included, must be in the head.
+     *
+     * The listing is read as it streams and the client is stopped after
+     * SEVENZIP_LISTING_MAX_ENTRIES entries or SEVENZIP_LISTING_MAX_BYTES of output; the
+     * entries read until then are kept, as only a handful are stored per release anyway,
+     * and the context is marked so the password status of the release stays unknown. The
+     * same happens when a record can't be read unambiguously and is left out.
+     *
+     * @return array<string, mixed>|null result like processCompressedData(), or null to fall back
+     */
+    public function listEncodedSevenZip(
+        string $head,
+        ?string $tail,
+        ReleaseProcessingContext $context,
+        string $tmpPath,
+    ): ?array {
+        $client = $this->config->sevenZipPath;
+        if (! is_string($client) || ! is_executable($client)) {
+            return null;
+        }
+
+        $start = $this->sevenZipStartHeader($head);
+        $length = $start === null ? null : $this->sevenZipArchiveLength($start, $context);
+        if ($length === null) {
+            return null;
+        }
+        if ($tail === null) {
+            if ($length > strlen($head)) {
+                return null;
+            }
+            $tail = substr($head, 0, $length);
+        }
+
+        $joined = $this->withSevenZipEndHeader($head, $tail);
+        if ($joined === null) {
+            return null;
+        }
+
+        $szip = new SzipInfo;
+        $szip->setData($joined);
+        $encoded = null;
+        foreach ($szip->getHeaders() ?: [] as $header) {
+            if ($header['type'] === SzipInfo::PROPERTY_ENCODED_HEADER) {
+                $encoded = $header;
+            }
+        }
+        if ($encoded === null || $szip->isEncrypted || ! isset($encoded['pack_offset'], $encoded['pack_sizes'])) {
+            return null;
+        }
+
+        $tailStart = $length - strlen($tail);
+        $packStart = 32 + (int) $encoded['pack_offset'];
+        $packEnd = $packStart + (int) array_sum($encoded['pack_sizes']);
+        if ($tailStart < 0 || $packStart < 32 || $packEnd > $length - $start['next_size']
+            || ($packStart < $tailStart && $packEnd > strlen($head))
+        ) {
+            return null;
+        }
+
+        $file = $tmpPath.uniqid('7z_', true).'.7z';
+        $process = null;
+        try {
+            $handle = @fopen($file, 'wb');
+            if ($handle === false) {
+                return null;
+            }
+            $written = fwrite($handle, $head) === strlen($head)
+                && fseek($handle, $tailStart) === 0
+                && fwrite($handle, $tail) === strlen($tail);
+            fclose($handle);
+            if (! $written) {
+                return null;
+            }
+
+            // A dummy password makes an encrypted archive fail instead of prompting.
+            $process = new SymfonyProcess([$client, 'l', '-slt', '-ba', '-sccUTF-8', '-pnntmux', '-t7z', '--', $file]);
+            $process->setTimeout(60)->start();
+            [$files, $complete] = $this->readSevenZipListing($process);
+        } catch (\Throwable) {
+            return null;
+        } finally {
+            if ($process?->isRunning()) {
+                $process->stop(0);
+            }
+            @unlink($file);
+        }
+
+        if ($files === []) {
+            return null;
+        }
+
+        $context->compressedFilesChecked++;
+        if (! $complete) {
+            $context->archiveListingIncomplete = true;
+        }
+
+        return [
+            'success' => true,
+            'files' => $files,
+            'hasPassword' => false,
+            'passwordStatus' => ReleaseBrowseService::PASSWD_NONE,
+            'archiveMarker' => '7',
+            'dataSummary' => ['main_type' => ArchiveInfo::TYPE_SZIP],
+            'listingOnly' => true,
+        ];
+    }
+
+    /**
+     * Turn `7z l -slt` output into rarinfo-style file records, leaving out directories.
+     * Records that can't be read unambiguously are left out and clear $reliable; see
+     * SevenZipListingParser.
+     *
+     * @return list<array{name: string, size: int, date: int, pass: int, compressed: int, crc32?: string}>
+     */
+    public static function parseSevenZipListing(string $output, ?bool &$reliable = null): array
+    {
+        $parser = new SevenZipListingParser;
+        $parser->feed($output);
+        $parser->finish();
+        $reliable = $parser->reliable;
+
+        return $parser->files;
+    }
+
+    /**
+     * Parse a running `7z l -slt` listing as it streams, stopping the client at the caps.
+     * Also says whether the listing was read to the end with every record understood.
+     *
+     * @return array{list<array{name: string, size: int, date: int, pass: int, compressed: int, crc32?: string}>, bool}
+     */
+    private function readSevenZipListing(SymfonyProcess $process): array
+    {
+        $parser = new SevenZipListingParser;
+        $bytes = 0;
+        foreach ($process->getIterator(SymfonyProcess::ITER_SKIP_ERR) as $chunk) {
+            $bytes += strlen($chunk);
+            $parser->feed($chunk);
+            if (count($parser->files) >= self::SEVENZIP_LISTING_MAX_ENTRIES) {
+                $process->stop(0);
+
+                return [array_slice($parser->files, 0, self::SEVENZIP_LISTING_MAX_ENTRIES), false];
+            }
+            if ($bytes > self::SEVENZIP_LISTING_MAX_BYTES) {
+                // The record being read when the output was cut is dropped, never half-parsed.
+                $process->stop(0);
+
+                return [$parser->files, false];
+            }
+        }
+
+        if ($process->wait() !== 0) {
+            return [[], true];
+        }
+        $parser->finish();
+
+        return [$parser->files, $parser->reliable];
+    }
+
+    /**
+     * Length of the archive the start header describes, or null when it can't belong to this
+     * release: larger than the release itself (when known) or SEVENZIP_MAX_ARCHIVE_BYTES.
+     *
+     * @param  array{next_offset: int, next_size: int, next_crc: int}  $start
+     */
+    private function sevenZipArchiveLength(array $start, ReleaseProcessingContext $context): ?int
+    {
+        $length = 32 + $start['next_offset'] + $start['next_size'];
+        $releaseSize = (int) ($context->release->size ?? 0);
+
+        return $releaseSize > 0 && $length > $releaseSize ? null : $length;
+    }
+
+    /**
      * @return array{next_offset: int, next_size: int, next_crc: int}|null
      */
     private function sevenZipStartHeader(string $data): ?array
@@ -339,7 +526,13 @@ class ArchiveExtractionService
         /** @var array{next_offset: int, next_size: int, next_crc: int} $start */
         $start = unpack('Pnext_offset/Pnext_size/Vnext_crc', $data, 12);
 
-        return $start['next_offset'] >= 0 && $start['next_size'] >= 0 ? $start : null;
+        // Unsigned values past PHP_INT_MAX unpack as negative; anything beyond the cap is corrupt
+        // and must not reach the offset arithmetic or the sparse copy.
+        $max = self::SEVENZIP_MAX_ARCHIVE_BYTES - 32;
+
+        return $start['next_offset'] >= 0 && $start['next_size'] >= 0
+            && $start['next_offset'] <= $max && $start['next_size'] <= $max - $start['next_offset']
+            ? $start : null;
     }
 
     /**

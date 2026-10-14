@@ -474,6 +474,90 @@ class AdditionalProcessingReleaseFileManagerTest extends TestCase
         ];
     }
 
+    #[DataProvider('sevenZipListings')]
+    public function test_a_cut_off_7z_listing_leaves_the_password_status_unknown(string $script, int $passwordStatus, array $names = []): void
+    {
+        DB::table('releases')->insert($this->releaseRow());
+        Search::shouldReceive('updateRelease')->once()->with(1);
+
+        $dir = sys_get_temp_dir().'/'.uniqid('7z-listing-', true);
+        mkdir($dir);
+        try {
+            file_put_contents($dir.'/7z', "#!/bin/sh\n".$script."\n");
+            chmod($dir.'/7z', 0755);
+            $archiveService = new ArchiveExtractionService($this->makeConfig(['sevenZipPath' => $dir.'/7z']));
+            $manager = $this->makeManager();
+            $context = new ReleaseProcessingContext(Release::query()->findOrFail(1));
+            $context->nzbHasCompressedFile = true;
+
+            $archive = $this->sevenZip('ignored.mkv', str_repeat('x', 100), compressedHeader: true);
+            $result = $archiveService->listEncodedSevenZip($archive, null, $context, $dir.'/');
+            $this->assertIsArray($result);
+            foreach ($result['files'] as $file) {
+                if ($context->releaseHasPassword) {
+                    break;
+                }
+                $manager->addFileInfo($file, $context, '\\.(?:par2|sfv|nzb)');
+            }
+            $manager->finalizeRelease($context, true);
+        } finally {
+            array_map('unlink', glob($dir.'/*') ?: []);
+            rmdir($dir);
+        }
+
+        $release = DB::table('releases')->where('id', 1)->first();
+        $this->assertSame($passwordStatus, (int) $release->passwordstatus);
+        $this->assertSame(0, (int) $release->haspreview);
+        $this->assertNull($release->archive_retry_at);
+        $this->assertGreaterThan(0, DB::table('release_files')->count());
+        foreach ($names as $name) {
+            $this->assertTrue(DB::table('release_files')->where('name', $name)->exists(), $name);
+        }
+    }
+
+    /**
+     * @return array<string, array{0: string, 1: int, 2?: list<string>}>
+     */
+    public static function sevenZipListings(): array
+    {
+        $plain = static fn (int $count, string $pad = ''): string => 'i=0; while [ $i -lt '.$count.' ]; do '
+            .'printf \'Path = %d'.$pad.'.txt\\nSize = 0\\nEncrypted = -\\n\\n\' $i; i=$((i+1)); done; ';
+        $encrypted = 'printf \'Path = Movie.2026.1080p.mkv\\nSize = 100\\nEncrypted = +\\n\\n\'; ';
+
+        return [
+            'encrypted entry past the entry cap' => [
+                $plain(ArchiveExtractionService::SEVENZIP_LISTING_MAX_ENTRIES).$encrypted,
+                -1,
+            ],
+            'encrypted entry past the output cap' => [
+                $plain(300, str_repeat('a', 20000)).$encrypted,
+                -1,
+            ],
+            'encrypted entry before the cap' => [
+                $plain(5).$encrypted.$plain(2000),
+                ReleaseBrowseService::PASSWD_RAR,
+            ],
+            'complete listing without encryption' => [
+                $plain(5),
+                ReleaseBrowseService::PASSWD_NONE,
+            ],
+            'CRLF listing of names containing byte 0x85' => [
+                'printf \'Path = \303\205land.mkv\r\nSize = 10\r\nEncrypted = -\r\n\r\n\'; '
+                    .'printf \'Path = Movie.\344\271\205.mkv\r\nSize = 13\r\nEncrypted = -\r\n\r\n\'; ',
+                ReleaseBrowseService::PASSWD_NONE,
+                ['Åland.mkv', 'Movie.久.mkv'],
+            ],
+            'encrypted entry behind a control character' => [
+                $plain(5).'printf \'Path = Movie\001.mkv\nSize = 100\nEncrypted = +\n\n\'; ',
+                -1,
+            ],
+            'encrypted entry behind a duplicate property' => [
+                $plain(5).'printf \'Path = a.txt\nPath = Movie.mkv\nSize = 100\nEncrypted = +\n\n\'; ',
+                -1,
+            ],
+        ];
+    }
+
     public function test_invalid_release_file_sizes_are_rejected(): void
     {
         DB::table('releases')->insert($this->releaseRow());
