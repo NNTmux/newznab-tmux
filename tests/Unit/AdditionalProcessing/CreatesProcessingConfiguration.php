@@ -32,6 +32,8 @@ trait CreatesProcessingConfiguration
             'maximumRarSegments' => 3,
             'maximumRarPasswordChecks' => 1,
             'archiveProbeFiles' => 3,
+            'seasonPackArchiveSets' => 3,
+            'seasonPackMaxReleaseFiles' => 30,
             'maxSizeBytes' => 107374182400,
             'minSizeBytes' => 0,
             'alternateNNTP' => false,

@@ -41,6 +41,10 @@ final readonly class ProcessingConfiguration
 
     public int $archiveProbeFiles;
 
+    public int $seasonPackArchiveSets;
+
+    public int $seasonPackMaxReleaseFiles;
+
     public int $maxSizeBytes;
 
     public int $minSizeBytes;
@@ -153,6 +157,8 @@ final readonly class ProcessingConfiguration
         $this->maximumRarSegments = (int) (app(ConfigurationProvider::class)->postProcessing()->maxPartsProcessed ?: 3);
         $this->maximumRarPasswordChecks = max((int) (app(ConfigurationProvider::class)->postProcessing()->passwordCheckAttempts ?: 1), 1);
         $this->archiveProbeFiles = max(0, (int) config('nntmux.archive_probe_files', 3));
+        $this->seasonPackArchiveSets = max(1, min(50, (int) config('nntmux.season_pack_archive_sets', 3)));
+        $this->seasonPackMaxReleaseFiles = max(11, min(200, (int) config('nntmux.season_pack_max_release_files', 30)));
         // Delegate to AdditionalCandidateQuery so size-filter semantics
         // (explicit '0' means disabled, empty/null means default) are owned
         // in one place and shared between the bucket query and the per-worker

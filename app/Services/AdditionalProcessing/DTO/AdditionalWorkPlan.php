@@ -88,6 +88,19 @@ final readonly class AdditionalWorkPlan
     }
 
     /**
+     * Distinct archive sets in the release, e.g. one per episode of a season pack.
+     */
+    public function archiveSetCount(): int
+    {
+        return count(array_unique(array_map(fn (ArchiveCandidate $candidate): string => $this->setKeyOf($candidate), $this->archiveCandidates)));
+    }
+
+    public function setKeyOf(ArchiveCandidate $candidate): string
+    {
+        return $candidate->setKey !== '' ? $candidate->setKey : 'src:'.$candidate->sourceIndex;
+    }
+
+    /**
      * @return list<ArchiveCandidate>
      */
     public function orderedArchiveCandidates(bool $reverse = false): array

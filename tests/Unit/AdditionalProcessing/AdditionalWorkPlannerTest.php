@@ -383,4 +383,50 @@ class AdditionalWorkPlannerTest extends TestCase
             $this->assertFalse($second->likelyFirstVolume);
         }
     }
+
+    #[Test]
+    public function it_groups_archive_volumes_into_sets(): void
+    {
+        $planner = new AdditionalWorkPlanner($this->makeConfig());
+        $keys = static fn (array $candidates): array => array_map(
+            static fn (ArchiveCandidate $candidate): string => $candidate->setKey,
+            $candidates,
+        );
+
+        $episodes = $planner->plan([
+            ['title' => '"Show.S01E01.1080p-GRP.part01.rar" yEnc (1/50)', 'segments' => ['<e1-1>']],
+            ['title' => '"Show.S01E01.1080p-GRP.part02.rar" yEnc (1/50)', 'segments' => ['<e1-2>']],
+            ['title' => '"Show.S01E02.1080p-GRP.rar" yEnc (1/50)', 'segments' => ['<e2-1>']],
+            ['title' => '"Show.S01E02.1080p-GRP.r00" yEnc (1/50)', 'segments' => ['<e2-2>']],
+            ['title' => '"Show.S01E03.1080p-GRP.7z.001" yEnc (1/50)', 'segments' => ['<e3-1>']],
+            ['title' => '"Subs.zip" yEnc (1/1)', 'segments' => ['<subs>']],
+        ], 'alt.binaries.test');
+        $hashed = $planner->plan([
+            ['title' => '"0123456789abcdef0123456789abcdef.10" yEnc (1/50)', 'segments' => ['<h-1>']],
+            ['title' => '"0123456789abcdef0123456789abcdef.11" yEnc (1/50)', 'segments' => ['<h-2>']],
+        ], 'alt.binaries.test');
+
+        $this->assertSame(
+            ['show.s01e01.1080p-grp', 'show.s01e01.1080p-grp', 'show.s01e02.1080p-grp', 'show.s01e02.1080p-grp', 'show.s01e03.1080p-grp', 'subs'],
+            $keys($episodes->archiveCandidates),
+        );
+        $this->assertSame(4, $episodes->archiveSetCount());
+        $this->assertSame(['0123456789abcdef0123456789abcdef', '0123456789abcdef0123456789abcdef'], $keys($hashed->archiveCandidates));
+        $this->assertSame(1, $hashed->archiveSetCount());
+    }
+
+    #[Test]
+    public function it_keeps_the_set_when_a_later_rar_volume_replaces_the_first(): void
+    {
+        $planner = new AdditionalWorkPlanner($this->makeConfig());
+
+        $plan = $planner->plan([
+            ['title' => '"Show.S01E01.part01.rar" yEnc (2/50)', 'segments' => ['<p1-2>'], 'firstsegment' => false],
+            ['title' => '"Show.S01E01.part02.rar" yEnc (1/50)', 'segments' => ['<p2-1>'], 'firstsegment' => true],
+        ], 'alt.binaries.test');
+
+        foreach ($plan->prioritizedArchiveCandidates() as $candidate) {
+            $this->assertSame('show.s01e01', $candidate->setKey);
+        }
+    }
 }

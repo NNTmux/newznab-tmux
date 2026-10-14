@@ -17,5 +17,6 @@ final readonly class ArchiveCandidate
         public int $sourceIndex,
         public array $tailMessageIds = [],
         public bool $hasFirstSegment = true,
+        public string $setKey = '',
     ) {}
 }

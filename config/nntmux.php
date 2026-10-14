@@ -21,6 +21,10 @@ return [
     'archive_retry_delay' => (int) env('NN_ARCHIVE_RETRY_DELAY', 86400),
     // Files of an obfuscated multi-file release whose first segment is checked for an archive.
     'archive_probe_files' => (int) env('NN_ARCHIVE_PROBE_FILES', 3),
+    // Season packs packed one archive set per episode: sets (first volume of each) listed per release; 1 = only the first set.
+    'season_pack_archive_sets' => (int) env('NN_SEASON_PACK_ARCHIVE_SETS', 3),
+    // Season packs: inner files stored in release_files (other releases keep 11).
+    'season_pack_max_release_files' => (int) env('NN_SEASON_PACK_MAX_RELEASE_FILES', 30),
     // Read the release's PAR2 index to find samples, videos and archives behind obfuscated names.
     'par2_media_mapping' => (bool) env('NN_PAR2_MEDIA_MAPPING', true),
     // Articles of the PAR2 index downloaded per release.

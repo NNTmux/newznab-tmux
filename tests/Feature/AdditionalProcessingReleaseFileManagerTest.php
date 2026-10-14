@@ -22,6 +22,7 @@ use App\Services\AdditionalProcessing\State\ReleaseProcessingContext;
 use App\Services\AdditionalProcessing\UsenetDownloadService;
 use App\Services\CollectionCleanupService;
 use App\Services\NameFixing\NameFixingService;
+use App\Services\NameFixing\ReleaseUpdateService;
 use App\Services\NfoService;
 use App\Services\Nzb\NzbService;
 use App\Services\ReleaseImageService;
@@ -143,6 +144,57 @@ class AdditionalProcessingReleaseFileManagerTest extends TestCase
         $this->assertSame(1, DB::table('releases')->where('id', 1)->value('rarinnerfilecount'));
         $this->assertNull(DB::table('releases')->where('id', 1)->value('additional_pp_claimed_at'));
         $this->assertNull(DB::table('releases')->where('id', 1)->value('additional_pp_claim_token'));
+    }
+
+    public function test_season_pack_files_are_not_matched_to_predb_one_by_one(): void
+    {
+        DB::table('releases')->insert(['searchname' => 'Show.S01.1080p.WEB-DL-GRP'] + $this->releaseRow());
+        Search::shouldReceive('updateRelease')->with(1);
+        $nameFixing = new CountingNameFixingService;
+        $manager = $this->makeManager($nameFixing);
+        $context = new ReleaseProcessingContext(Release::query()->findOrFail(1));
+        $context->seasonPack = true;
+
+        $manager->addFileInfo(['name' => 'Show.S01E01.1080p.WEB-DL-GRP.mkv', 'size' => 2048], $context, '\\.sfv');
+        $manager->processReleaseNameFromRar(['file_list' => [['name' => 'Show.S01E10.1080p.WEB-DL-GRP.mkv']]], $context);
+        $manager->finalizeRelease($context, false);
+
+        $this->assertSame(0, $nameFixing->matchPreDbFilesCalls);
+        $this->assertSame('Show.S01.1080p.WEB-DL-GRP', DB::table('releases')->where('id', 1)->value('searchname'));
+    }
+
+    public function test_season_pack_lists_every_episode_while_other_releases_keep_eleven_files(): void
+    {
+        DB::table('releases')->insert($this->releaseRow());
+        DB::table('releases')->insert(['id' => 2, 'guid' => 'guid-2'] + $this->releaseRow());
+        Search::shouldReceive('updateRelease')->twice();
+        $manager = $this->makeManager();
+
+        $pack = new ReleaseProcessingContext(Release::query()->findOrFail(1));
+        $pack->seasonPack = true;
+        $other = new ReleaseProcessingContext(Release::query()->findOrFail(2));
+        for ($episode = 1; $episode <= 25; $episode++) {
+            $name = sprintf('Show.S01E%02d.1080p.WEB-DL-GRP.mkv', $episode);
+            $manager->addFileInfo(['name' => $name, 'size' => 2048], $pack, '\\.sfv');
+            $manager->addFileInfo(['name' => $name, 'size' => 2048], $other, '\\.sfv');
+        }
+        $manager->finalizeRelease($pack, false);
+        $manager->finalizeRelease($other, false);
+
+        $this->assertSame(25, DB::table('release_files')->where('releases_id', 1)->count());
+        $this->assertSame(11, DB::table('release_files')->where('releases_id', 2)->count());
+    }
+
+    public function test_a_season_pack_is_never_renamed_to_one_of_its_episodes(): void
+    {
+        DB::table('releases')->insert(['searchname' => 'Show.S01.1080p.WEB-DL-GRP'] + $this->releaseRow());
+        $service = new ReleaseUpdateService;
+
+        $service->updateRelease(DB::table('releases')->where('id', 1)->first(), 'Show.S01E01.1080p.WEB-DL-GRP', 'test', true, 'Filenames, ', true, false);
+
+        $this->assertFalse($service->matched);
+        $this->assertSame(0, $service->fixed);
+        $this->assertSame('Show.S01.1080p.WEB-DL-GRP', DB::table('releases')->where('id', 1)->value('searchname'));
     }
 
     public function test_finalization_flushes_rows_and_synchronizes_search_immediately(): void
