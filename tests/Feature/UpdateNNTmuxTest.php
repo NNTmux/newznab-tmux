@@ -7,11 +7,15 @@ namespace Tests\Feature;
 use App\Console\Commands\UpdateNNTmux;
 use App\Services\NntmuxUpdateLock;
 use Illuminate\Contracts\Foundation\MaintenanceMode;
+use Illuminate\Process\PendingProcess;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
+use Illuminate\Support\Facades\Redis;
 use Mockery;
 use Mockery\MockInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
+use RuntimeException;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Tests\Support\ConfigurationTestBuilder;
@@ -27,9 +31,12 @@ class UpdateNNTmuxTest extends TestCase
 
     private bool $maintenanceActive = false;
 
+    private int $tmuxStartExitCode = 0;
+
     protected function setUp(): void
     {
         parent::setUp();
+        config(['database.redis.client' => 'phpredis']);
         ConfigurationTestBuilder::updateRuntime(['tmux_running' => true]);
         $this->directory = sys_get_temp_dir().'/nntmux-all-update-'.bin2hex(random_bytes(8));
         $this->originalBasePath = $this->app->basePath();
@@ -39,7 +46,9 @@ class UpdateNNTmuxTest extends TestCase
         File::ensureDirectoryExists($this->directory.'/.git');
         $this->mock(MaintenanceMode::class)->shouldReceive('active')->andReturnUsing(fn (): bool => $this->maintenanceActive);
         Process::preventStrayProcesses();
-        Process::fake(fn () => Process::result($this->directory.'/.git/index.lock'));
+        Process::fake(fn (PendingProcess $process) => $this->isFreshTmuxStart($process)
+            ? Process::result(exitCode: $this->tmuxStartExitCode)
+            : Process::result($this->directory.'/.git/index.lock'));
     }
 
     protected function tearDown(): void
@@ -120,12 +129,14 @@ class UpdateNNTmuxTest extends TestCase
         $this->expectPreparation($command);
         $command->shouldReceive('call')->once()->with('nntmux:git', ['--git-lock-timeout' => 0])->andReturn(0);
         $this->expectMaintenanceTasks($command);
+        $this->expectHealthyRedis();
         $this->expectWebRestore($command);
-        $command->shouldReceive('call')->once()->with('tmux:start')->andReturn(0);
+        $command->shouldReceive('call')->with('tmux:start')->never();
 
         [$status, $output] = $this->runCommand($command, ['--git-lock-timeout' => 0]);
 
         $this->assertSame(0, $status);
+        Process::assertRanTimes(fn (PendingProcess $process): bool => $this->isFreshTmuxStart($process), 1);
         $this->assertFalse($this->maintenanceActive);
         $this->assertStringContainsString('update completed successfully', $output);
         $this->assertStringNotContainsString(config('app.key'), $output);
@@ -147,6 +158,44 @@ class UpdateNNTmuxTest extends TestCase
         $this->assertTrue($this->maintenanceActive);
     }
 
+    public function test_redis_preflight_failure_restores_web_access_without_restarting_tmux(): void
+    {
+        config(['database.redis.client' => 'predis']);
+        $command = $this->command();
+        $this->expectPreparation($command);
+        $this->expectMaintenanceTasks($command);
+        $this->expectWebRestore($command);
+        $command->shouldReceive('call')->with('tmux:start')->never();
+        Redis::shouldReceive('connection')->never();
+
+        [$status, $output] = $this->runCommand($command, ['--skip-git' => true]);
+
+        $this->assertSame(1, $status);
+        $this->assertFalse($this->maintenanceActive);
+        $this->assertStringContainsString('Redis client mismatch', $output);
+        $this->assertStringContainsString('Skipping tmux restart', $output);
+        $this->assertStringNotContainsString('update completed successfully', $output);
+        $this->assertSame(0, (new NntmuxUpdateLock)->run(fn (): int => 0, checkGit: false));
+    }
+
+    public function test_tmux_restart_failure_fails_the_update_and_releases_the_lock(): void
+    {
+        $command = $this->command();
+        $this->expectPreparation($command);
+        $this->expectMaintenanceTasks($command);
+        $this->expectHealthyRedis();
+        $this->expectWebRestore($command);
+        $this->tmuxStartExitCode = 1;
+
+        [$status, $output] = $this->runCommand($command, ['--skip-git' => true]);
+
+        $this->assertSame(1, $status);
+        $this->assertFalse($this->maintenanceActive);
+        $this->assertStringContainsString('tmux:start failed while restoring environment', $output);
+        $this->assertStringNotContainsString('update completed successfully', $output);
+        $this->assertSame(0, (new NntmuxUpdateLock)->run(fn (): int => 0, checkGit: false));
+    }
+
     public function test_skip_git_does_not_require_a_repository_or_check_the_git_index_lock(): void
     {
         File::deleteDirectory($this->directory.'/.git');
@@ -154,13 +203,101 @@ class UpdateNNTmuxTest extends TestCase
         $this->expectPreparation($command);
         $command->shouldReceive('call')->with('nntmux:git', Mockery::any())->never();
         $this->expectMaintenanceTasks($command);
+        $this->expectHealthyRedis();
         $this->expectWebRestore($command);
-        $command->shouldReceive('call')->once()->with('tmux:start')->andReturn(0);
 
         [$status] = $this->runCommand($command, ['--skip-git' => true]);
 
         $this->assertSame(0, $status);
-        Process::assertNothingRan();
+        Process::assertNotRan(fn (PendingProcess $process): bool => ! $this->isFreshTmuxStart($process));
+    }
+
+    public function test_npm_ci_failure_reports_diagnostics_and_completes_using_install_fallback(): void
+    {
+        $this->fakeBuildFailure('npm ci --silent', 'dependency conflict', 'lockfile mismatch', 1);
+        $command = $this->command();
+        $this->expectPreparation($command);
+        $this->expectMaintenanceTasks($command);
+        $this->expectHealthyRedis();
+        $this->expectWebRestore($command);
+
+        [$status, $output] = $this->runCommand($command, ['--skip-git' => true, '--skip-npm' => false]);
+
+        $this->assertSame(0, $status);
+        $this->assertStringContainsString('npm ci failed, falling back to npm install', $output);
+        $this->assertStringContainsString('stderr=lockfile mismatch', $output);
+        $this->assertStringContainsString('stdout=dependency conflict', $output);
+        foreach (['npm install --silent', 'php artisan typescript:transform --force', 'npm exec vite build'] as $buildCommand) {
+            Process::assertRanTimes(fn (PendingProcess $process): bool => $process->command === $buildCommand && $process->path === $this->directory && $process->timeout === 600, 1);
+        }
+        Process::assertNotRan('npm run build');
+    }
+
+    #[DataProvider('buildFailures')]
+    /** @param list<string> $skippedCommands */
+    public function test_build_failure_restores_web_access_and_skips_later_steps(string $failedCommand, string $stdout, string $stderr, string $expected, array $skippedCommands): void
+    {
+        $this->fakeBuildFailure($failedCommand, $stdout, $stderr, 2);
+        $command = $this->command();
+        $this->expectPreparation($command);
+        $this->expectWebRestore($command);
+        $command->shouldReceive('call')->with('config:clear')->never();
+        Cache::shouldReceive('flush')->never();
+        Redis::shouldReceive('connection')->never();
+
+        [$status, $output] = $this->runCommand($command, ['--skip-git' => true, '--skip-npm' => false]);
+
+        $this->assertSame(1, $status);
+        $this->assertFalse($this->maintenanceActive);
+        $this->assertStringContainsString($expected, $output);
+        $this->assertStringContainsString('exit_code=2', $output);
+        $this->assertStringNotContainsString('update completed successfully', $output);
+        foreach ($skippedCommands as $skippedCommand) {
+            Process::assertNotRan(fn (PendingProcess $process): bool => $process->command === $skippedCommand);
+        }
+        Process::assertNotRan(fn (PendingProcess $process): bool => $this->isFreshTmuxStart($process));
+        $this->assertSame(0, (new NntmuxUpdateLock)->run(fn (): int => 0, checkGit: false));
+    }
+
+    /** @return iterable<string, array{string, string, string, string, list<string>}> */
+    public static function buildFailures(): iterable
+    {
+        yield 'install fallback fails' => ['npm install --silent', '', 'dependency resolution failed', 'npm install failed', ['php artisan typescript:transform --force', 'npm exec vite build']];
+        yield 'type transform fails' => ['php artisan typescript:transform --force', 'transform error', '', 'stdout=transform error', ['npm exec vite build']];
+        yield 'vite fails silently' => ['npm exec vite build', '', '', 'no stdout/stderr captured', []];
+    }
+
+    private function fakeBuildFailure(string $failedCommand, string $stdout, string $stderr, int $exitCode): void
+    {
+        Process::fake(function (PendingProcess $process) use ($failedCommand, $stdout, $stderr, $exitCode) {
+            if ($process->command === $failedCommand || ($failedCommand === 'npm install --silent' && $process->command === 'npm ci --silent')) {
+                return Process::result($stdout, $stderr, $exitCode);
+            }
+
+            return Process::result();
+        });
+    }
+
+    public function test_redis_connection_failure_restores_web_access_without_restarting_tmux(): void
+    {
+        $command = $this->command();
+        $this->expectPreparation($command);
+        $this->expectMaintenanceTasks($command);
+        $this->expectWebRestore($command);
+        Redis::shouldReceive('connection->ping')->once()->andThrow(new RuntimeException('connection refused'));
+
+        [$status, $output] = $this->runCommand($command, ['--skip-git' => true]);
+
+        $this->assertSame(1, $status);
+        $this->assertFalse($this->maintenanceActive);
+        $this->assertStringContainsString('Redis preflight failed: connection refused', $output);
+        Process::assertNotRan(fn (PendingProcess $process): bool => $this->isFreshTmuxStart($process));
+        $this->assertSame(0, (new NntmuxUpdateLock)->run(fn (): int => 0, checkGit: false));
+    }
+
+    private function isFreshTmuxStart(PendingProcess $process): bool
+    {
+        return $process->command === [PHP_BINARY, 'artisan', 'tmux:start'];
     }
 
     /** @return UpdateNNTmux&MockInterface */
@@ -202,10 +339,15 @@ class UpdateNNTmuxTest extends TestCase
     /** @param UpdateNNTmux&MockInterface $command */
     private function expectMaintenanceTasks(UpdateNNTmux $command): void
     {
-        foreach (['view:clear', 'route:clear', 'route:cache'] as $name) {
+        foreach (['config:clear', 'config:cache', 'view:clear', 'route:clear', 'route:cache'] as $name) {
             $command->shouldReceive('call')->once()->with($name)->andReturn(0);
         }
         Cache::shouldReceive('flush')->once()->andReturn(true);
+    }
+
+    private function expectHealthyRedis(): void
+    {
+        Redis::shouldReceive('connection->ping')->once()->andReturn('PONG');
     }
 
     /**
