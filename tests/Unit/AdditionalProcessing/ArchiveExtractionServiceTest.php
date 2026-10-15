@@ -553,7 +553,8 @@ class ArchiveExtractionServiceTest extends TestCase
 
         $this->assertIsArray($result);
         $this->assertGreaterThan(0, count($result['files']));
-        $this->assertLessThan(intdiv(ArchiveExtractionService::SEVENZIP_LISTING_MAX_BYTES, 20000) + 5, count($result['files']));
+        // Whole records within the byte cap only, however the output was chunked.
+        $this->assertLessThanOrEqual(intdiv(ArchiveExtractionService::SEVENZIP_LISTING_MAX_BYTES, strlen("Path = {$result['files'][0]['name']}\nSize = 1\n\n")), count($result['files']));
         $this->assertSame(str_repeat('a', 20000), $result['files'][0]['name']);
     }
 

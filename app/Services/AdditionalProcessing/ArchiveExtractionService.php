@@ -478,6 +478,11 @@ class ArchiveExtractionService
         $parser = new SevenZipListingParser;
         $bytes = 0;
         foreach ($process->getIterator(SymfonyProcess::ITER_SKIP_ERR) as $chunk) {
+            // Parse no more than the cap, however much output a single read returned.
+            $cut = $bytes + strlen($chunk) > self::SEVENZIP_LISTING_MAX_BYTES;
+            if ($cut) {
+                $chunk = substr($chunk, 0, self::SEVENZIP_LISTING_MAX_BYTES - $bytes);
+            }
             $bytes += strlen($chunk);
             $parser->feed($chunk);
             if (count($parser->files) >= self::SEVENZIP_LISTING_MAX_ENTRIES) {
@@ -485,7 +490,7 @@ class ArchiveExtractionService
 
                 return [array_slice($parser->files, 0, self::SEVENZIP_LISTING_MAX_ENTRIES), false];
             }
-            if ($bytes > self::SEVENZIP_LISTING_MAX_BYTES) {
+            if ($cut) {
                 // The record being read when the output was cut is dropped, never half-parsed.
                 $process->stop(0);
 

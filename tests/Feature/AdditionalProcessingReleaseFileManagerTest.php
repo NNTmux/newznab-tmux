@@ -474,6 +474,90 @@ class AdditionalProcessingReleaseFileManagerTest extends TestCase
         ];
     }
 
+    #[DataProvider('sevenZipListings')]
+    public function test_a_cut_off_7z_listing_leaves_the_password_status_unknown(string $script, int $passwordStatus, array $names = []): void
+    {
+        DB::table('releases')->insert($this->releaseRow());
+        Search::shouldReceive('updateRelease')->once()->with(1);
+
+        $dir = sys_get_temp_dir().'/'.uniqid('7z-listing-', true);
+        mkdir($dir);
+        try {
+            file_put_contents($dir.'/7z', "#!/bin/sh\n".$script."\n");
+            chmod($dir.'/7z', 0755);
+            $archiveService = new ArchiveExtractionService($this->makeConfig(['sevenZipPath' => $dir.'/7z']));
+            $manager = $this->makeManager();
+            $context = new ReleaseProcessingContext(Release::query()->findOrFail(1));
+            $context->nzbHasCompressedFile = true;
+
+            $archive = $this->sevenZip('ignored.mkv', str_repeat('x', 100), compressedHeader: true);
+            $result = $archiveService->listEncodedSevenZip($archive, null, $context, $dir.'/');
+            $this->assertIsArray($result);
+            foreach ($result['files'] as $file) {
+                if ($context->releaseHasPassword) {
+                    break;
+                }
+                $manager->addFileInfo($file, $context, '\\.(?:par2|sfv|nzb)');
+            }
+            $manager->finalizeRelease($context, true);
+        } finally {
+            array_map('unlink', glob($dir.'/*') ?: []);
+            rmdir($dir);
+        }
+
+        $release = DB::table('releases')->where('id', 1)->first();
+        $this->assertSame($passwordStatus, (int) $release->passwordstatus);
+        $this->assertSame(0, (int) $release->haspreview);
+        $this->assertNull($release->archive_retry_at);
+        $this->assertGreaterThan(0, DB::table('release_files')->count());
+        foreach ($names as $name) {
+            $this->assertTrue(DB::table('release_files')->where('name', $name)->exists(), $name);
+        }
+    }
+
+    /**
+     * @return array<string, array{0: string, 1: int, 2?: list<string>}>
+     */
+    public static function sevenZipListings(): array
+    {
+        $plain = static fn (int $count, string $pad = ''): string => 'i=0; while [ $i -lt '.$count.' ]; do '
+            .'printf \'Path = %d'.$pad.'.txt\\nSize = 0\\nEncrypted = -\\n\\n\' $i; i=$((i+1)); done; ';
+        $encrypted = 'printf \'Path = Movie.2026.1080p.mkv\\nSize = 100\\nEncrypted = +\\n\\n\'; ';
+
+        return [
+            'encrypted entry past the entry cap' => [
+                $plain(ArchiveExtractionService::SEVENZIP_LISTING_MAX_ENTRIES).$encrypted,
+                -1,
+            ],
+            'encrypted entry past the output cap' => [
+                $plain(300, str_repeat('a', 20000)).$encrypted,
+                -1,
+            ],
+            'encrypted entry before the cap' => [
+                $plain(5).$encrypted.$plain(2000),
+                ReleaseBrowseService::PASSWD_RAR,
+            ],
+            'complete listing without encryption' => [
+                $plain(5),
+                ReleaseBrowseService::PASSWD_NONE,
+            ],
+            'CRLF listing of names containing byte 0x85' => [
+                'printf \'Path = \303\205land.mkv\r\nSize = 10\r\nEncrypted = -\r\n\r\n\'; '
+                    .'printf \'Path = Movie.\344\271\205.mkv\r\nSize = 13\r\nEncrypted = -\r\n\r\n\'; ',
+                ReleaseBrowseService::PASSWD_NONE,
+                ['Åland.mkv', 'Movie.久.mkv'],
+            ],
+            'encrypted entry behind a control character' => [
+                $plain(5).'printf \'Path = Movie\001.mkv\nSize = 100\nEncrypted = +\n\n\'; ',
+                -1,
+            ],
+            'encrypted entry behind a duplicate property' => [
+                $plain(5).'printf \'Path = a.txt\nPath = Movie.mkv\nSize = 100\nEncrypted = +\n\n\'; ',
+                -1,
+            ],
+        ];
+    }
+
     #[DataProvider('compressedCandidatePayloads')]
     public function test_plain_media_behind_an_archive_name_finalizes_with_no_password(?string $data, string $expected): void
     {
@@ -659,87 +743,72 @@ class AdditionalProcessingReleaseFileManagerTest extends TestCase
         ];
     }
 
-    #[DataProvider('sevenZipListings')]
-    public function test_a_cut_off_7z_listing_leaves_the_password_status_unknown(string $script, int $passwordStatus, array $names = []): void
+    #[DataProvider('sevenZipListingsBesideMedia')]
+    public function test_plain_media_beside_a_7z_listed_by_7_zip_follows_the_listing(string $title, int $entries, int $passwordStatus): void
     {
-        DB::table('releases')->insert($this->releaseRow());
+        DB::table('releases')->insert([...$this->releaseRow(), 'nfostatus' => 1]);
         Search::shouldReceive('updateRelease')->once()->with(1);
+        $this->freezeSecond();
 
-        $dir = sys_get_temp_dir().'/'.uniqid('7z-listing-', true);
-        mkdir($dir);
-        try {
-            file_put_contents($dir.'/7z', "#!/bin/sh\n".$script."\n");
-            chmod($dir.'/7z', 0755);
-            $archiveService = new ArchiveExtractionService($this->makeConfig(['sevenZipPath' => $dir.'/7z']));
-            $manager = $this->makeManager();
-            $context = new ReleaseProcessingContext(Release::query()->findOrFail(1));
-            $context->nzbHasCompressedFile = true;
+        $tmpPath = sys_get_temp_dir().'/media-7z-'.uniqid().'/';
+        File::ensureDirectoryExists($tmpPath);
+        $client = $tmpPath.'7z';
+        file_put_contents($client, "#!/bin/sh\ni=0; while [ \$i -lt {$entries} ]; do printf 'Path = %d.txt\\nSize = 0\\nEncrypted = -\\n\\n' \$i; i=\$((i+1)); done\n");
+        chmod($client, 0755);
 
-            $archive = $this->sevenZip('ignored.mkv', str_repeat('x', 100), compressedHeader: true);
-            $result = $archiveService->listEncodedSevenZip($archive, null, $context, $dir.'/');
-            $this->assertIsArray($result);
-            foreach ($result['files'] as $file) {
-                if ($context->releaseHasPassword) {
-                    break;
-                }
-                $manager->addFileInfo($file, $context, '\\.(?:par2|sfv|nzb)');
-            }
-            $manager->finalizeRelease($context, true);
-        } finally {
-            array_map('unlink', glob($dir.'/*') ?: []);
-            rmdir($dir);
+        $config = $this->makeConfig(['processPasswords' => true, 'sevenZipPath' => $client]);
+        $media = ['"Movie.2026.part01.rar" yEnc (1/50)', '<v1>', str_pad("\x1A\x45\xDF\xA3\x01\x00\x00\x00", 512, "\x5A")];
+        $sevenZip = [$title, '<x1>', $this->sevenZip('ignored.mkv', str_repeat('x', 100), compressedHeader: true)];
+        $parser = Mockery::mock(NzbContentParser::class);
+        $parser->shouldReceive('parseNzb')->once()->with('guid-1')->andReturn([
+            'error' => null,
+            'contents' => array_map(static fn (array $file): array => ['title' => $file[0], 'segments' => [$file[1]]], [$media, $sevenZip]),
+        ]);
+        $download = Mockery::mock(UsenetDownloadService::class);
+        $download->shouldReceive('beginReleaseScope')->once();
+        $download->shouldReceive('finishReleaseScope')->once()->andReturn(new DownloadMetrics);
+        foreach ([$media, $sevenZip] as [$title, $messageId, $data]) {
+            $download->shouldReceive('download')->once()
+                ->with(DownloadKind::Compressed, [$messageId], '', 1, $title)
+                ->andReturn(['success' => true, 'data' => $data, 'groupUnavailable' => false, 'error' => null]);
         }
+        $workspace = Mockery::mock(TempWorkspaceService::class);
+        $workspace->shouldReceive('createReleaseTempFolder')->once()->andReturn($tmpPath);
+        $workspace->shouldReceive('listFiles')->andReturn([]);
+        $workspace->shouldReceive('clearDirectory')->once()->with($tmpPath, false)
+            ->andReturnUsing(static fn () => File::deleteDirectory($tmpPath));
+        $processor = new ReleaseProcessor(
+            $config,
+            $parser,
+            new AdditionalWorkPlanner($config),
+            new ArchiveExtractionService($config),
+            Mockery::mock(MediaExtractionService::class)->shouldIgnoreMissing(false),
+            $download,
+            $this->makeManager(),
+            Mockery::mock(ReleaseFilesArchiveFallback::class)->shouldIgnoreMissing(),
+            $workspace,
+            Mockery::mock(ConsoleOutputService::class)->shouldIgnoreMissing(),
+        );
+
+        $processor->process(new ReleaseProcessingContext(Release::query()->findOrFail(1)), '/tmp/');
 
         $release = DB::table('releases')->where('id', 1)->first();
         $this->assertSame($passwordStatus, (int) $release->passwordstatus);
         $this->assertSame(0, (int) $release->haspreview);
         $this->assertNull($release->archive_retry_at);
         $this->assertGreaterThan(0, DB::table('release_files')->count());
-        foreach ($names as $name) {
-            $this->assertTrue(DB::table('release_files')->where('name', $name)->exists(), $name);
-        }
     }
 
     /**
-     * @return array<string, array{0: string, 1: int, 2?: list<string>}>
+     * @return array<string, array{string, int, int}>
      */
-    public static function sevenZipListings(): array
+    public static function sevenZipListingsBesideMedia(): array
     {
-        $plain = static fn (int $count, string $pad = ''): string => 'i=0; while [ $i -lt '.$count.' ]; do '
-            .'printf \'Path = %d'.$pad.'.txt\\nSize = 0\\nEncrypted = -\\n\\n\' $i; i=$((i+1)); done; ';
-        $encrypted = 'printf \'Path = Movie.2026.1080p.mkv\\nSize = 100\\nEncrypted = +\\n\\n\'; ';
-
         return [
-            'encrypted entry past the entry cap' => [
-                $plain(ArchiveExtractionService::SEVENZIP_LISTING_MAX_ENTRIES).$encrypted,
-                -1,
-            ],
-            'encrypted entry past the output cap' => [
-                $plain(300, str_repeat('a', 20000)).$encrypted,
-                -1,
-            ],
-            'encrypted entry before the cap' => [
-                $plain(5).$encrypted.$plain(2000),
-                ReleaseBrowseService::PASSWD_RAR,
-            ],
-            'complete listing without encryption' => [
-                $plain(5),
-                ReleaseBrowseService::PASSWD_NONE,
-            ],
-            'CRLF listing of names containing byte 0x85' => [
-                'printf \'Path = \303\205land.mkv\r\nSize = 10\r\nEncrypted = -\r\n\r\n\'; '
-                    .'printf \'Path = Movie.\344\271\205.mkv\r\nSize = 13\r\nEncrypted = -\r\n\r\n\'; ',
-                ReleaseBrowseService::PASSWD_NONE,
-                ['Åland.mkv', 'Movie.久.mkv'],
-            ],
-            'encrypted entry behind a control character' => [
-                $plain(5).'printf \'Path = Movie\001.mkv\nSize = 100\nEncrypted = +\n\n\'; ',
-                -1,
-            ],
-            'encrypted entry behind a duplicate property' => [
-                $plain(5).'printf \'Path = a.txt\nPath = Movie.mkv\nSize = 100\nEncrypted = +\n\n\'; ',
-                -1,
-            ],
+            'complete listing' => ['"Extras.2026.7z" yEnc (1/1)', 3, ReleaseBrowseService::PASSWD_NONE],
+            'cut-off listing' => ['"Extras.2026.7z" yEnc (1/1)', ArchiveExtractionService::SEVENZIP_LISTING_MAX_ENTRIES + 1, -1],
+            'complete listing of a same-stem 7z' => ['Movie.2026.7z yEnc (1/1)', 3, ReleaseBrowseService::PASSWD_NONE],
+            'cut-off listing of a same-stem 7z' => ['"Movie.2026.7z" yEnc (1/1)', ArchiveExtractionService::SEVENZIP_LISTING_MAX_ENTRIES + 1, -1],
         ];
     }
 
