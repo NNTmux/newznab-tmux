@@ -425,6 +425,57 @@ class ArchiveExtractionServiceTest extends TestCase
     }
 
     #[Test]
+    #[DataProvider('ambiguousSevenZipRecords')]
+    public function it_marks_the_context_when_every_streamed_7z_record_is_rejected(string $record): void
+    {
+        $dir = $this->workDir();
+        $client = $this->sevenZipClientPrinting($dir, $this->printfBytes($record));
+        $service = new ArchiveExtractionService($this->makeConfig(['sevenZipPath' => $client]));
+        $archive = $this->sevenZip('ignored.mkv', str_repeat('x', 100), compressedHeader: true);
+        $context = $this->sevenZipContext();
+
+        $this->assertNull($service->listEncodedSevenZip($archive, null, $context, $dir.'/'));
+        $this->assertTrue($context->archiveListingIncomplete);
+        $this->assertSame(0, $context->compressedFilesChecked);
+    }
+
+    #[Test]
+    public function it_keeps_the_incomplete_mark_when_a_later_7z_listing_is_complete(): void
+    {
+        $dir = $this->workDir();
+        $archive = $this->sevenZip('ignored.mkv', str_repeat('x', 100), compressedHeader: true);
+        $context = $this->sevenZipContext();
+        $rejected = new ArchiveExtractionService($this->makeConfig([
+            'sevenZipPath' => $this->sevenZipClientPrinting($dir, $this->printfBytes("Path = a\x01b.mkv\nSize = 5\nEncrypted = +\n\n")),
+        ]));
+        $this->assertNull($rejected->listEncodedSevenZip($archive, null, $context, $dir.'/'));
+
+        $complete = new ArchiveExtractionService($this->makeConfig([
+            'sevenZipPath' => $this->sevenZipClientPrinting($dir, $this->printfBytes($this->sevenZipListing(['last.mkv'], "\n"))),
+        ]));
+        $result = $complete->listEncodedSevenZip($archive, null, $context, $dir.'/');
+
+        $this->assertIsArray($result);
+        $this->assertSame(['last.mkv'], array_column($result['files'], 'name'));
+        $this->assertTrue($context->archiveListingIncomplete);
+    }
+
+    #[Test]
+    public function it_does_not_mark_an_empty_or_failed_7z_listing_incomplete(): void
+    {
+        $dir = $this->workDir();
+        $archive = $this->sevenZip('ignored.mkv', str_repeat('x', 100), compressedHeader: true);
+
+        foreach (['true', 'exit 2'] as $script) {
+            $service = new ArchiveExtractionService($this->makeConfig(['sevenZipPath' => $this->sevenZipClientPrinting($dir, $script)]));
+            $context = $this->sevenZipContext();
+
+            $this->assertNull($service->listEncodedSevenZip($archive, null, $context, $dir.'/'), $script);
+            $this->assertFalse($context->archiveListingIncomplete, $script);
+        }
+    }
+
+    #[Test]
     public function it_lists_a_compressed_7z_header_through_a_sparse_copy_of_the_archive(): void
     {
         $dir = $this->workDir();
@@ -571,7 +622,9 @@ class ArchiveExtractionServiceTest extends TestCase
 
         foreach ([false, '/nonexistent/7z'] as $client) {
             $service = new ArchiveExtractionService($this->makeConfig(['sevenZipPath' => $client]));
-            $this->assertNull($service->listEncodedSevenZip(substr($archive, 0, 40), substr($archive, -60), $this->sevenZipContext(), sys_get_temp_dir().'/'));
+            $context = $this->sevenZipContext();
+            $this->assertNull($service->listEncodedSevenZip(substr($archive, 0, 40), substr($archive, -60), $context, sys_get_temp_dir().'/'));
+            $this->assertFalse($context->archiveListingIncomplete);
         }
     }
 

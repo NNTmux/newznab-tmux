@@ -55,6 +55,11 @@ final readonly class ArchiveCandidate
     /**
      * File name in an NZB subject, quoted ("name.part01.rar" yEnc (1/50)) or not
      * (name.part01.rar yEnc (1/50), [01/10] - name.mkv.001 yEnc), lower-cased.
+     *
+     * Unquoted, only "yEnc" and what follows, part counters and "-" separators around the
+     * name, and "[01/10] - " post counters inside it are dropped. Everything else stays,
+     * spaces and any poster prefix included, as the name can't be told apart from it:
+     * "First Movie.rar" and "Second Movie.rar" must never share a name.
      */
     public static function fileName(string $subject): string
     {
@@ -62,11 +67,12 @@ final readonly class ArchiveCandidate
             return strtolower(trim($quoted[1]));
         }
 
-        // Drop "yEnc" and what follows, then trailing part counters and separators;
-        // the name is the last word left.
+        $counter = '[\[(]\s*\d+\s*(?:\/|of)\s*\d+\s*[\])]';
         $name = (string) preg_replace('/(?:^|\s)yEnc\b.*$/is', '', $subject);
-        $name = (string) preg_replace('/(?:\s*(?:-|[\[(]\s*\d+\s*(?:\/|of)\s*\d+\s*[\])]))+\s*$/i', '', $name);
+        $name = (string) preg_replace('/(?:\s*(?:-|'.$counter.'))+\s*$/i', '', $name);
+        $name = (string) preg_replace('/^(?:\s*(?:-(?=\s)|'.$counter.'))+\s*/i', '', $name);
+        $name = (string) preg_replace('/\s+'.$counter.'\s+-\s+/i', ' ', $name);
 
-        return strtolower(preg_match('/(\S+)\s*$/', $name, $word) === 1 ? $word[1] : trim($name));
+        return strtolower(trim($name));
     }
 }

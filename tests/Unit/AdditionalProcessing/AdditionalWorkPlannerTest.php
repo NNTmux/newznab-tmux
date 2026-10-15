@@ -485,6 +485,10 @@ class AdditionalWorkPlannerTest extends TestCase
             'ZIP' => ['Movie.2026.zip', 'zip:movie.2026'],
             'ZIP volume' => ['Movie.2026.z01', 'zip:movie.2026'],
             'split video' => ['Movie.2026.mkv.001', 'split:movie.2026.mkv'],
+            'spaced RAR part' => ['First Movie.part01.rar', 'rar:first movie'],
+            'spaced ZIP volume' => ['First Movie.z01', 'zip:first movie'],
+            'spaced 7z volume' => ['First Movie.7z.001', '7z:first movie'],
+            'spaced split video' => ['First Movie.mkv.001', 'split:first movie.mkv'],
         ];
     }
 
@@ -496,15 +500,42 @@ class AdditionalWorkPlannerTest extends TestCase
             '"'.$name.'" yEnc (1/50)',
             $name.' yEnc (1/50)',
             $name.' (1/50)',
+            strtoupper($name).' - yEnc (01/50)',
             '[01/10] - '.$name.' yEnc',
             '[01/10] - "'.$name.'" yEnc (1/50)',
-            'Group Post - '.strtoupper($name).' - yEnc (01/50)',
         ];
 
         foreach ($subjects as $subject) {
             $this->assertSame(strtolower($name), ArchiveCandidate::fileName($subject), $subject);
             $this->assertSame($key, ArchiveCandidate::volumeSetKey($subject), $subject);
         }
+    }
+
+    #[Test]
+    public function it_keeps_unquoted_names_that_differ_before_their_last_space_apart(): void
+    {
+        $this->assertSame('first movie.rar', ArchiveCandidate::fileName('First Movie.rar yEnc (1/50)'));
+        $this->assertSame('rar:first movie', ArchiveCandidate::volumeSetKey('First Movie.rar yEnc (1/50)'));
+        $this->assertSame('rar:second movie', ArchiveCandidate::volumeSetKey('Second Movie.rar yEnc (1/50)'));
+        $this->assertSame('rar:other post - movie.2026', ArchiveCandidate::volumeSetKey('Other Post - Movie.2026.part01.rar - yEnc (01/50)'));
+        $this->assertSame('rar:movie (1 of 2) extras', ArchiveCandidate::volumeSetKey('Movie (1 of 2) Extras.rar yEnc (1/50)'));
+        $this->assertSame('rar:movie (2 of 2) extras', ArchiveCandidate::volumeSetKey('Movie (2 of 2) Extras.rar yEnc (1/50)'));
+    }
+
+    #[Test]
+    public function it_groups_unquoted_volumes_whose_subjects_differ_only_in_post_counters(): void
+    {
+        $subjects = [
+            'Group Post - Movie.2026.part01.rar - yEnc (01/50)',
+            'Group Post - Movie.2026.part02.rar - yEnc (02/50)',
+            'Group Post [01/10] - Movie.2026.part01.rar yEnc (1/50)',
+            'Group Post [02/10] - Movie.2026.part02.rar yEnc (1/50)',
+        ];
+
+        $this->assertSame(
+            ['rar:group post - movie.2026', 'rar:group post - movie.2026', 'rar:group post movie.2026', 'rar:group post movie.2026'],
+            array_map(ArchiveCandidate::volumeSetKey(...), $subjects),
+        );
     }
 
     #[Test]

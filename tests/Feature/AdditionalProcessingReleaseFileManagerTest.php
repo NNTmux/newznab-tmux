@@ -555,12 +555,13 @@ class AdditionalProcessingReleaseFileManagerTest extends TestCase
 
     /**
      * @param  list<array{string, string, string|false|null}>  $files  title, message-id and its data (false: download fails,
-     *                                                                 null: not downloaded, 'encrypted zip'/'encrypted 7z': such an archive)
+     *                                                                 null: not downloaded, 'encrypted rar'/'encrypted zip'/'encrypted 7z': such an archive)
      */
     #[DataProvider('mediaBesideOtherCandidates')]
     public function test_plain_media_only_finalizes_when_no_other_archive_stayed_unread(array $files, int $status): void
     {
         $files = array_map(fn (array $file): array => [$file[0], $file[1], match ($file[2]) {
+            'encrypted rar' => $this->rar('Movie.2026.1080p.mkv', str_repeat('x', 100), encryptedFile: true),
             'encrypted zip' => $this->zip('Movie.2026.1080p.mkv', str_repeat('x', 100), encryptedFile: true),
             'encrypted 7z' => $this->sevenZip('Movie.2026.1080p.mkv', str_repeat('x', 100), encryptedHeader: true),
             default => $file[2],
@@ -621,6 +622,7 @@ class AdditionalProcessingReleaseFileManagerTest extends TestCase
     {
         $mkv = str_pad("\x1A\x45\xDF\xA3\x01\x00\x00\x00", 512, "\x5A");
         $media = ['"Movie.2026.part01.rar" yEnc (1/50)', '<v1>', $mkv];
+        $spaced = ['First Movie.rar yEnc (1/50)', '<v1>', $mkv];
 
         $unreadable = str_pad("\x8E\x13\x7F\x02", 512, "\x5A");
         $none = ReleaseBrowseService::PASSWD_NONE;
@@ -645,6 +647,15 @@ class AdditionalProcessingReleaseFileManagerTest extends TestCase
                 ['"Movie.2026.mkv.001" yEnc (1/80)', '<s1>', $mkv],
                 ['"Movie.2026.mkv.zip" yEnc (1/3)', '<z1>', 'encrypted zip'],
             ], $passworded],
+            'an encrypted archive with another spaced name beside it' => [[$spaced, ['Second Movie.rar yEnc (1/50)', '<x1>', 'encrypted rar']], $passworded],
+            'an unreadable archive with another spaced name beside it' => [[$spaced, ['Second Movie.rar yEnc (1/50)', '<x1>', $unreadable]], -1],
+            'a missing archive with another spaced name beside it' => [[$spaced, ['Second Movie.rar yEnc (1/50)', '<x1>', false]], -1],
+            'spaced later volumes of the same file' => [[
+                ['First Movie.part01.rar yEnc (1/50)', '<v1>', $mkv],
+                ['First Movie.part02.rar yEnc (1/50)', '<v2>', null],
+                ['[03/50] - First Movie.part03.rar yEnc', '<v3>', null],
+                ['"First Movie.part04.rar" yEnc (1/50)', '<v4>', null],
+            ], $none],
         ];
     }
 
@@ -729,6 +740,79 @@ class AdditionalProcessingReleaseFileManagerTest extends TestCase
                 $plain(5).'printf \'Path = a.txt\nPath = Movie.mkv\nSize = 100\nEncrypted = +\n\n\'; ',
                 -1,
             ],
+        ];
+    }
+
+    /**
+     * @param  list<string>  $listings  7-Zip client output for each 7z archive of the release, listed in order
+     */
+    #[DataProvider('sevenZipListingsWithoutReadableRecords')]
+    public function test_a_7z_listing_without_one_readable_record_still_leaves_the_password_status_unknown(
+        array $listings,
+        bool $hasReleaseFile,
+        int $passwordStatus,
+        bool $retried,
+    ): void {
+        DB::table('releases')->insert($this->releaseRow());
+        if ($hasReleaseFile) {
+            DB::table('release_files')->insert(['releases_id' => 1, 'name' => 'Extras/readme.txt', 'size' => 10]);
+        }
+        Search::shouldReceive('updateRelease')->once()->with(1);
+        config(['nntmux.archive_retry_delay' => 86400]);
+        $this->freezeSecond();
+
+        $dir = sys_get_temp_dir().'/'.uniqid('7z-listing-', true);
+        mkdir($dir);
+        try {
+            $manager = $this->makeManager();
+            $context = new ReleaseProcessingContext(Release::query()->findOrFail(1));
+            $context->nzbHasCompressedFile = true;
+            $archive = $this->sevenZip('ignored.mkv', str_repeat('x', 100), compressedHeader: true);
+
+            foreach ($listings as $index => $listing) {
+                $client = $dir.'/7z-'.$index;
+                file_put_contents($client, "#!/bin/sh\n".$listing."\n");
+                chmod($client, 0755);
+                $result = (new ArchiveExtractionService($this->makeConfig(['sevenZipPath' => $client])))
+                    ->listEncodedSevenZip($archive, null, $context, $dir.'/');
+                foreach ($result['files'] ?? [] as $file) {
+                    if ($context->releaseHasPassword) {
+                        break;
+                    }
+                    $manager->addFileInfo($file, $context, '\\.(?:par2|sfv|nzb)');
+                }
+            }
+            $manager->finalizeRelease($context, true);
+        } finally {
+            array_map('unlink', glob($dir.'/*') ?: []);
+            rmdir($dir);
+        }
+
+        $release = DB::table('releases')->where('id', 1)->first();
+        $this->assertSame($passwordStatus, (int) $release->passwordstatus);
+        $this->assertSame($retried ? -1 : 0, (int) $release->haspreview);
+        $this->assertSame($retried ? now()->addDay()->toDateTimeString() : null, $release->archive_retry_at);
+    }
+
+    /**
+     * @return array<string, array{list<string>, bool, int, bool}>
+     */
+    public static function sevenZipListingsWithoutReadableRecords(): array
+    {
+        $controlCharacter = 'printf \'Path = Movie\001.mkv\nSize = 100\nEncrypted = +\n\n\'';
+        $duplicateProperty = 'printf \'Path = a.txt\nPath = Movie.mkv\nSize = 100\nEncrypted = +\n\n\'';
+        $plain = 'printf \'Path = Extras/info.txt\nSize = 4\nEncrypted = -\n\n\'';
+        $encrypted = 'printf \'Path = Movie.2026.1080p.mkv\nSize = 100\nEncrypted = +\n\n\'';
+
+        return [
+            'control character beside a stored file' => [[$controlCharacter], true, -1, false],
+            'duplicate property beside a stored file' => [[$duplicateProperty], true, -1, false],
+            'control character, then a complete listing' => [[$controlCharacter, $plain], false, -1, false],
+            'duplicate property, then a complete listing' => [[$duplicateProperty, $plain], false, -1, false],
+            'complete listing, then a control character' => [[$plain, $controlCharacter], false, -1, false],
+            'control character, then an encrypted entry' => [[$controlCharacter, $encrypted], false, ReleaseBrowseService::PASSWD_RAR, false],
+            'control character and no file at all' => [[$controlCharacter], false, -1, true],
+            'empty listing beside a stored file' => [[''], true, ReleaseBrowseService::PASSWD_NONE, false],
         ];
     }
 

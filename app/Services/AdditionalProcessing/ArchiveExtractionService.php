@@ -429,14 +429,15 @@ class ArchiveExtractionService
             @unlink($file);
         }
 
+        // Marked even when no record survived, as a rejected record may be the encrypted one.
+        if (! $complete) {
+            $context->archiveListingIncomplete = true;
+        }
         if ($files === []) {
             return null;
         }
 
         $context->compressedFilesChecked++;
-        if (! $complete) {
-            $context->archiveListingIncomplete = true;
-        }
 
         return [
             'success' => true,
