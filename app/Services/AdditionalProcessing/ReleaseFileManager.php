@@ -287,7 +287,12 @@ class ReleaseFileManager
                     Release::query()->where('id', $context->release->id)->update($updateRows);
                 }
             } else {
-                $updateRows['passwordstatus'] = $processPasswords ? $passwordStatus : ReleaseBrowseService::PASSWD_NONE;
+                // A cut-off listing can't rule out an encrypted entry past the cut: keep the status unknown
+                if (! $processPasswords) {
+                    $updateRows['passwordstatus'] = ReleaseBrowseService::PASSWD_NONE;
+                } elseif ($context->releaseHasPassword || ! $context->archiveListingIncomplete) {
+                    $updateRows['passwordstatus'] = $passwordStatus;
+                }
                 $updateRows['rarinnerfilecount'] = $releaseFilesCount;
                 Release::query()->where('id', $context->release->id)->update($updateRows);
             }
