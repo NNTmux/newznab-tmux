@@ -191,6 +191,7 @@ class ReleaseProcessor
             $probedArchive = $probe !== null && ArchiveExtractionService::hasArchiveSignature($probe[1]) ? $probe : null;
             if ($probedArchive !== null) {
                 $context->nzbHasCompressedFile = true;
+                $context->unplannedArchiveSeen = true;
             }
 
             if ($this->shouldProcessDownloads()) {
@@ -822,6 +823,11 @@ class ReleaseProcessor
                 continue;
             }
 
+            // Further volumes of a file already found to be plain media hold no file list.
+            if (isset($context->mediaVolumeSets[$archiveCandidate->volumeSet()])) {
+                continue;
+            }
+
             if (! $reverse) {
                 $triedCompressedMids = [...$triedCompressedMids, ...$archiveCandidate->messageIds];
             }
@@ -861,7 +867,8 @@ class ReleaseProcessor
 
                     continue;
                 }
-                if ($processed) {
+                // Plain media says nothing about the release's other archives; keep checking them.
+                if ($processed && ! isset($context->mediaVolumeSets[$archiveCandidate->volumeSet()])) {
                     break;
                 }
             } else {
@@ -921,6 +928,9 @@ class ReleaseProcessor
         }
 
         if (isset($result['standaloneVideoType'])) {
+            if ($source !== null) {
+                $context->mediaVolumeSets[$source->volumeSet()] = true;
+            }
             $this->output->echoInlineVideo();
             $fileLocation = $context->tmpPath.'inline_video_'.uniqid('', true).'.'.$result['standaloneVideoType'];
             File::put($fileLocation, $result['standaloneVideoData']);

@@ -19,4 +19,54 @@ final readonly class ArchiveCandidate
         public bool $hasFirstSegment = true,
         public string $setKey = '',
     ) {}
+
+    /**
+     * Key shared by every volume or piece of the file this candidate belongs to.
+     */
+    public function volumeSet(): string
+    {
+        return self::volumeSetKey($this->title);
+    }
+
+    /**
+     * Key of the volume set a subject belongs to: the archive family and the name without
+     * its volume suffix, e.g. "rar:movie" for movie.part01.rar, movie.rar and movie.r00, or
+     * "split:movie.mkv" for movie.mkv.001. Only genuine sibling volumes share a key; a
+     * movie.zip or movie.7z next to movie.part01.rar is a different set.
+     */
+    public static function volumeSetKey(string $subject): string
+    {
+        $name = self::fileName($subject);
+        $families = [
+            'rar' => '/^(.+?)\.(?:part\d+\.rar|rar|r\d{2,3})$/',
+            '7z' => '/^(.+?)\.7z(?:\.\d{3})?$/',
+            'zip' => '/^(.+?)\.(?:zipx?|zipr\d{2,3}|z\d{2,3})$/',
+            'split' => '/^([a-f0-9]{32})\.[1-9]\d{1,2}$|^(.+?)\.\d{3}$/',
+        ];
+        foreach ($families as $family => $pattern) {
+            if (preg_match($pattern, $name, $match) === 1) {
+                return $family.':'.($match[1] !== '' ? $match[1] : $match[2]);
+            }
+        }
+
+        return 'file:'.$name;
+    }
+
+    /**
+     * File name in an NZB subject, quoted ("name.part01.rar" yEnc (1/50)) or not
+     * (name.part01.rar yEnc (1/50), [01/10] - name.mkv.001 yEnc), lower-cased.
+     */
+    public static function fileName(string $subject): string
+    {
+        if (preg_match('/"([^"\r\n]+)"/', $subject, $quoted) === 1) {
+            return strtolower(trim($quoted[1]));
+        }
+
+        // Drop "yEnc" and what follows, then trailing part counters and separators;
+        // the name is the last word left.
+        $name = (string) preg_replace('/(?:^|\s)yEnc\b.*$/is', '', $subject);
+        $name = (string) preg_replace('/(?:\s*(?:-|[\[(]\s*\d+\s*(?:\/|of)\s*\d+\s*[\])]))+\s*$/i', '', $name);
+
+        return strtolower(preg_match('/(\S+)\s*$/', $name, $word) === 1 ? $word[1] : trim($name));
+    }
 }

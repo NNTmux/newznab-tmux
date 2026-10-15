@@ -62,6 +62,17 @@ class ReleaseProcessingContext
     public bool $nzbHasCompressedFile = false;
 
     /**
+     * Volume sets of compressed candidates whose data turned out to be plain media,
+     * which has no password.
+     *
+     * @var array<string, true>
+     */
+    public array $mediaVolumeSets = [];
+
+    // Archive data was found outside the planned archive candidates (e.g. by the probe).
+    public bool $unplannedArchiveSeen = false;
+
+    /**
      * @var list<array<string, mixed>>
      */
     public array $nzbContents = [];
@@ -223,6 +234,8 @@ class ReleaseProcessingContext
         $this->passwordStatus = 0;
         $this->releaseHasPassword = false;
         $this->nzbHasCompressedFile = false;
+        $this->mediaVolumeSets = [];
+        $this->unplannedArchiveSeen = false;
         $this->groupUnavailable = false;
         $this->workPlan = null;
         $this->seasonPack = false;
@@ -342,6 +355,25 @@ class ReleaseProcessingContext
             'par2Info' => $this->foundPAR2Info = true,
             default => null,
         };
+    }
+
+    /**
+     * True when every compressed candidate was proven to be plain media; an unread or
+     * unreadable archive anywhere else in the release keeps its password status unknown.
+     */
+    public function compressedFilesAreMedia(): bool
+    {
+        if ($this->mediaVolumeSets === [] || $this->unplannedArchiveSeen) {
+            return false;
+        }
+
+        foreach ($this->workPlan->archiveCandidates ?? [] as $candidate) {
+            if (! isset($this->mediaVolumeSets[$candidate->volumeSet()])) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
