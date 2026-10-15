@@ -300,6 +300,49 @@ class TmuxRuntimeTest extends TestCase
         $this->assertLessThan(2, microtime(true) - $started);
     }
 
+    #[DataProvider('drainingWorkerRoles')]
+    public function test_waiting_stop_finishes_active_batches_before_closing_the_session(TmuxPaneRole $role): void
+    {
+        ConfigurationTestBuilder::updateRuntime(['tmux_running' => true]);
+        $keeper = new TmuxSessionManager('unrelated');
+        $this->assertNotNull($keeper->createSession(), (string) $keeper->lastError());
+        $session = new TmuxSessionManager('draining');
+        $pane = $session->createSession();
+        $this->assertNotNull($pane);
+        $panes = new TmuxPaneManager('draining');
+        $this->assertTrue($panes->setPaneRole($pane, $role));
+        $monitor = $panes->splitHorizontal($pane, 50);
+        $this->assertNotNull($monitor);
+        $this->assertTrue($panes->setPaneRole($monitor, TmuxPaneRole::Monitor));
+        $this->assertTrue($panes->respawnPane($monitor, ['sleep', '60']));
+        $scraper = $panes->splitVertical($monitor, 50);
+        $this->assertNotNull($scraper);
+        $this->assertTrue($panes->setPaneRole($scraper, TmuxPaneRole::IrcScraper));
+        $this->assertTrue($panes->respawnPane($scraper, ['sleep', '60']));
+        $marker = $this->temporaryFile();
+        $runner = new TmuxTaskRunner('draining');
+        $script = 'file_put_contents($argv[1], "started\n"); usleep(750000); file_put_contents($argv[1], "finished\n", FILE_APPEND);';
+        $worker = implode(' ', array_map('escapeshellarg', [PHP_BINARY, '-r', $script, $marker]));
+        $batch = (new \ReflectionMethod($runner, 'batchCommand'))->invoke($runner, [$worker, 'printf "batch complete\\n" >> '.escapeshellarg($marker)]);
+        $this->assertTrue($panes->respawnPane($pane, ['bash', '-c', $runner->buildCommand($batch, ['sleep' => 0])]));
+        $this->await(static fn (): bool => str_contains(file_get_contents($marker), 'started'));
+
+        $this->artisan('tmux:stop --session=draining --force --wait --timeout=0')->assertExitCode(0);
+
+        $this->assertSame("started\nfinished\nbatch complete\n", file_get_contents($marker));
+        $this->assertSame(0, (int) DB::table('processing_runtime_states')->value('tmux_running'));
+        $this->assertSame(1, (int) DB::table('processing_runtime_states')->value('stop_requested'));
+        $this->assertFalse($session->sessionExists());
+        $this->assertTrue($keeper->sessionExists());
+    }
+
+    /** @return iterable<string, array{TmuxPaneRole}> */
+    public static function drainingWorkerRoles(): iterable
+    {
+        yield 'parallel processing' => [TmuxPaneRole::PostAdditional];
+        yield 'sequential processing' => [TmuxPaneRole::Sequential];
+    }
+
     public function test_stop_cancels_owned_workers_without_finishing_or_starting_queued_jobs(): void
     {
         if (! function_exists('pcntl_signal') || ! function_exists('posix_kill')) {

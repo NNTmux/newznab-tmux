@@ -151,8 +151,8 @@ class UpdateNNTmux extends Command
         // Check if tmux is running
         $tmux = new Tmux;
         $this->tmuxWasRunning = $tmux->isRunning();
-        if ($this->tmuxWasRunning) {
-            $this->call('tmux:stop', ['--force' => true]);
+        if ($this->call('tmux:stop', ['--force' => true, '--wait' => true]) !== Command::SUCCESS) {
+            throw new \RuntimeException('Failed to stop tmux before updating');
         }
 
         $this->progressBar->advance();

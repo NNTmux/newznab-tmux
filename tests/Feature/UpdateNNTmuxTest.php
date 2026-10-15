@@ -142,12 +142,45 @@ class UpdateNNTmuxTest extends TestCase
         $this->assertStringNotContainsString(config('app.key'), $output);
     }
 
+    public function test_failed_tmux_shutdown_aborts_before_git_and_restores_web_access(): void
+    {
+        $command = $this->command();
+        $this->expectPreparation($command, stopExitCode: 1);
+        $command->shouldReceive('call')->with('nntmux:git', Mockery::any())->never();
+        $command->shouldReceive('call')->with('nntmux:composer')->never();
+        $this->expectWebRestore($command);
+
+        [$status, $output] = $this->runCommand($command);
+
+        $this->assertSame(1, $status);
+        $this->assertFalse($this->maintenanceActive);
+        $this->assertStringContainsString('Failed to stop tmux before updating', $output);
+        Process::assertNotRan(fn (PendingProcess $process): bool => $this->isFreshTmuxStart($process));
+        $this->assertSame(0, (new NntmuxUpdateLock)->run(fn (): int => 0, checkGit: false));
+    }
+
+    public function test_paused_tmux_is_drained_before_git_without_restarting_it(): void
+    {
+        ConfigurationTestBuilder::updateRuntime(['tmux_running' => false]);
+        $command = $this->command();
+        $this->expectPreparation($command);
+        $command->shouldReceive('call')->once()->with('nntmux:git', ['--git-lock-timeout' => 0])->andReturn(0);
+        $this->expectMaintenanceTasks($command);
+        $this->expectHealthyRedis();
+        $this->expectWebRestore($command);
+
+        [$status] = $this->runCommand($command, ['--git-lock-timeout' => 0]);
+
+        $this->assertSame(0, $status);
+        Process::assertNotRan(fn (PendingProcess $process): bool => $this->isFreshTmuxStart($process));
+    }
+
     public function test_pre_existing_maintenance_mode_is_preserved_after_failure(): void
     {
         $this->maintenanceActive = true;
         $command = $this->command();
         $command->shouldReceive('call')->with('down', Mockery::any())->never();
-        $command->shouldReceive('call')->once()->with('tmux:stop', ['--force' => true])->andReturn(0);
+        $command->shouldReceive('call')->once()->with('tmux:stop', ['--force' => true, '--wait' => true])->andReturn(0);
         $command->shouldReceive('call')->once()->with('nntmux:git', ['--git-lock-timeout' => 0])->andReturn(1);
         $command->shouldReceive('call')->with('up')->never();
         $command->shouldReceive('call')->with('tmux:start')->never();
@@ -311,7 +344,7 @@ class UpdateNNTmuxTest extends TestCase
     }
 
     /** @param UpdateNNTmux&MockInterface $command */
-    private function expectPreparation(UpdateNNTmux $command): void
+    private function expectPreparation(UpdateNNTmux $command, int $stopExitCode = 0): void
     {
         $command->shouldReceive('call')->once()->with('down', Mockery::on(function (array $options): bool {
             $this->assertNotSame(config('app.key'), $options['--secret']);
@@ -323,7 +356,7 @@ class UpdateNNTmuxTest extends TestCase
 
             return 0;
         });
-        $command->shouldReceive('call')->once()->with('tmux:stop', ['--force' => true])->andReturn(0);
+        $command->shouldReceive('call')->once()->with('tmux:stop', ['--force' => true, '--wait' => true])->andReturn($stopExitCode);
     }
 
     /** @param UpdateNNTmux&MockInterface $command */

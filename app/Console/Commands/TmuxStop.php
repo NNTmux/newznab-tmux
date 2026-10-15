@@ -22,6 +22,7 @@ class TmuxStop extends Command
     protected $signature = 'tmux:stop
                             {--session= : Tmux session name}
                             {--force : Stop without confirmation}
+                            {--wait : Let active processing batches finish before closing the session}
                             {--timeout=5 : Maximum seconds for interrupted workers to clean up before closing the session}';
 
     /**
@@ -76,7 +77,10 @@ class TmuxStop extends Command
             $timeout = max(0, (int) $this->option('timeout'));
             $deadline = microtime(true) + $timeout;
             $interrupted = [];
-            $this->info('Interrupting processing and cleaning up workers...');
+            $wait = (bool) $this->option('wait');
+            $this->info($wait
+                ? 'Waiting for active processing panes to finish their work...'
+                : 'Interrupting processing and cleaning up workers...');
             do {
                 $panes->refresh();
                 $active = array_filter($panes->paneSnapshot(), static fn (array $state): bool => ! $state['dead']
@@ -85,12 +89,15 @@ class TmuxStop extends Command
                     break;
                 }
                 foreach (array_keys($active) as $pane) {
+                    if ($wait && ! in_array(TmuxPaneRole::tryFrom($active[$pane]['role']), [TmuxPaneRole::Monitor, TmuxPaneRole::IrcScraper], true)) {
+                        continue;
+                    }
                     if (! isset($interrupted[$pane])) {
                         $panes->sendKeys($pane, 'C-c', enter: false);
                         $interrupted[$pane] = true;
                     }
                 }
-                if (microtime(true) >= $deadline) {
+                if (! $wait && microtime(true) >= $deadline) {
                     $this->warn('Cleanup timeout reached; closing the processing session.');
 
                     break;
