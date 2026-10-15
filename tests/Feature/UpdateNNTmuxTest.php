@@ -159,7 +159,7 @@ class UpdateNNTmuxTest extends TestCase
         $this->assertSame(0, (new NntmuxUpdateLock)->run(fn (): int => 0, checkGit: false));
     }
 
-    public function test_paused_tmux_is_drained_before_git_without_restarting_it(): void
+    public function test_paused_tmux_is_stopped_before_git_without_restarting_it(): void
     {
         ConfigurationTestBuilder::updateRuntime(['tmux_running' => false]);
         $command = $this->command();
@@ -180,7 +180,7 @@ class UpdateNNTmuxTest extends TestCase
         $this->maintenanceActive = true;
         $command = $this->command();
         $command->shouldReceive('call')->with('down', Mockery::any())->never();
-        $command->shouldReceive('call')->once()->with('tmux:stop', ['--force' => true, '--wait' => true])->andReturn(0);
+        $command->shouldReceive('call')->once()->with('tmux:stop', ['--force' => true, '--wait' => true, '--timeout' => 60])->andReturn(0);
         $command->shouldReceive('call')->once()->with('nntmux:git', ['--git-lock-timeout' => 0])->andReturn(1);
         $command->shouldReceive('call')->with('up')->never();
         $command->shouldReceive('call')->with('tmux:start')->never();
@@ -356,7 +356,7 @@ class UpdateNNTmuxTest extends TestCase
 
             return 0;
         });
-        $command->shouldReceive('call')->once()->with('tmux:stop', ['--force' => true, '--wait' => true])->andReturn($stopExitCode);
+        $command->shouldReceive('call')->once()->with('tmux:stop', ['--force' => true, '--wait' => true, '--timeout' => 60])->andReturn($stopExitCode);
     }
 
     /** @param UpdateNNTmux&MockInterface $command */

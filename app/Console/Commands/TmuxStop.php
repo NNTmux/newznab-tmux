@@ -22,8 +22,8 @@ class TmuxStop extends Command
     protected $signature = 'tmux:stop
                             {--session= : Tmux session name}
                             {--force : Stop without confirmation}
-                            {--wait : Let active processing batches finish before closing the session}
-                            {--timeout=5 : Maximum seconds for interrupted workers to clean up before closing the session}';
+                            {--wait : Let active processing batches finish within the timeout before closing the session}
+                            {--timeout=5 : Maximum seconds to wait before closing the session}';
 
     /**
      * The console command description.
@@ -79,7 +79,7 @@ class TmuxStop extends Command
             $interrupted = [];
             $wait = (bool) $this->option('wait');
             $this->info($wait
-                ? 'Waiting for active processing panes to finish their work...'
+                ? "Waiting up to {$timeout} seconds for active processing panes to finish their work..."
                 : 'Interrupting processing and cleaning up workers...');
             do {
                 $panes->refresh();
@@ -88,8 +88,9 @@ class TmuxStop extends Command
                 if ($active === []) {
                     break;
                 }
+                $timedOut = microtime(true) >= $deadline;
                 foreach (array_keys($active) as $pane) {
-                    if ($wait && ! in_array(TmuxPaneRole::tryFrom($active[$pane]['role']), [TmuxPaneRole::Monitor, TmuxPaneRole::IrcScraper], true)) {
+                    if ($wait && ! $timedOut && ! in_array(TmuxPaneRole::tryFrom($active[$pane]['role']), [TmuxPaneRole::Monitor, TmuxPaneRole::IrcScraper], true)) {
                         continue;
                     }
                     if (! isset($interrupted[$pane])) {
@@ -97,8 +98,10 @@ class TmuxStop extends Command
                         $interrupted[$pane] = true;
                     }
                 }
-                if (! $wait && microtime(true) >= $deadline) {
-                    $this->warn('Cleanup timeout reached; closing the processing session.');
+                if (microtime(true) >= $deadline) {
+                    $this->warn($wait
+                        ? 'Wait timeout reached; stopping remaining panes and closing the processing session.'
+                        : 'Cleanup timeout reached; closing the processing session.');
 
                     break;
                 }

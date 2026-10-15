@@ -327,8 +327,10 @@ class TmuxRuntimeTest extends TestCase
         $this->assertTrue($panes->respawnPane($pane, ['bash', '-c', $runner->buildCommand($batch, ['sleep' => 0])]));
         $this->await(static fn (): bool => str_contains(file_get_contents($marker), 'started'));
 
-        $this->artisan('tmux:stop --session=draining --force --wait --timeout=0')->assertExitCode(0);
+        $started = microtime(true);
+        $this->artisan('tmux:stop --session=draining --force --wait --timeout=5')->assertExitCode(0);
 
+        $this->assertLessThan(4, microtime(true) - $started);
         $this->assertSame("started\nfinished\nbatch complete\n", file_get_contents($marker));
         $this->assertSame(0, (int) DB::table('processing_runtime_states')->value('tmux_running'));
         $this->assertSame(1, (int) DB::table('processing_runtime_states')->value('stop_requested'));
@@ -341,6 +343,45 @@ class TmuxRuntimeTest extends TestCase
     {
         yield 'parallel processing' => [TmuxPaneRole::PostAdditional];
         yield 'sequential processing' => [TmuxPaneRole::Sequential];
+    }
+
+    #[DataProvider('waitingStopTimeouts')]
+    public function test_waiting_stop_closes_unfinished_panes_when_the_timeout_expires(TmuxPaneRole $role, int $timeout): void
+    {
+        ConfigurationTestBuilder::updateRuntime(['tmux_running' => true]);
+        $keeper = new TmuxSessionManager('unrelated');
+        $this->assertNotNull($keeper->createSession(), (string) $keeper->lastError());
+        $session = new TmuxSessionManager('draining');
+        $pane = $session->createSession();
+        $this->assertNotNull($pane);
+        $panes = new TmuxPaneManager('draining');
+        $this->assertTrue($panes->setPaneRole($pane, $role));
+        $marker = $this->temporaryFile();
+        $script = 'file_put_contents($argv[1], "started\\n"); sleep(30); file_put_contents($argv[1], "finished\\n", FILE_APPEND);';
+        $this->assertTrue($panes->respawnPane($pane, [PHP_BINARY, '-r', $script, $marker]));
+        $this->await(static fn (): bool => str_contains(file_get_contents($marker), 'started'));
+
+        $started = microtime(true);
+        $this->artisan('tmux:stop', ['--session' => 'draining', '--force' => true, '--wait' => true, '--timeout' => $timeout])
+            ->expectsOutput('Wait timeout reached; stopping remaining panes and closing the processing session.')
+            ->assertExitCode(0);
+
+        $elapsed = microtime(true) - $started;
+        $this->assertGreaterThanOrEqual($timeout, $elapsed);
+        $this->assertLessThan($timeout + 3, $elapsed);
+        $this->assertSame("started\n", file_get_contents($marker));
+        $this->assertFalse($session->sessionExists());
+        $this->assertTrue($keeper->sessionExists());
+        $this->assertSame(0, (int) DB::table('processing_runtime_states')->value('tmux_running'));
+        $this->assertSame(1, (int) DB::table('processing_runtime_states')->value('stop_requested'));
+    }
+
+    /** @return iterable<string, array{TmuxPaneRole, int}> */
+    public static function waitingStopTimeouts(): iterable
+    {
+        yield 'parallel processing' => [TmuxPaneRole::PostAdditional, 1];
+        yield 'sequential processing' => [TmuxPaneRole::Sequential, 1];
+        yield 'immediate stop' => [TmuxPaneRole::PostAdditional, 0];
     }
 
     public function test_stop_cancels_owned_workers_without_finishing_or_starting_queued_jobs(): void
