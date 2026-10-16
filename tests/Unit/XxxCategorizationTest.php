@@ -157,4 +157,33 @@ class XxxCategorizationTest extends TestCase
 
         $this->assertFalse($result->isSuccessful());
     }
+
+    /**
+     * @return array<string, array{0: string, 1: int}>
+     */
+    public static function jacquieEtMichelReleasesProvider(): array
+    {
+        return [
+            'VFF 2160p' => ['JacquieEtMichelTV.Angel.26.10.10.VFF.2160p.WEB.AAC.2.0.x264.NOTAG', Category::XXX_UHD],
+            'VFF 720p' => ['JacquieEtMichelTV.Helena.26.09.29.VFF.720p.WEB.AAC.2.0.x264.NOTAG', Category::XXX_CLIPHD],
+            'VFF 720p space separated' => ['JacquieEtMichelTV Helena 26 09 29 VFF 720p WEB AAC 2 0 x264 NOTAG', Category::XXX_CLIPHD],
+            'VFF 576p' => ['JacquieEtMichelTV.Helena.26.09.29.VFF.576p.WEB.AAC.2.0.x264.NOTAG', Category::XXX_X264],
+            'VFF 360p' => ['JacquieEtMichelTV.Helena.26.09.29.VFF.360p.WEB.AAC.2.0.x264.NOTAG', Category::XXX_X264],
+        ];
+    }
+
+    #[DataProvider('jacquieEtMichelReleasesProvider')]
+    public function test_jacquie_et_michel_releases_are_categorized_as_xxx(string $releaseName, int $expectedCategoryId): void
+    {
+        $passable = $this->runPipeline($releaseName, 'alt.binaries.erotica.erotica');
+
+        $this->assertSame($expectedCategoryId, $passable->bestResult->categoryId, "Wrong category for: {$releaseName}");
+    }
+
+    public function test_french_movie_release_stays_in_movies_foreign(): void
+    {
+        $passable = $this->runPipeline('Some.Movie.2024.FRENCH.1080p.WEB-DL.x264-GROUP');
+
+        $this->assertSame(Category::MOVIE_FOREIGN, $passable->bestResult->categoryId);
+    }
 }
