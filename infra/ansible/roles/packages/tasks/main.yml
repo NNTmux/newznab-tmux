@@ -8,12 +8,19 @@
 - name: Fetch signed repository keys
   ansible.builtin.get_url:
     url: "{{ item.url }}"
-    dest: "/etc/apt/keyrings/{{ item.name }}.asc"
+    dest: "/etc/apt/keyrings/{{ item.name }}.{{ item.ext }}"
     mode: '0644'
   loop:
-    - {name: php, url: 'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x14aa40ec0831756756d7f66c4f4ea0aae5267a6c'}
-    - {name: mariadb, url: 'https://mariadb.org/mariadb_release_signing_key.asc'}
-    - {name: node, url: 'https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key'}
+    - {name: php, ext: gpg, url: 'https://packages.sury.org/php/apt.gpg'}
+    - {name: mariadb, ext: asc, url: 'https://mariadb.org/mariadb_release_signing_key.asc'}
+    - {name: node, ext: asc, url: 'https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key'}
+
+- name: Remove retired Launchpad PHP PPA source
+  ansible.builtin.apt_repository:
+    repo: 'deb [signed-by=/etc/apt/keyrings/php.asc] https://ppa.launchpadcontent.net/ondrej/php/ubuntu noble main'
+    filename: nntmux-php
+    state: absent
+    update_cache: false
 
 - name: Configure version-scoped package repositories
   ansible.builtin.apt_repository:
@@ -21,7 +28,7 @@
     filename: "nntmux-{{ item.name }}"
     update_cache: false
   loop:
-    - {name: php, repo: 'deb [signed-by=/etc/apt/keyrings/php.asc] https://ppa.launchpadcontent.net/ondrej/php/ubuntu noble main'}
+    - {name: php, repo: 'deb [signed-by=/etc/apt/keyrings/php.gpg] https://packages.sury.org/php/ noble main'}
     - {name: mariadb, repo: 'deb [signed-by=/etc/apt/keyrings/mariadb.asc] https://mirror.mariadb.org/repo/11.4/ubuntu noble main'}
     - {name: node, repo: 'deb [signed-by=/etc/apt/keyrings/node.asc] https://deb.nodesource.com/node_22.x nodistro main'}
 
