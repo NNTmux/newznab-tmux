@@ -60,14 +60,20 @@ class ReleaseContext
         return preg_match(self::STANDALONE_SEASON_TOKEN_REGEX, $this->releaseName) === 1;
     }
 
-    /**
-     * Check if this release has adult/XXX markers.
-     */
+    public function hasOnlyFansMarker(): bool
+    {
+        return preg_match('/\bOnly[-_ ]?Fans\b|^OF\./i', $this->releaseName) === 1;
+    }
+
     /**
      * Check if this release has adult/XXX markers.
      */
     public function hasAdultMarkers(): bool
     {
+        if ($this->hasOnlyFansMarker()) {
+            return true;
+        }
+
         // Check for explicit XXX markers and common adult keywords/studios
         if (preg_match('/\b(XXX|Porn|Anal|Brazzers|BangBros|Bangbros|NaughtyAmerica|RealityKings|Tushy|Vixen|Blacked|OnlyFans|MetArt|JoyMii|Creampie|MP4-XXX|PureTaboo|Lady[._ -]?Lyne|TeamSkeet|GirlsWay|EvilAngel|Kink|FakeHub|FakeTaxi|SexArt|Nubiles|Defloration|Deeper|Bellesa|Twistys|Mofos|MissaX|LegalPorno|AnalVids|JAV|Hentai|RoccoSiffredi|DivineBitches|Device[._ -]?Bondage|Hogtied|Wired[._ -]?Pussy|Fucking[._ -]?Machines|Ultimate[._ -]?Surrender|Public[._ -]?Disgrace|Sex[._ -]?And[._ -]?Submission|Bound[._ -]?Gang[._ -]?Bangs|Electro[._ -]?Sluts|Whipped[._ -]?Ass|TS[._ -]?Seduction|Infernal[._ -]?Restraints|Sexually[._ -]?Broken)\b/i', $this->releaseName)) {
             return true;

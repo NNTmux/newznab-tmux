@@ -186,4 +186,75 @@ class XxxCategorizationTest extends TestCase
 
         $this->assertSame(Category::MOVIE_FOREIGN, $passable->bestResult->categoryId);
     }
+
+    /**
+     * @return array<string, array{string}>
+     */
+    public static function onlyFansReleasesProvider(): array
+    {
+        return [
+            'screenshot Sadie' => ['OF.Sadie.Summers.NEW.TRADWIFE.BG.1080p'],
+            'screenshot Dolly' => ['OF.Dolly.Orchid.Beautiful.Asian.Girl.With.Small.Tits.Shakes.Her.Ass.Nonstop.Until.I.Cum.1080p'],
+            'screenshot Veronica' => ['OF.Theapolloshow.Veronica.Grace.1080p'],
+            'screenshot Maya' => ['OF.Theapolloshow.Maya.Faye.1080p'],
+            'lowercase' => ['of.Creator.Title.1080p'],
+            'mixed case UHD' => ['oF.Creator.Title.2160p'],
+            'no video hints' => ['OF.Creator.Title'],
+            'HD studio match' => ['OF.Brazzers.Performer.Title.1080p'],
+            'VR match' => ['OF.SexBabesVR.Creator.VR180.2160p'],
+            'video pack' => ['OF.Creator.Pack.mp4'],
+            'full site name' => ['OnlyFans.Creator.Title.1080p'],
+            'hyphenated site name' => ['Only-Fans.Creator.Title.1080p'],
+            'underscored site name' => ['Only_Fans.Creator.Title.1080p'],
+            'spaced site name' => ['Only Fans Creator Title 1080p'],
+        ];
+    }
+
+    #[DataProvider('onlyFansReleasesProvider')]
+    public function test_onlyfans_releases_match_directly_and_through_the_pipeline(string $releaseName): void
+    {
+        $context = new ReleaseContext(releaseName: $releaseName, groupId: 0);
+        $result = (new XxxCategorizer)->categorize($context);
+
+        $this->assertTrue($context->hasAdultMarkers());
+        $this->assertSame(Category::XXX_ONLYFANS, $result->categoryId);
+        $this->assertSame(0.95, $result->confidence);
+        $this->assertSame('onlyfans', $result->matchedBy);
+
+        foreach (['', 'alt.binaries.erotica.erotica'] as $groupName) {
+            $passable = $this->runPipeline($releaseName, $groupName);
+            $this->assertSame(Category::XXX_ONLYFANS, $passable->bestResult->categoryId);
+            $this->assertSame('onlyfans', $passable->bestResult->matchedBy);
+        }
+    }
+
+    /**
+     * @return array<string, array{string}>
+     */
+    public static function nonOnlyFansReleasesProvider(): array
+    {
+        return [
+            'internal prefix' => ['Story.OF.Creator.1080p'],
+            'different separator' => ['OF-Creator.1080p'],
+            'longer word' => ['OFFER.Creator.1080p'],
+            'leading whitespace' => [' OF.Creator.1080p'],
+            'bracketed prefix' => ['[OF.Creator.1080p]'],
+            'regular movie' => ['Some.Movie.2024.1080p.BluRay.x264-GROUP'],
+            'photos' => ['OF.Creator.Photoset.1080p'],
+            'pack without video hint' => ['OF.Creator.Pack.2160p'],
+            'full name photos' => ['OnlyFans.Creator.Imageset'],
+        ];
+    }
+
+    #[DataProvider('nonOnlyFansReleasesProvider')]
+    public function test_unrelated_names_and_photo_packs_do_not_match_onlyfans(string $releaseName): void
+    {
+        $context = new ReleaseContext(releaseName: $releaseName, groupId: 0);
+        $result = (new XxxCategorizer)->categorize($context);
+
+        $this->assertNotSame(Category::XXX_ONLYFANS, $result->categoryId);
+        foreach (['', 'alt.binaries.erotica.erotica'] as $groupName) {
+            $this->assertNotSame(Category::XXX_ONLYFANS, $this->runPipeline($releaseName, $groupName)->bestResult->categoryId);
+        }
+    }
 }

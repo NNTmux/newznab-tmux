@@ -81,7 +81,11 @@ class CategorizationPipeline
         bool $debug = false
     ): array {
         $releaseName = $this->nzbSplitUnwrapper->unwrap($releaseName) ?? $releaseName;
-        $releaseName = $this->obfuscatedSubjectExtractor->extract($releaseName) ?? $releaseName;
+
+        // Normalizing dots to spaces would erase the explicit OF. site prefix.
+        if (! (new ReleaseContext($releaseName, $groupId))->hasOnlyFansMarker()) {
+            $releaseName = $this->obfuscatedSubjectExtractor->extract($releaseName) ?? $releaseName;
+        }
 
         $groupName = UsenetGroup::whereId($groupId)->value('name') ?? '';
 

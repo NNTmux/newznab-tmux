@@ -40,12 +40,12 @@ class XxxCategorizer extends AbstractCategorizer
         $name = $context->releaseName;
 
         // Check if it looks like adult content
-        if (! $this->looksLikeXxx($name)) {
+        if (! $context->hasOnlyFansMarker() && ! $this->looksLikeXxx($name)) {
             return $this->noMatch();
         }
 
         // Try specific XXX subcategories in order of specificity
-        if ($result = $this->checkOnlyFans($name)) {
+        if ($result = $this->checkOnlyFans($context)) {
             return $result;
         }
 
@@ -187,15 +187,17 @@ class XxxCategorizer extends AbstractCategorizer
         return false;
     }
 
-    protected function checkOnlyFans(string $name): ?CategorizationResult
+    protected function checkOnlyFans(ReleaseContext $context): ?CategorizationResult
     {
+        $name = $context->releaseName;
+
         // Skip photo packs unless there's a video hint
         if (preg_match('/\b(photo(set)?|image(set)?|pics?|wallpapers?|collection|pack)\b/i', $name) &&
             ! preg_match('/\b(mp4|mkv|mov|wmv|avi|webm|h\.?264|x264|h\.?265|x265)\b/i', $name)) {
             return null;
         }
 
-        if (preg_match('/\bOnly[-_ ]?Fans\b|^OF\./i', $name)) {
+        if ($context->hasOnlyFansMarker()) {
             return $this->matched(Category::XXX_ONLYFANS, 0.95, 'onlyfans');
         }
 
