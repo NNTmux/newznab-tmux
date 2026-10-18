@@ -5,7 +5,7 @@
       "source": "thienanblog/awesome-ai-agent-skills",
       "sourceType": "github",
       "skillPath": "skills/agents-md-generator/SKILL.md",
-      "computedHash": "57cdc578141bed1d8e4a62a0d1a4e0958c709772aea26a9792f2f5c4867b7434"
+      "computedHash": "3e26f63adc7a986b7b081b4fdab4a633da3492560597aafd7f269a231d59b2e4"
     },
     "angular-architect": {
       "source": "jeffallan/claude-skills",
@@ -42,7 +42,7 @@
       "source": "thienanblog/awesome-ai-agent-skills",
       "sourceType": "github",
       "skillPath": "skills/brainstorm-first/SKILL.md",
-      "computedHash": "abb9f785bf6c8b1c908903ed2a34a74211872d83e0a627ee9abcfa7f7be9f1f9"
+      "computedHash": "ea3aba174868025e2170a3af41f48b880efec6ac3c7156432f877e89a01a7100"
     },
     "chaos-engineer": {
       "source": "jeffallan/claude-skills",
@@ -105,13 +105,13 @@
       "source": "thienanblog/awesome-ai-agent-skills",
       "sourceType": "github",
       "skillPath": "skills/debugging-workflow/SKILL.md",
-      "computedHash": "fa82a9b28f17ba3a191938b1c1ce983a7efd6b2cf7db35dbb92b97994c003841"
+      "computedHash": "4b3de803a3410fa50ee348320824f6501beadd593c00906970c3628de1a18ea3"
     },
     "design-system-generator": {
       "source": "thienanblog/awesome-ai-agent-skills",
       "sourceType": "github",
       "skillPath": "skills/design-system-generator/SKILL.md",
-      "computedHash": "33362adace6be7111912268ec53f0257f053a48c527255d010f6b4d4fab99463"
+      "computedHash": "7555ea35039bf4dd0104005216a69875b8abad060ffc8b7c0421d70b679a6cac"
     },
     "devops-engineer": {
       "source": "jeffallan/claude-skills",
@@ -127,13 +127,13 @@
       "source": "thienanblog/awesome-ai-agent-skills",
       "sourceType": "github",
       "skillPath": "skills/docker-local-dev/SKILL.md",
-      "computedHash": "48beea0c77d7dc0e7b36c8232ca4220b900f7d5e53d6e8bfacdb2ac6295f8694"
+      "computedHash": "f5610d1171820afe919397cc64adf0a9e07aa0d15f3b29b7f2ee28ca878b5302"
     },
     "documentation-guidelines": {
       "source": "thienanblog/awesome-ai-agent-skills",
       "sourceType": "github",
       "skillPath": "skills/documentation-guidelines/SKILL.md",
-      "computedHash": "4062a2ceaad577c294182ba5c1bf8f25c3dfb092154f9caed98aec1da3310258"
+      "computedHash": "60c79ce19ebf722e40e3774e70890583a4ac2381484ee060a493891646127df9"
     },
     "dotnet-core-expert": {
       "source": "jeffallan/claude-skills",
@@ -231,13 +231,13 @@
       "source": "thienanblog/awesome-ai-agent-skills",
       "sourceType": "github",
       "skillPath": "skills/laravel-11-12-app-guidelines/SKILL.md",
-      "computedHash": "98b9f9a9052b29dbae2a98aeb7b224b69572a227f3a9a2413816d94588df2c85"
+      "computedHash": "f195f6e2407faec9994603aaec065a4e041355fc37b05635d628f78baf413199"
     },
     "laravel-13-app-guidelines": {
       "source": "thienanblog/awesome-ai-agent-skills",
       "sourceType": "github",
       "skillPath": "skills/laravel-13-app-guidelines/SKILL.md",
-      "computedHash": "76bc2986af74c8cbadb77200edd0d485c6b0020ffda625e077aecd2965cff5cd"
+      "computedHash": "0f7e124428368df481febaa3abecbf0bae95d4d72624a77b01699286917be731"
     },
     "laravel-ai-sdk": {
       "source": "asyrafhussin/agent-skills",
@@ -411,7 +411,7 @@
       "source": "thienanblog/awesome-ai-agent-skills",
       "sourceType": "github",
       "skillPath": "skills/office-web-ui-system/SKILL.md",
-      "computedHash": "53d35e07b894b96a6cee99fd95145dd3464b453a80527812e5e997aeb9ee3cf2"
+      "computedHash": "60db2ef8fb7fb59569bc3b8e02edd47989d478637ae43f129e5527b1caeb6b93"
     },
     "pandas-pro": {
       "source": "jeffallan/claude-skills",
@@ -422,7 +422,7 @@
       "source": "thienanblog/awesome-ai-agent-skills",
       "sourceType": "github",
       "skillPath": "skills/performance-optimization/SKILL.md",
-      "computedHash": "1958e40d2e43cf06951f0ae703650ba474772308bd5d96fa05a3911c3264ede5"
+      "computedHash": "eb8928a8f3a3c2eb4afd99bde0363fe6766f833c60b07097c272cc13148efa6e"
     },
     "php-best-practices": {
       "source": "asyrafhussin/agent-skills",
@@ -455,7 +455,7 @@
       "source": "thienanblog/awesome-ai-agent-skills",
       "sourceType": "github",
       "skillPath": "skills/project-development-mindset/SKILL.md",
-      "computedHash": "4666d6da044d29bfdb2560b6636715a1d0888750f00da8ca3186697897ee6734"
+      "computedHash": "0909a2dc41348732389d6c0afea1930de9aef538d3d5c6ab2472b200f7023f63"
     },
     "project-docs": {
       "source": "asyrafhussin/agent-skills",
@@ -503,7 +503,7 @@
       "source": "thienanblog/awesome-ai-agent-skills",
       "sourceType": "github",
       "skillPath": "skills/run-reviewable-subtask-loop/SKILL.md",
-      "computedHash": "11db9fa922b1da33704b9b8b2d2b22c1ca94a019dc66c78ac78bbbf16e0fbc2b"
+      "computedHash": "a49c3a02d04d13c43615b8e2913401bcfc9f6e595c7a9b56d9f07d3f1b0a2274"
     },
     "rust-engineer": {
       "source": "jeffallan/claude-skills",
@@ -609,7 +609,7 @@
       "source": "thienanblog/awesome-ai-agent-skills",
       "sourceType": "github",
       "skillPath": "skills/testing-verification/SKILL.md",
-      "computedHash": "bc7d115e7c61895c4c4fb90c411323bc7ecad96b9487aa4ba2a731ae3cee6b4d"
+      "computedHash": "4be5207e51ea8a7b71211c19b38ac4e393e95172ede00209ff85ab090bc74042"
     },
     "the-fool": {
       "source": "jeffallan/claude-skills",
@@ -636,13 +636,13 @@
       "source": "thienanblog/awesome-ai-agent-skills",
       "sourceType": "github",
       "skillPath": "skills/ui-ux-concept-implementation/SKILL.md",
-      "computedHash": "63af43791f6dd6f344f8df8be3e277c0e68d1c9ee4dc0e578a810476948451a5"
+      "computedHash": "50f3d826e25842111bcb7bb853eef99780ece7e63e9b0bdd669e84bff48203c0"
     },
     "vps-docker-traefik-deploy": {
       "source": "thienanblog/awesome-ai-agent-skills",
       "sourceType": "github",
       "skillPath": "skills/vps-docker-traefik-deploy/SKILL.md",
-      "computedHash": "3bb0d7684a318cd04ac11b6c6091b57183c1b92396ef84fdd6ae660bff48ffd9"
+      "computedHash": "0b847ff56975d3b4bac761355c00128ec7ebe293eea69bcae5dd20d0eb9e8be1"
     },
     "vue-expert": {
       "source": "jeffallan/claude-skills",
