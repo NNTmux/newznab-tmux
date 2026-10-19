@@ -63,6 +63,11 @@ class IRCClient
     protected int $_reconnectDelay = 5;
 
     /**
+     * Seconds to wait for the server to accept our login (001).
+     */
+    protected int $_loginTimeout = 120;
+
+    /**
      * Stream socket client.
      *
      * @var resource|null
@@ -272,7 +277,15 @@ class IRCClient
         }
 
         // Loop over the socket buffer until we find "001".
+        $deadline = time() + $this->_loginTimeout;
+        $nickAttempt = 0;
         while (true) {
+            if (time() > $deadline) {
+                echo 'ERROR: No login confirmation from ('.$this->_remote_host.') within '.$this->_loginTimeout.' seconds.'.PHP_EOL;
+
+                return false;
+            }
+
             $this->_readSocket();
 
             // We got pinged, reply with a pong.
@@ -285,6 +298,20 @@ class IRCClient
                     break;
 
                     // We got 464, which means we need to send a password.
+                }
+
+                // 433/436: nick in use (often our own ghost from a dropped connection), so try another one.
+                if (in_array((int) $hits[2], [433, 436], true)) {
+                    if (++$nickAttempt > 5) {
+                        echo 'ERROR: Nickname ('.$nickName.') and its alternatives are in use on ('.$this->_remote_host.').'.PHP_EOL;
+
+                        return false;
+                    }
+                    if (! $this->_writeSocket('NICK '.$nickName.'_'.$nickAttempt)) {
+                        return false;
+                    }
+
+                    continue;
                 }
 
                 if ((int) $hits[2] === 464) {
