@@ -19,7 +19,7 @@
         "prettier-plugin-tailwindcss": "^0.7.4",
         "tailwindcss": "^4.3.3",
         "vite": "^8.3",
-        "vue": "^3.5.43"
+        "vue": "^3.5.44"
     },
     "dependencies": {
         "@alpinejs/csp": "^3.17.4",
