@@ -31,6 +31,30 @@ use RuntimeException;
 
 final class PredbSearchDriverTest extends TestCase
 {
+    public function test_filtered_fuzzy_search_uses_a_supported_elasticsearch_query_type(): void
+    {
+        $queries = [];
+        $client = $this->elasticClient(function (RequestInterface $request) use (&$queries): HttpResponse {
+            $queries[] = json_decode((string) $request->getBody(), true);
+
+            return $this->elasticResponse(['hits' => ['total' => ['value' => 0], 'hits' => []]]);
+        });
+        $this->setElasticClient($client);
+        $driver = new ElasticSearchDriver(['indexes' => ['releases' => 'releases'], 'fuzzy' => ['enabled' => true, 'fuzziness' => 'AUTO']]);
+
+        foreach (['ubunto', ['searchname' => 'ubunto'], ['ubunto']] as $phrases) {
+            $queries = [];
+            $result = $driver->searchReleasesFiltered(['phrases' => $phrases, 'try_fuzzy' => true], 10);
+
+            self::assertTrue($result['fuzzy']);
+            self::assertCount(2, $queries);
+            self::assertSame('cross_fields', $queries[0]['query']['bool']['must'][0]['multi_match']['type']);
+            self::assertArrayNotHasKey('fuzziness', $queries[0]['query']['bool']['must'][0]['multi_match']);
+            self::assertSame('best_fields', $queries[1]['query']['bool']['must'][0]['multi_match']['type']);
+            self::assertSame('AUTO', $queries[1]['query']['bool']['must'][0]['multi_match']['fuzziness']);
+        }
+    }
+
     private Container $previousContainer;
 
     private mixed $previousFacadeApplication;

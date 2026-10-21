@@ -2918,6 +2918,7 @@ class ElasticSearchDriver implements SearchDriverInterface
                         'operator' => 'and',
                     ];
                     if ($useFuzzy && $this->isFuzzyEnabled()) {
+                        $multi['type'] = 'best_fields';
                         $multi['fuzziness'] = $this->getFuzzyConfig()['fuzziness'] ?? 'AUTO';
                     }
                     $must[] = ['multi_match' => $multi];
@@ -2942,6 +2943,7 @@ class ElasticSearchDriver implements SearchDriverInterface
                         'operator' => 'and',
                     ];
                     if ($useFuzzy && $this->isFuzzyEnabled()) {
+                        $multi['type'] = 'best_fields';
                         $multi['fuzziness'] = $this->getFuzzyConfig()['fuzziness'] ?? 'AUTO';
                     }
                     $must[] = ['multi_match' => $multi];
@@ -3072,6 +3074,7 @@ class ElasticSearchDriver implements SearchDriverInterface
                     'operator' => 'and',
                 ];
                 if ($useFuzzy && $this->isFuzzyEnabled()) {
+                    $multi['type'] = 'best_fields';
                     $multi['fuzziness'] = $this->getFuzzyConfig()['fuzziness'] ?? 'AUTO';
                 }
                 $must[] = ['multi_match' => $multi];
