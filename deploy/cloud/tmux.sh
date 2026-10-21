@@ -9,7 +9,7 @@ stop() {
 }
 trap 'stop' TERM INT
 php artisan tmux:start --session=nntmux --no-interaction
-while php artisan tmux:health-check --session=nntmux --require-session --quiet; do
+while php artisan tmux:health-check --session=nntmux --auto-restart --quiet; do
     sleep 10 &
     wait "$!" || true
 done
