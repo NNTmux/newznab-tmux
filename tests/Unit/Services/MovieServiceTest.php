@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Services;
 
+use App\Facades\Search;
 use App\Models\Release;
 use App\Services\ImdbScraper;
 use App\Services\MovieService;
+use App\Services\TmdbClient;
 use App\Services\TraktService;
 use App\Services\TvProcessing\Providers\TraktProvider;
 use GuzzleHttp\Client;
@@ -17,6 +19,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
+use Mockery;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\Unit\ImdbScraperTestCase;
 
@@ -417,6 +420,53 @@ class MovieServiceTest extends ImdbScraperTestCase
         }
 
         $this->assertCount(0, $mock);
+        Log::shouldHaveReceived('warning')->once();
+    }
+
+    #[Test]
+    public function it_marks_each_failed_lookup_before_moving_to_the_next_release(): void
+    {
+        Cache::flush();
+        Log::spy();
+        config(['nntmux_api.omdb_api_key' => '', 'nntmux_api.trakttv_api_key' => '']);
+        $this->app->instance(ImdbScraper::class, Mockery::mock(ImdbScraper::class, ['isScrapingEnabled' => false]));
+        $this->app->instance(TmdbClient::class, Mockery::mock(TmdbClient::class, ['isConfigured' => false]));
+        Search::shouldReceive('updateRelease')->once()->with(2);
+        Search::shouldReceive('updateRelease')->once()->with(1);
+
+        Release::query()->insert([
+            ['id' => 1, 'searchname' => 'Crashing.Movie.2020.1080p.BluRay.x264-GRP', 'categories_id' => 2040, 'imdbid' => null],
+            ['id' => 2, 'searchname' => 'Missing.Movie.2021.1080p.BluRay.x264-GRP', 'categories_id' => 2040, 'imdbid' => null],
+            ['id' => 3, 'searchname' => 'Renamed.Movie.2022.1080p.BluRay.x264-GRP', 'categories_id' => 2040, 'imdbid' => null],
+        ]);
+
+        $service = new class extends MovieService
+        {
+            public ?string $missingImdbWhenCrashing = null;
+
+            protected function localIMDBSearch(): string|false
+            {
+                if ($this->currentRelID === '3') {
+                    Release::query()->whereKey(3)->update(['searchname' => 'Another.Movie.2022.1080p.BluRay.x264-GRP']);
+                }
+
+                if ($this->currentRelID === '1') {
+                    $this->missingImdbWhenCrashing = Release::query()->whereKey(2)->value('imdbid');
+
+                    throw new \RuntimeException('provider crashed');
+                }
+
+                return false;
+            }
+        };
+        $service->echooutput = false;
+
+        $service->processMovieReleases();
+
+        $this->assertSame('', $service->missingImdbWhenCrashing);
+        $this->assertSame('', Release::query()->whereKey(1)->value('imdbid'));
+        $this->assertSame('', Release::query()->whereKey(2)->value('imdbid'));
+        $this->assertNull(Release::query()->whereKey(3)->value('imdbid'));
         Log::shouldHaveReceived('warning')->once();
     }
 

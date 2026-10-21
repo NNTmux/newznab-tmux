@@ -1068,80 +1068,102 @@ class MovieService
 
         $res = $query->orderByDesc('id')->limit($this->movieqty)->get();
 
-        $movieCount = count($res);
-        $failedIDs = [];
+        if ($res->isEmpty()) {
+            return;
+        }
 
-        if ($movieCount > 0) {
-            if ($this->echooutput && $movieCount > 1) {
-                cli()->header('Processing '.$movieCount.' movie releases.');
+        if ($this->echooutput && $res->count() > 1) {
+            cli()->header('Processing '.$res->count().' movie releases.');
+        }
+
+        $failedCount = 0;
+        foreach ($res as $arr) {
+            $releaseId = (int) $arr['id'];
+            $searchName = (string) $arr['searchname'];
+
+            try {
+                $found = $this->lookupReleaseImdb($releaseId, $searchName);
+            } catch (\Throwable $e) {
+                Log::warning('Movie lookup failed for release '.$releaseId.': '.$e->getMessage(), [
+                    'release_id' => $releaseId,
+                    'exception' => $e,
+                ]);
+                $found = false;
             }
 
-            foreach ($res as $arr) {
-                if (! $this->parseMovieSearchName($arr['searchname'])) {
-                    $failedIDs[] = $arr['id'];
+            if ($found) {
+                continue;
+            }
 
-                    continue;
-                }
-
-                $this->currentRelID = (string) $arr['id'];
-                $movieName = $this->formatMovieName();
-
-                if ($this->echooutput) {
-                    cli()->info('Looking up: '.$movieName);
-                }
-
-                $foundIMDB = $this->searchLocalDatabase($arr['id']) ||
-                    $this->searchIMDb($arr['id']) ||
-                    $this->searchOMDbAPI($arr['id']) ||
-                    $this->searchTraktTV($arr['id'], $movieName) ||
-                    $this->searchTMDB($arr['id']);
-
-                if ($foundIMDB) {
+            try {
+                if ($this->markImdbLookupFailed($releaseId, $searchName)) {
+                    $failedCount++;
                     if ($this->echooutput) {
-                        cli()->primary('Successfully updated release with IMDB ID');
-                    }
-
-                    continue;
-                } else {
-                    $releaseCheck = Release::query()
-                        ->where('id', $arr['id'])
-                        ->where(function ($query): void {
-                            $query->whereNotNull('imdbid')
-                                ->where('imdbid', '<>', '')
-                                ->whereNotIn('imdbid', imdb_id_pending_values());
-                        })
-                        ->exists();
-                    if ($releaseCheck) {
-                        if ($this->echooutput) {
-                            cli()->info('Release already has IMDB ID, skipping');
-                        }
-
-                        continue;
+                        cli()->error("No IMDB ID found for ID: {$releaseId} - {$searchName}");
                     }
                 }
-
-                $failedIDs[] = $arr['id'];
-            }
-
-            if (! empty($failedIDs)) {
-                if ($this->echooutput) {
-                    $failedReleases = Release::query()
-                        ->select(['id', 'searchname'])
-                        ->whereIn('id', $failedIDs)
-                        ->get();
-
-                    cli()->header('Failed to find IMDB IDs for '.count($failedIDs).' releases:');
-                    foreach ($failedReleases as $release) {
-                        cli()->error("ID: {$release->id} - {$release->searchname}");
-                    }
-                }
-
-                foreach (array_chunk($failedIDs, 100) as $chunk) {
-                    Release::query()->whereIn('id', $chunk)->update(['imdbid' => '']);
-                    ReleaseSearchIndexSync::forIds($chunk);
-                }
+            } catch (\Throwable $e) {
+                Log::error('Could not mark movie lookup as failed for release '.$releaseId.': '.$e->getMessage());
             }
         }
+
+        if ($this->echooutput && $failedCount > 0) {
+            cli()->header('Failed to find IMDB IDs for '.$failedCount.' releases.');
+        }
+    }
+
+    /**
+     * Look up and store the IMDb ID for one release.
+     */
+    private function lookupReleaseImdb(int $releaseId, string $searchName): bool
+    {
+        if (! $this->parseMovieSearchName($searchName)) {
+            return false;
+        }
+
+        $this->currentRelID = (string) $releaseId;
+        $movieName = $this->formatMovieName();
+
+        if ($this->echooutput) {
+            cli()->info('Looking up: '.$movieName);
+        }
+
+        $found = $this->searchLocalDatabase($releaseId)
+            || $this->searchIMDb($releaseId)
+            || $this->searchOMDbAPI($releaseId)
+            || $this->searchTraktTV($releaseId, $movieName)
+            || $this->searchTMDB($releaseId);
+
+        if ($found && $this->echooutput) {
+            cli()->primary('Successfully updated release with IMDB ID');
+        }
+
+        return $found;
+    }
+
+    /**
+     * Mark a release's IMDb lookup as failed so it isn't looked up again.
+     *
+     * Skips a release that got an IMDb ID or was renamed in the meantime.
+     */
+    private function markImdbLookupFailed(int $releaseId, string $searchName): bool
+    {
+        $updated = Release::query()
+            ->whereKey($releaseId)
+            ->where('searchname', $searchName)
+            ->where(function ($query): void {
+                $query->whereNull('imdbid')
+                    ->orWhereIn('imdbid', imdb_id_pending_values());
+            })
+            ->update(['imdbid' => '']);
+
+        if ($updated === 0) {
+            return false;
+        }
+
+        ReleaseSearchIndexSync::forIds([$releaseId]);
+
+        return true;
     }
 
     private function formatMovieName(): string
