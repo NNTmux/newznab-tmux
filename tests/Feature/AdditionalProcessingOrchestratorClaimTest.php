@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Facades\Search;
 use App\Models\Release;
 use App\Services\AdditionalProcessing\AdditionalProcessingOrchestrator;
 use App\Services\AdditionalProcessing\ConsoleOutputService;
@@ -91,28 +92,8 @@ class AdditionalProcessingOrchestratorClaimTest extends TestCase
     {
         Log::spy();
 
-        DB::table('categories')->insert(['id' => 1, 'disablepreview' => 0]);
-        DB::table('releases')->insert([
-            'id' => 1,
-            'guid' => 'a-guid-1',
-            'leftguid' => 'a',
-            'name' => 'Example',
-            'searchname' => 'Example',
-            'size' => 2 * 1048576,
-            'groups_id' => 1,
-            'nfostatus' => -1,
-            'fromname' => 'poster@example.test',
-            'completion' => 100,
-            'categories_id' => 1,
-            'predb_id' => 0,
-            'pp_timeout_count' => 0,
-            'passwordstatus' => -1,
-            'haspreview' => -1,
-            'nzbstatus' => 1,
-            'postdate' => '2026-07-12 10:00:00',
-            'additional_pp_claimed_at' => null,
-            'additional_pp_claim_token' => null,
-        ]);
+        $this->insertClaimableRelease();
+        Search::shouldReceive('updateRelease')->once()->with(1);
 
         $processor = new FailingAdditionalReleaseProcessor;
         $tempWorkspace = new RecordingTempWorkspaceService;
@@ -142,6 +123,8 @@ class AdditionalProcessingOrchestratorClaimTest extends TestCase
         $this->assertSame(1, $output->endOutputCalls);
         $this->assertNull(Release::query()->where('id', 1)->value('additional_pp_claimed_at'));
         $this->assertNull(Release::query()->where('id', 1)->value('additional_pp_claim_token'));
+        $this->assertSame(0, (int) Release::query()->where('id', 1)->value('haspreview'));
+        $this->assertSame(-1, (int) Release::query()->where('id', 1)->value('passwordstatus'));
 
         Log::shouldHaveReceived('info')
             ->once()
@@ -168,6 +151,28 @@ class AdditionalProcessingOrchestratorClaimTest extends TestCase
                     && array_key_exists('stage_seconds', $context)
                     && array_key_exists('peak_memory_bytes', $context)),
             );
+    }
+
+    public function test_exception_after_finalization_keeps_the_finalized_status(): void
+    {
+        Log::spy();
+        $this->insertClaimableRelease();
+        Search::shouldReceive('updateRelease')->never();
+
+        $processor = new FailingAdditionalReleaseProcessor(finalizeFirst: true);
+        $orchestrator = new AdditionalProcessingOrchestrator(
+            $this->makeConfig(['queryLimit' => 25, 'minSizeBytes' => 0, 'maxSizeBytes' => 107374182400]),
+            $processor,
+            new RecordingTempWorkspaceService,
+            new RecordingConsoleOutputService
+        );
+
+        $orchestrator->start('', 'a');
+
+        $this->assertSame(1, $processor->processCalls);
+        $this->assertSame(1, (int) Release::query()->where('id', 1)->value('haspreview'));
+        $this->assertSame(0, (int) Release::query()->where('id', 1)->value('passwordstatus'));
+        $this->assertNull(Release::query()->where('id', 1)->value('additional_pp_claim_token'));
     }
 
     public function test_temp_setup_failure_does_not_claim_releases(): void
@@ -217,6 +222,32 @@ class AdditionalProcessingOrchestratorClaimTest extends TestCase
         $this->assertStringContainsString('Additional post-processing skipped', $output->warnings[0] ?? '');
         $this->assertNull(Release::query()->where('id', 1)->value('additional_pp_claimed_at'));
         $this->assertNull(Release::query()->where('id', 1)->value('additional_pp_claim_token'));
+    }
+
+    private function insertClaimableRelease(): void
+    {
+        DB::table('categories')->insert(['id' => 1, 'disablepreview' => 0]);
+        DB::table('releases')->insert([
+            'id' => 1,
+            'guid' => 'a-guid-1',
+            'leftguid' => 'a',
+            'name' => 'Example',
+            'searchname' => 'Example',
+            'size' => 2 * 1048576,
+            'groups_id' => 1,
+            'nfostatus' => -1,
+            'fromname' => 'poster@example.test',
+            'completion' => 100,
+            'categories_id' => 1,
+            'predb_id' => 0,
+            'pp_timeout_count' => 0,
+            'passwordstatus' => -1,
+            'haspreview' => -1,
+            'nzbstatus' => 1,
+            'postdate' => '2026-07-12 10:00:00',
+            'additional_pp_claimed_at' => null,
+            'additional_pp_claim_token' => null,
+        ]);
     }
 
     private function setEnvironmentValue(string $key, ?string $value): void
@@ -273,11 +304,15 @@ class FailingAdditionalReleaseProcessor extends ReleaseProcessor
 {
     public int $processCalls = 0;
 
-    public function __construct() {}
+    public function __construct(private readonly bool $finalizeFirst = false) {}
 
     public function process(ReleaseProcessingContext $context, string $mainTmpPath): ReleaseProcessingResult
     {
         $this->processCalls++;
+
+        if ($this->finalizeFirst) {
+            Release::query()->whereKey($context->release->id)->update(['passwordstatus' => 0, 'haspreview' => 1]);
+        }
 
         throw new \RuntimeException('boom');
     }

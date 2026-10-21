@@ -273,19 +273,8 @@ class ReleaseFileManager
             if (! $context->releaseHasPassword && $context->nzbHasCompressedFile && ! $context->compressedFilesAreMedia()
                 && $releaseFilesCount === 0
             ) {
-                // No file list could be read, often because volumes were still missing.
-                // Queue the release once more after a delay; a second failure stays unknown.
-                $retried = $updateRows['haspreview'] === 0 && Release::query()
-                    ->where('id', $context->release->id)
-                    ->whereNull(AdditionalCandidateQuery::ARCHIVE_RETRY_COLUMN)
-                    ->update([
-                        ...$updateRows,
-                        'haspreview' => -1,
-                        AdditionalCandidateQuery::ARCHIVE_RETRY_COLUMN => now()->addSeconds(AdditionalCandidateQuery::archiveRetryDelaySeconds()),
-                    ]) > 0;
-                if (! $retried) {
-                    Release::query()->where('id', $context->release->id)->update($updateRows);
-                }
+                // No file list could be read: the password status stays unknown.
+                Release::query()->where('id', $context->release->id)->update($updateRows);
             } else {
                 // A cut-off listing can't rule out an encrypted entry past the cut: keep the status unknown
                 if (! $processPasswords) {

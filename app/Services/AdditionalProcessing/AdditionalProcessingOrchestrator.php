@@ -240,9 +240,15 @@ class AdditionalProcessingOrchestrator
                     'guid_char' => $guidChar,
                     'exception' => $e,
                 ]);
-                // Don't rethrow: keep draining the bucket. The release will be
-                // re-selected on the next cycle, and the pp_timeout_count /
-                // maxpptimeoutcount machinery will eventually drop it.
+                // Don't rethrow: keep draining the bucket. The failure is final,
+                // so the release is not selected again.
+                if (! empty($release->id)) {
+                    try {
+                        AdditionalCandidateQuery::markFailed((int) $release->id);
+                    } catch (\Throwable $markFailedException) {
+                        Log::error('Could not mark release '.$release->id.' as failed: '.$markFailedException->getMessage());
+                    }
+                }
             } finally {
                 if ($this->claimToken !== '' && ! empty($release->id)) {
                     AdditionalCandidateQuery::clearClaim((int) $release->id, $this->claimToken);

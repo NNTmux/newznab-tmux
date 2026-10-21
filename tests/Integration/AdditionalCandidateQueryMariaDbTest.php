@@ -95,7 +95,6 @@ final class AdditionalCandidateQueryMariaDbTest extends TestCase
               AND r.haspreview = -1
               AND r.nzbstatus = 1
               AND c.disablepreview = 0
-              AND (r.archive_retry_at IS NULL OR r.archive_retry_at <= NOW())
               AND r.size > 1048576
               AND r.size < 107374182400
               AND r.leftguid = 'a'
@@ -113,7 +112,6 @@ final class AdditionalCandidateQueryMariaDbTest extends TestCase
               AND r.haspreview = -1
               AND r.nzbstatus = 1
               AND c.disablepreview = 0
-              AND (r.archive_retry_at IS NULL OR r.archive_retry_at <= NOW())
               AND r.size > 1048576
               AND r.size < 107374182400
             GROUP BY r.leftguid
@@ -128,7 +126,6 @@ final class AdditionalCandidateQueryMariaDbTest extends TestCase
               AND r.haspreview = -1
               AND r.nzbstatus = 1
               AND c.disablepreview = 0
-              AND (r.archive_retry_at IS NULL OR r.archive_retry_at <= NOW())
               AND r.size > 1048576
               AND r.size < 107374182400
             SQL);
@@ -211,7 +208,6 @@ final class AdditionalCandidateQueryMariaDbTest extends TestCase
                           AND r.haspreview = -1
                           AND r.nzbstatus = 1
                           AND c.disablepreview = 0
-                          AND (r.archive_retry_at IS NULL OR r.archive_retry_at <= NOW())
                           AND r.leftguid = 'a'
                           AND (r.additional_pp_claimed_at IS NULL OR r.additional_pp_claimed_at < DATE_SUB(NOW(), INTERVAL 300 SECOND))
                         ORDER BY r.postdate DESC, r.id ASC

@@ -353,12 +353,10 @@ class AdditionalProcessingReleaseFileManagerTest extends TestCase
         $this->assertSame('Example.Show.S01E01.mkv', DB::table('release_files')->value('name'));
     }
 
-    public function test_an_unreadable_archive_is_queued_for_one_retry_after_the_delay(): void
+    public function test_an_unreadable_archive_is_final_on_the_first_failure(): void
     {
         DB::table('releases')->insert($this->releaseRow());
-        Search::shouldReceive('updateRelease')->twice()->with(1);
-        config(['nntmux.archive_retry_delay' => 3600]);
-        $this->freezeSecond();
+        Search::shouldReceive('updateRelease')->once()->with(1);
 
         $manager = $this->makeManager();
         $context = new ReleaseProcessingContext(Release::query()->findOrFail(1));
@@ -367,19 +365,9 @@ class AdditionalProcessingReleaseFileManagerTest extends TestCase
 
         $release = DB::table('releases')->where('id', 1)->first();
         $this->assertSame(-1, (int) $release->passwordstatus);
-        $this->assertSame(-1, (int) $release->haspreview);
-        $this->assertSame(now()->addHour()->toDateTimeString(), (string) $release->archive_retry_at);
-        $this->assertNull($release->additional_pp_claimed_at);
-
-        $this->travel(2)->hours();
-        $context = new ReleaseProcessingContext(Release::query()->findOrFail(1));
-        $context->nzbHasCompressedFile = true;
-        $manager->finalizeRelease($context, true);
-
-        $release = DB::table('releases')->where('id', 1)->first();
-        $this->assertSame(-1, (int) $release->passwordstatus);
         $this->assertSame(0, (int) $release->haspreview);
-        $this->assertSame(now()->subHour()->toDateTimeString(), (string) $release->archive_retry_at);
+        $this->assertNull($release->archive_retry_at);
+        $this->assertNull($release->additional_pp_claimed_at);
     }
 
     #[DataProvider('probedArchiveScenarios')]
@@ -390,7 +378,6 @@ class AdditionalProcessingReleaseFileManagerTest extends TestCase
     ): void {
         DB::table('releases')->insert([...$this->releaseRow(), 'nfostatus' => 1]);
         Search::shouldReceive('updateRelease')->once()->with(1);
-        config(['nntmux.archive_retry_delay' => 86400]);
         $this->freezeSecond();
 
         $config = $this->makeConfig(['processPasswords' => true, 'maximumRarSegments' => 3]);
@@ -445,8 +432,8 @@ class AdditionalProcessingReleaseFileManagerTest extends TestCase
         $this->assertSame($failure === 'group-unavailable', $context->groupUnavailable);
         if ($failure !== null) {
             $this->assertSame(-1, (int) $release->passwordstatus);
-            $this->assertSame(-1, (int) $release->haspreview);
-            $this->assertSame(now()->addDay()->toDateTimeString(), $release->archive_retry_at);
+            $this->assertSame(0, (int) $release->haspreview);
+            $this->assertNull($release->archive_retry_at);
             $this->assertSame(0, DB::table('release_files')->count());
         } else {
             $this->assertSame($encrypted ? ReleaseBrowseService::PASSWD_RAR : ReleaseBrowseService::PASSWD_NONE, (int) $release->passwordstatus);
@@ -564,7 +551,6 @@ class AdditionalProcessingReleaseFileManagerTest extends TestCase
         $data ??= $this->rar('Movie.2026.1080p.mkv', str_repeat('B', 100));
         DB::table('releases')->insert([...$this->releaseRow(), 'nfostatus' => 1]);
         Search::shouldReceive('updateRelease')->once()->with(1);
-        config(['nntmux.archive_retry_delay' => 86400]);
         $this->freezeSecond();
 
         $config = $this->makeConfig(['processPasswords' => true]);
@@ -606,8 +592,8 @@ class AdditionalProcessingReleaseFileManagerTest extends TestCase
         $this->assertSame($expected === 'archive' ? 1 : 0, DB::table('release_files')->count());
         if ($expected === 'unknown') {
             $this->assertSame(-1, (int) $release->passwordstatus);
-            $this->assertSame(-1, (int) $release->haspreview);
-            $this->assertSame(now()->addDay()->toDateTimeString(), $release->archive_retry_at);
+            $this->assertSame(0, (int) $release->haspreview);
+            $this->assertNull($release->archive_retry_at);
         } else {
             $this->assertSame(ReleaseBrowseService::PASSWD_NONE, (int) $release->passwordstatus);
             $this->assertSame(0, (int) $release->haspreview);
@@ -652,7 +638,6 @@ class AdditionalProcessingReleaseFileManagerTest extends TestCase
         }], $files);
         DB::table('releases')->insert([...$this->releaseRow(), 'nfostatus' => 1]);
         Search::shouldReceive('updateRelease')->once()->with(1);
-        config(['nntmux.archive_retry_delay' => 86400]);
         $this->freezeSecond();
 
         $config = $this->makeConfig(['processPasswords' => true, 'maximumRarPasswordChecks' => 2]);
@@ -696,7 +681,8 @@ class AdditionalProcessingReleaseFileManagerTest extends TestCase
 
         $release = DB::table('releases')->where('id', 1)->first();
         $this->assertSame($status, (int) $release->passwordstatus);
-        $this->assertSame($status === -1 ? now()->addDay()->toDateTimeString() : null, $release->archive_retry_at);
+        $this->assertSame(0, (int) $release->haspreview);
+        $this->assertNull($release->archive_retry_at);
     }
 
     /**
@@ -820,14 +806,12 @@ class AdditionalProcessingReleaseFileManagerTest extends TestCase
         array $listings,
         bool $hasReleaseFile,
         int $passwordStatus,
-        bool $retried,
     ): void {
         DB::table('releases')->insert($this->releaseRow());
         if ($hasReleaseFile) {
             DB::table('release_files')->insert(['releases_id' => 1, 'name' => 'Extras/readme.txt', 'size' => 10]);
         }
         Search::shouldReceive('updateRelease')->once()->with(1);
-        config(['nntmux.archive_retry_delay' => 86400]);
         $this->freezeSecond();
 
         $dir = sys_get_temp_dir().'/'.uniqid('7z-listing-', true);
@@ -859,12 +843,12 @@ class AdditionalProcessingReleaseFileManagerTest extends TestCase
 
         $release = DB::table('releases')->where('id', 1)->first();
         $this->assertSame($passwordStatus, (int) $release->passwordstatus);
-        $this->assertSame($retried ? -1 : 0, (int) $release->haspreview);
-        $this->assertSame($retried ? now()->addDay()->toDateTimeString() : null, $release->archive_retry_at);
+        $this->assertSame(0, (int) $release->haspreview);
+        $this->assertNull($release->archive_retry_at);
     }
 
     /**
-     * @return array<string, array{list<string>, bool, int, bool}>
+     * @return array<string, array{list<string>, bool, int}>
      */
     public static function sevenZipListingsWithoutReadableRecords(): array
     {
@@ -874,14 +858,14 @@ class AdditionalProcessingReleaseFileManagerTest extends TestCase
         $encrypted = 'printf \'Path = Movie.2026.1080p.mkv\nSize = 100\nEncrypted = +\n\n\'';
 
         return [
-            'control character beside a stored file' => [[$controlCharacter], true, -1, false],
-            'duplicate property beside a stored file' => [[$duplicateProperty], true, -1, false],
-            'control character, then a complete listing' => [[$controlCharacter, $plain], false, -1, false],
-            'duplicate property, then a complete listing' => [[$duplicateProperty, $plain], false, -1, false],
-            'complete listing, then a control character' => [[$plain, $controlCharacter], false, -1, false],
-            'control character, then an encrypted entry' => [[$controlCharacter, $encrypted], false, ReleaseBrowseService::PASSWD_RAR, false],
-            'control character and no file at all' => [[$controlCharacter], false, -1, true],
-            'empty listing beside a stored file' => [[''], true, ReleaseBrowseService::PASSWD_NONE, false],
+            'control character beside a stored file' => [[$controlCharacter], true, -1],
+            'duplicate property beside a stored file' => [[$duplicateProperty], true, -1],
+            'control character, then a complete listing' => [[$controlCharacter, $plain], false, -1],
+            'duplicate property, then a complete listing' => [[$duplicateProperty, $plain], false, -1],
+            'complete listing, then a control character' => [[$plain, $controlCharacter], false, -1],
+            'control character, then an encrypted entry' => [[$controlCharacter, $encrypted], false, ReleaseBrowseService::PASSWD_RAR],
+            'control character and no file at all' => [[$controlCharacter], false, -1],
+            'empty listing beside a stored file' => [[''], true, ReleaseBrowseService::PASSWD_NONE],
         ];
     }
 

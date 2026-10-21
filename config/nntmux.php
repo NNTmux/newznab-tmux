@@ -17,8 +17,6 @@ return [
     'crc_token' => env('CRC_TOKEN', null),
     'multiprocessing_max_child_time' => env('NN_MULTIPROCESSING_MAX_CHILD_TIME', 1800),
     'concurrency_timeout' => env('NN_CONCURRENCY_TIMEOUT'),
-    // Seconds before a release whose archive could not be read is post-processed once more.
-    'archive_retry_delay' => (int) env('NN_ARCHIVE_RETRY_DELAY', 86400),
     // Files of an obfuscated multi-file release whose first segment is checked for an archive.
     'archive_probe_files' => (int) env('NN_ARCHIVE_PROBE_FILES', 3),
     // Season packs packed one archive set per episode: sets (first volume of each) listed per release; 1 = only the first set.

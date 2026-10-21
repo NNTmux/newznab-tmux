@@ -7,6 +7,7 @@ namespace App\Services\AdditionalProcessing;
 use App\Models\Release;
 use App\Services\Configuration\ConfigurationProvider;
 use App\Services\Runners\PostProcessRunner;
+use App\Support\ReleaseSearchIndexSync;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Carbon;
@@ -52,7 +53,7 @@ final class AdditionalCandidateQuery
 
     public const string CLAIM_TOKEN_COLUMN = 'additional_pp_claim_token';
 
-    /** Set once when an unreadable archive is queued for its single retry; never cleared. */
+    /** Set by `releases:retry-archive-inspection` when it requeues a release by hand, so it's only requeued once. */
     public const string ARCHIVE_RETRY_COLUMN = 'archive_retry_at';
 
     private static ?bool $supportsClaims = null;
@@ -114,7 +115,6 @@ final class AdditionalCandidateQuery
             ->where('r.haspreview', -1)
             ->where('r.nzbstatus', 1)
             ->where('c.disablepreview', 0);
-        self::applyArchiveRetryWindow($query);
         if ($min > 0) {
             $query->where('r.size', '>', $min);
         }
@@ -324,7 +324,6 @@ final class AdditionalCandidateQuery
                     ->where('r.passwordstatus', -1)
                     ->where('r.haspreview', -1)
                     ->where('r.nzbstatus', 1);
-                self::applyArchiveRetryWindow($lockQuery);
                 self::applyClaimWindow($lockQuery);
 
                 if (DB::getDriverName() !== 'sqlite') {
@@ -382,6 +381,25 @@ final class AdditionalCandidateQuery
     }
 
     /**
+     * Finish a release whose processing failed, so it isn't selected again.
+     *
+     * The password status stays unknown (-1), the same end state as an unreadable
+     * archive. A release that was already finalized is left untouched.
+     */
+    public static function markFailed(int $releaseId): void
+    {
+        $updated = Release::query()
+            ->where('id', $releaseId)
+            ->where('passwordstatus', -1)
+            ->where('haspreview', -1)
+            ->update(['haspreview' => 0, ...self::claimResetValues()]);
+
+        if ($updated > 0) {
+            ReleaseSearchIndexSync::forIds([$releaseId]);
+        }
+    }
+
+    /**
      * @return array<string, null>
      */
     public static function claimResetValues(): array
@@ -426,25 +444,6 @@ final class AdditionalCandidateQuery
                 ->whereNull('r.'.self::CLAIMED_AT_COLUMN)
                 ->orWhere('r.'.self::CLAIMED_AT_COLUMN, '<', $staleBefore);
         });
-    }
-
-    /**
-     * Keep a release queued for an archive retry out of the candidates until it is due.
-     *
-     * @param  Builder<Release>  $query
-     */
-    private static function applyArchiveRetryWindow(Builder $query): void
-    {
-        $query->where(function (Builder $retryQuery): void {
-            $retryQuery
-                ->whereNull('r.'.self::ARCHIVE_RETRY_COLUMN)
-                ->orWhere('r.'.self::ARCHIVE_RETRY_COLUMN, '<=', now());
-        });
-    }
-
-    public static function archiveRetryDelaySeconds(): int
-    {
-        return max(0, (int) config('nntmux.archive_retry_delay', 86400));
     }
 
     public static function claimTtlSeconds(): int
