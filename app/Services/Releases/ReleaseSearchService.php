@@ -13,7 +13,9 @@ use App\Models\UsenetGroup;
 use App\Services\Configuration\ConfigurationProvider;
 use App\Services\Search\DTO\ReleaseSearchQuery;
 use App\Services\Search\DTO\SearchCursor;
+use App\Services\Search\Support\ReleaseNameQuery;
 use App\Support\ReleaseSearchIndexDocument;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
@@ -116,7 +118,8 @@ class ReleaseSearchService
                 'password_allow_rar' => $this->passwordAllowRar(),
                 'sort_field' => $this->browseOrderToIndexSortField((string) $orderBy[0]),
                 'sort_dir' => $orderBy[1] ?? 'desc',
-                'try_fuzzy' => true,
+                'try_fuzzy' => false,
+                'partial_release_name' => true,
             ];
 
             $searchPage = Search::searchReleasePage(ReleaseSearchQuery::fromCriteria($criteria, $limit, $offset));
@@ -149,18 +152,11 @@ class ReleaseSearchService
             }
         }
 
-        $searchLimit = $this->determineSearchCandidateLimit($offset, $limit);
-        $searchResult = $this->performIndexSearch($searchFields, $searchLimit);
-
-        if (config('app.debug')) {
-            Log::debug('ReleaseSearchService::search after performIndexSearch', [
-                'result_count' => count($searchResult),
-            ]);
-        }
-
-        if (count($searchResult) === 0) {
+        if (config('nntmux.mysql_search_fallback', false) !== true) {
             return collect();
         }
+
+        $searchResult = $this->mysqlSearchQuery($searchFields)->toRawSql();
 
         // Build WHERE clause
         $whereSql = $this->buildSearchWhereClause(
@@ -259,7 +255,8 @@ class ReleaseSearchService
                 'password_allow_rar' => $this->passwordAllowRar(),
                 'sort_field' => $this->browseOrderToIndexSortField($orderField),
                 'sort_dir' => $orderDir,
-                'try_fuzzy' => true,
+                'try_fuzzy' => false,
+                'partial_release_name' => true,
                 'include_documents' => true,
             ];
 
@@ -410,39 +407,16 @@ class ReleaseSearchService
     }
 
     /**
-     * Original API search path (SQL filters + optional index ID list from fuzzy only).
+     * SQL fallback with release-name predicates applied before pagination.
      *
      * @param  array<int|string, mixed>  $cat
      */
     private function apiSearchLegacyMysql(mixed $searchName, mixed $groupName, int $offset, int $limit, int $maxAge, array $excludedCats, array $cat, int $minSize, string $orderBy = 'posted_desc'): mixed
     {
         [$orderField, $orderDir] = $this->getBrowseOrder($orderBy);
-        $searchLimit = $this->determineSearchCandidateLimit($offset, $limit);
-
-        $searchResult = [];
         $hasText = $searchName !== -1 && $searchName !== '' && $searchName !== null;
-        if ($hasText) {
-            $fuzzyResult = Search::searchReleasesWithFuzzy($searchName, $searchLimit);
-            $searchResult = $fuzzyResult['ids'] ?? [];
-
-            if (config('app.debug') && ($fuzzyResult['fuzzy'] ?? false)) {
-                Log::debug('apiSearch: Using fuzzy search results');
-            }
-
-            if ($searchResult === [] && config('nntmux.mysql_search_fallback', false) === true) {
-                if (config('app.debug')) {
-                    Log::debug('apiSearch: Falling back to MySQL search');
-                }
-                $searchResult = $this->performMySQLSearch(['searchname' => $searchName], $searchLimit);
-            }
-
-            if ($searchResult === []) {
-                if (config('app.debug')) {
-                    Log::debug('apiSearch: No results from any search engine');
-                }
-
-                return collect();
-            }
+        if ($hasText && config('nntmux.mysql_search_fallback', false) !== true) {
+            return collect();
         }
 
         $conditions = [
@@ -470,8 +444,8 @@ class ReleaseSearchService
             $conditions[] = sprintf('r.categories_id NOT IN (%s)', implode(',', array_map(static fn ($id): int => (int) $id, $excludedCats)));
         }
 
-        if ($searchResult !== []) {
-            $conditions[] = sprintf('r.id IN (%s)', implode(',', array_map(static fn ($id): int => (int) $id, $searchResult)));
+        if ($hasText) {
+            $conditions[] = 'r.id IN ('.$this->mysqlSearchQuery(['searchname' => $searchName])->toRawSql().')';
         }
 
         if ($minSize > 0) {
@@ -864,7 +838,7 @@ class ReleaseSearchService
                 }
             }
 
-            $searchResult = Search::searchReleases(['searchname' => $searchName], $this->prefilterCandidateLimit());
+            $searchResult = $this->searchReleaseNameIds(['searchname' => $searchName], $this->prefilterCandidateLimit());
 
             // Fall back to MySQL if search engine failed (only if enabled)
             if (empty($searchResult) && config('nntmux.mysql_search_fallback', false) === true) {
@@ -1135,7 +1109,7 @@ class ReleaseSearchService
         }
         $searchResult = $indexSearchResult; // Use index search result if we have it
         if (! $hasStrictTvSelector && empty($searchResult) && ! empty($name)) {
-            $searchResult = Search::searchReleases(['searchname' => $name], $this->prefilterCandidateLimit());
+            $searchResult = $this->searchReleaseNameIds(['searchname' => $name], $this->prefilterCandidateLimit());
 
             // Fall back to MySQL if search engine failed (only if enabled)
             if (empty($searchResult) && config('nntmux.mysql_search_fallback', false) === true) {
@@ -1245,8 +1219,7 @@ class ReleaseSearchService
                 }
                 $anidbIdFilter = 'AND r.anidbid IN ('.implode(',', array_map('intval', $anidbIds)).')';
             } else {
-                $fuzzyResult = Search::searchReleasesWithFuzzy($name, $searchLimit);
-                $searchResult = $fuzzyResult['ids'] ?? [];
+                $searchResult = $this->searchReleaseNameIds(['searchname' => $name], $searchLimit);
 
                 if (empty($searchResult) && config('nntmux.mysql_search_fallback', false) === true) {
                     $searchResult = $this->performMySQLSearch(['searchname' => $name], $searchLimit);
@@ -1349,7 +1322,7 @@ class ReleaseSearchService
 
         // Only perform name searches when the request does not already target a specific external ID.
         if (! $hasExternalIds && ! empty($name)) {
-            $searchResult = Search::searchReleases(['searchname' => $name], $this->prefilterCandidateLimit());
+            $searchResult = $this->searchReleaseNameIds(['searchname' => $name], $this->prefilterCandidateLimit());
 
             // Fall back to MySQL if search engine returned no results (only if enabled)
             if (empty($searchResult) && config('nntmux.mysql_search_fallback', false) === true) {
@@ -1513,63 +1486,19 @@ class ReleaseSearchService
     }
 
     /**
-     * Perform index search using Elasticsearch or Manticore, with MySQL fallback
-     *
-     * @param  array<string, mixed>  $searchArr
-     * @return array<string, mixed>
+     * @param  array<string, mixed>  $searchFields
+     * @return list<int>
      */
-    private function performIndexSearch(array $searchArr, int $limit): array
+    private function searchReleaseNameIds(array $searchFields, int $limit): array
     {
-        // Filter out -1 values and empty strings
-        $searchFields = Arr::where($searchArr, static function ($value) {
-            return $value !== -1 && $value !== '' && $value !== null;
-        });
+        $result = Search::searchReleasesFiltered([
+            'phrases' => $searchFields,
+            'try_fuzzy' => false,
+            'partial_release_name' => true,
+            'password_allow_rar' => $this->passwordAllowRar(),
+        ], $limit);
 
-        if (empty($searchFields)) {
-            if (config('app.debug')) {
-                Log::debug('performIndexSearch: searchFields is empty after filtering', [
-                    'original' => $searchArr,
-                ]);
-            }
-
-            return [];
-        }
-
-        if (config('app.debug')) {
-            Log::debug('performIndexSearch: starting search', [
-                'search_driver' => config('search.default'),
-                'searchFields' => $searchFields,
-                'limit' => $limit,
-            ]);
-        }
-
-        // Use the unified Search facade with fuzzy fallback
-        // This will try exact search first, then fuzzy if no results
-        $searchResult = Search::searchReleasesWithFuzzy($searchFields, $limit);
-        $result = $searchResult['ids'] ?? [];
-
-        if (config('app.debug')) {
-            Log::debug('performIndexSearch: Search result', [
-                'count' => count($result),
-                'fuzzy_used' => $searchResult['fuzzy'] ?? false,
-            ]);
-        }
-
-        // If search returned results, use them
-        if (! empty($result)) {
-            return $result;
-        }
-
-        // Fallback to MySQL LIKE search when search engine is unavailable (only if enabled)
-        if (config('nntmux.mysql_search_fallback', false) === true) {
-            if (config('app.debug')) {
-                Log::debug('performIndexSearch: Falling back to MySQL search');
-            }
-
-            return $this->performMySQLSearch($searchFields, $limit);
-        }
-
-        return [];
+        return $result['ids'];
     }
 
     /**
@@ -1765,30 +1694,7 @@ class ReleaseSearchService
     private function performMySQLSearch(array $searchFields, int $limit): array
     {
         try {
-            $query = Release::query()->select('id');
-
-            foreach ($searchFields as $field => $value) {
-                if (! empty($value)) {
-                    // Split search terms and search for each
-                    $terms = preg_split('/\s+/', trim($value));
-                    foreach ($terms as $term) {
-                        $term = trim($term);
-                        if (strlen($term) >= 2) {
-                            $query->where($field, 'LIKE', '%'.$term.'%');
-                        }
-                    }
-
-                    if ($field === 'searchname' && count($terms) > 1) {
-                        $normalizedPhrase = $this->normalizeMysqlFallbackPhrase($value);
-                        if ($normalizedPhrase !== '') {
-                            $query->whereRaw(
-                                "LOWER(REPLACE(REPLACE(REPLACE($field, '.', ' '), '-', ' '), '_', ' ')) LIKE ?",
-                                [$normalizedPhrase.'%']
-                            );
-                        }
-                    }
-                }
-            }
+            $query = $this->mysqlSearchQuery($searchFields);
 
             $results = $query->limit($limit)->pluck('id')->toArray();
 
@@ -1806,13 +1712,44 @@ class ReleaseSearchService
         }
     }
 
-    private function normalizeMysqlFallbackPhrase(string $value): string
+    /**
+     * @param  array<string, mixed>  $searchFields
+     * @return Builder<Release>
+     */
+    private function mysqlSearchQuery(array $searchFields): Builder
     {
-        $normalized = strtolower(trim($value));
-        $normalized = str_replace(['.', '-', '_'], ' ', $normalized);
-        $normalized = preg_replace('/\s+/', ' ', $normalized);
+        $query = Release::query()->select('id');
+        $hasField = false;
+        foreach ($searchFields as $field => $value) {
+            if (! in_array($field, ['searchname', 'name', 'fromname', 'filename'], true)
+                || ! is_string($value) || $value === '' || $value === '-1') {
+                continue;
+            }
+            $hasField = true;
+            if ($field === 'searchname') {
+                [$predicate, $bindings] = ReleaseNameQuery::fromString($value)->sqlPredicate('searchname');
+                $query->whereRaw($predicate, $bindings);
 
-        return trim((string) $normalized);
+                // Retain the SQL fallback's title-prefix protection for multi-word input.
+                if (preg_match('/\s/u', trim($value)) === 1 && preg_match('/["()|!*]|(?:^|\s)-\S/u', $value) !== 1) {
+                    $phrase = preg_replace('/\.(?:mkv|mp4|avi|nzb|nfo|rar|zip)$/i', '', trim($value)) ?? $value;
+                    $phrase = mb_strtolower(preg_replace('/[\s._-]+/u', ' ', $phrase) ?? '');
+                    $phrase = trim(preg_replace('/(?:^| )s\d{1,3}(?:e\d+)?(?: .*|$)/i', '', $phrase) ?? '');
+                    if ($phrase !== '') {
+                        $query->whereRaw(
+                            "LOWER(REPLACE(REPLACE(REPLACE(searchname, '.', ' '), '-', ' '), '_', ' ')) LIKE ?",
+                            [addcslashes($phrase, '%_\\').'%'],
+                        );
+                    }
+                }
+            } else {
+                foreach (preg_split('/\s+/u', trim($value)) ?: [] as $term) {
+                    $query->where($field, 'LIKE', '%'.addcslashes($term, '%_\\').'%');
+                }
+            }
+        }
+
+        return $hasField ? $query : $query->whereRaw('0 = 1');
     }
 
     /**
@@ -1853,10 +1790,10 @@ class ReleaseSearchService
      *
      * @param  array<int|string, mixed>  $cat  Category IDs (list or associative)
      * @param  array<int, int>  $excludedCats
-     * @param  array<string, mixed>  $searchResult
+     * @param  array<string, mixed>|string  $searchResult
      */
     private function buildSearchWhereClause(
-        array $searchResult,
+        array|string $searchResult,
         mixed $groupName,
         mixed $sizeFrom,
         mixed $sizeTo,
@@ -1869,7 +1806,7 @@ class ReleaseSearchService
     ): string {
         $conditions = [
             sprintf('r.passwordstatus %s', $this->showPasswords()),
-            sprintf('r.id IN (%s)', implode(',', array_map('intval', $searchResult))),
+            sprintf('r.id IN (%s)', is_string($searchResult) ? $searchResult : implode(',', array_map('intval', $searchResult))),
         ];
 
         // Add optional conditions
@@ -2161,9 +2098,9 @@ class ReleaseSearchService
         };
     }
 
-    private function getCacheVersion(): int
+    private function getCacheVersion(): string
     {
-        return (int) Cache::get(self::CACHE_VERSION_KEY, 1);
+        return ReleaseNameQuery::VERSION.':'.(int) Cache::get(self::CACHE_VERSION_KEY, 1).':';
     }
 
     /**

@@ -24,6 +24,7 @@ use App\Services\Releases\ReleaseBrowseService;
 use App\Services\Releases\ReleaseSearchService;
 use App\Services\Search\DTO\SearchCursor;
 use App\Services\Search\SearchCursorCodec;
+use App\Services\Search\Support\ReleaseNameQuery;
 use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -254,6 +255,7 @@ class ApiV2Controller extends BasePageController
     private function cursorQueryHash(Request $request): string
     {
         return hash('sha256', json_encode([
+            'matching' => ReleaseNameQuery::VERSION,
             'endpoint' => $request->path(),
             'params' => $this->inputCanonicalizer->canonicalize($request->except(['api_token', 'apikey', 'cursor', 'offset'])),
         ], JSON_THROW_ON_ERROR));

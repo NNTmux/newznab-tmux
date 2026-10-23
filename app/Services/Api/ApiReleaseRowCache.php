@@ -6,6 +6,7 @@ namespace App\Services\Api;
 
 use App\Exceptions\SearchUnavailableException;
 use App\Facades\Search;
+use App\Services\Search\Support\ReleaseNameQuery;
 use App\Services\Search\Support\SearchFailureTracker;
 use Countable;
 use Illuminate\Support\Facades\Cache;
@@ -118,6 +119,7 @@ class ApiReleaseRowCache
     private function cacheKey(string $apiVersion, string $scope, array $parameters): string
     {
         return 'api_release_rows:'.$apiVersion.':'.$scope.':'.md5(serialize([
+            'matching' => ReleaseNameQuery::VERSION,
             'driver' => Search::getCurrentDriver(),
             'release_version' => Cache::get('releases:cache_version', 1),
             'parameters' => $this->normalize($parameters),

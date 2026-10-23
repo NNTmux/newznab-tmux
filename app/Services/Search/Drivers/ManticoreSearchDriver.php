@@ -20,6 +20,7 @@ use App\Services\Search\DTO\SearchPage;
 use App\Services\Search\Support\ManticoreClientFactory;
 use App\Services\Search\Support\ManticoreIndexRegistry;
 use App\Services\Search\Support\ReleaseIndexProjection;
+use App\Services\Search\Support\ReleaseNameQuery;
 use App\Services\Search\Support\SearchFailureTracker;
 use App\Support\PredbSearchDocument;
 use App\Support\ReleaseSearchIndexDocument;
@@ -2692,9 +2693,10 @@ class ManticoreSearchDriver implements SearchDriverInterface
 
         $phrases = $criteria['phrases'] ?? null;
         $hasText = $phrases !== null && $phrases !== '' && $phrases !== -1;
-        $tryFuzzy = (bool) ($criteria['try_fuzzy'] ?? true) && ! self::hasMediaInfoFieldQuery($phrases);
+        $partialNames = (bool) ($criteria['partial_release_name'] ?? false);
+        $tryFuzzy = ! $partialNames && (bool) ($criteria['try_fuzzy'] ?? true) && ! self::hasMediaInfoFieldQuery($phrases);
 
-        $execute = function (bool $useFuzzy) use ($criteria, $limit, $offset, $hasText, $phrases): array {
+        $execute = function (bool $useFuzzy) use ($criteria, $limit, $offset, $hasText, $phrases, $partialNames): array {
             $query = (new Search($this->manticoreSearch))
                 ->setTable($this->getReleasesIndex())
                 ->stripBadUtf8(true);
@@ -2722,6 +2724,15 @@ class ManticoreSearchDriver implements SearchDriverInterface
                     $terms = [];
                     foreach ($searchArray as $key => $value) {
                         if (! is_string($key) || ! in_array($key, self::RELEASE_FIELD_SEARCH_FIELDS, true) || $value === '' || $value === null) {
+                            continue;
+                        }
+                        if ($partialNames && $key === 'searchname') {
+                            $prepared = ReleaseNameQuery::fromString((string) $value)->manticore();
+                            if ($prepared === '') {
+                                return ['ids' => [], 'total' => 0, 'fuzzy' => false];
+                            }
+                            $terms[] = '@@relaxed '.self::scopePreparedQueryToField($prepared, '@searchname');
+
                             continue;
                         }
                         $prepared = self::prepareUserSearchQuery((string) $value);

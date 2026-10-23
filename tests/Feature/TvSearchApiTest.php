@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Mockery;
+use Pdo\Sqlite;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
@@ -47,8 +48,9 @@ final class TvSearchApiTest extends TestCase
         }
 
         $pdo = DB::connection()->getPdo();
-        if ($pdo instanceof \PDO && method_exists($pdo, 'sqliteCreateFunction')) {
-            $pdo->sqliteCreateFunction('CONCAT', static fn (...$parts): string => implode('', $parts));
+        if ($pdo instanceof Sqlite) {
+            $pdo->createFunction('CONCAT', static fn (...$parts): string => implode('', $parts));
+            $pdo->createFunction('regexp', static fn (string $pattern, string $value): int => (int) preg_match('~'.$pattern.'~u', $value));
         }
     }
 
@@ -125,7 +127,7 @@ final class TvSearchApiTest extends TestCase
     {
         $mock = Mockery::mock(SearchService::class, [$this->app]);
         $mock->shouldReceive('searchReleasesByExternalId')->never();
-        $mock->shouldReceive('searchReleases')->once()->with(['searchname' => 'Simpsons'], 10000)->andReturn([1]);
+        $mock->shouldReceive('searchReleasesFiltered')->once()->with(['phrases' => ['searchname' => 'Simpsons'], 'try_fuzzy' => false, 'partial_release_name' => true, 'password_allow_rar' => false], 10000)->andReturn(['ids' => [1]]);
         $mock->shouldReceive('searchReleasesWithFuzzy')->never();
         $mock->shouldReceive('isAvailable')->andReturn(false);
 
@@ -156,10 +158,10 @@ final class TvSearchApiTest extends TestCase
     {
         $mock = Mockery::mock(SearchService::class, [$this->app]);
         $mock->shouldReceive('searchReleasesByExternalId')->never();
-        $mock->shouldReceive('searchReleases')
+        $mock->shouldReceive('searchReleasesFiltered')
             ->once()
-            ->with(['searchname' => 'Simpsons S06E24'], 10000)
-            ->andReturn([1, 2]);
+            ->with(['phrases' => ['searchname' => 'Simpsons S06E24'], 'try_fuzzy' => false, 'partial_release_name' => true, 'password_allow_rar' => false], 10000)
+            ->andReturn(['ids' => [1, 2]]);
         $mock->shouldReceive('searchReleasesWithFuzzy')->never();
         $mock->shouldReceive('isAvailable')->andReturn(false);
 
@@ -198,7 +200,7 @@ final class TvSearchApiTest extends TestCase
     {
         $mock = Mockery::mock(SearchService::class, [$this->app]);
         $mock->shouldReceive('searchReleasesByExternalId')->never();
-        $mock->shouldReceive('searchReleases')->once()->andReturn([1, 2]);
+        $mock->shouldReceive('searchReleasesFiltered')->once()->andReturn(['ids' => [1, 2]]);
         $mock->shouldReceive('searchReleasesWithFuzzy')->never();
         $mock->shouldReceive('isAvailable')->andReturn(false);
 
@@ -231,7 +233,7 @@ final class TvSearchApiTest extends TestCase
     {
         $mock = Mockery::mock(SearchService::class, [$this->app]);
         $mock->shouldReceive('searchReleasesByExternalId')->never();
-        $mock->shouldReceive('searchReleases')->once()->andReturn([1, 2]);
+        $mock->shouldReceive('searchReleasesFiltered')->once()->andReturn(['ids' => [1, 2]]);
         $mock->shouldReceive('searchReleasesWithFuzzy')->never();
         $mock->shouldReceive('isAvailable')->andReturn(false);
 
@@ -262,7 +264,7 @@ final class TvSearchApiTest extends TestCase
 
         $mock = Mockery::mock(SearchService::class, [$this->app]);
         $mock->shouldReceive('searchReleasesByExternalId')->never();
-        $mock->shouldReceive('searchReleases')->once()->with(['searchname' => 'The Simpsons'], 10000)->andReturn([]);
+        $mock->shouldReceive('searchReleasesFiltered')->once()->with(['phrases' => ['searchname' => 'The Simpsons'], 'try_fuzzy' => false, 'partial_release_name' => true, 'password_allow_rar' => false], 10000)->andReturn(['ids' => []]);
         $mock->shouldReceive('searchReleasesWithFuzzy')->never();
         $mock->shouldReceive('isAvailable')->andReturn(false);
 

@@ -39,6 +39,7 @@ final readonly class ReleaseSearchQuery
         public ?SearchCursor $cursor = null,
         public bool $trackTotal = true,
         public bool $includeDocuments = false,
+        public bool $partialReleaseName = false,
     ) {}
 
     /** @param array<string, mixed> $criteria */
@@ -73,6 +74,7 @@ final readonly class ReleaseSearchQuery
             cursor: $cursor,
             trackTotal: (bool) ($criteria['track_total'] ?? true),
             includeDocuments: (bool) ($criteria['include_documents'] ?? false),
+            partialReleaseName: (bool) ($criteria['partial_release_name'] ?? false),
         );
     }
 
@@ -104,6 +106,7 @@ final readonly class ReleaseSearchQuery
             'cursor_sort' => $this->cursor?->sortValues,
             'track_total' => $this->trackTotal,
             'include_documents' => $this->includeDocuments,
+            'partial_release_name' => $this->partialReleaseName,
         ];
     }
 

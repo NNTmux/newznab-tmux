@@ -13,7 +13,10 @@ use App\Services\Nzb\NzbService;
 use App\Services\Releases\ReleaseBrowseService;
 use App\Services\Releases\ReleaseSearchService;
 use App\Services\Search\DTO\ReleaseSearchQuery;
+use App\Services\Search\DTO\SearchCursor;
 use App\Services\Search\DTO\SearchPage;
+use App\Services\Search\SearchCursorCodec;
+use App\Services\Search\SearchService;
 use App\Services\Search\Support\SearchFailureTracker;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\Schema\Blueprint;
@@ -1141,6 +1144,62 @@ class ApiRequestMatrixTest extends TestCase
             ->assertJsonPath('error', 'Search cursor does not match this query or index generation.');
     }
 
+    /** @return array<string, array{string}> */
+    public static function partialSearchVersions(): array
+    {
+        return ['v1' => ['v1'], 'v2' => ['v2']];
+    }
+
+    #[DataProvider('partialSearchVersions')]
+    public function test_get_and_query_api_searches_share_the_strict_partial_name_policy(string $version): void
+    {
+        config(['search.drivers.manticore.fuzzy.enabled' => true]);
+        $name = 'The.Legend.of.Hanuman.S07';
+        $index = Mockery::mock(SearchService::class, [$this->app]);
+        $index->shouldReceive('isAvailable')->andReturn(true);
+        $index->shouldReceive('getCurrentDriver')->andReturn('manticore');
+        $index->shouldNotReceive('searchReleasesWithFuzzy');
+        $index->shouldReceive('searchReleasePage')->once()->withArgs(function (ReleaseSearchQuery $query) use ($name): bool {
+            $this->assertSame($name, $query->phrases);
+            $this->assertTrue($query->partialReleaseName);
+            $this->assertFalse($query->tryFuzzy);
+
+            return true;
+        })->andReturn(new SearchPage([1, 2], 2, false, 'manticore', documents: [
+            ['id' => 1, 'searchname' => $name.'.1080p.WEB-DL.x264-TEST', 'guid' => 'season-pack', 'categories_id' => 5030, 'postdate_ts' => 1792713600, 'adddate_ts' => 1792713600],
+            ['id' => 2, 'searchname' => $name.'E01.1080p.WEB-DL.x264-TEST', 'guid' => 'season-episode', 'categories_id' => 5030, 'postdate_ts' => 1792713600, 'adddate_ts' => 1792713600],
+        ]));
+        $this->app->instance(SearchService::class, $index);
+        $parameters = $version === 'v1'
+            ? ['apikey' => $this->apiToken(), 't' => 'search', 'o' => 'json', 'q' => $name]
+            : ['api_token' => $this->apiToken(), 'id' => $name];
+        $path = $version === 'v1' ? '/api/v1/api' : '/api/v2/search';
+
+        foreach ([$this->getJson($path.'?'.http_build_query($parameters)), $this->queryJson($path, $parameters)] as $response) {
+            $response->assertOk()
+                ->assertSee($name.'.1080p.WEB-DL.x264-TEST', false)
+                ->assertSee($name.'E01.1080p.WEB-DL.x264-TEST', false)
+                ->assertDontSee('Hanuman.S01', false);
+        }
+    }
+
+    public function test_search_cursor_from_before_the_matching_change_is_rejected(): void
+    {
+        $this->bindSearchMocks()->shouldNotReceive('apiSearch');
+        $oldHash = hash('sha256', json_encode([
+            'endpoint' => 'api/v2/search',
+            'params' => ['id' => 'Hanuman S07', 'limit' => '1'],
+        ], JSON_THROW_ON_ERROR));
+        $cursor = app(SearchCursorCodec::class)->encode(new SearchCursor(
+            sortValues: [1], total: 10, queryHash: $oldHash, driver: Search::getCurrentDriver(),
+            indexGeneration: (string) config('search.index_generation', '1'), expiresAt: time() + 600,
+        ));
+
+        $this->getJson('/api/v2/search?'.http_build_query([
+            'api_token' => $this->apiToken(), 'id' => 'Hanuman S07', 'limit' => 1, 'cursor' => $cursor,
+        ]))->assertBadRequest()->assertJsonPath('error', 'Search cursor does not match this query or index generation.');
+    }
+
     public function test_query_api_hits_and_downloads_from_query_links_are_registered(): void
     {
         $token = $this->apiToken();
@@ -1413,8 +1472,12 @@ class ApiRequestMatrixTest extends TestCase
     {
         config(['search.default' => 'manticore', 'search.drivers.manticore.max_matches' => 7500]);
         Search::shouldReceive('isAvailable')->andReturn(true);
-        Search::shouldReceive('searchReleases')->once()->with(['searchname' => 'ubuntu'], 7500)->andReturn([1]);
-        Search::shouldReceive('searchReleasesFiltered')->once()->andReturn(['ids' => [], 'total' => 0, 'fuzzy' => false]);
+        Search::shouldReceive('searchReleasesFiltered')->once()->with([
+            'phrases' => ['searchname' => 'ubuntu'], 'try_fuzzy' => false, 'partial_release_name' => true, 'password_allow_rar' => false,
+        ], 7500)->andReturn(['ids' => [1], 'total' => 1, 'fuzzy' => false]);
+        Search::shouldReceive('searchReleasesFiltered')->once()->withArgs(
+            static fn (array $criteria): bool => ($criteria['release_ids'] ?? []) === [1] && $criteria['phrases'] === null,
+        )->andReturn(['ids' => [], 'total' => 0, 'fuzzy' => false]);
 
         $releases = app(ReleaseSearchService::class)->moviesSearch(name: 'ubuntu');
 

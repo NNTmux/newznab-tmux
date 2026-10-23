@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Mockery;
+use Pdo\Sqlite;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
@@ -79,7 +80,7 @@ final class MovieSearchApiTest extends TestCase
     {
         $mock = Mockery::mock(SearchService::class, [$this->app]);
         $mock->shouldReceive('searchReleasesByExternalId')->never();
-        $mock->shouldReceive('searchReleases')->once()->with(['searchname' => 'Resurrection 2025'], 10000)->andReturn([1]);
+        $mock->shouldReceive('searchReleasesFiltered')->once()->with(['phrases' => ['searchname' => 'Resurrection 2025'], 'try_fuzzy' => false, 'partial_release_name' => true, 'password_allow_rar' => false], 10000)->andReturn(['ids' => [1]]);
         $mock->shouldReceive('searchReleasesWithFuzzy')->never();
         $mock->shouldReceive('isAvailable')->andReturn(false);
 
@@ -111,7 +112,7 @@ final class MovieSearchApiTest extends TestCase
 
         $mock = Mockery::mock(SearchService::class, [$this->app]);
         $mock->shouldReceive('searchReleasesByExternalId')->never();
-        $mock->shouldReceive('searchReleases')->once()->with(['searchname' => 'Resurrection 2025'], 10000)->andReturn([]);
+        $mock->shouldReceive('searchReleasesFiltered')->once()->with(['phrases' => ['searchname' => 'Resurrection 2025'], 'try_fuzzy' => false, 'partial_release_name' => true, 'password_allow_rar' => false], 10000)->andReturn(['ids' => []]);
         $mock->shouldReceive('searchReleasesWithFuzzy')->never();
         $mock->shouldReceive('isAvailable')->andReturn(false);
 
@@ -148,7 +149,8 @@ final class MovieSearchApiTest extends TestCase
                 $criteria = $query->criteria();
 
                 return ($criteria['phrases'] ?? null) === 'Resurrection 2025'
-                    && ($criteria['try_fuzzy'] ?? null) === true
+                    && ($criteria['try_fuzzy'] ?? null) === false
+                    && ($criteria['partial_release_name'] ?? null) === true
                     && $query->limit === 100
                     && $query->offset === 0;
             })
@@ -179,8 +181,9 @@ final class MovieSearchApiTest extends TestCase
         }
 
         $pdo = DB::connection()->getPdo();
-        if ($pdo instanceof \PDO && method_exists($pdo, 'sqliteCreateFunction')) {
-            $pdo->sqliteCreateFunction('CONCAT', static fn (...$parts): string => implode('', $parts));
+        if ($pdo instanceof Sqlite) {
+            $pdo->createFunction('CONCAT', static fn (...$parts): string => implode('', $parts));
+            $pdo->createFunction('regexp', static fn (string $pattern, string $value): int => (int) preg_match('~'.$pattern.'~u', $value));
         }
     }
 

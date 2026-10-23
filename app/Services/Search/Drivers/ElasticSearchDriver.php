@@ -18,6 +18,7 @@ use App\Services\Search\DTO\SearchPage;
 use App\Services\Search\Support\ElasticsearchClientFactory;
 use App\Services\Search\Support\ElasticsearchResponseHelper;
 use App\Services\Search\Support\ReleaseIndexProjection;
+use App\Services\Search\Support\ReleaseNameQuery;
 use App\Services\Search\Support\SearchFailureTracker;
 use App\Support\PredbSearchDocument;
 use App\Support\ReleaseSearchIndexDocument;
@@ -2899,14 +2900,28 @@ class ElasticSearchDriver implements SearchDriverInterface
 
         $phrases = $criteria['phrases'] ?? null;
         $hasText = $phrases !== null && $phrases !== '' && $phrases !== -1;
-        $tryFuzzy = (bool) ($criteria['try_fuzzy'] ?? true) && ! self::hasMediaInfoFieldQuery($phrases);
+        $partialNames = (bool) ($criteria['partial_release_name'] ?? false);
+        $tryFuzzy = ! $partialNames && (bool) ($criteria['try_fuzzy'] ?? true) && ! self::hasMediaInfoFieldQuery($phrases);
 
-        $run = function (bool $useFuzzy) use ($criteria, $limit, $offset, $hasText, $phrases): array {
+        $run = function (bool $useFuzzy) use ($criteria, $limit, $offset, $hasText, $phrases, $partialNames): array {
             $filter = $this->buildElasticsearchReleaseFilters($criteria);
             $must = [];
 
             if ($hasText) {
-                if (is_string($phrases)) {
+                if ($partialNames) {
+                    $namePhrases = is_string($phrases) ? ['searchname' => $phrases] : $phrases;
+                    if (! $this->isAssociativeStringArray($namePhrases)) {
+                        $namePhrases = ['searchname' => implode(' ', array_filter($namePhrases, 'is_string'))];
+                    }
+                    if (isset($namePhrases['searchname'])) {
+                        $must[] = ReleaseNameQuery::fromString((string) $namePhrases['searchname'])->elasticsearch();
+                        unset($namePhrases['searchname']);
+                    }
+                    $must = [...$must, ...$this->buildReleaseFieldSpecificMustClauses($namePhrases, false)];
+                    if ($must === []) {
+                        return ['ids' => [], 'total' => 0, 'fuzzy' => false];
+                    }
+                } elseif (is_string($phrases)) {
                     $text = trim($phrases);
                     if ($text === '') {
                         return ['ids' => [], 'total' => 0, 'fuzzy' => $useFuzzy];
