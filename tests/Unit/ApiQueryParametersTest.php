@@ -67,6 +67,16 @@ final class ApiQueryParametersTest extends TestCase
         self::assertSame(100, $this->parameters->limit(Request::create('/', 'GET')));
     }
 
+    public function test_retired_xxx_categories_also_search_their_replacement(): void
+    {
+        self::assertSame(['6041', '6040'], $this->parameters->categories(Request::create('/', 'GET', ['cat' => '6041'])));
+        self::assertSame(['6090', '6020', '6040', '6030'], $this->parameters->categories(Request::create('/', 'GET', ['cat' => '6090,6020'])));
+        self::assertSame(['6080', '6030'], $this->parameters->categories(Request::create('/', 'GET', ['cat' => '6080'])));
+        self::assertSame(['6030'], $this->parameters->categories(Request::create('/', 'GET', ['cat' => '6030'])));
+        self::assertSame(['6040', '6041'], $this->parameters->categories(Request::create('/', 'GET', ['cat' => '6040,6041'])));
+        self::assertSame(['6045'], $this->parameters->categories(Request::create('/', 'GET', ['cat' => '6045'])));
+    }
+
     public function test_invalid_sort_is_reported_without_building_a_response(): void
     {
         $request = Request::create('/', 'GET', ['sort' => 'unexpected']);

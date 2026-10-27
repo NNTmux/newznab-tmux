@@ -30,6 +30,15 @@ class XxxCategorizer extends AbstractCategorizer
     // VR headset / platform tokens
     protected const VR_DEVICES = 'GearVR|Oculus|Quest[123]?|PSVR|Vive|Index|Pimax';
 
+    // JAV studios and sites (also listed in KNOWN_STUDIOS)
+    protected const JAV_STUDIOS = '10musume|Caribbeancom(?:pr)?|Heyzo|Pacopacomama|1Pondo|Tokyo-?Hot|Gachinco|Kin8tengoku|HeyDouga|S-Cute|Muramura|JavHD|Mesubuta|Hitozuma[._ -]?Giri';
+
+    // Common JAV label prefixes, matched as LABEL-123 product codes
+    protected const JAV_LABELS = 'ABP|ABW|ADN|ATID|BBAN|CAWD|DASD|DVDMS|EBOD|FSDSS|GVH|HMN|HND|IPX|IPZ|JUFE|JUQ|JUY|KAWD|MEYD|MIAA|MIDE|MIDV|MIGD|MIMK|MKMP|MXGS|NHDTB|PPPD|PRED|RBD|REBD|SDDE|SDMU|SNIS|SONE|SSIS|SSNI|STARS|WAAA|WANZ|XVSR|YMDD';
+
+    // Video containers and codecs; their presence means a release is not an image collection
+    protected const VIDEO_MARKERS = 'mp4|mkv|wmv|avi|mov|webm|m4v|x264|x265|h\.?264|h\.?265|hevc|xvid|divx';
+
     public function getName(): string
     {
         return 'XXX';
@@ -38,70 +47,20 @@ class XxxCategorizer extends AbstractCategorizer
     public function categorize(ReleaseContext $context): CategorizationResult
     {
         $name = $context->releaseName;
+        $javResult = $this->checkJav($name);
 
-        // Check if it looks like adult content
-        if (! $context->hasOnlyFansMarker() && ! $this->looksLikeXxx($name)) {
+        if ($javResult === null && ! $context->hasOnlyFansMarker() && ! $this->looksLikeXxx($name)) {
             return $this->noMatch();
         }
 
-        // Try specific XXX subcategories in order of specificity
-        if ($result = $this->checkOnlyFans($context)) {
-            return $result;
-        }
-
-        if ($result = $this->checkVR($name)) {
-            return $result;
-        }
-
-        if ($result = $this->checkUHD($name)) {
-            return $result;
-        }
-
-        if ($result = $this->checkClipHD($name)) {
-            return $result;
-        }
-
-        if ($result = $this->checkPack($name)) {
-            return $result;
-        }
-
-        if ($result = $this->checkClipSD($name, $context->poster)) {
-            return $result;
-        }
-
-        if ($result = $this->checkSD($name)) {
-            return $result;
-        }
-
-        if ($context->catWebDL && ($result = $this->checkWebDL($name))) {
-            return $result;
-        }
-
-        if ($result = $this->checkX264($name)) {
-            return $result;
-        }
-
-        if ($result = $this->checkXvid($name)) {
-            return $result;
-        }
-
-        if ($result = $this->checkImageset($name)) {
-            return $result;
-        }
-
-        if ($result = $this->checkWMV($name)) {
-            return $result;
-        }
-
-        if ($result = $this->checkDVD($name)) {
-            return $result;
-        }
-
-        if ($result = $this->checkOther($name)) {
-            return $result;
-        }
-
-        return $this->noMatch();
+        return $this->checkOnlyFans($context)
+            ?? $javResult
+            ?? $this->checkImageset($name)
+            ?? $this->checkVR($name)
+            ?? $this->checkDVD($name)
+            ?? $this->checkPack($name)
+            ?? $this->checkResolution($name, $context->poster)
+            ?? $this->matched(Category::XXX_OTHER, 0.6, 'other');
     }
 
     /**
@@ -258,176 +217,25 @@ class XxxCategorizer extends AbstractCategorizer
         return null;
     }
 
-    protected function checkUHD(string $name): ?CategorizationResult
+    /**
+     * JAV needs positive identification: a JAV studio, an FC2-PPV id, a known label code, or an explicit JAV token.
+     */
+    protected function checkJav(string $name): ?CategorizationResult
     {
-        if (! preg_match('/\b(2160p|4k|UHD|Ultra[._ -]?HD)\b/i', $name)) {
-            return null;
+        if (preg_match('/\b(?:'.self::JAV_STUDIOS.')\b/i', $name)) {
+            return $this->matched(Category::XXX_JAV, 0.95, 'jav_studio');
         }
 
-        // Check for adult markers
-        $hasAdultMarker = preg_match('/\bXXX\b/i', $name) ||
-                          preg_match('/\b('.self::KNOWN_STUDIOS.')\b/i', strtolower($name)) ||
-                          preg_match('/\b(Hardcore|Porn|Sex|Anal|Creampie|MILF|Lesbian|Teen|Interracial)\b/i', $name);
-
-        if (! $hasAdultMarker) {
-            return null;
+        if (preg_match('/\bFC2[._ -]?PPV[._ -]?\d{5,8}\b/i', $name)) {
+            return $this->matched(Category::XXX_JAV, 0.95, 'jav_fc2');
         }
 
-        // Known UHD release groups
-        if (preg_match('/XXX.+2160p[\w\-.]+M[PO][V4]-(KTR|GUSH|FaiLED|SEXORS|hUSHhUSH|YAPG|WRB|NBQ|FETiSH)/i', $name)) {
-            return $this->matched(Category::XXX_UHD, 0.95, 'uhd_group');
+        if (preg_match('/\b(?:'.self::JAV_LABELS.')-\d{3,5}\b/i', $name)) {
+            return $this->matched(Category::XXX_JAV, 0.95, 'jav_code');
         }
 
-        return $this->matched(Category::XXX_UHD, 0.9, 'uhd');
-    }
-
-    protected function checkClipHD(string $name): ?CategorizationResult
-    {
-        // Exclude packs and collections
-        if (preg_match('/^(Complete|Pack|Collection|Anthology|Siterip|SiteRip)\b/i', $name)) {
-            return null;
-        }
-
-        // Exclude TV shows
-        if (preg_match('/\b(S\d{1,2}E\d{1,2}|S\d{1,2}|Season\s\d{1,2})\b/i', $name)) {
-            return null;
-        }
-
-        // Check for HD resolution
-        $hasHD = preg_match('/\b(720p|1080p|2160p|HD|4K)\b/i', $name);
-
-        // Studio + performer + HD resolution
-        if (preg_match('/^('.self::KNOWN_STUDIOS.')[.\-_ ]([A-Z][a-z]+).*?(720p|1080p|2160p|HD|4K)/i', $name)) {
-            return $this->matched(Category::XXX_CLIPHD, 0.9, 'clip_hd_studio');
-        }
-
-        // Known studio with date pattern: site.YYYY.MM.DD or site.YY.MM.DD
-        if (preg_match('/^('.self::KNOWN_STUDIOS.')[.\-_ ](19|20)?\d{2}[.\-_ ]\d{2}[.\-_ ]\d{2}/i', $name)) {
-            if ($hasHD) {
-                return $this->matched(Category::XXX_CLIPHD, 0.95, 'clip_hd_studio_date');
-            }
-
-            // Even without HD marker, if it's a known studio with date pattern, likely XXX
-            return $this->matched(Category::XXX_X264, 0.85, 'studio_date');
-        }
-
-        // Date pattern with 4-digit year: site.YYYY.MM.DD.performer.title.1080p
-        if (preg_match('/^([A-Z][a-zA-Z0-9]+)[.\-_ ](19|20)\d{2}[.\-_ ]\d{2}[.\-_ ]\d{2}[.\-_ ]/i', $name) &&
-            ! preg_match('/\b(S\d{2}E\d{2}|Documentary|Series)\b/i', $name)) {
-            // Check if it has adult keywords or HD resolution
-            if ($hasHD || preg_match('/\b('.self::ADULT_KEYWORDS.')\b/i', $name)) {
-                return $this->matched(Category::XXX_CLIPHD, 0.85, 'clip_hd_date_4digit');
-            }
-        }
-
-        // Date pattern with 2-digit year: site.YY.MM.DD.performer.title.1080p
-        if (preg_match('/^([A-Z][a-zA-Z0-9]+)\.(\d{2})\.(\d{2})\.(\d{2})\..*?(720p|1080p|2160p|HD|4K)/i', $name) &&
-            ! preg_match('/\b(S\d{2}E\d{2}|Documentary|Series)\b/i', $name)) {
-            return $this->matched(Category::XXX_CLIPHD, 0.85, 'clip_hd_date');
-        }
-
-        // JAV compact date pattern: site.YYMMDD (e.g., 10musume.121025)
-        if (preg_match('/^('.self::KNOWN_STUDIOS.')[.\-_ ](\d{6})/i', $name)) {
-            if ($hasHD) {
-                return $this->matched(Category::XXX_CLIPHD, 0.9, 'clip_hd_jav_date');
-            }
-
-            return $this->matched(Category::XXX_X264, 0.85, 'jav_date');
-        }
-
-        // Known studio with XXX marker and HD resolution
-        if (preg_match('/^('.self::KNOWN_STUDIOS.')[.\-_ ].*\bXXX\b.*?(720p|1080p|2160p|HD|4K)/i', $name)) {
-            return $this->matched(Category::XXX_CLIPHD, 0.9, 'clip_hd_studio_xxx');
-        }
-
-        // XXX with HD resolution
-        if (preg_match('/\b(XXX|MILF|Anal|Sex|Porn)[._ -]+(720p|1080p|2160p|HD|4K)\b/i', $name) ||
-            preg_match('/\b(720p|1080p|2160p|HD|4K)[._ -]+(XXX|MILF|Anal|Sex|Porn)\b/i', $name)) {
-            return $this->matched(Category::XXX_CLIPHD, 0.8, 'clip_hd_xxx');
-        }
-
-        return null;
-    }
-
-    protected function checkPack(string $name): ?CategorizationResult
-    {
-        if (preg_match('/[ .]PACK[ .]/i', $name)) {
-            return $this->matched(Category::XXX_PACK, 0.85, 'pack');
-        }
-
-        return null;
-    }
-
-    protected function checkClipSD(string $name, string $poster): ?CategorizationResult
-    {
-        if (preg_match('/anon@y[.]com|@md-hobbys[.]com|oz@lot[.]com/i', $poster)) {
-            return $this->matched(Category::XXX_CLIPSD, 0.85, 'clip_sd_poster');
-        }
-
-        if (preg_match('/(iPT\sTeam|KLEENEX)/i', $name) || stripos($name, 'SDPORN') !== false) {
-            return $this->matched(Category::XXX_CLIPSD, 0.85, 'clip_sd');
-        }
-
-        return null;
-    }
-
-    protected function checkSD(string $name): ?CategorizationResult
-    {
-        if (preg_match('/SDX264XXX|XXX\.HR\./i', $name)) {
-            return $this->matched(Category::XXX_SD, 0.85, 'sd');
-        }
-
-        return null;
-    }
-
-    protected function checkWebDL(string $name): ?CategorizationResult
-    {
-        // Exclude TV shows
-        if (preg_match('/\b(S\d{1,2}E\d{1,2})\b/i', $name)) {
-            return null;
-        }
-
-        if (preg_match('/web[._ -]dl|web-?rip/i', $name) &&
-            (preg_match('/\b('.self::ADULT_KEYWORDS.')\b/i', $name) ||
-             preg_match('/\b('.self::KNOWN_STUDIOS.')\b/i', $name) ||
-             preg_match('/\b(XXX|Porn|Adult|JAV|Hentai)\b/i', $name))) {
-            return $this->matched(Category::XXX_WEBDL, 0.85, 'webdl');
-        }
-
-        return null;
-    }
-
-    protected function checkX264(string $name): ?CategorizationResult
-    {
-        // Exclude HEVC/x265
-        if (preg_match('/\b(x265|hevc)\b/i', $name)) {
-            return null;
-        }
-
-        // Require H.264/x264/AVC
-        if (! preg_match('/\b((x|h)[\.\-_ ]?264|AVC)\b/i', $name)) {
-            return null;
-        }
-
-        // Reject obvious non-targets
-        if (preg_match('/\bwmv\b|S\d{1,2}E\d{1,2}|\d+x\d+/i', $name)) {
-            return null;
-        }
-
-        // Check for adult content
-        $adultPattern = '/\bXXX\b|a\.b\.erotica|BangBros|Jacquie[._ -]?Et[._ -]?Michel|Cum|Defloration|Err?oticax?|JoyMii|MetArt|Nubiles|Porn|SexArt|Tushy|Vixen|JAV|Brazzers|NaughtyAmerica|RealityKings/i';
-
-        if (preg_match($adultPattern, $name)) {
-            return $this->matched(Category::XXX_X264, 0.85, 'x264');
-        }
-
-        return null;
-    }
-
-    protected function checkXvid(string $name): ?CategorizationResult
-    {
-        if (preg_match('/(b[dr]|dvd)rip|detoxication|divx|nympho|pornolation|swe6|tesoro|xvid/i', $name)) {
-            return $this->matched(Category::XXX_XVID, 0.8, 'xvid');
+        if (preg_match('/\bJAV\b/i', $name)) {
+            return $this->matched(Category::XXX_JAV, 0.9, 'jav');
         }
 
         return null;
@@ -435,40 +243,67 @@ class XxxCategorizer extends AbstractCategorizer
 
     protected function checkImageset(string $name): ?CategorizationResult
     {
-        if (preg_match('/IMAGESET|PICTURESET|ABPEA/i', $name)) {
+        if (preg_match('/\b(?:'.self::VIDEO_MARKERS.')\b/i', $name)) {
+            return null;
+        }
+
+        if (preg_match('/(?:IMAGE|PICTURE|PHOTO)[._ -]?SETS?|ABPEA|\b(?:Pics|Photos|Images|JPE?Gs?|Wallpapers?)\b/i', $name)) {
             return $this->matched(Category::XXX_IMAGESET, 0.9, 'imageset');
         }
 
         return null;
     }
 
-    protected function checkWMV(string $name): ?CategorizationResult
-    {
-        // Exclude modern formats
-        if (preg_match('/\b(720p|1080p|2160p|x264|x265|h264|h265|hevc|XviD|MP4-|\.mp4)[._ -]/i', $name)) {
-            return null;
-        }
-
-        if (preg_match('/\b(WMV|Windows\s?Media\s?Video)\b|\.wmv$|[._ -]wmv[._ -]/i', $name)) {
-            return $this->matched(Category::XXX_WMV, 0.8, 'wmv');
-        }
-
-        return null;
-    }
-
+    /**
+     * Full DVD images or structures. DVDRip is a re-encode, so it counts as SD video.
+     */
     protected function checkDVD(string $name): ?CategorizationResult
     {
-        if (preg_match('/dvdr[^i]|dvd[59]/i', $name)) {
+        if (preg_match('/\bDVD-?R(?:[._ -]|$)|\bDVD[59]\b|VIDEO_TS|\bDVD[._ -]?ISO\b|\bDVD\b.*\b(?:ISO|IMG|NTSC|PAL)\b|\bFull[._ -]DVD\b/i', $name)) {
             return $this->matched(Category::XXX_DVD, 0.85, 'dvd');
         }
 
         return null;
     }
 
-    protected function checkOther(string $name): ?CategorizationResult
+    /**
+     * Video collections.
+     */
+    protected function checkPack(string $name): ?CategorizationResult
     {
-        if (preg_match('/[._ -]Brazzers|Creampie|[._ -]JAV[._ -]|North\.Pole|She[._ -]?Male|Transsexual|OLDER ANGELS/i', $name)) {
-            return $this->matched(Category::XXX_OTHER, 0.7, 'other');
+        if (preg_match('/[._ -]PACK(?:[._ -]|$)|\bMega[._ -]?Pack\b|\bSite[._ -]?Rip\b|^(?:Complete|Collection|Anthology)\b|\b\d+[._ -]?(?:clips|videos|scenes)\b/i', $name)) {
+            return $this->matched(Category::XXX_PACK, 0.85, 'pack');
+        }
+
+        return null;
+    }
+
+    /**
+     * Sort video by resolution: UHD at 2160p or above, HD from 720p, SD below that.
+     * When several resolutions are present the highest one wins.
+     */
+    protected function checkResolution(string $name, string $poster): ?CategorizationResult
+    {
+        if (preg_match('/(?<!\d)(?:2160|4320)[pi](?![a-z])|\b(?:4K|8K|UHD|Ultra[._ -]?HD)\b/i', $name)) {
+            return $this->matched(Category::XXX_UHD, 0.9, 'uhd');
+        }
+
+        if (preg_match('/(?<!\d)(?:720|1080|1440)[pi](?![a-z])|\b(?:FullHD|FHD)\b/i', $name)) {
+            return $this->matched(Category::XXX_HD, 0.9, 'hd');
+        }
+
+        // A bare HD token is weaker than an explicit resolution. Passion-HD is a studio name, not a resolution.
+        if (preg_match('/\bHD\b/i', (string) preg_replace('/Passion[._ -]?HD/i', '', $name))) {
+            return $this->matched(Category::XXX_HD, 0.8, 'hd_token');
+        }
+
+        if (preg_match('/(?<!\d)(?:240|270|360|480|540|576)[pi](?![a-z])|\bSD\b/i', $name)) {
+            return $this->matched(Category::XXX_SD, 0.9, 'sd');
+        }
+
+        if (preg_match('/\b(?:XviD|DivX|(?:DVD|BD|BR)Rip|WMV)\b|\.wmv$|SDX264XXX|XXX\.HR\.|iPT\sTeam|KLEENEX|SDPORN/i', $name) ||
+            preg_match('/anon@y[.]com|@md-hobbys[.]com|oz@lot[.]com/i', $poster)) {
+            return $this->matched(Category::XXX_SD, 0.85, 'sd_legacy');
         }
 
         return null;

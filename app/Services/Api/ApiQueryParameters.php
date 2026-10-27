@@ -40,10 +40,31 @@ final class ApiQueryParameters
             $value .= ','.Category::TV_WEBDL;
         }
 
-        return array_values(array_filter(
+        $categories = array_values(array_filter(
             array_map('trim', explode(',', $value)),
             static fn (string $id): bool => $id !== ''
         ));
+
+        return $this->withRetiredXxxReplacements($categories);
+    }
+
+    /**
+     * Keep retired XXX category ids working for older clients by also searching their replacement category.
+     *
+     * @param  list<string>  $categories
+     * @return list<string>
+     */
+    private function withRetiredXxxReplacements(array $categories): array
+    {
+        foreach ($categories as $id) {
+            $replacement = Category::XXX_RETIRED_FALLBACKS[(int) $id] ?? null;
+
+            if ($replacement !== null && ! in_array((string) $replacement, $categories, true)) {
+                $categories[] = (string) $replacement;
+            }
+        }
+
+        return $categories;
     }
 
     public function group(Request $request): string|int|bool

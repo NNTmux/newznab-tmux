@@ -855,9 +855,8 @@ class ReleaseRemoverService
             Category::MOVIE_HD,
             Category::MOVIE_OTHER,
             Category::MOVIE_SD,
-            Category::XXX_WMV,
-            Category::XXX_X264,
-            Category::XXX_XVID,
+            Category::XXX_SD,
+            Category::XXX_HD,
             Category::XXX_OTHER,
         ]);
 

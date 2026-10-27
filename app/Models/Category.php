@@ -150,15 +150,7 @@ class Category extends Model
 
     public const int XXX_DVD = 6010;
 
-    public const int XXX_WMV = 6020;
-
-    public const int XXX_XVID = 6030;
-
-    public const int XXX_X264 = 6040;
-
-    public const int XXX_CLIPHD = 6041;
-
-    public const int XXX_CLIPSD = 6042;
+    public const int XXX_HD = 6040;
 
     public const int XXX_UHD = 6045;
 
@@ -166,15 +158,30 @@ class Category extends Model
 
     public const int XXX_ONLYFANS = 6047;
 
+    public const int XXX_JAV = 6048;
+
     public const int XXX_PACK = 6050;
 
     public const int XXX_IMAGESET = 6060;
 
     public const int XXX_OTHER = 6999;
 
-    public const int XXX_SD = 6080;
+    public const int XXX_SD = 6030;
 
-    public const int XXX_WEBDL = 6090;
+    /**
+     * Retired XXX categories (WMV, HD Clips, SD Clips, old SD, WEBDL) and the category that replaces each one.
+     *
+     * Used by releases:recategorize-xxx to empty and delete them, and by the API to keep old category ids working.
+     *
+     * @var array<int, int>
+     */
+    public const array XXX_RETIRED_FALLBACKS = [
+        6020 => self::XXX_SD,
+        6041 => self::XXX_HD,
+        6042 => self::XXX_SD,
+        6080 => self::XXX_SD,
+        6090 => self::XXX_HD,
+    ];
 
     public const int BOOKS_MAGAZINES = 7010;
 

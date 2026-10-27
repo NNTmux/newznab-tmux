@@ -143,7 +143,7 @@ class XxxCategorizationTest extends TestCase
         $result = $categorizer->categorize($context);
 
         $this->assertTrue($result->isSuccessful());
-        $this->assertSame(Category::XXX_CLIPHD, $result->categoryId);
+        $this->assertSame(Category::XXX_HD, $result->categoryId);
     }
 
     public function test_lady_and_lyne_as_separate_tokens_do_not_trigger_xxx(): void
@@ -165,10 +165,10 @@ class XxxCategorizationTest extends TestCase
     {
         return [
             'VFF 2160p' => ['JacquieEtMichelTV.Angel.26.10.10.VFF.2160p.WEB.AAC.2.0.x264.NOTAG', Category::XXX_UHD],
-            'VFF 720p' => ['JacquieEtMichelTV.Helena.26.09.29.VFF.720p.WEB.AAC.2.0.x264.NOTAG', Category::XXX_CLIPHD],
-            'VFF 720p space separated' => ['JacquieEtMichelTV Helena 26 09 29 VFF 720p WEB AAC 2 0 x264 NOTAG', Category::XXX_CLIPHD],
-            'VFF 576p' => ['JacquieEtMichelTV.Helena.26.09.29.VFF.576p.WEB.AAC.2.0.x264.NOTAG', Category::XXX_X264],
-            'VFF 360p' => ['JacquieEtMichelTV.Helena.26.09.29.VFF.360p.WEB.AAC.2.0.x264.NOTAG', Category::XXX_X264],
+            'VFF 720p' => ['JacquieEtMichelTV.Helena.26.09.29.VFF.720p.WEB.AAC.2.0.x264.NOTAG', Category::XXX_HD],
+            'VFF 720p space separated' => ['JacquieEtMichelTV Helena 26 09 29 VFF 720p WEB AAC 2 0 x264 NOTAG', Category::XXX_HD],
+            'VFF 576p' => ['JacquieEtMichelTV.Helena.26.09.29.VFF.576p.WEB.AAC.2.0.x264.NOTAG', Category::XXX_SD],
+            'VFF 360p' => ['JacquieEtMichelTV.Helena.26.09.29.VFF.360p.WEB.AAC.2.0.x264.NOTAG', Category::XXX_SD],
         ];
     }
 
@@ -178,6 +178,65 @@ class XxxCategorizationTest extends TestCase
         $passable = $this->runPipeline($releaseName, 'alt.binaries.erotica.erotica');
 
         $this->assertSame($expectedCategoryId, $passable->bestResult->categoryId, "Wrong category for: {$releaseName}");
+    }
+
+    /**
+     * @return array<string, array{0: string, 1: int}>
+     */
+    public static function categoryDefinitionsProvider(): array
+    {
+        return [
+            'SD by resolution' => ['Brazzers.23.11.15.Model.Name.XXX.480p.MP4-KTR', Category::XXX_SD],
+            'SD by legacy codec' => ['XXX.Model.Name.Hardcore.Scene.XviD-GROUP', Category::XXX_SD],
+            'DVDRip is SD video, not a DVD' => ['XXX.Some.Movie.Title.DVDRip.x264-GROUP', Category::XXX_SD],
+            'HD' => ['Brazzers.23.11.15.Model.Name.XXX.1080p.MP4-KTR', Category::XXX_HD],
+            'UHD' => ['Brazzers.23.11.15.Model.Name.XXX.2160p.MP4-KTR', Category::XXX_UHD],
+            'highest resolution wins' => ['XXX.Model.Name.Scene.1080p.2160p.MP4-GROUP', Category::XXX_UHD],
+            'VR' => ['SexBabesVR.23.10.20.Virtual.Reality.VR180.3D.SBS.2160p-VRSins', Category::XXX_VR],
+            'OnlyFans' => ['OF.Creator.Title.1080p', Category::XXX_ONLYFANS],
+            'JAV label code' => ['SSIS-123.Model.Name.1080p', Category::XXX_JAV],
+            'JAV studio' => ['10musume.121025.01.Model.Name.1080p', Category::XXX_JAV],
+            'JAV FC2' => ['FC2-PPV-1234567.Model.1080p', Category::XXX_JAV],
+            'JAV token' => ['XXX.JAV.Uncensored.Model.Name.1080p', Category::XXX_JAV],
+            'Pack' => ['XXX.Studio.Megapack.1080p', Category::XXX_PACK],
+            'Pack by clip count' => ['XXX.Model.Name.50.Clips.1080p', Category::XXX_PACK],
+            'ImgSet' => ['XXX.Studio.Model.Name.Imageset', Category::XXX_IMAGESET],
+            'OnlyFans photo set is an ImgSet' => ['OF.Creator.Photoset.1080p', Category::XXX_IMAGESET],
+            'DVD image' => ['XXX.Studio.Movie.Title.DVDR-GROUP', Category::XXX_DVD],
+            'DVD9 structure' => ['XXX.Movie.Title.NTSC.DVD9-GROUP', Category::XXX_DVD],
+            'Other without resolution' => ['Brazzers.23.11.15.Model.Name.XXX.MP4-KTR', Category::XXX_OTHER],
+            'Other WEB-DL without resolution' => ['XXX.Model.Name.Scene.WEB-DL-GROUP', Category::XXX_OTHER],
+        ];
+    }
+
+    #[DataProvider('categoryDefinitionsProvider')]
+    public function test_releases_follow_the_xxx_category_definitions(string $releaseName, int $expectedCategoryId): void
+    {
+        foreach (['', 'alt.binaries.erotica.erotica'] as $groupName) {
+            $this->assertSame(
+                $expectedCategoryId,
+                $this->runPipeline($releaseName, $groupName)->bestResult->categoryId,
+                "Wrong category for: {$releaseName} in group '{$groupName}'"
+            );
+        }
+    }
+
+    /**
+     * @return array<string, array{string}>
+     */
+    public static function nonJavReleasesProvider(): array
+    {
+        return [
+            'unknown label code' => ['ABCD-123.Model.Name.XXX.1080p'],
+            'month in a date' => ['XXX.Model.Name.15-JUL-2023.1080p'],
+            'Tokyo as a word' => ['XXX.Tokyo.Hot.Nights.Model.1080p'],
+        ];
+    }
+
+    #[DataProvider('nonJavReleasesProvider')]
+    public function test_jav_requires_positive_identification(string $releaseName): void
+    {
+        $this->assertNotSame(Category::XXX_JAV, $this->runPipeline($releaseName)->bestResult->categoryId);
     }
 
     public function test_french_movie_release_stays_in_movies_foreign(): void

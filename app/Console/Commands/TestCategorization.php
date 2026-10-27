@@ -109,6 +109,13 @@ class TestCategorization extends Command
             // XXX
             'Brazzers.23.11.15.Model.Name.XXX.1080p.MP4-KTR',
             'SexBabesVR.23.10.20.Virtual.Reality.VR180.3D.SBS.2160p-VRSins',
+            'Brazzers.23.11.15.Model.Name.XXX.480p.MP4-KTR',
+            'Brazzers.23.11.15.Model.Name.XXX.2160p.MP4-KTR',
+            'SSIS-123.Model.Name.1080p',
+            'OF.Creator.Title.1080p',
+            'XXX.Studio.Model.Name.Imageset',
+            'XXX.Studio.Megapack.1080p',
+            'XXX.Studio.Movie.Title.DVDR-GROUP',
 
             // Games
             'Cyberpunk.2077.Ultimate.Edition.v2.12.1-RUNE',

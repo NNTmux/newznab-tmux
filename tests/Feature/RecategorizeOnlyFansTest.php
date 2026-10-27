@@ -33,7 +33,7 @@ class RecategorizeOnlyFansTest extends TestCase
             $table->string('title');
         });
         DB::table('categories')->insert([
-            ['id' => Category::XXX_CLIPHD, 'root_categories_id' => Category::XXX_ROOT, 'title' => 'HD Clips'],
+            ['id' => Category::XXX_HD, 'root_categories_id' => Category::XXX_ROOT, 'title' => 'HD'],
             ['id' => Category::XXX_UHD, 'root_categories_id' => Category::XXX_ROOT, 'title' => 'UHD'],
             ['id' => Category::XXX_OTHER, 'root_categories_id' => Category::XXX_ROOT, 'title' => 'Other'],
             ['id' => Category::XXX_ONLYFANS, 'root_categories_id' => Category::XXX_ROOT, 'title' => 'OnlyFans'],
@@ -72,7 +72,7 @@ class RecategorizeOnlyFansTest extends TestCase
         Search::shouldReceive('updateRelease')->never();
 
         $this->artisan('releases:recategorize-onlyfans')
-            ->expectsOutput(sprintf('#%d OF.Sadie.Summers.NEW.TRADWIFE.BG.1080p: XXX > HD Clips (%d) -> XXX > OnlyFans (6047)', $id, Category::XXX_CLIPHD))
+            ->expectsOutput(sprintf('#%d OF.Sadie.Summers.NEW.TRADWIFE.BG.1080p: XXX > HD (%d) -> XXX > OnlyFans (6047)', $id, Category::XXX_HD))
             ->expectsOutput('Inspected: 1; Eligible: 1; Skipped: 0; Failed: 0.')
             ->expectsOutput('Would update: 1. No releases were changed.')
             ->assertSuccessful();
@@ -196,7 +196,7 @@ class RecategorizeOnlyFansTest extends TestCase
             ->expectsOutput('XXX > OnlyFans category (6047) is missing. No releases were changed.')
             ->assertFailed();
 
-        $this->assertSame(Category::XXX_CLIPHD, DB::table('releases')->where('id', $id)->value('categories_id'));
+        $this->assertSame(Category::XXX_HD, DB::table('releases')->where('id', $id)->value('categories_id'));
     }
 
     public function test_database_failure_is_reported_and_other_releases_are_repaired(): void
@@ -212,7 +212,7 @@ class RecategorizeOnlyFansTest extends TestCase
             ->expectsOutput('Database categories updated: 1; Search refreshes requested: 1.')
             ->assertFailed();
 
-        $this->assertSame(Category::XXX_CLIPHD, DB::table('releases')->where('id', $failedId)->value('categories_id'));
+        $this->assertSame(Category::XXX_HD, DB::table('releases')->where('id', $failedId)->value('categories_id'));
         $this->assertSame(Category::XXX_ONLYFANS, DB::table('releases')->where('id', $validId)->value('categories_id'));
     }
 
@@ -234,7 +234,7 @@ class RecategorizeOnlyFansTest extends TestCase
     {
         $rows = [];
         for ($index = 0; $index < 251; $index++) {
-            $rows[] = ['name' => "OF.Creator.Title.{$index}.1080p", 'searchname' => "OF.Creator.Title.{$index}.1080p", 'categories_id' => Category::XXX_CLIPHD];
+            $rows[] = ['name' => "OF.Creator.Title.{$index}.1080p", 'searchname' => "OF.Creator.Title.{$index}.1080p", 'categories_id' => Category::XXX_HD];
         }
         DB::table('releases')->insert($rows);
         foreach (DB::table('releases')->pluck('id') as $id) {
@@ -248,7 +248,7 @@ class RecategorizeOnlyFansTest extends TestCase
         $this->assertSame(251, DB::table('releases')->where('categories_id', Category::XXX_ONLYFANS)->count());
     }
 
-    private function insertRelease(string $name, int $categoryId = Category::XXX_CLIPHD): int
+    private function insertRelease(string $name, int $categoryId = Category::XXX_HD): int
     {
         return (int) DB::table('releases')->insertGetId([
             'name' => $name,
