@@ -36,7 +36,7 @@ class DownloadStat extends Model
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array<int, array<string, mixed>>
      */
     public static function getTopDownloads(): array
     {

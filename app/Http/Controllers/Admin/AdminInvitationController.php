@@ -155,7 +155,7 @@ class AdminInvitationController extends BasePageController
     /**
      * Get top inviters statistics with caching
      *
-     * @return array<string, mixed>
+     * @return array<int, array<string, mixed>>
      */
     private function getTopInviters(int $limit = 10): array
     {

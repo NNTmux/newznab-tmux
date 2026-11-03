@@ -137,7 +137,7 @@ class NameCheckerService
     /**
      * Get checker statistics.
      *
-     * @return array<string, mixed>
+     * @return array<int, array{name: string, priority: int, class: class-string<NameCheckerInterface>}>
      */
     public function getStats(): array
     {

@@ -29,7 +29,7 @@ class RoleStat extends Model
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array<int, array<string, mixed>>
      */
     public static function getUsersByRole(): array
     {

@@ -16,7 +16,7 @@ class UserStatsService
     /**
      * Get user statistics by role
      *
-     * @return array<string, mixed>
+     * @return array<int, array{role: string, count: int}>
      */
     public function getUsersByRole(): array
     {
@@ -230,7 +230,7 @@ class UserStatsService
     /**
      * Get top downloaders
      *
-     * @return array{total_users: int<0, max>, downloads_today: int<0, max>, downloads_week: float|int, api_hits_today: int<0, max>, api_hits_week: float|int}
+     * @return array<int, array<string, mixed>>
      */
     public function getTopDownloaders(int $limit = 5): array
     {

@@ -61,10 +61,7 @@ class ReleasesOptimizePreflight extends Command
             }
         }
 
-        $indexes = array_values(array_filter(array_map(
-            static fn (array $index): ?string => isset($index['name']) ? (string) $index['name'] : null,
-            Schema::getIndexes('releases'),
-        )));
+        $indexes = array_column(Schema::getIndexes('releases'), 'name');
         sort($indexes);
 
         $this->report = [

@@ -51,7 +51,7 @@ class ReleaseExtraService
      * Get audio data for a release.
      *
      * @param  int  $id  Release ID
-     * @return array<string, mixed>
+     * @return array<int, array<string, mixed>>|false
      */
     public function getAudio(int $id): false|array
     {

@@ -58,7 +58,7 @@ class UserMovie extends Model
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array<int, array<string, mixed>>
      */
     public static function getMovies(mixed $uid): array
     {

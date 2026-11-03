@@ -60,6 +60,18 @@ final class NNTPCompressedOverviewTest extends TestCase
         $this->assertSame($lines, $this->reader($compressed.".\r\n")->read());
     }
 
+    public function test_reads_stream_spanning_multiple_socket_reads(): void
+    {
+        $lines = [];
+        for ($i = 0; $i < 8000; $i++) {
+            $lines[] = ($i + 1)."\t".bin2hex(random_bytes(8))." yEnc (1/50)\tp@x\tFri, 09 Oct 2026 15:13:49 +0000\t<".bin2hex(random_bytes(6)).">\t\t740112\t5690\tXref: x a.b:".($i + 1);
+        }
+        $compressed = gzcompress(implode("\r\n", $lines)."\r\n");
+        $this->assertGreaterThan(65536, \strlen($compressed));
+
+        $this->assertSame($lines, $this->reader($compressed.".\r\n")->read());
+    }
+
     public function test_corrupt_stream_returns_error(): void
     {
         $result = $this->reader("not zlib data\r\n.\r\n")->read();
