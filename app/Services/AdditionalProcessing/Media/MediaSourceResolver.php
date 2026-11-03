@@ -35,12 +35,18 @@ class MediaSourceResolver
         }
 
         $budget = $context->mediaBudget ??= new MediaByteBudget($this->config->mediaMaxBytes);
-        $files = $this->readIndex($context, $workPlan->par2IndexCandidates, $budget);
+        // Media work shares one time window per release, like MediaSourceStage.
+        $context->mediaClockStart ??= hrtime(true) / 1e9;
+        $deadline = min(
+            $context->mediaClockStart + $this->config->mediaStageMaxSeconds,
+            $context->workDeadline($this->config->releaseProcessingTimeout),
+        );
+        $files = $this->readIndex($context, $workPlan->par2IndexCandidates, $budget, $deadline);
         if ($files === []) {
             return null;
         }
 
-        [$verified, $articlePartSize] = $this->verifyAmbiguousFiles($context, $files, $budget);
+        [$verified, $articlePartSize] = $this->verifyAmbiguousFiles($context, $files, $budget, $deadline);
 
         $mapped = $this->mapper->map($context->nzbContents, $files, $articlePartSize, $verified);
 
@@ -51,10 +57,10 @@ class MediaSourceResolver
      * @param  list<ArchiveCandidate>  $candidates
      * @return list<Par2FileEntry>
      */
-    private function readIndex(ReleaseProcessingContext $context, array $candidates, MediaByteBudget $budget): array
+    private function readIndex(ReleaseProcessingContext $context, array $candidates, MediaByteBudget $budget, float $deadline): array
     {
         foreach ($candidates as $candidate) {
-            if ($context->groupUnavailable || ! $budget->allows($this->estimatedBytes($context, $candidate->sourceIndex, count($candidate->messageIds)))) {
+            if (hrtime(true) / 1e9 >= $deadline || $context->groupUnavailable || ! $budget->allows($this->estimatedBytes($context, $candidate->sourceIndex, count($candidate->messageIds)))) {
                 return [];
             }
 
@@ -102,7 +108,7 @@ class MediaSourceResolver
      * @param  list<Par2FileEntry>  $files
      * @return array{0: array<int, Par2FileEntry>, 1: int|null}
      */
-    private function verifyAmbiguousFiles(ReleaseProcessingContext $context, array $files, MediaByteBudget $budget): array
+    private function verifyAmbiguousFiles(ReleaseProcessingContext $context, array $files, MediaByteBudget $budget, float $deadline): array
     {
         $verified = [];
         $articlePartSize = null;
@@ -116,7 +122,7 @@ class MediaSourceResolver
             }
 
             foreach ($this->mapper->candidateIndexes($context->nzbContents, $wanted, $articlePartSize) as $sourceIndex) {
-                if ($attempts >= $this->config->par2VerifyFiles || $context->groupUnavailable) {
+                if (hrtime(true) / 1e9 >= $deadline || $attempts >= $this->config->par2VerifyFiles || $context->groupUnavailable) {
                     break 2;
                 }
                 if (isset($verified[$sourceIndex])) {

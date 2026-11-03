@@ -10,6 +10,7 @@ use App\Models\ReleaseNzbCreationFailure;
 use App\Services\Binaries\BinariesConfig;
 use App\Services\CollectionCleanupService;
 use App\Services\Configuration\ConfigurationProvider;
+use App\Services\NameFixing\NzbSplitUnwrapper;
 use App\Support\Data\NzbCreationResult;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
@@ -60,6 +61,8 @@ class NzbService
     protected string $nzbCommentString;
 
     protected string $siteCommentString;
+
+    private ?NzbSplitUnwrapper $nzbSplitUnwrapper = null;
 
     public function __construct(
         private readonly CollectionCleanupService $collectionCleanupService,
@@ -174,7 +177,7 @@ class NzbService
             $XMLWriter->endElement();
             $XMLWriter->startElement('meta');
             $XMLWriter->writeAttribute('type', 'name');
-            $XMLWriter->text($release->name);
+            $XMLWriter->text($this->metaName($release));
             $XMLWriter->endElement();
             $XMLWriter->endElement(); // head
             if (! $this->flushXmlWriter($XMLWriter, $gz)) {
@@ -388,8 +391,8 @@ class NzbService
         for ($i = 0; $i < $levelsToSplit && $i < 32; $i++) {
             $nzbPath .= $releaseGuid[$i].'/';
 
-            if ($createIfNotExist && ! File::isDirectory($nzbPath)) {
-                if (! File::makeDirectory($nzbPath, 0775) && ! File::isDirectory($nzbPath)) { // @phpstan-ignore booleanNot.alwaysTrue
+            if ($createIfNotExist && ! $this->nzbDirectoryExists($nzbPath)) {
+                if (! File::makeDirectory($nzbPath, 0775) && ! $this->nzbDirectoryExists($nzbPath)) {
                     throw new \RuntimeException(sprintf('Directory "%s" was not created', $nzbPath));
                 }
 
@@ -581,6 +584,99 @@ class NzbService
     }
 
     /**
+     * Rewrite the name meta of an existing NZBSPLIT NZB, which older code filled with the raw subject.
+     */
+    public function syncNameMetadata(Release $release): bool
+    {
+        if ($this->nzbSplitUnwrapper()->parse((string) $release->name) === null) {
+            return false;
+        }
+
+        return $this->rewriteHeadMeta($release, 'name', $this->metaName($release));
+    }
+
+    /**
+     * Name written to the NZB head. An NZBSPLIT `releases.name` is the raw part subject
+     * (`[80/98] "MLB__NZBSPLIT__<hash>__NZBSPLIT__....7z.080" yEnc`), so its clean title is used.
+     */
+    public function metaName(Release $release): string
+    {
+        $name = (string) $release->name;
+        $split = $this->nzbSplitUnwrapper()->parse($name);
+        if ($split === null) {
+            return $name;
+        }
+
+        $searchName = (string) ($release->searchname ?? '');
+
+        return $searchName !== '' && ! str_contains($searchName, '__NZBSPLIT__') ? $searchName : $split->title;
+    }
+
+    private function nzbSplitUnwrapper(): NzbSplitUnwrapper
+    {
+        return $this->nzbSplitUnwrapper ??= new NzbSplitUnwrapper;
+    }
+
+    /**
+     * Replace one `<meta type="...">` in the NZB head, keeping the file untouched if it changed meanwhile.
+     */
+    private function rewriteHeadMeta(Release $release, string $type, string $value): bool
+    {
+        $path = $this->nzbPath((string) $release->guid);
+        if ($path === false || ! is_readable($path)) {
+            return false;
+        }
+        $originalHash = hash_file('sha256', $path);
+        $raw = unzipGzipFile($path);
+        $document = new \DOMDocument;
+        if (! is_string($raw) || ! @$document->loadXML($raw, LIBXML_NONET)) {
+            return false;
+        }
+        $root = $document->documentElement;
+        if ($root === null || $root->localName !== 'nzb') {
+            return false;
+        }
+        $head = $document->getElementsByTagName('head')->item(0);
+        if ($head === null) {
+            $head = $document->createElementNS($root->namespaceURI, 'head');
+            $root->insertBefore($head, $root->firstChild);
+        }
+        foreach (iterator_to_array($document->getElementsByTagName('meta')) as $meta) {
+            if ($meta->getAttribute('type') === $type) {
+                $meta->parentNode?->removeChild($meta);
+            }
+        }
+        $meta = $document->createElementNS($root->namespaceURI, 'meta');
+        $meta->setAttribute('type', $type);
+        $meta->appendChild($document->createTextNode($value));
+        $head->appendChild($meta);
+        $xml = $document->saveXML();
+        if ($xml === false) {
+            return false;
+        }
+        $temporary = tempnam(dirname($path), '.'.$type.'-');
+        if ($temporary === false) {
+            return false;
+        }
+        try {
+            $encoded = str_ends_with($path, '.gz') ? gzencode($xml, 7) : $xml;
+            if ($encoded === false || file_put_contents($temporary, $encoded) !== strlen($encoded)) {
+                return false;
+            }
+            if ($originalHash === false || ! hash_equals($originalHash, (string) hash_file('sha256', $path))) {
+                return false;
+            }
+            chmod($temporary, fileperms($path) & 0777);
+
+            return rename($temporary, $path);
+        } finally {
+            if (is_file($temporary)) {
+                unlink($temporary);
+            }
+        }
+    }
+
+    /**
      * @return list<string>
      */
     protected function buildCandidateNzbBasePaths(string $configuredPath): array
@@ -643,6 +739,16 @@ class NzbService
         $normalizedPath = str_replace('\\', '/', trim($path));
 
         return rtrim($normalizedPath, '/').'/';
+    }
+
+    /**
+     * @phpstan-impure
+     */
+    private function nzbDirectoryExists(string $path): bool
+    {
+        clearstatcache(true, $path);
+
+        return File::isDirectory($path);
     }
 
     /**

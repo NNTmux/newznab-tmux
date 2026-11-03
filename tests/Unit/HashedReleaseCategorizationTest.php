@@ -132,6 +132,8 @@ class HashedReleaseCategorizationTest extends TestCase
             'TV episode' => ['Show.Name.S03E05.720p.HDTV.x264-GROUP', 'alt.binaries.hdtv'],
             'Music album' => ['Artist.Name-Album.Title-2024-FLAC-GROUP', 'alt.binaries.sounds.mp3'],
             'Game release' => ['Starfield-RUNE', 'alt.binaries.games'],
+            'Game title of short capitalized words' => ['Age.of.Wonders.4.The.Silver.Seas-RUNE', 'alt.binaries.misc'],
+            'Game title with roman numeral' => ['The.Last.Of.Us.Part.II.Remastered-FLT', 'alt.binaries.misc'],
             'Readable software package' => ['Microsoft Office Suite Installer', 'alt.binaries.warez'],
             'Adobe msix bundle' => ['Adobe Express Photos.Msixbundle', 'alt.binaries.erotica.divx'],
         ];

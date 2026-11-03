@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Enums\TmuxMode;
-use App\Models\Collection;
+use App\Services\CollectionCleanupService;
 use App\Services\Configuration\ConfigurationProvider;
 use App\Services\Configuration\ProcessingRuntimeStateRepository;
 use App\Services\Monitoring\TmuxMetricsSnapshot;
@@ -17,7 +17,6 @@ use App\Services\Tmux\TmuxSessionManager;
 use App\Services\Tmux\TmuxTaskRunner;
 use App\Support\MetadataSources;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Process;
 
 class TmuxMonitor extends Command
@@ -144,23 +143,16 @@ class TmuxMonitor extends Command
      */
     private function resetOldCollections(): void
     {
-        $delayTime = app(ConfigurationProvider::class)->ingestion()->collectionDelayHours;
-
         cli()->header('Resetting expired collections...');
 
         try {
-            DB::transaction(function () use ($delayTime) {
-                $count = Collection::query()
-                    ->where('dateadded', '<', now()->subHours($delayTime))
-                    ->update(['dateadded' => now()]);
+            $count = app(CollectionCleanupService::class)->restartCollectionDelay();
 
-                if ($count > 0) {
-                    $this->info("✅ Reset {$count} collections");
-                } else {
-                    $this->info('✅ No collections needed resetting');
-                }
-            }, 10);
-
+            if ($count > 0) {
+                $this->info("✅ Reset {$count} collections");
+            } else {
+                $this->info('✅ No collections needed resetting');
+            }
         } catch (\Exception $e) {
             $this->error('Failed to reset collections: '.$e->getMessage());
         }

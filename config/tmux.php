@@ -130,6 +130,12 @@ return [
     'monitor' => [
         'delay' => env('TMUX_MONITOR_DELAY', 10),
         'refresh_interval' => env('TMUX_REFRESH_INTERVAL', 60),
+        // Seconds the full-table process counts (proc_query 1) are cached; they only gate panes and fill the monitor.
+        'proc1_cache_ttl' => (int) env('TMUX_PROC1_CACHE_TTL', 300),
+        // Seconds the exact releases/binaries/parts/missed_parts row counts are cached (0 = count every refresh).
+        'table_counts_ttl' => (int) env('TMUX_TABLE_COUNTS_TTL', 300),
+        // Seconds the per-category release counts shown in the monitor are cached.
+        'category_counts_interval' => (int) env('TMUX_CATEGORY_COUNTS_INTERVAL', 300),
     ],
 
     'performance' => [

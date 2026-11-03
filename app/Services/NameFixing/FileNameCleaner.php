@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\NameFixing;
 
+use App\Services\NameFixing\Data\NzbSplitSubject;
 use App\Traits\DetectsHashedNames;
 
 /**
@@ -34,6 +35,9 @@ class FileNameCleaner
         '/^\d{1,3}$/',
     ];
 
+    /** `.001` split volumes, but not the codec in a name ending in `H.264` / `x.265`. */
+    private const string SPLIT_VOLUME_EXTENSION = '/(?<![.\-_ ][hx])\.\d{3}$/i';
+
     /**
      * Archive extension patterns to remove.
      */
@@ -48,7 +52,7 @@ class FileNameCleaner
         '/\.vol\d+[\+\-]\d+\.par2?$/i',
         '/\.par2?$/i',
         '/\.(tar|gz|bz2|xz|lz|lzma|cab|arj|ace|arc)$/i',
-        '/\.\d{3}$/i',
+        self::SPLIT_VOLUME_EXTENSION,
     ];
 
     /**
@@ -99,7 +103,15 @@ class FileNameCleaner
         // Extract filename from path
         $fileName = $this->extractFilenameFromPath($fileName);
 
-        $fileName = $this->extractNzbSplitName($fileName) ?? $fileName;
+        $split = $this->parseNzbSplitName($fileName);
+        if ($split !== null) {
+            // A sample upload must never drive a PreDB match for the full release.
+            if ($split->isSample || $this->isIgnorableForMatching($split->title) || $this->looksLikeStructuralJunk($split->title)) {
+                return false;
+            }
+
+            return $split->title;
+        }
 
         if ($this->isIgnorableForMatching($fileName)) {
             return false;
@@ -162,17 +174,21 @@ class FileNameCleaner
     {
         $t = trim($title);
 
-        $t = $this->extractNzbSplitName($t) ?? $t;
+        $split = $this->extractNzbSplitName($t);
+        if ($split !== null) {
+            return $split;
+        }
 
         // Remove common video file extensions
         $t = preg_replace('/\.(mkv|avi|mp4|m4v|mpg|mpeg|wmv|flv|mov|ts|vob|iso|divx)$/i', '', $t) ?? $t;
 
         // Remove archive, metadata, and common document/file extensions
         $t = preg_replace(
-            '/\.(par2?|nfo|sfv|nzb|rar|zip|7z|gz|tar|bz2|xz|r\d{2,3}|\d{3}|pkg|exe|msi|jpe?g|png|gif|bmp|pdf|epub|mobi|azw3?|djvu|cbr|cbz|fb2|lit|prc|opf|txt|log)$/i',
+            '/\.(par2?|nfo|sfv|nzb|rar|zip|7z|gz|tar|bz2|xz|r\d{2,3}|pkg|exe|msi|jpe?g|png|gif|bmp|pdf|epub|mobi|azw3?|djvu|cbr|cbz|fb2|lit|prc|opf|txt|log)$/i',
             '',
             $t
         ) ?? $t;
+        $t = preg_replace(self::SPLIT_VOLUME_EXTENSION, '', $t) ?? $t;
 
         // Remove common trailing segment markers
         $t = preg_replace('/[.\-_ ](?:part|vol|r)\d+(?:\+\d+)?$/i', '', $t) ?? $t;
@@ -191,7 +207,10 @@ class FileNameCleaner
     {
         $formatted = trim($title);
 
-        $formatted = $this->extractNzbSplitName($formatted) ?? $formatted;
+        $split = $this->extractNzbSplitName($formatted);
+        if ($split !== null) {
+            return $split;
+        }
 
         // Remove common media/archive extensions while keeping scene separators.
         $formatted = preg_replace(self::VIDEO_EXTENSIONS, '', $formatted) ?? $formatted;
@@ -255,14 +274,93 @@ class FileNameCleaner
             return false;
         }
 
-        // Check for valid release indicators
-        $hasGroupSuffix = (bool) preg_match('/[-.][A-Za-z0-9]{2,}$/', $t);
-        $hasYear = (bool) preg_match('/\b(19|20)\d{2}\b/', $t);
-        $hasQuality = (bool) preg_match('/\b(480p|720p|1080p|2160p|4k|webrip|web[ .-]?dl|bluray|bdrip|dvdrip|hdtv|hdrip|xvid|x264|x265|hevc|h\.?264|ts|cam|r5|proper|repack)\b/i', $t);
-        $hasTV = (bool) preg_match('/\bS\d{1,2}[Eex]\d{1,3}\b/i', $t) || SeasonPackDetector::isSeasonPack($t);
+        if ($this->isGenericFileName($t)) {
+            return false;
+        }
+
+        // Group suffix must be preceded by dash and not be a file extension.
+        $hasGroupSuffix = (bool) preg_match('/-[A-Za-z0-9]{2,15}$/', $t)
+            && ! preg_match('/\.(exe|mp4|avi|mkv|rar|zip|nfo|sfv|par2?|jpg|png|gif|iso|mp3|flac|wav)$/i', $t);
+        // Accept compact YYYYMMDD dates (e.g. sports releases like NBA.20260419....)
+        $hasYear = (bool) preg_match('/\b(19|20)\d{2}\b/', $t)
+            || (bool) preg_match('/\b(19|20)\d{6}\b/', $t);
+        // Accept broadcast-style resolutions such as 1080p60, 720pEN60fps or 1080iGRE25fps
+        $hasQuality = (bool) preg_match('/\b(480p|720p|1080p|2160p|4k|webrip|web[ .-]?dl|bluray|bdrip|dvdrip|hdtv|hdrip|xvid|x264|x265|hevc|h\.?264|ts|cam|r5|proper|repack)\b/i', $t)
+            || (bool) preg_match('/\b(?:480|576|720|1080|2160)[pi](?:\d{2,3})?(?:[A-Z]{2,3})?(?:\d{2,3}fps)?\b/i', $t);
+        $hasTV = (bool) preg_match('/\bS\d{1,2}[Eex]\d{1,3}\b/i', $t);
+        $hasSeason = SeasonPackDetector::isSeasonPack($t);
         $hasXXX = (bool) preg_match('/\bXXX\b/i', $t);
 
-        return $hasGroupSuffix || ($hasTV && $hasQuality) || ($hasYear && ($hasQuality || $hasTV)) || $hasXXX || $hasQuality || $hasTV;
+        return $hasGroupSuffix || (($hasTV || $hasSeason) && $hasQuality) || ($hasYear && ($hasQuality || $hasTV || $hasSeason)) || $hasXXX;
+    }
+
+    /**
+     * Detect if a string looks like a generic/fake file name commonly used by spam uploaders.
+     */
+    private function isGenericFileName(string $title): bool
+    {
+        $t = strtolower(trim($title));
+
+        $t = preg_replace('/\.(exe|mp4|avi|mkv|rar|zip|nfo|sfv|par2?|jpg|png|gif|iso|mp3|flac|wav)$/i', '', $t);
+        $t = trim($t, ' .-_');
+
+        $genericNames = [
+            'porn games',
+            'videolan mp4 video player',
+            'duke nukem 3d',
+            'citor 3',
+            'wallpaper viewer',
+            'media player',
+            'video player',
+            'image viewer',
+            'photo viewer',
+            'game launcher',
+            'installer',
+            'setup',
+            'readme',
+            'sample',
+            'cover',
+            'proof',
+            'erotic porn',
+        ];
+
+        foreach ($genericNames as $genericName) {
+            if ($t === $genericName) {
+                return true;
+            }
+        }
+
+        if (preg_match('/^[a-z0-9 ]{3,30}$/i', $t)) {
+            $words = explode(' ', $t);
+            $wordCount = count($words);
+
+            if ($wordCount >= 2 && $wordCount <= 5) {
+                $hasReleaseIndicator = preg_match('/\b(19|20)\d{2}\b/', $t)
+                    || preg_match('/\b(480p|720p|1080p|2160p|4k|webrip|bluray|dvdrip|hdtv|xvid|x264|x265|hevc)\b/i', $t)
+                    || preg_match('/\bS\d{1,2}[Eex]\d{1,3}\b/i', $t);
+
+                if (! $hasReleaseIndicator) {
+                    $genericWords = ['the', 'a', 'an', 'and', 'or', 'for', 'to', 'in', 'on', 'at', 'by', 'with',
+                        'player', 'viewer', 'game', 'games', 'porn', 'video', 'mp4', 'media', 'photo', 'image',
+                        'wallpaper', 'launcher', 'app', 'application', 'tool', 'software', 'program', 'erotic',
+                        'hot', 'sexy', 'free', 'new', 'best', 'full', 'pro', 'premium', 'ultimate', 'super',
+                        '3d', 'hd', 'pro', 'lite', 'plus', 'max', 'ultra', 'standard', 'advanced', 'basic'];
+
+                    $genericWordCount = 0;
+                    foreach ($words as $word) {
+                        if (in_array(strtolower($word), $genericWords, true) || strlen($word) <= 2) {
+                            $genericWordCount++;
+                        }
+                    }
+
+                    if ($genericWordCount >= $wordCount - 1) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -284,7 +382,10 @@ class FileNameCleaner
      */
     public function cleanForTitleMatch(string $filename): string
     {
-        $filename = $this->extractNzbSplitName($filename) ?? $filename;
+        $split = $this->extractNzbSplitName($filename);
+        if ($split !== null) {
+            return $split;
+        }
 
         // Remove file extension
         $clean = preg_replace('/\.(mkv|avi|mp4|m4v|wmv|mpg|mpeg|mov|ts|m2ts|vob|divx|flv|nfo|sfv|nzb|srr|srs|rar|r\d{2,4}|zip|7z|par2?|vol\d+[\+\-]\d+|\d{3})$/i', '', $filename);
@@ -373,6 +474,11 @@ class FileNameCleaner
     public function extractNzbSplitName(string $value): ?string
     {
         return $this->nzbSplitUnwrapper->unwrap($value);
+    }
+
+    public function parseNzbSplitName(string $value): ?NzbSplitSubject
+    {
+        return $this->nzbSplitUnwrapper->parse($value);
     }
 
     /**

@@ -121,7 +121,7 @@ final class LegacySettingsManifest
             'extract_using_rar_info' => ['keys' => ['extractusingrarinfo'], 'type' => 'bool', 'default' => false],
             'segments_to_download' => ['keys' => ['segmentstodownload'], 'type' => 'int', 'default' => 2, 'min' => 1],
             'ffmpeg_duration' => ['keys' => ['ffmpeg_duration'], 'type' => 'int', 'default' => 5, 'min' => 1],
-            'inner_file_blacklist' => ['keys' => ['innerfileblacklist'], 'type' => 'regex', 'default' => '/setup.exe|password.url/i'],
+            'inner_file_blacklist' => ['keys' => ['innerfileblacklist'], 'type' => 'regex', 'default' => '/setup\.exe|password\.url|\.scr$|\.pif$|\.lnk$/i'],
             'process_jpg' => ['keys' => ['processjpg'], 'type' => 'bool', 'default' => false],
             'process_thumbnails' => ['keys' => ['processthumbnails'], 'type' => 'bool', 'default' => false],
             'process_videos' => ['keys' => ['processvideos'], 'type' => 'bool', 'default' => false],

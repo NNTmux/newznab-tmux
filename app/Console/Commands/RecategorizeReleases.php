@@ -71,12 +71,12 @@ class RecategorizeReleases extends Command
         $count = $countQuery->count();
 
         $cat = new CategorizationService;
-        $results = $countQuery->select(['id', 'searchname', 'fromname', 'groups_id', 'categories_id'])->get();
+        $results = $countQuery->select(['id', 'name', 'searchname', 'fromname', 'groups_id', 'categories_id'])->get();
         $bar = $this->output->createProgressBar($count);
         $bar->start();
         foreach ($results as $result) {
             $bar->advance();
-            $catId = $cat->determineCategory($result->groups_id, $result->searchname, $result->fromname);
+            $catId = $cat->determineCategory($result->groups_id, $result->searchname, $result->fromname, sourceName: $result->name);
             if ((int) $result->categories_id !== (int) $catId['categories_id']) {
                 if ($this->option('test')) {
                     $this->info('Would have changed '.$result->searchname.' from '.$result->categories_id.' to '.$catId['categories_id']);
@@ -85,10 +85,11 @@ class RecategorizeReleases extends Command
                         'iscategorized' => 1,
                         ...TvProcessingCandidateQuery::resetColumns(),
                         'imdbid' => null,
+                        'movieinfo_id' => null,
                         'musicinfo_id' => null,
                         'consoleinfo_id' => null,
                         'gamesinfo_id' => 0,
-                        'bookinfo_id' => 0,
+                        'bookinfo_id' => null,
                         'anidbid' => null,
                         'categories_id' => $catId['categories_id'],
                     ]);

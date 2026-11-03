@@ -177,8 +177,6 @@ class ApiController extends BasePageController
             }
 
             $uid = $res->id;
-            // Use user ID directly instead of re-looking up by token
-            $catExclusions = User::getCachedCategoryExclusionById($uid);
             $maxRequests = $res->role->apirequests;
             $maxDownloads = $res->role->downloadrequests;
 
@@ -195,6 +193,11 @@ class ApiController extends BasePageController
             if ($thisRequests >= $maxRequests) {
                 return showApiError(500, 'Request limit reached ('.$thisRequests.'/'.$maxRequests.')');
             }
+        }
+
+        if ($uid !== '' && in_array($function, ['s', 'tv', 'm', 'music', 'book', 'anime'], true)) {
+            // Use user ID directly instead of re-looking up by token. Only search endpoints need category exclusions.
+            $catExclusions = User::getCachedCategoryExclusionById($uid);
         }
 
         // Set Query Parameters based on Request objects

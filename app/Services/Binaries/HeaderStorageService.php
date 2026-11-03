@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Binaries;
 
 use App\Support\SqlError;
+use App\Support\SubjectFileCounter;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -177,14 +178,24 @@ final class HeaderStorageService
 
             // Flush binary aggregate updates
             if (! $transaction->hasErrors()) {
+                $touchedBinaryIds = $this->partHandler->getTouchedBinaryIds();
                 if (! $this->binaryHandler->refreshAggregates(
-                    $this->partHandler->getTouchedBinaryIds(),
+                    $touchedBinaryIds,
                     $this->config->sqlChunkSize
                 )) {
                     $transaction->markError();
                 }
+                // Only collections that gained parts are re-aggregated; the
+                // rest of the chunk's collections just get last_seen_at.
+                $changedCollectionIds = $this->binaryHandler->collectionIdsForBinaries($touchedBinaryIds);
                 if (! $transaction->hasErrors() && ! $this->collectionHandler->refreshAggregates(
-                    $this->collectionHandler->getAllIds(),
+                    $changedCollectionIds,
+                    $this->config->sqlChunkSize
+                )) {
+                    $transaction->markError();
+                }
+                if (! $transaction->hasErrors() && ! $this->collectionHandler->touchLastSeen(
+                    array_values(array_diff($this->collectionHandler->getAllIds(), $changedCollectionIds)),
                     $this->config->sqlChunkSize
                 )) {
                     $transaction->markError();
@@ -211,6 +222,7 @@ final class HeaderStorageService
             return false;
         }
 
+        $this->collectionHandler->markCommitted();
         $this->failedInserts = array_merge(
             $this->failedInserts,
             $this->partHandler->getFailedNumbers()
@@ -247,10 +259,20 @@ final class HeaderStorageService
             $transaction->getBatchNoise()
         );
 
+        if ($this->collectionHandler->getLastException() !== null) {
+            // A SQL error may have rolled the transaction back server-side
+            // (e.g. deadlock), so the whole chunk must fail and be retried.
+            $transaction->markError();
+
+            return;
+        }
+
+        $skipped = 0;
         $binaryRecords = [];
         foreach ($headers as $index => $header) {
             if (! isset($collectionIds[$index])) {
-                $this->markHeaderFailed($header, $transaction);
+                $this->skipUnresolvedHeader($header);
+                $skipped++;
 
                 continue;
             }
@@ -263,11 +285,17 @@ final class HeaderStorageService
         }
 
         $binaryIds = $this->binaryHandler->getOrCreateBinaries($binaryRecords, $groupMySQL['id']);
+        if ($this->binaryHandler->getLastException() !== null) {
+            $transaction->markError();
+
+            return;
+        }
 
         foreach ($binaryRecords as $index => $record) {
             $header = $record['header'];
             if (! isset($binaryIds[$index])) {
-                $this->markHeaderFailed($header, $transaction);
+                $this->skipUnresolvedHeader($header);
+                $skipped++;
 
                 continue;
             }
@@ -275,6 +303,26 @@ final class HeaderStorageService
             if (! $this->partHandler->addPart($binaryIds[$index], $header)) {
                 $this->markHeaderFailed($header, $transaction);
             }
+        }
+
+        if ($skipped > 0) {
+            Log::warning('Binary headers skipped: collection or binary could not be resolved', [
+                'groups_id' => $groupMySQL['id'],
+                'article_count' => $skipped,
+                'chunk_size' => \count($headers),
+            ]);
+        }
+    }
+
+    /**
+     * Report one header as failed without rolling back the rest of its chunk.
+     *
+     * @param  array<string, mixed>  $header
+     */
+    private function skipUnresolvedHeader(array $header): void
+    {
+        if (isset($header['Number']) && (\is_int($header['Number']) || \is_string($header['Number']))) {
+            $this->failedInserts[] = $header['Number'];
         }
     }
 
@@ -284,9 +332,9 @@ final class HeaderStorageService
      */
     private function extractFileNumberAndTotal(array $header): array
     {
-        $fileCount = $this->getFileCount($header['matches'][1]);
+        $counter = SubjectFileCounter::parse((string) $header['matches'][1]);
 
-        return [(int) $fileCount[1], (int) $fileCount[3]];
+        return $counter === null ? [0, 0] : [$counter['filenumber'], $counter['totalfiles']];
     }
 
     /** @param  array<string, mixed>  $header */
@@ -296,17 +344,5 @@ final class HeaderStorageService
         if (isset($header['Number']) && (\is_int($header['Number']) || \is_string($header['Number']))) {
             $this->failedInserts[] = $header['Number'];
         }
-    }
-
-    /**
-     * @return array<int, int|string>
-     */
-    private function getFileCount(string $subject): array
-    {
-        if (! preg_match('/[[(\s](\d{1,5})(\/|[\s_]of[\s_]|-)(\d{1,5})[])[\s$:]/i', $subject, $fileCount)) {
-            $fileCount[1] = $fileCount[3] = 0;
-        }
-
-        return $fileCount;
     }
 }

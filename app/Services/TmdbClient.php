@@ -52,8 +52,9 @@ class TmdbClient
     }
 
     /**
-     * A copy of this client that throws TvProviderException on transient failures
-     * (429, 5xx, connection errors) so callers can retry later instead of treating them as "not found".
+     * A copy of this client that throws TvProviderException on every failure that isn't
+     * a plain 404 (429, 5xx, rejected key, other 4xx, unreadable body, connection errors)
+     * so callers retry later instead of treating it as "not found".
      */
     public function throwingOnTransientFailure(): static
     {
@@ -85,8 +86,9 @@ class TmdbClient
                     if ($exception instanceof RequestException) {
                         $status = $exception->response->status();
 
-                        // A rate limit won't clear within the retry delay; let the caller defer instead.
-                        return $status !== 404 && ! ($status === 429 && $this->throwOnTransientFailure);
+                        // Only server errors can clear within the retry delay. A rate limit
+                        // makes the throwing caller defer; other 4xx (bad key) never clear.
+                        return $status >= 500 || ($status === 429 && ! $this->throwOnTransientFailure);
                     }
 
                     return true;
@@ -94,7 +96,12 @@ class TmdbClient
                 ->get(self::BASE_URL.$endpoint, $params);
 
             if ($response->successful()) {
-                return $response->json();
+                $json = $response->json();
+                if (! \is_array($json) && $this->throwOnTransientFailure) {
+                    throw new TvProviderException('tmdb', sprintf('TMDB returned an unreadable body for %s', $endpoint), $response->status());
+                }
+
+                return \is_array($json) ? $json : null;
             }
 
             // Handle specific error codes - 404 is normal (resource not found)
@@ -104,7 +111,7 @@ class TmdbClient
                 return null;
             }
 
-            if ($this->throwOnTransientFailure && TvProviderException::isTransientStatus($response->status())) {
+            if ($this->throwOnTransientFailure) {
                 throw new TvProviderException(
                     'tmdb',
                     sprintf('TMDB returned %d for %s', $response->status(), $endpoint),

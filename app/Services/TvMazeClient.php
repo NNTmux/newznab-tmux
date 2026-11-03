@@ -148,7 +148,7 @@ class TvMazeClient
      * @param  array<string, scalar>  $query
      * @return array<int|string, mixed>|null
      *
-     * @throws TvProviderException on rate limits, server errors and connection failures
+     * @throws TvProviderException on every failure but a 404 (rate limits, server errors, blocks, connection failures)
      */
     protected function get(string $path, array $query = []): ?array
     {
@@ -184,11 +184,20 @@ class TvMazeClient
             );
         }
 
-        if (! $response->successful()) {
+        if ($status === 404) {
             return null;
         }
 
+        // A 403 (Cloudflare block), other 4xx or an unreadable body says nothing about the
+        // show: retry later instead of recording "not found".
+        if (! $response->successful()) {
+            throw new TvProviderException('tvmaze', sprintf('TVMaze returned %d for %s', $status, $path), $status);
+        }
+
         $data = $response->json();
+        if ($data === null && trim($response->body()) !== '') {
+            throw new TvProviderException('tvmaze', sprintf('TVMaze returned an unreadable body for %s', $path), $status);
+        }
 
         return \is_array($data) && $data !== [] ? $data : null;
     }

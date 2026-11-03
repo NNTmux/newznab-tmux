@@ -13,6 +13,7 @@ use App\Services\NfoService;
 use App\Services\TempWorkspaceService;
 use App\Services\TvProcessing\TvProcessingCandidateQuery;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use RuntimeException;
 
@@ -28,7 +29,27 @@ class PostProcessRunner extends BaseRunner
     }
 
     /**
-     * @param  array<int, object{id?: mixed}>  $releases
+     * The postprocess:guid command for one GUID bucket. Movie buckets pass their lookup mode
+     * (1 = all, 2 = renamed only) so workers honour "renamed only" runs.
+     *
+     * @param  object{id?: mixed, renamed?: mixed}  $release
+     * @return list<string>
+     */
+    private function postProcessGuidCommand(string $type, object $release): array
+    {
+        // id may already be a single GUID bucket char; if not, take first char defensively
+        $char = isset($release->id) ? substr((string) $release->id, 0, 1) : '';
+        $command = [PHP_BINARY, base_path('artisan'), 'postprocess:guid', $type, $char];
+
+        if ($type === 'movie' && isset($release->renamed)) {
+            $command[] = (string) $release->renamed;
+        }
+
+        return $command;
+    }
+
+    /**
+     * @param  array<int, object{id?: mixed, renamed?: mixed}>  $releases
      */
     private function runPostProcess(array $releases, int $maxProcesses, string $type, string $desc): void
     {
@@ -44,10 +65,8 @@ class PostProcessRunner extends BaseRunner
         if ((bool) config('nntmux.stream_fork_output', false) === true || $type === 'additional') {
             $commands = [];
             foreach ($releases as $release) {
-                // id may already be a single GUID bucket char; if not, take first char defensively
-                $char = isset($release->id) ? substr((string) $release->id, 0, 1) : '';
                 // Use postprocess:guid command which accepts the GUID character
-                $command = [PHP_BINARY, base_path('artisan'), 'postprocess:guid', $type, $char];
+                $command = $this->postProcessGuidCommand($type, $release);
                 if ($type === 'additional') {
                     $command = [...$command, '--worker', '--max-batches='.self::ADDITIONAL_WORKER_MAX_BATCHES];
                 }
@@ -63,9 +82,7 @@ class PostProcessRunner extends BaseRunner
 
         if ($count <= 1 || $maxProcesses <= 1) {
             foreach ($releases as $release) {
-                $char = isset($release->id) ? substr((string) $release->id, 0, 1) : '';
-                $command = [PHP_BINARY, base_path('artisan'), 'postprocess:guid', $type, $char];
-                echo $this->executeCommand($command);
+                echo $this->executeCommand($this->postProcessGuidCommand($type, $release));
                 cli()->primary('Finished task for '.$desc);
             }
 
@@ -74,8 +91,7 @@ class PostProcessRunner extends BaseRunner
 
         $commands = [];
         foreach ($releases as $idx => $release) {
-            $char = isset($release->id) ? substr((string) $release->id, 0, 1) : '';
-            $commands[$idx] = [PHP_BINARY, base_path('artisan'), 'postprocess:guid', $type, $char];
+            $commands[$idx] = $this->postProcessGuidCommand($type, $release);
         }
 
         try {
@@ -326,23 +342,24 @@ class PostProcessRunner extends BaseRunner
      */
     private function prepareAdditionalTempBuckets(array $chars): bool
     {
-        if ($chars === []) {
-            return true;
-        }
-
         $tempWorkspace = app(TempWorkspaceService::class);
         $basePath = (string) config('nntmux.tmp_unrar_path');
+        $staleAfterSeconds = max(
+            3600,
+            (int) config('nntmux.multiprocessing_max_child_time', 1800) * 2,
+        );
 
         try {
             foreach ($chars as $char) {
-                $bucketPath = $tempWorkspace->ensureMainTempPath($basePath, $char);
-                $tempWorkspace->pruneStaleWorkerDirectories(
-                    $bucketPath,
-                    max(
-                        3600,
-                        (int) config('nntmux.multiprocessing_max_child_time', 1800) * 2,
-                    ),
-                );
+                $tempWorkspace->ensureMainTempPath($basePath, $char);
+            }
+
+            // Sweep every bucket, including those without backlog this cycle, so crashed
+            // workers' directories do not accumulate under the temp path.
+            if ($basePath !== '' && File::isDirectory($basePath)) {
+                foreach (File::directories($basePath) as $bucketPath) {
+                    $tempWorkspace->pruneStaleWorkerDirectories($bucketPath, $staleAfterSeconds);
+                }
             }
         } catch (\Throwable $e) {
             cli()->warning('Additional post-processing skipped: '.$e->getMessage());
@@ -410,7 +427,8 @@ class PostProcessRunner extends BaseRunner
             return;
         }
 
-        $renamedFlag = ($renamedOnly ? 2 : 1);
+        // Workers re-apply the configured "renamed only" mode themselves; flag 2 makes it explicit.
+        $renamedFlag = ($renamedOnly || (int) app(ConfigurationProvider::class)->metadata()->movieLookup->value === 2) ? 2 : 1;
         $bucketExpr = $this->guidBucketExpression();
         $sql = '
             SELECT DISTINCT '.$bucketExpr.' AS id, '.$renamedFlag.' AS renamed

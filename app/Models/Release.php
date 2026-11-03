@@ -205,7 +205,7 @@ class Release extends Model
      */
     public static function insertRelease(array $parameters = [])
     {
-        $passwordStatus = config('nntmux_settings.check_passworded_rars') === true ? -1 : 0;
+        $passwordStatus = $parameters['passwordstatus'] ?? (config('nntmux_settings.check_passworded_rars') === true ? -1 : 0);
         $parameters['id'] = self::query()
             ->insertGetId(
                 [

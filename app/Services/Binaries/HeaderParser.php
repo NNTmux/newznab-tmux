@@ -116,7 +116,7 @@ final class HeaderParser
     {
         $ids = $this->blacklistService->getAndClearIdsToUpdate();
         if (! empty($ids)) {
-            $this->blacklistService->updateBlacklistUsage($ids); // @phpstan-ignore argument.type
+            $this->blacklistService->updateBlacklistUsage($ids);
         }
     }
 

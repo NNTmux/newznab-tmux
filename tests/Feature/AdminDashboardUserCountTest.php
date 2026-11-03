@@ -113,6 +113,22 @@ class AdminDashboardUserCountTest extends TestCase
         ], $this->snapshot->get()['stats']);
     }
 
+    public function test_today_counts_include_both_ends_of_today_and_nothing_outside_it(): void
+    {
+        $startOfToday = now()->startOfDay();
+        $this->insertRelease(10, $startOfToday->toDateTimeString());
+        $this->insertRelease(20, $startOfToday->copy()->endOfDay()->toDateTimeString());
+        $this->insertRelease(30, $startOfToday->copy()->subSecond()->toDateTimeString());
+        $this->insertRelease(40, $startOfToday->copy()->addDay()->toDateTimeString());
+        $this->insertUser(10, $startOfToday->toDateTimeString());
+        $this->insertUser(20, $startOfToday->copy()->subSecond()->toDateTimeString());
+
+        $stats = $this->snapshot->get()['stats'];
+
+        $this->assertSame(2, $stats['releases_today']);
+        $this->assertSame(1, $stats['users_today']);
+    }
+
     public function test_dashboard_returns_zero_counts_for_empty_tables(): void
     {
         $stats = $this->snapshot->get()['stats'];

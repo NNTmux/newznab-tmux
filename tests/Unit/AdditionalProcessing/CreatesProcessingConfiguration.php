@@ -70,6 +70,7 @@ trait CreatesProcessingConfiguration
             'mediaImageMaxBytes' => 8388608,
             'mediaStageMaxSeconds' => 30,
             'mediaFfmpegTimeout' => 30,
+            'mediaFfmpegThreads' => 1,
             'thumbnailFrameAttempts' => 4,
             'thumbnailMinStddev' => 12.0,
             'thumbnailMinLuma' => 24.0,

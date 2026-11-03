@@ -172,6 +172,8 @@ class ReleaseImageServiceTest extends TestCase
     public function test_delete_removes_webp_and_legacy_release_images(): void
     {
         $service = new ReleaseImageService;
+        $service->imgSavePath = $this->temporaryDirectory.'preview/';
+        $service->jpgSavePath = $this->temporaryDirectory.'sample/';
         $guid = 'delete-'.uniqid();
         $files = [
             $service->imgSavePath.$guid.'_thumb.webp',

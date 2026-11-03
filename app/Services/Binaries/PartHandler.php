@@ -119,11 +119,17 @@ final class PartHandler
 
         $pendingParts = $this->parts;
         $parts = $this->deduplicateParts($pendingParts);
-        foreach ($parts as $part) {
-            $this->touchedBinaryIds[(int) $part['binaries_id']] = true;
-        }
 
         $insertedCount = $this->insertChunk($parts);
+
+        // Only a flush that stored something changes aggregates; chunks made
+        // entirely of already-stored parts (rescans, backfill overlap) skip
+        // the binary and collection re-aggregation.
+        if ($insertedCount !== null && $insertedCount > 0) {
+            foreach ($parts as $part) {
+                $this->touchedBinaryIds[(int) $part['binaries_id']] = true;
+            }
+        }
 
         if ($insertedCount === null) {
             foreach ($pendingParts as $part) {

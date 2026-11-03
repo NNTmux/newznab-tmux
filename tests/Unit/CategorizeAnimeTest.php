@@ -95,6 +95,6 @@ final class CategorizeAnimeTest extends TestCase
 
         $this->assertTrue($result->isSuccessful());
         $this->assertSame(Category::TV_ANIME, $result->categoryId);
-        $this->assertSame('group_name_anime', $result->matchedBy);
+        $this->assertSame('group_anime', $result->matchedBy);
     }
 }

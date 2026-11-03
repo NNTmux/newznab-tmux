@@ -12,6 +12,21 @@ final class PredbSearchDocument
     }
 
     /**
+     * Pick the exact hit for a field; a filename shared by several PreDB rows identifies none of them.
+     *
+     * @param  array<int, array{id: int, title: string, filename: string, source: string}>  $hits  keyed by PreDB id
+     * @return array{id: int, title: string, filename: string, source: string}|null
+     */
+    public static function unambiguousExactHit(string $field, array $hits): ?array
+    {
+        if ($hits === [] || ($field === 'filename' && count($hits) > 1)) {
+            return null;
+        }
+
+        return reset($hits);
+    }
+
+    /**
      * @param  array<string, mixed>  $row
      * @return array{id: int, title: string, filename: string, source: string}
      */

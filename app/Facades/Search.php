@@ -40,6 +40,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static array searchReleasesByCategory(array $categoryIds, int $limit = 1000)
  * @method static array searchReleasesWithCategoryFilter(string $searchTerm, array $categoryIds = [], int $limit = 1000)
  * @method static array searchReleasesFiltered(array $criteria, int $limit, int $offset = 0)
+ * @method static \App\Services\Search\DTO\NameFixingSearchResult searchNameFixingCandidates(\App\Services\Search\DTO\NameFixingSearchQuery $query)
  * @method static void insertSecondary(\App\Enums\SecondarySearchIndex $index, int $id, array $document)
  * @method static void updateSecondary(\App\Enums\SecondarySearchIndex $index, int $id)
  * @method static void deleteSecondary(\App\Enums\SecondarySearchIndex $index, int $id)

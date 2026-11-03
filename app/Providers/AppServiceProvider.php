@@ -64,6 +64,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->blockHorizonWhenDisabled();
+
         Paginator::useTailwind();
 
         // Share public-site global data with layouts that need menu/category data.
@@ -137,5 +139,22 @@ class AppServiceProvider extends ServiceProvider
             (string) $app['config']->get('nntmux.log_viewer.index.table', 'app_logs_rt'),
             (bool) $app['config']->get('nntmux.log_viewer.index.enabled', true),
         ));
+    }
+
+    /**
+     * Prevent Horizon commands from running when Horizon is disabled.
+     */
+    private function blockHorizonWhenDisabled(): void
+    {
+        if (! $this->app->runningInConsole() || (bool) config('horizon.enabled', true)) {
+            return;
+        }
+
+        $command = $_SERVER['argv'][1] ?? null;
+        if (! is_string($command) || ! str_starts_with($command, 'horizon')) {
+            return;
+        }
+
+        throw new \RuntimeException('Horizon is disabled. Set HORIZON_ENABLED=true to run Horizon commands.');
     }
 }

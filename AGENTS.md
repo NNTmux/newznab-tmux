@@ -35,7 +35,7 @@ NNTP → NNTPService → BinariesRunner → ReleaseCreationService → ReleasePr
 | Pattern | Location | Example |
 |---------|----------|---------|
 | **Service Layer** | `app/Services/` | 50+ services with facades (`Search::`, `Categorization::`, `TvProcessing::`, `Yenc::`, `Elasticsearch::`) |
-| **Pipeline** | `*/Pipes/` | `TvProcessingPipeline` (Parse→Local DB→TVDB→TVMaze→TMDB→Trakt; pipes only record findings, `TvLookupOutcomeWriter` persists them; lookup states in `App\Enums\TvLookupStatus`, due-work SQL in `TvProcessingCandidateQuery`), `CategorizationPipeline` (priority-driven; `Music` runs before `Book` for audiobook detection) |
+| **Pipeline** | `*/Pipes/` | `TvProcessingPipeline` (Parse→Local DB→TVDB→TVMaze→TMDB→Trakt; pipes only record findings, `TvLookupOutcomeWriter` persists them; lookup states in `App\Enums\TvLookupStatus`, due-work SQL in `TvProcessingCandidateQuery`; local show choice in `LocalShowMatcher`; only a 404/empty provider answer is a miss, everything else throws `TvProviderException`; `tv:relink-local` links stored episodes without API calls, see `.ai/rules/tv-processing.md`), `CategorizationPipeline` (priority-driven; `Music` runs before `Book` for audiobook detection) |
 | **Driver** | `Search/Drivers/` | Manticore/Elasticsearch via `SEARCH_DRIVER` env var |
 | **Runners** | `Runners/` | `BinariesRunner`, `ReleasesRunner`, `BackfillRunner`, `PostProcessRunner` |
 | **DTO** | `*/DTO/`, `app/Support/DTOs/`, `app/Data/` | Internal: `NameFixResult`, `ReleaseProcessingContext`, `ReleaseCreationResult`. API responses use Spatie Laravel Data in `app/Data/Api/` (`ReleaseData`, `CategoryData`, `DetailsData`) |
@@ -99,6 +99,10 @@ PHPUnit only (no Pest). Create tests: `php artisan make:test --phpunit {name}`
 - Never `env()` outside config - use `config('key')`
 - **Whenever you add or rename an `env()` key — in any file, whether under `config/*.php` or anywhere else in the codebase — you MUST also add it (with a sensible default and a short comment) to `.env.example`.** Treat any new env setting without the matching `.env.example` entry as an incomplete task.
 - Runtime settings: `Settings::settingValue()`
+- Native Manticore installs use `config/manticore.conf`; Docker compose mounts `docker/manticoresearch/manticore.conf` to `/etc/manticoresearch/manticore.conf`
+- Docker Manticore must mount the whole `/var/lib/manticore` tree; do not switch back to `/var/lib/manticore/data` in compose or `data_dir`/`binlog_path`
+- Docker app containers must override `MANTICORESEARCH_HOST=manticore` and `ELASTICSEARCH_HOST=elasticsearch`; leaving search hosts at `127.0.0.1` inside containers makes web search return empty results even when indexes are populated
+- If Docker Manticore fails with `binlog.0000` or a missing `data` path, suspect an old pre-fix dev volume layout first and remove the stale Manticore volume before debugging search code
 - Laravel 13 route/middleware wiring lives in `bootstrap/app.php`; use that file when adding route groups, aliases, or middleware (for example the `/rss` mount)
 - Custom global middleware in `app/Http/Middleware/`: `DegradeWhenRedisUnreachable` (prepended; short-circuits requests when Redis is down via `StatusProbes`), `BlockAbusiveServices` (blocks AIOStreams, Oracle Cloud, UsenetStreamer, Cloudflare WARP), `NoCacheForAuthenticatedUsers` (CDN cache busting), `ContentSecurityPolicy`, `EnforceSessionToken`, `TrustedDevice2FAMiddleware`
 - In Docker/Sail, `Makefile` exports `.env` `SEARCH_DRIVER` as `COMPOSE_PROFILES`, so only the matching Manticore/Elasticsearch service starts
@@ -122,6 +126,11 @@ PHPUnit only (no Pest). Create tests: `php artisan make:test --phpunit {name}`
 - Reorder requests go to `AdminContentController::reorder()` and must include the exact ID set for one `contenttype`; mixed-type or partial payloads are rejected
 - The ordinal field is intentionally hidden on `resources/views/admin/content/add.blade.php`; the server assigns new items to the bottom of their own group in `AdminContentController::nextBottomOrdinal()`
 - Deleting content does not renumber remaining items; gaps in per-group ordinals are expected
+
+### Release search (`app/Services/Releases/`)
+- `ReleaseSearchService::searchSimilar()` depends on `buildSearchBaseSql()` selecting `cp.id AS categoryparentid`; do not remove that alias from the web search/base SQL.
+- Release search result caches and pager/count caches should all use the shared `releases:cache_version` (`CACHE_VERSION_KEY` / `getCacheVersion()`) so totals invalidate with cached result sets.
+- The MySQL fallback in `ReleaseSearchService` only safely handles DB-backed text fields (`searchname`, `name`, `fromname`) plus `filename` via `release_files`; do not treat search-index-only fields as direct `releases` columns.
 
 ## Code Formatting & Quality
 
@@ -157,12 +166,15 @@ Auto-runs: PHP lint, Composer lock validation, Pint formatting. Commit limits: 2
 - Never stage temporary files you created (scratch scripts, debug output, logs, planning documents), and do not stage unrelated pre-existing changes.
 - Only commit or push when the user explicitly asks in that conversation; that approval covers that one request only.
 
+After resolving merge conflicts, stage every resolved path with `git add <paths>` and verify `git ls-files -u` is empty. Removing conflict markers from the working tree alone does not clear the Git index's unmerged state.
+
 ## Key Directories
 
 | Path | Purpose |
 |------|---------|
 | `app/Services/TvProcessing/` | TV metadata pipeline |
 | `app/Services/Search/` | Manticore/ES abstraction |
+| `app/Services/Releases/` | Browse/search SQL, pagination, and cache-versioned release search paths |
 | `app/Services/NameFixing/` | Release name correction (see README.md there) |
 | `app/Services/Tmux/` | Tmux orchestration |
 | `app/Services/StatusProbes/` | Service health probes feeding `/status` and degrade middleware |

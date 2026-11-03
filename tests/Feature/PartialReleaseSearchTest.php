@@ -106,6 +106,24 @@ final class PartialReleaseSearchTest extends TestCase
         self::assertSame(2251, (int) $rows[0]->_totalrows);
     }
 
+    public function test_sql_fallback_matches_file_names_through_release_files(): void
+    {
+        Schema::create('release_files', function (Blueprint $table): void {
+            $table->integer('releases_id');
+            $table->string('name');
+        });
+        DB::table('releases')->insert($this->release(30, 'Obfuscated.Upload.2026'));
+        DB::table('release_files')->insert([
+            ['releases_id' => 30, 'name' => 'a1b2c3d4e5f6g7h8.part01.rar'],
+            ['releases_id' => 30, 'name' => 'a1b2c3d4e5f6g7h8.part02.rar'],
+            ['releases_id' => 1, 'name' => 'unrelated.nfo'],
+        ]);
+        $performMySQLSearch = new \ReflectionMethod(ReleaseSearchService::class, 'performMySQLSearch');
+
+        self::assertSame([30], $performMySQLSearch->invoke(new ReleaseSearchService, ['filename' => 'a1b2c3d4e5f6g7h8.part01.rar'], 50));
+        self::assertSame([], $performMySQLSearch->invoke(new ReleaseSearchService, ['filename' => 'missing.part01.rar'], 50));
+    }
+
     /** @return array<string, array{bool}> */
     public static function callers(): array
     {

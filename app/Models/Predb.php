@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Facades\Search;
+use App\Services\NameFixing\Data\ReleaseIdentity;
+use App\Services\NameFixing\PredbMatchGuard;
+use App\Services\NameFixing\ReleaseUpdateService;
 use App\Support\PredbSearchDocument;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -108,7 +111,7 @@ class Predb extends Model
         $query = self::query()
             ->where('releases.predb_id', '<', 1)
             ->join('releases', 'predb.title', '=', 'releases.searchname')
-            ->select(['predb.id as predb_id', 'releases.id as releases_id']);
+            ->select(['predb.id as predb_id', 'predb.title', 'releases.id as releases_id', 'releases.searchname']);
         if ($dateLimit !== false && (int) $dateLimit > 0) {
             $query->where('adddate', '>', now()->subDays((int) $dateLimit));
         }
@@ -119,8 +122,17 @@ class Predb extends Model
             $total = \count($res);
             cli()->primary(number_format($total).' releases to match.');
 
+            $updates = app(ReleaseUpdateService::class);
             foreach ($res as $row) {
-                Release::query()->where('id', $row['releases_id'])->update(['predb_id' => $row['predb_id']]);
+                // The join matches by collation; only a byte-identical name is this PreDB entry's release.
+                if ((string) $row['title'] === (string) $row['searchname']) {
+                    $updates->attachPredbId(
+                        (int) $row['releases_id'],
+                        (int) $row['predb_id'],
+                        new ReleaseIdentity((int) $row['releases_id'], searchname: (string) $row['searchname'], predbId: 0),
+                        (string) $row['title'],
+                    );
+                }
 
                 if (config('nntmux.echocli')) {
                     cli()->overWritePrimary(
@@ -163,15 +175,21 @@ class Predb extends Model
             return false;
         }
 
-        $pre = self::query()->find($hit['id'], ['id', 'title', 'filename']);
+        $pre = self::query()->find($hit['id'], ['id', 'title', 'filename', 'source']);
         if ($pre === null || $pre->title === '') {
             return false;
         }
 
         $name = PredbSearchDocument::exactValue($cleanerName);
-        if (PredbSearchDocument::exactValue($pre->title) !== $name
-            && PredbSearchDocument::exactValue($pre->filename) !== $name) {
-            return false;
+        if (PredbSearchDocument::exactValue($pre->title) !== $name) {
+            if (PredbSearchDocument::exactValue((string) $pre->filename) !== $name) {
+                return false;
+            }
+
+            $guard = app(PredbMatchGuard::class);
+            if (! $guard->allowsFilenameMatch($pre->source) || $guard->exceedsReleaseFanout((int) $pre->id)) {
+                return false;
+            }
         }
 
         return ['title' => $pre->title, 'predb_id' => (int) $pre->id];

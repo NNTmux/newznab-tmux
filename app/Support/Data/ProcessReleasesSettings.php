@@ -32,6 +32,7 @@ final class ProcessReleasesSettings extends Data
         public int $miscHashedRetentionHours = 0,
         public int $partRetentionHours = 24,
         public ?string $lastRunTime = null,
+        public bool $nzbSplitRequireCompleteSets = true,
     ) {
         // Clamp completion to a sane upper bound (legacy `min(100, …)`).
         if ($this->completion > 100) {
@@ -58,6 +59,7 @@ final class ProcessReleasesSettings extends Data
             miscHashedRetentionHours: $configuration->miscHashedRetentionHours,
             partRetentionHours: $configuration->partRetentionHours,
             lastRunTime: $runtimeState->last_binary_run_at?->toDateTimeString(),
+            nzbSplitRequireCompleteSets: (bool) config('nntmux.nzbsplit_require_complete_sets', true),
         );
     }
 

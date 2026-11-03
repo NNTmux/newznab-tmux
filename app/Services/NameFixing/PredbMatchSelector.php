@@ -17,6 +17,20 @@ class PredbMatchSelector
 
     private const MIN_ACCEPTABLE_SCORE = 60.0;
 
+    private const MIN_FILENAME_LENGTH = 12;
+
+    /**
+     * Release traits compared on normalized (lower-case, space-separated) names.
+     *
+     * @var array<string, array<string, string>>
+     */
+    private const TRAIT_PATTERNS = [
+        'resolution' => ['/\b(?:480|576|720|1080|2160)p\b/' => '', '/\b(?:4k|uhd)\b/' => '2160p'],
+        'codec' => ['/\b(?:x|h) ?264\b|\bavc\b/' => 'avc', '/\b(?:x|h) ?265\b|\bhevc\b/' => 'hevc', '/\bxvid\b/' => 'xvid', '/\bav1\b/' => 'av1'],
+        'episode' => ['/\bs\d{1,2}e\d{1,3}\b/' => ''],
+        'year' => ['/\b(?:19|20)\d{2}\b/' => ''],
+    ];
+
     /**
      * @var list<string>
      */
@@ -42,9 +56,12 @@ class PredbMatchSelector
 
     protected FileNameCleaner $fileNameCleaner;
 
-    public function __construct(?FileNameCleaner $fileNameCleaner = null)
+    protected PredbMatchGuard $guard;
+
+    public function __construct(?FileNameCleaner $fileNameCleaner = null, ?PredbMatchGuard $guard = null)
     {
         $this->fileNameCleaner = $fileNameCleaner ?? new FileNameCleaner;
+        $this->guard = $guard ?? new PredbMatchGuard;
     }
 
     /**
@@ -90,7 +107,20 @@ class PredbMatchSelector
     protected function scoreHit(string $normalizedQuery, array $queryTokens, array $hit): float
     {
         $title = $this->normalizeForComparison((string) ($hit['title'] ?? ''));
-        $filename = $this->normalizePredbFilename((string) ($hit['filename'] ?? ''));
+
+        // Untrusted sources (xrel) hold loosely named P2P releases: only an identical title counts.
+        if (! $this->guard->allowsFilenameMatch((string) ($hit['source'] ?? '')) && $title !== $normalizedQuery) {
+            return 0.0;
+        }
+
+        $filename = $this->usableFilename($hit);
+        if ($filename !== '' && $this->hasConflictingTraits($normalizedQuery, $filename)) {
+            $filename = '';
+        }
+
+        if ($this->hasConflictingTraits($normalizedQuery, $title)) {
+            $title = '';
+        }
 
         if ($title === '' && $filename === '') {
             return 0.0;
@@ -143,6 +173,26 @@ class PredbMatchSelector
         }
 
         return $score;
+    }
+
+    /**
+     * The hit's normalized filename, or '' when it must not be matched against: the source
+     * announces unreliable filenames, or the filename is too generic to identify one release.
+     *
+     * @param  array<string, mixed>  $hit
+     */
+    protected function usableFilename(array $hit): string
+    {
+        if (! $this->guard->allowsFilenameMatch((string) ($hit['source'] ?? ''))) {
+            return '';
+        }
+
+        $filename = $this->normalizePredbFilename((string) ($hit['filename'] ?? ''));
+        if (strlen($filename) < self::MIN_FILENAME_LENGTH || count($this->extractMeaningfulTokens($filename)) < 2) {
+            return '';
+        }
+
+        return $filename;
     }
 
     protected function normalizePredbFilename(string $filename): string
@@ -252,6 +302,42 @@ class PredbMatchSelector
         similar_text($left, $right, $percent);
 
         return $percent;
+    }
+
+    /**
+     * Two names describe different releases when both state a resolution, codec, episode
+     * or year and those values differ (e.g. x265 vs x264, 1080p vs 720p, S01E02 vs S01E03).
+     */
+    protected function hasConflictingTraits(string $query, string $candidate): bool
+    {
+        foreach (self::TRAIT_PATTERNS as $patterns) {
+            $queryValues = $this->traitValues($query, $patterns);
+            $candidateValues = $this->traitValues($candidate, $patterns);
+
+            if ($queryValues !== [] && $candidateValues !== [] && array_intersect($queryValues, $candidateValues) === []) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param  array<string, string>  $patterns  regex => canonical value ('' keeps the matched text)
+     * @return list<string>
+     */
+    protected function traitValues(string $normalizedValue, array $patterns): array
+    {
+        $values = [];
+        foreach ($patterns as $pattern => $canonical) {
+            if (preg_match_all($pattern, $normalizedValue, $matches)) {
+                foreach ($matches[0] as $match) {
+                    $values[] = $canonical !== '' ? $canonical : (string) preg_replace('/\s+/', '', $match);
+                }
+            }
+        }
+
+        return array_values(array_unique($values));
     }
 
     protected function hasMarkerMismatch(string $query, string $title, string $filename, string $pattern): bool

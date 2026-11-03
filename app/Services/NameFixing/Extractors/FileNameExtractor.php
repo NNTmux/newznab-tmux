@@ -18,7 +18,7 @@ class FileNameExtractor
     /**
      * PreDB regex pattern for scene release names.
      */
-    public const PREDB_REGEX = '/([\w.\'()\[\]-]+(?:[\s._-]+[\w.\'()\[\]-]+)+[-.][\w]+)/ui';
+    public const PREDB_REGEX = '/([\w.\'()\[\]+%-]+(?:[\s._-]+[\w.\'()\[\]+%-]+)+[-.][\w]+)/ui';
 
     protected FileNameCleaner $cleaner;
 
@@ -28,12 +28,78 @@ class FileNameExtractor
     }
 
     /**
+     * Common media file extension pattern for raw/flat filename matching.
+     */
+    private const MEDIA_EXT = '(?:mkv|avi|mp4|m4v|wmv|mpg|mpeg|mov|ts|m2ts|vob|divx|flv|webm|ogv|mp3|flac|m4a|aac|ogg|wav|wma|ape|opus|ac3|dts)';
+
+    /**
      * Extract a release name from a filename.
      */
     public function extractFromFile(string $filename): ?NameFixResult
     {
         $result = [];
         $cleanedFilename = $this->cleaner->cleanForTitleMatch($filename);
+
+        // ---------------------------------------------------------------
+        // Flat (raw/uncompressed) file patterns — no path separators.
+        // These match media files posted directly (not inside archives).
+        // ---------------------------------------------------------------
+        if (! str_contains($filename, '\\') && ! str_contains($filename, '/')) {
+            // Strip common timestamp suffixes appended by uploaders/indexers before the extension.
+            // e.g. "Title-GROUP_20250925145545.mkv" → "Title-GROUP.mkv"
+            $flatFilename = preg_replace('/_\d{8,14}(?=\.'.self::MEDIA_EXT.'$)/i', '', $filename);
+
+            // Strip extension to get the base name for hashed-name check
+            $baseName = preg_replace('/\.'.self::MEDIA_EXT.'$/i', '', $flatFilename);
+
+            // Skip obfuscated/hashed filenames — they are not usable for renaming
+            if ($baseName !== '' && $baseName !== $flatFilename && ! $this->cleaner->looksLikeHashedName($baseName)) {
+
+                // Flat scene release with group tag: Title.S01E01.720p.WEB-DL.x264-GROUP.mkv
+                if (preg_match('/^([A-Za-z0-9][\w.\-]+(?:[\.\-_ ][\w.\-]+)*\-[A-Za-z0-9]{2,15})\.'.self::MEDIA_EXT.'$/i', $flatFilename, $result)) {
+                    return NameFixResult::fromMatch($result[1], 'Flat scene release', 'File');
+                }
+
+                // Flat TV with SxxExx + quality: Show.S01E01.720p.WEB-DL.x264.mkv (no group tag)
+                if (preg_match('/^(.+?S\d{1,3}[.\-_ ]?E\d{1,3}(?:[.\-_ ]?E\d{1,3})*[.\-_ ].+?(?:720p|1080p|2160p|4K|HDTV|WEB[\-. ]?DL|WEB[\-. ]?RIP|BluRay|AMZN|HMAX|NF|DSNP).+?)\.'.self::MEDIA_EXT.'$/iu', $flatFilename, $result)) {
+                    return NameFixResult::fromMatch($result[1], 'Flat TV SxxExx quality', 'File');
+                }
+
+                // Flat TV with SxxExx (generic): Show.S01E01.Episode.Title.mkv
+                if (preg_match('/^(.+?S\d{1,3}[.\-_ ]?[ED]\d{1,3}.+?)\.'.self::MEDIA_EXT.'$/iu', $flatFilename, $result)) {
+                    return NameFixResult::fromMatch($result[1], 'Flat TV generic', 'File');
+                }
+
+                // Flat movie with year + quality: Title.2024.1080p.BluRay.x264-GROUP.mkv
+                if (preg_match('/^(.+?[.\-_ ](19|20)\d\d[.\-_ ].+?(?:720p|1080p|2160p|4K|UHD|BDRip|BluRay|DVDRip|WEB[\-. ]?DL|WEB[\-. ]?RIP|HDTV|REMUX).+?)\.'.self::MEDIA_EXT.'$/iu', $flatFilename, $result)) {
+                    return NameFixResult::fromMatch($result[1], 'Flat movie with quality', 'File');
+                }
+
+                // Flat movie with year (basic): Title.2024.mkv
+                if (preg_match('/^([A-Za-z0-9][\w.\-]+[.\-_ ](19|20)\d\d[\w.\-]*)\.'.self::MEDIA_EXT.'$/i', $flatFilename, $result)) {
+                    return NameFixResult::fromMatch($result[1], 'Flat movie year', 'File');
+                }
+
+                // Flat music release: Artist-Album-2024-FLAC-GROUP.flac or Artist-Album-WEB-2024-GROUP.mp3
+                if (preg_match('/^(.+?[.\-_ ](FLAC|MP3|AAC|OGG|WEB|CDR?|VINYL|SAT)[.\-_ ].+?[.\-_ ](19|20)\d\d[.\-_ ].+?\-[A-Za-z0-9]+)\.'.self::MEDIA_EXT.'$/i', $flatFilename, $result)) {
+                    return NameFixResult::fromMatch($result[1], 'Flat music release', 'File');
+                }
+
+                // Flat music with year-group at end: Artist-Album-2024-GROUP.flac
+                if (preg_match('/^(.+?(19|20)\d\d\-[A-Za-z0-9]{2,15})\.'.self::MEDIA_EXT.'$/i', $flatFilename, $result)) {
+                    return NameFixResult::fromMatch($result[1], 'Flat music year-group', 'File');
+                }
+
+                // Flat streaming service: Title.AMZN.WEB-DL.x264.mkv
+                if (preg_match('/^([A-Za-z0-9][\w.\-_ ]+[.\-_ ](AMZN|ATVP|DSNP|HMAX|HULU|iT|NF|PMTP|PCOK|ROKU|STAN|TVNZ|VUDU)[.\-_ ].+?(WEB[\-. ]?DL|WEB[\-. ]?RIP).+?)\.'.self::MEDIA_EXT.'$/i', $flatFilename, $result)) {
+                    return NameFixResult::fromMatch($result[1], 'Flat streaming service', 'File');
+                }
+            }
+        }
+
+        // ---------------------------------------------------------------
+        // Archive-path patterns (files inside archives with path separators)
+        // ---------------------------------------------------------------
 
         // Try each pattern in order of specificity
 

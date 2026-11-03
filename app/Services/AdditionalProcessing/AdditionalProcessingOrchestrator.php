@@ -24,7 +24,7 @@ class AdditionalProcessingOrchestrator
     public const int MAX_COMPRESSED_FILES_TO_CHECK = 10;
 
     /**
-     * @var Collection<int, mixed>
+     * @var Collection<int, Release>
      */
     private Collection $releases;
 
@@ -41,7 +41,9 @@ class AdditionalProcessingOrchestrator
         private readonly ReleaseProcessor $processor,
         private readonly TempWorkspaceService $tempWorkspace,
         private readonly ConsoleOutputService $output
-    ) {}
+    ) {
+        $this->releases = collect();
+    }
 
     /**
      * Start the additional processing.
@@ -64,9 +66,9 @@ class AdditionalProcessingOrchestrator
         $this->fetchReleases($groupID, $guidChar, $excludedReleaseIds);
 
         if ($this->totalReleases > 0) {
-            $this->output->echoDescription($this->totalReleases);
+            $this->output->echoDescription($this->config->queryLimit > 0 ? $this->config->queryLimit : 25);
 
-            return $this->processReleases($guidChar);
+            return $this->processReleases($guidChar, groupID: $groupID, excludedReleaseIds: $excludedReleaseIds);
         }
 
         return AdditionalBatchResult::empty();
@@ -81,11 +83,18 @@ class AdditionalProcessingOrchestrator
 
         try {
             $this->finish();
-            $release = Release::where('guid', $guid)->first();
+            $this->claimToken = bin2hex(random_bytes(16));
+            $id = Release::query()->where('guid', $guid)->value('id');
+            $release = $id !== null ? AdditionalCandidateQuery::claimSingle((int) $id, $this->claimToken) : null;
             if ($release === null) {
-                $this->output->warning('Release not found for GUID: '.$guid);
+                $this->output->warning($id === null ? 'Release not found for GUID: '.$guid : 'Release is already claimed by another worker.');
 
-                return new ReleaseProcessingResult(0, $guid, ProcessingOutcome::NotFound, reason: 'Release not found.');
+                return new ReleaseProcessingResult(
+                    (int) ($id ?? 0),
+                    $guid,
+                    $id === null ? ProcessingOutcome::NotFound : ProcessingOutcome::Failed,
+                    reason: $id === null ? 'Release not found.' : 'Release is already claimed by another worker.',
+                );
             }
 
             $releaseId = (int) $release->id;
@@ -103,7 +112,7 @@ class AdditionalProcessingOrchestrator
                 );
             }
 
-            $result = $this->processReleases($guidChar)->firstResult();
+            $result = $this->processReleases($guidChar, single: true)->firstResult();
 
             return $result ?? new ReleaseProcessingResult(
                 $releaseId,
@@ -122,6 +131,10 @@ class AdditionalProcessingOrchestrator
                 ProcessingOutcome::Failed,
                 reason: $e->getMessage(),
             );
+        } finally {
+            if ($releaseId > 0 && $this->claimToken !== '') {
+                AdditionalCandidateQuery::clearClaim($releaseId, $this->claimToken);
+            }
         }
     }
 
@@ -174,7 +187,8 @@ class AdditionalProcessingOrchestrator
         $this->claimToken = bin2hex(random_bytes(16));
         $this->releases = AdditionalCandidateQuery::claimBatch(
             $guidChar,
-            $this->config->queryLimit > 0 ? $this->config->queryLimit : 25,
+            // One release at a time: a claim is only held while that release is worked on.
+            1,
             $this->claimToken,
             $groupID,
             $this->config->minSizeBytes,
@@ -192,6 +206,9 @@ class AdditionalProcessingOrchestrator
                 'searchname',
                 'predb_id',
                 'pp_timeout_count',
+                'passwordstatus',
+                'haspreview',
+                'isrenamed',
                 AdditionalCandidateQuery::CLAIM_TOKEN_COLUMN,
             ],
             $excludedReleaseIds,
@@ -209,19 +226,22 @@ class AdditionalProcessingOrchestrator
      * every subsequent cycle, and the "needs additional pp" backlog would
      * grow indefinitely without any visible failure.
      *
+     * Releases are claimed one at a time and the next one is fetched after each,
+     * so a claim is only held while its release is actually being worked on.
+     *
+     * @param  list<int>  $excludedReleaseIds
+     *
      * @throws Exception
      */
-    private function processReleases(string $guidChar = ''): AdditionalBatchResult
+    private function processReleases(string $guidChar = '', bool $single = false, int|string $groupID = '', array $excludedReleaseIds = []): AdditionalBatchResult
     {
         $startedAt = hrtime(true);
-        $claimedIds = $this->releases
-            ->pluck('id')
-            ->map(static fn (mixed $id): int => (int) $id)
-            ->values()
-            ->all();
+        $claimedIds = [];
         $results = [];
+        $limit = $single ? 1 : ($this->config->queryLimit > 0 ? $this->config->queryLimit : 25);
 
-        foreach ($this->releases as $release) {
+        while (($release = $this->releases->first()) !== null) {
+            $claimedIds[] = (int) $release->id;
             $releaseStartedAt = hrtime(true);
 
             try {
@@ -254,6 +274,10 @@ class AdditionalProcessingOrchestrator
                     AdditionalCandidateQuery::clearClaim((int) $release->id, $this->claimToken);
                 }
             }
+            if ($single || count($claimedIds) >= $limit) {
+                break;
+            }
+            $this->fetchReleases($groupID, $guidChar, [...$excludedReleaseIds, ...$claimedIds]);
         }
 
         $batchResult = new AdditionalBatchResult(
@@ -268,7 +292,7 @@ class AdditionalProcessingOrchestrator
         Log::info('Additional postprocessing run finished', [
             'pipeline' => 'v2',
             'guid_char' => $guidChar,
-            'picked' => $this->totalReleases,
+            'picked' => count($claimedIds),
             'processed' => $batchResult->successfulCount(),
             'failed' => $batchResult->unsuccessfulCount(),
             'outcomes' => $batchResult->outcomeCounts(),
@@ -319,7 +343,11 @@ class AdditionalProcessingOrchestrator
     public function finish(): void
     {
         if ($this->mainTmpPath !== '') {
-            $this->tempWorkspace->clearDirectory($this->mainTmpPath, false);
+            try {
+                $this->tempWorkspace->clearDirectory($this->mainTmpPath, false);
+            } catch (\Throwable) {
+                Log::warning('Additional processing workspace cleanup failed');
+            }
             $this->mainTmpPath = '';
         }
 

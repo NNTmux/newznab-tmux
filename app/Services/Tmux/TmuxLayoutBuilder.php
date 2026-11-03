@@ -15,6 +15,7 @@ use Throwable;
  * Service for building tmux window layouts based on sequential mode
  *
  * Uses Nerd Font icons for pane names to provide a modern visual experience.
+ * Icons can be disabled via config('tmux.fonts.use_nerd_fonts') for compatibility.
  */
 class TmuxLayoutBuilder
 {
@@ -23,6 +24,8 @@ class TmuxLayoutBuilder
     protected TmuxPaneManager $paneManager;
 
     protected string $sessionName;
+
+    protected bool $useNerdFonts = true;
 
     private ?string $lastError = null;
 
@@ -36,34 +39,45 @@ class TmuxLayoutBuilder
      */
     protected array $paneIcons = [
         // Core processing
-        'Monitor' => '󰍹 Monitor',
-        'update_binaries' => ' Binaries',
-        'backfill' => '󰑓 Backfill',
-        'update_releases' => ' Releases',
-        'sequential' => '󰒿 Sequential',
+        'Monitor' => ['icon' => '󰍹', 'label' => 'Monitor'],
+        'update_binaries' => ['icon' => '', 'label' => 'Binaries'],
+        'backfill' => ['icon' => '󰑓', 'label' => 'Backfill'],
+        'update_releases' => ['icon' => '', 'label' => 'Releases'],
+        'sequential' => ['icon' => '󰒿', 'label' => 'Sequential'],
 
         // Utilities
-        'fixReleaseNames' => '󰯃 Fix Names',
-        'removeCrapReleases' => '󰆴 Remove Crap',
+        'fixReleaseNames' => ['icon' => '󰯃', 'label' => 'Fix Names'],
+        'removeCrapReleases' => ['icon' => '󰆴', 'label' => 'Remove Crap'],
 
         // Postprocessing
-        'postprocessing_additional' => ' Additional',
-        'postprocessing_tv' => '󰟴 TV/Anime',
-        'postprocessing_amazon' => ' Metadata',
-        'postprocessing_movies' => ' Movies',
+        'postprocessing_additional' => ['icon' => '', 'label' => 'Additional'],
+        'postprocessing_tv' => ['icon' => '󰟴', 'label' => 'TV/Anime'],
+        'postprocessing_amazon' => ['icon' => '', 'label' => 'Metadata'],
+        'postprocessing_movies' => ['icon' => '', 'label' => 'Movies'],
 
         // IRC
-        'scrapeIRC' => '󰻞 IRC Scraper',
+        'scrapeIRC' => ['icon' => '󰻞', 'label' => 'IRC Scraper'],
 
         // Monitoring tools
-        'htop' => ' htop',
-        'nmon' => '󰨇 nmon',
-        'vnstat' => '󰛳 vnstat',
-        'tcptrack' => '󱘖 tcptrack',
-        'bwm-ng' => '󰾆 bwm-ng',
-        'mytop' => ' mytop',
-        'redis' => ' Redis',
-        'bash' => ' Console',
+        'htop' => ['icon' => '', 'label' => 'htop'],
+        'nmon' => ['icon' => '󰨇', 'label' => 'nmon'],
+        'vnstat' => ['icon' => '󰛳', 'label' => 'vnstat'],
+        'tcptrack' => ['icon' => '󱘖', 'label' => 'tcptrack'],
+        'bwm-ng' => ['icon' => '󰾆', 'label' => 'bwm-ng'],
+        'mytop' => ['icon' => '', 'label' => 'mytop'],
+        'redis' => ['icon' => '', 'label' => 'Redis'],
+        'bash' => ['icon' => '', 'label' => 'Console'],
+    ];
+
+    /**
+     * Window title icons mapping
+     *
+     * @var array<string, array{icon: string, label: string}>
+     */
+    protected array $windowIcons = [
+        'Utils' => ['icon' => '', 'label' => 'Utils'],
+        'Post' => ['icon' => '', 'label' => 'Post'],
+        'IRC' => ['icon' => '󰻞', 'label' => 'IRC'],
     ];
 
     public function __construct(TmuxSessionManager $sessionManager)
@@ -71,6 +85,7 @@ class TmuxLayoutBuilder
         $this->sessionManager = $sessionManager;
         $this->sessionName = $sessionManager->sessionName();
         $this->paneManager = new TmuxPaneManager($this->sessionName);
+        $this->useNerdFonts = (bool) config('tmux.fonts.use_nerd_fonts', true);
     }
 
     /**
@@ -78,7 +93,35 @@ class TmuxLayoutBuilder
      */
     protected function getPaneDisplayName(string $name): string
     {
-        return $this->paneIcons[$name] ?? $name;
+        if (! isset($this->paneIcons[$name])) {
+            return $name;
+        }
+
+        $pane = $this->paneIcons[$name];
+
+        if ($this->useNerdFonts) {
+            return $pane['icon'].' '.$pane['label'];
+        }
+
+        return $pane['label'];
+    }
+
+    /**
+     * Get the display name with icon for a window
+     */
+    protected function getWindowDisplayName(string $name): string
+    {
+        if (! isset($this->windowIcons[$name])) {
+            return $name;
+        }
+
+        $window = $this->windowIcons[$name];
+
+        if ($this->useNerdFonts) {
+            return $window['icon'].' '.$window['label'];
+        }
+
+        return $window['label'];
     }
 
     /**
@@ -141,7 +184,7 @@ class TmuxLayoutBuilder
         // Window 1: Fix names + Remove crap
         $fixNames = $this->createWindowPane(
             1,
-            ' Utils',
+            $this->getWindowDisplayName('Utils'),
             TmuxPaneRole::FixNames,
             $this->getPaneDisplayName('fixReleaseNames'),
         );
@@ -155,7 +198,7 @@ class TmuxLayoutBuilder
         // Window 2: Postprocessing (left stack and right-side movies)
         $additional = $this->createWindowPane(
             2,
-            ' Post',
+            $this->getWindowDisplayName('Post'),
             TmuxPaneRole::PostAdditional,
             $this->getPaneDisplayName('postprocessing_additional'),
         );
@@ -203,7 +246,7 @@ class TmuxLayoutBuilder
         // Window 1: Utils (Fix names + Remove crap)
         $fixNames = $this->createWindowPane(
             1,
-            ' Utils',
+            $this->getWindowDisplayName('Utils'),
             TmuxPaneRole::FixNames,
             $this->getPaneDisplayName('fixReleaseNames'),
         );
@@ -217,7 +260,7 @@ class TmuxLayoutBuilder
         // Window 2: Postprocessing
         $additional = $this->createWindowPane(
             2,
-            ' Post',
+            $this->getWindowDisplayName('Post'),
             TmuxPaneRole::PostAdditional,
             $this->getPaneDisplayName('postprocessing_additional'),
         );
@@ -264,7 +307,7 @@ class TmuxLayoutBuilder
         // Window 1: Metadata postprocessing
         $fixNames = $this->createWindowPane(
             1,
-            ' Utils',
+            $this->getWindowDisplayName('Utils'),
             TmuxPaneRole::FixNames,
             $this->getPaneDisplayName('fixReleaseNames'),
         );
@@ -289,7 +332,7 @@ class TmuxLayoutBuilder
     {
         $this->createWindowPane(
             3,
-            '󰻞 IRC',
+            $this->getWindowDisplayName('IRC'),
             TmuxPaneRole::IrcScraper,
             $this->getPaneDisplayName('scrapeIRC'),
         );

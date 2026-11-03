@@ -230,6 +230,50 @@ class ReleaseNameFixedRecategorizationTest extends TestCase
         $this->assertSame(1, (int) $release->isrenamed);
     }
 
+    public function test_recategorization_after_rename_uses_the_nzb_split_uploader_tag(): void
+    {
+        Search::shouldReceive('updateRelease')->twice();
+
+        $group = UsenetGroup::query()->create([
+            'name' => 'alt.binaries.misc',
+            'active' => 1,
+            'backfill' => 0,
+        ]);
+
+        $rawName = '[04/99] "NHL__NZBSPLIT__402e05a035df97cfd4f50a08e28d6ea8__NZBSPLIT__Playoffs_14-05-2026_Vegas_Golden_Knights_vs_Anaheim_Ducks_R2,_GM_5_720p60_EN_TNT.7z.004" yEnc';
+        $newName = 'Playoffs.14-05-2026.Vegas.Golden.Knights.vs.Anaheim.Ducks.R2,.GM.5.720p60.EN.TNT';
+
+        $release = Release::factory()->create([
+            'name' => $rawName,
+            'searchname' => 'Playoffs 14-05-2026 Vegas Golden Knights',
+            'fromname' => 'progr@mmer.org',
+            'groups_id' => $group->id,
+            'categories_id' => Category::TV_HD,
+            'iscategorized' => 1,
+            'isrenamed' => 0,
+            'guid' => str_repeat('c', 40),
+            'leftguid' => 'c',
+            'size' => 1,
+            'postdate' => now(),
+            'adddate' => now(),
+        ]);
+
+        app(ReleaseUpdateService::class)->updateRelease(
+            $release->fresh(),
+            $newName,
+            'NZBSPLIT wrapper',
+            true,
+            'Filenames, ',
+            true,
+            false,
+        );
+
+        $release->refresh();
+
+        $this->assertSame($newName, $release->searchname);
+        $this->assertSame(Category::TV_SPORT, $release->categories_id);
+    }
+
     public function test_renaming_space_separated_scene_title_does_not_overwrite_dotted_searchname(): void
     {
         Search::shouldReceive('updateRelease')->once();
@@ -290,12 +334,16 @@ class ReleaseNameFixedRecategorizationTest extends TestCase
             'leftguid' => 'd',
             'proc_nfo' => 0,
         ]);
+        $releaseId = (int) $release->getKey();
 
-        app(ReleaseUpdateService::class)->updateSingleColumn('proc_nfo', 1, $release->id);
-        app(ReleaseUpdateService::class)->attachPredbId($release->id, 123);
+        DB::table('predb')->insert(['id' => 123, 'title' => 'Canonical.Title-GROUP']);
 
-        $this->assertSame(1, (int) $release->fresh()->proc_nfo);
-        $this->assertSame(123, (int) $release->fresh()->predb_id);
+        app(ReleaseUpdateService::class)->updateSingleColumn('proc_nfo', 1, $releaseId);
+        app(ReleaseUpdateService::class)->attachPredbId($releaseId, 123);
+
+        $updatedRelease = Release::query()->findOrFail($releaseId);
+        $this->assertSame(1, (int) $updatedRelease->proc_nfo);
+        $this->assertSame(123, (int) $updatedRelease->predb_id);
     }
 
     private function setEnvironmentValue(string $key, ?string $value): void
@@ -356,6 +404,7 @@ class ReleaseNameFixedRecategorizationTest extends TestCase
                 $table->unsignedTinyInteger('tv_lookup_attempts')->default(0);
                 $table->dateTime('tv_lookup_retry_at')->nullable();
                 $table->string('imdbid')->nullable();
+                $table->integer('movieinfo_id')->nullable();
                 $table->integer('musicinfo_id')->nullable();
                 $table->integer('consoleinfo_id')->nullable();
                 $table->integer('bookinfo_id')->nullable();
@@ -375,6 +424,13 @@ class ReleaseNameFixedRecategorizationTest extends TestCase
                 $table->tinyInteger('proc_crc32')->default(0);
                 $table->tinyInteger('passwordstatus')->default(0);
                 $table->tinyInteger('nzbstatus')->default(0);
+            });
+        }
+
+        if (! Schema::hasTable('predb')) {
+            Schema::create('predb', function (Blueprint $table): void {
+                $table->increments('id');
+                $table->string('title')->unique();
             });
         }
     }

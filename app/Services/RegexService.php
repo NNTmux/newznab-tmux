@@ -10,6 +10,7 @@ use App\Models\CollectionRegex;
 use App\Models\Release;
 use App\Models\ReleaseNamingRegex;
 use App\Models\UsenetGroup;
+use App\Support\SubjectFileCounter;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -19,6 +20,11 @@ use Illuminate\Support\Facades\DB;
  */
 class RegexService
 {
+    /**
+     * Newest binaries of a group scanned by the collection regex tester.
+     */
+    public const int COLLECTION_REGEX_TEST_ROW_LIMIT = 20000;
+
     /**
      * The ID of the Regex input string matched or the generic name
      */
@@ -178,12 +184,17 @@ class RegexService
             return [];
         }
 
+        // The regex runs in PHP, so cap the rows read, not the matches.
         $rows = DB::select(
             'SELECT
                     b.name, b.totalparts, b.currentparts, HEX(b.binaryhash) AS binaryhash,
                     c.fromname, HEX(c.collectionhash) AS collectionhash
                 FROM binaries b
-                INNER JOIN collections c ON c.id = b.collections_id'
+                INNER JOIN collections c ON c.id = b.collections_id
+                WHERE c.groups_id = ?
+                ORDER BY b.id DESC
+                LIMIT '.self::COLLECTION_REGEX_TEST_ROW_LIMIT,
+            [(int) $groupID]
         );
 
         $data = [];
@@ -200,11 +211,9 @@ class RegexService
                             $string2 .= '<br/>'.$key.': '.$hit;
                         }
                     }
-                    $files = 0;
-                    if (preg_match('/[[(\s](\d{1,5})(\/|[\s_]of[\s_]|-)(\d{1,5})[])\s$:]/i', $row->name, $fileCount)) {
-                        $files = $fileCount[3];
-                    }
-                    $newCollectionHash = sha1($string.$row->fromname.$groupID.$files);
+                    // Same identity as CollectionHandler: cleaned name + total files.
+                    $files = SubjectFileCounter::parse((string) $row->name)['totalfiles'] ?? 0;
+                    $newCollectionHash = sha1($string.$files);
                     $data['New hash: '.$newCollectionHash.$string2][$row->binaryhash] = [
                         'new_collection_hash' => $newCollectionHash,
                         'file_name' => $row->name,
@@ -307,21 +316,31 @@ class RegexService
      */
     protected function _fetchRegex(string $groupName): void
     {
-        // Get all regex from DB which match the current group name. Cache them for 15 minutes. #CACHEDQUERY#
-        $sql = sprintf(
-            'SELECT r.id, r.regex %s FROM %s r WHERE \'%s\' REGEXP r.group_regex AND r.status = 1 ORDER BY r.ordinal ASC, r.group_regex ASC',
-            ($this->tableName === 'category_regexes' ? ', r.categories_id' : ''),
-            $this->tableName,
-            $groupName
-        );
-
-        $this->_regexCache[$groupName]['regex'] = Cache::get(md5($sql));
-        if ($this->_regexCache[$groupName]['regex'] !== null) {
+        // tryRegex() runs once per header, so serve the in-process copy until
+        // it expires instead of a cache-store round-trip every call.
+        if (isset($this->_regexCache[$groupName]['expires']) && $this->_regexCache[$groupName]['expires'] > time()) {
             return;
         }
-        $this->_regexCache[$groupName]['regex'] = DB::select($sql);
-        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
-        Cache::put(md5($sql), $this->_regexCache[$groupName]['regex'], $expiresAt);
+
+        // Get all regex from DB which match the current group name. #CACHEDQUERY#
+        $sql = sprintf(
+            'SELECT r.id, r.regex %s FROM %s r WHERE ? REGEXP r.group_regex AND r.status = 1 ORDER BY r.ordinal ASC, r.group_regex ASC',
+            ($this->tableName === 'category_regexes' ? ', r.categories_id' : ''),
+            $this->tableName
+        );
+        $cacheKey = md5($sql.'|'.$groupName);
+        $ttlMinutes = (int) config('nntmux.cache_expiry_long');
+
+        $regexes = Cache::get($cacheKey);
+        if ($regexes === null) {
+            $regexes = DB::select($sql, [$groupName]);
+            Cache::put($cacheKey, $regexes, now()->addMinutes($ttlMinutes));
+        }
+
+        $this->_regexCache[$groupName] = [
+            'regex' => $regexes,
+            'expires' => time() + max(60, $ttlMinutes * 60),
+        ];
     }
 
     /**

@@ -12,8 +12,11 @@ use App\Services\Tmux\TmuxLayoutBuilder;
 use App\Services\Tmux\TmuxPaneManager;
 use App\Services\Tmux\TmuxSessionManager;
 use App\Services\Tmux\TmuxTaskRunner;
+use Illuminate\Console\OutputStyle;
 use Illuminate\Support\Facades\DB;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Process\Process;
 use Tests\Support\ConfigurationTestBuilder;
 use Tests\TestCase;
@@ -264,6 +267,7 @@ class TmuxRuntimeTest extends TestCase
             $panes = new TmuxPaneManager('selected-session');
             $this->assertTrue($panes->setPaneRole($id, TmuxPaneRole::Monitor));
             $command = new TmuxStart;
+            $command->setOutput(new OutputStyle(new ArrayInput([]), new BufferedOutput));
             (new \ReflectionMethod($command, 'startMonitor'))->invoke($command, 'selected-session');
             $this->assertSame('selected-session', file_get_contents($root.'/selected'));
         } finally {

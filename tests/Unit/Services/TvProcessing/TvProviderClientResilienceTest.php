@@ -102,6 +102,62 @@ class TvProviderClientResilienceTest extends TestCase
         $this->assertSame(0, $handler->count(), 'Expected login, 401, a second login and the retried request.');
     }
 
+    public function test_blocked_or_rejected_requests_are_never_reported_as_not_found(): void
+    {
+        Http::fake([
+            'api.tvmaze.com/*' => Http::response('<html>Cloudflare</html>', 403),
+            'api.themoviedb.org/*' => Http::response(['status_message' => 'Invalid API key'], 401),
+            'api.trakt.tv/*' => Http::response([], 403),
+        ]);
+
+        foreach ([
+            'tvmaze' => fn () => (new TvMazeClient)->singleSearchAkas('Severance'),
+            'tmdb' => fn () => (new TmdbClient)->throwingOnTransientFailure()->searchTv('Severance'),
+            'trakt' => fn () => (new TraktService)->throwingOnTransientFailure()->searchShows('Severance'),
+        ] as $provider => $request) {
+            try {
+                $request();
+                $this->fail("Expected {$provider} to throw instead of returning a miss.");
+            } catch (TvProviderException $e) {
+                $this->assertSame($provider, $e->provider);
+            }
+        }
+
+        $this->assertNull((new TmdbClient)->searchTv('Severance'), 'Optional enrichment callers still get null.');
+    }
+
+    public function test_rejected_tvdb_credentials_pause_lookups_instead_of_missing_every_show(): void
+    {
+        $handler = new MockHandler([new Response(401, [], '{}')]);
+        $provider = $this->tvdbProvider($handler);
+
+        foreach ([1, 2] as $attempt) {
+            try {
+                $provider->getShowInfo('Severance');
+                $this->fail('Expected a rejected login to be retried later, not a miss.');
+            } catch (TvProviderException $e) {
+                $this->assertSame(401, $e->statusCode);
+                $this->assertGreaterThan(0, $e->retryAfterSeconds);
+            }
+        }
+
+        $this->assertSame(0, $handler->count(), 'The second lookup must not log in again during the pause.');
+    }
+
+    public function test_tvdb_forbidden_and_failed_logins_are_transient(): void
+    {
+        $login = new Response(200, [], (string) json_encode(['data' => ['token' => 'token']]));
+
+        $this->expectException(TvProviderException::class);
+        $this->tvdbProvider(new MockHandler([$login, new Response(403, [], '{}')]))->getShowInfo('Severance');
+    }
+
+    public function test_tvdb_login_server_error_is_transient(): void
+    {
+        $this->expectException(TvProviderException::class);
+        $this->tvdbProvider(new MockHandler([new Response(503, [], '{}')]))->getShowInfo('Severance');
+    }
+
     private function tvdbProvider(MockHandler $handler): TvdbProvider
     {
         // The library caches route objects per process; drop them so they bind to this client.

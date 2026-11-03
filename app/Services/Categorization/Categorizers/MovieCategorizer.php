@@ -15,15 +15,71 @@ class MovieCategorizer extends AbstractCategorizer
 {
     protected int $priority = 25;
 
+    // Groups from Categorize.php
+    protected const ANIME_GROUPS = [
+        'alt.binaries.anime', 'alt.binaries.multimedia.anime.highspeed', 'alt.binaries.multimedia.anime.repost',
+        'alt.binaries.multimedia.anime', 'alt.binaries.multimedia.erotica.anime', 'alt.binaries.anime.highspeed',
+        'alt.binaries.anime.repost',
+    ];
+
+    protected const AUDIO_GROUPS = ['alt.binaries.sounds.music', 'alt.binaries.sounds.misc'];
+
+    // Movie usenet groups
+    protected const MOVIE_GROUPS = [
+        'alt.binaries.movies',
+        'alt.binaries.movies.divx',
+        'alt.binaries.movies.xvid',
+        'alt.binaries.dvd',
+        'alt.binaries.dvdr',
+        'alt.binaries.hdtv.x264',
+        'alt.binaries.x264',
+        'alt.binaries.bluray',
+    ];
+
     public function getName(): string
     {
         return 'Movie';
+    }
+
+    /**
+     * Check if the group is a movie group.
+     */
+    protected function isMovieGroup(string $groupName): bool
+    {
+        if (empty($groupName)) {
+            return false;
+        }
+
+        return in_array($groupName, self::MOVIE_GROUPS) ||
+               (bool) preg_match('/alt\.binaries\.(movies|dvd|bluray|x264)/i', $groupName);
     }
 
     public function shouldSkip(ReleaseContext $context): bool
     {
         // Skip if this looks like adult content
         if ($context->hasAdultMarkers()) {
+            return true;
+        }
+
+        // An archive known to hold a PDF or ebook is never a film.
+        if ($context->hasDocumentContent()) {
+            return true;
+        }
+
+        // Don't match anything from Anime groups to Movies
+        if ($context->groupName && in_array($context->groupName, self::ANIME_GROUPS)) {
+            return true;
+        }
+
+        // Don't match anything from Audio groups to Movies unless it contains video-related strings to catch FLAC movies
+        if ($context->groupName && in_array($context->groupName, self::AUDIO_GROUPS)) {
+            if (! preg_match('/(720|1080|2160|4320)p|UHD|Blu-?ray|Remux|WEB-?DL|HEVC|h264|h265|x264/i', $context->releaseName)) {
+                return true;
+            }
+        }
+
+        // Don't put anything from Anime Tosho in Movies
+        if (preg_match('/animetosho/i', $context->poster)) {
             return true;
         }
 
@@ -48,15 +104,30 @@ class MovieCategorizer extends AbstractCategorizer
             return true;
         }
 
+        // Skip TV-like patterns from Categorize.php
+        if (preg_match('/s\d{1,3}[._ -]?[ed]\d{1,3}|auto(cad|desk)|divx[._ -]plus|[._ -]exe$|[._ -](jav|XXX)[._ -]|SWE6RUS|\wXXX(1080p|720p|DVD)|Xilisoft|\-BABA$|\.S[0-9]\d{1,3}\.|GP-MP3|SUPDUB|Formule\.?1\.\d{4}\.GP\d{2}\.[\w.]+\.DUTCH|Kwalificatie|Vrije\.Training(\.\d)?/i', $context->releaseName)) {
+            return true;
+        }
+
+        // Skip daily TV show date patterns (e.g., Jimmy.Fallon.2020.05.14, Colbert.2024.01.15)
+        // Date format: YYYY.MM.DD or YYYY-MM-DD surrounded by separators
+        if (preg_match('/[._ -](19|20)\d{2}[._ -]\d{2}[._ -]\d{2}[._ -]/i', $context->releaseName)) {
+            return true;
+        }
+
         return false;
     }
 
     public function categorize(ReleaseContext $context): CategorizationResult
     {
         $name = $context->releaseName;
+        $groupName = $context->groupName;
+
+        // Check if from movie group
+        $isFromMovieGroup = $this->isMovieGroup($groupName);
 
         // Check if it looks like movie content
-        if (! $this->looksLikeMovie($name)) {
+        if (! $this->looksLikeMovie($name) && ! $isFromMovieGroup) {
             return $this->noMatch();
         }
 
@@ -101,7 +172,46 @@ class MovieCategorizer extends AbstractCategorizer
             return $result;
         }
 
+        // If from movie group but no specific match, categorize by resolution/format
+        if ($isFromMovieGroup) {
+            return $this->categorizeByResolution($name);
+        }
+
         return $this->noMatch();
+    }
+
+    /**
+     * Fallback categorization based on resolution/format for movie group releases.
+     */
+    protected function categorizeByResolution(string $name): CategorizationResult
+    {
+        // Check for UHD/4K
+        if (preg_match('/\b(2160p|4k|UHD)\b/i', $name)) {
+            return $this->matched(Category::MOVIE_UHD, 0.65, 'fallback_uhd');
+        }
+
+        // Check for HD
+        if (preg_match('/\b(1080p|720p)\b/i', $name)) {
+            return $this->matched(Category::MOVIE_HD, 0.65, 'fallback_hd');
+        }
+
+        // Check for BluRay
+        if (preg_match('/\b(BluRay|Blu-Ray|BD)\b/i', $name)) {
+            return $this->matched(Category::MOVIE_BLURAY, 0.65, 'fallback_bluray');
+        }
+
+        // Check for DVD
+        if (preg_match('/\b(DVD|DVDRip|DVDR)\b/i', $name)) {
+            return $this->matched(Category::MOVIE_DVD, 0.65, 'fallback_dvd');
+        }
+
+        // Check for SD formats
+        if (preg_match('/\b(480p|576p|XviD|DivX)\b/i', $name)) {
+            return $this->matched(Category::MOVIE_SD, 0.65, 'fallback_sd');
+        }
+
+        // Default to MOVIE_OTHER
+        return $this->matched(Category::MOVIE_OTHER, 0.5, 'fallback_movie');
     }
 
     /**
@@ -109,15 +219,28 @@ class MovieCategorizer extends AbstractCategorizer
      */
     protected function looksLikeMovie(string $name): bool
     {
-        return (bool) preg_match('/[._ -]AVC|[BH][DR]RIP|(Bluray|Blu-Ray)|BD[._ -]?(25|50)?|\bBR\b|Camrip|[._ -]\d{4}[._ -].+(720p|1080p|Cam|HDTS|2160p)|DIVX|[._ -]DVD[._ -]|DVD-?(5|9|R|Rip)|Untouched|VHSRip|XVID|[._ -](DTS|TVrip|webrip|WEBDL|WEB-DL)[._ -]|\b(2160)p\b.*\b(Netflix|Amazon|NF|AMZN|Disney)\b/i', $name);
+        // Comprehensive patterns from Categorize.php
+        if (preg_match('/[._ -]AVC|[BH][DR]RIP|(Tigole)|(Bluray|Blu-Ray)|BD[._ -]?(25|50)?|\bBR\b|Camrip|[._( -]\d{4}[._) -].+(720p|1080p|Cam|HDTS|2160p|10bit)|DIVX|[._ -]DVD[._ -]|DVD-?(5|9|R|Rip)|Untouched|VHSRip|XVID|[._ -](DTS|TVrip|webrip|WEB|WEBDL|WEB-DL)[._ -]|RetailSub$|\b(2160)p\b.*\b(Netflix|Amazon|NF|AMZN|Disney)\b/i', $name)) {
+            return true;
+        }
+
+        // HALLMARK releases are typically movies
+        if (preg_match('/\bHALLMARK\b/i', $name)) {
+            return true;
+        }
+
+        return false;
     }
 
     protected function checkForeign(string $name): ?CategorizationResult
     {
-        if (preg_match('/(danish|flemish|Deutsch|dutch|french|german|heb|hebrew|nl[._ -]?sub|dub(bed|s)?|\.NL|norwegian|swedish|swesub|spanish|Staffel)[._ -]|\(german\)|Multisub/i', $name)) {
-            return $this->matched(Category::MOVIE_FOREIGN, 0.8, 'foreign_language');
+        // Comprehensive foreign patterns from Categorize.php
+        if (preg_match('/(NLsubs|danish|flemish|Deutsch|dutch|German|heb|hebrew|nl[._ -]?sub|dub(bed|s)?|\.NL|norwegian|swedish|swesub|spanish|catalan|Staffel)[._ -]|\(german\)|Multisub/i', $name)) {
+            return $this->matched(Category::MOVIE_FOREIGN, 0.85, 'foreign_lang');
         }
-
+        if (preg_match('/[._ -](French|TRUEFRENCH|VGQ|VFQ|VFF|VFI|VFB|VF2|VOSTFR|FRENCHSUB|SUBFRENCH)/i', $name)) {
+            return $this->matched(Category::MOVIE_FOREIGN, 0.85, 'foreign_french');
+        }
         if (stripos($name, 'Castellano') !== false) {
             return $this->matched(Category::MOVIE_FOREIGN, 0.8, 'foreign_castellano');
         }
@@ -179,6 +302,11 @@ class MovieCategorizer extends AbstractCategorizer
 
     protected function checkDVD(string $name): ?CategorizationResult
     {
+        // Exclude comic formats from Categorize.php
+        if (preg_match('/c2c|cbr|cbz/i', $name)) {
+            return null;
+        }
+
         if (preg_match('/(dvd\-?r|[._ -]dvd|dvd9|dvd5|[._ -]r5)[._ -]/i', $name)) {
             return $this->matched(Category::MOVIE_DVD, 0.85, 'dvd');
         }

@@ -140,4 +140,66 @@ class MovieReverifyMatchesTest extends ImdbScraperTestCase
 
         $this->assertSame('13622970', Release::query()->whereKey(21)->value('imdbid'));
     }
+
+    #[Test]
+    public function it_requeues_stale_links_and_links_releases_to_existing_movieinfo(): void
+    {
+        $this->seedRepairLinkRows();
+
+        $this->artisan('movie:reverify-matches', ['--repair-links' => true])
+            ->expectsTable(['Repair', 'Changed'], [
+                ['Stale movie links requeued for lookup', '1'],
+                ['Releases linked to existing movieinfo', '2'],
+            ])
+            ->assertSuccessful();
+
+        // Failed lookup next to an old movie link: both cleared so the worker looks it up again.
+        $this->assertNull(Release::query()->whereKey(31)->value('imdbid'));
+        $this->assertNull(Release::query()->whereKey(31)->value('movieinfo_id'));
+        // Known IMDb id without a link (NULL or 0) gets the matching movieinfo row.
+        $this->assertSame(2, (int) Release::query()->whereKey(32)->value('movieinfo_id'));
+        $this->assertSame(2, (int) Release::query()->whereKey(33)->value('movieinfo_id'));
+        // Unknown IMDb id, a correct link, a non-movie release and a pending id stay as they were.
+        $this->assertNull(Release::query()->whereKey(34)->value('movieinfo_id'));
+        $this->assertSame(1, (int) Release::query()->whereKey(35)->value('movieinfo_id'));
+        $this->assertSame('', Release::query()->whereKey(36)->value('imdbid'));
+        $this->assertSame(1, (int) Release::query()->whereKey(36)->value('movieinfo_id'));
+        $this->assertNull(Release::query()->whereKey(37)->value('movieinfo_id'));
+    }
+
+    #[Test]
+    public function it_only_counts_link_repairs_in_dry_run_mode(): void
+    {
+        $this->seedRepairLinkRows();
+
+        $this->artisan('movie:reverify-matches', ['--repair-links' => true, '--dry-run' => true])
+            ->expectsTable(['Repair', 'Would change'], [
+                ['Stale movie links requeued for lookup', '1'],
+                ['Releases linked to existing movieinfo', '2'],
+            ])
+            ->assertSuccessful();
+
+        $this->assertSame('', Release::query()->whereKey(31)->value('imdbid'));
+        $this->assertSame(1, (int) Release::query()->whereKey(31)->value('movieinfo_id'));
+        $this->assertNull(Release::query()->whereKey(32)->value('movieinfo_id'));
+    }
+
+    private function seedRepairLinkRows(): void
+    {
+        Cache::flush();
+
+        $movieService = new MovieService;
+        $movieService->update(['imdbid' => '0087332', 'title' => 'Ghostbusters', 'year' => '1984']);
+        $movieService->update(['imdbid' => '0097428', 'title' => 'Ghostbusters II', 'year' => '1989']);
+
+        Release::query()->insert([
+            ['id' => 31, 'searchname' => 'Ghostbusters.2.German.1989.AC3.DVDRip.XviD-CENTi', 'categories_id' => 2030, 'imdbid' => '', 'movieinfo_id' => 1],
+            ['id' => 32, 'searchname' => 'Ghostbusters.II.1989.1080p.BluRay.x264-GRP', 'categories_id' => 2040, 'imdbid' => '0097428', 'movieinfo_id' => null],
+            ['id' => 33, 'searchname' => 'Ghostbusters.II.1989.720p.BluRay.x264-GRP', 'categories_id' => 2040, 'imdbid' => '0097428', 'movieinfo_id' => 0],
+            ['id' => 34, 'searchname' => 'Unknown.Movie.2020.1080p.WEB-DL-GRP', 'categories_id' => 2040, 'imdbid' => '1234567', 'movieinfo_id' => null],
+            ['id' => 35, 'searchname' => 'Ghostbusters.1984.1080p.BluRay.x264-GRP', 'categories_id' => 2040, 'imdbid' => '0087332', 'movieinfo_id' => 1],
+            ['id' => 36, 'searchname' => 'Some.Show.S01E01.1080p.WEB-DL-GRP', 'categories_id' => 5040, 'imdbid' => '', 'movieinfo_id' => 1],
+            ['id' => 37, 'searchname' => 'Pending.Movie.2020.1080p.WEB-DL-GRP', 'categories_id' => 2040, 'imdbid' => '0000000', 'movieinfo_id' => null],
+        ]);
+    }
 }

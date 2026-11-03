@@ -97,7 +97,8 @@ class AdminDashboardSnapshotService
      */
     private function buildStats(): array
     {
-        $today = now()->format('Y-m-d');
+        $todayStart = now()->startOfDay();
+        $tomorrowStart = $todayStart->copy()->addDay();
 
         $releasesCount = Release::query()->count();
         $activeUsersCount = User::query()->count();
@@ -114,8 +115,15 @@ class AdminDashboardSnapshotService
             ->where('is_permanent', true)
             ->count();
 
-        $releasesToday = Release::whereDate('adddate', $today)->count();
-        $usersToday = User::whereNull('deleted_at')->whereDate('created_at', $today)->count();
+        // Half-open ranges instead of whereDate() so MariaDB can use the adddate/created_at indexes.
+        $releasesToday = Release::query()
+            ->where('adddate', '>=', $todayStart)
+            ->where('adddate', '<', $tomorrowStart)
+            ->count();
+        $usersToday = User::query()
+            ->where('created_at', '>=', $todayStart)
+            ->where('created_at', '<', $tomorrowStart)
+            ->count();
 
         return [
             'releases' => $releasesCount,

@@ -49,7 +49,12 @@ class ProcessReleasesCommand extends Command
 
             return self::SUCCESS;
         } catch (\Throwable $e) {
-            Log::error($e->getTraceAsString());
+            Log::error('releases:process failed', [
+                'group_id' => $groupId,
+                'exception_class' => $e::class,
+                'exception_message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
             $this->error($e->getMessage());
 
             return self::FAILURE;

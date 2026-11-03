@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Facades\Search;
 use App\Models\Release;
 use App\Models\ReleaseFile;
 use App\Models\ReleaseNfo;
 use App\Models\UsenetGroup;
+use App\Services\AdditionalProcessing\UnrarRunner;
 use App\Services\Configuration\ConfigurationProvider;
 use App\Services\NNTP\NNTPService;
 use App\Services\Nzb\NzbContentsService;
@@ -108,6 +110,9 @@ class NfoService
      */
     protected const SETTINGS_CACHE_TTL = 300;
 
+    /** Seconds between NFO_FAILED archive passes for one bucket. */
+    private const int FAILED_ARCHIVE_PASS_INTERVAL = 3600;
+
     /**
      * Lazily loaded from settings + cache when NFO processing runs (see getters).
      */
@@ -140,8 +145,6 @@ class NfoService
 
     private string|false $unrarPath;
 
-    private string|false $timeoutPath;
-
     private int $timeoutSeconds;
 
     public const NFO_FAILED = -9; // We failed to get a NFO after admin set max retries.
@@ -166,7 +169,6 @@ class NfoService
 
         $this->tmpPath = rtrim((string) config('nntmux.tmp_unrar_path'), '/\\').'/';
         $this->unrarPath = config('nntmux_settings.unrar_path') ?: false;
-        $this->timeoutPath = config('nntmux_settings.timeout_path') ?: false;
         $this->timeoutSeconds = (int) (app(ConfigurationProvider::class)->postProcessing()->timeoutSeconds ?: 60);
     }
 
@@ -194,6 +196,43 @@ class NfoService
         }
 
         return $this->maxRetries;
+    }
+
+    /**
+     * Lowest nfostatus still retried. A download failure at this value moves the release to NFO_FAILED.
+     */
+    public function retryFloor(): int
+    {
+        return $this->getMaxRetries();
+    }
+
+    /**
+     * The NFO_FAILED pass rarely finds work (rows only qualify once release_files gains NFO entries),
+     * so it runs at most once per FAILED_ARCHIVE_PASS_INTERVAL for each bucket.
+     */
+    private function failedArchivePassIsDue(string $groupID, string $guidChar): bool
+    {
+        try {
+            return Cache::add('nfo:failed-archive-pass:'.$groupID.':'.$guidChar, true, self::FAILED_ARCHIVE_PASS_INTERVAL);
+        } catch (Throwable $e) {
+            if (config('app.debug')) {
+                Log::debug('NfoService cache bypassed: '.$e->getMessage());
+            }
+
+            return true;
+        }
+    }
+
+    /**
+     * NFO updates use the query builder, which skips ReleaseObserver, so push nfostatus to the search index here.
+     */
+    private function syncSearchIndex(int $releaseId): void
+    {
+        try {
+            Search::updateRelease($releaseId);
+        } catch (Throwable $e) {
+            Log::warning('NfoService: search index update failed', ['release_id' => $releaseId, 'error' => $e->getMessage()]);
+        }
     }
 
     private function getMaxSize(): int
@@ -537,7 +576,7 @@ class NfoService
                 $release->completion = 0;
             }
 
-            if ($release->completion === 0) {
+            if ((float) $release->completion <= 0.0) {
                 $nzbContentsService = app(NzbContentsService::class);
                 $nzbContentsService->setNntp($nntp);
                 $nzbContentsService->setNfo($this);
@@ -668,31 +707,12 @@ class NfoService
             File::put($archiveFile, $compressedData);
 
             foreach ($nfoFilenames as $nfoFilename) {
-                $command = [
-                    $this->unrarPath,
-                    'e',
-                    '-y',
-                    '-c-',
-                    '-inul',
-                    '-p-',
-                    '-@',
-                    '-',
-                    $archiveFile,
-                    $nfoFilename,
-                    $extractDir,
-                ];
-
-                if ($this->timeoutPath && $this->timeoutSeconds > 0) {
-                    $command = [
-                        $this->timeoutPath,
-                        '--foreground',
-                        '--signal=KILL',
-                        (string) $this->timeoutSeconds,
-                        ...$command,
-                    ];
+                $result = app(UnrarRunner::class)->run($this->unrarPath, [
+                    'e', '-y', '-c-', '-inul', '-p-', '-@', '--', $archiveFile, $nfoFilename, $extractDir,
+                ], $this->timeoutSeconds > 0 ? $this->timeoutSeconds : 60);
+                if ($result->exitCode() !== 0) {
+                    continue;
                 }
-
-                Process::timeout(1800)->run($command);
 
                 $extractedPath = $extractDir.basename($nfoFilename);
                 if (! File::isFile($extractedPath)) {
@@ -790,9 +810,12 @@ class NfoService
                                 ]);
                             }
 
-                            Release::whereId($release['id'])->update(['nfostatus' => self::NFO_FOUND]);
+                            $nfoUpdate = ['nfostatus' => self::NFO_FOUND];
+
+                            Release::whereId($release['id'])->update($nfoUpdate);
                             DB::commit();
                             $processedCount++;
+                            $this->syncSearchIndex((int) $release['id']);
                         } catch (\Exception $e) {
                             DB::rollBack();
                             if ($this->echo) {
@@ -833,7 +856,9 @@ class NfoService
      */
     private function buildNfoProcessingQuery(string $groupID, string $guidChar): \Illuminate\Database\Eloquent\Builder // @phpstan-ignore class.notFound, missingType.generics, return.phpDocType
     {
+        // Without a written NZB the worker cannot read the file list and would mark the release NFO_NONFO for good.
         $query = Release::query()
+            ->where('nzbstatus', NzbService::NZB_ADDED)
             ->whereBetween('nfostatus', [$this->getMaxRetries(), self::NFO_UNPROC]);
 
         if ($guidChar !== '') {
@@ -897,6 +922,10 @@ class NfoService
      */
     private function processFailedReleasesViaArchive(NNTPService $nntp, string $groupID, string $guidChar): int
     {
+        if (! $this->failedArchivePassIsDue($groupID, $guidChar)) {
+            return 0;
+        }
+
         $query = Release::query()
             ->where('nfostatus', self::NFO_FAILED)
             ->whereExists(function ($sub) {
@@ -950,6 +979,7 @@ class NfoService
                         Release::whereId($release['id'])->update(['nfostatus' => self::NFO_FOUND]);
                         DB::commit();
                         $processed++;
+                        $this->syncSearchIndex((int) $release['id']);
 
                         if ($this->echo) {
                             echo 'A';
@@ -981,7 +1011,7 @@ class NfoService
 
     /**
      * Get a string like this:
-     * "AND r.nfostatus BETWEEN -8 AND -1 AND r.size < 1073741824 AND r.size > 1048576"
+     * "AND r.nzbstatus = 1 AND r.nfostatus BETWEEN -8 AND -1 AND r.size < 1073741824 AND r.size > 1048576"
      * To use in a query.
      *
      *
@@ -997,7 +1027,8 @@ class NfoService
         $maxRetries = ($dummy >= 0 ? -($dummy + 1) : self::NFO_UNPROC);
 
         return sprintf(
-            'AND r.nfostatus BETWEEN %d AND %d %s %s',
+            'AND r.nzbstatus = %d AND r.nfostatus BETWEEN %d AND %d %s %s',
+            NzbService::NZB_ADDED,
             ($maxRetries < -8 ? -8 : $maxRetries),
             self::NFO_UNPROC,
             ($maxSize > 0 ? ('AND r.size < '.$maxSize) : ''),

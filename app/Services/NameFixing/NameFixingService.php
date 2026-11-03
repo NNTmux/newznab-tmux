@@ -5,10 +5,14 @@ declare(strict_types=1);
 namespace App\Services\NameFixing;
 
 use App\Facades\Search;
+use App\Services\Crc\CrcCandidateSelector;
+use App\Services\Crc\CrcEvidence;
+use App\Services\NameFixing\Data\ReleaseIdentity;
 use App\Services\NameFixing\Extractors\FileNameExtractor;
 use App\Services\NameFixing\Extractors\NfoNameExtractor;
 use App\Services\NNTP\NNTPService;
 use App\Services\Nzb\NzbContentsService;
+use Illuminate\Support\Facades\Log;
 use RuntimeException;
 
 /**
@@ -71,6 +75,10 @@ class NameFixingService
 
     protected DonorMatchSelector $donorMatchSelector;
 
+    protected Sdx264XxxNameResolver $sdx264XxxNameResolver;
+
+    protected PredbMatchGuard $predbMatchGuard;
+
     /**
      * @var array<string, array<string, mixed>|null>
      */
@@ -89,7 +97,9 @@ class NameFixingService
         ?FilePrioritizer $filePrioritizer = null,
         ?PredbMatchSelector $predbMatchSelector = null,
         ?NameFixingQueryService $queries = null,
-        ?DonorMatchSelector $donorMatchSelector = null
+        ?DonorMatchSelector $donorMatchSelector = null,
+        ?Sdx264XxxNameResolver $sdx264XxxNameResolver = null,
+        ?PredbMatchGuard $predbMatchGuard = null
     ) {
         $this->updateService = $updateService ?? new ReleaseUpdateService;
         $this->checkerService = $checkerService ?? new NameCheckerService;
@@ -97,9 +107,11 @@ class NameFixingService
         $this->fileExtractor = $fileExtractor ?? new FileNameExtractor;
         $this->fileNameCleaner = $fileNameCleaner ?? new FileNameCleaner;
         $this->filePrioritizer = $filePrioritizer ?? new FilePrioritizer;
-        $this->predbMatchSelector = $predbMatchSelector ?? new PredbMatchSelector($this->fileNameCleaner);
+        $this->predbMatchGuard = $predbMatchGuard ?? new PredbMatchGuard;
+        $this->predbMatchSelector = $predbMatchSelector ?? new PredbMatchSelector($this->fileNameCleaner, $this->predbMatchGuard);
         $this->queries = $queries ?? new NameFixingQueryService;
         $this->donorMatchSelector = $donorMatchSelector ?? new DonorMatchSelector;
+        $this->sdx264XxxNameResolver = $sdx264XxxNameResolver ?? app(Sdx264XxxNameResolver::class);
         $this->echoOutput = config('nntmux.echocli');
     }
 
@@ -239,8 +251,6 @@ class NameFixingService
     public function fixNamesWithCrc(int $time, bool $echo, int $cats, bool $nameStatus, bool $show): void
     {
         $this->echoStartMessage($time, 'CRC32');
-        $type = 'CRC32, ';
-
         if (! $this->startBatch(NameFixingQueryService::SOURCE_CRC, $time, $cats, ' CRC32\'s to process.')) {
             cli()->info('Nothing to fix.');
 
@@ -257,23 +267,13 @@ class NameFixingService
             foreach ($releases as $release) {
                 $this->updateService->reset();
                 $this->updateService->incrementChecked();
-                $prioritized = [];
-
-                foreach ($files[(int) $release->releases_id] ?? [] as $file) {
-                    $priority = $this->filePrioritizer->getCrcPriority((string) $file->filename);
-                    $prioritized[$priority][(string) $file->crc32] = (string) $file->crc32;
-                }
-
-                ksort($prioritized);
-                foreach ($prioritized as $values) {
-                    foreach ($values as $crc) {
-                        if ($this->applyDonorMatch($release, $donors[$crc] ?? [], 5, 'crcCheck: CRC32', $type, $echo, $nameStatus, $show)) {
-                            break 2;
-                        }
-                    }
-                }
-
-                if (! $this->updateService->matched) {
+                if (! $this->applyCrcFiles(
+                    $release,
+                    $files[(int) $release->releases_id] ?? [],
+                    $donors,
+                    $echo,
+                    $show
+                )) {
                     $this->markProcessed($echo, $nameStatus, 'proc_crc32', (int) $release->releases_id);
                 }
 
@@ -455,11 +455,13 @@ class NameFixingService
         }
 
         $bestMatch = $this->findBestPredbMatch($fileName);
-        if ($bestMatch !== null) {
+        if ($bestMatch !== null && ! $this->exceedsPredbFanout($bestMatch)) {
             if (strcasecmp((string) ($bestMatch['title'] ?? ''), (string) $release->searchname) === 0) {
                 $this->updateService->attachPredbId(
                     (int) $release->releases_id,
-                    (int) ($bestMatch['id'] ?? 0)
+                    (int) ($bestMatch['id'] ?? 0),
+                    ReleaseIdentity::fromRelease($release),
+                    isset($bestMatch['title']) ? (string) $bestMatch['title'] : null,
                 );
 
                 return $this->updateService->matched;
@@ -473,7 +475,8 @@ class NameFixingService
                 $type,
                 $nameStatus,
                 $show,
-                $bestMatch['id'] ?? null
+                $bestMatch['id'] ?? null,
+                canonicalTitle: isset($bestMatch['title']) ? (string) $bestMatch['title'] : null,
             );
 
             return $this->updateService->matched;
@@ -501,11 +504,33 @@ class NameFixingService
     }
 
     /**
+     * A fuzzy match is refused once its PreDB row already names too many releases;
+     * that is a generic filename pulling unrelated releases onto one title.
+     *
+     * @param  array<string, mixed>|null  $match
+     */
+    protected function exceedsPredbFanout(?array $match): bool
+    {
+        if ($match === null || ! $this->predbMatchGuard->exceedsReleaseFanout((int) ($match['id'] ?? 0))) {
+            return false;
+        }
+
+        Log::debug('PreDB match refused: row already linked to too many releases', [
+            'predb_id' => (int) ($match['id'] ?? 0),
+            'source' => (string) ($match['source'] ?? ''),
+            'max_releases' => $this->predbMatchGuard->maxReleasesPerPre(),
+        ]);
+
+        return true;
+    }
+
+    /**
      * @return \Generator<int, list<object>>
      */
     protected function candidateBatches(string $source, int $time, int $categories): \Generator
     {
         $afterId = 0;
+        $seenReleaseIds = [];
 
         do {
             $batch = $this->queries->candidateBatch($source, $time, $categories, $afterId);
@@ -513,9 +538,57 @@ class NameFixingService
                 break;
             }
 
-            yield $batch;
+            $uniqueBatch = [];
+            foreach ($batch as $release) {
+                $releaseId = (int) $release->releases_id;
+                if ($releaseId <= 0 || isset($seenReleaseIds[$releaseId])) {
+                    continue;
+                }
+
+                $seenReleaseIds[$releaseId] = true;
+                $uniqueBatch[] = $release;
+            }
+
+            if ($uniqueBatch !== []) {
+                yield $uniqueBatch;
+            }
             $afterId = (int) $batch[array_key_last($batch)]->releases_id;
         } while (count($batch) === NameFixingQueryService::BATCH_SIZE);
+
+        if (count($seenReleaseIds) >= $this->_totalReleases) {
+            return;
+        }
+
+        $fallbackAfterId = 0;
+        do {
+            $fallbackBatch = $this->queries->fallbackCandidateBatch(
+                $source,
+                $time,
+                $categories,
+                $fallbackAfterId
+            );
+            if ($fallbackBatch === []) {
+                break;
+            }
+
+            $missingBatch = [];
+            foreach ($fallbackBatch as $release) {
+                $releaseId = (int) $release->releases_id;
+                if ($releaseId <= 0 || isset($seenReleaseIds[$releaseId])) {
+                    continue;
+                }
+
+                $seenReleaseIds[$releaseId] = true;
+                $missingBatch[] = $release;
+            }
+
+            if ($missingBatch !== []) {
+                yield $missingBatch;
+            }
+
+            $fallbackAfterId = (int) $fallbackBatch[array_key_last($fallbackBatch)]->releases_id;
+        } while (count($fallbackBatch) === NameFixingQueryService::BATCH_SIZE
+            && count($seenReleaseIds) < $this->_totalReleases);
     }
 
     protected function startBatch(string $source, int $time, int $categories, string $message): bool
@@ -585,7 +658,8 @@ class NameFixingService
         if (strcasecmp((string) $donor->searchname, (string) $release->searchname) === 0) {
             $this->updateService->attachPredbId(
                 (int) $release->releases_id,
-                (int) $donor->predb_id
+                (int) $donor->predb_id,
+                ReleaseIdentity::fromRelease($release),
             );
 
             return $this->updateService->matched;
@@ -603,6 +677,65 @@ class NameFixingService
         );
 
         return $this->updateService->matched;
+    }
+
+    /**
+     * Resolve all file evidence before allowing a single mutation.
+     *
+     * @param  list<object>  $files
+     * @param  array<string, list<object>>  $donors
+     */
+    protected function applyCrcFiles(
+        object $release,
+        array $files,
+        array $donors,
+        bool $persist,
+        bool $show
+    ): bool {
+        $selector = new CrcCandidateSelector;
+        $resolved = null;
+        foreach ($files as $file) {
+            $evidence = CrcEvidence::fromArray([
+                'crc32' => $file->crc32 ?? null,
+                'size' => $file->filesize ?? null,
+                'name' => $file->filename ?? '',
+                'checksum_scope' => 'whole_file',
+            ]);
+            if ($evidence === null) {
+                continue;
+            }
+            $rows = array_values(array_filter(
+                $donors[$evidence->crcHash] ?? [],
+                static fn (object $row): bool => ! isset($row->releases_id)
+                    || (int) $row->releases_id !== (int) $release->releases_id
+            ));
+            if ($rows === []) {
+                continue;
+            }
+            $selected = $selector->select($rows, $evidence, (int) ($release->relsize ?? 0));
+            if ($selected === null) {
+                return false;
+            }
+            if ($resolved !== null && (
+                (int) $resolved->predb_id !== (int) $selected->predb_id
+                || strcasecmp((string) ($resolved->title ?? $resolved->searchname), (string) ($selected->title ?? $selected->searchname)) !== 0
+            )) {
+                return false;
+            }
+            $resolved = $selected;
+        }
+
+        if ($resolved === null) {
+            return false;
+        }
+
+        return $this->updateService->applyCrcMatch(
+            $release,
+            (string) ($resolved->title ?? $resolved->searchname),
+            (int) $resolved->predb_id,
+            $persist,
+            $show
+        );
     }
 
     /**
@@ -812,29 +945,10 @@ class NameFixingService
 
             if ((int) $release->proc_crc32 === self::PROC_CRC_NONE) {
                 $this->updateService->reset();
-                $prioritizedCrcs = [];
-                foreach ($releaseFiles as $file) {
-                    $crc = (string) ($file->crc32 ?? '');
-                    if ($crc === '') {
-                        continue;
-                    }
-
-                    $priority = $this->filePrioritizer->getCrcPriority((string) $file->filename);
-                    $prioritizedCrcs[$priority][$crc] = $crc;
+                if ($this->applyCrcFiles($release, $releaseFiles, $crcDonors, true, $show)) {
+                    continue;
                 }
-                ksort($prioritizedCrcs);
-
-                foreach ($prioritizedCrcs as $crcs) {
-                    foreach ($crcs as $crc) {
-                        if ($this->applyDonorMatch($release, $crcDonors[$crc] ?? [], 5, 'crcCheck: CRC32', 'CRC32, ', true, true, $show)) {
-                            break 2;
-                        }
-                    }
-                }
-
-                if (! $this->updateService->matched) {
-                    $this->updateService->updateSingleColumn('proc_crc32', self::PROC_CRC_DONE, $releaseId);
-                }
+                $this->updateService->updateSingleColumn('proc_crc32', self::PROC_CRC_DONE, $releaseId);
             }
 
             if ($this->updateService->matched) {
@@ -968,7 +1082,7 @@ class NameFixingService
         $matching = 0;
         foreach ($matches as $release) {
             if (strcasecmp($title, (string) $release->searchname) === 0) {
-                $this->updateService->attachPredbId((int) $release->releases_id, (int) $pre->predb_id);
+                $this->updateService->attachPredbId((int) $release->releases_id, (int) $pre->predb_id, ReleaseIdentity::fromRelease($release), $title);
             } else {
                 $this->updateService->reset();
                 $this->updateService->updateRelease(
@@ -979,7 +1093,8 @@ class NameFixingService
                     'PreDB FT Exact, ',
                     true,
                     $show,
-                    (int) $pre->predb_id
+                    (int) $pre->predb_id,
+                    canonicalTitle: $title,
                 );
             }
 
@@ -1042,7 +1157,7 @@ class NameFixingService
     }
 
     /**
-     * Fix XXX release names using specific file names.
+     * Fix supported XXX release names using search and file names.
      */
     public function fixXXXNamesWithFiles(int $time, bool $echo, int $cats, bool $nameStatus, bool $show): void
     {
@@ -1064,9 +1179,14 @@ class NameFixingService
                 $this->updateService->reset();
                 $this->updateService->incrementChecked();
 
+                $candidateNames = [(string) $release->searchname];
                 foreach ($files[(int) $release->releases_id] ?? [] as $file) {
+                    $candidateNames[] = (string) $file->textstring;
+                }
+
+                foreach (array_unique(array_filter($candidateNames)) as $candidateName) {
                     $candidate = clone $release;
-                    $candidate->textstring = (string) $file->textstring;
+                    $candidate->textstring = $candidateName;
                     if ($this->xxxNameCheck($candidate, $echo, $type, $nameStatus, $show)) {
                         break;
                     }
@@ -1133,6 +1253,22 @@ class NameFixingService
      */
     protected function xxxNameCheck(object $release, bool $echo, string $type, bool $nameStatus, bool $show): bool
     {
+        $sdx264Result = $this->sdx264XxxNameResolver->resolve((string) $release->textstring);
+        if ($sdx264Result !== null) {
+            $this->updateService->updateRelease(
+                $release,
+                $sdx264Result->newName,
+                $sdx264Result->getFormattedMethod(),
+                $echo,
+                $type,
+                $nameStatus,
+                $show,
+                $sdx264Result->preDbId
+            );
+
+            return $this->updateService->matched;
+        }
+
         if (preg_match('/^.+?SDPORN/i', $release->textstring, $hit)) {
             $this->updateService->updateRelease($release, $hit[0], 'fileCheck: XXX SDPORN', $echo, $type, $nameStatus, $show);
 
@@ -1180,10 +1316,10 @@ class NameFixingService
         if ($preDbMatch !== null) {
             if (strcasecmp((string) $preDbMatch['title'], (string) $release->searchname) === 0) {
                 if ($echo) {
-                    $this->updateService->attachPredbId((int) $release->releases_id, (int) $preDbMatch['id']);
+                    $this->updateService->attachPredbId((int) $release->releases_id, (int) $preDbMatch['id'], ReleaseIdentity::fromRelease($release), (string) $preDbMatch['title']);
                 }
             } else {
-                $this->updateService->updateRelease($release, $preDbMatch['title'], 'preDB: Match', $echo, $type, $nameStatus, $show, $preDbMatch['id']);
+                $this->updateService->updateRelease($release, $preDbMatch['title'], 'preDB: Match', $echo, $type, $nameStatus, $show, $preDbMatch['id'], canonicalTitle: (string) $preDbMatch['title']);
             }
 
             return $this->updateService->matched;
@@ -1291,11 +1427,11 @@ class NameFixingService
 
             $bestMatch = $this->findBestPredbMatch($cleanedFileName);
 
-            if ($bestMatch !== null && (int) ($bestMatch['id'] ?? 0) > 0) {
+            if ($bestMatch !== null && (int) ($bestMatch['id'] ?? 0) > 0 && ! $this->exceedsPredbFanout($bestMatch)) {
                 if (strcasecmp((string) $bestMatch['title'], (string) $release->searchname) !== 0) {
-                    $this->updateService->updateRelease($release, $bestMatch['title'], 'file matched source: '.($bestMatch['source'] ?? ''), $echo, 'PreDB file match, ', $nameStatus, $show, (int) $bestMatch['id']);
+                    $this->updateService->updateRelease($release, $bestMatch['title'], 'file matched source: '.($bestMatch['source'] ?? ''), $echo, 'PreDB file match, ', $nameStatus, $show, (int) $bestMatch['id'], canonicalTitle: (string) $bestMatch['title']);
                 } elseif ($echo) {
-                    $this->updateService->attachPredbId((int) $release->releases_id, (int) $bestMatch['id']);
+                    $this->updateService->attachPredbId((int) $release->releases_id, (int) $bestMatch['id'], ReleaseIdentity::fromRelease($release), (string) $bestMatch['title']);
                 }
                 $matching++;
 

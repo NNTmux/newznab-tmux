@@ -9,10 +9,13 @@ use App\Services\AdditionalProcessing\DTO\AdditionalWorkPlan;
 use App\Services\AdditionalProcessing\DTO\ArchiveCandidate;
 use App\Services\AdditionalProcessing\DTO\ImageCandidate;
 use App\Services\AdditionalProcessing\Media\ImageCandidateRanker;
+use App\Traits\DetectsHashedNames;
 use Illuminate\Support\Facades\Log;
 
 final readonly class AdditionalWorkPlanner
 {
+    use DetectsHashedNames;
+
     private const string SEVEN_ZIP_PATTERN = '/([^"\s\/]+)\.7z(?:\.(\d{3}))?($|[ ")]|-)/i';
 
     private const string ARCHIVE_PATTERN = '/(\.(part\d+|[rz]\d+|rar|7z|0+|0*10?|zipr\d{2,3}|zipx?)("|\s*\.rar)*($|[ ")]|-])|"[a-f0-9]{32}\.[1-9]\d{1,2}".*\(\d+\/\d{2,}\)$)/i';
@@ -458,9 +461,14 @@ final readonly class AdditionalWorkPlanner
 
     private function hasFileExtension(string $title): bool
     {
-        $name = preg_match('/"([^"]+)"/', $title, $quoted) === 1 ? $quoted[1] : $title;
+        $name = trim(preg_match('/"([^"]+)"/', $title, $quoted) === 1 ? $quoted[1] : $title);
 
-        return preg_match('/\.[a-z0-9]{2,4}$/i', trim($name)) === 1;
+        // "1c802fddd857e8a8.bin": a generic container suffix on a random name says nothing about the content.
+        if (preg_match('/\.(bin|dat)$/i', $name) === 1 && $this->isOpaqueRandomToken($name)) {
+            return false;
+        }
+
+        return preg_match('/\.[a-z0-9]{2,4}$/i', $name) === 1;
     }
 
     private function isSupportFile(string $title): bool

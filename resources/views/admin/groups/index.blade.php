@@ -31,9 +31,9 @@
 
         @if($grouplist && $grouplist->count() > 0)
             <x-admin.action-bar>
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(20rem,1fr)_minmax(0,auto)_auto]">
                     <!-- Search Form -->
-                    <div>
+                    <div class="min-w-0">
                         <form name="groupsearch" method="GET">
                             <div class="flex gap-2">
                                 <div class="relative flex-1">
@@ -53,13 +53,15 @@
                     </div>
 
                     <!-- Pagination -->
-                    <div class="flex justify-center items-center">
-                        {{ $grouplist->onEachSide(5)->links() }}
+                    <div class="min-w-0 overflow-x-auto">
+                        <div class="flex justify-center">
+                            {{ $grouplist->onEachSide(2)->links() }}
+                        </div>
                     </div>
 
                     <!-- Bulk Actions -->
-                    <div class="flex justify-end items-center">
-                        <div class="flex gap-2 items-center">
+                    <div class="flex min-w-0 justify-start xl:justify-end">
+                        <div class="flex flex-wrap gap-2 items-center justify-start xl:justify-end">
                             <!-- Selection Counter -->
                             <span id="selection-counter" class="hidden text-sm text-gray-600 dark:text-gray-400 mr-2">
                                 <span id="selected-count">0</span> selected

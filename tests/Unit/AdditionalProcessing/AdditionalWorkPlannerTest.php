@@ -282,6 +282,23 @@ class AdditionalWorkPlannerTest extends TestCase
     }
 
     #[Test]
+    public function it_treats_random_bin_names_as_unnamed_when_picking_the_index(): void
+    {
+        $planner = new AdditionalWorkPlanner($this->makeConfig(['par2MediaMapping' => true]));
+        $nzb = [
+            ['title' => '[1/7715] "1c802fddd857e8a8.bin" yEnc (1/7715)', 'segments' => ['<data>'], 'size' => 6_000_000_000, 'filecount' => 1],
+            ['title' => '[1/2] "477342bafc4695a6.bin" yEnc (1/2)', 'segments' => ['<index>'], 'size' => 800_000, 'filecount' => 1],
+            ['title' => '[1/5] "3eccaff3d139a1a5.bin" yEnc (1/5)', 'segments' => ['<volume>'], 'size' => 3_500_000, 'filecount' => 1],
+            ['title' => '[1/9] "firmware.bin" yEnc (1/9)', 'segments' => ['<named>'], 'size' => 100, 'filecount' => 1],
+        ];
+
+        $this->assertSame(
+            [1, 2],
+            array_map(static fn (ArchiveCandidate $candidate): int => $candidate->sourceIndex, $planner->plan($nzb, 'alt.binaries.misc')->par2IndexCandidates),
+        );
+    }
+
+    #[Test]
     public function it_lists_full_length_videos_largest_first_without_samples_or_archives(): void
     {
         $planner = new AdditionalWorkPlanner($this->makeConfig([

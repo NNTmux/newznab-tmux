@@ -36,15 +36,17 @@ class ConsoleOutputService
                 'Additional post-processing, started at: '.
                 now()->format('D M d, Y G:i a').
                 PHP_EOL.
-                'Downloaded: (xB)=yEnc article, (cB)=compressed part'.
+                'Downloaded: (xB)=yEnc article, (cB)=compressed part, (rB)=raw media part'.
                 PHP_EOL.
-                'Failures: fC#=Compressed(part #), fS=Sample, fM=Media(video), fA=Audio, fJ=JPEG, G=Missing group, T=Timeout skip'.
+                'Failures: fC#=Compressed(part #), fS=Sample, fM=Media(video), fA=Audio, fJ=JPEG, fR=Raw media, G=Missing group, T=Timeout skip'.
                 PHP_EOL.
                 'Processing: r=RAR, z=ZIP, (vRAW)=Inline video detected'.
                 PHP_EOL.
                 'Added: s=Sample image, j=JPEG image, A=Audio sample, a=Audio MediaInfo, v=Video sample'.
                 PHP_EOL.
-                'Added: m=Video MediaInfo, n=NFO, ^=Inner file details (RAR/ZIP)'.
+                'Added: m=Video MediaInfo, n=NFO, ^=Inner file details (RAR/ZIP/etc), ~=Raw file details'.
+                PHP_EOL.
+                'Matching: (rFR)=Raw file renamed'.
                 '',
                 'header'
             );
@@ -166,6 +168,26 @@ class ConsoleOutputService
     public function echoInlineVideo(): void
     {
         $this->echo('(vRAW)', 'primaryOver');
+    }
+
+    public function echoRawMediaDownload(): void
+    {
+        $this->echo('(rB)', 'primaryOver');
+    }
+
+    public function echoRawMediaFailure(): void
+    {
+        $this->echo('fR', 'warningOver');
+    }
+
+    public function echoRawFileInfoAdded(): void
+    {
+        $this->echo('~', 'primaryOver');
+    }
+
+    public function echoRawFileRenamed(): void
+    {
+        $this->echo('(rFR)', 'primaryOver');
     }
 
     public function echoPar2Mapped(int $files): void

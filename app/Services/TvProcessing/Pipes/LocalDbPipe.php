@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services\TvProcessing\Pipes;
 
+use App\Services\TvProcessing\LocalShowMatcher;
 use App\Services\TvProcessing\ParsedTvRelease;
-use App\Services\TvProcessing\Providers\AbstractTvProvider;
 use App\Services\TvProcessing\Providers\LocalDbProvider;
 use App\Services\TvProcessing\TvProcessingPassable;
 use App\Services\TvProcessing\TvProcessingResult;
@@ -20,6 +20,8 @@ use App\Services\TvProcessing\TvProcessingResult;
 class LocalDbPipe extends AbstractTvProviderPipe
 {
     protected int $priority = 10;
+
+    private ?LocalShowMatcher $matcher = null;
 
     public function __construct(private ?LocalDbProvider $localDb = null) {}
 
@@ -36,7 +38,7 @@ class LocalDbPipe extends AbstractTvProviderPipe
         $title = $parsed->cleanName;
 
         if (! $passable->hasShow()) {
-            $videoId = $localDb->getByTitle($title, AbstractTvProvider::TYPE_TV);
+            $videoId = ($this->matcher ??= new LocalShowMatcher($localDb))->find($parsed);
             if ($videoId <= 0) {
                 $this->outputNotFound($title);
 

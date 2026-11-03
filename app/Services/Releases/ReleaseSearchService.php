@@ -1258,7 +1258,7 @@ class ReleaseSearchService
         );
         $sql = sprintf(
             '%s
-			ORDER BY %s %s
+			ORDER BY r.%s %s
 			LIMIT %d OFFSET %d',
             $baseSql,
             $orderField,
@@ -1423,7 +1423,7 @@ class ReleaseSearchService
         );
 
         $sql = sprintf('%s ORDER BY r.%s %s LIMIT %d OFFSET %d', $baseSql, $orderField, $orderDir, $limit, $offset);
-        $cacheKey = md5('moviesSearch:v2:'.$sql.serialize(func_get_args()));
+        $cacheKey = md5($this->getCacheVersion().'moviesSearch:v2:'.$sql.serialize(func_get_args()));
         if (($releases = Cache::get($cacheKey)) !== null) {
             return $releases;
         }
@@ -1476,7 +1476,7 @@ class ReleaseSearchService
 
             $ret = [];
             foreach ($results as $res) {
-                if ($res['id'] !== $currentID && $res['categoryparentid'] === $parentCat) {
+                if ((int) $res->id !== (int) $currentID && (int) ($res->categoryparentid ?? 0) === (int) $parentCat) {
                     $ret[] = $res;
                 }
             }
@@ -1567,10 +1567,11 @@ class ReleaseSearchService
         string $airDate,
         bool $strictEpisodeResolution
     ): ?string {
+        $normalizedSeries = $series !== '' ? (int) preg_replace('/^s0*/i', '', $series) : 0;
         $showQry = sprintf(
             "\n\t\t\t\tSELECT v.id AS video, GROUP_CONCAT(tve.id SEPARATOR ',') AS episodes FROM videos v LEFT JOIN tv_episodes tve ON v.id = tve.videos_id WHERE (%s) %s %s %s GROUP BY v.id LIMIT 1",
             implode(' OR ', $siteSQL),
-            ($series !== '' ? sprintf('AND tve.series = %d', (int) preg_replace('/^s0*/i', '', $series)) : ''),
+            ($series !== '' ? sprintf('AND tve.series = %d', $normalizedSeries) : ''),
             ($episode !== '' ? sprintf('AND tve.episode = %d', (int) preg_replace('/^e0*/i', '', $episode)) : ''),
             ($airDate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', escapeString($airDate)) : '')
         );
@@ -1581,11 +1582,11 @@ class ReleaseSearchService
 
         $showSql = '';
         if ((! empty($episode) && ! empty($series)) && $show[0]->episodes !== '') {
-            $showSql .= ' AND r.tv_episodes_id IN ('.$show[0]->episodes.') AND tve.series = '.$series;
+            $showSql .= ' AND r.tv_episodes_id IN ('.$show[0]->episodes.') AND tve.series = '.$normalizedSeries;
         } elseif (! empty($episode) && $show[0]->episodes !== '') {
             $showSql = sprintf('AND r.tv_episodes_id IN (%s)', $show[0]->episodes);
         } elseif (! empty($series) && empty($episode)) {
-            $showSql .= ' AND r.tv_episodes_id IN ('.$show[0]->episodes.') AND tve.series = '.$series;
+            $showSql .= ' AND r.tv_episodes_id IN ('.$show[0]->episodes.') AND tve.series = '.$normalizedSeries;
         }
         if ((int) ($show[0]->video ?? 0) > 0) {
             $showSql .= ' AND r.videos_id = '.$show[0]->video;
@@ -1742,6 +1743,16 @@ class ReleaseSearchService
                         );
                     }
                 }
+            } elseif ($field === 'filename') {
+                // File names live in release_files, not on the releases table.
+                $query->whereExists(function ($files) use ($value): void {
+                    $files->selectRaw('1')
+                        ->from('release_files')
+                        ->whereColumn('release_files.releases_id', 'releases.id');
+                    foreach (preg_split('/\s+/u', trim($value)) ?: [] as $term) {
+                        $files->where('release_files.name', 'LIKE', '%'.addcslashes($term, '%_\\').'%');
+                    }
+                });
             } else {
                 foreach (preg_split('/\s+/u', trim($value)) ?: [] as $term) {
                     $query->where($field, 'LIKE', '%'.addcslashes($term, '%_\\').'%');
@@ -1986,6 +1997,7 @@ class ReleaseSearchService
             "SELECT r.id, r.searchname, r.guid, r.postdate, r.categories_id, r.size,
                     r.totalpart, r.fromname, r.grabs, r.comments, r.adddate,
                     r.videos_id, r.haspreview, r.jpgstatus, r.nfostatus,
+                    cp.id AS categoryparentid,
                     CONCAT(cp.title, ' > ', c.title) AS category_name,
                     MAX(df.failed) AS failed_count,
                     COUNT(DISTINCT rr.id) AS total_report_count,

@@ -175,16 +175,17 @@ class AdditionalCandidateQueryTest extends TestCase
         $this->assertSame([1], $third->pluck('id')->all());
     }
 
-    public function test_a_release_with_a_future_archive_retry_time_is_still_a_candidate(): void
+    public function test_legacy_archive_delays_do_not_postpone_final_processing(): void
     {
         DB::table('categories')->insert(['id' => 1, 'disablepreview' => 0]);
         DB::table('releases')->insert([
             $this->releaseRow(1, 'a', postdate: '2026-07-12 10:00:00', archiveRetryAt: now()->addDay()),
             $this->releaseRow(2, 'a', postdate: '2026-07-12 09:00:00'),
+            $this->releaseRow(3, 'a', postdate: '2026-07-12 08:00:00', archiveRetryAt: now()->subMinute()),
         ]);
 
-        $this->assertSame(['total' => 2, 'available' => 2], AdditionalCandidateQuery::backlogCounts());
-        $this->assertSame([1, 2], AdditionalCandidateQuery::claimBatch('a', 10, 'token-one', columns: ['id'])->pluck('id')->all());
+        $this->assertSame(['total' => 3, 'available' => 3], AdditionalCandidateQuery::backlogCounts());
+        $this->assertSame([1, 2, 3], AdditionalCandidateQuery::claimBatch('a', 10, 'token-one', columns: ['id'])->pluck('id')->all());
     }
 
     /**

@@ -21,17 +21,20 @@ class RecategorizeReleaseAfterNameFix
             'fromname',
             'categories_id',
             'iscategorized',
+            'name',
             'searchname',
         ]);
 
-        if ($release === null) {
+        // A later rename owns the category now; categorizing for this event's name would undo it.
+        if ($release === null || (string) $release->searchname !== $event->newName) {
             return;
         }
 
         $result = $this->categorization->determineCategory(
             $release->groups_id,
             $event->newName,
-            (string) ($release->fromname ?? $event->poster)
+            (string) ($release->fromname ?? $event->poster),
+            sourceName: (string) ($release->name ?? ''),
         );
 
         $newCategoryId = (int) ($result['categories_id'] ?? $release->categories_id);

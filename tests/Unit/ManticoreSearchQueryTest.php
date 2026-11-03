@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use App\Services\Search\Drivers\ManticoreSearchDriver;
+use App\Services\Search\DTO\NameFixingSearchQuery;
 use App\Services\Search\DTO\ReleaseSearchQuery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -11,6 +12,27 @@ use ReflectionClass;
 
 class ManticoreSearchQueryTest extends TestCase
 {
+    #[Test]
+    public function name_fixing_search_expressions_are_scoped_to_indexed_source_fields(): void
+    {
+        $reflection = new ReflectionClass(ManticoreSearchDriver::class);
+        $driver = $reflection->newInstanceWithoutConstructor();
+        $method = $reflection->getMethod('nameFixingSearchExpression');
+
+        $this->assertSame(
+            '@@relaxed @filename (srr | srs)',
+            $method->invoke($driver, new NameFixingSearchQuery(NameFixingSearchQuery::SOURCE_SRR))
+        );
+        $this->assertSame(
+            '@@relaxed @(filename,searchname) (SDX264XXX | SDPORN)',
+            $method->invoke($driver, new NameFixingSearchQuery(NameFixingSearchQuery::SOURCE_XXX))
+        );
+        $this->assertSame(
+            '@@relaxed @media_movie_name *',
+            $method->invoke($driver, new NameFixingSearchQuery(NameFixingSearchQuery::SOURCE_MEDIA_MOVIE))
+        );
+    }
+
     #[Test]
     #[DataProvider('negationQueriesProvider')]
     public function it_preserves_negation_operators(string $input, string $expected): void
@@ -238,6 +260,42 @@ class ManticoreSearchQueryTest extends TestCase
 
         $this->assertSame(75, $driver->capturedLimit);
         $this->assertSame([101, 202], $result);
+    }
+
+    #[Test]
+    public function it_includes_document_ids_in_predb_search_records(): void
+    {
+        $driver = new class extends ManticoreSearchDriver
+        {
+            public function __construct() {}
+
+            public function getPredbIndex(): string
+            {
+                return 'predb';
+            }
+
+            public function searchIndexes(string $rt_index, ?string $searchString, array $column = [], array $searchArray = [], int $limit = 1000): array
+            {
+                return [
+                    'id' => [77],
+                    'data' => [[
+                        'title' => 'Watch4Beauty.16.03.21.Sapphira.Interview.XXX-SDX264XXX',
+                        'filename' => '',
+                        'source' => 'predb',
+                    ]],
+                ];
+            }
+        };
+
+        $this->assertSame(
+            [[
+                'id' => 77,
+                'title' => 'Watch4Beauty.16.03.21.Sapphira.Interview.XXX-SDX264XXX',
+                'filename' => '',
+                'source' => 'predb',
+            ]],
+            $driver->searchPredb('Watch4Beauty 2016 03 21')
+        );
     }
 
     #[Test]

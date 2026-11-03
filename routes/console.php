@@ -55,6 +55,12 @@ if (config('nntmux.purge_inactive_users') === true) {
     Schedule::job(new RemoveInactiveAccounts)->daily();
     Schedule::job(new PurgeDeletedAccounts)->daily();
 }
+
+if (config('nntmux.nzb_import_folder') !== null) {
+    Schedule::command('nntmux:import-nzbs --folder='.config('nntmux.nzb_import_folder').' --delete --filename')->everyFiveMinutes()->withoutOverlapping();
+    // Import NFO files from the same folder (offset 2 min after NZB import)
+    Schedule::command('nntmux:import-nfos --folder='.config('nntmux.nzb_import_folder').' --delete --delete-failed')->cron('2-59/5 * * * *')->withoutOverlapping();
+}
 // Cleanup old API requests and download logs (older than 1 day) - deferred from inline API calls
 Schedule::call(function () {
     UserRequest::clearApiRequests(false);
@@ -66,8 +72,11 @@ Schedule::command('nntmux:check-service-health')->everyMinute()->withoutOverlapp
 Schedule::command('nntmux:search-repair --limit=100')->everyMinute()->withoutOverlapping();
 // TV: retry episode lookups for shows whose episode wasn't available yet, and normalize
 // any release still carrying a legacy TV processor status.
-Schedule::command('tv:reprocess-missing-episodes --limit=500')->everyThirtyMinutes()->withoutOverlapping()->runInBackground();
+Schedule::command('tv:reprocess-missing-episodes --limit=2000')->everyThirtyMinutes()->withoutOverlapping()->runInBackground();
 Schedule::command('tv:repair-links --legacy --stuck --orphans --limit=50000')->dailyAt('05:15')->withoutOverlapping();
+// TV: link releases to episodes stored since they were processed, from local tables only (resumes where it stopped).
+Schedule::command('tv:relink-local --limit=50000')->hourlyAt(40)->withoutOverlapping()->runInBackground();
+Schedule::command('tv:relink-local --unmatched --limit=50000')->dailyAt('04:45')->withoutOverlapping()->runInBackground();
 // Tail storage/logs into the Manticore log index used by the admin log viewer search
 Schedule::command('nntmux:index-logs')->everyMinute()->withoutOverlapping()->runInBackground()->when(static fn (): bool => (bool) config('nntmux.log_viewer.index.enabled'));
 // Keep the admin dashboard snapshot (Cache::flexible) hot so admins never pay

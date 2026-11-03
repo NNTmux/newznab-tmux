@@ -387,7 +387,7 @@ class NzbCreationReliabilityTest extends TestCase
 
     private function createSchema(): void
     {
-        foreach (['parts', 'binaries', 'collections', 'release_nzb_creation_failures', 'releases', 'categories', 'root_categories', 'usenet_groups'] as $table) {
+        foreach (['parts', 'binaries', 'collections', 'release_nzb_creation_failures', 'release_nzb_passwords', 'releases', 'categories', 'root_categories', 'usenet_groups'] as $table) {
             DB::statement("DROP TABLE IF EXISTS {$table}");
         }
         DB::statement('CREATE TABLE root_categories (id INTEGER PRIMARY KEY, title VARCHAR(255), status INTEGER DEFAULT 1, disablepreview INTEGER DEFAULT 0)');
@@ -411,6 +411,11 @@ class NzbCreationReliabilityTest extends TestCase
             last_error TEXT NULL,
             created_at DATETIME NULL,
             updated_at DATETIME NULL,
+            FOREIGN KEY (releases_id) REFERENCES releases(id) ON DELETE CASCADE
+        )');
+        DB::statement('CREATE TABLE release_nzb_passwords (
+            releases_id INTEGER PRIMARY KEY,
+            password VARCHAR(255) NOT NULL,
             FOREIGN KEY (releases_id) REFERENCES releases(id) ON DELETE CASCADE
         )');
         DB::statement('CREATE TABLE usenet_groups (id INTEGER PRIMARY KEY, name VARCHAR(255))');

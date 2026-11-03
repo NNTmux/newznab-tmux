@@ -12,8 +12,11 @@ use App\Services\TvProcessing\Providers\AbstractTvProvider;
  */
 final class FakeTvProvider extends AbstractTvProvider
 {
-    /** @var array{search: int, all: int, episode: int, airdate: int} */
-    public array $calls = ['search' => 0, 'all' => 0, 'episode' => 0, 'airdate' => 0];
+    /** @var array{search: int, all: int, episode: int, airdate: int, resolve: int} */
+    public array $calls = ['search' => 0, 'all' => 0, 'episode' => 0, 'airdate' => 0, 'resolve' => 0];
+
+    /** @var array<int, int> This provider's show id, keyed by the show's TVDB id. */
+    public array $siteIdsByTvdb = [];
 
     /** Thrown by every API call while set. */
     public ?TvProviderException $failWith = null;
@@ -72,6 +75,14 @@ final class FakeTvProvider extends AbstractTvProvider
         }
 
         return false;
+    }
+
+    public function resolveSiteId(array $knownIds): int
+    {
+        $this->calls['resolve']++;
+        $this->fail();
+
+        return $this->siteIdsByTvdb[$knownIds['tvdb']] ?? 0;
     }
 
     public function supportsAirdateLookup(): bool

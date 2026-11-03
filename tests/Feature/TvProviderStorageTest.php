@@ -105,6 +105,17 @@ class TvProviderStorageTest extends TestCase
         $this->assertSame(2, DB::table('videos')->count());
     }
 
+    public function test_add_keeps_same_named_shows_of_another_country_or_year_apart(): void
+    {
+        $british = $this->provider->add($this->show(['title' => 'The Office', 'country' => 'GB', 'started' => '2001-07-09', 'tvdb' => 78107]));
+        $american = $this->provider->add($this->show(['title' => 'The Office', 'country' => 'US', 'started' => '2005-03-24', 'tvdb' => 73244]));
+        $undated = $this->provider->add($this->show(['title' => 'The Office', 'country' => '', 'started' => '', 'tmdb' => 2316]));
+
+        $this->assertNotSame($british, $american);
+        $this->assertSame(78107, (int) DB::table('videos')->where('id', $british)->value('tvdb'), 'The US ids must not be copied onto the UK show.');
+        $this->assertSame($british, $undated, 'Without a year or country there is no conflict, so the oldest row is reused.');
+    }
+
     public function test_title_lookups_respect_type_and_prefer_the_tightest_match(): void
     {
         $this->insertVideo("Grey's Anatomy", ['type' => AbstractTvProvider::TYPE_FILM]);

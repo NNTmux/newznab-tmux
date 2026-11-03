@@ -107,10 +107,10 @@ final class ReleaseData extends Data
                 'imdbid' => self::nullIfZero($get('imdb')),
                 'tmdbid' => self::nullIfZero($get('tmdb')),
                 'traktid' => self::nullIfZero($get('trakt')),
-                'episode_title' => $get('title'),
-                'season' => $get('series'),
-                'episode' => $get('episode'),
-                'tvairdate' => $get('firstaired'),
+                'episode_title' => self::nullableString($get('title')),
+                'season' => self::nullableString($get('series')),
+                'episode' => self::nullableString($get('episode')),
+                'tvairdate' => self::nullableString($get('firstaired')),
                 'tvdbid' => self::nullIfZero($get('tvdb')),
                 'tvrageid' => self::nullIfZero($get('tvrage')),
                 'tvmazeid' => self::nullIfZero($get('tvmaze')),
@@ -123,5 +123,14 @@ final class ReleaseData extends Data
     private static function nullIfZero(mixed $value): mixed
     {
         return ($value !== null && $value !== 0 && $value !== '' && $value !== '0') ? $value : null;
+    }
+
+    private static function nullableString(mixed $value): ?string
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        return (string) $value;
     }
 }

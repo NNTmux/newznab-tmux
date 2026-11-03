@@ -6,6 +6,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Horizon Enabled
+    |--------------------------------------------------------------------------
+    |
+    | When false, `php artisan horizon*` commands refuse to run. Useful on
+    | installs that process queues with plain workers instead of Horizon.
+    |
+    */
+
+    'enabled' => (bool) env('HORIZON_ENABLED', true),
+
+    /*
+    |--------------------------------------------------------------------------
     | Horizon Name
     |--------------------------------------------------------------------------
     |
@@ -207,7 +219,7 @@ return [
             'maxJobs' => 0,
             'memory' => 128,
             'tries' => 1,
-            'timeout' => 60,
+            'timeout' => 120,
             'nice' => 0,
         ],
     ],

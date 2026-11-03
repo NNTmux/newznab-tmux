@@ -16,7 +16,8 @@ final class ProcessingMetrics
      */
     private array $stageNanoseconds = [];
 
-    public function __construct()
+    /** @param (Closure(): bool)|null $heartbeat */
+    public function __construct(private readonly ?Closure $heartbeat = null)
     {
         $this->startedAtNanoseconds = hrtime(true);
     }
@@ -29,6 +30,9 @@ final class ProcessingMetrics
      */
     public function measure(ProcessingStage $stage, Closure $operation): mixed
     {
+        if ($this->heartbeat !== null && ! ($this->heartbeat)()) {
+            throw new \RuntimeException('Additional processing ownership lost.');
+        }
         $startedAt = hrtime(true);
 
         try {

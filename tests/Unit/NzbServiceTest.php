@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
+use App\Models\Release;
 use App\Services\Nzb\NzbService;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
@@ -54,5 +56,28 @@ final class NzbServiceTest extends TestCase
         $messageId = $method->invoke($service, 'part01.abcd@example.test');
 
         $this->assertSame('part01.abcd@example.test', $messageId);
+    }
+
+    /**
+     * @return array<string, array{0: string, 1: string, 2: string}>
+     */
+    public static function metaNameProvider(): array
+    {
+        $wrapped = '[80/98] "MLB__NZBSPLIT__d5e69bbf16e52f8bc43063b814526b7f__NZBSPLIT__MLB_RS_2026_Detroit_Tigers_vs_Chicago_White_Sox_20_09_720pEN60fps_DSN.7z.080" yEnc';
+
+        return [
+            'nzbsplit uses the clean searchname' => [$wrapped, 'MLB.RS.2026.Detroit.Tigers.vs.Chicago.White.Sox.20.09.720pEN60fps.DSN.PreDB', 'MLB.RS.2026.Detroit.Tigers.vs.Chicago.White.Sox.20.09.720pEN60fps.DSN.PreDB'],
+            'nzbsplit with a wrapped searchname uses the parsed title' => [$wrapped, $wrapped, 'MLB.RS.2026.Detroit.Tigers.vs.Chicago.White.Sox.20.09.720pEN60fps.DSN'],
+            'ordinary release keeps its name' => ['[01/20] - "Some.Release.part01.rar" yEnc', 'Some.Release', '[01/20] - "Some.Release.part01.rar" yEnc'],
+        ];
+    }
+
+    #[DataProvider('metaNameProvider')]
+    public function test_meta_name_uses_clean_title_for_nzb_split_releases(string $name, string $searchName, string $expected): void
+    {
+        $service = (new ReflectionClass(NzbService::class))->newInstanceWithoutConstructor();
+        $release = (new Release)->forceFill(['name' => $name, 'searchname' => $searchName]);
+
+        $this->assertSame($expected, $service->metaName($release));
     }
 }

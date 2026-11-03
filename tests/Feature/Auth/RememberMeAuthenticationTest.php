@@ -14,15 +14,19 @@ use Illuminate\Auth\Events\OtherDeviceLogout;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\View\Factory as ViewFactory;
+use Illuminate\View\View;
 use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PragmaRX\Google2FALaravel\Facade as Google2FA;
+use ReflectionClass;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
@@ -79,12 +83,6 @@ class RememberMeAuthenticationTest extends TestCase
         DB::reconnect();
 
         $this->createSchema();
-        Schema::create('content', function (Blueprint $table): void {
-            $table->increments('id');
-            $table->integer('status');
-            $table->integer('contenttype');
-            $table->integer('ordinal')->nullable();
-        });
         app(PermissionRegistrar::class)->forgetCachedPermissions();
         $this->app->instance(PasswordBreachService::class, new class extends PasswordBreachService
         {
@@ -338,6 +336,52 @@ class RememberMeAuthenticationTest extends TestCase
             UserLoggedIn::class,
             fn (UserLoggedIn $event): bool => $event->user->is($user) && $event->ip === '203.0.113.42'
         );
+    }
+
+    public function test_stale_last_visit_is_checkpointed_without_dispatching_login_event(): void
+    {
+        $this->travelTo(now()->startOfSecond());
+        $user = $this->createUser('stale-last-visit@example.test');
+        $user->forceFill(['lastlogin' => now()->subHours(4)])->save();
+
+        Event::fake([UserLoggedIn::class]);
+        config()->set('nntmux_settings.store_user_ip', true);
+        Cache::flush();
+        $this->actingAs($user->fresh());
+        request()->server->set('REMOTE_ADDR', '203.0.113.44');
+
+        $this->composeGlobalData();
+
+        Event::assertNotDispatched(UserLoggedIn::class);
+        $checkpointedUser = $user->fresh();
+        $this->assertInstanceOf(User::class, $checkpointedUser);
+        $this->assertSame(now()->toDateTimeString(), $checkpointedUser->lastlogin?->toDateTimeString());
+        $this->assertSame('203.0.113.44', $checkpointedUser->host);
+
+        $this->travel(1)->minute();
+        $this->composeGlobalData();
+
+        Event::assertNotDispatched(UserLoggedIn::class);
+        $unchangedUser = $user->fresh();
+        $this->assertInstanceOf(User::class, $unchangedUser);
+        $this->assertSame(now()->subMinute()->toDateTimeString(), $unchangedUser->lastlogin?->toDateTimeString());
+    }
+
+    public function test_recent_last_visit_is_not_refreshed_or_logged(): void
+    {
+        $this->travelTo(now()->startOfSecond());
+        $user = $this->createUser('recent-last-visit@example.test');
+        $lastLogin = now()->subHours(2);
+        $user->forceFill(['lastlogin' => $lastLogin])->save();
+
+        Event::fake([UserLoggedIn::class]);
+        Cache::flush();
+        $this->actingAs($user->fresh());
+
+        $this->composeGlobalData();
+
+        Event::assertNotDispatched(UserLoggedIn::class);
+        $this->assertSame($lastLogin->toDateTimeString(), $user->fresh()?->lastlogin?->toDateTimeString());
     }
 
     public function test_two_factor_login_preserves_remember_me_until_otp_success(): void
@@ -621,6 +665,10 @@ class RememberMeAuthenticationTest extends TestCase
     protected function createSchema(): void
     {
         foreach ([
+            'user_excluded_categories',
+            'categories',
+            'root_categories',
+            'content',
             'user_activities',
             'trusted_devices',
             'role_has_permissions',
@@ -633,6 +681,31 @@ class RememberMeAuthenticationTest extends TestCase
         ] as $table) {
             Schema::dropIfExists($table);
         }
+
+        Schema::create('content', function (Blueprint $table): void {
+            $table->increments('id');
+            $table->unsignedInteger('contenttype');
+            $table->boolean('status');
+            $table->unsignedInteger('ordinal')->nullable();
+        });
+
+        Schema::create('root_categories', function (Blueprint $table): void {
+            $table->increments('id');
+            $table->string('title');
+        });
+
+        Schema::create('categories', function (Blueprint $table): void {
+            $table->increments('id');
+            $table->string('title');
+            $table->unsignedInteger('root_categories_id');
+            $table->text('description')->nullable();
+        });
+
+        Schema::create('user_excluded_categories', function (Blueprint $table): void {
+            $table->increments('id');
+            $table->unsignedInteger('users_id');
+            $table->unsignedInteger('categories_id');
+        });
 
         Schema::create('roles', function (Blueprint $table): void {
             $table->increments('id');
@@ -744,6 +817,18 @@ class RememberMeAuthenticationTest extends TestCase
         $user->assignRole($role);
 
         return $user->fresh();
+    }
+
+    private function composeGlobalData(): void
+    {
+        $reflection = new ReflectionClass(GlobalDataComposer::class);
+        $resolvedData = $reflection->getProperty('resolvedData');
+        $resolvedData->setValue(null, null);
+
+        $view = app(ViewFactory::class)->make('auth.login');
+        $this->assertInstanceOf(View::class, $view);
+
+        app(GlobalDataComposer::class)->compose($view);
     }
 
     private function setEnvironmentValue(string $key, ?string $value): void

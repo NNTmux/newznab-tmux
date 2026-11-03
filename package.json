@@ -3,7 +3,7 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "build": "php artisan typescript:transform --quiet && vite build",
+        "build": "php artisan typescript:transform --force && vite build",
         "types": "php artisan typescript:transform",
         "format": "prettier --write 'resources/**/*.{css,js,vue}'",
         "package-update": "ncu -u -x prettier-plugin-tailwindcss"

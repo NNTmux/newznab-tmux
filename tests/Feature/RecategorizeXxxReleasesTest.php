@@ -41,6 +41,7 @@ class RecategorizeXxxReleasesTest extends TestCase
             ['id' => Category::XXX_OTHER, 'root_categories_id' => Category::XXX_ROOT, 'title' => 'Other'],
             ['id' => 6020, 'root_categories_id' => Category::XXX_ROOT, 'title' => 'WMV'],
             ['id' => 6041, 'root_categories_id' => Category::XXX_ROOT, 'title' => 'HD Clips'],
+            ['id' => 6070, 'root_categories_id' => Category::XXX_ROOT, 'title' => 'Packs'],
             ['id' => 6080, 'root_categories_id' => Category::XXX_ROOT, 'title' => 'SD (legacy)'],
             ['id' => Category::MOVIE_HD, 'root_categories_id' => Category::MOVIE_ROOT, 'title' => 'HD'],
         ]);
@@ -114,14 +115,14 @@ class RecategorizeXxxReleasesTest extends TestCase
         $this->artisan('releases:recategorize-xxx', ['--apply' => true])
             ->expectsOutput('Inspected: 6; Changes: 5; Skipped: 0; Failed: 0.')
             ->expectsOutput('Database categories updated: 5; Search refreshes requested: 5.')
-            ->expectsOutput('Removed retired XXX categories: XXX > WMV (6020), XXX > HD Clips (6041), XXX > SD (legacy) (6080). User exclusions dropped: 3; category regexes moved: 1.')
+            ->expectsOutput('Removed retired XXX categories: XXX > WMV (6020), XXX > HD Clips (6041), XXX > Packs (6070), XXX > SD (legacy) (6080). User exclusions dropped: 3; category regexes moved: 1.')
             ->assertSuccessful();
 
         foreach ($expected as $id => $categoryId) {
             $this->assertSame($categoryId, DB::table('releases')->where('id', $id)->value('categories_id'));
         }
         $this->assertSame($cacheVersion + 1, Cache::get('releases:cache_version', 1));
-        $this->assertFalse(DB::table('categories')->whereIn('id', [6020, 6041, 6080])->exists());
+        $this->assertFalse(DB::table('categories')->whereIn('id', [6020, 6041, 6070, 6080])->exists());
         $this->assertSame(
             [[2, Category::XXX_HD]],
             DB::table('user_excluded_categories')->orderBy('users_id')->get()
@@ -133,16 +134,19 @@ class RecategorizeXxxReleasesTest extends TestCase
     public function test_releases_never_leave_xxx_and_retired_ones_use_the_fallback(): void
     {
         $retired = $this->insertRelease('Some.Movie.2024.1080p.BluRay.x264-GROUP', 6041);
+        $oldPacks = $this->insertRelease('Some.Movie.2024.1080p.BluRay.x264-GROUP', 6070);
         $live = $this->insertRelease('Some.Movie.2024.1080p.BluRay.x264-GROUP', Category::XXX_PACK);
         $formerXvid = $this->insertRelease('Some.Movie.2024.1080p.BluRay.x264-GROUP', Category::XXX_SD);
         $this->insertRelease('Some.Movie.2024.1080p.BluRay.x264-GROUP', Category::MOVIE_HD);
         Search::shouldReceive('updateRelease')->once()->with($retired);
+        Search::shouldReceive('updateRelease')->once()->with($oldPacks);
 
         $this->artisan('releases:recategorize-xxx', ['--apply' => true])
-            ->expectsOutput('Inspected: 3; Changes: 1; Skipped: 0; Failed: 0.')
+            ->expectsOutput('Inspected: 4; Changes: 2; Skipped: 0; Failed: 0.')
             ->assertSuccessful();
 
         $this->assertSame(Category::XXX_HD, DB::table('releases')->where('id', $retired)->value('categories_id'));
+        $this->assertSame(Category::XXX_PACK, DB::table('releases')->where('id', $oldPacks)->value('categories_id'));
         $this->assertSame(Category::XXX_PACK, DB::table('releases')->where('id', $live)->value('categories_id'));
         $this->assertSame(Category::XXX_SD, DB::table('releases')->where('id', $formerXvid)->value('categories_id'));
     }
@@ -158,7 +162,7 @@ class RecategorizeXxxReleasesTest extends TestCase
             ->expectsOutput('Retired XXX categories still hold 1 releases, so they were kept. Run again with --apply and without --limit to finish.')
             ->assertSuccessful();
 
-        $this->assertSame(3, DB::table('categories')->whereIn('id', [6020, 6041, 6080])->count());
+        $this->assertSame(4, DB::table('categories')->whereIn('id', [6020, 6041, 6070, 6080])->count());
         $this->assertSame(6041, DB::table('user_excluded_categories')->value('categories_id'));
     }
 

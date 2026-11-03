@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\View\Composers;
 
-use App\Events\UserLoggedIn;
 use App\Models\Category;
 use App\Models\Content;
 use App\Models\User;
 use App\Services\Configuration\ConfigurationProvider;
 use App\Services\SiteLogoService;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -71,21 +71,12 @@ class GlobalDataComposer
         });
 
         if (Auth::check()) {
-            $userId = Auth::id();
+            /** @var User $userdata */
+            $userdata = Auth::user();
+            $userId = (int) $userdata->getKey();
 
-            // User data with category exclusions (short cache per user)
-            $userdata = $this->rememberWithCacheFallback('composer_user_'.$userId, self::CACHE_TTL, function () use ($userId) {
-                $user = User::find($userId);
-                $user->categoryexclusions = User::getCachedCategoryExclusionById($userId);
-
-                return $user;
-            });
-
-            // Update last login every 3 hours (outside of cache to avoid stale checks)
-            if (now()->subHours(3) > $userdata->lastlogin) {
-                $userIp = config('nntmux_settings.store_user_ip') ? (request()->ip() ?? request()->getClientIp()) : '';
-                event(new UserLoggedIn($userdata, $userIp));
-            }
+            $this->checkpointLastVisit($userdata, $userId);
+            $userdata->categoryexclusions = User::getCachedCategoryExclusionById($userId);
 
             // Cached menu categories per user (depends on their exclusions)
             $parentcatlist = $this->rememberWithCacheFallback('menu_user_'.$userId, self::CACHE_TTL, function () use ($userdata) {
@@ -113,6 +104,29 @@ class GlobalDataComposer
         }
 
         return $viewData;
+    }
+
+    private function checkpointLastVisit(User $user, int $userId): void
+    {
+        $checkpointAt = now();
+        $cutoff = $checkpointAt->copy()->subHours(3);
+
+        if ($user->lastlogin !== null && $user->lastlogin >= $cutoff) {
+            return;
+        }
+
+        $userIp = config('nntmux_settings.store_user_ip') ? (request()->ip() ?? request()->getClientIp()) : '';
+
+        User::query()
+            ->whereKey($userId)
+            ->where(static function (Builder $query) use ($cutoff): void {
+                $query->whereNull('lastlogin')
+                    ->orWhere('lastlogin', '<', $cutoff);
+            })
+            ->update([
+                'lastlogin' => $checkpointAt,
+                'host' => $userIp,
+            ]);
     }
 
     /**

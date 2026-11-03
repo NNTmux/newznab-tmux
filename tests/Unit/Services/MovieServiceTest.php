@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Services;
 
+use aharen\OMDbAPI;
 use App\Facades\Search;
+use App\Models\MovieInfo;
 use App\Models\Release;
 use App\Services\ImdbScraper;
 use App\Services\MovieService;
+use App\Services\MoviesProcessor;
+use App\Services\Runners\PostProcessRunner;
 use App\Services\TmdbClient;
 use App\Services\TraktService;
 use App\Services\TvProcessing\Providers\TraktProvider;
@@ -15,11 +19,14 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\Unit\ImdbScraperTestCase;
 
@@ -59,6 +66,7 @@ class MovieServiceTest extends ImdbScraperTestCase
             $table->unsignedInteger('categories_id')->default(0);
             $table->string('imdbid')->nullable();
             $table->unsignedBigInteger('movieinfo_id')->nullable();
+            $table->boolean('isrenamed')->default(false);
         });
     }
 
@@ -424,6 +432,58 @@ class MovieServiceTest extends ImdbScraperTestCase
     }
 
     #[Test]
+    public function it_uses_an_embedded_imdb_id_before_searching_other_sources(): void
+    {
+        $service = new class extends MovieService
+        {
+            public int $localSearchCalls = 0;
+
+            protected function localIMDBSearch(): string|false
+            {
+                $this->localSearchCalls++;
+
+                return parent::localIMDBSearch();
+            }
+        };
+        $service->echooutput = false;
+        MovieInfo::query()->create(['imdbid' => '0137523', 'title' => 'Example Movie', 'year' => '2024']);
+        Release::query()->insert([
+            'id' => 1,
+            'searchname' => 'Example.Movie.2024.1080p.BluRay.imdb-tt0137523',
+            'categories_id' => 2040,
+            'imdbid' => null,
+        ]);
+        Search::shouldReceive('updateRelease')->once()->with(1);
+
+        $service->processMovieReleases();
+
+        $this->assertSame('0137523', Release::query()->whereKey(1)->value('imdbid'));
+        $this->assertSame('SearchName', $service->service);
+        $this->assertSame(0, $service->localSearchCalls);
+    }
+
+    #[Test]
+    public function it_searches_other_sources_when_an_embedded_imdb_id_is_rejected(): void
+    {
+        $service = new MovieService;
+        $service->echooutput = false;
+        MovieInfo::query()->create(['imdbid' => '13622970', 'title' => 'Another Movie', 'year' => '2020']);
+        MovieInfo::query()->create(['imdbid' => '0137523', 'title' => 'Example Movie', 'year' => '2024']);
+        Release::query()->insert([
+            'id' => 1,
+            'searchname' => 'Example.Movie.2024.1080p.BluRay.imdb-tt13622970',
+            'categories_id' => 2040,
+            'imdbid' => null,
+        ]);
+        Search::shouldReceive('updateRelease')->once()->with(1);
+
+        $service->processMovieReleases();
+
+        $this->assertSame('0137523', Release::query()->whereKey(1)->value('imdbid'));
+        $this->assertSame('Local DB', $service->service);
+    }
+
+    #[Test]
     public function it_marks_each_failed_lookup_before_moving_to_the_next_release(): void
     {
         Cache::flush();
@@ -468,6 +528,470 @@ class MovieServiceTest extends ImdbScraperTestCase
         $this->assertSame('', Release::query()->whereKey(2)->value('imdbid'));
         $this->assertNull(Release::query()->whereKey(3)->value('imdbid'));
         Log::shouldHaveReceived('warning')->once();
+    }
+
+    #[Test]
+    public function it_drops_the_old_movie_link_when_the_lookup_of_a_renamed_release_fails(): void
+    {
+        Cache::flush();
+        config(['nntmux_api.omdb_api_key' => '', 'nntmux_api.trakttv_api_key' => '']);
+        $this->app->instance(ImdbScraper::class, Mockery::mock(ImdbScraper::class, ['isScrapingEnabled' => false]));
+        $this->app->instance(TmdbClient::class, Mockery::mock(TmdbClient::class, ['isConfigured' => false]));
+        Search::shouldReceive('updateRelease')->once()->with(1);
+
+        // A rename reset imdbid but the release still points at the movie of its old name.
+        Release::query()->insert([
+            'id' => 1,
+            'searchname' => 'Ghostbusters.2.German.1989.AC3.DVDRip.XviD-CENTi',
+            'categories_id' => 2040,
+            'imdbid' => null,
+            'movieinfo_id' => 7,
+        ]);
+
+        $service = new class extends MovieService
+        {
+            protected function localIMDBSearch(): string|false
+            {
+                return false;
+            }
+        };
+        $service->echooutput = false;
+
+        $service->processMovieReleases();
+
+        $this->assertSame('', Release::query()->whereKey(1)->value('imdbid'));
+        $this->assertNull(Release::query()->whereKey(1)->value('movieinfo_id'));
+    }
+
+    /**
+     * @param  list<string>  $alternates
+     */
+    #[Test]
+    #[DataProvider('releaseNameProvider')]
+    public function it_parses_title_and_year_from_release_names(string $searchName, string $title, string $year, array $alternates): void
+    {
+        $service = new MovieService;
+
+        $this->assertTrue($this->invokeParse($service, $searchName));
+        $this->assertSame($title, $this->getMovieServiceProperty($service, 'currentTitle'));
+        $this->assertSame($year, $this->getMovieServiceProperty($service, 'currentYear'));
+        $this->assertSame($alternates, $this->getMovieServiceProperty($service, 'alternateTitles'));
+    }
+
+    /**
+     * Real searchnames from unmatched production releases.
+     *
+     * @return array<string, array{string, string, string, list<string>}>
+     */
+    public static function releaseNameProvider(): array
+    {
+        return [
+            'hyphenated title' => ['Re-Animator.1985.2160p.UHD.BDRip.HEVC.10bit.DV.HDR.DTS-HD.MA.5.1-MUSHR00M', 'Re-Animator', '1985', []],
+            'hyphenated multi-word title' => ['Spider-Man.Brand.New.Day.2026.2160p.iT.WEB-DL.DDP5.1.Atmos.H.265-Kitsune', 'Spider-Man Brand New Day', '2026', []],
+            'two letter title' => ['Pi.1998.UHD.BluRay.1080p.DD+Atmos.5.1.DoVi.HDR10+.x265-SM737', 'Pi', '1998', []],
+            'apostrophe' => ["The.Draughtsman's.Contract.1982.720p.BluRay.DD+2.0.x264-playHD", "The Draughtsman's Contract", '1982', []],
+            'no year, language tags' => ['Planes.German.DL.1080p.BluRay.X264-EXQUiSiTE', 'Planes', '', []],
+            'language tag before year' => ['Armand.German.2024.AC3.DVDRip.x264-LIM', 'Armand', '2024', []],
+            'language word in title' => ['The.German.2008.1080p.BluRay.x264-GRP', 'The German', '2008', []],
+            'language word in title, no year' => ['The.German.1080p.BluRay.x264-GRP', 'The German', '', []],
+            'language word as title' => ['French.2024.1080p.BluRay.x264-GRP', 'French', '2024', []],
+            'number in title' => ['Blade.Runner.2049.2017.1080p.BluRay.x264-SPARKS', 'Blade Runner 2049', '2017', []],
+            'year as title' => ['1917.2019.1080p.BluRay.x264', '1917', '2019', []],
+            'dash separated titles' => ['Starman - Uzayli Yildiz Adam (1984) 1080p NF WEBDL H264 [DUAL] DDP 51@TSRG', 'Starman - Uzayli Yildiz Adam', '1984', ['Starman', 'Uzayli Yildiz Adam']],
+            'bracketed title' => ['Orumcek Adam Yepyeni Bir Gun (Spider Man Brand New Day) 2026 WEBDL 2160p X265 10Bit DDP 5.1 [TR-EN] TurkSeeD', 'Orumcek Adam Yepyeni Bir Gun', '2026', ['Spider Man Brand New Day']],
+        ];
+    }
+
+    #[Test]
+    public function it_does_not_keep_the_previous_releases_title_when_parsing(): void
+    {
+        $service = new MovieService;
+
+        $this->assertTrue($this->invokeParse($service, 'Example.Movie.2024.1080p.BluRay.x264-GRP'));
+        $this->assertFalse($this->invokeParse($service, 'Das.Strafgericht.S2025E975.German.576p.RTLP.WEB-DL.AAC2.0.H.264-GLOTZE'));
+        $this->assertSame('', $this->getMovieServiceProperty($service, 'currentTitle'));
+        $this->assertSame('', $this->getMovieServiceProperty($service, 'currentYear'));
+    }
+
+    #[Test]
+    public function it_matches_local_titles_that_differ_only_in_punctuation(): void
+    {
+        Cache::flush();
+
+        $service = new MovieService;
+        $service->update(['imdbid' => '30460310', 'title' => 'Spider-Man: Brand New Day', 'year' => '2026']);
+
+        $this->invokeParse($service, 'Spider-Man.Brand.New.Day.2026.2160p.iT.WEB-DL.DDP5.1.Atmos.H.265-Kitsune');
+
+        $this->assertSame('30460310', $this->invokeLocalIMDBSearch($service));
+    }
+
+    #[Test]
+    public function it_does_not_match_a_short_title_to_a_longer_similar_one(): void
+    {
+        Cache::flush();
+
+        $service = new MovieService;
+        $service->update(['imdbid' => '1234567', 'title' => 'Pig', 'year' => '1998']);
+
+        $this->invokeParse($service, 'Pi.1998.UHD.BluRay.1080p.DD+Atmos.5.1.DoVi.HDR10+.x265-SM737');
+
+        $this->assertFalse($this->invokeLocalIMDBSearch($service));
+    }
+
+    #[Test]
+    public function it_matches_a_local_title_that_starts_a_german_release_title_from_the_same_year(): void
+    {
+        Cache::flush();
+
+        $service = new MovieService;
+        $service->update(['imdbid' => '0986263', 'title' => 'Surrogates', 'year' => '2009']);
+
+        $this->invokeParse($service, 'Surrogates.Mein.zweites.Ich.2009.GERMAN.DL.1080p.WEB.H264.iNTERNAL-SunDry');
+
+        $this->assertSame('0986263', $this->invokeLocalIMDBSearch($service));
+    }
+
+    #[Test]
+    public function it_rejects_ambiguous_wrong_year_or_sequel_prefix_matches(): void
+    {
+        $service = new MovieService;
+        $service->update(['imdbid' => '1298649', 'title' => 'The Watch', 'year' => '2012']);
+        $service->update(['imdbid' => '18352618', 'title' => 'The Watch', 'year' => '2012']);
+        $service->update(['imdbid' => '0986263', 'title' => 'Surrogates', 'year' => '2009']);
+        $service->update(['imdbid' => '1691917', 'title' => 'Planes', 'year' => '2014']);
+
+        $cases = [
+            'The.Watch.Nachbarn.der.3.Art.2012.German.DL.1080p.BluRay.AVC-VEiL',
+            'Surrogates.Mein.zweites.Ich.2010.GERMAN.DL.1080p.WEB.H264-SunDry',
+            'Planes.2.Immer.im.Einsatz.2014.German.DL.1080p.BDRip.AV1',
+        ];
+
+        foreach ($cases as $searchName) {
+            Cache::flush();
+            $this->invokeParse($service, $searchName);
+            $this->assertFalse($this->invokeLocalIMDBSearch($service), $searchName);
+        }
+    }
+
+    #[Test]
+    public function it_accepts_a_tmdb_movie_by_its_german_translation(): void
+    {
+        Cache::flush();
+        $tmdb = $this->bindTmdbClient();
+        $tmdb->shouldReceive('getMovie')->once()->andReturn($this->tmdbMovie());
+
+        $service = new MovieService;
+        $service->echooutput = false;
+        $this->invokeParse($service, 'Der.Teufel.traegt.Prada.2006.OPEN.MATTE.German.AC3D.DL.1080p.AmazonHD.x265-FuN');
+
+        $movie = $service->fetchTMDBProperties('0458352');
+
+        $this->assertIsArray($movie);
+        $this->assertSame('0458352', $movie['imdbid']);
+    }
+
+    #[Test]
+    public function it_does_not_let_one_releases_tmdb_rejection_hide_the_movie_from_another(): void
+    {
+        Cache::flush();
+        $tmdb = $this->bindTmdbClient();
+        $tmdb->shouldReceive('getMovie')->once()->andReturn($this->tmdbMovie());
+
+        $service = new MovieService;
+        $service->echooutput = false;
+
+        $this->invokeParse($service, 'Moana.2016.1080p.BluRay.x264-GRP');
+        $this->assertFalse($service->fetchTMDBProperties('0458352'));
+
+        $this->invokeParse($service, 'The.Devil.Wears.Prada.2006.1080p.BluRay.x264-GRP');
+        $this->assertIsArray($service->fetchTMDBProperties('0458352'));
+    }
+
+    #[Test]
+    public function it_retries_a_german_tmdb_search_with_umlauts_restored(): void
+    {
+        Cache::flush();
+        $this->disableOtherMovieProviders();
+        $tmdb = $this->bindTmdbClient();
+        $tmdb->shouldReceive('searchMovies')->andReturnUsing(
+            fn (string $query): array => $query === 'Der Teufel trägt Prada'
+                ? ['total_results' => 1, 'results' => [['id' => 350, 'release_date' => '2006-06-29']]]
+                : ['total_results' => 0, 'results' => []]
+        );
+        $tmdb->shouldReceive('getMovie')->with('350', Mockery::any())->once()->andReturn($this->tmdbMovie());
+        Search::shouldReceive('updateRelease')->with(1);
+        Search::shouldReceive('insertMovie');
+
+        Release::query()->insert([
+            'id' => 1,
+            'searchname' => 'Der.Teufel.traegt.Prada.2006.German.DL.2160p.HDR.WEBRip.AV1',
+            'categories_id' => 2010,
+            'imdbid' => null,
+        ]);
+
+        $service = $this->makeServiceWithoutCovers();
+        $service->processMovieReleases();
+
+        $this->assertSame('0458352', Release::query()->whereKey(1)->value('imdbid'));
+        $this->assertNotNull(Release::query()->whereKey(1)->value('movieinfo_id'));
+        $this->assertSame('TMDB', $service->service);
+    }
+
+    #[Test]
+    public function it_can_match_a_release_without_a_year_through_tmdb(): void
+    {
+        Cache::flush();
+        $this->disableOtherMovieProviders();
+        $tmdb = $this->bindTmdbClient();
+        $tmdb->shouldReceive('searchMovies')->with('Planes')->once()
+            ->andReturn(['total_results' => 1, 'results' => [['id' => 69735, 'release_date' => '2013-08-09']]]);
+        $tmdb->shouldReceive('getMovie')->once()->andReturn([
+            'id' => 69735,
+            'imdb_id' => 'tt1691917',
+            'title' => 'Planes',
+            'original_title' => 'Planes',
+            'release_date' => '2013-08-09',
+        ]);
+        Search::shouldReceive('updateRelease')->with(1);
+        Search::shouldReceive('insertMovie');
+
+        Release::query()->insert([
+            'id' => 1,
+            'searchname' => 'Planes.German.DL.1080p.BluRay.X264-EXQUiSiTE',
+            'categories_id' => 2010,
+            'imdbid' => null,
+        ]);
+
+        $this->makeServiceWithoutCovers()->processMovieReleases();
+
+        $this->assertSame('1691917', Release::query()->whereKey(1)->value('imdbid'));
+    }
+
+    #[Test]
+    public function it_skips_an_omdb_search_result_whose_title_does_not_match(): void
+    {
+        Cache::flush();
+
+        $service = new class extends MovieService
+        {
+            public function updateMovieInfo(string $imdbId): bool
+            {
+                return true;
+            }
+        };
+        $service->echooutput = false;
+        $service->omdbapikey = 'test-key';
+        $omdbApi = Mockery::mock(OMDbAPI::class);
+        $service->omdbApi = $omdbApi;
+        $omdbApi->shouldReceive('search')->andReturn((object) [
+            'message' => 'OK',
+            'data' => (object) [
+                'Response' => 'True',
+                'Search' => [
+                    (object) ['Title' => 'Completely Different', 'Year' => '2024', 'imdbID' => 'tt1111111', 'Type' => 'movie'],
+                    (object) ['Title' => 'Example Movie', 'Year' => '2024', 'imdbID' => 'tt0137523', 'Type' => 'movie'],
+                ],
+            ],
+        ]);
+        Search::shouldReceive('updateRelease')->with(7)->once();
+
+        Release::query()->insert([
+            'id' => 7,
+            'searchname' => 'Example.Movie.2024.1080p.BluRay.x264-GRP',
+            'categories_id' => 2040,
+            'imdbid' => null,
+        ]);
+        $this->invokeParse($service, 'Example.Movie.2024.1080p.BluRay.x264-GRP');
+
+        $method = new \ReflectionMethod($service, 'searchOMDbAPI');
+        $this->assertTrue($method->invoke($service, 7));
+        $this->assertSame('0137523', Release::query()->whereKey(7)->value('imdbid'));
+    }
+
+    #[Test]
+    public function it_stores_decimal_ratings_keeps_created_at_and_links_waiting_releases(): void
+    {
+        Cache::flush();
+        Search::shouldReceive('insertMovie');
+        Search::shouldReceive('updateRelease')->with(8)->once();
+
+        MovieInfo::query()->insert([
+            'imdbid' => '0137523',
+            'title' => 'Example Movie',
+            'year' => '2024',
+            'created_at' => '2020-01-01 00:00:00',
+            'updated_at' => '2020-01-01 00:00:00',
+        ]);
+        Release::query()->insert([
+            'id' => 8,
+            'searchname' => 'Example.Movie.2024.1080p.BluRay.x264-GRP',
+            'categories_id' => 2040,
+            'imdbid' => '0137523',
+            'movieinfo_id' => null,
+        ]);
+
+        $service = new class extends MovieService
+        {
+            public function fetchTMDBProperties(string $imdbId, bool $text = false): array|false
+            {
+                return ['title' => 'Example Movie', 'tmdbid' => 550, 'rating' => 7.8, 'year' => 2024, 'cover' => '', 'backdrop' => ''];
+            }
+
+            public function fetchIMDBProperties(string $imdbId): array|false
+            {
+                return false;
+            }
+
+            public function fetchTraktTVProperties(string $imdbId): array|false
+            {
+                return false;
+            }
+
+            public function fetchOmdbAPIProperties(string $imdbId): array|false
+            {
+                return false;
+            }
+
+            protected function fetchFanartTVProperties(string $imdbId): false|array
+            {
+                return false;
+            }
+        };
+        $service->echooutput = false;
+
+        $this->assertTrue($service->updateMovieInfo('0137523'));
+
+        $movie = MovieInfo::query()->where('imdbid', '0137523')->firstOrFail();
+        $this->assertSame('7.8', $movie->rating);
+        $this->assertSame('2020-01-01 00:00:00', $movie->created_at?->format('Y-m-d H:i:s'));
+        $this->assertSame($movie->id, (int) Release::query()->whereKey(8)->value('movieinfo_id'));
+    }
+
+    #[Test]
+    public function it_does_not_overwrite_a_release_relinked_by_another_worker_while_linking(): void
+    {
+        Search::shouldReceive('updateRelease')->with(11)->once();
+
+        Release::query()->insert([
+            ['id' => 10, 'searchname' => 'Example.Movie.2024', 'categories_id' => 2040, 'imdbid' => '0137523', 'movieinfo_id' => null],
+            ['id' => 11, 'searchname' => 'Example.Movie.2024', 'categories_id' => 2040, 'imdbid' => '0137523', 'movieinfo_id' => null],
+        ]);
+
+        // Another worker re-matches release 10 right after this worker selected it.
+        $interfered = false;
+        DB::listen(function (QueryExecuted $query) use (&$interfered): void {
+            if (! $interfered && str_starts_with($query->sql, 'select "id" from "releases"')) {
+                $interfered = true;
+                Release::query()->whereKey(10)->update(['imdbid' => '9999999', 'movieinfo_id' => 999]);
+            }
+        });
+
+        $method = new \ReflectionMethod(MovieService::class, 'linkReleasesToMovieInfo');
+        $method->invoke(new MovieService, '0137523', 42);
+
+        $this->assertTrue($interfered);
+        $this->assertSame(999, (int) Release::query()->whereKey(10)->value('movieinfo_id'));
+        $this->assertSame('9999999', Release::query()->whereKey(10)->value('imdbid'));
+        $this->assertSame(42, (int) Release::query()->whereKey(11)->value('movieinfo_id'));
+    }
+
+    #[Test]
+    public function it_passes_the_movie_lookup_mode_to_worker_commands(): void
+    {
+        $method = new \ReflectionMethod(PostProcessRunner::class, 'postProcessGuidCommand');
+        $runner = new PostProcessRunner;
+
+        $movieCommand = $method->invoke($runner, 'movie', (object) ['id' => 'a', 'renamed' => 2]);
+        $nfoCommand = $method->invoke($runner, 'nfo', (object) ['id' => 'a']);
+
+        $this->assertSame(['postprocess:guid', 'movie', 'a', '2'], array_slice($movieCommand, 2));
+        $this->assertSame(['postprocess:guid', 'nfo', 'a'], array_slice($nfoCommand, 2));
+    }
+
+    #[Test]
+    public function it_accepts_the_lookup_mode_as_a_cli_string(): void
+    {
+        Release::query()->insert([
+            'id' => 9,
+            'searchname' => 'Example.Movie.2024.1080p.BluRay.x264-GRP',
+            'categories_id' => 2040,
+            'imdbid' => null,
+            'isrenamed' => false,
+        ]);
+
+        (new MoviesProcessor(false))->process('', '', '2');
+
+        // Mode 2 only looks at renamed releases, so this one is left alone.
+        $this->assertNull(Release::query()->whereKey(9)->value('imdbid'));
+    }
+
+    private function invokeParse(MovieService $service, string $searchName): bool
+    {
+        $method = new \ReflectionMethod($service, 'parseMovieSearchName');
+
+        return $method->invoke($service, $searchName);
+    }
+
+    private function getMovieServiceProperty(MovieService $service, string $property): mixed
+    {
+        return (new \ReflectionProperty($service, $property))->getValue($service);
+    }
+
+    private function bindTmdbClient(): Mockery\MockInterface
+    {
+        $tmdb = Mockery::mock(TmdbClient::class);
+        $tmdb->shouldReceive('isConfigured')->andReturn(true);
+        $this->app->instance(TmdbClient::class, $tmdb);
+
+        return $tmdb;
+    }
+
+    private function disableOtherMovieProviders(): void
+    {
+        config([
+            'nntmux_api.omdb_api_key' => '',
+            'nntmux_api.trakttv_api_key' => '',
+            'nntmux_api.fanarttv_api_key' => '',
+        ]);
+        $this->app->instance(ImdbScraper::class, Mockery::mock(ImdbScraper::class, [
+            'isScrapingEnabled' => false,
+            'isEnabled' => false,
+        ]));
+    }
+
+    /**
+     * A MovieService that never downloads cover images.
+     */
+    private function makeServiceWithoutCovers(): MovieService
+    {
+        $service = new class extends MovieService
+        {
+            protected function hasCover(string $imdbId): bool
+            {
+                return true;
+            }
+        };
+        $service->echooutput = false;
+
+        return $service;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function tmdbMovie(): array
+    {
+        return [
+            'id' => 350,
+            'imdb_id' => 'tt0458352',
+            'title' => 'The Devil Wears Prada',
+            'original_title' => 'The Devil Wears Prada',
+            'release_date' => '2006-06-29',
+            'vote_average' => 7.4,
+            'alternative_titles' => ['titles' => [['title' => 'Devil Wears Prada']]],
+            'translations' => ['translations' => [['iso_639_1' => 'de', 'data' => ['title' => 'Der Teufel trägt Prada']]]],
+        ];
     }
 
     /**

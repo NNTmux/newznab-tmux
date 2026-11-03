@@ -16,9 +16,11 @@ return [
             'deleteAllOlderThanMinutes' => 60 * 24,
         ],
         */
-        env('TEMP_UNRAR_PATH', resource_path().'/tmp/unrar') => [
-            'deleteAllOlderThanMinutes' => 60 * 4,
-        ],
+        /*
+         * TEMP_UNRAR_PATH is intentionally not listed: this package deletes every empty
+         * subdirectory regardless of age, which removes live additional post-processing
+         * worker workspaces. PostProcessRunner prunes stale worker directories instead.
+         */
         env('TEMP_UNZIP_PATH', resource_path().'/tmp/unzip') => [
             'deleteAllOlderThanMinutes' => 60 * 4,
         ],

@@ -173,36 +173,52 @@ final class BinaryHandler
     {
         $lookupRows = array_values($rowsByArticleKey);
 
-        // One SELECT establishes both "did this row exist?" and "what is its
-        // id?", instead of two identical SELECTs (existingBinaryKeys +
-        // resolveBinaryIds) that the previous implementation issued.
-        $idsByKey = $this->selectBinaryIdsByKey($lookupRows);
+        // One SELECT establishes "did this row exist?", its id and its stored
+        // totalparts.
+        $existing = $this->selectExistingBinaries($lookupRows);
+        $idsByKey = [];
         $existingKeys = [];
-        foreach ($idsByKey as $key => $_id) {
+        foreach ($existing as $key => $row) {
+            $idsByKey[$key] = $row['id'];
             $existingKeys[$key] = true;
         }
 
-        if (DB::getDriverName() === 'sqlite') {
-            $this->bulkInsertBinariesSqlite($lookupRows);
-        } else {
-            $this->bulkInsertBinariesMysql($lookupRows);
-        }
-
-        // Only re-query for rows we couldn't satisfy from the prefetch
-        // (i.e. those that didn't exist before the bulk INSERT).
-        $missingRows = [];
+        // Only insert rows the prefetch did not find: ON DUPLICATE KEY on a
+        // known row still burns an AUTO_INCREMENT value and takes a write lock.
+        $rowsToInsert = [];
+        $totalPartsBumps = [];
         foreach ($lookupRows as $row) {
             $key = $this->binaryLookupKey((string) $row['hash'], (int) $row['collections_id']);
-            if (! isset($idsByKey[$key])) {
-                $missingRows[] = $row;
+            if (! isset($existing[$key])) {
+                $rowsToInsert[] = $row;
+
+                continue;
+            }
+            if ((int) $row['totalparts'] > $existing[$key]['totalparts']) {
+                $totalPartsBumps[(int) $row['totalparts']][] = $existing[$key]['id'];
             }
         }
 
-        if ($missingRows !== []) {
-            foreach ($this->selectBinaryIdsByKey($missingRows) as $key => $id) {
-                $idsByKey[$key] = $id;
+        // Deterministic unique-index lock order across concurrent workers.
+        usort(
+            $rowsToInsert,
+            static fn (array $a, array $b): int => [(int) $a['collections_id'], (string) $a['hash']]
+                <=> [(int) $b['collections_id'], (string) $b['hash']]
+        );
+
+        if ($rowsToInsert !== []) {
+            if (DB::getDriverName() === 'sqlite') {
+                $this->bulkInsertBinariesSqlite($rowsToInsert);
+            } else {
+                $this->bulkInsertBinariesMysql($rowsToInsert);
+            }
+
+            foreach ($this->selectExistingBinaries($rowsToInsert) as $key => $row) {
+                $idsByKey[$key] = $row['id'];
             }
         }
+
+        $this->raiseTotalParts($totalPartsBumps);
 
         foreach ($idsByKey as $key => $id) {
             if (! isset($existingKeys[$key])) {
@@ -214,14 +230,34 @@ final class BinaryHandler
     }
 
     /**
-     * @param  list<array<string, mixed>>  $rows
-     * @return array<string, int> id keyed by binaryLookupKey(hash, collectionId)
+     * Raise binaries.totalparts where a newer header reports more parts.
+     *
+     * @param  array<int, list<int>>  $binaryIdsByTotalParts
      */
-    private function selectBinaryIdsByKey(array $rows): array
+    private function raiseTotalParts(array $binaryIdsByTotalParts): void
+    {
+        foreach ($binaryIdsByTotalParts as $totalParts => $binaryIds) {
+            foreach (array_chunk(array_values(array_unique($binaryIds)), $this->sqlChunkSize) as $chunk) {
+                DB::table('binaries')
+                    ->whereIn('id', $chunk)
+                    ->where('totalparts', '<', $totalParts)
+                    ->update(['totalparts' => $totalParts]);
+            }
+        }
+    }
+
+    /**
+     * @param  list<array<string, mixed>>  $rows
+     * @return array<string, array{id: int, totalparts: int}> keyed by binaryLookupKey(hash, collectionId)
+     */
+    private function selectExistingBinaries(array $rows): array
     {
         $resolved = [];
         foreach ($this->selectBinaryRows($rows) as $row) {
-            $resolved[$this->binaryLookupKey((string) $row->hashvalue, (int) $row->collections_id)] = (int) $row->id;
+            $resolved[$this->binaryLookupKey((string) $row->hashvalue, (int) $row->collections_id)] = [
+                'id' => (int) $row->id,
+                'totalparts' => (int) $row->totalparts,
+            ];
         }
 
         return $resolved;
@@ -287,34 +323,43 @@ final class BinaryHandler
 
         $driver = DB::getDriverName();
         $hashExpression = $driver === 'sqlite' ? 'binaryhash' : 'LOWER(HEX(binaryhash))';
+        $hashPlaceholder = $driver === 'sqlite' ? '?' : 'UNHEX(?)';
 
-        // Group lookups by collections_id and run small `binaryhash IN (...)`
-        // queries per collection. This avoids producing a single
-        // `WHERE (... AND ...) OR (... AND ...) OR ...` expression with
-        // thousands of clauses and bindings, which both bloats the SQL
-        // string in PHP and can force MySQL into pathological plans.
-        $rowsByCollection = [];
+        $hashesByCollection = [];
         foreach ($rows as $row) {
-            $rowsByCollection[(int) $row['collections_id']][] = (string) $row['hash'];
+            $hashesByCollection[(int) $row['collections_id']][(string) $row['hash']] = true;
         }
 
-        $results = [];
-        foreach ($rowsByCollection as $collectionId => $hashes) {
-            $hashes = array_values(array_unique($hashes));
-            foreach (array_chunk($hashes, $this->sqlChunkSize) as $chunk) {
-                $placeholders = implode(',', array_fill(0, \count($chunk), $driver === 'sqlite' ? '?' : 'UNHEX(?)'));
-                $bindings = $chunk;
-                $bindings[] = $collectionId;
-
-                $rowsResult = DB::select(
-                    "SELECT id, {$hashExpression} AS hashvalue, collections_id FROM binaries "
-                    ."WHERE binaryhash IN ({$placeholders}) AND collections_id = ?",
-                    $bindings
-                );
-
-                foreach ($rowsResult as $r) {
-                    $results[] = $r;
+        // Pack several `(collections_id = ? AND binaryhash IN (...))` ranges
+        // into one statement, bounded by sqlChunkSize hashes. Each disjunct is
+        // a range on ux_binaries_collection_hash, and a chunk touching many
+        // small collections costs one round-trip instead of one per collection.
+        $batches = [];
+        $current = ['disjuncts' => [], 'bindings' => [], 'hashes' => 0];
+        foreach ($hashesByCollection as $collectionId => $hashSet) {
+            foreach (array_chunk(array_keys($hashSet), $this->sqlChunkSize) as $chunk) {
+                if ($this->sqlChunkSize < $current['hashes'] + \count($chunk) && $current['disjuncts'] !== []) {
+                    $batches[] = $current;
+                    $current = ['disjuncts' => [], 'bindings' => [], 'hashes' => 0];
                 }
+                $current['disjuncts'][] = '(collections_id = ? AND binaryhash IN ('
+                    .implode(',', array_fill(0, \count($chunk), $hashPlaceholder)).'))';
+                $current['bindings'][] = $collectionId;
+                array_push($current['bindings'], ...$chunk);
+                $current['hashes'] += \count($chunk);
+            }
+        }
+        // $rows is non-empty here, so the last batch always holds a disjunct.
+        $batches[] = $current;
+
+        $results = [];
+        foreach ($batches as $batch) {
+            foreach (DB::select(
+                "SELECT id, {$hashExpression} AS hashvalue, collections_id, totalparts FROM binaries WHERE "
+                .implode(' OR ', $batch['disjuncts']),
+                $batch['bindings']
+            ) as $row) {
+                $results[] = $row;
             }
         }
 
@@ -481,6 +526,25 @@ final class BinaryHandler
     public function getInsertedIds(): array
     {
         return array_keys($this->insertedBinaryIds);
+    }
+
+    /**
+     * Collections owning the given binaries, from the ids resolved this chunk.
+     *
+     * @param  list<int>  $binaryIds
+     * @return list<int>
+     */
+    public function collectionIdsForBinaries(array $binaryIds): array
+    {
+        $wanted = array_fill_keys(array_map('intval', $binaryIds), true);
+        $collectionIds = [];
+        foreach ($this->articles as $article) {
+            if (isset($wanted[$article['BinaryID']])) {
+                $collectionIds[$article['CollectionID']] = true;
+            }
+        }
+
+        return array_keys($collectionIds);
     }
 
     public function getLastException(): ?\Throwable

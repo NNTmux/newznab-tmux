@@ -43,10 +43,13 @@ class TempWorkspaceService
 
     /**
      * Create a per-release temp folder and return its path.
+     *
+     * The worker's main temp path is recreated when it has been removed underneath a
+     * long-running worker (for example by an external cleanup job).
      */
     public function createReleaseTempFolder(string $mainTmpPath, string $guid): string
     {
-        $this->assertWritableDirectory(rtrim($mainTmpPath, '/\\'), 'Additional post-processing temp path');
+        $this->ensureWritableDirectory(rtrim($mainTmpPath, '/\\'), 'Additional post-processing temp path');
 
         $tmpPath = rtrim($mainTmpPath, '/\\').'/'.$guid.'/';
         $this->ensureWritableDirectory($tmpPath, 'Release temp path');

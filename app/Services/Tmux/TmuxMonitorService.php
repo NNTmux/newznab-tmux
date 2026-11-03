@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\DB;
  */
 class TmuxMonitorService
 {
-    private const int PROC1_CACHE_TTL_SECONDS = 60;
+    private const string CATEGORY_COUNTS_CACHE_KEY = 'tmux:category_counts';
 
     protected Tmux $tmux;
 
@@ -199,11 +199,20 @@ class TmuxMonitorService
         }
 
         try {
-            $counts = Release::query()->selectRaw(implode(', ', $aggregates), $bindings)->first();
+            /** @var array<string, int>|null $counts */
+            $counts = Cache::remember(
+                self::CATEGORY_COUNTS_CACHE_KEY,
+                max(1, (int) config('tmux.monitor.category_counts_interval', 300)),
+                function () use ($aggregates, $bindings): ?array {
+                    $row = Release::query()->toBase()->selectRaw(implode(', ', $aggregates), $bindings)->first();
+
+                    return $row === null ? null : array_map(intval(...), (array) $row);
+                },
+            );
 
             if ($counts !== null) {
                 foreach (array_keys($this->categoryRanges()) as $name) {
-                    $this->runVar['counts']['now'][$name] = (int) $counts->getAttribute($name);
+                    $this->runVar['counts']['now'][$name] = (int) ($counts[$name] ?? 0);
                 }
             }
         } catch (\Exception $e) {
@@ -286,7 +295,7 @@ class TmuxMonitorService
     {
         return Cache::remember(
             'tmux:proc1:'.md5($query),
-            self::PROC1_CACHE_TTL_SECONDS,
+            max(1, (int) config('tmux.monitor.proc1_cache_ttl', 300)),
             static fn (): ?object => DB::selectOne($query),
         );
     }
@@ -299,10 +308,16 @@ class TmuxMonitorService
         $timer = microtime(true);
 
         try {
+            // collections stays live: it drives the kill-switch and the progressive sleep.
             $this->runVar['counts']['now']['collections_table'] = Collection::query()->count();
-            $this->runVar['counts']['now']['releases'] = Release::query()->count();
 
-            foreach ($this->aggregateTableRowCounts($this->tmux->cbpmTableQuery()) as $key => $count) {
+            // Exact COUNT(*) on parts, releases and binaries scans millions of
+            // rows, so those totals are cached for tmux.monitor.table_counts_ttl.
+            $cachedCounts = $this->rememberTableCounts(fn (): array => [
+                'releases' => Release::query()->count(),
+                ...$this->aggregateTableRowCounts($this->tmux->cbpmTableQuery()),
+            ]);
+            foreach ($cachedCounts as $key => $count) {
                 $this->runVar['counts']['now'][$key] = $count;
             }
 
@@ -323,6 +338,20 @@ class TmuxMonitorService
         } catch (\Exception $e) {
             logger()->error('Error collecting table counts: '.$e->getMessage());
         }
+    }
+
+    /**
+     * @param  \Closure(): array<string, int>  $count
+     * @return array<string, int>
+     */
+    protected function rememberTableCounts(\Closure $count): array
+    {
+        $ttl = (int) config('tmux.monitor.table_counts_ttl', 300);
+        if ($ttl <= 0) {
+            return $count();
+        }
+
+        return Cache::remember('tmux:table_counts', $ttl, $count);
     }
 
     /**

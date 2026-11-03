@@ -22,7 +22,6 @@ class ReleaseBrowseServiceTest extends TestCase
     {
         $ordering = $this->service->getBrowseOrdering();
 
-        $this->assertIsArray($ordering);
         $this->assertContains('name_asc', $ordering);
         $this->assertContains('name_desc', $ordering);
         $this->assertContains('cat_asc', $ordering);
@@ -147,6 +146,30 @@ class ReleaseBrowseServiceTest extends TestCase
         $result = $this->service->getBrowseOrder('name_invalid');
 
         $this->assertEquals(['searchname', 'desc'], $result);
+    }
+
+    /**
+     * Test that browse pagination builds a SQL LIMIT/OFFSET clause.
+     */
+    public function test_build_limit_clause_returns_limit_and_offset_for_positive_page_size(): void
+    {
+        $method = new \ReflectionMethod($this->service, 'buildLimitClause');
+
+        $result = $method->invoke($this->service, 40, 20);
+
+        $this->assertSame(' LIMIT 20 OFFSET 40', $result);
+    }
+
+    /**
+     * Test that browse pagination omits LIMIT/OFFSET when page size is not positive.
+     */
+    public function test_build_limit_clause_returns_empty_string_for_non_positive_page_size(): void
+    {
+        $method = new \ReflectionMethod($this->service, 'buildLimitClause');
+
+        $result = $method->invoke($this->service, 40, 0);
+
+        $this->assertSame('', $result);
     }
 
     /**

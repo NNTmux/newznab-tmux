@@ -521,6 +521,100 @@ class BinariesStorageInternalsTest extends TestCase
         $this->assertSame(2, DB::table('parts')->count());
     }
 
+    public function test_unresolvable_binary_fails_only_its_own_header_not_the_chunk(): void
+    {
+        $this->createHeaderStorageTables();
+        // Reproduce the legacy global UNIQUE(binaryhash) that production still carried.
+        DB::statement('CREATE UNIQUE INDEX binaries_binaryhash_unique ON binaries (binaryhash)');
+
+        $service = new HeaderStorageService($this->deterministicCollectionHandler(), config: new BinariesConfig(sqlChunkSize: 10));
+        $failed = $service->store([
+            $this->parsedHeader(940, 1, 'Post.Alpha [01/02]'),
+            $this->parsedHeader(941, 1, 'Post.Bravo [01/03]'),
+            $this->parsedHeader(942, 1, 'Unnumbered.Charlie'),
+        ], ['id' => 1, 'name' => 'alt.test'], true);
+
+        // Exactly one of the two colliding "file 1" headers loses; the rest commit.
+        $this->assertCount(1, $failed);
+        $this->assertContains($failed[0], [940, 941]);
+        $stored = DB::table('parts')->orderBy('number')->pluck('number')->all();
+        $this->assertCount(2, $stored);
+        $this->assertContains(942, $stored);
+        $this->assertNotContains($failed[0], $stored);
+    }
+
+    public function test_numbered_files_persist_in_every_collection_after_global_hash_index_is_dropped(): void
+    {
+        $this->createHeaderStorageTables();
+        DB::statement('CREATE UNIQUE INDEX binaries_binaryhash_unique ON binaries (binaryhash)');
+
+        $migration = require database_path('migrations/2026_11_01_105406_drop_global_binaryhash_unique_index.php');
+        $migration->up();
+
+        $service = new HeaderStorageService($this->deterministicCollectionHandler(), config: new BinariesConfig(sqlChunkSize: 10));
+        $failed = $service->store([
+            $this->parsedHeader(950, 1, 'Post.Alpha [01/02]'),
+            $this->parsedHeader(951, 1, 'Post.Bravo [01/03]'),
+        ], ['id' => 1, 'name' => 'alt.test'], true);
+
+        $this->assertSame([], $failed);
+        $this->assertSame(2, DB::table('collections')->count());
+        $this->assertSame(2, DB::table('binaries')->where('filenumber', 1)->count());
+        $this->assertSame(2, DB::table('parts')->count());
+        $this->assertSame(
+            [],
+            DB::select("SELECT name FROM sqlite_master WHERE type = 'index' AND name = 'binaries_binaryhash_unique'")
+        );
+    }
+
+    public function test_known_collection_and_binary_are_not_reinserted_but_totalparts_still_grows(): void
+    {
+        $this->createHeaderStorageTables();
+        $service = new HeaderStorageService($this->deterministicCollectionHandler(), config: new BinariesConfig(sqlChunkSize: 10));
+        $this->assertSame([], $service->store([
+            $this->parsedHeaderWithTotal(960, 1, 2, 'Known.Release'),
+        ], ['id' => 1, 'name' => 'alt.test'], true));
+
+        $inserts = [];
+        DB::listen(static function (QueryExecuted $query) use (&$inserts): void {
+            if (preg_match('/^insert\b.*\binto\s+["`]?(collections|binaries|collection_groups)["`]?\s/i', $query->sql, $match)) {
+                $inserts[] = strtolower($match[1]);
+            }
+        });
+
+        $this->assertSame([], $service->store([
+            $this->parsedHeaderWithTotal(961, 2, 5, 'Known.Release'),
+        ], ['id' => 1, 'name' => 'alt.test'], true));
+
+        $this->assertSame([], $inserts);
+        $this->assertSame(1, DB::table('binaries')->count());
+        $this->assertSame(5, (int) DB::table('binaries')->value('totalparts'));
+        $this->assertSame(2, DB::table('parts')->count());
+    }
+
+    public function test_chunk_of_already_stored_parts_skips_binary_reaggregation(): void
+    {
+        $this->createHeaderStorageTables();
+        $service = new HeaderStorageService($this->deterministicCollectionHandler(), config: new BinariesConfig(sqlChunkSize: 10));
+        $headers = [
+            $this->parsedHeader(970, 1, 'Rescanned.Release'),
+            $this->parsedHeader(971, 2, 'Rescanned.Release'),
+        ];
+        $this->assertSame([], $service->store($headers, ['id' => 1, 'name' => 'alt.test'], true));
+
+        $binaryUpdates = 0;
+        DB::listen(static function (QueryExecuted $query) use (&$binaryUpdates): void {
+            if (preg_match('/^update\s+["`]?binaries\b/i', $query->sql)) {
+                $binaryUpdates++;
+            }
+        });
+
+        $this->assertSame([], $service->store($headers, ['id' => 1, 'name' => 'alt.test'], true));
+
+        $this->assertSame(0, $binaryUpdates);
+        $this->assertSame(2, (int) DB::table('binaries')->value('currentparts'));
+    }
+
     public function test_cross_post_groups_are_normalized_and_deduplicated(): void
     {
         $this->createHeaderStorageTables();

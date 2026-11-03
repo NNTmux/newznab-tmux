@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Services\Search\Contracts;
 
 use App\Enums\SecondarySearchIndex;
+use App\Services\Search\DTO\NameFixingSearchQuery;
+use App\Services\Search\DTO\NameFixingSearchResult;
 use App\Services\Search\DTO\ReleaseSearchQuery;
 use App\Services\Search\DTO\SearchPage;
 
@@ -368,6 +370,8 @@ interface SearchServiceInterface
     public function searchReleasesFiltered(array $criteria, int $limit, int $offset = 0): array;
 
     public function searchReleasePage(ReleaseSearchQuery $query): SearchPage;
+
+    public function searchNameFixingCandidates(NameFixingSearchQuery $query): NameFixingSearchResult;
 
     /**
      * Upsert a metadata document (music, books, games, console, steam, anime).

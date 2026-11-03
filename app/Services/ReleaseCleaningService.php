@@ -446,7 +446,13 @@ class ReleaseCleaningService
      */
     public function fixerCleaner(string $name)
     {
-        $cleanerName = $this->nzbSplitUnwrapper->unwrap($name) ?? $name;
+        $unwrapped = $this->nzbSplitUnwrapper->unwrap($name);
+        if ($unwrapped !== null) {
+            // The unwrapper already removed archive suffixes; keep its sample marker.
+            return $this->stripInvalidCharacters($unwrapped);
+        }
+
+        $cleanerName = $name;
 
         // Remove sample/proof/thumbs markers from the end
         $cleanerName = preg_replace('/[.\-_](sample|proof|thumbs?)$/i', '', $cleanerName);
@@ -465,7 +471,11 @@ class ReleaseCleaningService
         // Collapse multiple spaces
         $cleanerName = preg_replace('/\s\s+/', ' ', $cleanerName);
 
-        // Remove invalid characters
-        return trim(mb_convert_encoding(preg_replace('/[^(\x20-\x7F)]*/', '', $cleanerName), 'UTF-8', mb_list_encodings()));
+        return $this->stripInvalidCharacters($cleanerName);
+    }
+
+    private function stripInvalidCharacters(string $name): string
+    {
+        return trim(mb_convert_encoding(preg_replace('/[^(\x20-\x7F)]*/', '', $name), 'UTF-8', mb_list_encodings()));
     }
 }

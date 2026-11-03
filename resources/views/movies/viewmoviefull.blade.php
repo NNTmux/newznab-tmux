@@ -132,7 +132,7 @@
                     <div class="mb-6">
                         <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
                             Available Releases
-                            <span class="text-lg font-normal text-gray-500" x-text="countText()"></span>
+                            <span class="text-lg font-normal text-gray-500" id="release-count" x-text="countText()"></span>
                         </h2>
 
                         <!-- Filter Buttons -->

@@ -83,7 +83,14 @@ class BackfillRunner extends BaseRunner
         if ($backfill_days === 1) {
             $backfilldays = 'g.backfill_target';
         } elseif ($backfill_days === 2) {
-            $backfilldays = (string) now()->diffInDays(Carbon::createFromFormat('Y-m-d', app(ConfigurationProvider::class)->ingestion()->safeBackfillDate), true);
+            try {
+                $safeDate = app(ConfigurationProvider::class)->ingestion()->safeBackfillDate;
+                if (! empty($safeDate)) {
+                    $backfilldays = (string) now()->diffInDays(Carbon::parse($safeDate), true);
+                }
+            } catch (\Exception) {
+                $backfilldays = '0';
+            }
         }
 
         $sql = 'SELECT g.name,

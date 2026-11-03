@@ -6,6 +6,7 @@ namespace Tests\Feature;
 
 use App\Services\Tmux\Tmux;
 use App\Services\Tmux\TmuxMonitorService;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use ReflectionClass;
 use ReflectionMethod;
@@ -43,15 +44,8 @@ final class TmuxTableCountsTest extends TestCase
 
     public function test_monitor_table_refresh_reflects_inserted_and_deleted_parts(): void
     {
-        $tmux = $this->getMockBuilder(Tmux::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['proc_query'])
-            ->getMock();
-        $tmux->method('proc_query')->willReturn('SELECT 0 AS active_groups');
-        $monitor = (new ReflectionClass(TmuxMonitorService::class))->newInstanceWithoutConstructor();
-        (new ReflectionProperty(TmuxMonitorService::class, 'tmux'))->setValue($monitor, $tmux);
-        $refresh = new ReflectionMethod(TmuxMonitorService::class, 'getTableCounts');
-        $state = new ReflectionProperty(TmuxMonitorService::class, 'runVar');
+        config(['tmux.monitor.table_counts_ttl' => 0]);
+        [$monitor, $refresh, $state] = $this->monitor();
 
         DB::table('collections')->insert(['id' => 1]);
         DB::table('releases')->insert([['id' => 1], ['id' => 2]]);
@@ -74,5 +68,45 @@ final class TmuxTableCountsTest extends TestCase
         DB::table('parts')->delete();
         $refresh->invoke($monitor);
         $this->assertSame(0, $state->getValue($monitor)['counts']['now']['parts_table']);
+    }
+
+    public function test_slow_table_counts_are_cached_while_collections_stay_live(): void
+    {
+        config(['tmux.monitor.table_counts_ttl' => 300]);
+        Cache::forget('tmux:table_counts');
+        [$monitor, $refresh, $state] = $this->monitor();
+
+        DB::table('parts')->insert(['id' => 1]);
+        $refresh->invoke($monitor);
+
+        DB::table('parts')->insert(['id' => 2]);
+        DB::table('releases')->insert(['id' => 1]);
+        DB::table('collections')->insert(['id' => 1]);
+        $refresh->invoke($monitor);
+        $counts = $state->getValue($monitor)['counts']['now'];
+
+        $this->assertSame(1, $counts['parts_table']);
+        $this->assertSame(0, $counts['releases']);
+        $this->assertSame(1, $counts['collections_table']);
+    }
+
+    /**
+     * @return array{0: TmuxMonitorService, 1: ReflectionMethod, 2: ReflectionProperty}
+     */
+    private function monitor(): array
+    {
+        $tmux = $this->getMockBuilder(Tmux::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['proc_query'])
+            ->getMock();
+        $tmux->method('proc_query')->willReturn('SELECT 0 AS active_groups');
+        $monitor = (new ReflectionClass(TmuxMonitorService::class))->newInstanceWithoutConstructor();
+        (new ReflectionProperty(TmuxMonitorService::class, 'tmux'))->setValue($monitor, $tmux);
+
+        return [
+            $monitor,
+            new ReflectionMethod(TmuxMonitorService::class, 'getTableCounts'),
+            new ReflectionProperty(TmuxMonitorService::class, 'runVar'),
+        ];
     }
 }

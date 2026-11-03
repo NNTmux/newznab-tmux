@@ -10,6 +10,8 @@ services:
             - '${APP_PORT:-80}:80'
         environment:
             TZ: ${APP_TIMEZONE}
+            MANTICORESEARCH_HOST: manticore
+            ELASTICSEARCH_HOST: elasticsearch
         healthcheck:
             test: ["CMD", "curl", "-f", "http://localhost:${APP_PORT:-80}"]
             interval: 10s
@@ -37,6 +39,8 @@ services:
         tty: true
         environment:
             TZ: ${APP_TIMEZONE}
+            MANTICORESEARCH_HOST: manticore
+            ELASTICSEARCH_HOST: elasticsearch
         env_file:
             - .env
         volumes:
@@ -56,6 +60,8 @@ services:
             - .env
         environment:
             TZ: ${APP_TIMEZONE}
+            MANTICORESEARCH_HOST: manticore
+            ELASTICSEARCH_HOST: elasticsearch
         volumes:
             - 'install:/app/_install'
             - 'storage:/app/storage'
@@ -130,8 +136,8 @@ services:
                 soft: -1
                 hard: -1
         volumes:
-            - 'manticore:/var/lib/manticore/data'
-            - ./config/manticore.conf:/etc/manticoresearch/manticore.conf
+            - 'manticore:/var/lib/manticore'
+            - ./docker/manticoresearch/manticore.conf:/etc/manticoresearch/manticore.conf
         networks:
             - nntmux
         healthcheck:

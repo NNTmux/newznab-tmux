@@ -29,23 +29,23 @@ class ReleaseRemoverBatchingTest extends TestCase
 
     public function createApplication()
     {
-        foreach (['APP_ENV', 'DB_CONNECTION', 'DB_DATABASE'] as $key) {
-            $this->originalEnvironment[$key] = getenv($key);
-        }
-
         $this->databasePath = sys_get_temp_dir().'/nntmux-release-remover-test.sqlite';
+
+        $this->originalEnvironment = [
+            'APP_ENV' => getenv('APP_ENV'),
+            'DB_CONNECTION' => getenv('DB_CONNECTION'),
+            'DB_DATABASE' => getenv('DB_DATABASE'),
+        ];
+
         if (file_exists($this->databasePath)) {
             unlink($this->databasePath);
         }
 
         $pdo = new PDO('sqlite:'.$this->databasePath);
 
-        putenv('APP_ENV=testing');
-        putenv('DB_CONNECTION=sqlite');
-        putenv('DB_DATABASE='.$this->databasePath);
-        $_ENV['APP_ENV'] = $_SERVER['APP_ENV'] = 'testing';
-        $_ENV['DB_CONNECTION'] = $_SERVER['DB_CONNECTION'] = 'sqlite';
-        $_ENV['DB_DATABASE'] = $_SERVER['DB_DATABASE'] = $this->databasePath;
+        $this->setEnvironmentValue('APP_ENV', 'testing');
+        $this->setEnvironmentValue('DB_CONNECTION', 'sqlite');
+        $this->setEnvironmentValue('DB_DATABASE', $this->databasePath);
 
         $app = require __DIR__.'/../../bootstrap/app.php';
         $app->make(Kernel::class)->bootstrap();
@@ -103,14 +103,22 @@ class ReleaseRemoverBatchingTest extends TestCase
         }
 
         foreach ($this->originalEnvironment as $key => $value) {
-            if ($value === false) {
-                putenv($key);
-                unset($_ENV[$key], $_SERVER[$key]);
-            } else {
-                putenv($key.'='.$value);
-                $_ENV[$key] = $_SERVER[$key] = $value;
-            }
+            $this->setEnvironmentValue($key, $value === false ? null : $value);
         }
+    }
+
+    private function setEnvironmentValue(string $key, ?string $value): void
+    {
+        if ($value === null) {
+            putenv($key);
+            unset($_ENV[$key], $_SERVER[$key]);
+
+            return;
+        }
+
+        putenv($key.'='.$value);
+        $_ENV[$key] = $value;
+        $_SERVER[$key] = $value;
     }
 
     public function test_blacklist_removal_is_not_limited_to_one_hundred_search_results(): void

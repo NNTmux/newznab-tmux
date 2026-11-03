@@ -5,10 +5,16 @@ declare(strict_types=1);
 namespace App\Services\NameFixing;
 
 use App\Models\Category;
+use App\Services\Crc\CrcEvidence;
+use App\Services\Search\Contracts\SearchServiceInterface;
+use App\Services\Search\DTO\NameFixingSearchQuery;
+use App\Services\Search\DTO\NameFixingSearchResult;
 use Carbon\CarbonImmutable;
+use Illuminate\Container\Container;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
+use Throwable;
 
 final class NameFixingQueryService
 {
@@ -33,6 +39,21 @@ final class NameFixingQueryService
     public const BATCH_SIZE = 1000;
 
     private ConnectionInterface $database;
+
+    private ?SearchServiceInterface $searchService;
+
+    /** @var array<int, array<string, mixed>> */
+    private array $indexedDocuments = [];
+
+    /** @var list<string> */
+    private const INDEXED_CANDIDATE_SOURCES = [
+        self::SOURCE_NFO,
+        self::SOURCE_FILES,
+        self::SOURCE_SRR,
+        self::SOURCE_UID,
+        self::SOURCE_XXX,
+        self::SOURCE_MEDIA_MOVIE,
+    ];
 
     /**
      * @var array<string, string>
@@ -60,13 +81,16 @@ final class NameFixingQueryService
         self::SOURCE_UID => "EXISTS (SELECT 1 FROM media_infos source_media WHERE source_media.releases_id = r.id AND source_media.unique_id IS NOT NULL AND source_media.unique_id != '')",
         self::SOURCE_HASH => "EXISTS (SELECT 1 FROM par_hashes source_hash WHERE source_hash.releases_id = r.id AND source_hash.hash != '')",
         self::SOURCE_PAR2 => '1 = 1',
-        self::SOURCE_XXX => "EXISTS (SELECT 1 FROM release_files source_xxx WHERE source_xxx.releases_id = r.id AND source_xxx.name LIKE '%SDPORN%')",
+        self::SOURCE_XXX => "r.searchname LIKE 'SDX264XXX-%' OR EXISTS (SELECT 1 FROM release_files source_xxx WHERE source_xxx.releases_id = r.id AND (source_xxx.name LIKE '%SDPORN%' OR source_xxx.name LIKE '%SDX264XXX-%'))",
         self::SOURCE_MEDIA_MOVIE => "EXISTS (SELECT 1 FROM media_infos source_movie WHERE source_movie.releases_id = r.id AND source_movie.movie_name IS NOT NULL AND source_movie.movie_name != '')",
     ];
 
-    public function __construct(?ConnectionInterface $database = null)
-    {
+    public function __construct(
+        ?ConnectionInterface $database = null,
+        ?SearchServiceInterface $searchService = null
+    ) {
         $this->database = $database ?? DB::connection();
+        $this->searchService = $searchService;
     }
 
     /**
@@ -78,6 +102,41 @@ final class NameFixingQueryService
         int $categories,
         int $afterId = 0,
         int $limit = self::BATCH_SIZE
+    ): array {
+        if (in_array($source, self::INDEXED_CANDIDATE_SOURCES, true)) {
+            $indexed = $this->indexedCandidateBatch($source, $time, $categories, $afterId, $limit);
+            if ($indexed !== null) {
+                return $indexed;
+            }
+        }
+
+        return $this->databaseCandidateBatch($source, $time, $categories, $afterId, $limit);
+    }
+
+    /**
+     * Bypass the search index when a run detects that indexed candidates were incomplete.
+     *
+     * @return list<object>
+     */
+    public function fallbackCandidateBatch(
+        string $source,
+        int $time,
+        int $categories,
+        int $afterId = 0,
+        int $limit = self::BATCH_SIZE
+    ): array {
+        return $this->databaseCandidateBatch($source, $time, $categories, $afterId, $limit);
+    }
+
+    /**
+     * @return list<object>
+     */
+    private function databaseCandidateBatch(
+        string $source,
+        int $time,
+        int $categories,
+        int $afterId,
+        int $limit
     ): array {
         [$where, $bindings] = $this->candidateWhere($source, $time, $categories);
         $bindings[] = $afterId;
@@ -93,6 +152,90 @@ final class NameFixingQueryService
              AND r.id > ?
              ORDER BY r.id ASC
              LIMIT ?",
+            $bindings
+        );
+    }
+
+    /**
+     * @return list<object>|null
+     */
+    private function indexedCandidateBatch(
+        string $source,
+        int $time,
+        int $categories,
+        int $afterId,
+        int $limit
+    ): ?array {
+        $searchService = $this->searchService();
+        if ($searchService === null) {
+            return null;
+        }
+
+        try {
+            $result = $searchService->searchNameFixingCandidates(new NameFixingSearchQuery(
+                source: $source,
+                afterId: $afterId,
+                limit: min(10000, max($limit, $limit * 4)),
+                categoryIds: $this->candidateCategoryIds($source, $categories),
+                addedAfter: $time === 1 ? CarbonImmutable::now()->subHours(6)->getTimestamp() : 0,
+            ));
+        } catch (Throwable) {
+            return null;
+        }
+
+        if (! $result->available || $result->ids === []) {
+            return null;
+        }
+
+        $this->rememberIndexedDocuments($result);
+        $confirmed = $this->candidateRowsForIds(
+            $source,
+            $time,
+            $categories,
+            $afterId,
+            $limit,
+            $result->ids
+        );
+
+        if (count($confirmed) >= max(1, $limit)) {
+            return $confirmed;
+        }
+
+        $fallback = $this->databaseCandidateBatch($source, $time, $categories, $afterId, max(1, $limit));
+
+        return $this->mergeReleaseRows($confirmed, $fallback, max(1, $limit));
+    }
+
+    /**
+     * @param  list<int>  $releaseIds
+     * @return list<object>
+     */
+    private function candidateRowsForIds(
+        string $source,
+        int $time,
+        int $categories,
+        int $afterId,
+        int $limit,
+        array $releaseIds
+    ): array {
+        if ($releaseIds === []) {
+            return [];
+        }
+
+        [$where, $bindings] = $this->candidateWhere($source, $time, $categories);
+        $bindings = array_merge($bindings, $releaseIds, [$afterId, max(1, $limit)]);
+
+        return $this->database->select(
+            "SELECT r.id AS releases_id, r.id, r.name, r.searchname, r.fromname, r.groups_id,
+                    r.categories_id, r.size AS relsize, r.guid, r.predb_id, r.nfostatus,
+                    r.proc_nfo, r.proc_files, r.proc_par2, r.proc_uid, r.proc_srr,
+                    r.proc_hash16k, r.proc_crc32
+             FROM releases r
+             WHERE {$where}
+             AND r.id IN (".$this->placeholders(count($releaseIds)).')
+             AND r.id > ?
+             ORDER BY r.id ASC
+             LIMIT ?',
             $bindings
         );
     }
@@ -165,12 +308,12 @@ final class NameFixingQueryService
             self::SOURCE_FILES => '',
             self::SOURCE_SRR => " AND (rf.name LIKE '%.srr' OR rf.name LIKE '%.srs')",
             self::SOURCE_CRC => " AND rf.crc32 IS NOT NULL AND rf.crc32 != ''",
-            self::SOURCE_XXX => " AND rf.name LIKE '%SDPORN%'",
+            self::SOURCE_XXX => " AND (rf.name LIKE '%SDPORN%' OR rf.name LIKE '%SDX264XXX-%')",
             default => throw new InvalidArgumentException("Unsupported release-file source [{$source}]."),
         };
 
         return $this->selectForReleaseIds(
-            'SELECT rf.releases_id, rf.name AS textstring, rf.name AS filename, rf.crc32
+            'SELECT rf.releases_id, rf.name AS textstring, rf.name AS filename, rf.crc32, rf.size AS filesize
              FROM release_files rf
              WHERE rf.releases_id IN (%s)'.$filter.'
              ORDER BY rf.releases_id, rf.name',
@@ -184,13 +327,29 @@ final class NameFixingQueryService
      */
     public function mediaRows(array $releaseIds): array
     {
-        return $this->selectForReleaseIds(
+        if ($releaseIds === []) {
+            return [];
+        }
+
+        $indexedRows = $this->indexedMediaRows($releaseIds);
+        $indexedReleaseIds = array_map(
+            static fn (object $row): int => (int) $row->releases_id,
+            $indexedRows
+        );
+        $missingReleaseIds = array_values(array_diff($releaseIds, $indexedReleaseIds));
+        if ($missingReleaseIds === []) {
+            return $indexedRows;
+        }
+
+        $databaseRows = $this->selectForReleaseIds(
             'SELECT mi.releases_id, mi.unique_id AS uid, mi.movie_name, mi.file_name
              FROM media_infos mi
              WHERE mi.releases_id IN (%s)
              ORDER BY mi.releases_id',
-            $releaseIds
+            $missingReleaseIds
         );
+
+        return [...$indexedRows, ...$databaseRows];
     }
 
     /**
@@ -213,6 +372,24 @@ final class NameFixingQueryService
      * @return array<string, list<object>>
      */
     public function uidDonors(array $uniqueIds): array
+    {
+        if ($uniqueIds === []) {
+            return [];
+        }
+
+        $indexed = $this->indexedUidDonors($uniqueIds);
+        if ($indexed !== null) {
+            return $indexed;
+        }
+
+        return $this->databaseUidDonors($uniqueIds);
+    }
+
+    /**
+     * @param  list<string>  $uniqueIds
+     * @return array<string, list<object>>
+     */
+    private function databaseUidDonors(array $uniqueIds): array
     {
         if ($uniqueIds === []) {
             return [];
@@ -256,8 +433,9 @@ final class NameFixingQueryService
      */
     public function crcDonors(array $crcs): array
     {
-        return $this->donors(
+        return $this->crcRows(
             'SELECT rf.crc32 AS match_key, r.id AS releases_id, r.size AS relsize,
+                    rf.crc32 AS crchash, rf.size AS filesize,
                     r.searchname, r.fromname, r.predb_id
              FROM release_files rf
              INNER JOIN releases r ON r.id = rf.releases_id
@@ -265,6 +443,44 @@ final class NameFixingQueryService
              AND r.predb_id > 0',
             $crcs
         );
+    }
+
+    /**
+     * Include legacy unpadded/lowercase hashes without losing index lookups.
+     *
+     * @param  list<string>  $crcs
+     * @return array<string, list<object>>
+     */
+    private function crcRows(string $sql, array $crcs): array
+    {
+        $variants = [];
+        foreach ($crcs as $crc) {
+            $normalized = CrcEvidence::normalizeCrc($crc);
+            if ($normalized === '') {
+                continue;
+            }
+
+            $short = ltrim($normalized, '0');
+            $short = $short === '' ? '0' : $short;
+            for ($length = strlen($short); $length <= 8; $length++) {
+                $variant = str_pad($short, $length, '0', STR_PAD_LEFT);
+                $variants[$variant] = $variant;
+                $variants[strtolower($variant)] = strtolower($variant);
+            }
+        }
+
+        $grouped = [];
+        foreach (array_chunk(array_values($variants), 500) as $values) {
+            foreach ($this->database->select(sprintf($sql, $this->placeholders(count($values))), $values) as $row) {
+                $key = CrcEvidence::normalizeCrc($row->match_key ?? null);
+                if ($key !== '') {
+                    $row->crchash = $key;
+                    $grouped[$key][] = $row;
+                }
+            }
+        }
+
+        return $grouped;
     }
 
     /**
@@ -308,7 +524,7 @@ final class NameFixingQueryService
 
         return $this->database->select(
             'SELECT r.id AS releases_id, r.name, r.fromname, r.searchname,
-                    r.groups_id, r.categories_id
+                    r.groups_id, r.categories_id, r.guid, r.predb_id
              FROM releases r
              WHERE r.id IN ('.$this->placeholders(count($candidateIds)).')
              AND r.predb_id = 0
@@ -342,12 +558,25 @@ final class NameFixingQueryService
      */
     public function prefileCandidateBatch(int $cursor, int $limit, bool $descending): array
     {
+        $indexed = $this->indexedPrefileCandidateBatch($cursor, $limit, $descending);
+        if ($indexed !== null) {
+            return $indexed;
+        }
+
+        return $this->databasePrefileCandidateBatch($cursor, $limit, $descending);
+    }
+
+    /**
+     * @return list<object>
+     */
+    private function databasePrefileCandidateBatch(int $cursor, int $limit, bool $descending): array
+    {
         $operator = $descending ? '<' : '>';
         $direction = $descending ? 'DESC' : 'ASC';
 
         return $this->database->select(
             'SELECT r.id AS releases_id, r.name, r.searchname, r.fromname,
-                    r.groups_id, r.categories_id
+                    r.groups_id, r.categories_id, r.guid, r.predb_id
              FROM releases r
              WHERE r.predb_id = 0
              AND r.isrenamed = 0
@@ -362,6 +591,257 @@ final class NameFixingQueryService
              LIMIT ?",
             [$cursor, max(1, $limit)]
         );
+    }
+
+    /**
+     * @param  list<int>  $releaseIds
+     * @return list<object>
+     */
+    private function indexedMediaRows(array $releaseIds): array
+    {
+        $searchService = $this->searchService();
+        if ($searchService === null) {
+            return [];
+        }
+
+        $missingDocumentIds = array_values(array_filter(
+            $releaseIds,
+            fn (int $releaseId): bool => ! isset($this->indexedDocuments[$releaseId])
+        ));
+
+        if ($missingDocumentIds !== []) {
+            try {
+                $result = $searchService->searchNameFixingCandidates(new NameFixingSearchQuery(
+                    source: NameFixingSearchQuery::SOURCE_MEDIA,
+                    limit: count($missingDocumentIds),
+                    releaseIds: $missingDocumentIds,
+                ));
+                if ($result->available) {
+                    $this->rememberIndexedDocuments($result);
+                }
+            } catch (Throwable) {
+                return [];
+            }
+        }
+
+        $rows = [];
+        foreach ($releaseIds as $releaseId) {
+            $document = $this->indexedDocuments[$releaseId] ?? null;
+            if (! is_array($document)
+                || (int) ($document['has_media_info'] ?? 0) !== 1
+                || ! array_key_exists('media_unique_id', $document)
+                || ! array_key_exists('media_movie_name', $document)
+                || ! array_key_exists('media_file_name', $document)) {
+                continue;
+            }
+
+            $rows[] = (object) [
+                'releases_id' => $releaseId,
+                'uid' => (string) $document['media_unique_id'],
+                'movie_name' => (string) $document['media_movie_name'],
+                'file_name' => (string) $document['media_file_name'],
+            ];
+        }
+
+        return $rows;
+    }
+
+    /**
+     * @param  list<string>  $uniqueIds
+     * @return array<string, list<object>>|null
+     */
+    private function indexedUidDonors(array $uniqueIds): ?array
+    {
+        $searchService = $this->searchService();
+        if ($searchService === null) {
+            return null;
+        }
+
+        try {
+            $result = $searchService->searchNameFixingCandidates(new NameFixingSearchQuery(
+                source: NameFixingSearchQuery::SOURCE_UID,
+                limit: 10000,
+                matchValues: $uniqueIds,
+            ));
+        } catch (Throwable) {
+            return null;
+        }
+
+        if (! $result->available || $result->hasMore) {
+            return null;
+        }
+        if ($result->ids === []) {
+            return $this->databaseUidDonors($uniqueIds);
+        }
+
+        $this->rememberIndexedDocuments($result);
+        $rows = $this->database->select(
+            'SELECT r.id AS releases_id, r.size AS relsize, r.searchname, r.fromname, r.predb_id
+             FROM releases r
+             WHERE r.id IN ('.$this->placeholders(count($result->ids)).')
+             AND (r.predb_id > 0 OR r.anidbid > 0 OR r.fromname = ?)',
+            [...$result->ids, 'nonscene@Ef.net (EF)']
+        );
+
+        $grouped = [];
+        foreach ($rows as $row) {
+            $document = $this->indexedDocuments[(int) $row->releases_id] ?? null;
+            $matchKey = is_array($document) ? trim((string) ($document['media_unique_id'] ?? '')) : '';
+            if ($matchKey === '') {
+                continue;
+            }
+
+            $row->match_key = $matchKey;
+            $grouped[$matchKey][] = $row;
+        }
+
+        $missingValues = array_values(array_diff($uniqueIds, array_keys($grouped)));
+        if ($missingValues !== []) {
+            foreach ($this->databaseUidDonors($missingValues) as $matchKey => $donors) {
+                $grouped[$matchKey] = $donors;
+            }
+        }
+
+        return $grouped;
+    }
+
+    /** @return list<object>|null */
+    private function indexedPrefileCandidateBatch(int $cursor, int $limit, bool $descending): ?array
+    {
+        $searchService = $this->searchService();
+        if ($searchService === null) {
+            return null;
+        }
+
+        try {
+            $result = $searchService->searchNameFixingCandidates(new NameFixingSearchQuery(
+                source: NameFixingSearchQuery::SOURCE_FILES,
+                afterId: $descending ? 0 : $cursor,
+                beforeId: $descending ? $cursor : 0,
+                limit: min(10000, max($limit, $limit * 4)),
+                categoryIds: Category::OTHERS_GROUP,
+                descending: $descending,
+            ));
+        } catch (Throwable) {
+            return null;
+        }
+
+        if (! $result->available || $result->ids === []) {
+            return null;
+        }
+
+        $this->rememberIndexedDocuments($result);
+        $confirmed = $this->prefileRowsForIds($result->ids, $cursor, $limit, $descending);
+        if (count($confirmed) >= max(1, $limit)) {
+            return $confirmed;
+        }
+
+        $fallback = $this->databasePrefileCandidateBatch($cursor, $limit, $descending);
+
+        return $this->mergeReleaseRows($confirmed, $fallback, max(1, $limit), $descending);
+    }
+
+    /**
+     * @param  list<int>  $releaseIds
+     * @return list<object>
+     */
+    private function prefileRowsForIds(array $releaseIds, int $cursor, int $limit, bool $descending): array
+    {
+        $operator = $descending ? '<' : '>';
+        $direction = $descending ? 'DESC' : 'ASC';
+
+        return $this->database->select(
+            'SELECT r.id AS releases_id, r.name, r.searchname, r.fromname,
+                    r.groups_id, r.categories_id, r.guid, r.predb_id
+             FROM releases r
+             WHERE r.predb_id = 0
+             AND r.isrenamed = 0
+             AND r.categories_id IN ('.implode(',', Category::OTHERS_GROUP).')
+             AND r.id IN ('.$this->placeholders(count($releaseIds)).")
+             AND r.id {$operator} ?
+             AND EXISTS (
+                SELECT 1 FROM release_files rf
+                WHERE rf.releases_id = r.id
+                AND rf.name IS NOT NULL
+             )
+             ORDER BY r.id {$direction}
+             LIMIT ?",
+            [...$releaseIds, $cursor, max(1, $limit)]
+        );
+    }
+
+    /**
+     * @param  list<object>  $primary
+     * @param  list<object>  $fallback
+     * @return list<object>
+     */
+    private function mergeReleaseRows(array $primary, array $fallback, int $limit, bool $descending = false): array
+    {
+        $rows = [];
+        foreach ([...$primary, ...$fallback] as $row) {
+            $rows[(int) $row->releases_id] = $row;
+        }
+
+        $rows = array_values($rows);
+        usort($rows, static fn (object $left, object $right): int => $descending
+            ? (int) $right->releases_id <=> (int) $left->releases_id
+            : (int) $left->releases_id <=> (int) $right->releases_id);
+
+        return array_slice($rows, 0, $limit);
+    }
+
+    private function rememberIndexedDocuments(NameFixingSearchResult $result): void
+    {
+        foreach ($result->documents as $releaseId => $document) {
+            if ($releaseId > 0) {
+                $this->indexedDocuments[$releaseId] = $document;
+            }
+        }
+    }
+
+    /** @return list<int> */
+    private function candidateCategoryIds(string $source, int $categories): array
+    {
+        if ($categories !== 1) {
+            return [];
+        }
+
+        $categoryIds = Category::OTHERS_GROUP;
+        if ($source === self::SOURCE_XXX) {
+            array_push($categoryIds, ...$this->xxxSdCategoryIds());
+        }
+
+        return array_values(array_unique($categoryIds));
+    }
+
+    /**
+     * XXX SD plus the retired XXX ids that fold into it, which keep their releases until releases:recategorize-xxx runs.
+     *
+     * @return list<int>
+     */
+    private function xxxSdCategoryIds(): array
+    {
+        return [Category::XXX_SD, ...array_keys(Category::XXX_RETIRED_FALLBACKS, Category::XXX_SD, true)];
+    }
+
+    private function searchService(): ?SearchServiceInterface
+    {
+        if ($this->searchService instanceof SearchServiceInterface) {
+            return $this->searchService;
+        }
+
+        $container = Container::getInstance();
+        if (! $container->bound(SearchServiceInterface::class)) {
+            return null;
+        }
+
+        try {
+            $service = $container->make(SearchServiceInterface::class);
+        } catch (Throwable) {
+            return null;
+        }
+
+        return $this->searchService = $service;
     }
 
     /**
@@ -399,7 +879,12 @@ final class NameFixingQueryService
         }
 
         if ($categories === 1) {
-            $where[] = 'r.categories_id IN ('.implode(',', Category::OTHERS_GROUP).')';
+            $categoryIds = Category::OTHERS_GROUP;
+            if ($source === self::SOURCE_XXX) {
+                array_push($categoryIds, ...$this->xxxSdCategoryIds());
+            }
+
+            $where[] = 'r.categories_id IN ('.implode(',', array_unique($categoryIds)).')';
         }
 
         return [implode(' AND ', $where), $bindings];
@@ -419,7 +904,7 @@ final class NameFixingQueryService
         }
 
         $placeholder = $this->placeholders((int) (count($releaseIds) / $placeholderGroups));
-        $sql = vsprintf($sql, array_fill(0, $placeholderGroups, $placeholder));
+        $sql = str_replace('%s', $placeholder, $sql);
 
         return $this->database->select($sql, $releaseIds);
     }

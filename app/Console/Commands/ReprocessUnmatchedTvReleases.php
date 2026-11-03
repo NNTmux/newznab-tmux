@@ -10,6 +10,7 @@ use App\Services\TvProcessing\TvProcessingCandidateQuery;
 use App\Services\TvProcessing\TvProcessingPipeline;
 use App\Services\TvProcessing\TvProcessingResult;
 use Illuminate\Console\Command;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Log;
 
 class ReprocessUnmatchedTvReleases extends Command
@@ -23,6 +24,8 @@ class ReprocessUnmatchedTvReleases extends Command
                             {--limit=0 : Limit the number of releases to process (0 = no limit)}
                             {--dry-run : Show how many releases would be processed without making changes}
                             {--parse-failed : Also retry releases whose names could not be parsed}
+                            {--requeue : Hand the releases back to the regular TV workers instead of processing them here}
+                            {--since= : Only releases added within this many days}
                             {--debug : Show detailed debug information for each release}
                             {--sleep=0 : Sleep time in milliseconds between processing each release}';
 
@@ -57,6 +60,11 @@ class ReprocessUnmatchedTvReleases extends Command
             ->orderBy('adddate', 'desc')
             ->orderBy('postdate', 'desc');
 
+        $since = (int) $this->option('since');
+        if ($since > 0) {
+            $query->where('adddate', '>=', now()->subDays($since));
+        }
+
         $totalCount = (clone $query)->count();
 
         if ($totalCount === 0) {
@@ -73,6 +81,10 @@ class ReprocessUnmatchedTvReleases extends Command
             $this->info("Processing limited to {$processCount} release(s).");
         } else {
             $processCount = $totalCount;
+        }
+
+        if ($this->option('requeue') && ! $dryRun) {
+            return $this->requeue($query, $processCount);
         }
 
         if ($dryRun) {
@@ -180,6 +192,24 @@ class ReprocessUnmatchedTvReleases extends Command
                 $processed > 0 ? round(($matched / $processed) * 100, 2).'%' : '0%',
             ]]
         );
+
+        return self::SUCCESS;
+    }
+
+    /**
+     * Reset the releases to Pending so the tmux TV workers look them up again with the
+     * current parser and providers, at their own pace and with the normal retry rules.
+     *
+     * @param  Builder<Release>  $query
+     */
+    private function requeue(Builder $query, int $count): int
+    {
+        $requeued = 0;
+        $query->select('id')->limit($count)->pluck('id')->chunk(1000)->each(function ($ids) use (&$requeued): void {
+            $requeued += Release::query()->whereIn('id', $ids->all())->update(TvProcessingCandidateQuery::resetColumns());
+        });
+
+        $this->info('Requeued '.number_format($requeued).' release(s) for the TV workers.');
 
         return self::SUCCESS;
     }

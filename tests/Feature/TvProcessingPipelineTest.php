@@ -13,9 +13,12 @@ use App\Services\TvProcessing\Pipes\ParseInfoPipe;
 use App\Services\TvProcessing\Pipes\TvdbPipe;
 use App\Services\TvProcessing\Pipes\TvMazePipe;
 use App\Services\TvProcessing\TvProcessingCandidateQuery;
+use App\Services\TvProcessing\TvProcessingPassable;
 use App\Services\TvProcessing\TvProcessingPipeline;
+use Closure;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Mockery;
 use Tests\Support\ConfigurationTestBuilder;
 use Tests\Support\Tv\FakeTvProvider;
 use Tests\Support\TvProcessingSchema;
@@ -68,7 +71,7 @@ class TvProcessingPipelineTest extends TestCase
 
         $episodeId = (int) DB::table('tv_episodes')->where(['videos_id' => $videoId, 'series' => 2])->value('id');
         $this->assertRelease($releaseId, $videoId, $episodeId);
-        $this->assertSame(['search' => 0, 'all' => 0, 'episode' => 1, 'airdate' => 0], $this->tvdb->calls);
+        $this->assertSame(['search' => 0, 'all' => 0, 'episode' => 1, 'airdate' => 0, 'resolve' => 0], $this->tvdb->calls);
     }
 
     public function test_missing_episode_keeps_the_show_and_is_retried_until_it_airs(): void
@@ -90,6 +93,69 @@ class TvProcessingPipelineTest extends TestCase
 
         $episodeId = (int) DB::table('tv_episodes')->where(['videos_id' => $videoId, 'series' => 3])->value('id');
         $this->assertRelease($releaseId, $videoId, $episodeId);
+    }
+
+    public function test_a_provider_without_an_id_for_a_known_show_looks_it_up_through_the_other_ids(): void
+    {
+        // Production: most shows found on TVDB carry no TVMaze id, so TVMaze was skipped.
+        $videoId = $this->insertVideo('The Traitors: New Blood', ['tvdb' => 466894]);
+        $this->tvmaze->siteIdsByTvdb[466894] = 81234;
+        $this->tvmaze->episodes[81234] = [['series' => 1, 'episode' => 7, 'firstaired' => '2026-10-31']];
+        $first = $this->insertTvRelease('The.Traitors.New.Blood.S01E07.1080p.WEB.h264-EDITH');
+        $second = $this->insertTvRelease('The.Traitors.New.Blood.S01E07.720p.WEB.h264-GRP');
+
+        $this->pipeline()->process();
+
+        $episodeId = (int) DB::table('tv_episodes')->where(['videos_id' => $videoId, 'series' => 1, 'episode' => 7])->value('id');
+        $this->assertRelease($first, $videoId, $episodeId);
+        $this->assertRelease($second, $videoId, $episodeId);
+        $this->assertSame(81234, (int) DB::table('videos')->where('id', $videoId)->value('tvmaze'));
+        $this->assertSame(1, $this->tvmaze->calls['resolve'], 'The id is stored, so the second release reuses it.');
+    }
+
+    public function test_a_show_unknown_to_a_provider_is_not_cross_referenced_again_for_a_day(): void
+    {
+        $videoId = $this->insertVideo('Severance', ['tvdb' => 371980]);
+        $this->insertTvRelease('Severance.S03E01.1080p.WEB.h264-GRP');
+        $this->insertTvRelease('Severance.S03E02.1080p.WEB.h264-GRP');
+
+        $this->pipeline()->process();
+
+        $this->assertSame(1, $this->tvmaze->calls['resolve']);
+        $this->assertSame(0, (int) DB::table('videos')->where('id', $videoId)->value('tvmaze'));
+    }
+
+    public function test_a_provider_outage_never_spends_the_last_episode_attempt(): void
+    {
+        $videoId = $this->insertVideo('Severance', ['tvdb' => 371980]);
+        $this->insertEpisode($videoId, 1, 1);
+        $releaseId = $this->insertTvRelease('Severance.S03E01.1080p.WEB.h264-GRP', [
+            'videos_id' => $videoId,
+            'tv_episodes_id' => TvLookupStatus::EpisodeMissing->value,
+            'tv_lookup_attempts' => TvProcessingCandidateQuery::MAX_EPISODE_ATTEMPTS - 1,
+            'tv_lookup_retry_at' => now()->subMinute(),
+        ]);
+        $this->tvdb->failWith = new TvProviderException('tvdb', 'TVDB returned 503', 503);
+        $this->tvmaze->failWith = new TvProviderException('tvmaze', 'TVMaze returned 503', 503);
+
+        $this->artisan('tv:reprocess-missing-episodes')->assertSuccessful();
+
+        $this->assertRelease($releaseId, $videoId, TvLookupStatus::EpisodeMissing->value, attempts: TvProcessingCandidateQuery::MAX_EPISODE_ATTEMPTS - 1);
+        $this->assertGreaterThan(now()->toDateTimeString(), DB::table('releases')->where('id', $releaseId)->value('tv_lookup_retry_at'));
+    }
+
+    public function test_a_country_qualified_release_falls_back_to_the_title_without_the_country(): void
+    {
+        $this->tvdb->shows['big brother'] = ['title' => 'Big Brother (AU)', 'country' => 'AU', 'tvdb' => 76524];
+        $this->tvdb->episodes[76524] = [['series' => 2026, 'episode' => 5, 'firstaired' => '2026-10-30']];
+        $releaseId = $this->insertTvRelease('Big.Brother.Australia.S2026E05.1080p.WEB');
+
+        $this->pipeline()->process();
+
+        $videoId = (int) DB::table('videos')->where('tvdb', 76524)->value('id');
+        $this->assertGreaterThan(0, $videoId);
+        $this->assertSame(2, $this->tvdb->calls['search'], 'Full title first, then without the country.');
+        $this->assertRelease($releaseId, $videoId, (int) DB::table('tv_episodes')->where('videos_id', $videoId)->value('id'));
     }
 
     public function test_repaired_legacy_backlog_gets_a_single_retry(): void
@@ -244,7 +310,7 @@ class TvProcessingPipelineTest extends TestCase
         $this->pipeline()->process();
 
         $this->assertSame(2, DB::table('releases')->where('tv_episodes_id', '>', 0)->count());
-        $this->assertSame(['search' => 1, 'all' => 1, 'episode' => 0, 'airdate' => 0], $this->tvdb->calls);
+        $this->assertSame(['search' => 1, 'all' => 1, 'episode' => 0, 'airdate' => 0, 'resolve' => 0], $this->tvdb->calls);
     }
 
     public function test_renamed_only_lookup_mode_applies_even_when_a_worker_passes_mode_one(): void
@@ -269,6 +335,31 @@ class TvProcessingPipelineTest extends TestCase
 
         $this->assertSame([$due], DB::table('releases')->whereRaw(TvProcessingCandidateQuery::workCondition(1))->pluck('id')->all());
         $this->assertSame(0, DB::table('releases')->whereRaw(TvProcessingCandidateQuery::workCondition(0))->count());
+    }
+
+    public function test_output_setting_is_applied_to_subsequent_processing_calls(): void
+    {
+        $releaseId = $this->insertTvRelease('Unparseable');
+        $release = DB::table('releases')->find($releaseId);
+        $pipe = Mockery::mock(ParseInfoPipe::class)->makePartial();
+        $pipe->shouldReceive('setEchoOutput')->once()->with(true)->ordered()->passthru();
+        $pipe->shouldReceive('setEchoOutput')->once()->with(false)->ordered()->passthru();
+        $pipe->shouldReceive('handle')->twice()->andReturnUsing(
+            static function (TvProcessingPassable $passable, Closure $next): TvProcessingPassable {
+                $passable->markParseFailed();
+
+                return $passable;
+            }
+        );
+        $pipeline = new TvProcessingPipeline([$pipe], false);
+        $runState = $pipeline->newRunState();
+
+        $this->assertSame($pipeline, $pipeline->setEchoOutput(true));
+        $pipeline->processRelease($release, false, $runState);
+        $this->assertSame($pipeline, $pipeline->setEchoOutput(false));
+        $pipeline->processRelease($release, false, $runState);
+
+        $this->assertRelease($releaseId, 0, TvLookupStatus::ParseFailed->value);
     }
 
     private function pipeline(): TvProcessingPipeline

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Services\Binaries\CbpOrphanPruner;
 use App\Services\XrefService;
 use App\Support\Utf8;
 use Illuminate\Console\Command;
@@ -336,6 +337,9 @@ final class OptimizeCbpStorage extends Command
         DB::statement(
             'DELETE b FROM binaries b INNER JOIN cbp_binary_map m ON m.old_id = b.id WHERE m.old_id <> m.keep_id'
         );
+        // Legacy global UNIQUE(binaryhash): numbered files share md5('file:N')
+        // across collections, so it must go before hashes are rewritten.
+        $this->dropIndexIfExists('binaries', 'binaries_binaryhash_unique');
         DB::statement('UPDATE binaries SET binaryhash = cbp_hash');
 
         $this->dropIndexIfExists('binaries', 'ux_collection_id_filenumber');
@@ -372,6 +376,20 @@ final class OptimizeCbpStorage extends Command
     {
         if (! $this->indexExists('collections', 'ix_collections_group_filecheck_seen_id')) {
             DB::statement('CREATE INDEX ix_collections_group_filecheck_seen_id ON collections (groups_id, filecheck, last_seen_at, id)');
+        }
+        // FK creation fails (1452) while orphans exist; an interrupted run left
+        // production stuck here with tens of millions of stale group rows.
+        $pruner = app(CbpOrphanPruner::class);
+        foreach (array_keys(CbpOrphanPruner::TARGETS) as $table) {
+            $deleted = $pruner->sweep($table)['deleted'];
+            $this->line(sprintf('  Removed %s orphan %s rows.', number_format($deleted), $table));
+        }
+
+        if (! $this->foreignKeyExists('binaries', 'FK_Collections')) {
+            DB::statement(
+                'ALTER TABLE binaries ADD CONSTRAINT FK_Collections
+                 FOREIGN KEY (collections_id) REFERENCES collections(id) ON DELETE CASCADE ON UPDATE CASCADE'
+            );
         }
         $this->dropForeignKeyIfExists('collection_groups', 'fk_collection_groups_collection');
         DB::statement(
@@ -439,15 +457,19 @@ final class OptimizeCbpStorage extends Command
         }
     }
 
-    private function dropForeignKeyIfExists(string $table, string $constraint): void
+    private function foreignKeyExists(string $table, string $constraint): bool
     {
-        $exists = DB::select(
+        return DB::select(
             'SELECT CONSTRAINT_NAME FROM information_schema.TABLE_CONSTRAINTS
              WHERE CONSTRAINT_SCHEMA = DATABASE() AND TABLE_NAME = ?
                AND CONSTRAINT_NAME = ? AND CONSTRAINT_TYPE = \'FOREIGN KEY\'',
             [$table, $constraint]
-        );
-        if ($exists !== []) {
+        ) !== [];
+    }
+
+    private function dropForeignKeyIfExists(string $table, string $constraint): void
+    {
+        if ($this->foreignKeyExists($table, $constraint)) {
             DB::statement("ALTER TABLE `{$table}` DROP FOREIGN KEY `{$constraint}`");
         }
     }

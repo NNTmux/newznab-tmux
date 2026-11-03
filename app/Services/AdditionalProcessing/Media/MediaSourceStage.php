@@ -305,7 +305,7 @@ class MediaSourceStage
      */
     private function deadline(ReleaseProcessingContext $context): float
     {
-        $deadline = hrtime(true) / 1e9 + $this->config->mediaStageMaxSeconds;
+        $deadline = ($context->mediaClockStart ??= hrtime(true) / 1e9) + $this->config->mediaStageMaxSeconds;
         if ($this->config->releaseProcessingTimeout > 0) {
             $deadline = min(
                 $deadline,

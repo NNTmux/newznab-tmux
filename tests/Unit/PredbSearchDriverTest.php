@@ -112,6 +112,19 @@ final class PredbSearchDriverTest extends TestCase
     }
 
     #[DataProvider('backends')]
+    public function test_filename_shared_by_several_predb_rows_is_rejected(string $backend): void
+    {
+        $queries = [];
+        $driver = $this->driver($backend, [[], [
+            ['_id' => 7, '_source' => ['title' => 'First.Scene-GROUP', 'filename' => 'movie.mkv', 'source' => 'xrel']],
+            ['_id' => 8, '_source' => ['title' => 'Unrelated.Scene-OTHER', 'filename' => 'movie.mkv', 'source' => 'xrel']],
+        ]], $queries);
+
+        self::assertNull($driver->matchPredbExact('movie.mkv'));
+        self::assertCount(2, $queries);
+    }
+
+    #[DataProvider('backends')]
     public function test_partial_or_fuzzy_hits_and_missing_ids_are_rejected(string $backend): void
     {
         $queries = [];
@@ -266,7 +279,7 @@ final class PredbSearchDriverTest extends TestCase
         } else {
             self::assertSame('custom_pre', $request['index']);
             self::assertSame(['term' => [$field.'_exact' => mb_strtolower($name)]], $request['body']['query']);
-            self::assertSame(1, $request['body']['size']);
+            self::assertSame(5, $request['body']['size']);
         }
     }
 

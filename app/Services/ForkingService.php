@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Models\Collection;
 use App\Services\Configuration\ConfigurationProvider;
 use App\Services\Runners\BackfillRunner;
 use App\Services\Runners\BinariesRunner;
@@ -273,20 +274,20 @@ class ForkingService
     protected function getReleaseWorkCount(): int
     {
         $groups = DB::select('SELECT id FROM usenet_groups WHERE (active = 1 OR backfill = 1)');
-        $count = 0;
+        try {
+            $groupsWithCollections = Collection::groupIdsWithCollections();
+        } catch (\PDOException $e) {
+            if (config('app.debug')) {
+                Log::debug($e->getMessage());
+            }
 
+            return 0;
+        }
+
+        $count = 0;
         foreach ($groups as $group) {
-            try {
-                $query = DB::select(
-                    sprintf('SELECT id FROM collections WHERE groups_id = %d LIMIT 1', $group->id)
-                );
-                if (! empty($query)) {
-                    $count++;
-                }
-            } catch (\PDOException $e) {
-                if (config('app.debug')) {
-                    Log::debug($e->getMessage());
-                }
+            if (isset($groupsWithCollections[(int) $group->id])) {
+                $count++;
             }
         }
 

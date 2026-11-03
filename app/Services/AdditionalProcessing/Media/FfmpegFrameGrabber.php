@@ -11,12 +11,17 @@ use Illuminate\Support\Facades\Log;
  * Grabs keyframes with one ffmpeg call. Only keyframes are decoded, so even a
  * frame far into a file is reached quickly, and frames are selected by
  * timestamp rather than seeking, which a partial download cannot support.
+ *
+ * Left alone, ffmpeg starts decoder and filter threads for every core on each
+ * call, and every postprocess worker grabs frames at the same time, so the
+ * thread count is capped (0 keeps ffmpeg's default).
  */
 class FfmpegFrameGrabber implements VideoFrameGrabber
 {
     public function __construct(
         private readonly MediaToolFactory $tools,
         private readonly bool $debugMode = false,
+        private readonly int $threads = 1,
     ) {}
 
     public function grab(string $videoPath, ?VideoContainer $container, float $from, float $spacing, int $count, string $outputDirectory): array
@@ -27,6 +32,7 @@ class FfmpegFrameGrabber implements VideoFrameGrabber
             $this->tools->ffmpeg()->getFFMpegDriver()->command([
                 '-y',
                 '-v', 'error',
+                ...$this->threadLimits(),
                 '-skip_frame', 'nokey',
                 ...$this->inputFormat($container),
                 '-i', $videoPath,
@@ -95,6 +101,16 @@ class FfmpegFrameGrabber implements VideoFrameGrabber
         $bitRate = self::positiveFloat($tags['BPS'] ?? null) ?? self::positiveFloat($video['bit_rate'] ?? null);
 
         return ['duration' => $duration, 'bitRate' => $bitRate === null ? null : (int) $bitRate];
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function threadLimits(): array
+    {
+        return $this->threads > 0
+            ? ['-filter_threads', (string) $this->threads, '-threads', (string) $this->threads]
+            : [];
     }
 
     /**

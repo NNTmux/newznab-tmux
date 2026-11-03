@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Runners;
 
+use App\Models\Collection;
 use App\Models\UsenetGroup;
 use App\Services\Configuration\ConfigurationProvider;
 use Illuminate\Support\Facades\DB;
@@ -18,16 +19,17 @@ class ReleasesRunner extends BaseRunner
         $maxProcesses = (int) app(ConfigurationProvider::class)->ingestion()->releaseThreads;
 
         $uGroups = [];
+        try {
+            $groupsWithCollections = Collection::groupIdsWithCollections();
+        } catch (\PDOException $e) {
+            if (config('app.debug') === true) {
+                Log::debug($e->getMessage());
+            }
+            $groupsWithCollections = [];
+        }
         foreach ($groups as $group) {
-            try {
-                $query = DB::select(sprintf('SELECT id FROM collections WHERE groups_id = %d LIMIT 1', $group->id));
-                if (! empty($query)) {
-                    $uGroups[] = ['id' => $group->id, 'name' => $group->name];
-                }
-            } catch (\PDOException $e) {
-                if (config('app.debug') === true) {
-                    Log::debug($e->getMessage());
-                }
+            if (isset($groupsWithCollections[(int) $group->id])) {
+                $uGroups[] = ['id' => $group->id, 'name' => $group->name];
             }
         }
 

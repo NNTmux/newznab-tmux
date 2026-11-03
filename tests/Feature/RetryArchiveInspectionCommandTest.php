@@ -77,6 +77,7 @@ class RetryArchiveInspectionCommandTest extends TestCase
             $this->releaseRow(6, 'Listed.Release.rar', passwordStatus: 0),
             $this->releaseRow(7, 'Pending.Release.rar', hasPreview: -1),
             $this->releaseRow(8, 'No.Nzb.Release.rar', nzbStatus: 0),
+            $this->releaseRow(9, 'Previewed.Release.rar', hasPreview: 1),
         ]);
     }
 
@@ -124,6 +125,20 @@ class RetryArchiveInspectionCommandTest extends TestCase
         $this->assertSame(0, (int) DB::table('releases')->where('id', 5)->value('haspreview'));
         $this->assertSame('2026-10-01 00:00:00', DB::table('releases')->where('id', 5)->value('archive_retry_at'));
         $this->assertSame(0, DB::table('releases')->whereIn('id', [6, 7, 8])->whereNotNull('archive_retry_at')->count());
+    }
+
+    public function test_with_preview_also_queues_unfinished_releases_that_have_a_preview(): void
+    {
+        $this->artisan('releases:retry-archive-inspection')
+            ->expectsOutput('Queued 4 release(s) for one more archive inspection.')
+            ->assertSuccessful();
+        $this->assertSame(1, (int) DB::table('releases')->where('id', 9)->value('haspreview'));
+
+        $this->artisan('releases:retry-archive-inspection', ['--with-preview' => true])
+            ->expectsOutput('Queued 1 release(s) for one more archive inspection.')
+            ->assertSuccessful();
+        $this->assertSame(-1, (int) DB::table('releases')->where('id', 9)->value('haspreview'));
+        $this->assertNotNull(DB::table('releases')->where('id', 9)->value('archive_retry_at'));
     }
 
     /**

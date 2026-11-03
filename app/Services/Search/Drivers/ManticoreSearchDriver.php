@@ -15,6 +15,8 @@ use App\Models\Release;
 use App\Models\SteamApp;
 use App\Models\Video;
 use App\Services\Search\Contracts\SearchDriverInterface;
+use App\Services\Search\DTO\NameFixingSearchQuery;
+use App\Services\Search\DTO\NameFixingSearchResult;
 use App\Services\Search\DTO\ReleaseSearchQuery;
 use App\Services\Search\DTO\SearchPage;
 use App\Services\Search\Support\ManticoreClientFactory;
@@ -166,6 +168,113 @@ class ManticoreSearchDriver implements SearchDriverInterface
             hasMore: (bool) ($result['has_more'] ?? (($query->offset + count($result['ids'])) < (int) $result['total'])),
             documents: $result['documents'] ?? [],
         );
+    }
+
+    public function searchNameFixingCandidates(NameFixingSearchQuery $query): NameFixingSearchResult
+    {
+        if (! $this->isAvailable()) {
+            return NameFixingSearchResult::unavailable($this->getDriverName());
+        }
+
+        $limit = $query->normalizedLimit((int) ($this->config['max_matches'] ?? 10000));
+
+        try {
+            $search = (new Search($this->manticoreSearch))
+                ->setTable($this->getReleasesIndex())
+                ->stripBadUtf8(true)
+                ->maxMatches($limit)
+                ->limit($limit);
+
+            $searchExpression = $this->nameFixingSearchExpression($query);
+            if ($searchExpression !== null) {
+                $search->search($searchExpression);
+            }
+
+            $releaseIds = $query->normalizedReleaseIds();
+            if (count($releaseIds) === 1) {
+                $search->filter('id', '=', $releaseIds[0]);
+            } elseif ($releaseIds !== []) {
+                $search->filter('id', 'in', $releaseIds);
+            }
+
+            $categoryIds = $query->normalizedCategoryIds();
+            if (count($categoryIds) === 1) {
+                $search->filter('categories_id', '=', $categoryIds[0]);
+            } elseif ($categoryIds !== []) {
+                $search->filter('categories_id', 'in', $categoryIds);
+            }
+
+            if ($query->afterId > 0) {
+                $search->filter('id', 'gte', $query->afterId + 1);
+            }
+            if ($query->beforeId > 0) {
+                $search->filter('id', 'lte', $query->beforeId - 1);
+            }
+            if ($query->addedAfter > 0) {
+                $search->filter('adddate_ts', 'gte', $query->addedAfter);
+            }
+
+            $matchValues = $query->normalizedMatchValues();
+            if ($query->source === NameFixingSearchQuery::SOURCE_UID) {
+                if (count($matchValues) === 1) {
+                    $search->filter('media_unique_id', '=', $matchValues[0]);
+                } elseif ($matchValues !== []) {
+                    $search->filter('media_unique_id', 'in', $matchValues);
+                } else {
+                    $search->notFilter('media_unique_id', '=', '');
+                }
+            } elseif ($query->source === NameFixingSearchQuery::SOURCE_NFO) {
+                $search->filter('nfoid', 'gte', 1);
+            } elseif ($query->source === NameFixingSearchQuery::SOURCE_MEDIA) {
+                $search->filter('has_media_info', '=', 1);
+            }
+
+            $search->sort('id', $query->descending ? 'desc' : 'asc');
+            $results = $search->get();
+            $ids = [];
+            $documents = [];
+
+            foreach ($results as $document) {
+                $id = (int) $document->getId();
+                if ($id <= 0) {
+                    continue;
+                }
+
+                $data = $document->getData();
+                $data['id'] = $id;
+                $ids[] = $id;
+                $documents[$id] = $data;
+            }
+
+            $total = (int) $results->getTotal();
+
+            return new NameFixingSearchResult(
+                ids: $ids,
+                documents: $documents,
+                total: $total,
+                available: true,
+                hasMore: count($ids) === $limit && $total > count($ids),
+                driver: $this->getDriverName(),
+            );
+        } catch (\Throwable $exception) {
+            Log::warning('ManticoreSearch name-fixing candidate query failed', [
+                'source' => $query->source,
+                'error' => $exception->getMessage(),
+            ]);
+
+            return NameFixingSearchResult::unavailable($this->getDriverName());
+        }
+    }
+
+    private function nameFixingSearchExpression(NameFixingSearchQuery $query): ?string
+    {
+        return match ($query->source) {
+            NameFixingSearchQuery::SOURCE_FILES => '@@relaxed @filename *',
+            NameFixingSearchQuery::SOURCE_SRR => '@@relaxed @filename (srr | srs)',
+            NameFixingSearchQuery::SOURCE_XXX => '@@relaxed @(filename,searchname) (SDX264XXX | SDPORN)',
+            NameFixingSearchQuery::SOURCE_MEDIA_MOVIE => '@@relaxed @media_movie_name *',
+            default => null,
+        };
     }
 
     /**
@@ -1383,9 +1492,11 @@ class ManticoreSearchDriver implements SearchDriverInterface
 
         $result = $this->searchIndexes($this->getPredbIndex(), $searchString, ['title', 'filename'], []); // @phpstan-ignore argument.type
 
+        $records = is_array($result['data'] ?? null) ? $result['data'] : [];
+        $resultIds = is_array($result['id'] ?? null) ? $result['id'] : [];
         $hits = [];
-        foreach ($result['data'] ?? [] as $offset => $row) {
-            $id = (int) ($result['id'][$offset] ?? 0);
+        foreach ($records as $offset => $row) {
+            $id = (int) ($resultIds[$offset] ?? 0);
             if ($id > 0) {
                 $hits[] = PredbSearchDocument::normalize($row, $id);
             }
@@ -1414,12 +1525,18 @@ class ManticoreSearchDriver implements SearchDriverInterface
                     ->limit(5)
                     ->get();
 
+                $hits = [];
                 foreach ($results as $doc) {
                     $hit = PredbSearchDocument::normalize($doc->getData(), (int) $doc->getId());
                     if ($hit['id'] > 0 && $hit['title'] !== ''
                         && PredbSearchDocument::exactValue($hit[$field]) === PredbSearchDocument::exactValue($name)) {
-                        return $hit;
+                        $hits[$hit['id']] = $hit;
                     }
+                }
+
+                $match = PredbSearchDocument::unambiguousExactHit($field, $hits);
+                if ($match !== null) {
+                    return $match;
                 }
             }
         } catch (\Throwable $exception) {
@@ -1836,7 +1953,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
 
         $cached = Cache::get($cacheKey);
         if ($cached !== null) {
-            return $cached;
+            return $this->normalizeSuggestions($cached);
         }
 
         $suggestions = [];
@@ -1855,13 +1972,9 @@ class ManticoreSearchDriver implements SearchDriverInterface
             ]);
 
             if (! empty($result) && is_array($result)) {
-                foreach ($result as $item) {
-                    if (isset($item['suggest']) && $item['suggest'] !== $query) {
-                        $suggestions[] = [
-                            'suggest' => $item['suggest'],
-                            'distance' => $item['distance'] ?? 0,
-                            'docs' => $item['docs'] ?? 0,
-                        ];
+                foreach ($this->normalizeSuggestions($result) as $item) {
+                    if ($item['suggest'] !== $query) {
+                        $suggestions[] = $item;
                     }
                 }
             }
@@ -1876,11 +1989,46 @@ class ManticoreSearchDriver implements SearchDriverInterface
             $suggestions = $this->suggestFallback($query, $index);
         }
 
+        $suggestions = $this->normalizeSuggestions($suggestions);
+
         if (! empty($suggestions)) {
             Cache::put($cacheKey, $suggestions, now()->addMinutes($this->config['cache_minutes'] ?? 5));
         }
 
         return $suggestions;
+    }
+
+    /**
+     * @return array<array{suggest: string, distance: int, docs: int}>
+     */
+    private function normalizeSuggestions(mixed $suggestions): array
+    {
+        if (! is_array($suggestions)) {
+            return [];
+        }
+
+        $normalized = [];
+
+        foreach ($suggestions as $suggestion) {
+            if (! is_array($suggestion) || ! is_scalar($suggestion['suggest'] ?? null)) {
+                continue;
+            }
+
+            $suggestionText = trim((string) $suggestion['suggest']);
+            if ($suggestionText === '') {
+                continue;
+            }
+
+            $distance = $suggestion['distance'] ?? 0;
+            $docs = $suggestion['docs'] ?? 0;
+            $normalized[] = [
+                'suggest' => $suggestionText,
+                'distance' => is_numeric($distance) ? (int) $distance : 0,
+                'docs' => is_numeric($docs) ? (int) $docs : 0,
+            ];
+        }
+
+        return $normalized;
     }
 
     /**

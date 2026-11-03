@@ -219,7 +219,7 @@ class ReleaseBrowseService
             $searchIndexFilter,
             $orderBy[0], // @phpstan-ignore offsetAccess.notFound
             $orderBy[1], // @phpstan-ignore offsetAccess.notFound
-            ($start === 0 ? ' LIMIT '.$num : ' LIMIT '.$num.' OFFSET '.$start)
+            $this->buildLimitClause($start, $num)
         );
 
         $cacheKey = md5($cacheVersion.$qry.$page);
@@ -556,6 +556,19 @@ class ReleaseBrowseService
     }
 
     /**
+     * LIMIT/OFFSET for the browse query; a non-positive limit means no limit.
+     */
+    private function buildLimitClause(mixed $start, mixed $num): string
+    {
+        $limit = (int) $num;
+        if ($limit <= 0) {
+            return '';
+        }
+
+        return sprintf(' LIMIT %d OFFSET %d', $limit, max(0, (int) $start));
+    }
+
+    /**
      * Return ordering types usable on site.
      *
      * @return array<int, string>
@@ -586,6 +599,7 @@ class ReleaseBrowseService
      */
     public function getShowsRange(mixed $userShows, mixed $offset, mixed $limit, mixed $orderBy, int $maxAge = -1, array $excludedCats = [])
     {
+        $cacheVersion = $this->getCacheVersion();
         $orderBy = $this->getBrowseOrder($orderBy);
         $sql = sprintf(
             "SELECT r.id, r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, r.haspreview, r.jpgstatus,  cp.title AS parent_category, c.title AS sub_category,
@@ -609,13 +623,14 @@ class ReleaseBrowseService
             $orderBy[1], // @phpstan-ignore offsetAccess.notFound
             ($offset === false ? '' : (' LIMIT '.$limit.' OFFSET '.$offset))
         );
+        $cacheKey = 'shows_'.md5($cacheVersion.$sql);
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
-        $result = Cache::get(md5($sql));
+        $result = Cache::get($cacheKey);
         if ($result !== null) {
             return $result;
         }
         $result = Release::fromQuery($sql);
-        Cache::put(md5($sql), $result, $expiresAt);
+        Cache::put($cacheKey, $result, $expiresAt);
 
         return $result;
     }
@@ -627,7 +642,7 @@ class ReleaseBrowseService
     {
         return $this->getPagerCount(
             sprintf(
-                'SELECT r.id
+                'SELECT COUNT(*) AS count
 				FROM releases r
 				WHERE %s %s
 				AND r.categories_id BETWEEN %d AND %d

@@ -44,6 +44,30 @@ abstract class AbstractTvProvider extends BaseVideoProvider
     /** Minimum title similarity (percent) for a search result to be considered. */
     protected const MATCH_PROBABILITY = 75;
 
+    /** Similarity needed when either title is shorter than 8 characters. */
+    protected const SHORT_TITLE_MATCH_PROBABILITY = 90;
+
+    /**
+     * ISO 3166 alpha-3 codes (TVDB v4 returns "usa", "gbr") to the alpha-2 codes stored
+     * in videos.countries_id.
+     */
+    private const ALPHA3_TO_ALPHA2 = [
+        'USA' => 'US', 'GBR' => 'GB', 'CAN' => 'CA', 'AUS' => 'AU', 'NZL' => 'NZ', 'IRL' => 'IE',
+        'DEU' => 'DE', 'AUT' => 'AT', 'CHE' => 'CH', 'FRA' => 'FR', 'BEL' => 'BE', 'NLD' => 'NL',
+        'LUX' => 'LU', 'ESP' => 'ES', 'PRT' => 'PT', 'ITA' => 'IT', 'GRC' => 'GR', 'SWE' => 'SE',
+        'NOR' => 'NO', 'DNK' => 'DK', 'FIN' => 'FI', 'ISL' => 'IS', 'POL' => 'PL', 'CZE' => 'CZ',
+        'SVK' => 'SK', 'HUN' => 'HU', 'ROU' => 'RO', 'BGR' => 'BG', 'HRV' => 'HR', 'SRB' => 'RS',
+        'SVN' => 'SI', 'BIH' => 'BA', 'MKD' => 'MK', 'EST' => 'EE', 'LVA' => 'LV', 'LTU' => 'LT',
+        'UKR' => 'UA', 'RUS' => 'RU', 'TUR' => 'TR', 'ISR' => 'IL', 'EGY' => 'EG', 'SAU' => 'SA',
+        'ARE' => 'AE', 'IND' => 'IN', 'PAK' => 'PK', 'JPN' => 'JP', 'KOR' => 'KR', 'CHN' => 'CN',
+        'TWN' => 'TW', 'HKG' => 'HK', 'THA' => 'TH', 'PHL' => 'PH', 'IDN' => 'ID', 'MYS' => 'MY',
+        'SGP' => 'SG', 'VNM' => 'VN', 'BRA' => 'BR', 'MEX' => 'MX', 'ARG' => 'AR', 'COL' => 'CO',
+        'CHL' => 'CL', 'PER' => 'PE', 'VEN' => 'VE', 'ZAF' => 'ZA', 'NGA' => 'NG', 'KEN' => 'KE',
+    ];
+
+    /** @var array<string, string> country names already resolved through the countries table */
+    private static array $countryNameCodes = [];
+
     /** Seconds to wait for the per-show episode insert lock. */
     private const EPISODE_LOCK_SECONDS = 120;
 
@@ -252,11 +276,35 @@ abstract class AbstractTvProvider extends BaseVideoProvider
             }
         }
 
-        return (int) Video::query()
-            ->where('title', (string) ($show['title'] ?? ''))
+        // Same title alone isn't the same show: "The Office" (GB, 2001) and "The Office"
+        // (US, 2005) must stay apart. A missing year or country on either side is no conflict.
+        $title = mb_substr((string) ($show['title'] ?? ''), 0, 180);
+        if ($title === '') {
+            return 0;
+        }
+
+        $country = (string) ($show['country'] ?? '');
+        $year = $this->yearOf($show['started'] ?? null);
+        $rows = Video::query()
+            ->where('title', $title)
             ->where('type', (int) ($show['type'] ?? parent::TYPE_TV))
             ->orderBy('id')
-            ->value('id');
+            ->get(['id', 'countries_id', 'started']);
+
+        foreach ($rows as $row) {
+            $rowCountry = $this->normalizeCountry((string) $row->countries_id);
+            $rowYear = $this->yearOf((string) $row->started);
+            if ($country !== '' && $rowCountry !== '' && $country !== $rowCountry) {
+                continue;
+            }
+            if ($year !== null && $rowYear !== null && abs($year - $rowYear) > 1) {
+                continue;
+            }
+
+            return (int) $row->id;
+        }
+
+        return 0;
     }
 
     /**
@@ -459,7 +507,16 @@ abstract class AbstractTvProvider extends BaseVideoProvider
             return $code === 'UK' ? 'GB' : $code;
         }
 
-        return countryCode($country);
+        if (\strlen($country) === 3) {
+            $code = strtoupper($country);
+            if (isset(self::ALPHA3_TO_ALPHA2[$code])) {
+                return self::ALPHA3_TO_ALPHA2[$code];
+            }
+        }
+
+        $key = mb_strtolower($country);
+
+        return self::$countryNameCodes[$key] ??= countryCode($country);
     }
 
     protected function normalizeImdbValue(mixed $value): string
@@ -579,6 +636,7 @@ abstract class AbstractTvProvider extends BaseVideoProvider
      */
     public function parseInfo(string $relname): bool|array
     {
+        $relname = $this->stripReleaseNoise($relname);
         $showInfo['name'] = $this->parseName($relname);
 
         if (! empty($showInfo['name'])) {
@@ -588,13 +646,21 @@ abstract class AbstractTvProvider extends BaseVideoProvider
             // Clean show name.
             $showInfo['cleanname'] = preg_replace('/ - \d+$/i', '', $this->cleanName($showInfo['name']));
             $showInfo['cleanname'] = $this->normalizeShowTitle($showInfo['cleanname']);
+            $showInfo['searchname'] = $showInfo['country'] !== ''
+                ? $this->splitTrailingCountry($showInfo['cleanname'])['title']
+                : $showInfo['cleanname'];
 
             // Get the Season/Episode/Airdate
             $showInfo += $this->parseSeasonEp($relname);
+            $titlePart = (string) ($showInfo['prefix'] ?? $relname);
+            unset($showInfo['prefix']);
 
             if (isset($showInfo['season'], $showInfo['episode'])) {
                 if (! isset($showInfo['airdate'])) {
-                    if (preg_match('/[^a-z0-9](?P<year>(19|20)(\d{2}))[^a-z0-9]/i', $relname, $yearMatch)) {
+                    // Only a year inside the title part ("Doctor.Who.2005.S01E01") is the show's year;
+                    // one after the episode marker is usually an episode title or a release date.
+                    if (preg_match('/[^a-z0-9](?P<year>(19|20)(\d{2}))(?=[^a-z0-9]|$)/i', $titlePart, $yearMatch)
+                        || preg_match('/[^a-z0-9]s\d{1,3}[^a-z0-9]?e\d{1,3}[._ ](?P<year>(19|20)\d{2})[._ ](?:\d{3,4}[pi]|WEB|HDTV|Blu-?Ray)/i', $relname, $yearMatch)) {
                         $showInfo['cleanname'] .= ' ('.$yearMatch['year'].')';
                         $showInfo['year'] = (int) $yearMatch['year'];
                     }
@@ -609,6 +675,37 @@ abstract class AbstractTvProvider extends BaseVideoProvider
         }
 
         return false;
+    }
+
+    /**
+     * Remove tokens that release groups add around the show title but no metadata
+     * source knows: sign-language "Signed" versions, broadcast time slots ("4PM"),
+     * "Volume N YYYY" collections, spam site prefixes, HTML-entity leftovers and
+     * quoted par2/rar filenames.
+     */
+    protected function stripReleaseNoise(string $relname): string
+    {
+        $relname = trim($relname);
+
+        // "ghost.hunters.s08e05.hdtv.xvid-grp.vol03+04.par2" wrapped in quotes.
+        if (preg_match('/^"(?P<file>[^"]+)"$/', $relname, $quoted)) {
+            $relname = $quoted['file'];
+        }
+        $relname = (string) preg_replace('/(\.vol\d+\+\d+)?\.(par2|rar|r\d{2}|nzb|mkv|mp4|avi)$/i', '', $relname);
+
+        // "www.site.com - Show" and "movieddl.me.Show" (lowercase site, then the real title).
+        $relname = (string) preg_replace('/^www\.[\w-]+\.[a-z]{2,4}[\s._-]+/i', '', $relname);
+        $relname = (string) preg_replace('/^[a-z0-9-]{3,}\.(?:me|com|net|org|to|ws|cc|info)[._ -]+(?=[A-Z0-9])/', '', $relname);
+
+        // "&amp;" with the punctuation stripped: "Preston.andamp.Brianna", "AandampE".
+        $relname = (string) preg_replace('/andamp/i', 'and', $relname);
+
+        $relname = (string) preg_replace('/(?<=[._ ])Signed(?:[._ ]Version)?(?=[._ -])/i', '', $relname);
+        $relname = (string) preg_replace('/(?<=[._ ])\d{1,2}(?:AM|PM)(?=[._ ])/i', '', $relname);
+        $relname = (string) preg_replace('/(?<=[._ ])Volume[._ ]\d{1,3}(?:[._ ](?:19|20)\d{2})?(?=[._ ])/i', '', $relname);
+
+        // Removing a token leaves a doubled separator behind.
+        return (string) preg_replace('/([._ ])[._ ]+/', '$1', $relname);
     }
 
     /**
@@ -663,10 +760,13 @@ abstract class AbstractTvProvider extends BaseVideoProvider
      */
     private function convertAcronyms(string $str): string
     {
+        // "S.W.A.T.Exiles" -> "SWAT.Exiles": a dot that ends the acronym stays as a separator.
         return preg_replace_callback(
             '/\b((?:[A-Za-z]\.){2,}[A-Za-z]?\.?)\b/',
             function ($matches) {
-                return str_replace('.', '', $matches[1]);
+                $acronym = $matches[1];
+
+                return str_replace('.', '', $acronym).(str_ends_with($acronym, '.') ? '.' : '');
             },
             $str
         );
@@ -751,8 +851,13 @@ abstract class AbstractTvProvider extends BaseVideoProvider
     {
         $episodeArr = [];
 
+        // S2026E05: daily and yearly shows numbered by year
+        if (preg_match('/^(.*?)[^a-z0-9]s((?:19|20)\d{2})[^a-z0-9]?e(\d{1,3})(?!\d)/i', $relname, $hits)) {
+            $episodeArr['season'] = (int) $hits[2];
+            $episodeArr['episode'] = (int) $hits[3];
+        }
         // S01E01-E02 and S01E01-02
-        if (preg_match('/^(.*?)[^a-z0-9]s(\d{1,2})[^a-z0-9]?e(\d{1,3})[e-](\d{1,3})[^a-z0-9]?/i', $relname, $hits)) {
+        elseif (preg_match('/^(.*?)[^a-z0-9]s(\d{1,2})[^a-z0-9]?e(\d{1,3})[e-](\d{1,3})[^a-z0-9]?/i', $relname, $hits)) {
             $episodeArr['season'] = (int) $hits[2];
             $episodeArr['episode'] = [(int) $hits[3], (int) $hits[4]];
         }
@@ -761,8 +866,8 @@ abstract class AbstractTvProvider extends BaseVideoProvider
             $episodeArr['season'] = (int) $hits[2];
             $episodeArr['episode'] = (int) $hits[3];
         }
-        // S01E01 and S01.E01
-        elseif (preg_match('/^(.*?)[^a-z0-9]s(\d{1,2})[^a-z0-9]?e(\d{1,3})[abr]?[^a-z0-9]?/i', $relname, $hits)) {
+        // S01E01, S01.E01 and long-running S196E01
+        elseif (preg_match('/^(.*?)[^a-z0-9]s(\d{1,3})[^a-z0-9]?e(\d{1,3})[abr]?[^a-z0-9]?/i', $relname, $hits)) {
             $episodeArr['season'] = (int) $hits[2];
             $episodeArr['episode'] = (int) $hits[3];
         }
@@ -771,8 +876,8 @@ abstract class AbstractTvProvider extends BaseVideoProvider
             $episodeArr['season'] = (int) $hits[2];
             $episodeArr['episode'] = 'all';
         }
-        // S01
-        elseif (preg_match('/^(.*?)[^a-z0-9]s(\d{1,2})[^a-z0-9]?/i', $relname, $hits)) {
+        // S01 as a whole token, so group names like "-S4LT" aren't season packs
+        elseif (preg_match('/^(.*?)[^a-z0-9]s(\d{1,2})(?![a-z0-9])/i', $relname, $hits)) {
             $episodeArr['season'] = (int) $hits[2];
             $episodeArr['episode'] = 'all';
         }
@@ -825,11 +930,18 @@ abstract class AbstractTvProvider extends BaseVideoProvider
         elseif (preg_match('/[_\s][-_][_\s](\d{1,3})[_\s]*[\[(]/i', $relname, $hits)) {
             $episodeArr['season'] = 1;
             $episodeArr['episode'] = (int) $hits[1];
+
+            return $episodeArr;
         }
         // Season.1
         elseif (preg_match('/^(.*?)[^a-z0-9]Seasons?[^a-z0-9]?(\d{1,2})/i', $relname, $hits)) {
             $episodeArr['season'] = (int) $hits[2];
             $episodeArr['episode'] = 'all';
+        }
+
+        // Every other pattern captures the text before the episode marker: the title part.
+        if ($episodeArr !== [] && isset($hits[1])) {
+            $episodeArr['prefix'] = $hits[1];
         }
 
         return $episodeArr;
@@ -866,24 +978,35 @@ abstract class AbstractTvProvider extends BaseVideoProvider
      */
     private function parseCountry(string $showName): string
     {
-        if (preg_match('/[^a-z0-9](US|UK|AU|NZ|CA|NL|Canada|Australia|America|United[^a-z0-9]States|United[^a-z0-9]Kingdom)/i', $showName, $countryMatch)) {
-            $currentCountry = strtolower($countryMatch[1]);
-            if ($currentCountry === 'canada') {
-                $country = 'CA';
-            } elseif ($currentCountry === 'australia') {
-                $country = 'AU';
-            } elseif ($currentCountry === 'america' || $currentCountry === 'united states') {
-                $country = 'US';
-            } elseif ($currentCountry === 'united kingdom') {
-                $country = 'UK';
-            } else {
-                $country = strtoupper($countryMatch[1]);
-            }
-        } else {
-            $country = '';
+        return $this->splitTrailingCountry($showName)['country'];
+    }
+
+    /**
+     * Split a trailing country qualifier off a show title: "Ghosts US" or "Love Island
+     * Australia". Two-letter codes must be upper case ("The Last of Us" keeps its "Us")
+     * and only the last word counts ("Better Call Saul" has no Canada in it).
+     *
+     * @return array{title: string, country: string}
+     */
+    public function splitTrailingCountry(string $title): array
+    {
+        $title = trim($title);
+        $names = [
+            'united states' => 'US', 'united kingdom' => 'GB', 'canada' => 'CA', 'australia' => 'AU',
+            'new zealand' => 'NZ',
+        ];
+
+        if (preg_match('/^(?P<title>.+?)[\s._-]+\(?(?P<code>US|UK|GB|AU|NZ|CA|NL|IE|IL|TH|DE|FR|ES|SE|DK|NO|FI|BR|MX|KR|JP|IN|ZA|PL|BE)\)?$/', $title, $match)) {
+            return ['title' => $match['title'], 'country' => $this->normalizeCountryCode($match['code'])];
         }
 
-        return $country;
+        if (preg_match('/^(?P<title>.+?)[\s._-]+\(?(?P<name>'.implode('|', array_map(fn (string $name): string => str_replace(' ', '[\s._]', $name), array_keys($names))).')\)?$/i', $title, $match)) {
+            $name = strtolower((string) preg_replace('/[\s._]+/', ' ', $match['name']));
+
+            return ['title' => $match['title'], 'country' => $names[$name]];
+        }
+
+        return ['title' => $title, 'country' => ''];
     }
 
     /**
@@ -907,15 +1030,16 @@ abstract class AbstractTvProvider extends BaseVideoProvider
         $str = str_replace(["'", ':', '!', '"', '#', '*', "'", ',', '(', ')', '?'], '', $str);
         $str = str_replace('$', 's', $str);
 
-        // Remove language tags that are commonly found in release names
-        $str = preg_replace('/\b(German|French|Spanish|Italian|Dutch|Russian|Japanese|Korean|Chinese|Portuguese|Swedish|Norwegian|Danish|Finnish|Polish|Czech|Hungarian|Romanian|Greek|Turkish|Arabic|Hebrew|Hindi|Thai|Vietnamese|Indonesian|Malay|Tagalog|DL|Dubbed|Subbed|MULTI|MULTi)\b/i', '', $str);
+        // Remove language tags after the title ("Show German DL"). Only trailing ones, and
+        // never the whole title, so "Greek" and "Russian Doll" stay intact.
+        $str = preg_replace('/(?<=\S)(\s+(German|French|Spanish|Italian|Dutch|Russian|Japanese|Korean|Chinese|Portuguese|Swedish|Norwegian|Danish|Finnish|Polish|Czech|Hungarian|Romanian|Greek|Turkish|Arabic|Hebrew|Hindi|Thai|Vietnamese|Indonesian|Malay|Tagalog|DL|Dubbed|Subbed|MULTI))+\s*$/i', '', $str);
 
         // Remove common subtitle/episode indicators that aren't part of the show title
         $str = preg_replace('/\s+-\s+.*(wo andere|where others|Arbeiten|Working).*$/i', '', $str);
 
-        // Clean up trailing hyphens, episode numbers, and other artifacts
+        // Clean up trailing hyphens and other artifacts. Trailing numbers stay: they are
+        // part of titles like "The 100", "Station 19" and "Babylon 5".
         $str = preg_replace('/\s*-\s*$/', '', $str);  // Trailing hyphen
-        $str = preg_replace('/\s+\d{1,3}\s*$/', '', $str);  // Trailing episode number
         $str = preg_replace('/\s+-$/', '', $str);  // Another trailing hyphen cleanup
 
         $str = preg_replace('/\s{2,}/', ' ', $str);
@@ -965,19 +1089,29 @@ abstract class AbstractTvProvider extends BaseVideoProvider
         string $candidateCountry = '',
     ): float {
         $candidateYear = $this->yearOf($candidateStarted);
-        if (preg_match('/^(?P<title>.+?)\s*\((?P<year>(19|20)\d{2})\)$/', trim($candidateTitle), $titleYear) === 1) {
+        $candidateTitle = trim($candidateTitle);
+        if (preg_match('/^(?P<title>.+?)\s*\((?P<year>(19|20)\d{2})\)$/', $candidateTitle, $titleYear) === 1) {
             $candidateTitle = $titleYear['title'];
             $candidateYear ??= (int) $titleYear['year'];
         }
+        // "Ghosts (US)", "Big Brother (UK)": the qualifier is the candidate's country, not its title.
+        if (preg_match('/^(?P<title>.+?)\s*\((?P<code>[A-Z]{2})\)$/', $candidateTitle, $titleCountry) === 1) {
+            $candidateTitle = $titleCountry['title'];
+            if (trim($candidateCountry) === '') {
+                $candidateCountry = $titleCountry['code'];
+            }
+        }
 
-        $ours = mb_strtolower(trim($ourName));
-        $theirs = mb_strtolower(trim($candidateTitle));
+        $ours = $this->comparableTitle($ourName);
+        $theirs = $this->comparableTitle($candidateTitle);
         if ($ours === '' || $theirs === '') {
             return 0.0;
         }
 
+        // Short titles are one letter away from another show ("you" / "yo").
+        $threshold = min(mb_strlen($ours), mb_strlen($theirs)) < 8 ? self::SHORT_TITLE_MATCH_PROBABILITY : self::MATCH_PROBABILITY;
         $exact = $ours === $theirs;
-        $score = $exact ? 100.0 : $this->checkMatch($theirs, $ours, self::MATCH_PROBABILITY);
+        $score = $exact ? 100.0 : $this->checkMatch($theirs, $ours, $threshold);
         if ($score <= 0.0) {
             return 0.0;
         }
@@ -992,12 +1126,33 @@ abstract class AbstractTvProvider extends BaseVideoProvider
             }
         }
 
-        if ($ourCountry !== '' && $candidateCountry !== ''
-            && $this->normalizeCountryCode($ourCountry) === $this->normalizeCountryCode($candidateCountry)) {
-            $score += 2.0;
+        $ourCode = $this->normalizeCountry($ourCountry);
+        $theirCode = $this->normalizeCountry($candidateCountry);
+        if ($ourCode !== '' && $theirCode !== '') {
+            // A release that names its country ("Shameless US") prefers that version.
+            $score += $ourCode === $theirCode ? 2.0 : -5.0;
         }
 
         return $score;
+    }
+
+    /**
+     * Title reduced to what both sides of a comparison can agree on: lower case, ASCII,
+     * "&" as "and", no punctuation ("Grey's Anatomy" equals "Greys Anatomy").
+     */
+    public function comparableTitle(string $title): string
+    {
+        $title = mb_strtolower(trim($title));
+        $ascii = function_exists('iconv') ? @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $title) : false;
+        // Only when transliteration kept every character: CJK titles would turn into "???".
+        if (\is_string($ascii) && trim($ascii) !== '' && substr_count($ascii, '?') === substr_count($title, '?')) {
+            $title = strtolower($ascii);
+        }
+        $title = str_replace('&', ' and ', $title);
+        $title = (string) preg_replace("/['\x{2019}`\"]/u", '', $title);
+        $title = (string) preg_replace('/[^\p{L}\p{N}]+/u', ' ', $title);
+
+        return trim((string) preg_replace('/\s+/', ' ', $title));
     }
 
     private function yearOf(mixed $date): ?int
@@ -1094,7 +1249,8 @@ abstract class AbstractTvProvider extends BaseVideoProvider
                 }
             }
 
-            $traktService = app(TraktService::class);
+            // Throwing variant: the default one sleeps up to 5 minutes on a 429.
+            $traktService = app(TraktService::class)->throwingOnTransientFailure();
             if ($traktService->isConfigured()) {
                 $traktIds = null;
                 if ($tvdbId > 0) {
@@ -1115,6 +1271,43 @@ abstract class AbstractTvProvider extends BaseVideoProvider
         }
 
         return $result;
+    }
+
+    /**
+     * This provider's id for a stored show that another provider found, looked up through
+     * the show's other ids; 0 when the provider has no cross-reference or no match.
+     *
+     * @param  array{trakt: int, tmdb: int, tvdb: int, tvmaze: int, imdb: string}  $knownIds
+     */
+    public function resolveSiteId(array $knownIds): int
+    {
+        return 0;
+    }
+
+    /**
+     * The stored ids of a show, for resolveSiteId().
+     *
+     * @return array{trakt: int, tmdb: int, tvdb: int, tvmaze: int, imdb: string}
+     */
+    public function knownSiteIds(int $videoId): array
+    {
+        $video = Video::query()->where('id', $videoId)->first(['trakt', 'tmdb', 'tvdb', 'tvmaze', 'imdb']);
+
+        return [
+            'trakt' => (int) ($video->trakt ?? 0),
+            'tmdb' => (int) ($video->tmdb ?? 0),
+            'tvdb' => (int) ($video->tvdb ?? 0),
+            'tvmaze' => (int) ($video->tvmaze ?? 0),
+            'imdb' => $this->normalizeImdbValue($video->imdb ?? ''),
+        ];
+    }
+
+    /** "tt0903747" for a stored IMDb id, or '' when there is none. */
+    protected function imdbWithPrefix(string $imdb): string
+    {
+        $digits = ltrim(preg_replace('/\D/', '', $imdb) ?? '', '0');
+
+        return $digits !== '' ? 'tt'.str_pad($digits, 7, '0', STR_PAD_LEFT) : '';
     }
 
     /**

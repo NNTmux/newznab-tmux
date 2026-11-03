@@ -34,23 +34,43 @@ class TmdbProvider extends AbstractTvProvider
 
         $name = (string) preg_replace('# \((19|20)\d{2}\)$#', '', $name);
 
-        $response = $year !== null ? $this->tmdbClient->searchTv($name, 1, $year) : null;
-        if (empty($response['results'])) {
+        // A wrong year filters the right show out, so an unconvincing year-filtered
+        // search is retried without the year.
+        $highest = null;
+        if ($year !== null) {
+            $response = $this->tmdbClient->searchTv($name, 1, $year);
+            $highest = $this->bestResult(\is_array($response['results'] ?? null) ? $response['results'] : [], $name, $year, $country);
+        }
+        if ($highest === null) {
             $response = $this->tmdbClient->searchTv($name);
+            $highest = $this->bestResult(\is_array($response['results'] ?? null) ? $response['results'] : [], $name, $year, $country);
         }
 
-        if (empty($response['results']) || ! \is_array($response['results'])) {
-            return false;
+        return $highest !== null ? $this->withDetails($highest) : false;
+    }
+
+    public function resolveSiteId(array $knownIds): int
+    {
+        if (! $this->tmdbClient->isConfigured()) {
+            return 0;
         }
 
-        return $this->matchShowInfo($response['results'], $name, $year, $country);
+        $tmdbId = $knownIds['tvdb'] > 0 ? (int) ($this->tmdbClient->lookupTvShowIds($knownIds['tvdb'], 'tvdb')['tmdb'] ?? 0) : 0;
+        $imdb = $this->imdbWithPrefix($knownIds['imdb']);
+        if ($tmdbId === 0 && $imdb !== '') {
+            $tmdbId = (int) ($this->tmdbClient->lookupTvShowIds($imdb, 'imdb')['tmdb'] ?? 0);
+        }
+
+        return $tmdbId;
     }
 
     /**
+     * The highest scoring search result, or null when nothing scores.
+     *
      * @param  array<int|string, mixed>  $shows
-     * @return array<string, mixed>|false
+     * @return array<string, mixed>|null
      */
-    private function matchShowInfo(array $shows, string $cleanName, ?int $year, string $country): array|false
+    private function bestResult(array $shows, string $cleanName, ?int $year, string $country): ?array
     {
         $highestScore = 0.0;
         $highest = null;
@@ -77,10 +97,15 @@ class TmdbProvider extends AbstractTvProvider
             }
         }
 
-        if ($highest === null) {
-            return false;
-        }
+        return $highest;
+    }
 
+    /**
+     * @param  array<string, mixed>  $highest
+     * @return array<string, mixed>|false
+     */
+    private function withDetails(array $highest): array|false
+    {
         $showId = TmdbClient::getInt($highest, 'id');
         if ($showId === 0) {
             return false;
@@ -228,7 +253,8 @@ class TmdbProvider extends AbstractTvProvider
     protected function lookupTraktId(int $tmdbId, int|string $imdbId, int $tvdbId): int
     {
         try {
-            $traktService = app(TraktService::class);
+            // Throwing variant: the default one sleeps up to 5 minutes on a 429.
+            $traktService = app(TraktService::class)->throwingOnTransientFailure();
 
             if (! $traktService->isConfigured()) {
                 return 0;

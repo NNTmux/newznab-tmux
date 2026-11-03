@@ -173,6 +173,10 @@ if (! function_exists('getSimilarName')) {
 if (! function_exists('human_filesize')) {
     function human_filesize(int|float|string $bytes, int $decimals = 0): string
     {
+        $bytes = (int) $bytes;
+        if ($bytes <= 0) {
+            return '0 B';
+        }
         $size = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
         $factor = (int) floor((\strlen((string) $bytes) - 1) / 3);
 

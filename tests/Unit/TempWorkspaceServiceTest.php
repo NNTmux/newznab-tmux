@@ -58,6 +58,18 @@ class TempWorkspaceServiceTest extends TestCase
     }
 
     #[WithoutErrorHandler]
+    public function test_create_release_temp_folder_recreates_deleted_worker_directory(): void
+    {
+        $main = $this->svc->ensureMainTempPath($this->base, 'a', '', 'worker');
+        File::deleteDirectory($this->base.DIRECTORY_SEPARATOR.'a');
+
+        $tmp = $this->svc->createReleaseTempFolder($main, 'guid-123');
+
+        $this->assertTrue(File::isDirectory($main));
+        $this->assertTrue(File::isDirectory($tmp));
+    }
+
+    #[WithoutErrorHandler]
     public function test_worker_workspaces_are_isolated_within_a_guid_bucket(): void
     {
         $first = $this->svc->ensureMainTempPath($this->base, 'a', '', 'worker-one');

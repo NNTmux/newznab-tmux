@@ -18,6 +18,7 @@ final readonly class ParsedTvRelease
         public bool $seasonPack,
         public ?string $airdate,
         public ?int $year,
+        public string $searchName = '',
     ) {}
 
     /**
@@ -48,6 +49,7 @@ final readonly class ParsedTvRelease
             seasonPack: $seasonPack,
             airdate: $airdate !== '' ? $airdate : null,
             year: is_numeric($year) ? (int) $year : null,
+            searchName: (string) ($info['searchname'] ?? ''),
         );
     }
 
@@ -70,6 +72,15 @@ final readonly class ParsedTvRelease
     public function titleWithoutYear(): string
     {
         return trim((string) preg_replace('/\s*\((19|20)\d{2}\)$/', '', $this->cleanName));
+    }
+
+    /**
+     * The title to search metadata sources with: no year suffix and no trailing country
+     * qualifier ("Ghosts US" searches "Ghosts"; the country is scored separately).
+     */
+    public function searchTitle(): string
+    {
+        return $this->searchName !== '' ? $this->searchName : $this->titleWithoutYear();
     }
 
     /** Two-letter country parsed from the name, or ''. */

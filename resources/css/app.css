@@ -1442,6 +1442,23 @@ footer {
     .dark textarea:not([class*="dark:text-"]) {
         color: rgb(243 244 246) !important; /* gray-100 */
     }
+
+    /* Native dropdowns need their own dark surface; color-scheme alone is not
+       consistently applied to the popup menu by Chromium/WebKit. */
+    .dark select {
+        color-scheme: dark;
+    }
+
+    .dark select:not([class*="dark:bg-"]) {
+        background-color: var(--surface-card-dark);
+        border-color: var(--border-default-dark);
+    }
+
+    .dark select option,
+    .dark select optgroup {
+        background-color: var(--surface-card-dark);
+        color: rgb(243 244 246); /* gray-100 */
+    }
 }
 
 /* Page-level card container (rounded-xl, shadow) - !important so scheme wins over Tailwind utilities */

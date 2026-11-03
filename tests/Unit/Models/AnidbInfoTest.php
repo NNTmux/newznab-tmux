@@ -36,7 +36,7 @@ class AnidbInfoTest extends TestCase
     }
 
     #[Test]
-    public function it_returns_myanimelist_url_when_myanimelist_id_exists(): void
+    public function it_returns_mal_url_when_mal_id_exists(): void
     {
         $animeInfo = new AnidbInfo([
             'anidbid' => 1,
@@ -44,9 +44,21 @@ class AnidbInfoTest extends TestCase
             'type' => 'TV Series',
         ]);
 
-        $url = $animeInfo->getMyAnimeListUrl();
+        $url = $animeInfo->getMalUrl();
 
         $this->assertEquals('https://myanimelist.net/anime/9253', $url);
+    }
+
+    #[Test]
+    public function it_returns_null_external_urls_when_ids_are_missing(): void
+    {
+        $animeInfo = new AnidbInfo([
+            'anidbid' => 12345,
+            'type' => 'TV Series',
+        ]);
+
+        $this->assertNull($animeInfo->getAnilistUrl());
+        $this->assertNull($animeInfo->getMalUrl());
     }
 
     #[Test]

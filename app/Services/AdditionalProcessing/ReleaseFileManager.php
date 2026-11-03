@@ -82,7 +82,7 @@ class ReleaseFileManager
             return false;
         }
 
-        if (! isset($file['name'])) {
+        if (! isset($file['name']) || ! empty($file['is_dir'])) {
             return false;
         }
 
@@ -150,8 +150,58 @@ class ReleaseFileManager
                 }
                 $context->releaseHasPassword = true;
                 $context->passwordStatus = ReleaseBrowseService::PASSWD_RAR;
-            } elseif ($file['name'] !== '' && ! str_starts_with($file['name'], '.') && ! $context->defersArchiveNameChecks()) {
+            } elseif ($file['name'] !== '' && ! str_starts_with($file['name'], '.') && ! $context->protectsReleaseNameFromFileNames()) {
                 // Run PreDB filename check
+                $context->release['filename'] = $file['name'];
+                $context->release['releases_id'] = $context->release->id;
+                $this->nameFixingService->matchPreDbFiles($context->release, true, true, true);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Add file information for a raw (non-archive) media file.
+     * Unlike addFileInfo(), this does not skip files based on archive support-file patterns,
+     * since raw files are not inside archives and their extensions (mkv, mp4, etc.) are the actual content.
+     *
+     * @param  array<string, mixed>  $file  File info with name, size, date, pass, crc32
+     *
+     * @throws \Exception
+     */
+    public function addRawFileInfo(
+        array $file,
+        ReleaseProcessingContext $context
+    ): bool {
+        if (! isset($file['name']) || $file['name'] === '') {
+            return false;
+        }
+
+        // Don't add too many files
+        if ($context->addedFileInfo >= $this->releaseFileLimit($context)) {
+            return false;
+        }
+
+        $context->totalFileInfo++;
+
+        $added = ReleaseFile::addReleaseFiles(
+            $context->release->id,
+            $file['name'],
+            $this->normalizeFileSize($file['size'] ?? 0) ?? 0,
+            $file['date'] ?? now(),
+            $file['pass'] ?? 0,
+            '',
+            (string) ($file['crc32'] ?? ''),
+        );
+
+        if (! empty($added)) {
+            $context->addedFileInfo++;
+
+            // Run PreDB filename check
+            if (! str_starts_with($file['name'], '.') && ! $context->protectsReleaseNameFromFileNames()) {
                 $context->release['filename'] = $file['name'];
                 $context->release['releases_id'] = $context->release->id;
                 $this->nameFixingService->matchPreDbFiles($context->release, true, true, true);
@@ -178,7 +228,7 @@ class ReleaseFileManager
      */
     public function processReleaseNameFromNzbContents(array $nzbContents, ReleaseProcessingContext $context): bool
     {
-        if (! $this->releaseHasNzbSplitWrapper($context->release)) {
+        if (! $this->needsNzbSplitRename($context->release)) {
             return false;
         }
 
@@ -189,13 +239,13 @@ class ReleaseFileManager
                 continue;
             }
 
-            $candidate = $this->fileNameCleaner->extractNzbSplitName($title);
+            $split = $this->fileNameCleaner->parseNzbSplitName($title);
 
-            if ($candidate === null) {
+            if ($split === null || $split->isSample) {
                 continue;
             }
 
-            $candidate = $this->fileNameCleaner->normalizeCandidateTitle($candidate);
+            $candidate = $this->fileNameCleaner->normalizeCandidateTitle($split->title);
 
             $isPlausible = $this->fileNameCleaner->isPlausibleReleaseTitle($candidate);
             if (! $isPlausible) {
@@ -212,9 +262,7 @@ class ReleaseFileManager
                 true
             );
 
-            $context->release->searchname = $candidate;
-
-            return true;
+            return $this->releaseUpdateService->lastResult?->written() === true;
         }
 
         return false;
@@ -270,10 +318,15 @@ class ReleaseFileManager
 
             $releaseFilesCount = ReleaseFile::whereReleasesId($context->release->id)->count('releases_id') ?? 0;
 
-            if (! $context->releaseHasPassword && $context->nzbHasCompressedFile && ! $context->compressedFilesAreMedia()
-                && $releaseFilesCount === 0
+            if (! $context->releaseHasPassword && $context->nzbHasCompressedFile && ! $context->archivesAreCompanions
+                && ! $context->compressedFilesAreMedia() && $releaseFilesCount === 0
             ) {
                 // No file list could be read: the password status stays unknown.
+                Release::query()->where('id', $context->release->id)->update($updateRows);
+            } elseif ($context->nzbHasRawMediaFile && ! $context->nzbHasCompressedFile) {
+                // Raw media files (no archives) have no password.
+                $updateRows['passwordstatus'] = ReleaseBrowseService::PASSWD_NONE;
+                $updateRows['rarinnerfilecount'] = $releaseFilesCount;
                 Release::query()->where('id', $context->release->id)->update($updateRows);
             } else {
                 // A cut-off listing can't rule out an encrypted entry past the cut: keep the status unknown
@@ -293,7 +346,11 @@ class ReleaseFileManager
         $context->pendingParHashes = [];
         $context->releaseFilesChanged = $context->releaseFilesChanged || $insertedReleaseFiles > 0;
 
-        $this->searchSyncCoordinator->request((int) $context->release->id);
+        try {
+            $this->searchSyncCoordinator->request((int) $context->release->id);
+        } catch (\Throwable) {
+            Log::warning('Additional processing search synchronization failed', ['release_id' => $context->release->id]);
+        }
     }
 
     /**
@@ -423,7 +480,15 @@ class ReleaseFileManager
             return false;
         }
 
-        $postDate = Carbon::createFromFormat('Y-m-d H:i:s', $releaseInfo->postdate)->getTimestamp();
+        if (empty($releaseInfo->postdate)) {
+            return false;
+        }
+
+        try {
+            $postDate = Carbon::parse($releaseInfo->postdate)->getTimestamp();
+        } catch (\Exception) {
+            return false;
+        }
 
         // Only get new name if category is OTHER
         $foundName = true;
@@ -598,7 +663,7 @@ class ReleaseFileManager
      */
     public function matchFileNamesToPreDb(array $files, ReleaseProcessingContext $context): void
     {
-        if ($context->defersArchiveNameChecks()) {
+        if ($context->protectsReleaseNameFromFileNames()) {
             return;
         }
 
@@ -627,8 +692,8 @@ class ReleaseFileManager
         array $dataSummary,
         ReleaseProcessingContext $context
     ): void {
-        // One inner file names one episode, not the whole season pack
-        if ($context->defersArchiveNameChecks()) {
+        // One inner file names one episode (or an extra), not the whole season pack
+        if ($context->protectsReleaseNameFromFileNames()) {
             return;
         }
 
@@ -705,17 +770,23 @@ class ReleaseFileManager
         }
 
         $cleaned = preg_replace(
-            '/\.(mkv|avi|mp4|m4v|mpg|mpeg|wmv|flv|mov|ts|vob|iso|divx|par2?|nfo|sfv|nzb|rar|zip|r\d{2,3}|pkg|exe|msi)$/i',
+            '/\.(mkv|avi|mp4|m4v|mpg|mpeg|wmv|flv|mov|ts|vob|iso|divx|par2?|nfo|sfv|nzb|rar|zip|r\d{2,3}|pkg|exe|msi|jpe?g|png|gif|bmp|webp)$/i',
             '',
             $basename
         );
 
         if (preg_match('/^(.+[-.][A-Za-z0-9_]{2,})$/i', $cleaned, $match)) {
-            return ucwords($match[1], '.-_ ');
+            // Remove any remaining file extension from the match before returning
+            $result = preg_replace('/\.(mkv|avi|mp4|m4v|mpg|mpeg|wmv|flv|mov|ts|vob|iso|divx|par2?|nfo|sfv|nzb|rar|zip|r\d{2,3}|pkg|exe|msi|jpe?g|png|gif|bmp|webp)$/i', '', $match[1]);
+
+            return ucwords($result, '.-_ ');
         }
 
         if (preg_match(ReleaseUpdateService::PREDB_REGEX, $cleaned, $hit)) {
-            return ucwords($hit[0], '.');
+            // Remove any remaining file extension from the match before returning
+            $result = preg_replace('/\.(mkv|avi|mp4|m4v|mpg|mpeg|wmv|flv|mov|ts|vob|iso|divx|par2?|nfo|sfv|nzb|rar|zip|r\d{2,3}|pkg|exe|msi|jpe?g|png|gif|bmp|webp)$/i', '', $hit[0]);
+
+            return ucwords($result, '.');
         }
 
         return null;
@@ -831,13 +902,27 @@ class ReleaseFileManager
         return (int) $normalizedSize;
     }
 
-    private function releaseHasNzbSplitWrapper(Release $release): bool
+    /**
+     * An NZBSPLIT release needs the NZB-title rename only until it has a clean name.
+     *
+     * Release creation already stores the unwrapped title and sets isrenamed, so re-running
+     * on every post-process pass would only churn; a PreDB-linked name is never replaced.
+     */
+    private function needsNzbSplitRename(Release $release): bool
     {
         $name = (string) ($release->name ?? '');
         $searchName = (string) ($release->searchname ?? '');
+        $searchNameWrapped = str_contains(strtoupper($searchName), '__NZBSPLIT__');
 
-        return str_contains(strtoupper($name), 'NZBSPLIT')
-            || str_contains(strtoupper($searchName), 'NZBSPLIT');
+        if (! $searchNameWrapped && ! str_contains(strtoupper($name), '__NZBSPLIT__')) {
+            return false;
+        }
+
+        if ((int) ($release->predb_id ?? $release->preid ?? 0) > 0) {
+            return false;
+        }
+
+        return $searchNameWrapped || (int) ($release->isrenamed ?? 0) === 0;
     }
 
     /**

@@ -408,8 +408,23 @@ class ReleaseImageService
 
         return match ($this->outputFormat()) {
             'webp' => $image->toWebp()->quality($quality)->toBytes(),
-            default => $image->toJpeg()->quality($quality)->toBytes(),
+            default => $this->jpegBytes($image, $quality),
         };
+    }
+
+    private function jpegBytes(LaravelImage $image, int $quality): string
+    {
+        try {
+            return $image->toJpeg()->quality($quality)->toBytes();
+        } catch (Throwable $e) {
+            if (! str_contains(strtolower($e->getMessage()), 'alpha channel') || Image::getDefaultDriver() === 'gd') {
+                throw $e;
+            }
+
+            Log::debug('Image driver alpha channel error, falling back to GD: '.$e->getMessage());
+
+            return $image->usingGd()->toJpeg()->quality($quality)->toBytes();
+        }
     }
 
     private function outputFormat(): string

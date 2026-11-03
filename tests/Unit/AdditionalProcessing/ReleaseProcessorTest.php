@@ -4,6 +4,7 @@ namespace Tests\Unit\AdditionalProcessing;
 
 use App\Enums\ImageAssetProfile;
 use App\Models\Release;
+use App\Services\AdditionalProcessing\AdditionalProcessingOrchestrator;
 use App\Services\AdditionalProcessing\AdditionalWorkPlanner;
 use App\Services\AdditionalProcessing\ArchiveExtractionService;
 use App\Services\AdditionalProcessing\Config\ProcessingConfiguration;
@@ -17,6 +18,7 @@ use App\Services\AdditionalProcessing\NzbContentParser;
 use App\Services\AdditionalProcessing\ReleaseFileManager;
 use App\Services\AdditionalProcessing\ReleaseFilesArchiveFallback;
 use App\Services\AdditionalProcessing\ReleaseProcessor;
+use App\Services\AdditionalProcessing\ReleaseRenamingService;
 use App\Services\AdditionalProcessing\ReleaseSearchSyncCoordinator;
 use App\Services\AdditionalProcessing\State\PersistenceMetricsCollector;
 use App\Services\AdditionalProcessing\State\ReleaseProcessingContext;
@@ -30,10 +32,12 @@ use App\Support\Data\ImageProcessingResult;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Facade;
+use Illuminate\Support\Facades\Log;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 class ReleaseProcessorTest extends TestCase
 {
@@ -88,34 +92,51 @@ class ReleaseProcessorTest extends TestCase
     }
 
     #[Test]
-    public function it_finalizes_a_release_after_basic_successful_processing(): void
+    #[DataProvider('postFinalizationFailures')]
+    public function it_finalizes_a_release_after_basic_successful_processing(bool $cleanupFails, bool $syncFails): void
     {
+        $logger = Mockery::mock(LoggerInterface::class);
+        $logger->shouldReceive('warning')->times((int) $cleanupFails + (int) $syncFails);
+        Log::swap($logger);
         $config = $this->makeConfig();
         $nzbParser = Mockery::mock(NzbContentParser::class);
         $nzbParser->shouldReceive('parseNzb')->once()->with('guid-1')->andReturn([
             'error' => null,
             'contents' => [['title' => 'file.nzb', 'segments' => []]],
         ]);
+        $nzbParser->shouldReceive('detectRawMediaFiles')->once()->andReturn([
+            'hasRawMediaFile' => false,
+            'rawMediaFileEntries' => [],
+        ]);
+
         $releaseManager = Mockery::mock(ReleaseFileManager::class);
         $releaseManager->shouldReceive('processReleaseNameFromNzbContents')->once()->andReturnFalse();
         $persistenceMetrics = new PersistenceMetricsCollector;
         $synchronizedReleaseIds = [];
         $searchSyncCoordinator = new ReleaseSearchSyncCoordinator(
             $persistenceMetrics,
-            static function (int $releaseId) use (&$synchronizedReleaseIds): void {
+            static function (int $releaseId) use (&$synchronizedReleaseIds, $syncFails): void {
                 $synchronizedReleaseIds[] = $releaseId;
+                if ($syncFails) {
+                    throw new \RuntimeException('Search is unavailable');
+                }
             },
         );
         $releaseManager->shouldReceive('finalizeRelease')
             ->once()
-            ->andReturnUsing(static function () use ($searchSyncCoordinator): void {
+            ->andReturnUsing(static function (ReleaseProcessingContext $context) use ($searchSyncCoordinator): void {
                 $searchSyncCoordinator->request(1);
                 $searchSyncCoordinator->request(1);
             });
 
         $tempWorkspace = Mockery::mock(TempWorkspaceService::class);
         $tempWorkspace->shouldReceive('createReleaseTempFolder')->once()->andReturn('/tmp/ap-release/');
-        $tempWorkspace->shouldReceive('clearDirectory')->once()->with('/tmp/ap-release/', false)->andReturnNull();
+        $cleanup = $tempWorkspace->shouldReceive('clearDirectory')->once()->with('/tmp/ap-release/', false);
+        if ($cleanupFails) {
+            $cleanup->andThrow(new \RuntimeException('Cleanup failed'));
+        } else {
+            $cleanup->andReturnNull();
+        }
 
         $output = Mockery::mock(ConsoleOutputService::class);
         $output->shouldReceive('echoReleaseStart')->once()->andReturnNull();
@@ -159,6 +180,11 @@ class ReleaseProcessorTest extends TestCase
         ], array_keys($result->stageDurations));
     }
 
+    public static function postFinalizationFailures(): array
+    {
+        return [[false, false], [true, false], [false, true]];
+    }
+
     #[Test]
     public function it_always_uses_the_v2_work_plan_for_message_id_selection(): void
     {
@@ -170,6 +196,10 @@ class ReleaseProcessorTest extends TestCase
             'contents' => $nzbContents,
         ]);
         $nzbParser->shouldNotReceive('extractMessageIDs');
+        $nzbParser->shouldReceive('detectRawMediaFiles')->once()->andReturn([
+            'hasRawMediaFile' => false,
+            'rawMediaFileEntries' => [],
+        ]);
 
         $releaseManager = Mockery::mock(ReleaseFileManager::class);
         $releaseManager->shouldReceive('processReleaseNameFromNzbContents')->once()->andReturnFalse();
@@ -375,6 +405,10 @@ class ReleaseProcessorTest extends TestCase
                 ['title' => '"G9AJxkjPdN0iBdyG.7z.002" yEnc (1/2)', 'segments' => ['<v2-1>', '<v2-2>']],
             ],
         ]);
+        $nzbParser->shouldReceive('detectRawMediaFiles')->once()->andReturn([
+            'hasRawMediaFile' => false,
+            'rawMediaFileEntries' => [],
+        ]);
 
         $downloadService = Mockery::mock(UsenetDownloadService::class);
         $this->expectDownloadScope($downloadService);
@@ -474,6 +508,10 @@ class ReleaseProcessorTest extends TestCase
             'error' => null,
             'contents' => [['title' => '"Some.Release.7z" yEnc (1/3)', 'segments' => ['<s-1>', '<s-2>', '<s-3>', '<s-4>']]],
         ]);
+        $nzbParser->shouldReceive('detectRawMediaFiles')->once()->andReturn([
+            'hasRawMediaFile' => false,
+            'rawMediaFileEntries' => [],
+        ]);
 
         $downloadService = Mockery::mock(UsenetDownloadService::class);
         $this->expectDownloadScope($downloadService);
@@ -566,6 +604,10 @@ class ReleaseProcessorTest extends TestCase
             'error' => null,
             'contents' => [['title' => '"KlUC4yTqeaIpcTbOIYdzhqqWF" yEnc (1/103)', 'segments' => ['<probe>'], 'filecount' => 1]],
         ]);
+        $nzbParser->shouldReceive('detectRawMediaFiles')->once()->andReturn([
+            'hasRawMediaFile' => false,
+            'rawMediaFileEntries' => [],
+        ]);
 
         $downloadService = Mockery::mock(UsenetDownloadService::class);
         $this->expectDownloadScope($downloadService);
@@ -614,6 +656,10 @@ class ReleaseProcessorTest extends TestCase
             'error' => null,
             'contents' => [['title' => '"KlUC4yTqeaIpcTbOIYdzhqqWF" yEnc (1/103)', 'segments' => ['<probe>'], 'filecount' => 1]],
         ]);
+        $nzbParser->shouldReceive('detectRawMediaFiles')->once()->andReturn([
+            'hasRawMediaFile' => false,
+            'rawMediaFileEntries' => [],
+        ]);
 
         $downloadService = Mockery::mock(UsenetDownloadService::class);
         $this->expectDownloadScope($downloadService);
@@ -654,6 +700,10 @@ class ReleaseProcessorTest extends TestCase
             'error' => null,
             'contents' => [['title' => '"KlUC4yTqeaIpcTbOIYdzhqqWF" yEnc (1/103)', 'segments' => ['<probe>'], 'filecount' => 1]],
         ]);
+        $nzbParser->shouldReceive('detectRawMediaFiles')->once()->andReturn([
+            'hasRawMediaFile' => false,
+            'rawMediaFileEntries' => [],
+        ]);
 
         $downloadService = Mockery::mock(UsenetDownloadService::class);
         $this->expectDownloadScope($downloadService);
@@ -693,6 +743,10 @@ class ReleaseProcessorTest extends TestCase
         $nzbParser->shouldReceive('parseNzb')->once()->andReturn([
             'error' => null,
             'contents' => [['title' => '"KlUC4yTqeaIpcTbOIYdzhqqWF" yEnc (1/103)', 'segments' => ['<probe>'], 'filecount' => 1]],
+        ]);
+        $nzbParser->shouldReceive('detectRawMediaFiles')->once()->andReturn([
+            'hasRawMediaFile' => false,
+            'rawMediaFileEntries' => [],
         ]);
 
         $downloadService = Mockery::mock(UsenetDownloadService::class);
@@ -746,6 +800,10 @@ class ReleaseProcessorTest extends TestCase
         $nzbParser->shouldReceive('parseNzb')->once()->andReturn([
             'error' => null,
             'contents' => [['title' => '"KlUC4yTqeaIpcTbOIYdzhqqWF" yEnc (1/103)', 'segments' => ['<probe>', '<last>'], 'filecount' => 1]],
+        ]);
+        $nzbParser->shouldReceive('detectRawMediaFiles')->once()->andReturn([
+            'hasRawMediaFile' => false,
+            'rawMediaFileEntries' => [],
         ]);
 
         $downloadService = Mockery::mock(UsenetDownloadService::class);
@@ -810,6 +868,11 @@ class ReleaseProcessorTest extends TestCase
             ],
         ]);
 
+        $nzbParser->shouldReceive('detectRawMediaFiles')->once()->andReturn([
+            'hasRawMediaFile' => false,
+            'rawMediaFileEntries' => [],
+        ]);
+
         $downloadService = Mockery::mock(UsenetDownloadService::class);
         $this->expectDownloadScope($downloadService);
         $downloadService->shouldReceive('download')
@@ -869,6 +932,10 @@ class ReleaseProcessorTest extends TestCase
                 ['title' => '"aB3dE5fG7hJ9" yEnc (1/2)', 'segments' => ['<par2-1>', '<par2-2>'], 'size' => 900, 'filecount' => 1],
                 ['title' => '"kL2mN4pQ6rS8" yEnc (1/3)', 'segments' => ['<7z-1>', '<7z-2>', '<7z-3>'], 'size' => 800, 'filecount' => 1],
             ],
+        ]);
+        $nzbParser->shouldReceive('detectRawMediaFiles')->once()->andReturn([
+            'hasRawMediaFile' => false,
+            'rawMediaFileEntries' => [],
         ]);
 
         $downloadService = Mockery::mock(UsenetDownloadService::class);
@@ -937,6 +1004,11 @@ class ReleaseProcessorTest extends TestCase
             ),
         ]);
 
+        $nzbParser->shouldReceive('detectRawMediaFiles')->once()->andReturn([
+            'hasRawMediaFile' => false,
+            'rawMediaFileEntries' => [],
+        ]);
+
         $downloadService = Mockery::mock(UsenetDownloadService::class);
         $this->expectDownloadScope($downloadService);
         foreach (['<file-1>', '<file-2>'] as $messageId) {
@@ -962,6 +1034,7 @@ class ReleaseProcessorTest extends TestCase
     {
         $config = $this->makeConfig(['processPasswords' => true]);
         $nzbParser = Mockery::mock(NzbContentParser::class);
+        $nzbParser->shouldReceive('detectRawMediaFiles')->andReturn(['hasRawMediaFile' => false, 'rawMediaFileEntries' => []]);
         $nzbParser->shouldReceive('parseNzb')->once()->andReturn([
             'error' => null,
             'contents' => [
@@ -996,6 +1069,10 @@ class ReleaseProcessorTest extends TestCase
         $nzbParser->shouldReceive('parseNzb')->once()->andReturn([
             'error' => null,
             'contents' => [['title' => '"Movie.2024.sample.mkv" yEnc (1/2)', 'segments' => ['<s1>', '<s2>'], 'filecount' => 1]],
+        ]);
+        $nzbParser->shouldReceive('detectRawMediaFiles')->once()->andReturn([
+            'hasRawMediaFile' => false,
+            'rawMediaFileEntries' => [],
         ]);
 
         $downloadService = Mockery::mock(UsenetDownloadService::class);
@@ -1043,6 +1120,7 @@ class ReleaseProcessorTest extends TestCase
         $tmpPath = $this->useRealFilesystem();
         $config = $this->makeConfig(['processThumbnails' => true, 'par2MediaMapping' => true, 'archiveProbeFiles' => 0]);
         $nzbParser = Mockery::mock(NzbContentParser::class);
+        $nzbParser->shouldReceive('detectRawMediaFiles')->andReturn(['hasRawMediaFile' => false, 'rawMediaFileEntries' => []]);
         $nzbParser->shouldReceive('parseNzb')->once()->andReturn([
             'error' => null,
             'contents' => [
@@ -1126,6 +1204,10 @@ class ReleaseProcessorTest extends TestCase
             'error' => null,
             'contents' => [['title' => '"movie.rar" yEnc (1/1)', 'segments' => ['<rar>'], 'size' => strlen($sample) + 200, 'filecount' => 1]],
         ]);
+        $nzbParser->shouldReceive('detectRawMediaFiles')->once()->andReturn([
+            'hasRawMediaFile' => false,
+            'rawMediaFileEntries' => [],
+        ]);
 
         $downloadService = Mockery::mock(UsenetDownloadService::class);
         $this->expectDownloadScope($downloadService);
@@ -1194,6 +1276,10 @@ class ReleaseProcessorTest extends TestCase
                 ['title' => '"movie.screens.jpg" yEnc (1/2)', 'segments' => ['<s1>', '<s2>'], 'size' => 1200000, 'filecount' => 1],
             ],
         ]);
+        $nzbParser->shouldReceive('detectRawMediaFiles')->once()->andReturn([
+            'hasRawMediaFile' => false,
+            'rawMediaFileEntries' => [],
+        ]);
 
         $downloadService = Mockery::mock(UsenetDownloadService::class);
         $this->expectDownloadScope($downloadService);
@@ -1246,6 +1332,10 @@ class ReleaseProcessorTest extends TestCase
                 ['title' => '"c0ffee03" yEnc (1/50)', 'segments' => ['<m1>'], 'size' => 50000, 'filecount' => 1],
             ],
         ]);
+        $nzbParser->shouldReceive('detectRawMediaFiles')->once()->andReturn([
+            'hasRawMediaFile' => false,
+            'rawMediaFileEntries' => [],
+        ]);
 
         $downloadService = $this->scopedDownloadService();
         $downloadService->shouldNotReceive('download');
@@ -1286,6 +1376,10 @@ class ReleaseProcessorTest extends TestCase
                 ['title' => '"release.part01.rar" yEnc (2/2)', 'segments' => ['<p1-2>'], 'firstsegment' => false],
                 ['title' => '"release.part02.rar" yEnc (1/2)', 'segments' => ['<p2-1>'], 'firstsegment' => true],
             ],
+        ]);
+        $nzbParser->shouldReceive('detectRawMediaFiles')->once()->andReturn([
+            'hasRawMediaFile' => false,
+            'rawMediaFileEntries' => [],
         ]);
 
         $downloadService = Mockery::mock(UsenetDownloadService::class);
@@ -1345,6 +1439,10 @@ class ReleaseProcessorTest extends TestCase
                 ['title' => '"Movie.2026.mkv.001" yEnc (1/80)', 'segments' => ['<m1-1>', '<m1-2>']],
                 ['title' => '"Movie.2026.mkv.002" yEnc (1/80)', 'segments' => ['<m2-1>', '<m2-2>']],
             ],
+        ]);
+        $nzbParser->shouldReceive('detectRawMediaFiles')->once()->andReturn([
+            'hasRawMediaFile' => false,
+            'rawMediaFileEntries' => [],
         ]);
 
         $downloadService = Mockery::mock(UsenetDownloadService::class);
@@ -1426,8 +1524,12 @@ class ReleaseProcessorTest extends TestCase
     public function it_lists_the_first_volume_of_several_archive_sets_for_a_season_pack(): void
     {
         $downloaded = [];
+        $renaming = Mockery::mock(ReleaseRenamingService::class);
+        $renaming->shouldReceive('fileNameChecks')->once()
+            ->with(Mockery::on(static fn (array $files): bool => $files[0]['name'] === 'Show.S01E01.1080p.WEB-DL-GRP.mkv'), Mockery::type(ReleaseProcessingContext::class), Mockery::any())
+            ->andReturnFalse();
 
-        $context = $this->processSeasonPackSets(4, $downloaded);
+        $context = $this->processSeasonPackSets(4, $downloaded, $renaming);
 
         $this->assertSame(['E01.part01', 'E02.part01', 'E03.part01'], $downloaded);
         $this->assertTrue($context->seasonPack);
@@ -1464,17 +1566,99 @@ class ReleaseProcessorTest extends TestCase
             ['title' => '"Movie.2026.1080p.BluRay-GRP.cd1.rar" yEnc (1/2)', 'segments' => ['<cd1>']],
             ['title' => '"Movie.2026.1080p.BluRay-GRP.cd2.rar" yEnc (1/2)', 'segments' => ['<cd2>']],
         ]]);
+        $nzbParser->shouldReceive('detectRawMediaFiles')->once()->andReturn(['hasRawMediaFile' => false, 'rawMediaFileEntries' => []]);
         $downloadService = Mockery::mock(UsenetDownloadService::class);
         $this->expectDownloadScope($downloadService);
         $downloadService->shouldReceive('download')->once()
             ->andReturn(['success' => true, 'data' => $this->rar('Movie.2026.1080p.BluRay-GRP.cd1.mkv', str_repeat('x', 100)), 'groupUnavailable' => false, 'error' => null]);
+        $renaming = Mockery::mock(ReleaseRenamingService::class);
+        $renaming->shouldReceive('fileNameChecks')->once()->andReturnFalse();
 
         $context = $this->makeContext();
         $context->release->nfostatus = 1;
-        $this->seasonPackProcessor($config, $nzbParser, $downloadService, $this->countingReleaseManager())->process($context, '/tmp/main/');
+        $this->seasonPackProcessor($config, $nzbParser, $downloadService, $this->countingReleaseManager(), $renaming)->process($context, '/tmp/main/');
 
         $this->assertFalse($context->seasonPack);
         $this->assertSame(1, $context->totalFileInfo);
+    }
+
+    #[Test]
+    public function it_lists_raw_episodes_next_to_a_companion_subtitle_archive(): void
+    {
+        $episodes = $this->rawEpisodes(3);
+        $config = $this->makeConfig(['processPasswords' => true]);
+        $nzbParser = Mockery::mock(NzbContentParser::class);
+        $nzbParser->shouldReceive('parseNzb')->once()->andReturn(['error' => null, 'contents' => [
+            ...array_map(static fn (array $episode): array => ['title' => $episode['title'], 'segments' => $episode['segments'], 'size' => $episode['size']], $episodes),
+            ['title' => '"Show.S01.Subs.rar" yEnc (1/1)', 'segments' => ['<subs>'], 'size' => 1_000_000],
+        ]]);
+        $nzbParser->shouldReceive('detectRawMediaFiles')->once()->andReturn(['hasRawMediaFile' => true, 'rawMediaFileEntries' => $episodes]);
+        $downloadService = Mockery::mock(UsenetDownloadService::class);
+        $this->expectDownloadScope($downloadService);
+        $downloadService->shouldReceive('download')->once()
+            ->with(DownloadKind::Compressed, ['<subs>'], '', 1, '"Show.S01.Subs.rar" yEnc (1/1)')
+            ->andReturn(['success' => true, 'data' => $this->rar('Show.S01E01.srt', 'subtitle'), 'groupUnavailable' => false, 'error' => null]);
+        $releaseManager = $this->countingReleaseManager();
+        $releaseManager->shouldReceive('addRawFileInfo')->times(3)->andReturnFalse();
+        $renaming = Mockery::mock(ReleaseRenamingService::class);
+        $renaming->shouldReceive('rawFileNameChecks')->once()->andReturnFalse();
+        $renaming->shouldReceive('fileNameChecks')->never();
+
+        $context = $this->makeContext();
+        $context->release->nfostatus = 1;
+        $this->seasonPackProcessor($config, $nzbParser, $downloadService, $releaseManager, $renaming)->process($context, '/tmp/main/');
+
+        $this->assertTrue($context->archivesAreCompanions);
+    }
+
+    #[Test]
+    public function it_skips_the_raw_pass_when_the_archive_carries_the_release(): void
+    {
+        $proof = ['title' => '"Movie.2026.1080p.BluRay-GRP.proof.mkv" yEnc (1/1)', 'segments' => ['<proof>'], 'size' => 1_000_000, 'extension' => 'mkv'];
+        $config = $this->makeConfig(['processPasswords' => true]);
+        $nzbParser = Mockery::mock(NzbContentParser::class);
+        $nzbParser->shouldReceive('parseNzb')->once()->andReturn(['error' => null, 'contents' => [
+            ['title' => $proof['title'], 'segments' => $proof['segments'], 'size' => $proof['size']],
+            ['title' => '"Movie.2026.1080p.BluRay-GRP.rar" yEnc (1/50)', 'segments' => ['<rar>'], 'size' => 5_000_000_000],
+        ]]);
+        $nzbParser->shouldReceive('detectRawMediaFiles')->once()->andReturn(['hasRawMediaFile' => true, 'rawMediaFileEntries' => [$proof]]);
+        $downloadService = Mockery::mock(UsenetDownloadService::class);
+        $this->expectDownloadScope($downloadService);
+        $downloadService->shouldReceive('download')->once()
+            ->andReturn(['success' => true, 'data' => $this->rar('Movie.2026.1080p.BluRay-GRP.mkv', str_repeat('x', 100)), 'groupUnavailable' => false, 'error' => null]);
+        $releaseManager = $this->countingReleaseManager();
+        $releaseManager->shouldReceive('addRawFileInfo')->never();
+
+        $context = $this->makeContext();
+        $context->release->nfostatus = 1;
+        $this->seasonPackProcessor($config, $nzbParser, $downloadService, $releaseManager)->process($context, '/tmp/main/');
+
+        $this->assertFalse($context->archivesAreCompanions);
+    }
+
+    #[Test]
+    public function it_lists_every_raw_episode_of_a_season_pack_with_bounded_media_downloads(): void
+    {
+        $episodes = $this->rawEpisodes(24);
+        $config = $this->makeConfig(['processMediaInfo' => true]);
+        $nzbParser = Mockery::mock(NzbContentParser::class);
+        $nzbParser->shouldReceive('parseNzb')->once()->andReturn(['error' => null, 'contents' => array_map(
+            static fn (array $episode): array => ['title' => $episode['title'], 'segments' => $episode['segments'], 'size' => $episode['size']],
+            $episodes,
+        )]);
+        $nzbParser->shouldReceive('detectRawMediaFiles')->once()->andReturn(['hasRawMediaFile' => true, 'rawMediaFileEntries' => $episodes]);
+        $downloadService = Mockery::mock(UsenetDownloadService::class);
+        $this->expectDownloadScope($downloadService);
+        $downloadService->shouldReceive('downloadByMessageIDs')->times(AdditionalProcessingOrchestrator::MAX_COMPRESSED_FILES_TO_CHECK)
+            ->andReturn(['success' => false, 'data' => null, 'groupUnavailable' => false, 'error' => 'missing']);
+        $releaseManager = $this->countingReleaseManager();
+        $releaseManager->shouldReceive('addRawFileInfo')->times(24)->andReturnFalse();
+
+        $context = $this->makeContext();
+        $context->release->nfostatus = 1;
+        $this->seasonPackProcessor($config, $nzbParser, $downloadService, $releaseManager)->process($context, '/tmp/main/');
+
+        $this->assertTrue($context->seasonPack);
     }
 
     #[Test]
@@ -1486,6 +1670,7 @@ class ReleaseProcessorTest extends TestCase
             ['title' => '"a1b2c3d4.part01.rar" yEnc (1/2)', 'segments' => ['<episode>']],
             ['title' => '"e5f6a7b8.rar" yEnc (1/1)', 'segments' => ['<extras>']],
         ]]);
+        $nzbParser->shouldReceive('detectRawMediaFiles')->once()->andReturn(['hasRawMediaFile' => false, 'rawMediaFileEntries' => []]);
         $downloadService = Mockery::mock(UsenetDownloadService::class);
         $this->expectDownloadScope($downloadService);
         $downloadService->shouldReceive('download')->twice()->andReturnUsing(fn (DownloadKind $kind, array $ids): array => [
@@ -1515,6 +1700,7 @@ class ReleaseProcessorTest extends TestCase
     private function processSeasonPackSets(
         int $episodes,
         array &$downloaded,
+        ?ReleaseRenamingService $renaming = null,
         array $failing = [],
         string $passworded = '',
     ): ReleaseProcessingContext {
@@ -1530,6 +1716,7 @@ class ReleaseProcessorTest extends TestCase
         }
         $nzbParser = Mockery::mock(NzbContentParser::class);
         $nzbParser->shouldReceive('parseNzb')->once()->andReturn(['error' => null, 'contents' => $contents]);
+        $nzbParser->shouldReceive('detectRawMediaFiles')->once()->andReturn(['hasRawMediaFile' => false, 'rawMediaFileEntries' => []]);
 
         $downloadService = Mockery::mock(UsenetDownloadService::class);
         $this->expectDownloadScope($downloadService);
@@ -1561,9 +1748,27 @@ class ReleaseProcessorTest extends TestCase
 
         $context = $this->makeContext();
         $context->release->nfostatus = 1;
-        $this->seasonPackProcessor($config, $nzbParser, $downloadService, $releaseManager)->process($context, '/tmp/main/');
+        $this->seasonPackProcessor($config, $nzbParser, $downloadService, $releaseManager, $renaming)->process($context, '/tmp/main/');
 
         return $context;
+    }
+
+    /**
+     * @return list<array{title: string, segments: list<string>, size: int, extension: string}>
+     */
+    private function rawEpisodes(int $count): array
+    {
+        $episodes = [];
+        for ($episode = 1; $episode <= $count; $episode++) {
+            $episodes[] = [
+                'title' => sprintf('"Show.S01E%02d.1080p.WEB-DL-GRP.mkv" yEnc (1/100)', $episode),
+                'segments' => [sprintf('<raw-%d>', $episode)],
+                'size' => 1_000_000_000,
+                'extension' => 'mkv',
+            ];
+        }
+
+        return $episodes;
     }
 
     private function countingReleaseManager(): ReleaseFileManager&Mockery\MockInterface
@@ -1585,6 +1790,7 @@ class ReleaseProcessorTest extends TestCase
         NzbContentParser $nzbParser,
         UsenetDownloadService $downloadService,
         ReleaseFileManager $releaseManager,
+        ?ReleaseRenamingService $renaming = null,
     ): ReleaseProcessor {
         return new ReleaseProcessor(
             $config,
@@ -1597,6 +1803,7 @@ class ReleaseProcessorTest extends TestCase
             Mockery::mock(ReleaseFilesArchiveFallback::class)->shouldIgnoreMissing(),
             $this->tempWorkspaceWithoutFiles(),
             Mockery::mock(ConsoleOutputService::class)->shouldIgnoreMissing(),
+            releaseRenamingService: $renaming,
         );
     }
 
@@ -1631,6 +1838,10 @@ class ReleaseProcessorTest extends TestCase
                 'error' => null,
                 'contents' => [['title' => '"G9AJxkjPdN0iBdyG.7z" yEnc (1/1)', 'segments' => ['<s-1>']]],
             ]);
+            $nzbParser->shouldReceive('detectRawMediaFiles')->once()->andReturn([
+                'hasRawMediaFile' => false,
+                'rawMediaFileEntries' => [],
+            ]);
             $downloadService->shouldReceive('download')
                 ->once()
                 ->with(DownloadKind::Compressed, ['<s-1>'], '', 1, '"G9AJxkjPdN0iBdyG.7z" yEnc (1/1)')
@@ -1642,6 +1853,10 @@ class ReleaseProcessorTest extends TestCase
                     ['title' => '"G9AJxkjPdN0iBdyG.7z.001" yEnc (1/2)', 'segments' => ['<v1-1>', '<v1-2>']],
                     ['title' => '"G9AJxkjPdN0iBdyG.7z.002" yEnc (1/2)', 'segments' => ['<v2-1>', '<v2-2>']],
                 ],
+            ]);
+            $nzbParser->shouldReceive('detectRawMediaFiles')->once()->andReturn([
+                'hasRawMediaFile' => false,
+                'rawMediaFileEntries' => [],
             ]);
             $downloadService->shouldReceive('download')
                 ->once()
@@ -1773,6 +1988,10 @@ class ReleaseProcessorTest extends TestCase
         $parser->shouldReceive('parseNzb')->once()->andReturn([
             'error' => null,
             'contents' => [['title' => 'archive.part01.rar', 'segments' => ['<archive>']]],
+        ]);
+        $parser->shouldReceive('detectRawMediaFiles')->andReturn([
+            'hasRawMediaFile' => false,
+            'rawMediaFileEntries' => [],
         ]);
 
         return $parser;

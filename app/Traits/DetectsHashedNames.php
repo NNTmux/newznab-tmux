@@ -39,6 +39,38 @@ trait DetectsHashedNames
             || $this->isRandomDigitPattern($coreName);
     }
 
+    /**
+     * True for one opaque random token such as "V0hjRm1Y2RYrJ74Ds65swvI4CJCk8U6j" or
+     * "1c802fddd857e8a8.bin". Narrower than isHashedOrGibberish(), which also flags some
+     * real multi-word titles, so it is safe where a false positive would drop a real name.
+     */
+    public function isOpaqueRandomToken(string $name): bool
+    {
+        $stem = preg_replace('/(\.(part\d+|vol\d+[+-]\d+|\d{3}))?(\.[a-z0-9]{2,4})?$/i', '', trim($name)) ?? '';
+        $length = strlen($stem);
+        if ($length < 12 || preg_match('/^[A-Za-z0-9]+$/', $stem) !== 1) {
+            return false;
+        }
+
+        if ($length >= 16 && preg_match('/^(?=.*\d)(?=.*[a-f])[a-f0-9]+$/i', $stem) === 1) {
+            return true;
+        }
+
+        // Random base62 switches between lowercase, uppercase and digits on ~62% of
+        // neighbouring characters; CamelCase titles such as "BreakingBad2008S01E01" switch far less.
+        $switches = 0;
+        $previous = null;
+        foreach (str_split($stem) as $character) {
+            $class = ctype_digit($character) ? 'd' : (ctype_upper($character) ? 'u' : 'l');
+            if ($previous !== null && $class !== $previous) {
+                $switches++;
+            }
+            $previous = $class;
+        }
+
+        return $switches >= 0.45 * ($length - 1);
+    }
+
     // ---------------------------------------------------------------
     // Hex / hash boundary checks (operate on the raw release name)
     // ---------------------------------------------------------------
@@ -184,6 +216,10 @@ trait DetectsHashedNames
      * A high transition rate (upper↔lower, letter↔digit) with no
      * media keywords in the original name suggests randomness.
      *
+     * Transitions are counted inside each separator-delimited word, and a word's
+     * leading capital is not one, so dotted titles such as
+     * "Age.of.Wonders.4.The.Silver.Seas" are not mistaken for random strings.
+     *
      * @param  string  $coreName  Name with extensions and separators stripped.
      * @param  string  $originalName  The unmodified release name (for keyword check).
      */
@@ -195,7 +231,13 @@ trait DetectsHashedNames
             return false;
         }
 
-        $transitions = $this->countCharacterTransitions($coreName);
+        $words = $originalName !== ''
+            ? preg_split('/[.\-_\s]+/', $this->stripExtensionsForAnalysis($originalName), -1, PREG_SPLIT_NO_EMPTY) ?: [$coreName]
+            : [$coreName];
+        $transitions = 0;
+        foreach ($words as $word) {
+            $transitions += $this->countCharacterTransitions($word) - (preg_match('/^[A-Z][a-z]/', $word) === 1 ? 1 : 0);
+        }
         $transitionRate = $transitions / ($coreLen - 1);
 
         if ($transitionRate > 0.35) {

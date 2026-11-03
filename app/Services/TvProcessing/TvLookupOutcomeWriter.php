@@ -20,6 +20,26 @@ use Illuminate\Support\Facades\DB;
  */
 class TvLookupOutcomeWriter
 {
+    /** While a batch runs, the browse cache is bumped once at its end instead of per match. */
+    private bool $batching = false;
+
+    private bool $cacheBumpPending = false;
+
+    public function beginBatch(): void
+    {
+        $this->batching = true;
+    }
+
+    /** Ends a batch and applies the browse cache bump it deferred. */
+    public function endBatch(): void
+    {
+        $this->batching = false;
+        if ($this->cacheBumpPending) {
+            $this->cacheBumpPending = false;
+            ReleaseBrowseService::bumpCacheVersion();
+        }
+    }
+
     public function record(TvReleaseContext $context, TvProcessingResult $result): void
     {
         $linked = DB::transaction(function () use ($context, $result): bool {
@@ -49,7 +69,11 @@ class TvLookupOutcomeWriter
         });
 
         if ($linked && \in_array($result->status, [TvProcessingResult::STATUS_MATCHED, TvProcessingResult::STATUS_SEASON_PACK], true)) {
-            ReleaseBrowseService::bumpCacheVersion();
+            if ($this->batching) {
+                $this->cacheBumpPending = true;
+            } else {
+                ReleaseBrowseService::bumpCacheVersion();
+            }
         }
     }
 
@@ -72,7 +96,14 @@ class TvLookupOutcomeWriter
                 $attempts = $previousStatus === TvLookupStatus::EpisodeMissing->value ? $previousAttempts + 1 : 1;
                 $retryAt = null;
                 if ($result->transient) {
-                    $retryAt = now()->addSeconds(max($result->retryAfter ?? 0, TvProcessingCandidateQuery::KNOWN_SHOW_TRANSIENT_DELAY));
+                    // A provider outage says nothing about the episode: it never spends the
+                    // last attempt, and backs off like any other transient failure.
+                    $attempts = min($attempts, TvProcessingCandidateQuery::MAX_EPISODE_ATTEMPTS - 1);
+                    $retryAt = now()->addSeconds(max(
+                        $result->retryAfter ?? 0,
+                        TvProcessingCandidateQuery::KNOWN_SHOW_TRANSIENT_DELAY,
+                        TvProcessingCandidateQuery::transientDelay($attempts),
+                    ));
                 } elseif ($attempts < TvProcessingCandidateQuery::MAX_EPISODE_ATTEMPTS) {
                     $retryAt = now()->addSeconds(TvProcessingCandidateQuery::episodeDelay($attempts));
                 }
@@ -95,8 +126,13 @@ class TvLookupOutcomeWriter
             case TvProcessingResult::STATUS_PARSE_FAILED:
                 return $this->columns(0, TvLookupStatus::ParseFailed->value);
 
-            default:
+            case TvProcessingResult::STATUS_NOT_FOUND:
                 return $this->columns(0, TvLookupStatus::ShowNotFound->value);
+
+            default:
+                // Skipped or pending: nothing was decided, so look again later rather than
+                // recording a miss that is never retried.
+                return $this->columns(0, TvLookupStatus::Pending->value, 0, now()->addSeconds(TvProcessingCandidateQuery::transientDelay(1)));
         }
     }
 

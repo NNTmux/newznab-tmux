@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace App\Services\TvProcessing\Pipes;
 
 use App\Exceptions\TvProviderException;
+use App\Models\Video;
 use App\Services\TvProcessing\ParsedTvRelease;
 use App\Services\TvProcessing\Providers\AbstractTvProvider;
 use App\Services\TvProcessing\TvPosterResolver;
 use App\Services\TvProcessing\TvProcessingPassable;
 use App\Services\TvProcessing\TvProcessingResult;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -25,6 +27,9 @@ use Illuminate\Support\Facades\Log;
  */
 abstract class AbstractApiProviderPipe extends AbstractTvProviderPipe
 {
+    /** How long a failed site id cross-reference isn't tried again for a show. */
+    private const int SITE_ID_MISS_TTL = 86400;
+
     public function __construct(
         private ?AbstractTvProvider $provider = null,
         private readonly ?TvPosterResolver $posterResolver = null,
@@ -98,7 +103,7 @@ abstract class AbstractApiProviderPipe extends AbstractTvProviderPipe
             }
 
             $this->outputSearching($title);
-            $show = $provider->getShowInfo($parsed->titleWithoutYear(), $parsed->year, $parsed->countryCode());
+            $show = $this->searchShow($provider, $parsed);
             if (! \is_array($show) || empty($show['title'])) {
                 $passable->runState->rememberTitleNotFound($name, $title);
                 $this->outputNotFound($title);
@@ -131,6 +136,9 @@ abstract class AbstractApiProviderPipe extends AbstractTvProviderPipe
         }
 
         $siteId = (int) $provider->getSiteIDFromVideoID($this->siteColumn(), $videoId);
+        if ($siteId <= 0 && $parsed->hasEpisodeReference()) {
+            $siteId = $this->resolveSiteId($provider, $videoId);
+        }
         if ($siteId <= 0) {
             return TvProcessingResult::skipped('show has no '.$this->siteColumn().' id', $name);
         }
@@ -146,6 +154,50 @@ abstract class AbstractApiProviderPipe extends AbstractTvProviderPipe
         $this->outputEpisodeMissing($title, $parsed);
 
         return TvProcessingResult::episodeMissing($videoId, $name);
+    }
+
+    /**
+     * Find this provider's id for a show another provider found (most shows only carry
+     * the id of the provider that found them) and store it, so this provider can look
+     * up the show's episodes too. A miss is remembered for a day across workers.
+     */
+    private function resolveSiteId(AbstractTvProvider $provider, int $videoId): int
+    {
+        $missKey = 'tv:siteid-miss:'.$this->siteColumn().':'.$videoId;
+        if (Cache::has($missKey)) {
+            return 0;
+        }
+
+        $siteId = $provider->resolveSiteId($provider->knownSiteIds($videoId));
+        if ($siteId <= 0) {
+            Cache::put($missKey, 1, self::SITE_ID_MISS_TTL);
+
+            return 0;
+        }
+
+        // Another stored show may already own the id (a duplicate row); use it for this
+        // lookup but don't copy it, so site ids stay unique.
+        if (Video::query()->where($this->siteColumn(), $siteId)->where('id', '<>', $videoId)->doesntExist()) {
+            $provider->update($videoId, [$this->siteColumn() => $siteId]);
+        }
+
+        return $siteId;
+    }
+
+    /**
+     * Search with the full title first ("MasterChef Australia" is its own show), then
+     * without a trailing country qualifier ("Big Brother Australia" is "Big Brother (AU)").
+     *
+     * @return array<string, mixed>|false
+     */
+    private function searchShow(AbstractTvProvider $provider, ParsedTvRelease $parsed): array|false
+    {
+        $show = $provider->getShowInfo($parsed->titleWithoutYear(), $parsed->year, $parsed->countryCode());
+        if ((! \is_array($show) || empty($show['title'])) && $parsed->searchTitle() !== $parsed->titleWithoutYear()) {
+            $show = $provider->getShowInfo($parsed->searchTitle(), $parsed->year, $parsed->countryCode());
+        }
+
+        return \is_array($show) ? $show : false;
     }
 
     private function resolveEpisode(TvProcessingPassable $passable, ParsedTvRelease $parsed, AbstractTvProvider $provider, int $siteId, int $videoId): int

@@ -184,6 +184,28 @@ class PostProcessRunnerAdditionalThreadsTest extends TestCase
         ], array_values($runner->capturedCommands));
     }
 
+    public function test_process_additional_prunes_stale_workers_in_buckets_without_backlog(): void
+    {
+        DB::table('categories')->insert(['id' => 1, 'disablepreview' => 0]);
+        DB::table('releases')->insert($this->releaseRow(1, 'a'));
+        $staleWorker = $this->tmpUnrarPath.'/z/stale-worker';
+        $activeWorker = $this->tmpUnrarPath.'/z/active-worker';
+        mkdir($staleWorker, 0777, true);
+        mkdir($activeWorker, 0777, true);
+        touch($staleWorker, time() - 7200);
+
+        $runner = new class extends PostProcessRunner
+        {
+            protected function runStreamingCommands(array $commands, int $maxProcesses, string $desc): void {}
+        };
+
+        $runner->processAdditional();
+
+        $this->assertDirectoryDoesNotExist($staleWorker);
+        $this->assertDirectoryExists($activeWorker);
+        $this->assertDirectoryExists($this->tmpUnrarPath.'/a');
+    }
+
     public function test_direct_guid_command_processes_one_batch(): void
     {
         $this->mock(AdditionalProcessingOrchestrator::class, function (MockInterface $mock): void {
@@ -342,10 +364,10 @@ class PostProcessRunnerAdditionalThreadsTest extends TestCase
         $this->assertSame(1, $report['backlog']['total']);
         $this->assertSame(1, $report['backlog']['available']);
         $this->assertSame(1, $report['backlog']['stale_claims']);
-        $this->assertSame(825, $report['capacity']['max_in_flight']);
+        $this->assertSame(33, $report['capacity']['max_in_flight']);
         $this->assertSame('v2', $report['settings']['pipeline']);
         $this->assertContains('stale-claims', $warningCodes);
-        $this->assertContains('claim-ttl', $warningCodes);
+        $this->assertNotContains('claim-ttl', $warningCodes);
         $this->assertContains('missing-index', $warningCodes);
         $this->assertContains('unwritable-temp-path', $warningCodes);
         $this->assertContains('oversized-capacity', $warningCodes);
@@ -449,6 +471,7 @@ class PostProcessRunnerAdditionalThreadsTest extends TestCase
             $table->timestamp('additional_pp_claimed_at')->nullable();
             $table->string('additional_pp_claim_token', 64)->nullable();
             $table->timestamp('archive_retry_at')->nullable();
+            $table->integer('pp_timeout_count')->default(0);
         });
     }
 }

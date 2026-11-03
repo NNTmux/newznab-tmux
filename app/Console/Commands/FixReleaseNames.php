@@ -146,8 +146,8 @@ class FixReleaseNames extends Command
         $this->info('php artisan releases:fix-names 8 : Fix release names in misc categories using Par2 Files.');
         $this->info('php artisan releases:fix-names 9 : Fix release names in misc categories using UID in the past 6 hours.');
         $this->info('php artisan releases:fix-names 10 : Fix release names in misc categories using UID.');
-        $this->info('php artisan releases:fix-names 11 : Fix SDPORN XXX release names using specific File Name in the past 6 hours.');
-        $this->info('php artisan releases:fix-names 12 : Fix SDPORN XXX release names using specific File Name.');
+        $this->info('php artisan releases:fix-names 11 : Fix supported XXX release names using search/file names in the past 6 hours.');
+        $this->info('php artisan releases:fix-names 12 : Fix supported XXX release names using search/file names.');
         $this->info('php artisan releases:fix-names 13 : Fix release names using SRR files in the past 6 hours.');
         $this->info('php artisan releases:fix-names 14 : Fix release names using SRR files.');
         $this->info('php artisan releases:fix-names 15 : Fix release names using PAR2 hash_16K block in the past 6 hours.');

@@ -5,12 +5,35 @@ declare(strict_types=1);
 namespace Tests\Unit;
 
 use App\Services\Search\Drivers\ElasticSearchDriver;
+use App\Services\Search\DTO\NameFixingSearchQuery;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
 final class ElasticSearchQueryTest extends TestCase
 {
+    #[Test]
+    public function name_fixing_filters_cover_indexed_source_fields_and_cursor_constraints(): void
+    {
+        $reflection = new ReflectionClass(ElasticSearchDriver::class);
+        $driver = $reflection->newInstanceWithoutConstructor();
+        $method = $reflection->getMethod('nameFixingFilters');
+
+        $filters = $method->invoke($driver, new NameFixingSearchQuery(
+            source: NameFixingSearchQuery::SOURCE_UID,
+            afterId: 100,
+            limit: 25,
+            categoryIds: [7010],
+            addedAfter: 1_700_000_000,
+            matchValues: ['uid-a', 'uid-b'],
+        ));
+
+        $this->assertContains(['terms' => ['categories_id' => [7010]]], $filters);
+        $this->assertContains(['range' => ['id' => ['gte' => 101]]], $filters);
+        $this->assertContains(['range' => ['adddate_ts' => ['gte' => 1_700_000_000]]], $filters);
+        $this->assertContains(['terms' => ['media_unique_id' => ['uid-a', 'uid-b']]], $filters);
+    }
+
     #[Test]
     public function it_uses_release_text_fields_constant_with_searchname_variants_only(): void
     {

@@ -291,22 +291,18 @@ docker compose up -d
 | CI / scripted teardown          | `make fresh FORCE=1` or `make nuke FORCE=1` to skip prompts           |
 | supervisorctl not connecting    | `make root-shell` then `supervisorctl status` to verify socket path   |
 
-## Nginx (GetPageSpeed + Brotli)
+## Nginx (Ubuntu archive + gzip)
 
-The app container's nginx is installed from the [GetPageSpeed apt repo](https://extras.getpagespeed.com/ubuntu/)
-(stable branch) instead of the Ubuntu archive. This gives us a current nginx
-build with ABI-matched dynamic modules. The `nginx-module-brotli` package is
-installed and the brotli directives in `docker/8.5/nginx.conf` are enabled by
-default (gzip is kept as a fallback for clients without `br` support).
+The app container's nginx is installed from the Ubuntu archive. This keeps the
+Docker build independent of third-party nginx module repositories and avoids ABI
+mismatches between `nginx` and dynamic module packages.
 
-The repo is apt-pinned at priority `1001` via
-`/etc/apt/preferences.d/getpagespeed-nginx.pref` so `nginx` and module
-packages always resolve from GetPageSpeed even if Ubuntu publishes a newer
-version. A `nginx -t` is run during `docker build` to fail fast on any config
-drift.
+Gzip compression is enabled in `docker/8.5/nginx.conf`. Brotli is intentionally
+not enabled because Ubuntu's stock nginx package does not include Brotli
+directives by default. A `nginx -t` is run during `docker build` to fail fast on
+any config drift.
 
-To revert to stock Ubuntu nginx, remove the GetPageSpeed apt key, list, and
-preferences entries from `docker/8.5/Dockerfile`, drop `nginx-module-brotli`
-from the install line, re-comment the brotli block in `docker/8.5/nginx.conf`,
-and run `make rebuild`.
+If Brotli support is required later, add it as an optional build-time path with
+ABI-matched nginx/module packages instead of a hard dependency for every local
+build.
 

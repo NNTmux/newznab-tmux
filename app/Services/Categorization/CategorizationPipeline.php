@@ -72,15 +72,32 @@ class CategorizationPipeline
      * @param  string  $releaseName  The name of the release
      * @param  string|null  $poster  The poster name
      * @param  bool  $debug  Whether to include debug information
+     * @param  string|null  $sourceName  The raw subject/`releases.name`; supplies the NZBSPLIT uploader tag
+     *                                   when `$releaseName` is already the unwrapped title
+     * @param  string|null  $contentFileName  A file inside the archive, used for its media/document type
      * @return array<string, mixed> The categorization result
      */
     public function categorize(
         int|string $groupId,
         string $releaseName,
         ?string $poster = '',
-        bool $debug = false
+        bool $debug = false,
+        ?string $sourceName = null,
+        ?string $contentFileName = null,
     ): array {
-        $releaseName = $this->nzbSplitUnwrapper->unwrap($releaseName) ?? $releaseName;
+        $split = $this->nzbSplitUnwrapper->parse($releaseName);
+        if ($split !== null) {
+            $releaseName = $split->title;
+        } elseif ($sourceName !== null && $sourceName !== '') {
+            $split = $this->nzbSplitUnwrapper->parse($sourceName);
+        }
+
+        $contentExtension = $split?->extension;
+        if ($contentFileName !== null && $contentFileName !== '') {
+            $contentExtension = $this->nzbSplitUnwrapper->parse($contentFileName)->extension
+                ?? (preg_match('/\.([A-Za-z0-9]{2,4})$/', $contentFileName, $extension) ? strtolower($extension[1]) : null)
+                ?? $contentExtension;
+        }
 
         // Normalizing dots to spaces would erase the explicit OF. site prefix.
         if (! (new ReleaseContext($releaseName, $groupId))->hasOnlyFansMarker()) {
@@ -96,6 +113,8 @@ class CategorizationPipeline
             poster: $poster ?? '',
             categorizeForeign: $this->categorizeForeign,
             catWebDL: $this->catWebDL,
+            sourceTag: $split?->tag,
+            contentExtension: $contentExtension,
         );
 
         $passable = new CategorizationPassable($context, $debug);

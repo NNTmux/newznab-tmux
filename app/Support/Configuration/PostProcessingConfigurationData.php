@@ -42,7 +42,7 @@ final readonly class PostProcessingConfigurationData
 
     public static function defaults(): self
     {
-        return new self(1, 1, 1, 1, 1, 60, 120, 3, 25, 3, 1, 10, 3, false, 2, 5, '/setup.exe|password.url/i', false, false, false, false, 1048576, 107374182400, 1048576, 107374182400, 100, 5, true, false);
+        return new self(1, 1, 1, 1, 1, 60, 120, 3, 25, 3, 1, 10, 3, false, 2, 5, '/setup\.exe|password\.url|\.scr$|\.pif$|\.lnk$/i', false, false, false, false, 1048576, 107374182400, 1048576, 107374182400, 100, 5, true, false);
     }
 
     public static function fromModel(PostProcessingConfiguration $model): self

@@ -73,7 +73,10 @@ class ArchiveExtractionCommandTest extends TestCase
 
     public function test_nfo_fallback_passes_the_archive_filename_without_a_shell(): void
     {
-        Process::fake();
+        Process::fake([
+            "'/usr/bin/unrar'" => Process::result('UNRAR 7.0 freeware', '', 0),
+            '*' => Process::result(),
+        ]);
 
         $filename = 'release$(touch command-injection).nfo';
         $tmpPath = sys_get_temp_dir().'/nntmux-nfo-command-'.uniqid('', true).'/';
@@ -85,24 +88,17 @@ class ArchiveExtractionCommandTest extends TestCase
         foreach ([
             'tmpPath' => $tmpPath,
             'unrarPath' => '/usr/bin/unrar',
-            'timeoutPath' => '/usr/bin/timeout',
             'timeoutSeconds' => 60,
         ] as $property => $value) {
             $reflection->getProperty($property)->setValue($service, $value);
         }
 
-        $reflection->getMethod('extractNfoViaUnrar')->invoke($service, 'ARCHIVE', [$filename], 'test-guid');
+        $reflection->getMethod('extractNfoViaUnrar')->invoke($service, "Rar!\x1a\x07\x00", [$filename], 'test-guid');
 
         Process::assertRan(function (PendingProcess $process) use ($filename): bool {
             return is_array($process->command)
-                && array_slice($process->command, 0, 6) === [
-                    '/usr/bin/timeout',
-                    '--foreground',
-                    '--signal=KILL',
-                    '60',
-                    '/usr/bin/unrar',
-                    'e',
-                ]
+                && array_slice($process->command, 0, 2) === ['/usr/bin/unrar', 'e']
+                && in_array('--', $process->command, true)
                 && in_array($filename, $process->command, true);
         });
 

@@ -30,11 +30,20 @@ enum CollectionFileCheckStatus: int
     /** Collection marked for deletion */
     case Delete = 5;
 
+    /** Incomplete status written by older versions; no longer set */
+    case LegacyIncomplete = 10;
+
     /** Temporary complete status during processing */
     case TempComplete = 15;
 
     /** Collection has zero-numbered parts (special handling) */
     case ZeroPart = 16;
+
+    /**
+     * One article of a per-article-obfuscated upload, held back from the stale path
+     * until ObfuscatedUploadAssembler merges it or the hold expires.
+     */
+    case ObfuscatedHold = 17;
 
     /**
      * Get the human-readable description for this status.
@@ -48,8 +57,10 @@ enum CollectionFileCheckStatus: int
             self::Sized => 'Size calculated',
             self::Inserted => 'Inserted as release',
             self::Delete => 'Marked for deletion',
+            self::LegacyIncomplete => 'Legacy incomplete',
             self::TempComplete => 'Temporarily complete',
             self::ZeroPart => 'Zero-part collection',
+            self::ObfuscatedHold => 'Held for obfuscated upload assembly',
         };
     }
 
@@ -72,6 +83,35 @@ enum CollectionFileCheckStatus: int
     public static function readyForRelease(): array
     {
         return [self::Sized];
+    }
+
+    /**
+     * Incomplete statuses that take the stale path once the collection delay
+     * passes: totalfiles is lowered to the files present and the collection
+     * is promoted. Legacy 10/15/16 rows used to be re-reconciled every cycle
+     * until the collection timeout because only 0/1/10 were promoted.
+     *
+     * @return list<int>
+     */
+    public static function staleReconcilableValues(): array
+    {
+        return [
+            self::Default->value,
+            self::CompleteCollection->value,
+            self::LegacyIncomplete->value,
+            self::TempComplete->value,
+            self::ZeroPart->value,
+        ];
+    }
+
+    /**
+     * Statuses the stuck-collection cleanup deletes once the collection timeout passes.
+     *
+     * @return list<int>
+     */
+    public static function stuckCleanupValues(): array
+    {
+        return [...self::staleReconcilableValues(), self::ObfuscatedHold->value];
     }
 
     /**

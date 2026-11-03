@@ -23,6 +23,15 @@ class FileNameExtractorTest extends TestCase
         $this->assertSame('File', $result->checkerName);
     }
 
+    public function test_accepts_broadcast_resolution_tokens_in_nzb_split_names(): void
+    {
+        $result = (new FileNameExtractor)->extractFromFile(
+            'MLB__NZBSPLIT__d5e69bbf16e52f8bc43063b814526b7f__NZBSPLIT__MLB_RS_2026_Detroit_Tigers_vs_Chicago_White_Sox_20_09_720pEN60fps_DSN.7z.080'
+        );
+
+        $this->assertSame('MLB.RS.2026.Detroit.Tigers.vs.Chicago.White.Sox.20.09.720pEN60fps.DSN', $result?->newName);
+    }
+
     public function test_rejects_low_information_nzb_split_payloads(): void
     {
         $extractor = new FileNameExtractor;

@@ -346,7 +346,7 @@
     }
     </style>
 
-    <script>
+    <script nonce="{{ csp_nonce() }}">
     new Vue({
         el: '.v-thread',
         name: 'Thread',

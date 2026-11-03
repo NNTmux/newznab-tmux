@@ -15,9 +15,10 @@ class RetryArchiveInspection extends Command
 
     protected $signature = 'releases:retry-archive-inspection
                             {--limit=0 : Max releases to queue (0 = no limit)}
+                            {--with-preview : Also queue unfinished releases that already have a preview (haspreview 1)}
                             {--dry-run : Count the affected releases by archive type without queueing them}';
 
-    protected $description = 'Queue releases whose archives could not be read (passwordstatus -1, haspreview 0) for one more post-processing pass.';
+    protected $description = 'Queue releases whose archives could not be read (passwordstatus -1, haspreview 0, or 1 with --with-preview) for one more post-processing pass.';
 
     public function handle(): int
     {
@@ -69,7 +70,7 @@ class RetryArchiveInspection extends Command
     {
         return Release::query()
             ->where('passwordstatus', -1)
-            ->where('haspreview', 0)
+            ->whereIn('haspreview', $this->option('with-preview') ? [0, 1] : [0])
             ->where('nzbstatus', 1)
             ->whereNull(AdditionalCandidateQuery::ARCHIVE_RETRY_COLUMN);
     }

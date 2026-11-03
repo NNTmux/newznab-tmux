@@ -30,7 +30,7 @@ class BlacklistService
     /**
      * Track blacklist IDs to update last_activity for.
      *
-     * @var array<string, mixed>
+     * @var array<int|string, int|string>
      */
     private array $idsToUpdate = [];
 
@@ -83,7 +83,7 @@ class BlacklistService
     /**
      * Get and reset collected blacklist IDs that matched during checks.
      *
-     * @return list<mixed>
+     * @return list<int|string>
      */
     public function getAndClearIdsToUpdate(): array
     {
@@ -96,7 +96,7 @@ class BlacklistService
     /**
      * Update last_activity timestamp for given blacklist IDs.
      *
-     * @param  array<string, mixed>  $ids
+     * @param  list<int|string>  $ids
      */
     public function updateBlacklistUsage(array $ids): void
     {

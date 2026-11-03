@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Enums\ImageAssetProfile;
+use App\Enums\RenameApplyResult;
 use App\Enums\SecondarySearchIndex;
 use App\Exceptions\BookProviderException;
 use App\Facades\Search;
@@ -12,7 +13,9 @@ use App\Models\BookInfo;
 use App\Models\Category;
 use App\Models\Release;
 use App\Services\Configuration\ConfigurationProvider;
+use App\Services\NameFixing\Data\ReleaseIdentity;
 use App\Services\NameFixing\Extractors\ObfuscatedSubjectExtractor;
+use App\Services\NameFixing\ReleaseUpdateService;
 use App\Services\Releases\ReleaseBrowseService;
 use App\Support\BookIsbn;
 use App\Support\BookMatchScorer;
@@ -88,6 +91,21 @@ class BookService
         $this->itunes = $itunes ?? new ItunesService;
         $this->scorer = $scorer ?? new BookMatchScorer;
         $this->releaseImageService = $releaseImageService ?? new ReleaseImageService;
+    }
+
+    private ?ReleaseUpdateService $releaseUpdates = null;
+
+    /**
+     * Book-name normalizations go through the guarded rename path.
+     */
+    public function setReleaseUpdateService(ReleaseUpdateService $releaseUpdates): void
+    {
+        $this->releaseUpdates = $releaseUpdates;
+    }
+
+    private function releaseUpdates(): ReleaseUpdateService
+    {
+        return $this->releaseUpdates ??= app(ReleaseUpdateService::class);
     }
 
     /**
@@ -442,7 +460,7 @@ class BookService
     protected function normalizeBookSearchNames(string $groupID = '', string $guidChar = ''): void
     {
         $query = Release::query()
-            ->select(['id', 'name', 'searchname', 'categories_id', 'isrenamed'])
+            ->select(['id', 'guid', 'name', 'searchname', 'categories_id', 'isrenamed'])
             ->whereRaw(BookProcessingCandidateQuery::categoryCondition())
             ->whereRaw(BookProcessingCandidateQuery::normalizationCondition($this->lookupMode))
             ->orderByDesc('postdate')
@@ -463,16 +481,16 @@ class BookService
             $normalizedSearchName = $this->determineReadableBookSearchName($sourceName, $parsed);
 
             $updates = ['book_name_normalized_at' => now()];
-            $nameChanged = $normalizedSearchName !== null && $normalizedSearchName !== $release->searchname;
-            if ($nameChanged) {
-                $updates['searchname'] = $normalizedSearchName;
-                $updates['isrenamed'] = 1;
+            if ($normalizedSearchName !== null && $normalizedSearchName !== $release->searchname) {
+                // A release renamed meanwhile is left for the next normalization pass; a name too long to
+                // store is not retried, so only the normalization time is recorded for it below.
+                $applied = $this->releaseUpdates()->applyRename(ReleaseIdentity::fromRelease($release), $normalizedSearchName, [...$updates, 'isrenamed' => 1]);
+                if ($applied !== RenameApplyResult::TooLong) {
+                    continue;
+                }
             }
 
             Release::query()->where('id', (int) $release->id)->update($updates);
-            if ($nameChanged) {
-                Search::updateRelease((int) $release->id);
-            }
         }
     }
 
@@ -584,11 +602,11 @@ class BookService
         $parsed = $this->parseReleaseName($rawReleaseName, (string) $releasetype);
         $normalizedReleaseName = $this->determineReadableBookSearchName($rawReleaseName, $parsed) ?? $rawReleaseName;
         if ($normalizedReleaseName !== $rawReleaseName) {
-            Release::query()->where('id', (int) $releaseID)->update([
-                'searchname' => $normalizedReleaseName,
-                'isrenamed' => 1,
-            ]);
-            Search::updateRelease((int) $releaseID);
+            $this->releaseUpdates()->applyRename(
+                new ReleaseIdentity((int) $releaseID, searchname: $rawReleaseName),
+                $normalizedReleaseName,
+                ['isrenamed' => 1],
+            );
         }
         $this->parsedBookResult = $parsed;
         $this->parsedIsbn = $parsed->isbn;

@@ -52,4 +52,22 @@ use Illuminate\Database\Eloquent\Model;
 class Collection extends Model
 {
     public $timestamps = false;
+
+    /**
+     * Ids of the groups that currently have collections, as a lookup set.
+     *
+     * One DISTINCT over the groups_id-prefixed indexes replaces probing
+     * every active group with its own `LIMIT 1` query.
+     *
+     * @return array<int, true>
+     */
+    public static function groupIdsWithCollections(): array
+    {
+        $groupIds = [];
+        foreach (static::query()->distinct()->pluck('groups_id') as $groupId) {
+            $groupIds[(int) $groupId] = true;
+        }
+
+        return $groupIds;
+    }
 }

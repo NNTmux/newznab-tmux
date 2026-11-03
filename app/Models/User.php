@@ -152,6 +152,63 @@ final class User extends Authenticatable implements CanResetPasswordContract, Ha
     protected $guarded = [];
 
     /**
+     * In-memory storage for category exclusions (not persisted to database).
+     *
+     * @var array<int>|null
+     */
+    protected ?array $categoryExclusionsCache = null;
+
+    /**
+     * Set the categoryexclusions attribute (stored in-memory only, not persisted).
+     *
+     * @param  array<int>  $value
+     */
+    public function setCategoryexclusionsAttribute(array $value): void
+    {
+        $this->categoryExclusionsCache = $value;
+    }
+
+    /**
+     * Get the categoryexclusions attribute (from in-memory cache).
+     *
+     * @return array<int>
+     */
+    public function getCategoryexclusionsAttribute(): array
+    {
+        return $this->categoryExclusionsCache ?? [];
+    }
+
+    /**
+     * Override getDirty to exclude categoryexclusions from being saved to database.
+     *
+     * @return array<string, mixed>
+     */
+    public function getDirty(): array
+    {
+        $dirty = parent::getDirty();
+
+        // Remove categoryexclusions from dirty attributes as it's not a database column
+        unset($dirty['categoryexclusions']);
+
+        return $dirty;
+    }
+
+    /**
+     * Override getAttributes to exclude categoryexclusions from database operations.
+     *
+     * @return array<string, mixed>
+     */
+    public function getAttributes(): array
+    {
+        $attributes = parent::getAttributes();
+
+        // Remove categoryexclusions as it's not a database column
+        unset($attributes['categoryexclusions']);
+
+        return $attributes;
+    }
+
+    /**
      * Roles excluded from promotions.
      *
      * @var list<string>
@@ -739,7 +796,7 @@ final class User extends Authenticatable implements CanResetPasswordContract, Ha
             ->orderBy('effective_date', 'asc')
             ->get();
 
-        return $stackedHistory->map(function ($history) { // @phpstan-ignore return.type
+        return $stackedHistory->map(function ($history) {
             $role = Role::find($history->new_role_id);
 
             return [

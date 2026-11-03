@@ -20,6 +20,28 @@ class MusicCategorizer extends AbstractCategorizer
 
     protected const LANGUAGE_CODES = 'ar|bg|bl|cs|cz|da|de|dk|el|es|et|fi|fr|ger|gr|heb|hr|hu|hun|is|it|ita|jp|jap|ko|kor|lt|lv|mk|nl|no|pl|pt|ro|rs|ru|se|sk|sl|sr|sv|th|tr|ua|vi|zh';
 
+    // Music/Audio usenet groups
+    protected const AUDIO_GROUPS = [
+        'alt.binaries.sounds.music',
+        'alt.binaries.sounds.misc',
+        'alt.binaries.sounds.mp3',
+        'alt.binaries.sounds.flac',
+        'alt.binaries.sounds.lossless',
+        'alt.binaries.mp3',
+        'alt.binaries.music',
+    ];
+
+    protected const AUDIOBOOK_GROUPS = [
+        'alt.binaries.audiobook',
+        'alt.binaries.audiobooks',
+        'alt.binaries.sounds.audiobooks',
+    ];
+
+    protected const PODCAST_GROUPS = [
+        'alt.binaries.podcast',
+        'alt.binaries.podcasts',
+    ];
+
     public function getName(): string
     {
         return 'Music';
@@ -41,14 +63,30 @@ class MusicCategorizer extends AbstractCategorizer
     public function categorize(ReleaseContext $context): CategorizationResult
     {
         $name = $context->releaseName;
+        $groupName = $context->groupName;
+
+        // Check if from music-related group
+        $isFromAudioGroup = $this->isAudioGroup($groupName);
+        $isFromAudiobookGroup = $this->isAudiobookGroup($groupName);
+        $isFromPodcastGroup = $this->isPodcastGroup($groupName);
 
         // Try each music category
         if ($result = $this->checkAudiobook($name)) {
             return $result;
         }
 
+        // If from audiobook group but didn't match audiobook patterns, still categorize as audiobook
+        if ($isFromAudiobookGroup) {
+            return $this->matched(Category::MUSIC_AUDIOBOOK, 0.7, 'fallback_audiobook_group');
+        }
+
         if ($result = $this->checkPodcast($name)) {
             return $result;
+        }
+
+        // If from podcast group but didn't match podcast patterns, still categorize as podcast
+        if ($isFromPodcastGroup) {
+            return $this->matched(Category::MUSIC_PODCAST, 0.7, 'fallback_podcast_group');
         }
 
         if ($result = $this->checkMusicVideo($name, $context->categorizeForeign)) {
@@ -67,7 +105,91 @@ class MusicCategorizer extends AbstractCategorizer
             return $result;
         }
 
+        // If from audio group but no specific match, categorize by format indicators
+        if ($isFromAudioGroup) {
+            return $this->categorizeByFormat($name, $context->categorizeForeign);
+        }
+
         return $this->noMatch();
+    }
+
+    /**
+     * Check if the group is an audio/music group.
+     */
+    protected function isAudioGroup(string $groupName): bool
+    {
+        if (empty($groupName)) {
+            return false;
+        }
+
+        return in_array($groupName, self::AUDIO_GROUPS) ||
+               (bool) preg_match('/alt\.binaries\.(sounds|mp3|music|lossless)/i', $groupName);
+    }
+
+    /**
+     * Check if the group is an audiobook group.
+     */
+    protected function isAudiobookGroup(string $groupName): bool
+    {
+        if (empty($groupName)) {
+            return false;
+        }
+
+        return in_array($groupName, self::AUDIOBOOK_GROUPS) ||
+               (bool) preg_match('/audiobook/i', $groupName);
+    }
+
+    /**
+     * Check if the group is a podcast group.
+     */
+    protected function isPodcastGroup(string $groupName): bool
+    {
+        if (empty($groupName)) {
+            return false;
+        }
+
+        return in_array($groupName, self::PODCAST_GROUPS) ||
+               (bool) preg_match('/podcast/i', $groupName);
+    }
+
+    /**
+     * Fallback categorization based on format indicators for audio group releases.
+     */
+    protected function categorizeByFormat(string $name, bool $categorizeForeign): CategorizationResult
+    {
+        // Check for lossless indicators
+        if (preg_match('/\b(FLAC|APE|WAV|ALAC|DSD|Lossless)\b/i', $name)) {
+            if ($categorizeForeign && $this->checkForeign($name)) {
+                return $this->matched(Category::MUSIC_FOREIGN, 0.65, 'fallback_lossless_foreign');
+            }
+
+            return $this->matched(Category::MUSIC_LOSSLESS, 0.65, 'fallback_lossless');
+        }
+
+        // Check for MP3 indicators
+        if (preg_match('/\b(MP3|320|256|192|128|kbps|VBR|CBR)\b/i', $name)) {
+            if ($categorizeForeign && $this->checkForeign($name)) {
+                return $this->matched(Category::MUSIC_FOREIGN, 0.65, 'fallback_mp3_foreign');
+            }
+
+            return $this->matched(Category::MUSIC_MP3, 0.65, 'fallback_mp3');
+        }
+
+        // Check for video indicators
+        if (preg_match('/\b(720p|1080p|2160p|BluRay|DVDRip|Concert|Live)\b/i', $name)) {
+            if ($categorizeForeign && $this->checkForeign($name)) {
+                return $this->matched(Category::MUSIC_FOREIGN, 0.65, 'fallback_video_foreign');
+            }
+
+            return $this->matched(Category::MUSIC_VIDEO, 0.65, 'fallback_video');
+        }
+
+        // Default to MUSIC_OTHER
+        if ($categorizeForeign && $this->checkForeign($name)) {
+            return $this->matched(Category::MUSIC_FOREIGN, 0.5, 'fallback_music_foreign');
+        }
+
+        return $this->matched(Category::MUSIC_OTHER, 0.5, 'fallback_music');
     }
 
     protected function checkForeign(string $name): bool

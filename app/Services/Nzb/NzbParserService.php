@@ -59,6 +59,7 @@ class NzbParserService
             }
 
             $result[$i]['title'] = $title;
+            $result[$i]['poster'] = (string) $file->attributes()->poster;
             // Stripped subjects can merge several NZB files into one entry.
             $result[$i]['filecount'] = ($result[$i]['filecount'] ?? 0) + 1;
 
@@ -96,6 +97,11 @@ class NzbParserService
             foreach ($file->segments->segment as $segment) {
                 $number = $segment->attributes()->number;
                 $segments[] = [$number === null ? null : (int) $number, (string) $segment];
+                $result[$i]['segment_metadata'][] = [
+                    'message_id' => (string) $segment,
+                    'number' => (int) $segment->attributes()->number,
+                    'bytes' => (int) $segment->attributes()->bytes,
+                ];
                 $fileSize += $segment->attributes()->bytes;
                 $numSegments++;
             }

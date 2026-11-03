@@ -11,10 +11,16 @@ use App\Services\CollectionsCleaningService;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 final class CbpMariaDbIngestionTest extends TestCase
 {
+    /**
+     * @var array<string, string|false>
+     */
+    private array $originalEnvironment = [];
+
     public function createApplication()
     {
         $database = getenv('CBP_INTEGRATION_DB_DATABASE');
@@ -22,16 +28,19 @@ final class CbpMariaDbIngestionTest extends TestCase
             return parent::createApplication();
         }
 
-        putenv('DB_CONNECTION=mariadb');
-        putenv('DB_DATABASE='.$database);
-        putenv('DB_HOST=mariadb');
-        putenv('DB_USERNAME='.(string) getenv('CBP_INTEGRATION_DB_USERNAME'));
-        putenv('DB_PASSWORD='.(string) getenv('CBP_INTEGRATION_DB_PASSWORD'));
-        $_ENV['DB_CONNECTION'] = $_SERVER['DB_CONNECTION'] = 'mariadb';
-        $_ENV['DB_DATABASE'] = $_SERVER['DB_DATABASE'] = $database;
-        $_ENV['DB_HOST'] = $_SERVER['DB_HOST'] = 'mariadb';
-        $_ENV['DB_USERNAME'] = $_SERVER['DB_USERNAME'] = (string) getenv('CBP_INTEGRATION_DB_USERNAME');
-        $_ENV['DB_PASSWORD'] = $_SERVER['DB_PASSWORD'] = (string) getenv('CBP_INTEGRATION_DB_PASSWORD');
+        $this->originalEnvironment = [
+            'DB_CONNECTION' => getenv('DB_CONNECTION'),
+            'DB_DATABASE' => getenv('DB_DATABASE'),
+            'DB_HOST' => getenv('DB_HOST'),
+            'DB_USERNAME' => getenv('DB_USERNAME'),
+            'DB_PASSWORD' => getenv('DB_PASSWORD'),
+        ];
+
+        $this->setEnvironmentValue('DB_CONNECTION', 'mariadb');
+        $this->setEnvironmentValue('DB_DATABASE', $database);
+        $this->setEnvironmentValue('DB_HOST', 'mariadb');
+        $this->setEnvironmentValue('DB_USERNAME', (string) getenv('CBP_INTEGRATION_DB_USERNAME'));
+        $this->setEnvironmentValue('DB_PASSWORD', (string) getenv('CBP_INTEGRATION_DB_PASSWORD'));
 
         $app = require __DIR__.'/../../bootstrap/app.php';
         $app->make(Kernel::class)->bootstrap();
@@ -97,6 +106,24 @@ final class CbpMariaDbIngestionTest extends TestCase
             DB::statement('SET FOREIGN_KEY_CHECKS=1');
         }
         parent::tearDown();
+
+        foreach ($this->originalEnvironment as $key => $value) {
+            $this->setEnvironmentValue($key, $value === false ? null : $value);
+        }
+    }
+
+    private function setEnvironmentValue(string $key, ?string $value): void
+    {
+        if ($value === null) {
+            putenv($key);
+            unset($_ENV[$key], $_SERVER[$key]);
+
+            return;
+        }
+
+        putenv($key.'='.$value);
+        $_ENV[$key] = $value;
+        $_SERVER[$key] = $value;
     }
 
     public function test_reingestion_is_idempotent_and_hot_lookups_use_indexes(): void
@@ -148,6 +175,19 @@ final class CbpMariaDbIngestionTest extends TestCase
             $this->assertStringContainsString('CBP_STORAGE_MIGRATION_EXECUTE=true', $exception->getMessage());
         }
         $this->assertSame(2, DB::table('parts')->count());
+
+        if (Schema::hasTable('settings')) {
+            DB::table('settings')->updateOrInsert(['name' => 'running'], ['value' => '1']);
+            config()->set('nntmux.cbp.storage_migration_execute', true);
+            try {
+                $migration->up();
+                $this->fail('The CBP storage migration ran while the tmux engine was marked running.');
+            } catch (\RuntimeException $exception) {
+                $this->assertStringContainsString('tmux engine is marked running', $exception->getMessage());
+            }
+            $this->assertSame(2, DB::table('parts')->count());
+            DB::table('settings')->where('name', 'running')->update(['value' => '0']);
+        }
 
         config()->set('nntmux.cbp.storage_migration_execute', true);
         $migration->up();

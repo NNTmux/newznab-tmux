@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Support\SubjectFileCounter;
+use App\Support\Utf8;
+
 /**
  * Cleans names for collections/imports/namefixer.
  *
@@ -159,7 +162,7 @@ class CollectionsCleaningService
             '/(-? [a-z0-9]+-?|\(?\d{4}\)?([_-])[a-z0-9]+)\.jpg"?| [a-z0-9]+\.mu3"?|((\d{1,3})?\.part(\d{1,5})?|\d{1,5} ?|sample|- Partie \d+)?\.(7z|\d{3}(?=([\s"]))|avi|diz|docx?|epub|idx|iso|jpg|m3u|m4a|mds|mkv|mobi|mp4|nfo|nzb|par(\s?2|")|pdf|rar|rev|rtf|r\d\d|sfv|srs|srr|sub|txt|vol.+(par2)|xls|zip|z{2,3})"?|(\s|(\d{2,3})?-)\d{2,3}\.mp3|\d{2,3}\.pdf|\.part\d{1,4}\./i',
             // Cached extension patterns
             '/'.$this->e0.'/i',
-        ], ' ', $this->subject);
+        ], ' ', SubjectFileCounter::strip($this->subject));
 
         return [
             'id' => self::REGEX_GENERIC_MATCH,
@@ -186,7 +189,7 @@ class CollectionsCleaningService
             '/\d{1,3}([,.\\/])\d{1,3}\s([kmg])b|(])?\s\d+KB\s(yENC)?|"?\s\d+\sbytes?|[- ]?\d+[.,]?\d+\s([gkm])?B\s-?(\s?yenc)?|\s\(d{1,3},\d{1,3}\s{K,M,G}B\)\s|yEnc \d+k$|{\d+ yEnc bytes}|yEnc \d+ |\(\d+ ?([kmg])?b(ytes)?\) yEnc$/i',
             // AutoRarPar and yEnc markers
             '/AutoRarPar\d{1,5}|\(\d+\)\s?yEnc|\d+(Amateur|Classic)| \d{4,}[a-z]{4,} |.vol\d+\+\d+|.part\d+/i',
-        ], ' ', $this->subject);
+        ], ' ', SubjectFileCounter::strip($this->subject));
 
         $cleanSubject = $this->normalizeString($cleanSubject);
 
@@ -259,8 +262,9 @@ class CollectionsCleaningService
         // Collapse multiple spaces into one
         $normalized = trim(preg_replace('/\s\s+/', ' ', $subject));
 
-        // Ensure UTF-8 encoding
-        return mb_convert_encoding($normalized, 'UTF-8', mb_list_encodings());
+        // Only invalid UTF-8 is converted; trying every encoding mbstring
+        // knows on each header was a measurable cost in the ingest hot path.
+        return Utf8::clean($normalized);
     }
 
     /**

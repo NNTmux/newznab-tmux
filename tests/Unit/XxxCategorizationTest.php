@@ -158,6 +158,21 @@ class XxxCategorizationTest extends TestCase
         $this->assertFalse($result->isSuccessful());
     }
 
+    public function test_resolved_sdx264xxx_name_remains_in_the_xxx_sd_category(): void
+    {
+        $categorizer = new XxxCategorizer;
+        $context = new ReleaseContext(
+            releaseName: 'Watch4Beauty.2016.03.21.Sapphira.Interview.XXX.SD.x264-SDX264XXX',
+            groupId: 0,
+        );
+
+        $result = $categorizer->categorize($context);
+
+        $this->assertTrue($result->isSuccessful());
+        $this->assertSame(Category::XXX_SD, $result->categoryId);
+        $this->assertSame('sd', $result->matchedBy);
+    }
+
     /**
      * @return array<string, array{0: string, 1: int}>
      */
@@ -170,6 +185,15 @@ class XxxCategorizationTest extends TestCase
             'VFF 576p' => ['JacquieEtMichelTV.Helena.26.09.29.VFF.576p.WEB.AAC.2.0.x264.NOTAG', Category::XXX_SD],
             'VFF 360p' => ['JacquieEtMichelTV.Helena.26.09.29.VFF.360p.WEB.AAC.2.0.x264.NOTAG', Category::XXX_SD],
         ];
+    }
+
+    #[DataProvider('jacquieEtMichelReleasesProvider')]
+    public function test_jacquie_et_michel_releases_are_recognized_without_a_group(string $releaseName, int $expectedCategoryId): void
+    {
+        $result = (new XxxCategorizer)->categorize(new ReleaseContext(releaseName: $releaseName, groupId: 0));
+
+        $this->assertTrue($result->isSuccessful());
+        $this->assertSame($expectedCategoryId, $result->categoryId);
     }
 
     #[DataProvider('jacquieEtMichelReleasesProvider')]

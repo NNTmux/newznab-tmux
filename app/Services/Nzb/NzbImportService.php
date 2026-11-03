@@ -169,6 +169,7 @@ class NzbImportService
 
                 if ($nzbString === false) {
                     $this->echoOut('ERROR: Unable to read: '.$nzbFilePath);
+                    Log::channel('nzb_import')->error('Unable to read: '.$nzbFilePath);
                     $reportResult($nzbFilePath, NzbImportStatus::Failed);
 
                     if ($deleteFailed) {
@@ -183,6 +184,7 @@ class NzbImportService
                 $nzbXML = @simplexml_load_string($nzbString);
                 if ($nzbXML === false || strtolower($nzbXML->getName()) !== 'nzb') {
                     $this->echoOut('ERROR: Unable to load NZB XML data: '.$nzbFilePath);
+                    Log::channel('nzb_import')->error('Unable to load NZB XML data: '.$nzbFilePath);
                     $reportResult($nzbFilePath, NzbImportStatus::Failed);
 
                     if ($deleteFailed) {
@@ -229,6 +231,7 @@ class NzbImportService
                     if (! $stored) {
                         $destination = $path ?? $this->relGuid;
                         $this->echoOut('ERROR: Problem compressing NZB file to: '.$destination);
+                        Log::channel('nzb_import')->error('Problem compressing NZB file to: '.$destination);
 
                         // Remove the release.
                         Release::query()->where('guid', $this->relGuid)->delete();
@@ -247,6 +250,7 @@ class NzbImportService
                         }
 
                         $nzbsImported++;
+                        Log::channel('nzb_import')->info('Imported: '.$nzbFilePath);
                     }
                 } else {
                     $reportResult($nzbFilePath, $importStatus);
@@ -274,6 +278,7 @@ class NzbImportService
                 }
             } else {
                 $this->echoOut('ERROR: Unable to fetch: '.$nzbFilePath);
+                Log::channel('nzb_import')->error('Unable to fetch: '.$nzbFilePath);
                 $reportResult($nzbFilePath, NzbImportStatus::Failed);
                 $nzbsSkipped++;
             }
@@ -450,20 +455,20 @@ class NzbImportService
                 $this->echoOut($errorMessage);
 
                 // Persist blacklist usage stats if we matched any rule during this NZB processing
-                $this->blacklistService->updateBlacklistUsage($this->blacklistService->getAndClearIdsToUpdate()); // @phpstan-ignore argument.type
+                $this->blacklistService->updateBlacklistUsage($this->blacklistService->getAndClearIdsToUpdate());
 
                 return $isBlackListed ? NzbImportStatus::Blacklisted : NzbImportStatus::NoGroup;
             }
         }
 
         // After scanning all files, persist any matched whitelist/blacklist usage
-        $this->blacklistService->updateBlacklistUsage($this->blacklistService->getAndClearIdsToUpdate()); // @phpstan-ignore argument.type
+        $this->blacklistService->updateBlacklistUsage($this->blacklistService->getAndClearIdsToUpdate());
 
         // Try to insert the NZB details into the DB.
         return $this->insertNZB(
             [
                 'subject' => $firstName,
-                'useFName' => $nzbFileName,
+                'useFName' => $nzbFileName !== '' ? $nzbFileName : $firstName,
                 'postDate' => empty($postDate) ? now()->format('Y-m-d H:i:s') : $postDate,
                 'from' => empty($posterName) ? '' : $posterName,
                 'groups_id' => $groupID,
@@ -609,7 +614,12 @@ class NzbImportService
 
         $categoryId = $nzbDetails['nzbCategoryId'];
         if (! \is_int($categoryId)) {
-            $determinedCategory = $this->category->determineCategory($nzbDetails['groups_id'], $cleanName, $escapedFromName);
+            $determinedCategory = $this->category->determineCategory(
+                $nzbDetails['groups_id'],
+                $cleanName,
+                $escapedFromName,
+                sourceName: (string) $subject,
+            );
             $categoryId = (int) $determinedCategory['categories_id'];
         }
 
@@ -625,6 +635,7 @@ class NzbImportService
                 'size' => $nzbDetails['totalSize'],
                 'categories_id' => $categoryId,
                 'isrenamed' => $renamed,
+                'iscategorized' => 1,
                 'predb_id' => $predbIdInt,
                 'nzbstatus' => NzbService::NZB_ADDED,
             ]

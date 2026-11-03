@@ -120,7 +120,7 @@ class Category extends Model
 
     public const int PC_MAC = 4030;
 
-    public const int PC_PHONE_OTHER = 4040;
+    public const int PC_PHONE_OTHER = 4999;
 
     public const int PC_GAMES = 4050;
 
@@ -170,6 +170,7 @@ class Category extends Model
 
     /**
      * Retired XXX categories (WMV, HD Clips, SD Clips, old SD, WEBDL) and the category that replaces each one.
+     * 6070 is a duplicate "Packs" row that installs seeded before April 2023 still have; Pack is 6050.
      *
      * Used by releases:recategorize-xxx to empty and delete them, and by the API to keep old category ids working.
      *
@@ -179,6 +180,7 @@ class Category extends Model
         6020 => self::XXX_SD,
         6041 => self::XXX_HD,
         6042 => self::XXX_SD,
+        6070 => self::XXX_PACK,
         6080 => self::XXX_SD,
         6090 => self::XXX_HD,
     ];
@@ -312,7 +314,7 @@ class Category extends Model
 
     /**
      * @param  array<int|string, mixed>  $cat  Category IDs (list or associative)
-     * @return array<string, mixed>|string|null
+     * @return list<mixed>|string|null
      */
     public static function getCategorySearch(array $cat = [], ?string $searchType = null, mixed $builder = false): string|array|null
     {
@@ -366,6 +368,9 @@ class Category extends Model
                 $categories[] = $categoryInt;
             }
         }
+
+        // Ensure unique categories to avoid duplicate IDs in IN clause
+        $categories = array_values(array_unique($categories));
 
         $catCount = count($categories);
 
@@ -540,11 +545,13 @@ class Category extends Model
     public static function getForMenu(array $excludedCats = []): array
     {
         $categoriesResult = [];
-        $categoriesArray = RootCategory::query()->with(['categories' => function ($query) use ($excludedCats) {
-            if (! empty($excludedCats)) {
-                $query->whereNotIn('id', $excludedCats);
-            }
-            $query->select(['id', 'title', 'root_categories_id', 'description']);
+        // Retired XXX categories stay in the table until releases:recategorize-xxx empties them; never offer them.
+        $hiddenCats = array_merge($excludedCats, array_keys(self::XXX_RETIRED_FALLBACKS));
+
+        $categoriesArray = RootCategory::query()->with(['categories' => function ($query) use ($hiddenCats) {
+            $query->whereNotIn('id', $hiddenCats)
+                ->select(['id', 'title', 'root_categories_id', 'description'])
+                ->orderBy('id');
         }])->select(['id', 'title'])->get()->toArray();
 
         foreach ($categoriesArray as $category) {

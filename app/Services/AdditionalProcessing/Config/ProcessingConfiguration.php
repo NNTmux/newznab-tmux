@@ -118,6 +118,8 @@ final readonly class ProcessingConfiguration
 
     public int $mediaFfmpegTimeout;
 
+    public int $mediaFfmpegThreads;
+
     public int $thumbnailFrameAttempts;
 
     public float $thumbnailMinStddev;
@@ -187,6 +189,7 @@ final readonly class ProcessingConfiguration
         $this->mediaImageMaxBytes = max(1048576, (int) config('nntmux.media_image_max_bytes', 8388608));
         $this->mediaStageMaxSeconds = max(0, (int) config('nntmux.media_stage_max_seconds', 30));
         $this->mediaFfmpegTimeout = max(1, (int) config('nntmux.media_ffmpeg_timeout', 30));
+        $this->mediaFfmpegThreads = max(0, (int) config('nntmux.media_ffmpeg_threads', 1));
         $this->thumbnailFrameAttempts = min(10, max(1, (int) config('nntmux.thumbnail_frame_attempts', 4)));
         $this->thumbnailMinStddev = (float) config('nntmux.thumbnail_min_stddev', 12);
         $this->thumbnailMinLuma = (float) config('nntmux.thumbnail_min_luma', 24);

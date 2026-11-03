@@ -13,6 +13,8 @@ use App\Models\MusicInfo;
 use App\Models\SteamApp;
 use App\Models\Video;
 use App\Services\Search\Contracts\SearchDriverInterface;
+use App\Services\Search\DTO\NameFixingSearchQuery;
+use App\Services\Search\DTO\NameFixingSearchResult;
 use App\Services\Search\DTO\ReleaseSearchQuery;
 use App\Services\Search\DTO\SearchPage;
 use App\Services\Search\Support\ElasticsearchClientFactory;
@@ -135,6 +137,124 @@ class ElasticSearchDriver implements SearchDriverInterface
             hasMore: (bool) ($result['has_more'] ?? (($query->offset + count($result['ids'])) < (int) $result['total'])),
             documents: $result['documents'] ?? [],
         );
+    }
+
+    public function searchNameFixingCandidates(NameFixingSearchQuery $query): NameFixingSearchResult
+    {
+        if (! $this->isElasticsearchAvailable()) {
+            return NameFixingSearchResult::unavailable($this->getDriverName());
+        }
+
+        $limit = $query->normalizedLimit(self::MAX_RESULTS);
+
+        try {
+            $filters = $this->nameFixingFilters($query);
+            $body = [
+                'query' => $filters === []
+                    ? ['match_all' => new \stdClass]
+                    : ['bool' => ['filter' => $filters]],
+                'sort' => [
+                    ['id' => ['order' => $query->descending ? 'desc' : 'asc']],
+                ],
+                'size' => $limit,
+                'track_total_hits' => true,
+                '_source' => true,
+            ];
+
+            $response = $this->getClient()->search([
+                'index' => $this->getReleasesIndex(),
+                'body' => $body,
+            ]);
+
+            $ids = [];
+            $documents = [];
+            $hits = $response['hits']['hits'] ?? [];
+            foreach ($hits as $hit) {
+                $id = (int) ($hit['_id'] ?? $hit['_source']['id'] ?? 0);
+                if ($id <= 0) {
+                    continue;
+                }
+
+                $document = is_array($hit['_source'] ?? null) ? $hit['_source'] : [];
+                $document['id'] = $id;
+                $ids[] = $id;
+                $documents[$id] = $document;
+            }
+
+            $total = (int) ($response['hits']['total']['value'] ?? $response['hits']['total'] ?? 0);
+
+            return new NameFixingSearchResult(
+                ids: $ids,
+                documents: $documents,
+                total: $total,
+                available: true,
+                hasMore: count($ids) === $limit && $total > count($ids),
+                driver: $this->getDriverName(),
+            );
+        } catch (\Throwable $exception) {
+            Log::warning('ElasticSearch name-fixing candidate query failed', [
+                'source' => $query->source,
+                'error' => $exception->getMessage(),
+            ]);
+
+            return NameFixingSearchResult::unavailable($this->getDriverName());
+        }
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    private function nameFixingFilters(NameFixingSearchQuery $query): array
+    {
+        $filters = [];
+        $releaseIds = $query->normalizedReleaseIds();
+        if ($releaseIds !== []) {
+            $filters[] = ['ids' => ['values' => array_map('strval', $releaseIds)]];
+        }
+
+        $categoryIds = $query->normalizedCategoryIds();
+        if ($categoryIds !== []) {
+            $filters[] = ['terms' => ['categories_id' => $categoryIds]];
+        }
+
+        $idRange = [];
+        if ($query->afterId > 0) {
+            $idRange['gte'] = $query->afterId + 1;
+        }
+        if ($query->beforeId > 0) {
+            $idRange['lte'] = $query->beforeId - 1;
+        }
+        if ($idRange !== []) {
+            $filters[] = ['range' => ['id' => $idRange]];
+        }
+
+        if ($query->addedAfter > 0) {
+            $filters[] = ['range' => ['adddate_ts' => ['gte' => $query->addedAfter]]];
+        }
+
+        $matchValues = $query->normalizedMatchValues();
+        $sourceFilter = match ($query->source) {
+            NameFixingSearchQuery::SOURCE_NFO => ['range' => ['nfoid' => ['gte' => 1]]],
+            NameFixingSearchQuery::SOURCE_FILES => ['exists' => ['field' => 'filename']],
+            NameFixingSearchQuery::SOURCE_SRR => ['bool' => ['should' => [
+                ['match' => ['filename' => ['query' => 'srr', 'operator' => 'and']]],
+                ['match' => ['filename' => ['query' => 'srs', 'operator' => 'and']]],
+            ], 'minimum_should_match' => 1]],
+            NameFixingSearchQuery::SOURCE_XXX => ['multi_match' => [
+                'query' => 'SDX264XXX SDPORN',
+                'fields' => ['filename', 'searchname'],
+                'operator' => 'or',
+            ]],
+            NameFixingSearchQuery::SOURCE_UID => $matchValues === []
+                ? ['exists' => ['field' => 'media_unique_id']]
+                : ['terms' => ['media_unique_id' => $matchValues]],
+            NameFixingSearchQuery::SOURCE_MEDIA => ['term' => ['has_media_info' => 1]],
+            NameFixingSearchQuery::SOURCE_MEDIA_MOVIE => ['exists' => ['field' => 'media_movie_name']],
+            default => throw new RuntimeException("Unsupported name-fixing search source [{$query->source}]."),
+        };
+        $filters[] = $sourceFilter;
+
+        return $filters;
     }
 
     /**
@@ -868,17 +988,23 @@ class ElasticSearchDriver implements SearchDriverInterface
                     'index' => $this->getPredbIndex(),
                     'body' => [
                         'query' => ['term' => [$field.'_exact' => PredbSearchDocument::exactValue($name)]],
-                        'size' => 1,
+                        'size' => 5,
                         '_source' => ['title', 'filename', 'source'],
                     ],
                 ]);
 
+                $hits = [];
                 foreach ($response['hits']['hits'] ?? [] as $doc) {
                     $hit = PredbSearchDocument::normalize($doc['_source'] ?? [], (int) ($doc['_id'] ?? 0));
                     if ($hit['id'] > 0 && $hit['title'] !== ''
                         && PredbSearchDocument::exactValue($hit[$field]) === PredbSearchDocument::exactValue($name)) {
-                        return $hit;
+                        $hits[$hit['id']] = $hit;
                     }
+                }
+
+                $match = PredbSearchDocument::unambiguousExactHit($field, $hits);
+                if ($match !== null) {
+                    return $match;
                 }
             }
         } catch (\Throwable $exception) {

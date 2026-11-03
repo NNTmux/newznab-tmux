@@ -67,6 +67,9 @@ class BinariesService
     /** @var array<int, true> */
     private array $headersReceived = [];
 
+    /** @var array<string, int|null> group name => usenet_groups.id, for postdate() */
+    private array $groupIdsByName = [];
+
     public function __construct(
         ?BinariesConfig $config = null,
         ?HeaderParser $headerParser = null,
@@ -448,6 +451,8 @@ class BinariesService
         $attempts = 0;
         $date = 0;
 
+        $groupId = $this->resolvePostdateGroupId($groupData);
+
         do {
             // Try to get the article date locally first.
             //
@@ -459,14 +464,15 @@ class BinariesService
             // 2026_05_05 add_cbp_query_indexes migration makes this an index
             // lookup; do not drop it without revisiting this call site.
             // LIMIT 1 is fine because we just need any matching collection
-            // date for the article.
-            $local = DB::select(
+            // date for the article. Article numbers are only unique within
+            // a group, so the collection must belong to the group asked about.
+            $local = $groupId === null ? [] : DB::select(
                 'SELECT c.date AS date FROM collections c
                     INNER JOIN binaries b ON(c.id=b.collections_id)
                     INNER JOIN parts p ON(b.id=p.binaries_id)
-                    WHERE p.number = ?
+                    WHERE p.number = ? AND c.groups_id = ?
                     LIMIT 1',
-                [$currentPost]
+                [$currentPost, $groupId]
             );
 
             if (! empty($local)) {
@@ -529,6 +535,31 @@ class BinariesService
     }
 
     // ==================== Private Helper Methods ====================
+
+    /**
+     * The local postdate lookup needs the group id, but callers pass the NNTP
+     * GROUP summary, which only carries the group name.
+     *
+     * @param  array<string, mixed>  $groupData
+     */
+    private function resolvePostdateGroupId(array $groupData): ?int
+    {
+        if (isset($groupData['id']) && is_numeric($groupData['id'])) {
+            return (int) $groupData['id'];
+        }
+
+        $name = isset($groupData['group']) ? (string) $groupData['group'] : '';
+        if ($name === '') {
+            return null;
+        }
+
+        if (! array_key_exists($name, $this->groupIdsByName)) {
+            $id = UsenetGroup::getIDByName($name);
+            $this->groupIdsByName[$name] = $id === false ? null : (int) $id;
+        }
+
+        return $this->groupIdsByName[$name];
+    }
 
     /**
      * @param  array<string, mixed>  $groupMySQL

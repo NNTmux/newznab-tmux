@@ -222,4 +222,17 @@ class ReleaseSearchServiceOrderingTest extends TestCase
 
         $this->assertSame(3, $method->invoke($service, 'WHERE r.passwordstatus <= 0 AND r.id IN (1,2,3)'));
     }
+
+    /**
+     * Test that the web search base SQL includes the parent category alias used by searchSimilar().
+     */
+    public function test_build_search_base_sql_includes_category_parent_id_alias(): void
+    {
+        $reflection = new ReflectionClass(ReleaseSearchService::class);
+        $method = $reflection->getMethod('buildSearchBaseSql');
+
+        $sql = $method->invoke($this->service, 'WHERE r.id IN (1,2,3)');
+
+        $this->assertStringContainsString('cp.id AS categoryparentid', $sql);
+    }
 }

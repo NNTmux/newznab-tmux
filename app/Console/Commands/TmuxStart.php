@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Enums\TmuxPaneRole;
-use App\Models\Collection;
+use App\Services\CollectionCleanupService;
 use App\Services\Configuration\ConfigurationProvider;
 use App\Services\Configuration\ProcessingRuntimeStateRepository;
 use App\Services\Tmux\TmuxCommand;
@@ -14,7 +14,6 @@ use App\Services\Tmux\TmuxPaneManager;
 use App\Services\Tmux\TmuxSessionManager;
 use App\Support\MetadataSources;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Process;
 
 class TmuxStart extends Command
@@ -167,21 +166,14 @@ class TmuxStart extends Command
      */
     private function resetOldCollections(): void
     {
-        $delayTime = app(ConfigurationProvider::class)->ingestion()->collectionDelayHours;
-
         try {
-            DB::transaction(function () use ($delayTime) {
-                $count = Collection::query()
-                    ->where('dateadded', '<', now()->subHours($delayTime))
-                    ->update(['dateadded' => now()]);
+            $count = app(CollectionCleanupService::class)->restartCollectionDelay();
 
-                if ($count > 0) {
-                    $this->info("  ✓ Reset {$count} expired collections");
-                } else {
-                    $this->info('  ✓ No collections needed resetting');
-                }
-            }, 10);
-
+            if ($count > 0) {
+                $this->info("  ✓ Reset {$count} expired collections");
+            } else {
+                $this->info('  ✓ No collections needed resetting');
+            }
         } catch (\Exception $e) {
             $this->warn('  ⚠ Failed to reset collections: '.$e->getMessage());
         }
@@ -197,6 +189,8 @@ class TmuxStart extends Command
         $command = TmuxCommand::monitor($sessionName);
         $channel = 'nntmux-ready-'.bin2hex(random_bytes(12));
         $command[] = '--ready-channel='.$channel;
+
+        $this->line('  ↪ Monitor command: '.implode(' ', array_map('escapeshellarg', $command)));
 
         $monitorPane = $paneManager->paneForRole(TmuxPaneRole::Monitor, '0.0');
         if (! $paneManager->respawnPane($monitorPane, $command)) {

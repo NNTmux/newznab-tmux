@@ -16,8 +16,10 @@ use App\Services\AdditionalProcessing\NzbContentParser;
 use App\Services\AdditionalProcessing\ReleaseFileManager;
 use App\Services\AdditionalProcessing\ReleaseFilesArchiveFallback;
 use App\Services\AdditionalProcessing\ReleaseProcessor;
+use App\Services\AdditionalProcessing\ReleaseRenamingService;
 use App\Services\AdditionalProcessing\ReleaseSearchSyncCoordinator;
 use App\Services\AdditionalProcessing\State\PersistenceMetricsCollector;
+use App\Services\AdditionalProcessing\UnrarRunner;
 use App\Services\AdditionalProcessing\UsenetDownloadService;
 use App\Services\Categorization\CategorizationService;
 use App\Services\NameFixing\NameFixingService;
@@ -43,6 +45,8 @@ class AdditionalProcessingServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->app->singleton(UnrarRunner::class);
+
         // Configuration is a singleton since it loads settings once
         $this->app->singleton(ProcessingConfiguration::class, function () {
             return new ProcessingConfiguration;
@@ -151,6 +155,7 @@ class AdditionalProcessingServiceProvider extends ServiceProvider
                 $app->make(ConsoleOutputService::class),
                 $app->make(ReleaseSearchSyncCoordinator::class),
                 $app->make(PersistenceMetricsCollector::class),
+                $app->make(ReleaseRenamingService::class),
                 $app->make(MediaSourceResolver::class),
             );
         });
@@ -171,6 +176,15 @@ class AdditionalProcessingServiceProvider extends ServiceProvider
             return new TempWorkspaceService;
         });
 
+        // Release Renaming service
+        $this->app->singleton(ReleaseRenamingService::class, function ($app) {
+            return new ReleaseRenamingService(
+                $app->make(ProcessingConfiguration::class),
+                $app->make(NameFixingService::class),
+                $app->make(ReleaseUpdateService::class)
+            );
+        });
+
         // Main orchestrator
         $this->app->singleton(AdditionalProcessingOrchestrator::class, function ($app) {
             return new AdditionalProcessingOrchestrator(
@@ -185,11 +199,15 @@ class AdditionalProcessingServiceProvider extends ServiceProvider
     /**
      * Bootstrap services.
      */
-    public function boot(PersistenceMetricsCollector $persistenceMetrics): void
+    public function boot(): void
     {
-        DB::listen(static function (QueryExecuted $query) use ($persistenceMetrics): void {
-            $persistenceMetrics->recordDatabaseStatement($query->time);
-        });
+        // Resolve the metrics collector lazily so booting stays cheap and the
+        // provider also works in minimal containers without a database binding.
+        if ($this->app->bound('db')) {
+            DB::listen(function (QueryExecuted $query): void {
+                $this->app->make(PersistenceMetricsCollector::class)->recordDatabaseStatement($query->time);
+            });
+        }
 
         $this->app->terminating(function (): void {
             if ($this->app->resolved(AdditionalProcessingOrchestrator::class)) {

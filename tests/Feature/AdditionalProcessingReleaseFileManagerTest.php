@@ -385,6 +385,7 @@ class AdditionalProcessingReleaseFileManagerTest extends TestCase
             ? $this->rar('readme.txt', str_repeat('A', 100)).substr($this->rar('Movie.2026.1080p.mkv', str_repeat('B', 100), $encrypted), 20)
             : $this->zip('readme.txt', str_repeat('A', 100)).$this->zip('Movie.2026.1080p.mkv', str_repeat('B', 100), $encrypted);
         $parser = Mockery::mock(NzbContentParser::class);
+        $parser->shouldReceive('detectRawMediaFiles')->andReturn(['hasRawMediaFile' => false, 'rawMediaFileEntries' => []]);
         $parser->shouldReceive('parseNzb')->once()->with('guid-1')->andReturn([
             'error' => null,
             'contents' => [[
@@ -555,6 +556,7 @@ class AdditionalProcessingReleaseFileManagerTest extends TestCase
 
         $config = $this->makeConfig(['processPasswords' => true]);
         $parser = Mockery::mock(NzbContentParser::class);
+        $parser->shouldReceive('detectRawMediaFiles')->andReturn(['hasRawMediaFile' => false, 'rawMediaFileEntries' => []]);
         $parser->shouldReceive('parseNzb')->once()->with('guid-1')->andReturn([
             'error' => null,
             'contents' => [['title' => '"Movie.2026.part01.rar" yEnc (1/50)', 'segments' => ['<v1>']]],
@@ -642,6 +644,7 @@ class AdditionalProcessingReleaseFileManagerTest extends TestCase
 
         $config = $this->makeConfig(['processPasswords' => true, 'maximumRarPasswordChecks' => 2]);
         $parser = Mockery::mock(NzbContentParser::class);
+        $parser->shouldReceive('detectRawMediaFiles')->andReturn(['hasRawMediaFile' => false, 'rawMediaFileEntries' => []]);
         $parser->shouldReceive('parseNzb')->once()->with('guid-1')->andReturn([
             'error' => null,
             'contents' => array_map(static fn (array $file): array => ['title' => $file[0], 'segments' => [$file[1]]], $files),
@@ -746,6 +749,7 @@ class AdditionalProcessingReleaseFileManagerTest extends TestCase
         $media = ['"Movie.2026.part01.rar" yEnc (1/50)', '<v1>', str_pad("\x1A\x45\xDF\xA3\x01\x00\x00\x00", 512, "\x5A")];
         $sevenZip = [$title, '<x1>', $this->sevenZip('ignored.mkv', str_repeat('x', 100), compressedHeader: true)];
         $parser = Mockery::mock(NzbContentParser::class);
+        $parser->shouldReceive('detectRawMediaFiles')->andReturn(['hasRawMediaFile' => false, 'rawMediaFileEntries' => []]);
         $parser->shouldReceive('parseNzb')->once()->with('guid-1')->andReturn([
             'error' => null,
             'contents' => array_map(static fn (array $file): array => ['title' => $file[0], 'segments' => [$file[1]]], [$media, $sevenZip]),

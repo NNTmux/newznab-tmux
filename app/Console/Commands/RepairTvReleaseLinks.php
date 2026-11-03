@@ -127,12 +127,24 @@ class RepairTvReleaseLinks extends Command
             ->where('tv_episodes_id', '<=', 0)
             ->whereNotIn('tv_episodes_id', [TvLookupStatus::EpisodeMissing->value, TvLookupStatus::SeasonPack->value]);
 
-        return $this->eachChunk($query, ['id', 'searchname'], function (Collection $releases): void {
+        return $this->eachChunk($query, ['id', 'searchname', 'videos_id'], function (Collection $releases): void {
             $seasonPacks = [];
             $missing = [];
+            $linked = [];
             foreach ($releases as $release) {
-                if ($this->parse((string) $release->searchname)?->seasonPack) {
+                $parsed = $this->parse((string) $release->searchname);
+                if ($parsed?->seasonPack) {
                     $seasonPacks[] = $release->id;
+
+                    continue;
+                }
+
+                // The episode is often stored by now: link it instead of spending an API retry.
+                $episodeId = $parsed?->hasEpisodeReference()
+                    ? $this->parser()->getBySeasonEp((int) $release->videos_id, $parsed->season ?? -1, $parsed->episode ?? 0, (string) $parsed->airdate)
+                    : false;
+                if ($episodeId !== false) {
+                    $linked[(int) $release->id] = $episodeId;
                 } else {
                     $missing[] = $release->id;
                 }
@@ -140,6 +152,13 @@ class RepairTvReleaseLinks extends Command
 
             Release::query()->whereIn('id', $seasonPacks)->update(['tv_episodes_id' => TvLookupStatus::SeasonPack->value, 'tv_lookup_attempts' => 0, 'tv_lookup_retry_at' => null]);
             Release::query()->whereIn('id', $missing)->update(self::singleRetryColumns());
+            foreach ($linked as $releaseId => $episodeId) {
+                Release::query()->whereKey($releaseId)->update(['tv_episodes_id' => $episodeId, 'tv_lookup_attempts' => 0, 'tv_lookup_retry_at' => null]);
+            }
+            if ($linked !== []) {
+                ReleaseSearchIndexSync::forIds(array_keys($linked));
+                $this->linksChanged = true;
+            }
         });
     }
 
@@ -363,8 +382,11 @@ class RepairTvReleaseLinks extends Command
 
     private function parse(string $searchname): ?ParsedTvRelease
     {
-        $this->parser ??= new LocalDbProvider;
+        return ParsedTvRelease::fromParseInfo($this->parser()->parseInfo($searchname));
+    }
 
-        return ParsedTvRelease::fromParseInfo($this->parser->parseInfo($searchname));
+    private function parser(): LocalDbProvider
+    {
+        return $this->parser ??= new LocalDbProvider;
     }
 }

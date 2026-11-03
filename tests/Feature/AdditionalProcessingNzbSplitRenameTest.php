@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Enums\RenameApplyResult;
 use App\Models\Category;
 use App\Models\Release;
 use App\Services\AdditionalProcessing\Config\ProcessingConfiguration;
@@ -15,6 +16,7 @@ use App\Services\NameFixing\ReleaseUpdateService;
 use App\Services\NfoService;
 use App\Services\Nzb\NzbService;
 use App\Services\ReleaseImageService;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class AdditionalProcessingNzbSplitRenameTest extends TestCase
@@ -47,7 +49,10 @@ class AdditionalProcessingNzbSplitRenameTest extends TestCase
                 'Filenames, ',
                 true,
                 true
-            );
+            )
+            ->willReturnCallback(function () use ($updateService): void {
+                $updateService->lastResult = RenameApplyResult::Applied;
+            });
 
         $manager = $this->makeReleaseFileManager($updateService);
 
@@ -56,7 +61,71 @@ class AdditionalProcessingNzbSplitRenameTest extends TestCase
         ], $context);
 
         $this->assertTrue($renamed);
-        $this->assertSame($expected, $context->release->searchname);
+    }
+
+    public function test_additional_postprocessing_reports_skipped_nzb_split_write_as_not_renamed(): void
+    {
+        $wrapped = 'MLB__NZBSPLIT__f5054661a1d468cc6a8712de8217c1c9__NZBSPLIT__MLB_2026_Cincinnati_Reds_vs_Tampa_Bay_Rays_20_04_720pEN60fps.7z.075';
+        $release = $this->makeRelease(127, $wrapped, $wrapped);
+
+        $context = new ReleaseProcessingContext($release);
+        $updateService = $this->createMock(ReleaseUpdateService::class);
+        $updateService->expects($this->once())
+            ->method('updateRelease')
+            ->willReturnCallback(function () use ($updateService): void {
+                $updateService->lastResult = RenameApplyResult::StaleIdentity;
+            });
+
+        $renamed = $this->makeReleaseFileManager($updateService)
+            ->processReleaseNameFromNzbContents([['title' => $wrapped]], $context);
+
+        $this->assertFalse($renamed);
+        $this->assertSame($wrapped, $context->release->searchname);
+    }
+
+    /**
+     * @return array<string, array{0: array<string, mixed>}>
+     */
+    public static function alreadyNamedNzbSplitReleaseProvider(): array
+    {
+        $wrapped = '[75/98] "MLB__NZBSPLIT__f5054661a1d468cc6a8712de8217c1c9__NZBSPLIT__MLB_2026_Cincinnati_Reds_vs_Tampa_Bay_Rays_20_04_720pEN60fps.7z.075" yEnc';
+
+        return [
+            'unwrapped at creation' => [['name' => $wrapped, 'searchname' => 'MLB.2026.Cincinnati.Reds.vs.Tampa.Bay.Rays.20.04.720pEN60fps', 'isrenamed' => 1]],
+            'predb linked' => [['name' => $wrapped, 'searchname' => $wrapped, 'isrenamed' => 0, 'predb_id' => 55]],
+        ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $attributes
+     */
+    #[DataProvider('alreadyNamedNzbSplitReleaseProvider')]
+    public function test_additional_postprocessing_does_not_rerun_nzb_split_rename(array $attributes): void
+    {
+        $release = $this->makeRelease(128, (string) $attributes['name'], (string) $attributes['searchname']);
+        $release->forceFill($attributes);
+
+        $updateService = $this->createMock(ReleaseUpdateService::class);
+        $updateService->expects($this->never())->method('updateRelease');
+
+        $renamed = $this->makeReleaseFileManager($updateService)
+            ->processReleaseNameFromNzbContents([['title' => (string) $attributes['name']]], new ReleaseProcessingContext($release));
+
+        $this->assertFalse($renamed);
+    }
+
+    public function test_additional_postprocessing_skips_nzb_split_sample_titles(): void
+    {
+        $wrapped = '[1/2] "MOTD__NZBSPLIT__16fdb79df730a11998d802bc408b8101__NZBSPLIT__match.of.the.day.2026.05.17.1080p.hdtv.h264-ftp.sample.7z.001" yEnc';
+        $release = $this->makeRelease(129, $wrapped, $wrapped);
+
+        $updateService = $this->createMock(ReleaseUpdateService::class);
+        $updateService->expects($this->never())->method('updateRelease');
+
+        $renamed = $this->makeReleaseFileManager($updateService)
+            ->processReleaseNameFromNzbContents([['title' => $wrapped]], new ReleaseProcessingContext($release));
+
+        $this->assertFalse($renamed);
     }
 
     public function test_additional_postprocessing_skips_non_nzbsplit_wrapped_titles(): void
@@ -171,6 +240,19 @@ class AdditionalProcessingNzbSplitRenameTest extends TestCase
 
         $this->assertSame('Scene NFO', $normalize->invoke($manager, $utf16));
         $this->assertSame('Scene NFO', $normalize->invoke($manager, "\xEF\xBB\xBFScene NFO"));
+    }
+
+    private function makeRelease(int $id, string $name, string $searchName): Release
+    {
+        return new Release([
+            'id' => $id,
+            'releases_id' => $id,
+            'name' => $name,
+            'searchname' => $searchName,
+            'guid' => str_repeat('c', 40),
+            'groups_id' => 1,
+            'categories_id' => Category::OTHER_HASHED,
+        ]);
     }
 
     private function makeReleaseFileManager(?ReleaseUpdateService $updateService = null): ReleaseFileManager

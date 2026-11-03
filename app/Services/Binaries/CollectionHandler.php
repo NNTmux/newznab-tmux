@@ -42,6 +42,19 @@ final class CollectionHandler
 
     private ?\Throwable $lastException = null;
 
+    /**
+     * collection_groups rows known to be committed, keyed "id|group". Survives
+     * reset() so long-lived collections are not re-written on every chunk.
+     *
+     * @var array<string, true>
+     */
+    private array $committedGroupRows = [];
+
+    /** @var array<string, true> collection_groups rows written in the open transaction */
+    private array $pendingGroupRows = [];
+
+    private const int COMMITTED_GROUP_ROWS_LIMIT = 100000;
+
     public function __construct(
         ?CollectionsCleaningService $collectionsCleaning = null,
         ?XrefService $xrefService = null,
@@ -61,7 +74,22 @@ final class CollectionHandler
         $this->insertedCollectionIds = [];
         $this->batchCollectionHashes = [];
         $this->existingIdsByHash = [];
+        $this->pendingGroupRows = [];
         $this->lastException = null;
+    }
+
+    /**
+     * Record that the current chunk's transaction committed, so its
+     * collection_groups rows need not be written again.
+     */
+    public function markCommitted(): void
+    {
+        if (\count($this->committedGroupRows) + \count($this->pendingGroupRows) > self::COMMITTED_GROUP_ROWS_LIMIT) {
+            $this->committedGroupRows = [];
+        }
+
+        $this->committedGroupRows += $this->pendingGroupRows;
+        $this->pendingGroupRows = [];
     }
 
     /**
@@ -82,6 +110,8 @@ final class CollectionHandler
             $groupName
         );
 
+        $fromName = Utf8::clean($header['From']);
+
         $collectionKey = $collMatch['name'].$totalFiles;
 
         // Return cached ID if already processed this batch
@@ -99,7 +129,6 @@ final class CollectionHandler
         $headerTokens = $this->xrefService->extractTokens($header['Xref'] ?? '');
 
         $subject = substr(Utf8::clean($header['matches'][1]), 0, 255);
-        $fromName = Utf8::clean($header['From']);
 
         $driver = DB::getDriverName();
 
@@ -301,10 +330,23 @@ final class CollectionHandler
             }
         }
 
-        if (DB::getDriverName() === 'sqlite') {
-            $this->bulkInsertCollectionsSqlite($rowsByCollectionKey);
-        } else {
-            $this->bulkInsertCollectionsMysql($rowsByCollectionKey);
+        // Only insert hashes the prefetch did not find. Re-inserting known rows
+        // through ON DUPLICATE KEY still consumes an AUTO_INCREMENT value per
+        // row, which exhausted the INT collections.id range far faster than
+        // collections were actually created. Sorting keeps the unique-index
+        // lock order identical across concurrent group workers.
+        $rowsToInsert = array_filter(
+            $rowsByCollectionKey,
+            static fn (array $row): bool => ! isset($existingHashes[$row['collectionhash']])
+        );
+        uasort($rowsToInsert, static fn (array $a, array $b): int => strcmp($a['collectionhash'], $b['collectionhash']));
+
+        if ($rowsToInsert !== []) {
+            if (DB::getDriverName() === 'sqlite') {
+                $this->bulkInsertCollectionsSqlite($rowsToInsert);
+            } else {
+                $this->bulkInsertCollectionsMysql($rowsToInsert);
+            }
         }
 
         // Only resolve ids for the hashes we couldn't satisfy from the
@@ -429,6 +471,11 @@ final class CollectionHandler
                 continue;
             }
             foreach (array_keys($groupNames) as $groupName) {
+                $rowKey = $collectionId.'|'.$groupName;
+                if (isset($this->committedGroupRows[$rowKey]) || isset($this->pendingGroupRows[$rowKey])) {
+                    continue;
+                }
+                $this->pendingGroupRows[$rowKey] = true;
                 $rows[] = ['collections_id' => $collectionId, 'group_name' => $groupName];
             }
         }
@@ -582,6 +629,36 @@ final class CollectionHandler
         }
 
         return (int) (Collection::whereCollectionhash($collectionHash)->value('id') ?? 0);
+    }
+
+    /**
+     * Mark collections as seen without re-aggregating them. Used for
+     * collections whose binaries received no new parts in a chunk.
+     *
+     * @param  list<int>  $collectionIds
+     */
+    public function touchLastSeen(array $collectionIds, int $chunkSize = 500): bool
+    {
+        $collectionIds = array_values(array_unique(array_map('intval', $collectionIds)));
+        if ($collectionIds === []) {
+            return true;
+        }
+
+        try {
+            $now = now()->format('Y-m-d H:i:s');
+            foreach (array_chunk($collectionIds, max(1, min($chunkSize, $this->sqlChunkSize))) as $chunk) {
+                DB::table('collections')->whereIn('id', $chunk)->update(['last_seen_at' => $now]);
+            }
+
+            return true;
+        } catch (\Throwable $e) {
+            $this->lastException = $e;
+            if (config('app.debug') === true) {
+                SqlError::logFailure('Collection last_seen_at refresh failed', $e);
+            }
+
+            return false;
+        }
     }
 
     /**

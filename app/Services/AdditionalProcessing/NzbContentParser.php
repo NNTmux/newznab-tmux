@@ -147,9 +147,11 @@ class NzbContentParser
     /**
      * Process NZB contents to extract message IDs for different file types.
      *
-     * @param  list<array<string, mixed>>  $nzbContents
+     * @param  array<int, array<string, mixed>>  $nzbContents
      * @return array{
      *     hasCompressedFile: bool,
+     *     hasRawMediaFile: bool,
+     *     rawMediaFileEntries: array<int, array{title: string, segments: array<int, string>, size: int, extension: string}>,
      *     sampleMessageIDs: list<string>,
      *     jpgMessageIDs: list<string>,
      *     mediaInfoMessageID: string,
@@ -165,6 +167,8 @@ class NzbContentParser
     ): array {
         $result = [
             'hasCompressedFile' => false,
+            'hasRawMediaFile' => false,
+            'rawMediaFileEntries' => [],
             'sampleMessageIDs' => [],
             'jpgMessageIDs' => [],
             'mediaInfoMessageID' => '',
@@ -189,6 +193,40 @@ class NzbContentParser
                     $title
                 )) {
                     $result['hasCompressedFile'] = true;
+                }
+
+                // Raw (non-archive) media file detection — video files posted directly
+                if (! empty($segments)
+                    && preg_match('/'.$config->videoFileRegex.'[. ")\]]/i', $title, $videoMatch)
+                    // Exclude files that also match compressed patterns (e.g. "movie.mkv.rar")
+                    && ! preg_match('/\.(part\d+|[rz]\d+|rar|zip|7z|gz|bz2|xz)(\s|"|$)/i', $title)
+                    // Exclude sample videos — those are handled separately
+                    && stripos($title, 'sample') === false
+                ) {
+                    $ext = ltrim(strtolower($videoMatch[1]), '.');
+                    $result['hasRawMediaFile'] = true;
+                    $result['rawMediaFileEntries'][] = [
+                        'title' => $title,
+                        'segments' => array_map('strval', $segments),
+                        'size' => $file['size'] ?? 0,
+                        'extension' => $ext,
+                    ];
+                }
+
+                // Raw (non-archive) audio file detection
+                if (! empty($segments)
+                    && preg_match('/'.$config->audioFileRegex.'[. ")\]]/i', $title, $audioMatch)
+                    && ! preg_match('/\.(part\d+|[rz]\d+|rar|zip|7z|gz|bz2|xz)(\s|"|$)/i', $title)
+                    && stripos($title, 'sample') === false
+                ) {
+                    $ext = ltrim(strtolower($audioMatch[1]), '.');
+                    $result['hasRawMediaFile'] = true;
+                    $result['rawMediaFileEntries'][] = [
+                        'title' => $title,
+                        'segments' => array_map('strval', $segments),
+                        'size' => $file['size'] ?? 0,
+                        'extension' => $ext,
+                    ];
                 }
 
                 // Look for a video sample (not an image)
@@ -233,6 +271,61 @@ class NzbContentParser
         }
 
         return $result;
+    }
+
+    /**
+     * Detect raw (non-archive) media files posted directly to the NZB.
+     *
+     * This is a focused companion to the work planner, which does not detect
+     * raw media. Returns entries shaped for ReleaseProcessingContext::rawMediaFileEntries.
+     *
+     * @param  array<int, array<string, mixed>>  $nzbContents
+     * @return array{hasRawMediaFile: bool, rawMediaFileEntries: array<int, array{title: string, segments: array<int, string>, size: int, extension: string}>}
+     */
+    public function detectRawMediaFiles(array $nzbContents, ProcessingConfiguration $config): array
+    {
+        $entries = [];
+
+        foreach ($nzbContents as $file) {
+            try {
+                $title = (string) ($file['title'] ?? '');
+                $segments = $file['segments'] ?? [];
+
+                if (empty($segments) || stripos($title, 'sample') !== false) {
+                    continue;
+                }
+
+                // Exclude files that are actually archives (e.g. "movie.mkv.rar")
+                if (preg_match('/\.(part\d+|[rz]\d+|rar|zip|7z|gz|bz2|xz)(\s|"|$)/i', $title)) {
+                    continue;
+                }
+
+                $extension = null;
+                if (preg_match('/'.$config->videoFileRegex.'[. ")\]]/i', $title, $match)) {
+                    $extension = ltrim(strtolower($match[1]), '.');
+                } elseif (preg_match('/'.$config->audioFileRegex.'[. ")\]]/i', $title, $match)) {
+                    $extension = ltrim(strtolower($match[1]), '.');
+                }
+
+                if ($extension === null) {
+                    continue;
+                }
+
+                $entries[] = [
+                    'title' => $title,
+                    'segments' => array_map('strval', $segments),
+                    'size' => $file['size'] ?? 0,
+                    'extension' => $extension,
+                ];
+            } catch (\ErrorException $e) {
+                Log::debug($e->getTraceAsString());
+            }
+        }
+
+        return [
+            'hasRawMediaFile' => $entries !== [],
+            'rawMediaFileEntries' => $entries,
+        ];
     }
 
     /**

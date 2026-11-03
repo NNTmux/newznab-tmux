@@ -126,4 +126,21 @@ class CategorizePcGameTest extends TestCase
         $this->assertSame(Category::PC_0DAY, $result->categoryId, "Expected PC_0DAY for installer package: $name");
         $this->assertSame('0day_msix_installer', $result->matchedBy);
     }
+
+    public function test_other_mobile_platforms_use_the_seeded_phone_other_category(): void
+    {
+        $context = new ReleaseContext(
+            releaseName: 'Nokia.Maps.v3.Symbian.S60-GROUP',
+            groupId: 0,
+            groupName: '',
+            poster: ''
+        );
+
+        $result = $this->categorizer->categorize($context);
+
+        $this->assertTrue($result->isSuccessful());
+        $this->assertSame('phone_other', $result->matchedBy);
+        // 4999 is the Phone-Other row in CategoriesTableSeeder; 4040 has never existed in the categories table.
+        $this->assertSame(4999, $result->categoryId);
+    }
 }

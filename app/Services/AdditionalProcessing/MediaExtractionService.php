@@ -18,6 +18,7 @@ use App\Services\AdditionalProcessing\Media\ThumbnailFrameSelector;
 use App\Services\AdditionalProcessing\State\PersistenceMetricsCollector;
 use App\Services\AdditionalProcessing\State\ReleaseProcessingContext;
 use App\Services\Categorization\CategorizationService;
+use App\Services\NameFixing\Data\ReleaseIdentity;
 use App\Services\NameFixing\ReleaseUpdateService;
 use App\Services\ReleaseExtraService;
 use App\Services\ReleaseImageService;
@@ -56,6 +57,7 @@ class MediaExtractionService
         ?ReleaseSearchSyncCoordinator $searchSyncCoordinator = null,
         ?MediaToolFactory $tools = null,
         ?ThumbnailFrameSelector $frameSelector = null,
+        private ?ReleaseUpdateService $releaseUpdates = null,
     ) {
         $this->searchSyncCoordinator = $searchSyncCoordinator
             ?? new ReleaseSearchSyncCoordinator(
@@ -65,10 +67,21 @@ class MediaExtractionService
         $scorer = new FrameQualityScorer($config->thumbnailMinStddev, $config->thumbnailMinLuma, $config->thumbnailMaxLuma);
         $this->frameSelector = $frameSelector ?? new ThumbnailFrameSelector(
             $config,
-            new FfmpegFrameGrabber($this->tools, $config->debugMode),
+            new FfmpegFrameGrabber($this->tools, $config->debugMode, $config->mediaFfmpegThreads),
             $scorer,
         );
         $this->imageInspector = new ImageInspector($scorer, $config->thumbnailMinStddev);
+    }
+
+    /**
+     * Renames go through the guarded path, sharing this service's search sync coordinator.
+     */
+    private function releaseUpdates(): ReleaseUpdateService
+    {
+        return $this->releaseUpdates ??= new ReleaseUpdateService(
+            $this->categorize,
+            searchSyncCoordinator: $this->searchSyncCoordinator,
+        );
     }
 
     /**
@@ -253,11 +266,9 @@ class MediaExtractionService
             $result['audioInfo'] = true;
         }
 
-        $rQuery = Release::query()
-            ->where('proc_pp', '=', 0)
-            ->where('id', $context->release->id)
-            ->select(['searchname', 'fromname', 'categories_id', 'groups_id'])
-            ->first();
+        $rQuery = Release::query()->where('proc_pp', '=', 0)->where('id', $context->release->id)->select([
+            'searchname', 'fromname', 'categories_id', 'groups_id',
+        ])->first();
 
         $musicParent = (string) Category::MUSIC_ROOT;
         if ($rQuery === null || ! preg_match(
@@ -287,9 +298,8 @@ class MediaExtractionService
                             $ext = strtoupper($fileExtension);
 
                             $newName = $track->get('performer')->getFullName().' - '.$track->get('album')->getFullName();
-                            if (! empty($track->get('recorded_date'))
-                                && preg_match('/(?:19|20)\d\d/', $track->get('recorded_date')->getFullname, $Year)
-                            ) {
+                            if (! empty($track->get('recorded_date')) && preg_match('/(?:19|20)\d\d/',
+                                $track->get('recorded_date')->getFullname, $Year)) {
                                 $newName .= ' ('.$Year[0].') '.$ext;
                             } else {
                                 $newName .= ' '.$ext;
@@ -298,27 +308,30 @@ class MediaExtractionService
                             $newCat = match ($ext) {
                                 'MP3' => Category::MUSIC_MP3,
                                 'FLAC' => Category::MUSIC_LOSSLESS,
-                                default => $this->categorize->determineCategory($rQuery->groups_id, $newName, $rQuery->fromname),
+                                default => $this->categorize->determineCategory($rQuery->groups_id, $newName,
+                                    $rQuery->fromname),
                             };
 
-                            $newTitle = escapeString(substr($newName, 0, 255));
-                            Release::whereId($context->release->id)->update([
-                                'searchname' => $newTitle,
+                            // The name is a bound parameter: it must not be SQL-quoted (escapeString()) here.
+                            $newTitle = $newName;
+                            $identity = new ReleaseIdentity(
+                                (int) $context->release->id,
+                                isset($context->release->guid) ? (string) $context->release->guid : null,
+                                searchname: (string) $rQuery->searchname,
+                                predbId: 0,
+                            );
+                            $applied = $this->releaseUpdates()->applyRename($identity, $newTitle, [
                                 'categories_id' => is_array($newCat) ? $newCat['categories_id'] : $newCat,
-                                'iscategorized' => 1,
-                                'isrenamed' => 1,
-                                'proc_pp' => 1,
-                            ]);
+                                'iscategorized' => 1, 'isrenamed' => 1, 'proc_pp' => 1,
+                            ], release: $context->release)->written();
 
-                            $this->searchSyncCoordinator->request((int) $context->release->id);
-
-                            if ($this->config->echoCLI) {
+                            if ($applied && $this->config->echoCLI) {
                                 $releaseInfo = (object) [
                                     'groups_id' => $rQuery->groups_id, 'categories_id' => $rQuery->categories_id,
                                     'searchname' => $rQuery->searchname, 'name' => $rQuery->searchname,
                                     'releases_id' => $context->release->id, 'filename' => '',
                                 ];
-                                (new ReleaseUpdateService)->echoReleaseInfo($releaseInfo, $newTitle,
+                                $this->releaseUpdates()->echoReleaseInfo($releaseInfo, $newTitle,
                                     is_array($newCat) ? $newCat : ['categories_id' => $newCat], '',
                                     'MediaExtractionService->getAudioInfo');
                             }
@@ -400,9 +413,7 @@ class MediaExtractionService
         string $tmpPath
     ): array {
         $result = [
-            'sample' => false,
-            'video' => false,
-            'mediaInfo' => false,
+            'sample' => false, 'video' => false, 'mediaInfo' => false,
         ];
 
         if (! $context->foundSample) {

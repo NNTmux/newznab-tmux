@@ -190,7 +190,7 @@
     }
     </style>
 
-    <script>
+    <script nonce="{{ csp_nonce() }}">
     new Vue({
         el: '.v-category-show',
         name: 'CategoryShow',

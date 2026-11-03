@@ -46,7 +46,8 @@ final class AdditionalProcessingDiagnostics
         $tempPath = $this->tempPath($warnings);
         $maximumClaimLifetime = min(
             max(1, $childTimeout),
-            max(1, $releaseTimeout) * $batchSize,
+            // Workers claim one release at a time, so a claim lives for at most one release timeout.
+            max(1, $releaseTimeout),
         );
 
         if ($backlog['stale_claims'] > 0) {
@@ -64,12 +65,12 @@ final class AdditionalProcessingDiagnostics
             );
         }
 
-        $maxInFlight = $threads * $batchSize;
+        $maxInFlight = $threads;
         if ($threads > self::OVERSIZED_THREAD_THRESHOLD || $maxInFlight > self::OVERSIZED_IN_FLIGHT_THRESHOLD) {
             $warnings[] = $this->warning(
                 'oversized-capacity',
                 'postthreads='.$threads.' and maxaddprocessed='.$batchSize.' allow up to '.$maxInFlight
-                .' claimed releases at once; reduce threads or batch size and benchmark end-to-end throughput.',
+                .' claimed releases at once; reduce threads and benchmark end-to-end throughput.',
             );
         }
 

@@ -12,6 +12,8 @@ use App\Models\Release;
 use App\Models\ReleaseNzbCreationFailure;
 use App\Models\UsenetGroup;
 use App\Services\Binaries\BinariesConfig;
+use App\Services\Binaries\Obfuscated\ObfuscatedUploadAssembler;
+use App\Services\Binaries\Obfuscated\ObfuscatedUploadConfig;
 use App\Services\Categorization\CategorizationService;
 use App\Services\Configuration\ConfigurationProvider;
 use App\Services\Configuration\ProcessingRuntimeStateRepository;
@@ -79,6 +81,10 @@ final class ReleaseProcessingService
 
     private readonly BinariesConfig $binariesConfig;
 
+    private readonly ObfuscatedUploadAssembler $obfuscatedUploadAssembler;
+
+    private ?bool $collectionsHaveLastSeenAt = null;
+
     public function __construct(
         ?NzbService $nzb = null,
         ?ReleaseCleaningService $releaseCleaning = null,
@@ -88,6 +94,7 @@ final class ReleaseProcessingService
         ?CollectionCleanupService $collectionCleanupService = null,
         ?PostProcessService $postProcessService = null,
         ?BinariesConfig $binariesConfig = null,
+        ?ObfuscatedUploadAssembler $obfuscatedUploadAssembler = null,
     ) {
         $this->echoCLI = (bool) config('nntmux.echocli');
 
@@ -106,6 +113,8 @@ final class ReleaseProcessingService
             );
         $this->postProcessService = $postProcessService;
         $this->binariesConfig = $binariesConfig ?? BinariesConfig::fromSettings();
+        $this->obfuscatedUploadAssembler = $obfuscatedUploadAssembler
+            ?? new ObfuscatedUploadAssembler(ObfuscatedUploadConfig::fromConfig());
 
         $this->settings = $this->loadSettings();
         $this->validateSettings();
@@ -314,7 +323,7 @@ final class ReleaseProcessingService
         $query = Release::query()
             ->where('categories_id', Category::OTHER_MISC)
             ->where('iscategorized', 0)
-            ->select(['id', 'fromname', 'groups_id', $type]);
+            ->select(array_values(array_unique(['id', 'fromname', 'groups_id', 'name', $type])));
 
         if (! empty($groupId)) {
             $query->where('groups_id', $groupId);
@@ -332,7 +341,8 @@ final class ReleaseProcessingService
                 $categoryResult = $categorizer->determineCategory(
                     $release->groups_id,
                     $release->{$type},
-                    $release->fromname
+                    $release->fromname,
+                    sourceName: (string) ($release->name ?? ''),
                 );
 
                 Release::query()
@@ -366,11 +376,38 @@ final class ReleaseProcessingService
 
         $normalizedGroupId = $this->normalizeGroupId($groupID);
         $this->processStuckCollections($normalizedGroupId ?? 0);
+        $this->assembleObfuscatedUploads($normalizedGroupId);
         $this->reconcileIncompleteCollections($normalizedGroupId);
 
         $count = $this->countCompleteCollections($normalizedGroupId);
         $this->outputStat('Complete collections found', $count);
         $this->outputElapsedTime($startTime);
+    }
+
+    /**
+     * Merge per-article-obfuscated uploads before the stale path would promote and delete
+     * their one-part collections. A failure is logged and never stops release processing.
+     */
+    private function assembleObfuscatedUploads(?int $groupId): void
+    {
+        if (! $this->obfuscatedUploadAssembler->isEnabled()) {
+            return;
+        }
+
+        $groupIds = $groupId !== null
+            ? [$groupId]
+            : UsenetGroup::getActiveIDs()->pluck('id')->map(static fn ($id): int => (int) $id)->all();
+
+        foreach ($groupIds as $id) {
+            try {
+                $result = $this->obfuscatedUploadAssembler->assembleGroup($id);
+                if ($this->echoCLI && ($result->merged > 0 || $result->failed > 0)) {
+                    $this->outputStat('Obfuscated uploads assembled', $result->merged);
+                }
+            } catch (Throwable $e) {
+                Log::warning('Obfuscated upload assembly failed', ['group' => $id, 'error' => $e->getMessage()]);
+            }
+        }
     }
 
     /**
@@ -414,34 +451,69 @@ final class ReleaseProcessingService
      */
     private function reconcileIncompleteCollections(?int $groupId): void
     {
-        $lastId = 0;
         $statuses = [
             CollectionFileCheckStatus::Default->value,
             CollectionFileCheckStatus::CompleteCollection->value,
             CollectionFileCheckStatus::CompleteParts->value,
             CollectionFileCheckStatus::TempComplete->value,
             CollectionFileCheckStatus::ZeroPart->value,
-            10,
+            CollectionFileCheckStatus::LegacyIncomplete->value,
         ];
 
+        // Two passes instead of one OR: each is index-friendly, and every row
+        // is reconciled on its own, so the split does not change the result.
+        // CompleteParts first, so rows the stale pass moves there are not
+        // reconciled twice in one call.
+        $this->reconcileCollectionPages(
+            static fn ($query) => $query->where('filecheck', CollectionFileCheckStatus::CompleteParts->value),
+            $groupId,
+            $statuses,
+        );
+
+        $cutoff = now()->subHours($this->settings->collectionDelayTime);
+        $staleStatuses = array_values(array_diff($statuses, [CollectionFileCheckStatus::CompleteParts->value]));
+        // Cap the keyset at the newest stale id. Without it the last page scans
+        // every young collection to the end of the table. Both lookups range
+        // over collections_dateadded_idx, so they cost one pass over the stale
+        // backlog, and an empty backlog skips the pass entirely.
+        $maxStaleId = max(
+            (int) Collection::query()->where('dateadded', '<', $cutoff)->max('id'),
+            (int) Collection::query()->whereNull('dateadded')->where('added', '<', $cutoff)->max('id'),
+        );
+        if ($maxStaleId === 0) {
+            return;
+        }
+
+        $this->reconcileCollectionPages(
+            static fn ($query) => $query
+                ->where('id', '<=', $maxStaleId)
+                ->whereIn('filecheck', $staleStatuses)
+                ->where(static fn ($created) => $created
+                    ->where('dateadded', '<', $cutoff)
+                    ->orWhere(static fn ($legacy) => $legacy
+                        ->whereNull('dateadded')
+                        ->where('added', '<', $cutoff))),
+            $groupId,
+            $statuses,
+        );
+    }
+
+    /**
+     * Keyset-page the collections matching $filter and reconcile each page.
+     *
+     * @param  callable(\Illuminate\Database\Eloquent\Builder<Collection>): mixed  $filter
+     * @param  list<int>  $statuses
+     */
+    private function reconcileCollectionPages(callable $filter, ?int $groupId, array $statuses): void
+    {
+        $lastId = 0;
         do {
             $query = Collection::query()
                 ->where('id', '>', $lastId)
-                ->where(function ($query) use ($statuses): void {
-                    $query->where('filecheck', CollectionFileCheckStatus::CompleteParts->value)
-                        ->orWhere(function ($stale) use ($statuses): void {
-                            $stale->whereIn('filecheck', array_values(array_diff(
-                                $statuses,
-                                [CollectionFileCheckStatus::CompleteParts->value]
-                            )))->whereRaw(
-                                'COALESCE(dateadded, added) < ?',
-                                [now()->subHours($this->settings->collectionDelayTime)]
-                            );
-                        });
-                })
                 ->when($groupId !== null, static fn ($q) => $q->where('groups_id', $groupId))
                 ->orderBy('id')
                 ->limit($this->binariesConfig->reconcileBatchSize);
+            $filter($query);
             $ids = $query->pluck('id')->map(static fn ($id): int => (int) $id)->all();
             if ($ids === []) {
                 break;
@@ -481,6 +553,9 @@ final class ReleaseProcessingService
                 [...$collectionIds, ...$collectionIds]
             );
 
+            $holdNzbSplit = $this->nzbSplitHoldSql();
+            $staleStatuses = implode(', ', CollectionFileCheckStatus::staleReconcilableValues());
+
             DB::update(
                 "UPDATE collections c
                  LEFT JOIN (
@@ -492,14 +567,14 @@ final class ReleaseProcessingService
                  SET c.filesize = COALESCE(a.filesize, 0),
                      c.totalfiles = CASE
                         WHEN COALESCE(c.dateadded, c.added) < ?
-                         AND c.filecheck IN (0, 1, 10)
+                         AND c.filecheck IN ({$staleStatuses}){$holdNzbSplit}
                         THEN COALESCE(a.currentfiles, 0) ELSE c.totalfiles END,
                      c.filecheck = CASE
                         WHEN c.totalfiles > 0
                          AND COALESCE(a.currentfiles, 0) IN (c.totalfiles, c.totalfiles + 1)
                          AND COALESCE(a.completefiles, 0) >= c.totalfiles THEN ?
                         WHEN COALESCE(c.dateadded, c.added) < ?
-                         AND c.filecheck IN (0, 1, 10) THEN ?
+                         AND c.filecheck IN ({$staleStatuses}){$holdNzbSplit} THEN ?
                         ELSE c.filecheck END
                  WHERE c.id IN ({$idPlaceholders}) AND c.filecheck IN ({$statusPlaceholders})",
                 [
@@ -513,6 +588,29 @@ final class ReleaseProcessingService
                 ]
             );
         }, self::MAX_RETRIES);
+    }
+
+    /**
+     * NZBSPLIT sets carry no PAR2, so a missing volume makes the download unusable. Their declared
+     * `[n/m]` file count is kept instead of being lowered to the files seen after the delay; a set
+     * that never completes is removed by the stuck-collection cleanup at the collection timeout.
+     */
+    private function holdsNzbSplitCollection(string $subject, int $totalFiles): bool
+    {
+        return $this->settings->nzbSplitRequireCompleteSets
+            && $totalFiles > 0
+            && str_contains($subject, '__NZBSPLIT__');
+    }
+
+    /**
+     * SQL counterpart of {@see holdsNzbSplitCollection()} for the stale branches. INSTR, not LIKE:
+     * `_` is a LIKE wildcard.
+     */
+    private function nzbSplitHoldSql(): string
+    {
+        return $this->settings->nzbSplitRequireCompleteSets
+            ? " AND NOT (INSTR(c.subject, '__NZBSPLIT__') > 0 AND c.totalfiles > 0)"
+            : '';
     }
 
     /**
@@ -549,7 +647,8 @@ final class ReleaseProcessingService
                 $createdAt = $collection->dateadded ?? $collection->added;
                 $stale = $createdAt !== null
                     && strtotime((string) $createdAt) < now()->subHours($this->settings->collectionDelayTime)->timestamp
-                    && \in_array((int) $collection->filecheck, [0, 1, 10], true);
+                    && \in_array((int) $collection->filecheck, CollectionFileCheckStatus::staleReconcilableValues(), true)
+                    && ! $this->holdsNzbSplitCollection((string) ($collection->subject ?? ''), (int) $collection->totalfiles);
                 $totalFiles = $stale ? (int) $aggregate->currentfiles : (int) $collection->totalfiles;
                 $ready = $totalFiles > 0
                     && \in_array((int) $aggregate->currentfiles, [$totalFiles, $totalFiles + 1], true)
@@ -593,6 +692,16 @@ final class ReleaseProcessingService
             $par2OnlyCollectionIds->where('c.groups_id', $normalizedGroupId);
         }
         $stats['par2Only'] += $this->deleteCollectionQueryInBatches($par2OnlyCollectionIds, 'Par2-only cleanup');
+
+        // Sized collections with no bytes are never released and every size
+        // filter below skips them, so they would linger until part retention.
+        $emptySized = Collection::query()
+            ->where('filecheck', CollectionFileCheckStatus::Sized->value)
+            ->where('filesize', 0);
+        if ($normalizedGroupId !== null) {
+            $emptySized->where('groups_id', $normalizedGroupId);
+        }
+        $stats['minSize'] += $this->deleteCollectionQueryInBatches($emptySized, 'Empty sized cleanup');
 
         foreach ($groupIDs as $grpID) {
             $groupSettings = UsenetGroup::getGroupByID($grpID['id']);
@@ -857,7 +966,9 @@ final class ReleaseProcessingService
      */
     public function deleteCollections(int|string|null $groupID): void
     {
-        $this->collectionCleanupService->deleteFinishedAndOrphans($this->echoCLI);
+        $groupId = is_numeric($groupID) && (int) $groupID > 0 ? (int) $groupID : null;
+
+        $this->collectionCleanupService->deleteFinishedAndOrphans($this->echoCLI, $groupId);
     }
 
     /**
@@ -1052,18 +1163,24 @@ final class ReleaseProcessingService
 
         do {
             try {
+                // No ORDER BY: every batch is deleted, so order is irrelevant, and
+                // sorting by id makes MariaDB walk the primary key instead of
+                // ranging over (groups_id, filecheck, last_seen_at).
                 $query = DB::table('collections')
-                    ->whereIn('filecheck', [
-                        CollectionFileCheckStatus::Default->value,
-                        CollectionFileCheckStatus::CompleteCollection->value,
-                        CollectionFileCheckStatus::TempComplete->value,
-                        CollectionFileCheckStatus::ZeroPart->value,
-                        10,
-                    ])
-                    ->orderBy('id')
+                    ->whereIn('filecheck', CollectionFileCheckStatus::stuckCleanupValues())
                     ->limit(self::BATCH_SIZE);
-                if (Schema::hasColumn('collections', 'last_seen_at')) {
-                    $query->whereRaw('COALESCE(last_seen_at, dateadded, added) < ?', [$cutoff]);
+                $this->collectionsHaveLastSeenAt ??= Schema::hasColumn('collections', 'last_seen_at');
+                if ($this->collectionsHaveLastSeenAt) {
+                    // Sargable form of COALESCE(last_seen_at, dateadded, added) < cutoff.
+                    $query->where(static fn ($idle) => $idle
+                        ->where('last_seen_at', '<', $cutoff)
+                        ->orWhere(static fn ($unseen) => $unseen
+                            ->whereNull('last_seen_at')
+                            ->where(static fn ($created) => $created
+                                ->where('dateadded', '<', $cutoff)
+                                ->orWhere(static fn ($legacy) => $legacy
+                                    ->whereNull('dateadded')
+                                    ->where('added', '<', $cutoff)))));
                 } else {
                     $query->where('added', '<', $cutoff);
                 }

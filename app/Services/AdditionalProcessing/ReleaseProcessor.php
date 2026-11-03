@@ -25,6 +25,7 @@ use App\Services\Releases\ReleaseBrowseService;
 use App\Services\TempWorkspaceService;
 use dariusiii\rarinfo\SzipInfo;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Stateless release processor for additional post-processing.
@@ -55,6 +56,7 @@ class ReleaseProcessor
         private readonly ConsoleOutputService $output,
         private readonly ?ReleaseSearchSyncCoordinator $searchSyncCoordinator = null,
         private readonly ?PersistenceMetricsCollector $persistenceMetricsCollector = null,
+        private readonly ?ReleaseRenamingService $releaseRenamingService = null,
         ?MediaSourceResolver $mediaSourceResolver = null,
         ?ArchivedMediaSlicer $archivedMediaSlicer = null,
         ?MediaSourceStage $mediaSourceStage = null,
@@ -84,12 +86,18 @@ class ReleaseProcessor
         $searchSyncCoordinator->beginReleaseScope($releaseId);
         $this->downloadService->beginReleaseScope();
 
+        app(UnrarRunner::class)->setDeadline($context->workDeadline($this->config->releaseProcessingTimeout));
         try {
             $result = $this->processRelease($context, $mainTmpPath, $metrics);
         } finally {
+            app(UnrarRunner::class)->setDeadline(null);
             $context->releaseDownloadedArchives();
             try {
-                $searchSyncCoordinator->finishReleaseScope();
+                try {
+                    $searchSyncCoordinator->finishReleaseScope();
+                } catch (\Throwable) {
+                    Log::warning('Additional processing search synchronization failed', ['release_id' => $releaseId]);
+                }
             } finally {
                 $persistenceMetrics = $persistenceMetricsCollector->finishReleaseScope();
                 $downloadMetrics = $this->downloadService->finishReleaseScope();
@@ -203,6 +211,18 @@ class ReleaseProcessor
                     return $timeoutResult;
                 }
 
+                if (! $bookFlood && $context->nzbHasRawMediaFile
+                    && (! $context->nzbHasCompressedFile || ($context->archivesAreCompanions = $this->archivesAreCompanions($context)))
+                ) {
+                    $metrics->measure(
+                        ProcessingStage::DirectDownloads,
+                        fn () => $this->processNzbRawMediaFiles($context),
+                    );
+                    if (($timeoutResult = $this->processingTimeoutResult($context, $metrics)) !== null) {
+                        return $timeoutResult;
+                    }
+                }
+
                 if (! $bookFlood && $context->nzbHasCompressedFile) {
                     $triedCompressedMids = [];
                     $metrics->measure(
@@ -294,10 +314,14 @@ class ReleaseProcessor
             );
         } finally {
             if ($context->tmpPath !== '') {
-                $metrics->measure(
-                    ProcessingStage::WorkspaceCleanup,
-                    fn () => $this->tempWorkspace->clearDirectory($context->tmpPath, false),
-                );
+                try {
+                    $metrics->measure(
+                        ProcessingStage::WorkspaceCleanup,
+                        fn () => $this->tempWorkspace->clearDirectory($context->tmpPath, false),
+                    );
+                } catch (\Throwable) {
+                    Log::warning('Additional processing workspace cleanup failed', ['release_id' => $release->id]);
+                }
             }
         }
     }
@@ -393,6 +417,12 @@ class ReleaseProcessor
             $context->releaseGroupName,
         );
         $this->useWorkPlan($context, $workPlan);
+
+        // The work planner does not detect raw (non-archive) media; scan for
+        // those so raw-media releases still get processed.
+        $rawMedia = $this->nzbParser->detectRawMediaFiles($context->nzbContents, $this->config);
+        $context->nzbHasRawMediaFile = $rawMedia['hasRawMediaFile'];
+        $context->rawMediaFileEntries = $rawMedia['rawMediaFileEntries'];
         $this->refreshSeasonPackState($context, $context->nzbContents);
 
         return $workPlan->bookFlood;
@@ -419,7 +449,12 @@ class ReleaseProcessor
             return;
         }
 
-        $plan = $this->mediaSourceResolver->resolve($context);
+        try {
+            $plan = $this->mediaSourceResolver->resolve($context);
+        } catch (\Throwable) {
+            Log::warning('PAR2 media source planning failed', ['release_id' => $context->release->id]);
+            $plan = null;
+        }
         if ($plan === null) {
             return;
         }
@@ -495,22 +530,63 @@ class ReleaseProcessor
     }
 
     /**
-     * Once every archive set was read: a confirmed season pack keeps its name, and when no
-     * second episode showed up the per-file renames held back during the walk run as usual.
+     * Name the release once every archive set of a (possible) season pack was read.
+     *
+     * A confirmed pack is named after its season. When no second episode showed up,
+     * the per-file checks deferred during the archive walk run as they would have
+     * on the first listing.
      */
     private function runDeferredArchiveNameChecks(ReleaseProcessingContext $context): void
     {
-        if ($context->releaseHasPassword || $context->seasonPack || ! $context->seasonPackProbable) {
+        if ($context->releaseHasPassword
+            || $context->archivesAreCompanions
+            || ! $context->defersArchiveNameChecks()
+            || $context->firstArchiveListing === null
+        ) {
             return;
         }
 
-        $context->seasonPackProbable = false;
-        if ($context->firstArchiveFiles !== null) {
-            $this->releaseManager->matchFileNamesToPreDb($context->firstArchiveFiles, $context);
+        $listing = $context->firstArchiveListing;
+        if (! $context->seasonPack) {
+            $context->seasonPackProbable = false;
+            $this->releaseManager->matchFileNamesToPreDb($listing['files'], $context);
         }
-        if ($context->reverseArchiveSummary !== null) {
+
+        $this->releaseRenamingService?->fileNameChecks($listing['files'], $context, $listing['dataSummary']);
+
+        if (! $context->seasonPack && $context->reverseArchiveSummary !== null) {
             $this->releaseManager->processReleaseNameFromRar($context->reverseArchiveSummary, $context);
         }
+    }
+
+    /**
+     * Raw videos are the payload when they outweigh every other non-PAR2 file, so archives
+     * next to them (subtitles, extras) are companions rather than the release itself.
+     */
+    private function archivesAreCompanions(ReleaseProcessingContext $context): bool
+    {
+        $videoBytes = 0;
+        $rawTitles = [];
+        foreach ($context->rawMediaFileEntries as $entry) {
+            $rawTitles[$entry['title']] = true;
+            if ($this->isVideoExtension($entry['extension'])) {
+                $videoBytes += (int) $entry['size'];
+            }
+        }
+        if ($videoBytes === 0) {
+            return false;
+        }
+
+        $otherBytes = 0;
+        foreach ($context->nzbContents as $file) {
+            $title = (string) ($file['title'] ?? '');
+            if (isset($rawTitles[$title]) || stripos($title, 'sample') !== false || preg_match('/\.(?:par2|vol\d+[+-]\d+)/i', $title) === 1) {
+                continue;
+            }
+            $otherBytes += (int) ($file['size'] ?? 0);
+        }
+
+        return $videoBytes > $otherBytes;
     }
 
     private function initializeContext(ReleaseProcessingContext $context): void
@@ -1004,7 +1080,7 @@ class ReleaseProcessor
         $files = is_array($result['files'] ?? null) ? $result['files'] : [];
         $this->noteArchiveListing($context, $files);
         if (! $reverse && $files !== [] && $context->defersArchiveNameChecks()) {
-            $context->firstArchiveFiles ??= $files;
+            $context->firstArchiveListing ??= ['files' => $files, 'dataSummary' => $result['dataSummary'] ?? []];
         }
 
         if ($reverse && ! empty($result['dataSummary'])) {
@@ -1023,6 +1099,16 @@ class ReleaseProcessor
             if ($this->releaseManager->addFileInfo($file, $context, $this->config->supportFileRegex)) {
                 $this->output->echoFileInfoAdded();
             }
+        }
+
+        if ($this->releaseRenamingService !== null && $files !== [] && ! $reverse
+            && ! $context->archivesAreCompanions && ! $context->defersArchiveNameChecks()
+        ) {
+            $this->releaseRenamingService->fileNameChecks(
+                $files,
+                $context,
+                $result['dataSummary'] ?? []
+            );
         }
 
         if (! empty($result['listingOnly'])) {
@@ -1242,5 +1328,190 @@ class ReleaseProcessor
             }
             File::delete($path);
         }
+    }
+
+    private function processNzbRawMediaFiles(ReleaseProcessingContext $context): void
+    {
+        if ($context->groupUnavailable || $context->rawMediaFileEntries === []) {
+            return;
+        }
+
+        if ($this->releaseRenamingService !== null && (int) ($context->release->isrenamed ?? 0) === 0) {
+            try {
+                $renamed = $this->releaseRenamingService->rawFileNameChecks(
+                    $context,
+                    fn (string $subject, string $ext): string => $this->extractFilenameFromSubject($subject, $ext)
+                );
+
+                if ($renamed) {
+                    $this->output->echoRawFileRenamed();
+                }
+            } catch (\Throwable $e) {
+                if ($this->config->debugMode) {
+                    Log::error('Raw file rename failed: '.$e->getMessage());
+                }
+            }
+        }
+
+        $processed = 0;
+        $mediaAttempts = 0;
+        // A season pack lists every episode; media downloads stay bounded either way
+        $listLimit = $context->seasonPack
+            ? max(AdditionalProcessingOrchestrator::MAX_COMPRESSED_FILES_TO_CHECK, $this->config->seasonPackMaxReleaseFiles)
+            : AdditionalProcessingOrchestrator::MAX_COMPRESSED_FILES_TO_CHECK;
+
+        foreach ($context->rawMediaFileEntries as $rawFile) {
+            if ($context->groupUnavailable) {
+                break;
+            }
+            if ($processed >= $listLimit) {
+                break;
+            }
+
+            $title = $rawFile['title'];
+            $segments = $rawFile['segments'];
+            $fileSize = $rawFile['size'];
+            $extension = $rawFile['extension'];
+
+            if ($segments === []) {
+                continue;
+            }
+
+            $cleanName = $this->extractFilenameFromSubject($title, $extension);
+            $fileEntry = [
+                'name' => $cleanName,
+                'size' => $fileSize,
+                'date' => now(),
+                'pass' => false,
+                'crc32' => '',
+            ];
+
+            if ($this->releaseManager->addRawFileInfo($fileEntry, $context)) {
+                $this->output->echoRawFileInfoAdded();
+            }
+
+            $needsVideoProcessing = ! $context->foundMediaInfo || ! $context->foundSample || ! $context->foundVideo;
+            if ($needsVideoProcessing && $this->isVideoExtension($extension)
+                && $mediaAttempts < AdditionalProcessingOrchestrator::MAX_COMPRESSED_FILES_TO_CHECK
+            ) {
+                $mediaAttempts++;
+                $messageIDs = array_slice($segments, 0, min($this->config->maximumRarSegments, count($segments)));
+                $result = $this->downloadService->downloadByMessageIDs(
+                    $messageIDs,
+                    $context->releaseGroupName,
+                    $context->release->id
+                );
+
+                if ($result['groupUnavailable']) {
+                    $context->groupUnavailable = true;
+                    $this->output->echoGroupUnavailable();
+                    break;
+                }
+
+                if ($result['success'] && is_string($result['data']) && $this->downloadService->meetsMinimumSize($result['data'])) {
+                    $this->output->echoRawMediaDownload();
+                    $fileLocation = $context->tmpPath.'rawmedia_'.uniqid('', true).'.'.$extension;
+                    File::put($fileLocation, $result['data']);
+
+                    if (! $context->foundMediaInfo && $this->mediaService->getMediaInfo($fileLocation, $context->release->id)) {
+                        $context->markFound('mediaInfo');
+                        $this->output->echoMediaInfoAdded();
+                    }
+                    if (! $context->foundSample && $this->mediaService->getSample($fileLocation, $context->tmpPath, $context->release->guid)) {
+                        $context->markFound('sample');
+                        $this->output->echoSampleCreated();
+                    }
+                    if (! $context->foundVideo && $this->mediaService->getVideo($fileLocation, $context->tmpPath, $context->release->guid)) {
+                        $context->markFound('video');
+                        $this->output->echoVideoCreated();
+                    }
+
+                    File::delete($fileLocation);
+                } else {
+                    $this->output->echoRawMediaFailure();
+                }
+            }
+
+            $needsAudioProcessing = ! $context->foundAudioInfo || ! $context->foundAudioSample;
+            if ($needsAudioProcessing && $this->isAudioExtension($extension)
+                && $mediaAttempts < AdditionalProcessingOrchestrator::MAX_COMPRESSED_FILES_TO_CHECK
+            ) {
+                $mediaAttempts++;
+                $messageIDs = array_slice($segments, 0, min($this->config->maximumRarSegments, count($segments)));
+                $result = $this->downloadService->downloadByMessageIDs(
+                    $messageIDs,
+                    $context->releaseGroupName,
+                    $context->release->id
+                );
+
+                if ($result['groupUnavailable']) {
+                    $context->groupUnavailable = true;
+                    $this->output->echoGroupUnavailable();
+                    break;
+                }
+
+                if ($result['success'] && is_string($result['data']) && $this->downloadService->meetsMinimumSize($result['data'])) {
+                    $this->output->echoRawMediaDownload();
+                    $fileLocation = $context->tmpPath.'rawaudio_'.uniqid('', true).'.'.$extension;
+                    File::put($fileLocation, $result['data']);
+
+                    $audioResult = $this->mediaService->getAudioInfo(
+                        $fileLocation,
+                        $extension,
+                        $context,
+                        $context->tmpPath
+                    );
+
+                    if ($audioResult['audioInfo']) {
+                        $this->output->echoAudioInfoAdded();
+                    }
+                    if ($audioResult['audioSample']) {
+                        $this->output->echoAudioSampleCreated();
+                    }
+
+                    File::delete($fileLocation);
+                } else {
+                    $this->output->echoRawMediaFailure();
+                }
+            }
+
+            $processed++;
+        }
+
+    }
+
+    private function extractFilenameFromSubject(string $subject, string $extension): string
+    {
+        $quotedPattern = '/"([^"]+\.'.preg_quote($extension, '/').')"/i';
+        if (preg_match($quotedPattern, $subject, $match) === 1) {
+            return $match[1];
+        }
+
+        $barePattern = '/\b([\w.\-\[\](){}+]+\.'.preg_quote($extension, '/').')\b/i';
+        if (preg_match($barePattern, $subject, $match) === 1) {
+            return $match[1];
+        }
+
+        $clean = preg_replace('/\s*\(\d+\/\d+\)\s*$/', '', $subject) ?? $subject;
+        $clean = preg_replace('/\s*yEnc\s*$/i', '', $clean) ?? $clean;
+        $clean = trim($clean, " \t\n\r\0\x0B\"");
+
+        return $clean !== '' ? $clean : 'unknown.'.$extension;
+    }
+
+    private function isVideoExtension(string $extension): bool
+    {
+        return in_array(strtolower($extension), [
+            'avi', 'f4v', 'ifo', 'm1v', 'm2v', 'm4v', 'mkv', 'mov', 'mp4',
+            'mpeg', 'mpg', 'mpgv', 'mpv', 'ogv', 'qt', 'rm', 'rmvb', 'ts', 'vob', 'wmv',
+        ], true);
+    }
+
+    private function isAudioExtension(string $extension): bool
+    {
+        return in_array(strtolower($extension), [
+            'aac', 'aiff', 'ape', 'ac3', 'asf', 'dts', 'flac', 'mka', 'mks',
+            'mp2', 'mp3', 'ra', 'ogg', 'ogm', 'w64', 'wav', 'wma',
+        ], true);
     }
 }

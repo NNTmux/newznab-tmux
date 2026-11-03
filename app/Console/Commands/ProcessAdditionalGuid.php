@@ -74,6 +74,7 @@ class ProcessAdditionalGuid extends Command
                 'passwordstatus' => -1,
                 'haspreview' => -1,
                 'archive_retry_at' => null,
+                'pp_timeout_count' => 0,
                 'jpgstatus' => 0,
                 'videostatus' => 0,
                 'nfostatus' => -1,

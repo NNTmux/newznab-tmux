@@ -74,6 +74,27 @@ class TraktProvider extends AbstractTvProvider
             : false;
     }
 
+    public function resolveSiteId(array $knownIds): int
+    {
+        $client = $this->tvClient();
+        if (! $client->isConfigured()) {
+            return 0;
+        }
+
+        $imdb = $this->imdbWithPrefix($knownIds['imdb']);
+        foreach ([['tvdb', $knownIds['tvdb']], ['tmdb', $knownIds['tmdb']], ['imdb', $imdb]] as [$type, $id]) {
+            if (empty($id)) {
+                continue;
+            }
+            $traktId = (int) ($client->lookupShowIds($id, $type)['trakt'] ?? 0);
+            if ($traktId > 0) {
+                return $traktId;
+            }
+        }
+
+        return 0;
+    }
+
     public function fetchAllEpisodes(int $siteId, int $videoId): int
     {
         $client = $this->tvClient();

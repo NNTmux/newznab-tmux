@@ -24,7 +24,8 @@ class MoviesProcessor
      */
     public function process(string $groupID = '', string $guidChar = '', int|string|null $processMovies = ''): void
     {
-        $processMovies = (is_numeric($processMovies) ? $processMovies : app(ConfigurationProvider::class)->metadata()->movieLookup->value);
+        // CLI workers pass the mode as a string ("2"); MovieService takes an int.
+        $processMovies = (int) (is_numeric($processMovies) ? $processMovies : app(ConfigurationProvider::class)->metadata()->movieLookup->value);
         if ($processMovies > 0) {
             (new MovieService)->processMovieReleases($groupID, $guidChar, $processMovies);
         }

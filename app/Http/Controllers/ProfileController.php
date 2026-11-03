@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UpdateThemeRequest;
 use App\Jobs\SendAccountDeletedEmail;
+use App\Models\Category;
 use App\Models\GdprRequest;
 use App\Models\ReleaseComment;
 use App\Models\RootCategory;
@@ -178,11 +179,6 @@ class ProfileController extends BasePageController
                         }
                     }
 
-                    // Keep the composer's cached per-user data in sync with theme changes
-                    if ($request->hasAny(['theme_preference', 'color_scheme'])) {
-                        Cache::forget('composer_user_'.$userid);
-                    }
-
                     // Update timezone preference
                     if ($request->has('timezone')) {
                         $timezoneValue = $request->input('timezone');
@@ -241,7 +237,9 @@ class ProfileController extends BasePageController
             'privileged' => $this->userdata->hasRole('Admin') || $this->userdata->hasRole('Moderator'),
             'userinvitedby' => $this->userdata->invitedby ? User::find($this->userdata->invitedby) : null,
             'categoriesWithSubs' => RootCategory::with(['categories' => function ($query) {
-                $query->where('status', 1)->orderBy('title');
+                $query->where('status', 1)
+                    ->whereNotIn('id', array_keys(Category::XXX_RETIRED_FALLBACKS))
+                    ->orderBy('title');
             }])->where('status', 1)->orderBy('title')->get(),
             'meta_title' => 'Edit User Profile',
             'meta_keywords' => 'edit,profile,user,details',
@@ -306,9 +304,6 @@ class ProfileController extends BasePageController
             $user->color_scheme = $request->input('color_scheme');
         }
         $user->save();
-
-        // Keep the composer's cached per-user data in sync with theme changes
-        Cache::forget('composer_user_'.$user->id);
 
         return response()->json([
             'success' => true,

@@ -70,6 +70,7 @@ final class ApiQueryParametersTest extends TestCase
     public function test_retired_xxx_categories_also_search_their_replacement(): void
     {
         self::assertSame(['6041', '6040'], $this->parameters->categories(Request::create('/', 'GET', ['cat' => '6041'])));
+        self::assertSame(['6070', '6050'], $this->parameters->categories(Request::create('/', 'GET', ['cat' => '6070'])));
         self::assertSame(['6090', '6020', '6040', '6030'], $this->parameters->categories(Request::create('/', 'GET', ['cat' => '6090,6020'])));
         self::assertSame(['6080', '6030'], $this->parameters->categories(Request::create('/', 'GET', ['cat' => '6080'])));
         self::assertSame(['6030'], $this->parameters->categories(Request::create('/', 'GET', ['cat' => '6030'])));

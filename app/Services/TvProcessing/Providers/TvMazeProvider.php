@@ -15,6 +15,9 @@ use DariusIII\TVMaze\TVShow;
  */
 class TvMazeProvider extends AbstractTvProvider
 {
+    /** An exact title whose year doesn't contradict the release. */
+    private const float CONVINCING_SCORE = 100.0;
+
     public TvMazeClient $client;
 
     public function __construct(?TvMazeClient $client = null)
@@ -34,16 +37,23 @@ class TvMazeProvider extends AbstractTvProvider
         $name = (string) preg_replace('# \((19|20)\d{2}\)$#', '', $name);
 
         // The single search embeds AKAs; the full search ranks better but carries none.
+        // Only a convincing single result (exact title, year not contradicting) skips the
+        // full search; otherwise both compete, so a same-titled remake can't win by default.
         $candidates = [];
         $single = $this->client->singleSearchAkas($name);
         if ($single !== null) {
             $candidates[] = $single;
         }
-        $return = $this->matchShowInfo($candidates, $name, $year, $country);
+        [$best, $score] = $this->bestShow($candidates, $name, $year, $country);
 
-        if ($return === false) {
-            $return = $this->matchShowInfo($this->client->searchShows($name), $name, $year, $country);
+        if ($score < self::CONVINCING_SCORE) {
+            [$fullBest, $fullScore] = $this->bestShow($this->client->searchShows($name), $name, $year, $country);
+            if ($fullScore > $score) {
+                $best = $fullBest;
+            }
         }
+
+        $return = $best !== null ? $this->formatShowInfo($best) : false;
 
         if (\is_array($return) && empty($return['aliases']) && (int) $return['tvmaze'] > 0) {
             $return['aliases'] = $this->client->akas((int) $return['tvmaze']);
@@ -53,12 +63,12 @@ class TvMazeProvider extends AbstractTvProvider
     }
 
     /**
-     * Attempts to find the best matching show by title or aliases.
+     * The best matching show by title or aliases, with its score; [null, 0.0] when none scores.
      *
      * @param  list<TVShow>  $shows
-     * @return array<string, mixed>|false
+     * @return array{0: TVShow|null, 1: float}
      */
-    private function matchShowInfo(array $shows, string $cleanName, ?int $year, string $country): array|false
+    private function bestShow(array $shows, string $cleanName, ?int $year, string $country): array
     {
         $highestScore = 0.0;
         $highest = null;
@@ -84,7 +94,18 @@ class TvMazeProvider extends AbstractTvProvider
             }
         }
 
-        return $highest !== null ? $this->formatShowInfo($highest) : false;
+        return [$highest, $highestScore];
+    }
+
+    public function resolveSiteId(array $knownIds): int
+    {
+        $show = $knownIds['tvdb'] > 0 ? $this->client->lookup('thetvdb', $knownIds['tvdb']) : null;
+        $imdb = $this->imdbWithPrefix($knownIds['imdb']);
+        if ($show === null && $imdb !== '') {
+            $show = $this->client->lookup('imdb', $imdb);
+        }
+
+        return $show !== null ? (int) $show->id : 0;
     }
 
     public function fetchAllEpisodes(int $siteId, int $videoId): int

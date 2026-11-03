@@ -36,8 +36,10 @@ class ApiInformController extends Controller
 
         if (! empty($releaseObName) && ! empty($releasePrName) && ! empty($apiToken)) {
             ReleaseInform::insertOrIgnore(['relOName' => $releaseObName, 'relPName' => $releasePrName, 'api_token' => $apiToken, 'created_at' => now(), 'updated_at' => now()]);
-            $release = Release::whereSearchname($releaseObName)->first();
-            if (! empty($release)) {
+            // searchname matches case- and accent-insensitively; only the byte-identical name is the reported release.
+            $release = Release::query()->where('searchname', $releaseObName)->limit(25)->get()
+                ->first(static fn (Release $candidate): bool => $candidate->searchname === $releaseObName);
+            if ($release !== null) {
                 (new ReleaseUpdateService)->updateRelease($release, $releasePrName, 'Release Inform API', true, 'Filenames, ', true, true);
             }
 

@@ -9,6 +9,7 @@ use App\Services\Configuration\ConfigurationProvider;
 use App\Services\NfoService;
 use App\Services\NNTP\NNTPService;
 use App\Services\PostProcessService;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Service for processing NZB contents - extracting NFO files, PAR2 information,
@@ -81,8 +82,11 @@ class NzbContentsService
 
         // Check if download failed
         if ($this->nntp->isError($fetchedBinary)) {
-            // NFO download failed, decrement attempts to allow retries
-            Release::query()->where('id', $relID)->decrement('nfostatus');
+            // NFO download failed: count down the retries; at the floor, hand the release to the NFO_FAILED archive pass
+            $retryFloor = $this->nfo->retryFloor();
+            Release::query()->where('id', $relID)->update([
+                'nfostatus' => DB::raw(sprintf('CASE WHEN nfostatus <= %d THEN %d ELSE nfostatus - 1 END', $retryFloor, NfoService::NFO_FAILED)),
+            ]);
             if ($this->echoOutput) {
                 echo 'f';
             }
@@ -245,9 +249,11 @@ class NzbContentsService
         $nzbFile = $this->loadNzb($guid);
         if ($nzbFile !== false) {
             foreach ($nzbFile->file as $nzbContents) {
+                // Check the subject first: only single-article PAR2 files are downloaded, never every file.
                 if ($nameStatus === 1
-                    && $this->postProcessService->parsePAR2((string) $nzbContents->segments->segment, $relID, $groupID, $this->nntp, $show)
                     && preg_match('/\.(par[2" ]|\d{2,3}").+\(1\/1\)/i', (string) $nzbContents->attributes()->subject)
+                    && ($messageId = $this->firstSegmentMessageId($nzbContents)) !== null
+                    && $this->parsePar2Article($messageId, $relID, $groupID, $show)
                 ) {
                     Release::query()->where('id', $relID)->update(['proc_par2' => 1]);
 
@@ -261,6 +267,32 @@ class NzbContentsService
         }
 
         return false;
+    }
+
+    /**
+     * Download one PAR2 article and try to rename the release from it.
+     */
+    protected function parsePar2Article(string $messageId, int $relID, int $groupID, int $show): bool
+    {
+        return $this->postProcessService->parsePAR2($messageId, $relID, $groupID, $this->nntp, $show);
+    }
+
+    /**
+     * The message ID of segment number 1 (the file's start), or of the only segment when unnumbered.
+     */
+    private function firstSegmentMessageId(\SimpleXMLElement $file): ?string
+    {
+        $segments = [];
+        foreach ($file->segments->segment ?? [] as $segment) {
+            $segments[] = $segment;
+        }
+        foreach ($segments as $segment) {
+            if ((int) $segment->attributes()->number === 1) {
+                return (string) $segment;
+            }
+        }
+
+        return count($segments) === 1 && (string) $segments[0] !== '' ? (string) $segments[0] : null;
     }
 
     /**

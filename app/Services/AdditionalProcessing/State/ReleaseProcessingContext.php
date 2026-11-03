@@ -64,6 +64,13 @@ class ReleaseProcessingContext
     // NZB state
     public bool $nzbHasCompressedFile = false;
 
+    public bool $nzbHasRawMediaFile = false;
+
+    /**
+     * @var array<int, array{title: string, segments: array<int, string>, size: int, extension: string}>
+     */
+    public array $rawMediaFileEntries = [];
+
     /**
      * Volume sets of compressed candidates whose data turned out to be plain media,
      * which has no password.
@@ -88,11 +95,14 @@ class ReleaseProcessingContext
     /** One episode was listed from a release with several archive sets; the rest of the season may follow. */
     public bool $seasonPackProbable = false;
 
+    /** Raw videos are the payload and the archives only carry extras such as subtitles. */
+    public bool $archivesAreCompanions = false;
+
     /** @var list<string> names listed from every archive read for this release */
     public array $archiveFileNames = [];
 
-    /** @var array<int, array<string, mixed>>|null files of the first archive listed while names were deferred */
-    public ?array $firstArchiveFiles = null;
+    /** @var array{files: array<int, array<string, mixed>>, dataSummary: array<string, mixed>}|null */
+    public ?array $firstArchiveListing = null;
 
     /** @var array<string, mixed>|null summary of the last archive read in reverse while names were deferred */
     public ?array $reverseArchiveSummary = null;
@@ -102,6 +112,9 @@ class ReleaseProcessingContext
 
     /** Network bytes left for finding preview sources. */
     public ?MediaByteBudget $mediaBudget = null;
+
+    /** hrtime seconds when media work first spent network time, so later media work shares one window. */
+    public ?float $mediaClockStart = null;
 
     /**
      * Starts of videos stored in downloaded archive volumes, samples first.
@@ -238,17 +251,21 @@ class ReleaseProcessingContext
         $this->releaseHasPassword = false;
         $this->archiveListingIncomplete = false;
         $this->nzbHasCompressedFile = false;
+        $this->nzbHasRawMediaFile = false;
+        $this->rawMediaFileEntries = [];
         $this->mediaVolumeSets = [];
         $this->unplannedArchiveSeen = false;
         $this->groupUnavailable = false;
         $this->workPlan = null;
         $this->seasonPack = false;
         $this->seasonPackProbable = false;
+        $this->archivesAreCompanions = false;
         $this->archiveFileNames = [];
-        $this->firstArchiveFiles = null;
+        $this->firstArchiveListing = null;
         $this->reverseArchiveSummary = null;
         $this->mediaPlan = null;
         $this->mediaBudget = null;
+        $this->mediaClockStart = null;
         $this->archivedMedia = [];
         $this->releaseDownloadedArchives();
         $this->resetMessageIDs();
@@ -292,12 +309,21 @@ class ReleaseProcessingContext
     }
 
     /**
-     * Season packs read several archive sets, and no inner file name (one episode)
-     * may rename the release while they are read.
+     * Season packs read several archive sets before any name is derived from their contents;
+     * companion archives (subtitles next to raw videos) never name the release at all.
      */
     public function defersArchiveNameChecks(): bool
     {
-        return $this->seasonPack || $this->seasonPackProbable;
+        return ! $this->archivesAreCompanions && ($this->seasonPack || $this->seasonPackProbable);
+    }
+
+    /**
+     * Whether archive or file contents must not rename the release to one of its files:
+     * a season pack holds many episodes and companion archives only hold extras.
+     */
+    public function protectsReleaseNameFromFileNames(): bool
+    {
+        return $this->seasonPack || $this->seasonPackProbable || $this->archivesAreCompanions;
     }
 
     /**
@@ -397,6 +423,11 @@ class ReleaseProcessingContext
     public function needsSample(): bool
     {
         return ! $this->foundSample || ! $this->foundJPGSample;
+    }
+
+    public function workDeadline(int $timeoutSeconds): float
+    {
+        return $timeoutSeconds > 0 ? $this->startTime / 1e9 + max(0, $timeoutSeconds - 2) : INF;
     }
 
     /**

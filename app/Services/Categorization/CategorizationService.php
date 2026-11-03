@@ -30,15 +30,19 @@ class CategorizationService
      * @param  string  $releaseName  The name of the release
      * @param  string|null  $poster  The poster name
      * @param  bool  $debug  Whether to include debug information
+     * @param  string|null  $sourceName  The raw subject/`releases.name` (NZBSPLIT uploader tag source)
+     * @param  string|null  $contentFileName  A file inside the archive, used for its media/document type
      * @return array<string, mixed> The categorization result with category ID and optional debug info
      */
     public function determineCategory(
         int|string $groupId,
         string $releaseName = '',
         ?string $poster = '',
-        bool $debug = false
+        bool $debug = false,
+        ?string $sourceName = null,
+        ?string $contentFileName = null,
     ): array {
-        return $this->pipeline->categorize($groupId, $releaseName, $poster, $debug);
+        return $this->pipeline->categorize($groupId, $releaseName, $poster, $debug, $sourceName, $contentFileName);
     }
 
     /**

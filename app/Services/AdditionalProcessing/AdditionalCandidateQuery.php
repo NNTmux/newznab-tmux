@@ -273,6 +273,26 @@ final class AdditionalCandidateQuery
     }
 
     /**
+     * Lock and claim one release by id, for single-release runs.
+     */
+    public static function claimSingle(int $id, string $token): ?Release
+    {
+        return DB::transaction(function () use ($id, $token): ?Release {
+            $query = Release::query()->from('releases as r')->where('r.id', $id);
+            self::applyClaimWindow($query);
+            $release = $query->lockForUpdate()->first();
+            if ($release === null) {
+                return null;
+            }
+            if (self::supportsClaims()) {
+                $release->forceFill([self::CLAIMED_AT_COLUMN => now(), self::CLAIM_TOKEN_COLUMN => $token])->saveQuietly();
+            }
+
+            return $release;
+        }, 3);
+    }
+
+    /**
      * Claim a bounded batch of release rows for one worker.
      *
      * @param  list<string>  $columns
@@ -324,6 +344,24 @@ final class AdditionalCandidateQuery
                     ->where('r.passwordstatus', -1)
                     ->where('r.haspreview', -1)
                     ->where('r.nzbstatus', 1);
+                // Re-check what the unlocked candidate pick saw: rows may have changed meanwhile.
+                $lockQuery->whereExists(function ($category): void {
+                    $category->selectRaw('1')->from('categories as c')->whereColumn('c.id', 'r.categories_id')->where('c.disablepreview', 0);
+                });
+                $minimum = $minSizeBytes ?? self::minSizeBytes();
+                $maximum = $maxSizeBytes ?? self::maxSizeBytes();
+                if ($minimum > 0) {
+                    $lockQuery->where('r.size', '>', $minimum);
+                }
+                if ($maximum > 0) {
+                    $lockQuery->where('r.size', '<', $maximum);
+                }
+                if ($guidChar !== '') {
+                    $lockQuery->where('r.leftguid', $guidChar);
+                }
+                if ($groupID !== '' && $groupID !== 0 && $groupID !== '0') {
+                    $lockQuery->where('r.groups_id', $groupID);
+                }
                 self::applyClaimWindow($lockQuery);
 
                 if (DB::getDriverName() !== 'sqlite') {

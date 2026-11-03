@@ -137,16 +137,10 @@ class TraktService
         try {
             $response = Http::timeout($this->timeout)
                 ->retry($this->retryTimes, $this->retryDelay, function (\Throwable $exception, PendingRequest $request, ?string $key = null) {
-                    // Don't retry on 404 - resource doesn't exist
+                    // Only server errors can clear within the short retry delay: 404 is a
+                    // miss, 429 is backed off below, other 4xx (bad key) never clear.
                     if ($exception instanceof RequestException) {
-                        $status = $exception->response->status();
-                        if ($status === 404) {
-                            return false;
-                        }
-                        // Don't retry 429 with short delay - we handle it below with backoff
-                        if ($status === 429) {
-                            return false;
-                        }
+                        return $exception->response->status() >= 500;
                     }
 
                     return true;
@@ -169,7 +163,9 @@ class TraktService
                 return $data;
             }
 
-            if ($this->throwOnTransientFailure && TvProviderException::isTransientStatus($response->status())) {
+            // Every failure but a plain 404 (rate limit, 5xx, rejected key, 420/423 account
+            // limits) is retried later by throwing callers, never recorded as a miss.
+            if ($this->throwOnTransientFailure && $response->status() !== 404) {
                 throw new TvProviderException(
                     'trakt',
                     sprintf('Trakt returned %d for %s', $response->status(), $endpoint),
@@ -342,6 +338,14 @@ class TraktService
             return $this->formatImdbId($formattedId);
         }
 
+        // /shows/:id only takes Trakt ids, slugs and IMDb ids. A TMDB or TVDB id in that
+        // path is read as the Trakt id of an unrelated show, so resolve it first.
+        if ($idType === 'tmdb' || $idType === 'tvdb') {
+            $traktId = (int) ($this->lookupShowIds($formattedId, $idType)['trakt'] ?? 0);
+
+            return $traktId > 0 ? (string) $traktId : null;
+        }
+
         return $formattedId;
     }
 
@@ -390,7 +394,7 @@ class TraktService
 
         // Get the first matching show
         $show = $results[0]['show'] ?? null;
-        if ($show === null || ! isset($show['ids'])) { // @phpstan-ignore isset.offset
+        if ($show === null || ! isset($show['ids'])) {
             return null;
         }
 

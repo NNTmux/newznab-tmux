@@ -63,6 +63,9 @@ class TvProcessingPipeline
         return $this;
     }
 
+    /**
+     * Enable or disable provider output for subsequent processing calls.
+     */
     public function setEchoOutput(bool $echoOutput): self
     {
         $this->echoOutput = $echoOutput;
@@ -160,8 +163,13 @@ class TvProcessingPipeline
         $startTime = microtime(true);
         $runState = $this->newRunState();
 
-        foreach ($releases as $release) {
-            $this->updateStats($this->processRelease($release, false, $runState));
+        $this->writer->beginBatch();
+        try {
+            foreach ($releases as $release) {
+                $this->updateStats($this->processRelease($release, false, $runState));
+            }
+        } finally {
+            $this->writer->endBatch();
         }
 
         $this->stats['duration'] = microtime(true) - $startTime;

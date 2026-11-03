@@ -140,6 +140,20 @@ class TraktServiceTest extends TestCase
         });
     }
 
+    public function test_episode_fallback_resolves_tmdb_ids_to_trakt_ids_first(): void
+    {
+        Http::fake([
+            'https://api.trakt.tv/search/tmdb/95396*' => Http::response([['type' => 'show', 'show' => ['title' => 'Severance', 'ids' => ['trakt' => 154997, 'tmdb' => 95396]]]], 200),
+            'https://api.trakt.tv/shows/154997/seasons/2/episodes/5*' => Http::response(['title' => 'Trojan\'s Horse', 'season' => 2, 'number' => 5], 200),
+            'https://api.trakt.tv/shows/95396/*' => Http::response(['title' => 'Another show entirely', 'season' => 2, 'number' => 5], 200),
+        ]);
+
+        $episode = $this->service->getEpisodeSummaryWithFallback(['tmdb' => 95396], 2, 5, 'full');
+
+        $this->assertSame('Trojan\'s Horse', $episode['title'] ?? null);
+        Http::assertNotSent(fn ($request) => str_contains($request->url(), 'https://api.trakt.tv/shows/95396'));
+    }
+
     public function test_search_by_id_omits_empty_type_query_parameter(): void
     {
         Http::fake([

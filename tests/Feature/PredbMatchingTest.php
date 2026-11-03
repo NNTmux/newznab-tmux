@@ -31,6 +31,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Mockery;
+use Mockery\MockInterface;
 use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Client\ClientInterface;
@@ -40,6 +41,7 @@ use ReflectionProperty;
 use RuntimeException;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Tests\Support\ConfigurationTestBuilder;
 use Tests\TestCase;
 
 final class PredbMatchingTest extends TestCase
@@ -74,9 +76,11 @@ final class PredbMatchingTest extends TestCase
         Cache::flush();
         DB::statement('CREATE TABLE predb (id INTEGER PRIMARY KEY, title TEXT, filename TEXT, source TEXT, size TEXT, category TEXT, nuked INTEGER DEFAULT 0)');
         DB::table('predb')->insert(['id' => 7, 'title' => 'Canonical.Scene-GROUP', 'filename' => 'File.Name-GROUP', 'source' => 'srrdb']);
-        DB::statement('CREATE TABLE releases (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, searchname TEXT, totalpart INTEGER, groups_id INTEGER, adddate TEXT, guid TEXT, leftguid TEXT, postdate TEXT, fromname TEXT, size INTEGER, passwordstatus INTEGER, haspreview INTEGER, categories_id INTEGER, nfostatus INTEGER, nzbstatus INTEGER, isrenamed INTEGER, iscategorized INTEGER, predb_id INTEGER)');
+        DB::statement('CREATE TABLE releases (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, searchname TEXT, totalpart INTEGER, groups_id INTEGER, adddate TEXT, guid TEXT, leftguid TEXT, postdate TEXT, fromname TEXT, size INTEGER, passwordstatus INTEGER, haspreview INTEGER, categories_id INTEGER, nfostatus INTEGER, nzbstatus INTEGER, isrenamed INTEGER, iscategorized INTEGER, predb_id INTEGER, source INTEGER)');
         DB::statement('CREATE TABLE usenet_groups (id INTEGER PRIMARY KEY, name TEXT)');
         DB::table('usenet_groups')->insert(['id' => 1, 'name' => 'alt.binaries.test']);
+        // Commands under test read the typed site configuration.
+        ConfigurationTestBuilder::installDefaults();
     }
 
     protected function tearDown(): void
@@ -88,14 +92,15 @@ final class PredbMatchingTest extends TestCase
         }
     }
 
-    /** @return array<string, array{string}> */
+    /** @return array<string, array{string, int}> */
     public static function exactNames(): array
     {
-        return ['title' => ['canonical.scene-group'], 'filename' => ['file.name-group']];
+        // A filename hit also checks how many releases the PreDB row already names.
+        return ['title' => ['canonical.scene-group', 1], 'filename' => ['file.name-group', 2]];
     }
 
     #[DataProvider('exactNames')]
-    public function test_match_pre_validates_by_primary_key_only(string $name): void
+    public function test_match_pre_validates_by_primary_key_only(string $name, int $expectedQueries): void
     {
         Search::shouldReceive('matchPredbExact')->once()->with($name)->andReturn($this->hit());
         DB::enableQueryLog();
@@ -103,7 +108,7 @@ final class PredbMatchingTest extends TestCase
 
         self::assertSame(['title' => 'Canonical.Scene-GROUP', 'predb_id' => 7], Predb::matchPre($name));
         $queries = DB::getQueryLog();
-        self::assertCount(1, $queries);
+        self::assertCount($expectedQueries, $queries);
         self::assertStringContainsString('where "predb"."id" = ?', $queries[0]['query']);
         self::assertSame([7], $queries[0]['bindings']);
     }
@@ -174,7 +179,7 @@ final class PredbMatchingTest extends TestCase
     public function test_filename_match_saves_association_with_real_update_service(bool $rename, bool $output): void
     {
         config(['nntmux.echocli' => $output]);
-        foreach (['videos_id', 'tv_episodes_id', 'imdbid', 'musicinfo_id', 'consoleinfo_id', 'bookinfo_id', 'book_lookup_attempts', 'book_lookup_retry_at', 'book_name_normalized_at', 'tv_lookup_attempts', 'tv_lookup_retry_at', 'anidbid'] as $column) {
+        foreach (['videos_id', 'tv_episodes_id', 'imdbid', 'movieinfo_id', 'musicinfo_id', 'consoleinfo_id', 'bookinfo_id', 'book_lookup_attempts', 'book_lookup_retry_at', 'book_name_normalized_at', 'tv_lookup_attempts', 'tv_lookup_retry_at', 'anidbid'] as $column) {
             DB::statement('ALTER TABLE releases ADD COLUMN '.$column.' TEXT');
         }
         DB::table('releases')->insert(['id' => 42, 'searchname' => $rename ? 'Old.Title' : 'Canonical.Scene-GROUP', 'predb_id' => 0, 'categories_id' => 7010, 'groups_id' => 1]);
@@ -197,6 +202,37 @@ final class PredbMatchingTest extends TestCase
         $updates->expects(self::never())->method('attachPredbId');
         Search::shouldReceive('searchPredb')->once()->andReturn([array_replace($this->hit(), ['id' => 0])]);
         self::assertSame(0, (new NameFixingService(updateService: $updates))->matchPreDbFiles((object) ['releases_id' => 42, 'filename' => 'File.Name-GROUP.mkv', 'searchname' => 'Old.Title'], false, true, false));
+    }
+
+    public function test_match_pre_ignores_filenames_from_untrusted_sources(): void
+    {
+        DB::table('predb')->where('id', 7)->update(['source' => 'xREL']);
+        Search::shouldReceive('matchPredbExact')->twice()->andReturn(array_replace($this->hit(), ['source' => 'xREL']));
+
+        self::assertFalse(Predb::matchPre('file.name-group'));
+        self::assertSame(['title' => 'Canonical.Scene-GROUP', 'predb_id' => 7], Predb::matchPre('canonical.scene-group'));
+    }
+
+    public function test_match_pre_refuses_filename_once_predb_row_names_too_many_releases(): void
+    {
+        config(['nntmux.predb_max_releases_per_pre' => 2]);
+        $this->linkReleasesToPredb(7, 2);
+        Search::shouldReceive('matchPredbExact')->twice()->andReturn($this->hit());
+
+        self::assertFalse(Predb::matchPre('file.name-group'));
+        self::assertSame(['title' => 'Canonical.Scene-GROUP', 'predb_id' => 7], Predb::matchPre('canonical.scene-group'));
+    }
+
+    public function test_filename_matching_refuses_predb_row_that_names_too_many_releases(): void
+    {
+        config(['nntmux.predb_max_releases_per_pre' => 2]);
+        $this->linkReleasesToPredb(7, 2);
+        $updates = $this->createMock(ReleaseUpdateService::class);
+        $updates->expects(self::never())->method('updateRelease');
+        $updates->expects(self::never())->method('attachPredbId');
+        Search::shouldReceive('searchPredb')->once()->andReturn([$this->hit()]);
+
+        self::assertSame(0, (new NameFixingService(updateService: $updates))->matchPreDbFiles((object) ['releases_id' => 42, 'filename' => 'File.Name-GROUP.mkv', 'searchname' => 'Old.Title'], true, true, false));
     }
 
     /** @return array<string, array{int, string}> */
@@ -303,7 +339,7 @@ final class PredbMatchingTest extends TestCase
         Elasticsearch::swap(Mockery::mock());
         Elasticsearch::shouldReceive('indices->putMapping')->once()->with(['index' => 'custom_pre', 'body' => ['properties' => PredbSearchDocument::elasticsearchExactMappings()]])->andReturn([]);
         Elasticsearch::shouldReceive('bulk')->once()->with(['body' => [['index' => ['_index' => 'custom_pre', '_id' => 7]], PredbSearchDocument::forElasticsearch($this->hit())]])->andReturn(['errors' => false]);
-        DB::partialMock()->shouldReceive('statement')->once()->with('SET SESSION group_concat_max_len = ?', [16384])->andReturnTrue();
+        $this->databaseWithStubbedStatements()->shouldReceive('statement')->once()->with('SET SESSION group_concat_max_len = ?', [16384])->andReturnTrue();
 
         $this->artisan('nntmux:populate', ['--elastic' => true, '--predb' => true, '--count' => 1, '--batch-size' => 1])->assertSuccessful();
     }
@@ -314,7 +350,7 @@ final class PredbMatchingTest extends TestCase
         Elasticsearch::swap(Mockery::mock());
         Elasticsearch::shouldReceive('indices->putMapping')->once()->with(['index' => 'custom_pre', 'body' => ['properties' => PredbSearchDocument::elasticsearchExactMappings()]])->andReturn([]);
         Elasticsearch::shouldReceive('bulk')->once()->with(['body' => [['index' => ['_index' => 'custom_pre', '_id' => 7]], PredbSearchDocument::forElasticsearch($this->hit())]])->andReturn(['errors' => false]);
-        DB::partialMock()->shouldReceive('statement')->once()->with('SET SESSION group_concat_max_len = ?', [65535])->andReturnTrue();
+        $this->databaseWithStubbedStatements()->shouldReceive('statement')->once()->with('SET SESSION group_concat_max_len = ?', [65535])->andReturnTrue();
 
         $this->artisan('nntmux:offset-worker', ['--elastic' => true, '--predb' => true, '--limit' => 1, '--batch-size' => 1])->assertSuccessful();
     }
@@ -355,7 +391,7 @@ final class PredbMatchingTest extends TestCase
         $this->mockElasticIndexCreation($created);
         $this->app->detectEnvironment(static fn (): string => 'local');
         config(['search.default' => 'elasticsearch', 'nntmux_settings.path_to_nzbs' => '/unused']);
-        DB::partialMock()->shouldReceive('statement')->andReturnTrue();
+        $this->databaseWithStubbedStatements()->shouldReceive('statement')->andReturnTrue();
         File::shouldReceive('allFiles')->twice()->andReturn([]);
         File::shouldReceive('delete')->once()->with([])->andReturnTrue();
         File::shouldReceive('exists')->andReturnFalse();
@@ -367,6 +403,18 @@ final class PredbMatchingTest extends TestCase
         self::assertArrayNotHasKey('predb', $created);
         self::assertSame(['type' => 'keyword'], $created['custom_pre']['mappings']['properties']['title_exact']);
         self::assertSame(['type' => 'keyword'], $created['custom_pre']['mappings']['properties']['filename_exact']);
+    }
+
+    /**
+     * Stub MySQL-only session statements while every other database call reaches the real manager.
+     * (DB::partialMock() builds the manager without its constructor, so schema checks would fail.)
+     */
+    private function databaseWithStubbedStatements(): MockInterface
+    {
+        $database = Mockery::mock($this->app->make('db'));
+        DB::swap($database);
+
+        return $database;
     }
 
     /** @param array<string, array<string, mixed>> $created */
@@ -389,6 +437,13 @@ final class PredbMatchingTest extends TestCase
     }
 
     /** @return array{id: int, title: string, filename: string, source: string} */
+    private function linkReleasesToPredb(int $predbId, int $count): void
+    {
+        foreach (range(1, $count) as $offset) {
+            DB::table('releases')->insert(['id' => 100 + $offset, 'searchname' => 'Linked.'.$offset, 'predb_id' => $predbId, 'categories_id' => 7010, 'groups_id' => 1]);
+        }
+    }
+
     private function hit(): array
     {
         return ['id' => 7, 'title' => 'Canonical.Scene-GROUP', 'filename' => 'File.Name-GROUP', 'source' => 'srrdb'];

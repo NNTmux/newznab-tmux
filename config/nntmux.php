@@ -8,6 +8,13 @@ return [
     'echocli' => env('ECHOCLI', true),
     'rename_par2' => env('RENAME_PAR2', true),
     'rename_music_mediainfo' => env('RENAME_MUSIC_MEDIAINFO', true),
+    // PreDB sources whose filename is never used to match releases (comma-separated, case-insensitive).
+    'predb_filename_untrusted_sources' => array_values(array_filter(array_map(
+        static fn (string $source): string => strtolower(trim($source)),
+        explode(',', (string) env('NN_PREDB_FILENAME_UNTRUSTED_SOURCES', 'xrel,xrelp2p'))
+    ))),
+    // A PreDB filename or fuzzy match is refused once this many releases already use that PreDB row.
+    'predb_max_releases_per_pre' => (int) env('NN_PREDB_MAX_RELEASES_PER_PRE', 5),
     'cache_expiry_short' => (int) env('CACHE_EXPIRY_SHORT', 5),
     'cache_expiry_medium' => (int) env('CACHE_EXPIRY_MEDIUM', 10),
     'cache_expiry_long' => (int) env('CACHE_EXPIRY_LONG', 15),
@@ -49,6 +56,8 @@ return [
     'media_stage_max_seconds' => (int) env('NN_MEDIA_STAGE_MAX_SECONDS', 30),
     // Seconds one ffmpeg or ffprobe call may run.
     'media_ffmpeg_timeout' => (int) env('NN_MEDIA_FFMPEG_TIMEOUT', 30),
+    // Threads one thumbnail ffmpeg call may use; 0 lets ffmpeg start one per core.
+    'media_ffmpeg_threads' => (int) env('NN_MEDIA_FFMPEG_THREADS', 1),
     // Keyframes compared when choosing a preview frame.
     'thumbnail_frame_attempts' => (int) env('NN_THUMBNAIL_FRAME_ATTEMPTS', 4),
     // Frames with less brightness variation than this are treated as blank.
@@ -57,6 +66,9 @@ return [
     'thumbnail_min_luma' => (float) env('NN_THUMBNAIL_MIN_LUMA', 24),
     'thumbnail_max_luma' => (float) env('NN_THUMBNAIL_MAX_LUMA', 232),
     'stream_fork_output' => env('STREAM_FORK_OUTPUT', false),
+    // NZBSPLIT uploads carry no PAR2: hold their collections until every declared [n/m] file has
+    // arrived (dropped at collection_timeout_hours otherwise) and never release sample-only sets.
+    'nzbsplit_require_complete_sets' => (bool) env('NN_NZBSPLIT_REQUIRE_COMPLETE_SETS', true),
     'cbp' => [
         // Bound the amount of header data retained and written in one transaction.
         'header_chunk_size' => (int) env('CBP_HEADER_CHUNK_SIZE', 500),
@@ -66,8 +78,31 @@ return [
         'reconcile_batch_size' => (int) env('CBP_RECONCILE_BATCH_SIZE', 500),
         // Maximum flattened binary/part rows loaded while streaming an NZB.
         'nzb_stream_rows' => (int) env('CBP_NZB_STREAM_ROWS', 5000),
+        // Collection ids checked for missing binaries per global release run (cursor wraps around).
+        'orphan_collection_window' => (int) env('CBP_ORPHAN_COLLECTION_WINDOW', 100000),
         // Explicit maintenance-window approval for the destructive hash/key migration.
         'storage_migration_execute' => (bool) env('CBP_STORAGE_MIGRATION_EXECUTE', false),
+        // Rebuild uploads whose every article carries its own random subject (each article
+        // otherwise becomes a one-part collection that is never released). See ObfuscatedUploadAssembler.
+        'obfuscated' => [
+            'enabled' => (bool) env('CBP_OBFUSCATED_ENABLED', false),
+            // An upload is only assembled once no article of it arrived for this long.
+            'quiet_minutes' => (int) env('CBP_OBFUSCATED_QUIET_MINUTES', 20),
+            // Single-part collections one poster needs for one (file count, part count) to count as randomized.
+            'min_articles' => (int) env('CBP_OBFUSCATED_MIN_ARTICLES', 50),
+            // A time gap larger than this starts a new file or upload.
+            'gap_minutes' => (int) env('CBP_OBFUSCATED_GAP_MINUTES', 30),
+            // Held articles that saw nothing new for this long go back to the normal stale path.
+            'hold_minutes' => (int) env('CBP_OBFUSCATED_HOLD_MINUTES', 360),
+            // Share of an upload's parts that must be present (PAR2 repairs the rest).
+            'min_completion_percent' => (float) env('CBP_OBFUSCATED_MIN_COMPLETION_PERCENT', 98),
+            // Same-size files that cannot be told apart: rank (assign by posting order), drop, or skip.
+            'ambiguous_policy' => (string) env('CBP_OBFUSCATED_AMBIGUOUS_POLICY', 'rank'),
+            // Uploads above this many parts are left alone.
+            'max_parts_per_upload' => (int) env('CBP_OBFUSCATED_MAX_PARTS_PER_UPLOAD', 250000),
+            // Uploads merged per group in one release-processing run.
+            'max_uploads_per_run' => (int) env('CBP_OBFUSCATED_MAX_UPLOADS_PER_RUN', 200),
+        ],
     ],
     'purge_inactive_users' => env('PURGE_INACTIVE_USERS', false),
     'purge_inactive_users_days' => env('PURGE_INACTIVE_USERS_DAYS', 180),

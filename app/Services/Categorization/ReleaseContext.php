@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services\Categorization;
 
+use App\Services\NameFixing\Data\NzbSplitSubject;
+
 /**
  * Value object containing release information for categorization.
  */
@@ -11,6 +13,12 @@ class ReleaseContext
 {
     private const string STANDALONE_SEASON_TOKEN_REGEX = '/(?:^|[._ -])S\d{1,3}(?=$|[._ -])/i';
 
+    private const string BOOK_SIGNAL_REGEX = '/\b(?:MAGAZINE|e-?Books?|EPUB|MOBI|AZW3?|PDF|Comics?|CB[RZ]|Audiobooks?)\b/i';
+
+    /**
+     * @param  string|null  $sourceTag  Uploader tag of an NZBSPLIT subject (`MLB`, `Fifa`, ...)
+     * @param  string|null  $contentExtension  Extension of the file inside the archive, when known
+     */
     public function __construct(
         public readonly string $releaseName,
         public readonly int|string $groupId,
@@ -18,7 +26,30 @@ class ReleaseContext
         public readonly string $poster = '',
         public readonly bool $categorizeForeign = true,
         public readonly bool $catWebDL = true,
+        public readonly ?string $sourceTag = null,
+        public readonly ?string $contentExtension = null,
     ) {}
+
+    public function hasSportSourceTag(): bool
+    {
+        return NzbSplitSubject::isSportTag($this->sourceTag);
+    }
+
+    /**
+     * The archive holds a document (PDF, ebook, comic) rather than video.
+     */
+    public function hasDocumentContent(): bool
+    {
+        return NzbSplitSubject::isDocumentExtension($this->contentExtension);
+    }
+
+    /**
+     * Book and magazine markers that must win over a sport hint (`World.Soccer.June.2026.MAGAZINE`).
+     */
+    public function hasBookSignals(): bool
+    {
+        return $this->hasDocumentContent() || preg_match(self::BOOK_SIGNAL_REGEX, $this->releaseName) === 1;
+    }
 
     /**
      * Get the release name in lowercase for case-insensitive matching.

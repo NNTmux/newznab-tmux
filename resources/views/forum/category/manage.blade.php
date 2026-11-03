@@ -42,7 +42,7 @@
         </draggable>
     </script>
 
-    <script>
+    <script nonce="{{ csp_nonce() }}">
     var draggableCategoryList = {
         name: 'draggable-category-list',
         template: '#draggable-category-list-template',

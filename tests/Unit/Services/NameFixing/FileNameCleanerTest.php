@@ -48,4 +48,23 @@ class FileNameCleanerTest extends TestCase
             $cleaner->formatSearchName('Southern Charm S11E12 Even Further South 720p AMZN WEB-DL DDP2 0 H 264-NTb.mkv')
         );
     }
+
+    public function test_a_trailing_h264_codec_is_not_taken_for_a_split_volume(): void
+    {
+        $cleaner = new FileNameCleaner;
+        $name = 'Gegen.den.Strom.1997.GERMAN.720p.ARD.WEB-DL.AAC2.0.H.264';
+
+        $this->assertSame($name, $cleaner->normalizeCandidateTitle($name));
+        $this->assertSame($name, $cleaner->formatSearchName($name));
+        $this->assertSame('Show.S01E01.1080p.WEB.x.265', $cleaner->formatSearchName('Show.S01E01.1080p.WEB.x.265'));
+    }
+
+    public function test_split_volume_extensions_are_still_removed(): void
+    {
+        $cleaner = new FileNameCleaner;
+
+        $this->assertSame('Movie.2020.1080p.BluRay.x264-GRP', $cleaner->normalizeCandidateTitle('Movie.2020.1080p.BluRay.x264-GRP.001'));
+        $this->assertSame('Movie.2020.1080p.BluRay.x264-GRP', $cleaner->formatSearchName('Movie.2020.1080p.BluRay.x264-GRP.7z.001'));
+        $this->assertSame('Movie.2020.1080p.BluRay.x264-GRP', $cleaner->formatSearchName('Movie.2020.1080p.BluRay.x264-GRP.002'));
+    }
 }

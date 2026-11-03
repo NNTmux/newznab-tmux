@@ -29,6 +29,16 @@ return new class extends Migration
             );
         }
 
+        if (Schema::hasTable('settings')) {
+            $tmuxRunning = DB::table('settings')->where('name', 'running')->value('value');
+            if ((string) $tmuxRunning === '1') {
+                throw new RuntimeException(
+                    "Refusing to run the CBP storage optimizer while the tmux engine is marked running.\n".
+                    'Stop ingestion with `php artisan tmux:stop`, leave CBP_STORAGE_MIGRATION_EXECUTE=true only for that maintenance window, then rerun `php artisan migrate`.'
+                );
+            }
+        }
+
         $collectionCount = (int) DB::table('collections')->count();
         $exitCode = Artisan::call('cbp:optimize-storage', [
             '--execute' => true,
@@ -55,6 +65,9 @@ return new class extends Migration
                 'CBP storage optimization finished without satisfying the migration contract: '.implode('; ', $issues)
             );
         }
+
+        // Reminder only — migrations must not rewrite .env.
+        echo "CBP storage optimization finished. Set CBP_STORAGE_MIGRATION_EXECUTE=false in .env and run `php artisan config:clear` before the next deploy.\n";
     }
 
     public function down(): void

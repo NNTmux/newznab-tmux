@@ -9,6 +9,8 @@ use App\Services\Search\Contracts\SearchDriverInterface;
 use App\Services\Search\Contracts\SearchServiceInterface;
 use App\Services\Search\Drivers\ElasticSearchDriver;
 use App\Services\Search\Drivers\ManticoreSearchDriver;
+use App\Services\Search\DTO\NameFixingSearchQuery;
+use App\Services\Search\DTO\NameFixingSearchResult;
 use App\Services\Search\DTO\ReleaseSearchQuery;
 use App\Services\Search\DTO\SearchPage;
 use Illuminate\Support\Manager;
@@ -526,6 +528,11 @@ class SearchService extends Manager implements SearchServiceInterface
     public function searchReleasePage(ReleaseSearchQuery $query): SearchPage
     {
         return $this->driver()->searchReleasePage($query);
+    }
+
+    public function searchNameFixingCandidates(NameFixingSearchQuery $query): NameFixingSearchResult
+    {
+        return $this->driver()->searchNameFixingCandidates($query);
     }
 
     public function insertSecondary(SecondarySearchIndex $index, int $id, array $document): void

@@ -12,19 +12,29 @@ use Tests\TestCase;
 
 class CoverControllerTest extends TestCase
 {
-    /** @var list<string> */
-    private array $createdFiles = [];
+    private string $tempStoragePath;
+
+    private string $tempPublicPath;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         config(['app.key' => 'base64:'.base64_encode(random_bytes(32))]);
+
+        // Keep cover fixtures out of the real storage/public trees.
+        $this->tempStoragePath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'cover-storage-'.uniqid('', true);
+        $this->tempPublicPath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'cover-public-'.uniqid('', true);
+        File::makeDirectory($this->tempStoragePath, 0777, true);
+        File::makeDirectory($this->tempPublicPath, 0777, true);
+        $this->app->useStoragePath($this->tempStoragePath);
+        $this->app->usePublicPath($this->tempPublicPath);
     }
 
     protected function tearDown(): void
     {
-        File::delete($this->createdFiles);
+        File::deleteDirectory($this->tempStoragePath);
+        File::deleteDirectory($this->tempPublicPath);
 
         parent::tearDown();
     }
@@ -99,7 +109,5 @@ class CoverControllerTest extends TestCase
         } else {
             imagejpeg($image, $path, 82);
         }
-
-        $this->createdFiles[] = $path;
     }
 }

@@ -38,6 +38,7 @@ Changelog		-binary text eol=lf
 .gitignore		-binary text
 .gitattributes	-binary text
 .gitmodules		-binary text
+.env.example	-binary text eol=lf merge=union
 composer.lock	-binary text
 
 # Docker specific

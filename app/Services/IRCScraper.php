@@ -9,12 +9,18 @@ use App\Models\Predb;
 use App\Models\UsenetGroup;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class IRCScraper.
  */
 class IRCScraper extends IRCClient
 {
+    /**
+     * Length of predb.title; longer announced titles are rejected instead of truncated.
+     */
+    public const MAX_TITLE_LENGTH = 255;
+
     /**
      * Regex to ignore categories.
      */
@@ -194,7 +200,7 @@ class IRCScraper extends IRCClient
         }
 
         if (preg_match(
-            '/^(NEW|UPD|NUK): \[DT: (?P<time>.+?)\]\s?\[TT: (?P<title>.+?)\]\s?\[SC: (?P<source>.+?)\]\s?\[CT: (?P<category>.+?)\]\s?\[RQ: (?P<req>.+?)\]'.
+            '/^(?P<type>NEW|UPD|NUK): \[DT: (?P<time>.+?)\]\s?\[TT: (?P<title>.+?)\]\s?\[SC: (?P<source>.+?)\]\s?\[CT: (?P<category>.+?)\]\s?\[RQ: (?P<req>.+?)\]'.
             '\s?\[SZ: (?P<size>.+?)\]\s?\[FL: (?P<files>.+?)\]\s?(\[FN: (?P<filename>.+?)\]\s?)?(\[(?P<nuked>(UN|MOD|RE|OLD)?NUKED?): (?P<reason>.+?)\])?$/i',
             $this->_channelData['message'],
             $hits
@@ -227,9 +233,16 @@ class IRCScraper extends IRCClient
                 return;
             }
 
-            $utime = Carbon::createFromTimeString($hits['time'], 'UTC')->timestamp;
+            // predb.title is varchar(255); a longer title would be stored truncated as a different literal.
+            if (mb_strlen($hits['title']) > self::MAX_TITLE_LENGTH) {
+                Log::notice('predb.irc.title_too_long', ['source' => $hits['source'], 'length' => mb_strlen($hits['title'])]);
 
-            $this->_curPre['predate'] = 'FROM_UNIXTIME('.$utime.')';
+                return;
+            }
+
+            $this->_curPre['type'] = strtoupper($hits['type']);
+            // A nuke announcement's DT is when the nuke was announced, not when the release was pre'd.
+            $this->_curPre['predate'] = $this->_curPre['type'] === 'NUK' ? '' : $this->preTime($hits['time']);
             $this->_curPre['title'] = $hits['title'];
             $this->_curPre['source'] = $hits['source'];
             if ($hits['category'] !== 'N/A') {
@@ -286,8 +299,11 @@ class IRCScraper extends IRCClient
      */
     protected function _checkForDupe(): void
     {
-        $this->_oldPre = Predb::query()->where('title', $this->_curPre['title'])->select(['category', 'size'])->first();
-        if ($this->_oldPre === null) {
+        $this->_oldPre = Predb::query()->where('title', $this->_curPre['title'])->select(['id', 'title', 'category', 'size', 'source', 'predate'])->first();
+        if ($this->_oldPre !== null && (string) $this->_oldPre->title !== $this->_curPre['title']) {
+            // The collation matched a different literal title; never update another release's PRE.
+            $this->logCollision((string) $this->_oldPre->title);
+        } elseif ($this->_oldPre === null) {
             if ($this->_debug && ! $this->_silent) {
                 echo '[DEBUG] New PRE found, inserting: '.$this->_curPre['title'].PHP_EOL;
             }
@@ -318,73 +334,43 @@ class IRCScraper extends IRCClient
             return;
         }
 
-        // Double-check database to ensure we don't have stale search index data
-        $existingPre = Predb::query()->where('title', $this->_curPre['title'])->first();
-        if ($existingPre !== null) {
-            if ($this->_debug && ! $this->_silent) {
-                echo '[DEBUG] PRE already exists in database (ID: '.$existingPre->id.'), skipping insert'.PHP_EOL;
-            }
-
-            return;
-        }
-
-        if ($this->_debug && ! $this->_silent) {
-            echo '[DEBUG] PRE not in database, proceeding with insert...'.PHP_EOL;
-        }
-
-        $query = 'INSERT INTO predb (';
-
-        $query .= (! empty($this->_curPre['size']) ? 'size, ' : '');
-        $query .= (! empty($this->_curPre['category']) ? 'category, ' : '');
-        $query .= (! empty($this->_curPre['source']) ? 'source, ' : '');
-        $query .= (! empty($this->_curPre['reason']) ? 'nukereason, ' : '');
-        $query .= (! empty($this->_curPre['files']) ? 'files, ' : '');
-        $query .= (! empty($this->_curPre['reqid']) ? 'requestid, ' : '');
-        $query .= (! empty($this->_curPre['group_id']) ? 'groups_id, ' : '');
-        $query .= (! empty($this->_curPre['nuked']) ? 'nuked, ' : '');
-        $query .= (! empty($this->_curPre['filename']) ? 'filename, ' : '');
-
-        $query .= 'predate, title) VALUES (';
-
-        $query .= (! empty($this->_curPre['size']) ? escapeString($this->_curPre['size']).', ' : '');
-        $query .= (! empty($this->_curPre['category']) ? escapeString($this->_curPre['category']).', ' : '');
-        $query .= (! empty($this->_curPre['source']) ? escapeString($this->_curPre['source']).', ' : '');
-        $query .= (! empty($this->_curPre['reason']) ? escapeString($this->_curPre['reason']).', ' : '');
-        $query .= (! empty($this->_curPre['files']) ? escapeString($this->_curPre['files']).', ' : '');
-        $query .= (! empty($this->_curPre['reqid']) ? $this->_curPre['reqid'].', ' : '');
-        $query .= (! empty($this->_curPre['group_id']) ? $this->_curPre['group_id'].', ' : '');
-        $query .= (! empty($this->_curPre['nuked']) ? $this->_curPre['nuked'].', ' : '');
-        $query .= (! empty($this->_curPre['filename']) ? escapeString($this->_curPre['filename']).', ' : '');
-        $query .= (! empty($this->_curPre['predate']) ? $this->_curPre['predate'].', ' : 'NOW(), ');
-
-        $query .= '%s)';
-
-        if ($this->_debug && ! $this->_silent) {
-            echo '[DEBUG] Executing SQL: '.substr($query, 0, 100).'...'.PHP_EOL;
-        }
+        $row = array_filter([
+            'size' => $this->_curPre['size'] ?? '',
+            'category' => $this->_curPre['category'] ?? '',
+            'source' => $this->_curPre['source'] ?? '',
+            'nukereason' => $this->_curPre['reason'] ?? '',
+            'files' => $this->_curPre['files'] ?? '',
+            'requestid' => $this->_curPre['reqid'] ?? '',
+            'groups_id' => $this->_curPre['group_id'] ?? '',
+            'nuked' => $this->_curPre['nuked'] ?? '',
+            'filename' => $this->_curPre['filename'] ?? '',
+        ], static fn (mixed $value): bool => ! empty($value));
+        $row['title'] = $this->_curPre['title'];
+        // An unparseable announce time stays unknown rather than becoming the time we heard it.
+        $row['predate'] = $this->_curPre['predate'] !== '' ? $this->_curPre['predate'] : null;
 
         try {
-            DB::insert(
-                sprintf(
-                    $query,
-                    escapeString($this->_curPre['title'])
-                )
-            );
+            DB::table('predb')->insertOrIgnore($row);
+            $pre = Predb::query()->where('title', $row['title'])->first(['id', 'title', 'filename', 'source']);
+            if ($pre === null) {
+                return;
+            }
+            if ((string) $pre->title !== $row['title']) {
+                $this->logCollision((string) $pre->title);
 
-            $lastId = DB::connection()->getPdo()->lastInsertId();
-
-            if ($this->_debug && ! $this->_silent) {
-                echo '[DEBUG] Successfully inserted PRE with ID: '.$lastId.PHP_EOL;
+                return;
             }
 
-            $parameters = [
-                'id' => $lastId,
-                'title' => $this->_curPre['title'],
-                'filename' => $this->_curPre['filename'] ?? null,
-                'source' => $this->_curPre['source'] ?? null,
-            ];
+            if ($this->_debug && ! $this->_silent) {
+                echo '[DEBUG] Successfully inserted PRE with ID: '.$pre->id.PHP_EOL;
+            }
 
-            Search::insertPredb($parameters);
+            Search::insertPredb([
+                'id' => (int) $pre->id,
+                'title' => $pre->title,
+                'filename' => $pre->filename,
+                'source' => $pre->source,
+            ]);
 
             $this->_doEcho(true);
         } catch (\Exception $e) {
@@ -406,48 +392,85 @@ class IRCScraper extends IRCClient
             return;
         }
 
-        $query = 'UPDATE predb SET ';
+        $current = Predb::query()->where('title', $this->_curPre['title'])->first(['id', 'title', 'source', 'predate', 'category']);
+        if ($current === null) {
+            return;
+        }
+        if ((string) $current->title !== $this->_curPre['title']) {
+            $this->logCollision((string) $current->title);
 
-        $query .= (! empty($this->_curPre['size']) ? 'size = '.escapeString($this->_curPre['size']).', ' : '');
-        $query .= (! empty($this->_curPre['source']) ? 'source = '.escapeString($this->_curPre['source']).', ' : '');
-        $query .= (! empty($this->_curPre['files']) ? 'files = '.escapeString($this->_curPre['files']).', ' : '');
-        $query .= (! empty($this->_curPre['reason']) ? 'nukereason = '.escapeString($this->_curPre['reason']).', ' : '');
-        $query .= (! empty($this->_curPre['reqid']) ? 'requestid = '.$this->_curPre['reqid'].', ' : '');
-        $query .= (! empty($this->_curPre['group_id']) ? 'groups_id = '.$this->_curPre['group_id'].', ' : '');
-        $query .= (! empty($this->_curPre['predate']) ? 'predate = '.$this->_curPre['predate'].', ' : '');
-        $query .= (! empty($this->_curPre['nuked']) ? 'nuked = '.$this->_curPre['nuked'].', ' : '');
-        $query .= (! empty($this->_curPre['filename']) ? 'filename = '.escapeString($this->_curPre['filename']).', ' : '');
-        $query .= (
-            (empty($this->_oldPre['category']) && ! empty($this->_curPre['category']))
-                ? 'category = '.escapeString($this->_curPre['category']).', '
-                : ''
-        );
-
-        if ($query === 'UPDATE predb SET ') {
             return;
         }
 
-        $query .= 'title = '.escapeString($this->_curPre['title']);
-        $query .= ' WHERE title = '.escapeString($this->_curPre['title']);
+        if (($this->_curPre['type'] ?? '') === 'NUK') {
+            // A nuke announcement only changes the nuke state; its other fields describe the announce, not the PRE.
+            $columns = ['nuked' => $this->_curPre['nuked'] ?? '', 'nukereason' => $this->_curPre['reason'] ?? ''];
+        } else {
+            $columns = [
+                'size' => $this->_curPre['size'] ?? '',
+                'files' => $this->_curPre['files'] ?? '',
+                'nukereason' => $this->_curPre['reason'] ?? '',
+                'requestid' => $this->_curPre['reqid'] ?? '',
+                'groups_id' => $this->_curPre['group_id'] ?? '',
+                'nuked' => $this->_curPre['nuked'] ?? '',
+                'filename' => $this->_curPre['filename'] ?? '',
+            ];
+            // Attribution, PRE time and category describe the original PRE and are only filled when unknown.
+            if (($current->source === null || $current->source === '') && ! empty($this->_curPre['source'])) {
+                $columns['source'] = $this->_curPre['source'];
+            }
+            if ($current->predate === null && ! empty($this->_curPre['predate'])) {
+                $columns['predate'] = $this->_curPre['predate'];
+            }
+            if (empty($current->category) && ! empty($this->_curPre['category'])) {
+                $columns['category'] = $this->_curPre['category'];
+            }
+        }
 
-        // Execute the update and then fetch the affected row ID by title.
-        DB::update($query);
+        $columns = array_filter($columns, static fn (mixed $value): bool => ! empty($value));
+        if ($columns === []) {
+            return;
+        }
 
-        // Look up the predb row ID by title for indexing backends.
-        $pre = Predb::query()->where('title', $this->_curPre['title'])->first(['id', 'title', 'filename', 'source']);
+        DB::table('predb')->where('id', $current->id)->update($columns);
 
+        $pre = Predb::query()->whereKey($current->id)->first(['id', 'title', 'filename', 'source']);
         if ($pre !== null) {
-            $parameters = [
+            Search::updatePreDb([
                 'id' => (int) $pre->id,
                 'title' => $pre->title,
                 'filename' => $pre->filename,
                 'source' => $pre->source,
-            ];
-
-            Search::updatePreDb($parameters);
+            ]);
         }
 
         $this->_doEcho(false);
+    }
+
+    /**
+     * Convert the announced PRE time to the application timezone, or '' when it cannot be parsed.
+     */
+    protected function preTime(string $announced): string
+    {
+        try {
+            return Carbon::createFromTimeString($announced, 'UTC')
+                ->setTimezone((string) config('app.timezone', 'UTC'))
+                ->format('Y-m-d H:i:s');
+        } catch (\Throwable) {
+            return '';
+        }
+    }
+
+    protected function logCollision(string $storedTitle): void
+    {
+        Log::notice('predb.irc.literal_identity_collision', [
+            'title' => $this->_curPre['title'],
+            'stored_title' => $storedTitle,
+            'source' => $this->_curPre['source'] ?? '',
+        ]);
+        if ($this->_debug && ! $this->_silent) {
+            echo '[DEBUG] PRE title collides with stored literal '.$storedTitle.', skipping'.PHP_EOL;
+        }
     }
 
     /**
@@ -525,6 +548,7 @@ class IRCScraper extends IRCClient
         $this->_oldPre = [];
         $this->_curPre =
             [
+                'type' => '',
                 'title' => '',
                 'size' => '',
                 'predate' => '',

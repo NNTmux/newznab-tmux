@@ -56,6 +56,19 @@ class RepairTvReleaseLinksTest extends TestCase
         $this->assertSame(TvLookupStatus::SeasonPack->value, (int) DB::table('releases')->where('id', $pack)->value('tv_episodes_id'));
     }
 
+    public function test_stuck_releases_whose_episode_is_stored_are_linked_without_a_retry(): void
+    {
+        $videoId = $this->insertVideo('The Expanse');
+        $episodeId = $this->insertEpisode($videoId, 2, 3);
+        $releaseId = $this->insertTvRelease('The.Expanse.S02E03.720p.HDTV.x264-GRP', ['videos_id' => $videoId, 'tv_episodes_id' => -1]);
+
+        $this->artisan('tv:repair-links', ['--stuck' => true])->assertSuccessful();
+
+        $release = DB::table('releases')->find($releaseId);
+        $this->assertSame([$episodeId, 0, null], [(int) $release->tv_episodes_id, (int) $release->tv_lookup_attempts, $release->tv_lookup_retry_at]);
+        Search::getFacadeRoot()->shouldHaveReceived('updateRelease')->with($releaseId)->once();
+    }
+
     public function test_links_to_another_shows_episode_or_a_deleted_show_are_removed(): void
     {
         $expanse = $this->insertVideo('The Expanse');
