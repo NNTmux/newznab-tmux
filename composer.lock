@@ -4257,16 +4257,16 @@
         },
         {
             "name": "paragonie/constant_time_encoding",
-            "version": "v3.1.3",
+            "version": "v3.1.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/paragonie/constant_time_encoding.git",
-                "reference": "d5b01a39b3415c2cd581d3bd3a3575c1ebbd8e77"
+                "reference": "5efef6e6cb43e088ccab7d0c1e2f2ab25b9e8b54"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/paragonie/constant_time_encoding/zipball/d5b01a39b3415c2cd581d3bd3a3575c1ebbd8e77",
-                "reference": "d5b01a39b3415c2cd581d3bd3a3575c1ebbd8e77",
+                "url": "https://api.github.com/repos/paragonie/constant_time_encoding/zipball/5efef6e6cb43e088ccab7d0c1e2f2ab25b9e8b54",
+                "reference": "5efef6e6cb43e088ccab7d0c1e2f2ab25b9e8b54",
                 "shasum": ""
             },
             "require": {
@@ -4322,7 +4322,7 @@
                 "issues": "https://github.com/paragonie/constant_time_encoding/issues",
                 "source": "https://github.com/paragonie/constant_time_encoding"
             },
-            "time": "2025-09-24T15:06:41+00:00"
+            "time": "2026-11-06T20:31:19+00:00"
         },
         {
             "name": "php-ffmpeg/php-ffmpeg",
@@ -5976,16 +5976,16 @@
         },
         {
             "name": "sentry/sentry",
-            "version": "4.35.0",
+            "version": "4.36.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/getsentry/sentry-php.git",
-                "reference": "8247f5411fd98d98183366f001278ce3591eda20"
+                "reference": "7df5eefacff197c0aae0925a4848e3f91719d37c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/getsentry/sentry-php/zipball/8247f5411fd98d98183366f001278ce3591eda20",
-                "reference": "8247f5411fd98d98183366f001278ce3591eda20",
+                "url": "https://api.github.com/repos/getsentry/sentry-php/zipball/7df5eefacff197c0aae0925a4848e3f91719d37c",
+                "reference": "7df5eefacff197c0aae0925a4848e3f91719d37c",
                 "shasum": ""
             },
             "require": {
@@ -6057,7 +6057,7 @@
             ],
             "support": {
                 "issues": "https://github.com/getsentry/sentry-php/issues",
-                "source": "https://github.com/getsentry/sentry-php/tree/4.35.0"
+                "source": "https://github.com/getsentry/sentry-php/tree/4.36.0"
             },
             "funding": [
                 {
@@ -6069,7 +6069,7 @@
                     "type": "custom"
                 }
             ],
-            "time": "2026-10-29T16:02:44+00:00"
+            "time": "2026-11-05T16:26:18+00:00"
         },
         {
             "name": "sentry/sentry-laravel",
@@ -15688,25 +15688,25 @@
         },
         {
             "name": "spatie/laravel-ignition",
-            "version": "2.12.1",
+            "version": "2.13.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-ignition.git",
-                "reference": "0d49228686542bf718ad1a978ab3eb1d5a0dcd41"
+                "reference": "0cf60c3e1a63e7fc5ea04d6fb0a162057724f041"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-ignition/zipball/0d49228686542bf718ad1a978ab3eb1d5a0dcd41",
-                "reference": "0d49228686542bf718ad1a978ab3eb1d5a0dcd41",
+                "url": "https://api.github.com/repos/spatie/laravel-ignition/zipball/0cf60c3e1a63e7fc5ea04d6fb0a162057724f041",
+                "reference": "0cf60c3e1a63e7fc5ea04d6fb0a162057724f041",
                 "shasum": ""
             },
             "require": {
                 "ext-curl": "*",
                 "ext-json": "*",
                 "ext-mbstring": "*",
-                "illuminate/support": "^11.0|^12.0|^13.0",
-                "nesbot/carbon": "^2.72|^3.0",
-                "php": "^8.2",
+                "illuminate/support": "^13.0",
+                "nesbot/carbon": "^3.13.3",
+                "php": "^8.4",
                 "spatie/ignition": "^1.16",
                 "symfony/console": "^7.4|^8.0",
                 "symfony/var-dumper": "^7.4|^8.0"
@@ -15715,8 +15715,8 @@
                 "livewire/livewire": "^3.7.0|^4.0|dev-josh/v3-laravel-13-support",
                 "mockery/mockery": "^1.6.12",
                 "openai-php/client": "^0.10.3|^0.19",
-                "orchestra/testbench": "^v9.16.0|^10.6|^11.0",
-                "pestphp/pest": "^3.7|^4.0",
+                "orchestra/testbench": "^11.0",
+                "pestphp/pest": "^5.3.5",
                 "phpstan/extension-installer": "^1.4.3",
                 "phpstan/phpstan-deprecation-rules": "^2.0.3",
                 "phpstan/phpstan-phpunit": "^2.0.8",
@@ -15776,7 +15776,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-10-19T16:31:25+00:00"
+            "time": "2026-11-06T15:11:05+00:00"
         },
         {
             "name": "staabm/side-effects-detector",
