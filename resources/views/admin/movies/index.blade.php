@@ -2,14 +2,14 @@
 
 @section('content')
 <div class="space-y-6">
+    <x-admin.page-header :title="$title" icon="fas fa-film">
+        <x-slot:actions>
+            <a href="{{ url('admin/movie-add') }}" class="px-4 py-2 bg-accent dark:bg-accent-hover text-white rounded-lg hover:bg-accent-hover dark:hover:bg-primary-800">
+                <i aria-hidden="true" class="fas fa-plus mr-2"></i>Add Movie
+            </a>
+        </x-slot:actions>
+    </x-admin.page-header>
     <x-admin.card>
-        <x-admin.page-header :title="$title" icon="fas fa-film">
-            <x-slot:actions>
-                <a href="{{ url('admin/movie-add') }}" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800">
-                    <i class="fas fa-plus mr-2"></i>Add Movie
-                </a>
-            </x-slot:actions>
-        </x-admin.page-header>
 
         <!-- Search Form -->
         <x-admin.search-bar>
@@ -17,15 +17,15 @@
                 <div class="flex gap-2">
                     <div class="relative flex-1">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i class="fas fa-search text-gray-400"></i>
+                            <i aria-hidden="true" class="fas fa-search text-gray-400"></i>
                         </div>
                         <input type="text"
                                name="moviesearch"
                                value="{{ $lastSearch ?? '' }}"
                                placeholder="Search by IMDB ID or movie title..."
-                               class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
+                               class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100">
                     </div>
-                    <button type="submit" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800">
+                    <button type="submit" class="px-4 py-2 bg-accent dark:bg-accent-hover text-white rounded-lg hover:bg-accent-hover dark:hover:bg-primary-800">
                         Search
                     </button>
                     @if(!empty($lastSearch))
@@ -53,7 +53,7 @@
                 @foreach($movielist as $movie)
                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                            <a href="{{ $site->dereferrerLink }}https://www.imdb.com/title/tt{{ $movie->imdbid }}" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">
+                            <a href="{{ $site->dereferrerLink }}https://www.imdb.com/title/tt{{ $movie->imdbid }}" target="_blank" class="text-link dark:text-primary-400 hover:underline">
                                 {{ $movie->imdbid }}
                             </a>
                         </td>
@@ -71,36 +71,36 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm">
                             @if($movie->cover == 1)
-                                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-                                    <i class="fas fa-check"></i> Yes
+                                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200">
+                                    <i aria-hidden="true" class="fas fa-check"></i> Yes
                                 </span>
                             @else
                                 <span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">
-                                    <i class="fas fa-times"></i> No
+                                    <i aria-hidden="true" class="fas fa-times"></i> No
                                 </span>
                             @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm">
                             @if($movie->backdrop == 1)
-                                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-                                    <i class="fas fa-check"></i> Yes
+                                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200">
+                                    <i aria-hidden="true" class="fas fa-check"></i> Yes
                                 </span>
                             @else
                                 <span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">
-                                    <i class="fas fa-times"></i> No
+                                    <i aria-hidden="true" class="fas fa-times"></i> No
                                 </span>
                             @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <a href="{{ url('admin/movie-edit?id=' . $movie->imdbid) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 mr-3">
-                                <i class="fas fa-edit"></i> Edit
+                            <a href="{{ url('admin/movie-edit?id=' . $movie->imdbid) }}" class="text-link dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300 mr-3">
+                                <i aria-hidden="true" class="fas fa-edit"></i> Edit
                             </a>
                             <form method="POST" action="{{ route('admin.movie-edit') }}" class="inline">
                                 @csrf
                                 <input type="hidden" name="id" value="{{ $movie->imdbid }}">
                                 <input type="hidden" name="update" value="1">
-                                <button type="submit" class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300" title="Update from TMDB">
-                                    <i class="fas fa-sync-alt"></i> Update
+                                <button type="submit" class="text-success-600 dark:text-success-400 hover:text-success-900 dark:hover:text-success-300" title="Update from TMDB">
+                                    <i aria-hidden="true" class="fas fa-sync-alt"></i> Update
                                 </button>
                             </form>
                         </td>

@@ -2,20 +2,20 @@
 
 @section('content')
 <div class="space-y-6">
+    <x-admin.page-header :title="$title" icon="fas fa-user">
+        <x-slot:actions>
+            @if(!empty($user['id']))
+                <x-admin.button :href="url('admin/user-role-history/'.$user['id'])" tone="gray" icon="fas fa-history">View Role History</x-admin.button>
+            @endif
+        </x-slot:actions>
+    </x-admin.page-header>
     <x-admin.card>
-        <x-admin.page-header :title="$title" icon="fas fa-user">
-            <x-slot:actions>
-                @if(!empty($user['id']))
-                    <x-admin.button :href="url('admin/user-role-history/'.$user['id'])" tone="gray" icon="fas fa-history">View Role History</x-admin.button>
-                @endif
-            </x-slot:actions>
-        </x-admin.page-header>
 
         <!-- Error Messages -->
         @if(!empty($error))
             <div class="mx-6 mt-4 p-4 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-lg">
                 <p class="text-red-800 dark:text-red-200">
-                    <i class="fas fa-exclamation-circle mr-2"></i>{{ $error }}
+                    <i aria-hidden="true" class="fas fa-exclamation-circle mr-2"></i>{{ $error }}
                 </p>
             </div>
         @endif
@@ -24,6 +24,7 @@
         <div class="p-6" x-data="adminUserEdit">
         <form id="admin-user-edit-form" method="post" action="{{ url('admin/user-edit') }}">
             @csrf
+            <x-form-errors class="m-6 mb-0" />
             <input type="hidden" name="action" value="submit">
             @if(!empty($user['id']))
                 <input type="hidden" name="id" value="{{ $user['id'] }}">
@@ -40,7 +41,7 @@
                            name="username"
                            value="{{ is_array($user) ? ($user['username'] ?? '') : ($user->username ?? '') }}"
                            required
-                           class="w-full px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                           class="w-full px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500">
                 </div>
 
                 <!-- Email -->
@@ -53,7 +54,7 @@
                            name="email"
                            value="{{ is_array($user) ? ($user['email'] ?? '') : ($user->email ?? '') }}"
                            required
-                           class="w-full px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                           class="w-full px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500">
                 </div>
 
                 <!-- Password -->
@@ -67,9 +68,9 @@
                                name="password"
                                placeholder="{{ !empty($user['id']) ? 'Leave blank to keep current password' : '' }}"
                                @if(empty($user['id'])) required @endif
-                               class="w-full px-3 py-2 pr-12 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500">
-                        <button type="button" class="password-toggle-btn absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" data-field-id="password">
-                            <i class="fas fa-eye" id="password-eye"></i>
+                               class="w-full px-3 py-2 pr-12 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500 placeholder:text-gray-400 dark:placeholder:text-gray-500">
+                        <button aria-label="Show password" type="button" class="password-toggle-btn absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" data-field-id="password">
+                            <i aria-hidden="true" class="fas fa-eye" id="password-eye"></i>
                         </button>
                     </div>
                     @if(!empty($user['id']))
@@ -86,15 +87,15 @@
                         @php
                             $pendingRole = $user->pendingRole;
                         @endphp
-                        <div class="mb-2 p-2 bg-blue-100 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-700 rounded text-sm text-blue-800 dark:text-blue-200 flex items-center">
-                            <i class="fas fa-info-circle mr-2"></i>
+                        <div class="mb-2 p-2 bg-primary-100 dark:bg-primary-900/30 border border-primary-300 dark:border-primary-700 rounded text-sm text-primary-800 dark:text-primary-200 flex items-center">
+                            <i aria-hidden="true" class="fas fa-info-circle mr-2"></i>
                             <span><strong>Note:</strong> This user has a pending role change to <strong>{{ $pendingRole->name ?? 'Unknown' }}</strong></span>
                         </div>
                     @endif
                     <select id="role"
                             name="role"
                             required
-                            class="w-full px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                            class="w-full px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500">
                         @foreach($role_ids ?? [] as $index => $roleId)
                             <option value="{{ $roleId }}"
                                 {{ (is_array($user) ? ($user['role'] ?? '') : ($user->roles->first()->id ?? '')) == $roleId ? 'selected' : '' }}>
@@ -116,7 +117,7 @@
                                    class="rounded border-gray-300 dark:border-gray-500 text-purple-600 dark:text-purple-500 shadow-sm focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-purple-500 dark:focus:border-purple-400 bg-white dark:bg-gray-700">
                             <div class="ml-3 flex-1">
                                 <span class="text-sm font-medium text-gray-900 dark:text-gray-100 group-hover:text-purple-700 dark:group-hover:text-purple-300 transition-colors">
-                                    <i class="fas fa-layer-group mr-1 text-purple-600 dark:text-purple-400"></i>
+                                    <i aria-hidden="true" class="fas fa-layer-group mr-1 text-purple-600 dark:text-purple-400"></i>
                                     Stack role changes
                                 </span>
                                 <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">
@@ -138,7 +139,7 @@
                            id="invites"
                            name="invites"
                            value="{{ is_array($user) ? ($user['invites'] ?? 0) : ($user->invites ?? 0) }}"
-                           class="w-full px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                           class="w-full px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500">
                 </div>
 
                 <!-- Notes -->
@@ -149,18 +150,18 @@
                     <textarea id="notes"
                               name="notes"
                               rows="4"
-                              class="w-full px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">{{ is_array($user) ? ($user['notes'] ?? '') : ($user->notes ?? '') }}</textarea>
+                              class="w-full px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500">{{ is_array($user) ? ($user['notes'] ?? '') : ($user->notes ?? '') }}</textarea>
                 </div>
 
                 @include('admin.users.partials.view-preferences')
 
                 <!-- Action Buttons -->
                 <div class="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-                    <button type="submit" form="admin-user-edit-form" class="px-6 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800">
-                        <i class="fas fa-save mr-2"></i>Save User
+                    <button type="submit" form="admin-user-edit-form" class="px-6 py-2 bg-accent dark:bg-accent-hover text-white rounded-lg hover:bg-accent-hover dark:hover:bg-primary-800">
+                        <i aria-hidden="true" class="fas fa-save mr-2"></i>Save User
                     </button>
                     <a href="{{ url('admin/user-list') }}" class="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600">
-                        <i class="fas fa-times mr-2"></i>Cancel
+                        <i aria-hidden="true" class="fas fa-times mr-2"></i>Cancel
                     </a>
                 </div>
         </div>

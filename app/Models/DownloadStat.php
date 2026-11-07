@@ -6,6 +6,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class DownloadStat extends Model
 {
@@ -25,14 +26,19 @@ class DownloadStat extends Model
             ->limit(10)
             ->get();
 
-        foreach ($releases as $release) {
-            self::updateOrCreate([
-                'searchname' => $release->searchname,
-                'guid' => $release->guid,
-                'adddate' => $release->adddate,
-                'grabs' => $release->grabs,
-            ]);
-        }
+        // The table only caches the current top list: rebuild it (this also clears duplicate rows
+        // left by the old collector, which keyed rows on every column including grabs).
+        DB::transaction(static function () use ($releases): void {
+            self::query()->delete();
+            foreach ($releases as $release) {
+                self::query()->create([
+                    'guid' => $release->guid,
+                    'searchname' => $release->searchname,
+                    'adddate' => $release->adddate,
+                    'grabs' => $release->grabs,
+                ]);
+            }
+        });
     }
 
     /**
@@ -40,6 +46,6 @@ class DownloadStat extends Model
      */
     public static function getTopDownloads(): array
     {
-        return self::query()->select(['searchname', 'guid', 'adddate', 'grabs'])->get()->toArray();
+        return self::query()->select(['searchname', 'guid', 'adddate', 'grabs'])->orderByDesc('grabs')->limit(10)->get()->toArray();
     }
 }

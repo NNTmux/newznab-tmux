@@ -1,7 +1,8 @@
 @extends('layouts.main')
 @section('content')
+<x-page-header :title="$title" eyebrow="Developer resources" description="Integrate with the index using the Newznab-compatible XML API and authenticated download endpoints." icon="fas fa-code" />
+
 <div class="surface-panel rounded-xl shadow-sm mb-6">
-    <x-page-header :title="$title" eyebrow="Developer resources" description="Integrate with the index using the Newznab-compatible XML API and authenticated download endpoints." icon="fas fa-code" />
     <div class="p-6">
         <p class="text-lg text-gray-700 dark:text-gray-300 mb-6 dark:text-gray-300">
             Here lives the documentation for the API for accessing NZB and index data. API functions require your API key
@@ -16,18 +17,18 @@
         @auth
             <div class="surface-panel-alt rounded-lg p-6 mb-6 border">
                 <h4 class="text-lg font-semibold mb-3 text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
-                    <i class="fa fa-key mr-2 text-gray-600 dark:text-gray-400"></i>Your API Credentials
+                    <i aria-hidden="true" class="fa-solid fa-key mr-2 text-gray-600 dark:text-gray-400"></i>Your API Credentials
                 </h4>
                 <div class="flex rounded-md shadow-sm" x-data="copyToClipboard()">
                     <input type="text" class="flex-1 rounded-l-md border-gray-300 dark:border-gray-600 font-mono text-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white" value="apikey={{ auth()->user()->api_token }}" readonly id="apikeyInput">
-                    <button class="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500" type="button" @click="copy('apikeyInput')" title="Copy to clipboard" :class="copied ? 'text-green-600' : ''">
-                        <i class="fa" :class="copied ? 'fa-check' : 'fa-copy'"></i>
+                    <button aria-label="Copy to clipboard" class="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500" type="button" @click="copy('apikeyInput')" title="Copy to clipboard" :class="copied ? 'text-success-600' : ''">
+                        <i aria-hidden="true" class="fa" :class="copied ? 'fa-check' : 'fa-copy'"></i>
                     </button>
                 </div>
             </div>
         @endauth
         <h4 class="text-lg font-semibold mb-3 text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
-            <i class="fa fa-plug mr-2 text-gray-600 dark:text-gray-400"></i>Available Functions
+            <i aria-hidden="true" class="fa-solid fa-plug mr-2 text-gray-600 dark:text-gray-400"></i>Available Functions
         </h4>
         <p class="text-gray-700 dark:text-gray-300 mb-4 dark:text-gray-300">Use the parameter <code class="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-sm text-red-600 dark:bg-gray-700 dark:text-red-400">?t=</code> to specify the function being called. In addition to search, TV, and movies, this site supports <strong class="text-gray-900 dark:text-gray-100">music</strong> (<code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">t=music</code> or <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">t=audio</code>), <strong class="text-gray-900 dark:text-gray-100">books</strong> (<code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">t=book</code> or <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">t=b</code>), and <strong class="text-gray-900 dark:text-gray-100">anime</strong> (<code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">t=anime</code>). See <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">?t=caps</code> for capability flags.</p>
         <div class="overflow-x-auto">
@@ -48,13 +49,13 @@
                                 available search categories and version number of the newznab protocol being used.
                             </span>
                             <div class="text-gray-500 text-sm mt-1 dark:text-gray-400">
-                                <i class="fa fa-info-circle mr-1"></i>No credentials required
+                                <i aria-hidden="true" class="fa-solid fa-info-circle mr-1"></i>No credentials required
                             </div>
                         </td>
                         <td class="px-6 py-4">
-                            <a href="{{ url('/api/v1/api?t=caps') }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-primary-700 bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
-                                <i class="fa fa-external-link-alt mr-1"></i>
-                                <code class="text-primary-700 dark:text-primary-400">?t=caps</code>
+                            <a href="{{ url('/api/v1/api?t=caps') }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-link bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
+                                <i aria-hidden="true" class="fa-solid fa-external-link-alt mr-1"></i>
+                                <code class="text-link dark:text-primary-400">?t=caps</code>
                             </a>
                         </td>
                     </tr>
@@ -75,13 +76,13 @@
                         <td class="px-6 py-4">
                             <div class="flex flex-col gap-2">
                                 @auth
-                                <a href="{{ url('/api/v1/api?t=search&q=linux&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-primary-700 bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
-                                    <i class="fa fa-external-link-alt mr-1"></i>
-                                    <code class="text-primary-700 dark:text-primary-400">?t=search&amp;q=linux</code>
+                                <a href="{{ url('/api/v1/api?t=search&q=linux&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-link bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
+                                    <i aria-hidden="true" class="fa-solid fa-external-link-alt mr-1"></i>
+                                    <code class="text-link dark:text-primary-400">?t=search&amp;q=linux</code>
                                 </a>
-                                <a href="{{ url('/api/v1/api?t=search&cat=' . $catClass::GAME_ROOT . ',' . $catClass::MOVIE_ROOT . '&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-primary-700 bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
-                                    <i class="fa fa-external-link-alt mr-1"></i>
-                                    <code class="text-primary-700 dark:text-primary-400">?t=search&amp;cat={{ $catClass::GAME_ROOT }},{{ $catClass::MOVIE_ROOT }}</code>
+                                <a href="{{ url('/api/v1/api?t=search&cat=' . $catClass::GAME_ROOT . ',' . $catClass::MOVIE_ROOT . '&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-link bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
+                                    <i aria-hidden="true" class="fa-solid fa-external-link-alt mr-1"></i>
+                                    <code class="text-link dark:text-primary-400">?t=search&amp;cat={{ $catClass::GAME_ROOT }},{{ $catClass::MOVIE_ROOT }}</code>
                                 </a>
                                 @else
                                 <span class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700">
@@ -114,9 +115,9 @@
                         </td>
                         <td class="px-6 py-4">
                             @auth
-                            <a href="{{ url('/api/v1/api?t=tvsearch&q=law%20and%20order&season=7&ep=12&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-primary-700 bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
-                                <i class="fa fa-external-link-alt mr-1"></i>
-                                <code class="text-primary-700 dark:text-primary-400">?t=tvsearch&amp;q=law and order&amp;season=7&amp;ep=12</code>
+                            <a href="{{ url('/api/v1/api?t=tvsearch&q=law%20and%20order&season=7&ep=12&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-link bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
+                                <i aria-hidden="true" class="fa-solid fa-external-link-alt mr-1"></i>
+                                <code class="text-link dark:text-primary-400">?t=tvsearch&amp;q=law and order&amp;season=7&amp;ep=12</code>
                             </a>
                             @else
                             <span class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700">
@@ -140,9 +141,9 @@
                         </td>
                         <td class="px-6 py-4">
                             @auth
-                            <a href="{{ url('/api/v1/api?t=movie&imdbid=1418646&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-primary-700 bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
-                                <i class="fa fa-external-link-alt mr-1"></i>
-                                <code class="text-primary-700 dark:text-primary-400">?t=movie&amp;imdbid=1418646</code>
+                            <a href="{{ url('/api/v1/api?t=movie&imdbid=1418646&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-link bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
+                                <i aria-hidden="true" class="fa-solid fa-external-link-alt mr-1"></i>
+                                <code class="text-link dark:text-primary-400">?t=movie&amp;imdbid=1418646</code>
                             </a>
                             @else
                             <span class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700">
@@ -167,9 +168,9 @@
                         </td>
                         <td class="px-6 py-4">
                             @auth
-                            <a href="{{ url('/api/v1/api?t=music&q=' . rawurlencode('pink floyd') . '&cat=' . $catClass::MUSIC_ROOT . '&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-primary-700 bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
-                                <i class="fa fa-external-link-alt mr-1"></i>
-                                <code class="text-primary-700 dark:text-primary-400">?t=music&amp;q=…&amp;cat={{ $catClass::MUSIC_ROOT }}</code>
+                            <a href="{{ url('/api/v1/api?t=music&q=' . rawurlencode('pink floyd') . '&cat=' . $catClass::MUSIC_ROOT . '&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-link bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
+                                <i aria-hidden="true" class="fa-solid fa-external-link-alt mr-1"></i>
+                                <code class="text-link dark:text-primary-400">?t=music&amp;q=…&amp;cat={{ $catClass::MUSIC_ROOT }}</code>
                             </a>
                             @else
                             <span class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700">
@@ -194,9 +195,9 @@
                         </td>
                         <td class="px-6 py-4">
                             @auth
-                            <a href="{{ url('/api/v1/api?t=book&q=' . rawurlencode('science fiction') . '&cat=' . $catClass::BOOKS_ROOT . '&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-primary-700 bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
-                                <i class="fa fa-external-link-alt mr-1"></i>
-                                <code class="text-primary-700 dark:text-primary-400">?t=book&amp;q=…&amp;cat={{ $catClass::BOOKS_ROOT }}</code>
+                            <a href="{{ url('/api/v1/api?t=book&q=' . rawurlencode('science fiction') . '&cat=' . $catClass::BOOKS_ROOT . '&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-link bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
+                                <i aria-hidden="true" class="fa-solid fa-external-link-alt mr-1"></i>
+                                <code class="text-link dark:text-primary-400">?t=book&amp;q=…&amp;cat={{ $catClass::BOOKS_ROOT }}</code>
                             </a>
                             @else
                             <span class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700">
@@ -216,13 +217,13 @@
                         <td class="px-6 py-4">
                             <div class="flex flex-col gap-2">
                                 @auth
-                                <a href="{{ url('/api/v1/api?t=anime&q=' . rawurlencode('attack on titan') . '&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-primary-700 bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
-                                    <i class="fa fa-external-link-alt mr-1"></i>
-                                    <code class="text-primary-700 dark:text-primary-400">?t=anime&amp;q=attack on titan</code>
+                                <a href="{{ url('/api/v1/api?t=anime&q=' . rawurlencode('attack on titan') . '&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-link bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
+                                    <i aria-hidden="true" class="fa-solid fa-external-link-alt mr-1"></i>
+                                    <code class="text-link dark:text-primary-400">?t=anime&amp;q=attack on titan</code>
                                 </a>
-                                <a href="{{ url('/api/v1/api?t=anime&anilistid=21&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-primary-700 bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
-                                    <i class="fa fa-external-link-alt mr-1"></i>
-                                    <code class="text-primary-700 dark:text-primary-400">?t=anime&amp;anilistid=21</code>
+                                <a href="{{ url('/api/v1/api?t=anime&anilistid=21&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-link bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
+                                    <i aria-hidden="true" class="fa-solid fa-external-link-alt mr-1"></i>
+                                    <code class="text-link dark:text-primary-400">?t=anime&amp;anilistid=21</code>
                                 </a>
                                 @else
                                 <span class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700">
@@ -240,9 +241,9 @@
                         <td class="px-6 py-4"><span class="text-gray-700 dark:text-gray-300">Returns detailed information about an NZB.</span></td>
                         <td class="px-6 py-4">
                             @auth
-                            <a href="{{ url('/api/v1/api?t=details&id=9ca52909ba9b9e5e6758d815fef4ecda&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-primary-700 bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
-                                <i class="fa fa-external-link-alt mr-1"></i>
-                                <code class="text-primary-700 dark:text-primary-400">?t=details&amp;id=9ca52909ba9b9e5e6758d815fef4ecda</code>
+                            <a href="{{ url('/api/v1/api?t=details&id=9ca52909ba9b9e5e6758d815fef4ecda&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-link bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
+                                <i aria-hidden="true" class="fa-solid fa-external-link-alt mr-1"></i>
+                                <code class="text-link dark:text-primary-400">?t=details&amp;id=9ca52909ba9b9e5e6758d815fef4ecda</code>
                             </a>
                             @else
                             <span class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700">
@@ -260,9 +261,9 @@
                         </td>
                         <td class="px-6 py-4">
                             @auth
-                            <a href="{{ url('/api/v1/api?t=info&id=9ca52909ba9b9e5e6758d815fef4ecda&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-primary-700 bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
-                                <i class="fa fa-external-link-alt mr-1"></i>
-                                <code class="text-primary-700 dark:text-primary-400">?t=info&amp;id=9ca52909ba9b9e5e6758d815fef4ecda</code>
+                            <a href="{{ url('/api/v1/api?t=info&id=9ca52909ba9b9e5e6758d815fef4ecda&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-link bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
+                                <i aria-hidden="true" class="fa-solid fa-external-link-alt mr-1"></i>
+                                <code class="text-link dark:text-primary-400">?t=info&amp;id=9ca52909ba9b9e5e6758d815fef4ecda</code>
                             </a>
                             @else
                             <span class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700">
@@ -276,9 +277,9 @@
                         <td class="px-6 py-4"><span class="text-gray-700 dark:text-gray-300">Downloads the NZB file associated with an ID.</span></td>
                         <td class="px-6 py-4">
                             @auth
-                            <a href="{{ url('/api/v1/api?t=get&id=9ca52909ba9b9e5e6758d815fef4ecda&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-primary-700 bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
-                                <i class="fa fa-external-link-alt mr-1"></i>
-                                <code class="text-primary-700 dark:text-primary-400">?t=get&amp;id=9ca52909ba9b9e5e6758d815fef4ecda</code>
+                            <a href="{{ url('/api/v1/api?t=get&id=9ca52909ba9b9e5e6758d815fef4ecda&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-link bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
+                                <i aria-hidden="true" class="fa-solid fa-external-link-alt mr-1"></i>
+                                <code class="text-link dark:text-primary-400">?t=get&amp;id=9ca52909ba9b9e5e6758d815fef4ecda</code>
                             </a>
                             @else
                             <span class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700">
@@ -291,7 +292,7 @@
             </table>
         </div>
         <h4 class="text-lg font-semibold mt-6 mb-3 text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
-            <i class="fa fa-sort-amount-down mr-2 text-gray-600 dark:text-gray-400"></i>Sorting Results (v1)
+            <i aria-hidden="true" class="fa-solid fa-sort-amount-down mr-2 text-gray-600 dark:text-gray-400"></i>Sorting Results (v1)
         </h4>
         <p class="text-gray-700 dark:text-gray-300 mb-4 dark:text-gray-300">
             Search-style endpoints support <code class="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-xs text-red-600 dark:bg-gray-700 dark:text-red-400">sort=field_direction</code>.
@@ -302,17 +303,17 @@
                 <h5 class="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100 dark:text-white">Sort request examples</h5>
                 <div class="flex flex-col gap-2">
                     @auth
-                        <a href="{{ url('/api/v1/api?t=search&q=ubuntu&sort=posted_desc&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-primary-700 bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
-                            <i class="fa fa-external-link-alt mr-1"></i>
-                            <code class="text-primary-700 dark:text-primary-400">?t=search&amp;q=ubuntu&amp;sort=posted_desc</code>
+                        <a href="{{ url('/api/v1/api?t=search&q=ubuntu&sort=posted_desc&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-link bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
+                            <i aria-hidden="true" class="fa-solid fa-external-link-alt mr-1"></i>
+                            <code class="text-link dark:text-primary-400">?t=search&amp;q=ubuntu&amp;sort=posted_desc</code>
                         </a>
-                        <a href="{{ url('/api/v1/api?t=search&q=ubuntu&sort=name_asc&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-primary-700 bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
-                            <i class="fa fa-external-link-alt mr-1"></i>
-                            <code class="text-primary-700 dark:text-primary-400">?t=search&amp;q=ubuntu&amp;sort=name_asc</code>
+                        <a href="{{ url('/api/v1/api?t=search&q=ubuntu&sort=name_asc&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-link bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
+                            <i aria-hidden="true" class="fa-solid fa-external-link-alt mr-1"></i>
+                            <code class="text-link dark:text-primary-400">?t=search&amp;q=ubuntu&amp;sort=name_asc</code>
                         </a>
-                        <a href="{{ url('/api/v1/api?t=search&q=ubuntu&sort=size_desc&limit=50&offset=0&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-primary-700 bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
-                            <i class="fa fa-external-link-alt mr-1"></i>
-                            <code class="text-primary-700 dark:text-primary-400">?t=search&amp;q=ubuntu&amp;sort=size_desc&amp;limit=50</code>
+                        <a href="{{ url('/api/v1/api?t=search&q=ubuntu&sort=size_desc&limit=50&offset=0&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-link bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
+                            <i aria-hidden="true" class="fa-solid fa-external-link-alt mr-1"></i>
+                            <code class="text-link dark:text-primary-400">?t=search&amp;q=ubuntu&amp;sort=size_desc&amp;limit=50</code>
                         </a>
                     @else
                         <code class="block bg-gray-100 dark:bg-gray-800 p-2 rounded text-sm text-red-600 dark:bg-gray-700 dark:text-red-400">?t=search&amp;q=ubuntu&amp;sort=posted_desc</code>
@@ -337,7 +338,7 @@
             </div>
         </div>
         <h4 class="text-lg font-semibold mt-6 mb-3 text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
-            <i class="fa fa-filter mr-2 text-gray-600 dark:text-gray-400"></i>HTTP QUERY Method
+            <i aria-hidden="true" class="fa-solid fa-filter mr-2 text-gray-600 dark:text-gray-400"></i>HTTP QUERY Method
         </h4>
         <p class="text-gray-700 dark:text-gray-300 mb-4">
             The API also accepts the HTTP <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">QUERY</code> method (RFC 10008), which sends the same parameters as a JSON body instead of the URL.
@@ -358,14 +359,14 @@
         </div>
 
         <h4 class="text-lg font-semibold mt-6 mb-3 text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
-            <i class="fa fa-file-code mr-2 text-gray-600 dark:text-gray-400"></i>Output Format
+            <i aria-hidden="true" class="fa-solid fa-file-code mr-2 text-gray-600 dark:text-gray-400"></i>Output Format
         </h4>
         <p class="text-gray-700 dark:text-gray-300 mb-4 dark:text-gray-300">Select your preferred output format (not applicable to functions which return an NZB/NFO file).</p>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="surface-panel-alt rounded-lg border shadow-sm h-full">
                 <div class="p-6">
                     <h5 class="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
-                        <i class="fa fa-code mr-2 text-primary-600 dark:text-primary-400"></i>XML (default)
+                        <i aria-hidden="true" class="fa-solid fa-code mr-2 text-link dark:text-primary-400"></i>XML (default)
                     </h5>
                     <p class="text-gray-700 dark:text-gray-300 mb-3 dark:text-gray-300">Returns the data in an XML document.</p>
                     <code class="block bg-gray-100 dark:bg-gray-800 p-2 rounded text-sm text-red-600 dark:bg-gray-700 dark:text-red-400">?t=search&amp;q=linux&amp;o=xml</code>
@@ -374,7 +375,7 @@
             <div class="surface-panel-alt rounded-lg border shadow-sm h-full">
                 <div class="p-6">
                     <h5 class="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
-                        <i class="fa fa-brackets-curly mr-2 text-primary-600 dark:text-primary-400"></i>JSON
+                        <i aria-hidden="true" class="fa-solid fa-code mr-2 text-link dark:text-primary-400"></i>JSON
                     </h5>
                     <p class="text-gray-700 dark:text-gray-300 mb-3 dark:text-gray-300">Returns the data in a JSON object.</p>
                     <code class="block bg-gray-100 dark:bg-gray-800 p-2 rounded text-sm text-red-600 dark:bg-gray-700 dark:text-red-400">?t=search&amp;q=linux&amp;o=json</code>

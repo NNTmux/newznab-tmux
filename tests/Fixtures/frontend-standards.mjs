@@ -86,6 +86,157 @@ assert.equal(theme.colorScheme, 'blue');
 theme.set('dark');
 assert.equal(theme.current, 'dark', 'Theme selection still works when storage is blocked');
 
+let memberTheme;
+const storedTheme = new Map();
+const savedRequests = [];
+const memberMetas = {
+    'meta[name="theme-preference"]': { content: 'dark' },
+    'meta[name="color-scheme-preference"]': { content: 'violet' },
+    'meta[name="user-authenticated"]': { content: 'true' },
+    'meta[name="update-theme-url"]': { content: '/profile/update-theme' },
+    'meta[name="csrf-token"]': { content: 'token' },
+};
+loadComponent('stores/theme.js', {
+    Alpine: { store: (_name, value) => { memberTheme = value; } },
+    window: { matchMedia: () => ({ matches: false }) },
+    localStorage: {
+        getItem: key => storedTheme.get(key) ?? null,
+        setItem: (key, value) => storedTheme.set(key, value),
+    },
+    fetch: (url, options) => { savedRequests.push({ url, body: JSON.parse(options.body) }); return Promise.resolve(); },
+    document: {
+        querySelector: selector => memberMetas[selector] ?? null,
+        getElementById: () => null,
+        querySelectorAll: () => [],
+    },
+});
+memberTheme.apply = () => {};
+memberTheme.applyScheme = () => {};
+memberTheme._listenOS = () => {};
+memberTheme.init();
+assert.equal(memberTheme.colorScheme, 'violet', 'Signed-in users keep their saved scheme');
+assert.equal(storedTheme.get('theme'), 'dark', 'Saved theme is mirrored for pages without a session');
+assert.equal(storedTheme.get('color_scheme'), 'violet');
+memberTheme.setScheme('teal');
+assert.equal(storedTheme.get('color_scheme'), 'teal');
+assert.deepEqual(savedRequests.at(-1), { url: '/profile/update-theme', body: { theme_preference: 'dark', color_scheme: 'teal' } });
+
+let toastStore;
+const toastTimers = [];
+loadComponent('stores/toast.js', {
+    Alpine: { store: (_name, value) => { toastStore = value; } },
+    window: {},
+    document: { getElementById: () => null },
+    setTimeout: (callback, delay) => { toastTimers.push({ callback, delay }); return toastTimers.length; },
+    clearTimeout: () => {},
+    Date: { now: () => 1000 },
+});
+toastStore.show('Saved', 'success');
+toastStore.show('Could not save', 'error');
+toastStore.show('Check settings', 'warning');
+assert.equal(toastTimers.length, 1, 'Only the success toast auto-dismisses');
+assert.equal(toastTimers[0].delay, 5000);
+assert.equal(toastStore.items[1].remaining, null, 'Errors stay until the user dismisses them');
+toastStore.pause(1);
+assert.equal(toastStore._timers[1], undefined, 'Hovering or focusing a toast pauses its timer');
+toastStore.resume(1);
+assert.equal(toastTimers.length, 2, 'Leaving the toast restarts the timer');
+
+{
+    const htmlAttributes = new Map();
+    const stored = new Map();
+    const events = [];
+    const listeners = {};
+    const context = {
+        document: { documentElement: {
+            getAttribute: name => htmlAttributes.get(name) ?? null,
+            setAttribute: (name, value) => htmlAttributes.set(name, value),
+            removeAttribute: name => htmlAttributes.delete(name),
+        } },
+        localStorage: { setItem: (key, value) => stored.set(key, value), getItem: key => stored.get(key) ?? null },
+        window: {
+            dispatchEvent: event => { events.push(event); (listeners[event.type] || []).forEach(cb => cb(event)); },
+            addEventListener: (type, cb) => { (listeners[type] ||= []).push(cb); },
+        },
+        CustomEvent: class { constructor(type, init) { this.type = type; this.detail = init.detail; } },
+    };
+    let railFactory;
+    const railSource = readFileSync(new URL('../../resources/js/alpine/components/admin/sidebar-rail.js', import.meta.url), 'utf8')
+        .replace("import Alpine from '@alpinejs/csp';", '')
+        .replace(/export /g, '');
+    runInNewContext(railSource + '\nthis.setAdminSidebarCollapsed = setAdminSidebarCollapsed;', Object.assign(context, {
+        Alpine: { data: (_name, callback) => { railFactory = callback; } },
+    }));
+    const rail = railFactory();
+    rail.init();
+    assert.equal(rail.collapsed, false);
+    rail.toggle();
+    assert.equal(htmlAttributes.get('data-admin-sidebar'), 'collapsed', 'Collapsing marks <html> for the rail CSS');
+    assert.equal(stored.get('admin_sidebar'), 'collapsed', 'The rail state is remembered');
+    assert.equal(rail.collapsed, true, 'Every rail toggle follows the shared change event');
+    context.localStorage.setItem = () => { throw new Error('Storage access denied'); };
+    context.setAdminSidebarCollapsed(false);
+    assert.equal(htmlAttributes.has('data-admin-sidebar'), false, 'Expanding still works when storage is blocked');
+    assert.equal(rail.collapsed, false);
+}
+
+{
+    const tokens = { '--ui-fg-muted': '#64748b', '--ui-border': '#e2e8f0', '--font-sans': 'Figtree Variable', '--color-success-500': '' };
+    let observerCallback;
+    const context = {
+        getComputedStyle: () => ({ getPropertyValue: name => tokens[name] ?? '' }),
+        document: {
+            documentElement: {},
+            createElement: () => ({ getContext: () => { throw new Error('No canvas in tests'); } }),
+        },
+        MutationObserver: class { constructor(callback) { observerCallback = callback; } observe() {} disconnect() {} },
+    };
+    const source = readFileSync(new URL('../../resources/js/alpine/lib/chart-theme.js', import.meta.url), 'utf8').replace(/export /g, '');
+    runInNewContext(source + '\nthis.api = { toRgba, seriesColors, applyChartDefaults, observeTheme };', context);
+    const { toRgba, seriesColors, applyChartDefaults, observeTheme } = context.api;
+
+    assert.equal(toRgba('#3b82f6', 0.5), 'rgba(59, 130, 246, 0.5)');
+    assert.equal(toRgba('oklch(70% 0.1 200)'), null, 'Unparseable colors report null so callers can fall back');
+    const fallbackColors = seriesColors('success', 0.2);
+    assert.equal(fallbackColors.borderColor, 'rgba(16, 185, 129, 1)', 'A missing token falls back to the built-in hex value');
+    assert.equal(fallbackColors.backgroundColor, 'rgba(16, 185, 129, 0.2)');
+
+    const Chart = { defaults: { font: {} } };
+    applyChartDefaults(Chart);
+    assert.equal(Chart.defaults.color, 'rgba(100, 116, 139, 1)');
+    assert.equal(Chart.defaults.font.family, 'Figtree Variable');
+
+    let updated = 0;
+    const chart = { $themeTone: { name: 'primary', fillAlpha: 0.2 }, data: { datasets: [{}] }, update: () => { updated++; } };
+    observeTheme(Chart, () => [chart]);
+    tokens['--color-primary-500'] = '#10b981';
+    observerCallback();
+    assert.equal(updated, 1, 'Theme changes re-render registered charts');
+    assert.equal(chart.data.datasets[0].borderColor, 'rgba(16, 185, 129, 1)', 'Charts pick up the new scheme color');
+}
+
+{
+    let monitoringFactory;
+    const monitoringSource = readFileSync(new URL('../../resources/js/alpine/components/admin/monitoring.js', import.meta.url), 'utf8')
+        .replace(/^import .*$/gm, '');
+    runInNewContext(monitoringSource, {
+        Alpine: { data: (_name, callback) => { monitoringFactory = callback; } },
+        window: { addEventListener() {}, removeEventListener() {} },
+        document: { addEventListener() {}, removeEventListener() {} },
+    });
+    const monitoring = monitoringFactory();
+    monitoring.render = () => {};
+    const focused = [];
+    const tabs = ['overview', 'releases', 'queues'].map(key => ({ dataset: { tabKey: key }, focus: () => focused.push(key) }));
+    let prevented = false;
+    monitoring.onTabKeydown({ key: 'ArrowLeft', target: tabs[0], currentTarget: { querySelectorAll: () => tabs }, preventDefault: () => { prevented = true; } });
+    assert.equal(monitoring.active, 'queues', 'ArrowLeft wraps to the last tab');
+    assert.equal(focused.join(), 'queues');
+    assert.equal(prevented, true);
+    monitoring.onTabKeydown({ key: 'Home', target: tabs[2], currentTarget: { querySelectorAll: () => tabs }, preventDefault() {} });
+    assert.equal(monitoring.active, 'overview');
+}
+
 let passwordFactory;
 loadComponent('components/password-toggle.js', {
     Alpine: { data: (_name, callback) => { passwordFactory = callback; } },

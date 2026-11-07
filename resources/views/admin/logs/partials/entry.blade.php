@@ -7,14 +7,14 @@
         <span x-show="entry.line" class="text-gray-400 dark:text-gray-500" x-text="lineLabel(entry)"></span>
         <span class="ml-auto flex items-center gap-1 opacity-70 transition group-hover:opacity-100">
             @if($showOpenInFile)
-                <button type="button" class="rounded px-1.5 py-0.5 text-gray-500 hover:bg-gray-100 hover:text-gray-800 dark:hover:bg-gray-800 dark:hover:text-gray-200" title="Open this entry in its file" @click="openInFile(entry)">
+                <button aria-label="Open this entry in its file" type="button" class="rounded px-1.5 py-0.5 text-gray-500 hover:bg-gray-100 hover:text-gray-800 dark:hover:bg-gray-800 dark:hover:text-gray-200" title="Open this entry in its file" @click="openInFile(entry)">
                     <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i>
                 </button>
             @endif
-            <button type="button" x-show="entry.truncated" class="rounded px-1.5 py-0.5 text-gray-500 hover:bg-gray-100 hover:text-gray-800 dark:hover:bg-gray-800 dark:hover:text-gray-200" title="Load the full entry" @click="showFullEntry(entry)">
+            <button aria-label="Load the full entry" type="button" x-show="entry.truncated" class="rounded px-1.5 py-0.5 text-gray-500 hover:bg-gray-100 hover:text-gray-800 dark:hover:bg-gray-800 dark:hover:text-gray-200" title="Load the full entry" @click="showFullEntry(entry)">
                 <i class="fas fa-up-right-and-down-left-from-center" aria-hidden="true"></i>
             </button>
-            <button type="button" class="rounded px-1.5 py-0.5 text-gray-500 hover:bg-gray-100 hover:text-gray-800 dark:hover:bg-gray-800 dark:hover:text-gray-200" title="Copy entry" @click="copyEntry(entry)">
+            <button aria-label="Copy entry" type="button" class="rounded px-1.5 py-0.5 text-gray-500 hover:bg-gray-100 hover:text-gray-800 dark:hover:bg-gray-800 dark:hover:text-gray-200" title="Copy entry" @click="copyEntry(entry)">
                 <i class="fas" :class="copyIconClass(entry)" aria-hidden="true"></i>
             </button>
         </span>
@@ -31,7 +31,7 @@
 
     <template x-if="entry._hasBody">
         <div class="mt-1">
-            <button type="button" class="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:underline dark:text-blue-400" @click="toggleEntry(entry)">
+            <button type="button" class="inline-flex items-center gap-1 text-xs font-medium text-link hover:underline dark:text-primary-400" @click="toggleEntry(entry)">
                 <i class="fas text-[10px]" :class="isExpanded(entry) ? 'fa-chevron-down' : 'fa-chevron-right'" aria-hidden="true"></i>
                 <span x-text="isExpanded(entry) ? 'Hide details' : 'Show details'"></span>
             </button>

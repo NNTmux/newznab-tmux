@@ -2,19 +2,9 @@
 
 @section('content')
 <div class="space-y-6">
+    <x-admin.page-header :title="$title" icon="fas fa-shield-alt" />
     <x-admin.card>
-        <x-admin.page-header :title="$title" icon="fas fa-shield-alt" />
 
-        @if(session('success'))
-            <div class="mx-6 mt-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg text-green-800 dark:text-green-200">
-                <i class="fas fa-check-circle mr-2"></i>{{ session('success') }}
-            </div>
-        @endif
-        @if(session('error'))
-            <div class="mx-6 mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-800 dark:text-red-200">
-                <i class="fas fa-exclamation-circle mr-2"></i>{{ session('error') }}
-            </div>
-        @endif
 
         <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
             <form method="get" action="{{ route('admin.gdpr-requests.index') }}" class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
@@ -37,8 +27,8 @@
                     </select>
                 </div>
                 <div class="flex gap-2">
-                    <button type="submit" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700">
-                        <i class="fas fa-filter mr-2"></i>Filter
+                    <button type="submit" class="px-4 py-2 bg-accent dark:bg-accent-hover text-white rounded-md hover:bg-accent-hover">
+                        <i aria-hidden="true" class="fas fa-filter mr-2"></i>Filter
                     </button>
                     <a href="{{ route('admin.gdpr-requests.index') }}" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600">Clear</a>
                 </div>
@@ -70,8 +60,8 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ formatDateTime($gdprRequest->completed_at) ?: '—' }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                <a href="{{ route('admin.gdpr-requests.show', $gdprRequest) }}" class="text-blue-600 dark:text-blue-400 hover:underline">
-                                    <i class="fas fa-eye mr-1"></i>View
+                                <a href="{{ route('admin.gdpr-requests.show', $gdprRequest) }}" class="text-link dark:text-primary-400 hover:underline">
+                                    <i aria-hidden="true" class="fas fa-eye mr-1"></i>View
                                 </a>
                             </td>
                         </tr>

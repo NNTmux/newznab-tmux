@@ -67,4 +67,22 @@ final class SettingsPageCatalogTest extends TestCase
         $this->assertSame('Process Movies', $fields[1]->label);
         $this->assertSame([0 => 'Disabled', 1 => 'All releases', 2 => 'Renamed releases only'], $fields[1]->options);
     }
+
+    public function test_every_page_field_appears_in_exactly_one_section(): void
+    {
+        $catalog = new SettingsPageCatalog;
+
+        foreach (ConfigurationDomain::cases() as $domain) {
+            $sections = $catalog->sectionsForPage($domain);
+            $sectioned = array_map(static fn ($field): string => $field->column, array_merge(...array_values($sections)));
+
+            $this->assertSame(
+                array_map(static fn ($field): string => $field->column, $catalog->fieldsForPage($domain)),
+                array_values(array_intersect(array_map(static fn ($field): string => $field->column, $catalog->fieldsForPage($domain)), $sectioned)),
+                "{$domain->value} lost a field while grouping",
+            );
+            $this->assertCount(count($catalog->fieldsForPage($domain)), $sectioned, "{$domain->value} duplicated a field");
+            $this->assertNotContains([], $sections);
+        }
+    }
 }

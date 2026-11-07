@@ -1,18 +1,19 @@
 @extends('layouts.main')
 
 @section('content')
+<x-page-header title="Trending movies" eyebrow="Popular right now" description="Most downloaded movies in the last 48 hours, refreshed every hour." icon="fas fa-fire">
+    <x-slot:stats>
+        <span class="workspace-hero__stat"><i class="fas fa-ranking-star" aria-hidden="true"></i>{{ isset($trendingMovies) ? number_format($trendingMovies->count()) : 0 }} trending</span>
+    </x-slot:stats>
+    <x-slot:actions>
+        @if(auth()->check())
+            <a href="{{ url('/rss/trending-movies?dl=1&api_token='.auth()->user()->api_token) }}" class="workspace-hero__action" title="RSS Feed"><i class="fas fa-rss" aria-hidden="true"></i>RSS Feed</a>
+        @endif
+        <a href="{{ route('Movies') }}" class="workspace-hero__action"><i class="fas fa-film" aria-hidden="true"></i>Browse all movies</a>
+    </x-slot:actions>
+</x-page-header>
+
 <div class="surface-panel rounded-xl shadow-sm">
-    <x-page-header title="Trending movies" eyebrow="Popular right now" description="Most downloaded movies in the last 48 hours, refreshed every hour." icon="fas fa-fire">
-        <x-slot:stats>
-            <span class="workspace-hero__stat"><i class="fas fa-ranking-star" aria-hidden="true"></i>{{ isset($trendingMovies) ? number_format($trendingMovies->count()) : 0 }} trending</span>
-        </x-slot:stats>
-        <x-slot:actions>
-            @if(auth()->check())
-                <a href="{{ url('/rss/trending-movies?dl=1&api_token='.auth()->user()->api_token) }}" class="workspace-hero__action" title="RSS Feed"><i class="fas fa-rss" aria-hidden="true"></i>RSS Feed</a>
-            @endif
-            <a href="{{ route('Movies') }}" class="workspace-hero__action"><i class="fas fa-film" aria-hidden="true"></i>Browse all movies</a>
-        </x-slot:actions>
-    </x-page-header>
 
     <!-- Trending Movies List -->
     @if(isset($trendingMovies) && $trendingMovies->count() > 0)
@@ -24,7 +25,7 @@
                             <!-- Rank Badge -->
                             <div class="absolute top-4 left-4 z-10">
                                 <div class="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg
-                                    {{ $index < 3 ? 'bg-linear-to-br from-yellow-400 to-yellow-600' : 'bg-linear-to-br from-gray-400 to-gray-600' }}">
+                                    {{ $index < 3 ? 'bg-linear-to-br from-warning-400 to-warning-600' : 'bg-linear-to-br from-gray-400 to-gray-600' }}">
                                     #{{ $index + 1 }}
                                 </div>
                             </div>
@@ -36,13 +37,13 @@
                                         <img src="{{ $movie->cover }}" alt="{{ $movie->title }}" class="w-full md:w-64 h-96 object-cover rounded-xl shadow-xl" loading="lazy">
                                     @else
                                         <div class="w-full md:w-64 h-96 bg-gray-200 dark:bg-gray-700 flex items-center justify-center rounded-xl shadow-xl">
-                                            <i class="fas fa-film text-gray-400 text-5xl"></i>
+                                            <i aria-hidden="true" class="fas fa-film text-gray-400 text-5xl"></i>
                                         </div>
                                     @endif
                                 </a>
                                 <!-- Download Badge -->
                                 <div class="absolute bottom-4 right-4 bg-primary-500 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg">
-                                    <i class="fas fa-download mr-1"></i>{{ number_format($movie->total_downloads) }}
+                                    <i aria-hidden="true" class="fas fa-download mr-1"></i>{{ number_format($movie->total_downloads) }}
                                 </div>
                             </div>
 
@@ -51,7 +52,7 @@
                                 <div class="flex flex-col h-full">
                                     <!-- Title and Info -->
                                     <div class="flex-1">
-                                        <a href="{{ route('movie.view', ['imdbid' => $movie->imdbid]) }}" class="hover:text-primary-600 dark:hover:text-primary-400">
+                                        <a href="{{ route('movie.view', ['imdbid' => $movie->imdbid]) }}" class="hover:text-link dark:hover:text-primary-400">
                                             <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
                                                 {{ $movie->title }}
                                             </h2>
@@ -60,34 +61,34 @@
                                         <div class="flex flex-wrap items-center gap-4 mb-4 text-sm text-gray-600 dark:text-gray-400">
                                             @if($movie->year)
                                                 <span class="inline-flex items-center">
-                                                    <i class="fas fa-calendar mr-1"></i> {{ $movie->year }}
+                                                    <i aria-hidden="true" class="fas fa-calendar mr-1"></i> {{ $movie->year }}
                                                 </span>
                                             @endif
                                             @if($movie->rating)
-                                                <span class="inline-flex items-center text-yellow-600">
-                                                    <i class="fas fa-star mr-1"></i> {{ $movie->rating }}/10
+                                                <span class="inline-flex items-center text-warning-600">
+                                                    <i aria-hidden="true" class="fas fa-star mr-1"></i> {{ $movie->rating }}/10
                                                 </span>
                                             @endif
-                                            <span class="inline-flex items-center text-primary-600 dark:text-primary-400">
-                                                <i class="fas fa-film mr-1"></i> {{ $movie->release_count }} Release{{ $movie->release_count > 1 ? 's' : '' }}
+                                            <span class="inline-flex items-center text-link dark:text-primary-400">
+                                                <i aria-hidden="true" class="fas fa-film mr-1"></i> {{ $movie->release_count }} Release{{ $movie->release_count > 1 ? 's' : '' }}
                                             </span>
                                         </div>
 
                                         <!-- External Links -->
                                         <div class="flex items-center gap-2 mb-4 text-xs flex-wrap">
                                             @if($movie->imdbid)
-                                                <a href="{{ $site->dereferrerLink }}https://www.imdb.com/title/tt{{ $movie->imdbid }}" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200 transition">
-                                                    <i class="fab fa-imdb mr-1"></i> IMDb
+                                                <a href="{{ $site->dereferrerLink }}https://www.imdb.com/title/tt{{ $movie->imdbid }}" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-warning-100 dark:bg-warning-900/40 text-warning-800 dark:text-warning-200 rounded-lg hover:bg-warning-200 transition">
+                                                    <i aria-hidden="true" class="fab fa-imdb mr-1"></i> IMDb
                                                 </a>
                                             @endif
                                             @if($movie->tmdbid)
                                                 <a href="{{ $site->dereferrerLink }}https://www.themoviedb.org/movie/{{ $movie->tmdbid }}" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-primary-100 text-primary-800 rounded-lg hover:bg-primary-200 transition dark:bg-primary-900/30 dark:text-primary-200 dark:hover:bg-primary-800/30">
-                                                    <i class="fas fa-film mr-1"></i> TMDb
+                                                    <i aria-hidden="true" class="fas fa-film mr-1"></i> TMDb
                                                 </a>
                                             @endif
                                             @if($movie->traktid)
-                                                <a href="{{ $site->dereferrerLink }}https://trakt.tv/movies/{{ $movie->traktid }}" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-red-100 text-red-800 rounded-lg hover:bg-red-200 transition">
-                                                    <i class="fas fa-heart mr-1"></i> Trakt
+                                                <a href="{{ $site->dereferrerLink }}https://trakt.tv/movies/{{ $movie->traktid }}" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-200 rounded-lg hover:bg-red-200 transition">
+                                                    <i aria-hidden="true" class="fas fa-heart mr-1"></i> Trakt
                                                 </a>
                                             @endif
                                         </div>
@@ -109,11 +110,11 @@
 
                                     <!-- Action Buttons -->
                                     <div class="flex gap-3 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                                        <a href="{{ route('movie.view', ['imdbid' => $movie->imdbid]) }}" class="inline-flex items-center px-6 py-2.5 bg-primary-600 dark:bg-primary-700 text-white font-medium rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 transition shadow-md">
-                                            <i class="fas fa-eye mr-2"></i> View All Releases
+                                        <a href="{{ route('movie.view', ['imdbid' => $movie->imdbid]) }}" class="inline-flex items-center px-6 py-2.5 bg-accent dark:bg-accent-hover text-white font-medium rounded-lg hover:bg-accent-hover dark:hover:bg-primary-800 transition shadow-md">
+                                            <i aria-hidden="true" class="fas fa-eye mr-2"></i> View All Releases
                                         </a>
                                         <a href="{{ route('Movies') }}?title={{ urlencode($movie->title) }}" class="inline-flex items-center px-6 py-2.5 bg-gray-600 text-white font-medium rounded-lg hover:bg-gray-700 transition shadow-md">
-                                            <i class="fas fa-search mr-2"></i> Search Similar
+                                            <i aria-hidden="true" class="fas fa-search mr-2"></i> Search Similar
                                         </a>
                                     </div>
                                 </div>
@@ -137,7 +138,7 @@
     <!-- Info Box -->
     <div class="px-6 py-4 surface-panel-alt border-t">
         <div class="flex items-start gap-3">
-            <i class="fas fa-info-circle text-primary-500 mt-1"></i>
+            <i aria-hidden="true" class="fas fa-info-circle text-primary-500 mt-1"></i>
             <div class="text-sm text-gray-700 dark:text-gray-300">
                 <strong>About Trending Movies:</strong> This list shows the top 15 most downloaded movies on our platform <strong>in the last 48 hours</strong>.
                 The rankings are updated automatically every hour based on recent download activity.

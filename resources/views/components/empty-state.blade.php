@@ -14,7 +14,7 @@
     <h3 class="mb-2 text-xl font-semibold tracking-tight text-gray-900 dark:text-gray-100">{{ $title }}</h3>
     <p class="mx-auto mb-5 max-w-md text-sm leading-6 text-gray-500 dark:text-gray-400">{{ $message }}</p>
     @if($actionUrl && $actionLabel)
-        <a href="{{ $actionUrl }}" class="inline-flex min-h-11 items-center gap-2 rounded-xl bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 dark:bg-primary-700 dark:hover:bg-primary-600">
+        <a href="{{ $actionUrl }}" class="inline-flex min-h-11 items-center gap-2 rounded-xl bg-accent px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 dark:bg-accent-hover dark:hover:bg-accent">
             @if($actionIcon)
                 <i class="{{ $actionIcon }}" aria-hidden="true"></i>
             @endif

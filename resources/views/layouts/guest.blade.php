@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="color-scheme" content="light dark">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="theme-preference" content="system">
+    @include('partials.theme-meta')
 
     {{-- Apply dark mode BEFORE any CSS loads to prevent white flash --}}
     @include('partials.theme-init')

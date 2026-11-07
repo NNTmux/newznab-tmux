@@ -32,6 +32,7 @@ Alpine.store('theme', {
             ? (schemeMeta ? schemeMeta.content : (schemeData?.dataset?.colorScheme || 'blue'))
             : storedScheme;
         this.colorScheme = colorSchemes.includes(preferredScheme) ? preferredScheme : 'blue';
+        if (isAuth && isAuth.content === 'true') this._mirrorToStorage();
 
         this.apply();
         this.applyScheme();
@@ -110,9 +111,9 @@ Alpine.store('theme', {
         document.querySelectorAll('.dropdown-theme-btn, .mobile-theme-btn').forEach(function(btn) {
             var isActive = btn.dataset.theme === self.current;
             btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
-            btn.classList.remove('bg-primary-600', 'bg-blue-600', 'text-white', 'text-gray-300', 'hover:bg-gray-800', 'hover:bg-gray-700', 'hover:text-white');
+            btn.classList.remove('bg-accent', 'text-white', 'text-gray-300', 'hover:bg-gray-800', 'hover:bg-gray-700', 'hover:text-white');
             if (isActive) {
-                btn.classList.add('bg-primary-600', 'text-white');
+                btn.classList.add('bg-accent', 'text-white');
             } else {
                 btn.classList.add('text-gray-300', 'hover:text-white');
                 if (btn.classList.contains('mobile-theme-btn')) {
@@ -156,12 +157,17 @@ Alpine.store('theme', {
         });
     },
 
-    /** Persist theme and color scheme to server (authenticated) or localStorage (guest) */
+    /**
+     * Persist theme and color scheme. Always mirrored to localStorage so pages rendered
+     * without a session (error pages) can match; signed-in users are also saved server-side.
+     */
     _save() {
         const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
         const url = document.querySelector('meta[name="update-theme-url"]')?.content;
         const isAuth = document.querySelector('meta[name="user-authenticated"]');
         const payload = { theme_preference: this.current, color_scheme: this.colorScheme };
+
+        this._mirrorToStorage();
 
         if (isAuth && isAuth.content === 'true' && url && csrf) {
             fetch(url, {
@@ -169,13 +175,16 @@ Alpine.store('theme', {
                 headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf },
                 body: JSON.stringify(payload)
             }).catch(err => console.error('Error saving theme:', err));
-        } else {
-            try {
-                localStorage.setItem('theme', this.current);
-                localStorage.setItem('color_scheme', this.colorScheme);
-            } catch (_error) {
-                // Keep the selected theme for this page when persistence is unavailable.
-            }
+        }
+    },
+
+    /** Copy the active theme to localStorage; silently skipped when storage is blocked. */
+    _mirrorToStorage() {
+        try {
+            localStorage.setItem('theme', this.current);
+            localStorage.setItem('color_scheme', this.colorScheme);
+        } catch (_error) {
+            // Keep the selected theme for this page when persistence is unavailable.
         }
     }
 });

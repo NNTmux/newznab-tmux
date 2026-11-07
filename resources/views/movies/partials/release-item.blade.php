@@ -8,7 +8,7 @@
         <div class="release-card-container">
             <div class="release-info-wrapper min-w-0 flex-1">
                 <a href="{{ url('/details/' . $release->guid) }}"
-                   class="line-clamp-2 block break-all text-sm font-semibold leading-5 text-gray-800 hover:text-primary-600 dark:text-gray-200 dark:hover:text-primary-400"
+                   class="line-clamp-2 block break-all text-sm font-semibold leading-5 text-gray-800 hover:text-link dark:text-gray-200 dark:hover:text-primary-400"
                    title="{{ $release->searchname }}">
                     {{ $release->searchname }}
                 </a>

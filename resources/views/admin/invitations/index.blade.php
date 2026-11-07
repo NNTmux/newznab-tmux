@@ -2,18 +2,17 @@
 
 @section('content')
 <div class="space-y-6">
+    <x-admin.page-header :title="$title" icon="fas fa-envelope">
+        <x-slot:actions>
+            <form method="POST" action="{{ url('admin/invitations/cleanup') }}" class="inline">
+                @csrf
+                <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                    <i aria-hidden="true" class="fas fa-trash mr-2"></i>Cleanup Expired
+                </button>
+            </form>
+        </x-slot:actions>
+    </x-admin.page-header>
     <x-admin.card>
-        <!-- Header -->
-        <x-admin.page-header :title="$title" icon="fas fa-envelope">
-            <x-slot:actions>
-                <form method="POST" action="{{ url('admin/invitations/cleanup') }}" class="inline">
-                    @csrf
-                    <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
-                        <i class="fas fa-trash mr-2"></i>Cleanup Expired
-                    </button>
-                </form>
-            </x-slot:actions>
-        </x-admin.page-header>
 
         <!-- Statistics Cards -->
         <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
@@ -24,11 +23,11 @@
                 </div>
                 <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow border border-gray-200 dark:border-gray-700">
                     <div class="text-sm text-gray-500 dark:text-gray-400">Pending</div>
-                    <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">{{ $stats['pending'] }}</div>
+                    <div class="text-2xl font-bold text-link dark:text-primary-400">{{ $stats['pending'] }}</div>
                 </div>
                 <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow border border-gray-200 dark:border-gray-700">
                     <div class="text-sm text-gray-500 dark:text-gray-400">Used</div>
-                    <div class="text-2xl font-bold text-green-600 dark:text-green-400">{{ $stats['used'] }}</div>
+                    <div class="text-2xl font-bold text-success-600 dark:text-success-400">{{ $stats['used'] }}</div>
                 </div>
                 <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow border border-gray-200 dark:border-gray-700">
                     <div class="text-sm text-gray-500 dark:text-gray-400">Expired</div>
@@ -63,7 +62,7 @@
                                name="email"
                                value="{{ $email }}"
                                placeholder="Filter by email"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">
                     </div>
                     <div>
                         <label for="invited_by" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Invited By</label>
@@ -72,11 +71,11 @@
                                name="invited_by"
                                value="{{ $invited_by }}"
                                placeholder="Filter by inviter username"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">
                     </div>
                     <div>
                         <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
-                        <select name="status" id="status" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                        <select name="status" id="status" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">
                             @foreach($statusOptions as $key => $label)
                                 <option value="{{ $key }}" {{ $status === $key ? 'selected' : '' }}>{{ $label }}</option>
                             @endforeach
@@ -84,7 +83,7 @@
                     </div>
                     <div>
                         <label for="ob" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Order By</label>
-                        <select name="ob" id="ob" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                        <select name="ob" id="ob" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">
                             <option value="created_at_desc" {{ $orderBy === 'created_at_desc' ? 'selected' : '' }}>Created (Newest)</option>
                             <option value="created_at_asc" {{ $orderBy === 'created_at_asc' ? 'selected' : '' }}>Created (Oldest)</option>
                             <option value="expires_at_desc" {{ $orderBy === 'expires_at_desc' ? 'selected' : '' }}>Expires (Latest)</option>
@@ -95,11 +94,11 @@
                     </div>
                 </div>
                 <div class="mt-4 flex space-x-2">
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                        <i class="fas fa-filter mr-2"></i>Filter
+                    <button type="submit" class="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent-hover">
+                        <i aria-hidden="true" class="fas fa-filter mr-2"></i>Filter
                     </button>
                     <a href="{{ url('admin/invitations') }}" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
-                        <i class="fas fa-times mr-2"></i>Clear
+                        <i aria-hidden="true" class="fas fa-times mr-2"></i>Clear
                     </a>
                 </div>
             </form>
@@ -112,7 +111,7 @@
                 <x-admin.data-table>
                     <x-slot:head>
                         <x-admin.th>
-                            <input type="checkbox" id="select_all" class="rounded">
+                            <input aria-label="Select item" type="checkbox" id="select_all" class="rounded">
                         </x-admin.th>
                         <x-admin.th>Email</x-admin.th>
                         <x-admin.th>Invited By</x-admin.th>
@@ -125,7 +124,7 @@
                         @forelse($invitations as $invitation)
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                                 <td class="px-6 py-4 whitespace-nowrap text-center">
-                                    <input type="checkbox" name="invitation_ids[]" value="{{ $invitation->id }}" class="rounded invitation-checkbox">
+                                    <input aria-label="Select item" type="checkbox" name="invitation_ids[]" value="{{ $invitation->id }}" class="rounded invitation-checkbox">
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
                                     {{ $invitation->email }}
@@ -135,20 +134,20 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @if($invitation->used_at)
-                                        <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                                            <i class="fas fa-check-circle mr-1"></i>Used
+                                        <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-success-100 text-success-800 dark:bg-success-900 dark:text-success-200">
+                                            <i aria-hidden="true" class="fas fa-check-circle mr-1"></i>Used
                                         </span>
                                     @elseif(!$invitation->is_active)
-                                        <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
-                                            <i class="fas fa-ban mr-1"></i>Cancelled
+                                        <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-warning-100 text-warning-800 dark:bg-warning-900 dark:text-warning-200">
+                                            <i aria-hidden="true" class="fas fa-ban mr-1"></i>Cancelled
                                         </span>
                                     @elseif($invitation->expires_at && $invitation->expires_at->isPast())
                                         <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
-                                            <i class="fas fa-clock mr-1"></i>Expired
+                                            <i aria-hidden="true" class="fas fa-clock mr-1"></i>Expired
                                         </span>
                                     @else
-                                        <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                                            <i class="fas fa-hourglass-half mr-1"></i>Pending
+                                        <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-200">
+                                            <i aria-hidden="true" class="fas fa-hourglass-half mr-1"></i>Pending
                                         </span>
                                     @endif
                                 </td>
@@ -159,14 +158,14 @@
                                     {{ $invitation->expires_at ? formatDateTime($invitation->expires_at) : 'Never' }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                    <a href="{{ url('admin/invitations/' . $invitation->id) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">
-                                        <i class="fas fa-eye"></i>
+                                    <a aria-label="View" href="{{ url('admin/invitations/' . $invitation->id) }}" class="text-link dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300">
+                                        <i aria-hidden="true" class="fas fa-eye"></i>
                                     </a>
                                     @if(!$invitation->used_at)
                                         <form method="POST" action="{{ url('admin/invitations/' . $invitation->id . '/resend') }}" class="inline">
                                             @csrf
-                                            <button type="submit" class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300" title="Resend">
-                                                <i class="fas fa-paper-plane"></i>
+                                            <button aria-label="Resend" type="submit" class="text-success-600 dark:text-success-400 hover:text-success-900 dark:hover:text-success-300" title="Resend">
+                                                <i aria-hidden="true" class="fas fa-paper-plane"></i>
                                             </button>
                                         </form>
                                         <form method="POST" action="{{ url('admin/invitations/' . $invitation->id . '/cancel') }}" class="inline"
@@ -177,8 +176,8 @@
                                               data-confirm-text="Cancel Invitation"
                                               @submit.prevent="submit()">
                                             @csrf
-                                            <button type="submit" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300" title="Cancel">
-                                                <i class="fas fa-ban"></i>
+                                            <button aria-label="Cancel" type="submit" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300" title="Cancel">
+                                                <i aria-hidden="true" class="fas fa-ban"></i>
                                             </button>
                                         </form>
                                     @endif
@@ -221,7 +220,7 @@
     <x-admin.card class="mt-8">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
-                <i class="fas fa-trophy mr-2"></i>Top Inviters
+                <i aria-hidden="true" class="fas fa-trophy mr-2"></i>Top Inviters
             </h2>
         </div>
         <div class="p-6">
@@ -249,7 +248,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
                                     {{ $user['total_invitations'] ?? 0 }}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600 dark:text-green-400 font-semibold">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-success-600 dark:text-success-400 font-semibold">
                                     {{ $user['successful_invitations'] ?? 0 }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
@@ -260,7 +259,7 @@
                                     @endphp
                                     <div class="flex items-center">
                                         <div class="w-16 bg-gray-200 dark:bg-gray-700 rounded-full h-2 mr-2">
-                                            <div class="bg-green-600 dark:bg-green-500 h-2 rounded-full" style="width: {{ $rate }}%"></div>
+                                            <div class="bg-success-600 dark:bg-success-500 h-2 rounded-full" style="width: {{ $rate }}%"></div>
                                         </div>
                                         <span>{{ $rate }}%</span>
                                     </div>

@@ -10,11 +10,11 @@
     </x-page-header>
 
     <!-- RSS Feed Info Card -->
-    <div class="info-card-gradient border-l-4 border-blue-500 rounded-lg p-5 mb-6 shadow">
+    <div class="info-card-gradient border-l-4 border-primary-500 rounded-lg p-5 mb-6 shadow">
         <div class="flex items-start">
             <div class="shrink-0">
-                <div class="flex items-center justify-center h-10 w-10 rounded-lg bg-blue-500 text-white">
-                    <i class="fa fa-rss text-lg"></i>
+                <div class="flex items-center justify-center h-10 w-10 rounded-lg bg-primary-500 text-white">
+                    <i aria-hidden="true" class="fa-solid fa-rss text-lg"></i>
                 </div>
             </div>
             <div class="ml-4 flex-1">
@@ -22,8 +22,8 @@
                 <p class="text-sm text-gray-700 dark:text-gray-300">
                     Using 'My Movies' you can search for movies and add them to a wishlist. If the movie becomes available it will be added to your
                     <a href="{{ url("/rss/mymovies?dl=1&i={$userdata->id}&api_token={$userdata->api_token}") }}"
-                       class="font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline inline-flex items-center">
-                        <i class="fa fa-rss mr-1"></i>personal RSS feed
+                       class="font-semibold text-link dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 underline inline-flex items-center">
+                        <i aria-hidden="true" class="fa-solid fa-rss mr-1"></i>personal RSS feed
                     </a>
                     for automatic downloading.
                 </p>
@@ -33,15 +33,15 @@
 
     <!-- Action Buttons -->
     <div class="flex flex-wrap gap-3 mb-6">
-        <a class="px-6 py-3 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 shadow-md hover:shadow-lg transition-all duration-200 inline-flex items-center font-medium"
+        <a class="px-6 py-3 bg-accent dark:bg-accent-hover text-white rounded-lg hover:bg-accent-hover dark:hover:bg-primary-800 shadow-md hover:shadow-lg transition-all duration-200 inline-flex items-center font-medium"
            href="{{ url('/browse/Movies') }}"
            title="Browse all available movies">
-            <i class="fa fa-list mr-2"></i>Browse All Movies
+            <i aria-hidden="true" class="fa-solid fa-list mr-2"></i>Browse All Movies
         </a>
         <a class="px-6 py-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500 shadow-md hover:shadow-lg transition-all duration-200 inline-flex items-center font-medium"
            href="{{ url("/rss/mymovies?dl=1&i={$userdata->id}&api_token={$userdata->api_token}") }}"
            title="All movies in your watchlist as an RSS feed">
-            <i class="fa fa-rss mr-2 text-orange-500"></i>RSS Feed
+            <i aria-hidden="true" class="fa-solid fa-rss mr-2 text-orange-500"></i>RSS Feed
         </a>
     </div>
 
@@ -52,8 +52,8 @@
             <div class="table-header-gradient px-6 py-4 border-b-2 border-gray-300 dark:border-gray-600">
                 <div class="flex items-center justify-between">
                     <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center">
-                        <i class="fa fa-bookmark mr-2 text-blue-600"></i>
-                        Your Movies <span class="ml-2 px-3 py-1 bg-blue-600 dark:bg-blue-700 text-white text-sm rounded-full font-bold">{{ count($movies) }}</span>
+                        <i aria-hidden="true" class="fa-solid fa-bookmark mr-2 text-link"></i>
+                        Your Movies <span class="ml-2 px-3 py-1 bg-accent dark:bg-accent-hover text-white text-sm rounded-full font-bold">{{ count($movies) }}</span>
                     </h2>
                 </div>
             </div>
@@ -62,7 +62,7 @@
             <div class="hidden lg:block">
                 <div class="divide-y divide-gray-200 dark:divide-gray-700">
                     @foreach($movies as $movie)
-                        <div class="p-6 hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors duration-150">
+                        <div class="p-6 hover:bg-primary-50 dark:hover:bg-gray-700 transition-colors duration-150">
                             <div class="flex gap-6">
                                 <!-- Movie Poster -->
                                 <div class="shrink-0">
@@ -78,7 +78,7 @@
                                         <div class="flex-1">
                                             <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-1">
                                                 <a href="{{ url("/Movies?imdb={$movie['imdbid']}") }}"
-                                                   class="hover:text-blue-600 dark:text-blue-400 transition-colors">
+                                                   class="hover:text-link dark:text-primary-400 transition-colors">
                                                     {{ e($movie['title'] ?? '') }}
                                                     @if(!empty($movie['year']))
                                                         <span class="text-gray-500 font-normal">({{ $movie['year'] }})</span>
@@ -93,12 +93,12 @@
                                             <a class="inline-flex items-center px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 shadow hover:shadow-md transition-all duration-200 text-sm font-medium"
                                                href="{{ url("/mymovies?id=edit&imdb={$movie['imdbid']}") }}"
                                                title="Edit Categories">
-                                                <i class="fa fa-edit mr-1.5"></i>Edit
+                                                <i aria-hidden="true" class="fa-solid fa-edit mr-1.5"></i>Edit
                                             </a>
                                             <form method="POST" action="{{ url("/mymovies?id=delete&imdb={$movie['imdbid']}") }}" x-data="confirmForm" @submit.prevent="submit()" data-title="Remove Movie" data-message="Are you sure you want to remove this movie from your watchlist?" data-confirm-text="Remove" data-type="danger">
                                                 @csrf
                                                 <button type="submit" class="inline-flex items-center px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 dark:bg-red-700 shadow hover:shadow-md transition-all duration-200 text-sm font-medium" title="Remove from My Movies">
-                                                    <i class="fa fa-trash mr-1.5"></i>Delete
+                                                    <i aria-hidden="true" class="fa-solid fa-trash mr-1.5"></i>Delete
                                                 </button>
                                             </form>
                                         </div>
@@ -111,14 +111,14 @@
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                                         @if(!empty($movie['genre']))
                                             <div class="flex items-center text-sm">
-                                                <span class="font-semibold text-gray-700 dark:text-gray-300 mr-2"><i class="fa fa-tag mr-1 text-blue-600 dark:text-blue-400"></i>Genre:</span>
+                                                <span class="font-semibold text-gray-700 dark:text-gray-300 mr-2"><i aria-hidden="true" class="fa-solid fa-tag mr-1 text-link dark:text-primary-400"></i>Genre:</span>
                                                 <span class="text-gray-600 dark:text-gray-400">{{ e($movie['genre']) }}</span>
                                             </div>
                                         @endif
 
                                         @if(!empty($movie['director']))
                                             <div class="flex items-center text-sm">
-                                                <span class="font-semibold text-gray-700 dark:text-gray-300 mr-2"><i class="fa fa-video-camera mr-1 text-blue-600 dark:text-blue-400"></i>Director:</span>
+                                                <span class="font-semibold text-gray-700 dark:text-gray-300 mr-2"><i aria-hidden="true" class="fa-solid fa-video-camera mr-1 text-link dark:text-primary-400"></i>Director:</span>
                                                 <span class="text-gray-600 dark:text-gray-400">{{ e($movie['director']) }}</span>
                                             </div>
                                         @endif
@@ -126,23 +126,23 @@
 
                                     @if(!empty($movie['actors']))
                                         <div class="flex items-start text-sm mb-3">
-                                            <span class="font-semibold text-gray-700 dark:text-gray-300 mr-2 shrink-0"><i class="fa fa-users mr-1 text-blue-600 dark:text-blue-400"></i>Starring:</span>
+                                            <span class="font-semibold text-gray-700 dark:text-gray-300 mr-2 shrink-0"><i aria-hidden="true" class="fa-solid fa-users mr-1 text-link dark:text-primary-400"></i>Starring:</span>
                                             <span class="text-gray-600 dark:text-gray-400">{{ e($movie['actors']) }}</span>
                                         </div>
                                     @endif
 
                                     <div class="flex items-center gap-4 pt-3 border-t border-gray-200 dark:border-gray-700">
-                                        <span class="inline-flex items-center px-3 py-1.5 category-badge text-blue-800 text-xs font-semibold rounded-full border border-blue-200">
-                                            <i class="fa fa-folder-open mr-1.5"></i>{{ !empty($movie['categoryNames']) ? e($movie['categoryNames']) : 'All Categories' }}
+                                        <span class="inline-flex items-center px-3 py-1.5 category-badge text-primary-800 dark:text-primary-200 text-xs font-semibold rounded-full border border-primary-200">
+                                            <i aria-hidden="true" class="fa-solid fa-folder-open mr-1.5"></i>{{ !empty($movie['categoryNames']) ? e($movie['categoryNames']) : 'All Categories' }}
                                         </span>
                                         <span class="text-xs text-gray-500 dark:text-gray-400 flex items-center">
-                                            <i class="fa fa-calendar mr-1"></i>Added {{ isset($movie['created_at']) ? date('M d, Y', strtotime($movie['created_at'])) : '' }}
+                                            <i aria-hidden="true" class="fa-solid fa-calendar mr-1"></i>Added {{ isset($movie['created_at']) ? date('M d, Y', strtotime($movie['created_at'])) : '' }}
                                         </span>
-                                        <a class="inline-flex items-center px-3 py-1.5 bg-yellow-400 hover:bg-yellow-500 text-gray-900 dark:text-gray-100 text-xs font-semibold rounded-full transition-colors"
+                                        <a class="inline-flex items-center px-3 py-1.5 bg-warning-400 hover:bg-warning-500 text-gray-900 dark:text-gray-100 text-xs font-semibold rounded-full transition-colors"
                                            target="_blank"
                                            href="{{ $site->dereferrerLink }}http://www.imdb.com/title/tt{{ $movie['imdbid'] }}"
                                            title="View on IMDB">
-                                            <i class="fa fa-external-link mr-1"></i>IMDB
+                                            <i aria-hidden="true" class="fa-solid fa-external-link mr-1"></i>IMDB
                                         </a>
                                     </div>
                                 </div>
@@ -155,7 +155,7 @@
             <!-- Mobile/Tablet Card View -->
             <div class="lg:hidden">
                 @foreach($movies as $movie)
-                    <div class="p-6 border-b border-gray-200 dark:border-gray-700 hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors duration-150">
+                    <div class="p-6 border-b border-gray-200 dark:border-gray-700 hover:bg-primary-50 dark:hover:bg-gray-700 transition-colors duration-150">
                         <div class="flex gap-4 mb-4">
                             <div class="shrink-0">
                                 <img class="rounded-lg movie-poster-shadow w-24 h-36 object-cover"
@@ -166,7 +166,7 @@
                             <div class="flex-1 min-w-0">
                                 <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1">
                                     <a href="{{ url("/Movies?imdb={$movie['imdbid']}") }}"
-                                       class="hover:text-blue-600">
+                                       class="hover:text-link">
                                         {{ e($movie['title'] ?? '') }}
                                         @if(!empty($movie['year']))
                                             <span class="text-gray-500 text-sm">({{ $movie['year'] }})</span>
@@ -176,8 +176,8 @@
                                 @if(!empty($movie['tagline']))
                                     <p class="text-xs italic text-gray-600 dark:text-gray-400 mb-2">{{ e($movie['tagline']) }}</p>
                                 @endif
-                                <span class="inline-flex items-center px-2 py-1 category-badge text-blue-800 text-xs font-semibold rounded-full border border-blue-200">
-                                    <i class="fa fa-folder-open mr-1"></i>{{ !empty($movie['categoryNames']) ? e($movie['categoryNames']) : 'All' }}
+                                <span class="inline-flex items-center px-2 py-1 category-badge text-primary-800 dark:text-primary-200 text-xs font-semibold rounded-full border border-primary-200">
+                                    <i aria-hidden="true" class="fa-solid fa-folder-open mr-1"></i>{{ !empty($movie['categoryNames']) ? e($movie['categoryNames']) : 'All' }}
                                 </span>
                             </div>
                         </div>
@@ -188,25 +188,25 @@
 
                         <div class="flex items-center justify-between pt-3 border-t border-gray-200 dark:border-gray-700">
                             <div class="flex gap-2">
-                                <a class="inline-flex items-center px-3 py-1.5 bg-yellow-400 hover:bg-yellow-500 text-gray-900 text-xs font-semibold rounded-full transition-colors"
+                                <a class="inline-flex items-center px-3 py-1.5 bg-warning-400 hover:bg-warning-500 text-gray-900 dark:text-gray-100 text-xs font-semibold rounded-full transition-colors"
                                    target="_blank"
                                    href="{{ $site->dereferrerLink }}http://www.imdb.com/title/tt{{ $movie['imdbid'] }}">
-                                    <i class="fa fa-external-link mr-1"></i>IMDB
+                                    <i aria-hidden="true" class="fa-solid fa-external-link mr-1"></i>IMDB
                                 </a>
                                 <span class="text-xs text-gray-500 dark:text-gray-400 flex items-center">
-                                    <i class="fa fa-calendar mr-1"></i>{{ isset($movie['created_at']) ? date('M d, Y', strtotime($movie['created_at'])) : '' }}
+                                    <i aria-hidden="true" class="fa-solid fa-calendar mr-1"></i>{{ isset($movie['created_at']) ? date('M d, Y', strtotime($movie['created_at'])) : '' }}
                                 </span>
                             </div>
                             <div class="flex gap-2">
-                                <a class="px-3 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 text-sm font-medium shadow"
+                                <a aria-label="Edit" class="px-3 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 text-sm font-medium shadow"
                                    href="{{ url("/mymovies?id=edit&imdb={$movie['imdbid']}") }}"
                                    title="Edit">
-                                    <i class="fa fa-edit"></i>
+                                    <i aria-hidden="true" class="fa-solid fa-edit"></i>
                                 </a>
                                 <form method="POST" action="{{ url("/mymovies?id=delete&imdb={$movie['imdbid']}") }}" x-data="confirmForm" @submit.prevent="submit()" data-title="Remove Movie" data-message="Are you sure you want to remove this movie from your watchlist?" data-confirm-text="Remove" data-type="danger">
                                     @csrf
-                                    <button type="submit" class="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 dark:bg-red-700 text-sm font-medium shadow" title="Remove">
-                                        <i class="fa fa-trash"></i>
+                                    <button aria-label="Remove" type="submit" class="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 dark:bg-red-700 text-sm font-medium shadow" title="Remove">
+                                        <i aria-hidden="true" class="fa-solid fa-trash"></i>
                                     </button>
                                 </form>
                             </div>
@@ -220,15 +220,15 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
             <div class="text-center py-16 px-6">
                 <div class="mx-auto h-24 w-24 empty-state-bg rounded-full flex items-center justify-center mb-6 shadow-sm">
-                    <i class="fa fa-film text-5xl text-blue-600"></i>
+                    <i aria-hidden="true" class="fa-solid fa-film text-5xl text-link"></i>
                 </div>
                 <h3 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">No Movies in Watchlist</h3>
                 <p class="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
                     You haven't bookmarked any movies yet. Search for movies and add them to your watchlist.
                 </p>
                 <a href="{{ url('/browse/Movies') }}"
-                   class="inline-flex items-center px-6 py-3 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 shadow-md hover:shadow-lg transition-all duration-200 font-medium">
-                    <i class="fa fa-search mr-2"></i>Browse Movies
+                   class="inline-flex items-center px-6 py-3 bg-accent dark:bg-accent-hover text-white rounded-lg hover:bg-accent-hover dark:hover:bg-primary-800 shadow-md hover:shadow-lg transition-all duration-200 font-medium">
+                    <i aria-hidden="true" class="fa-solid fa-search mr-2"></i>Browse Movies
                 </a>
             </div>
         </div>

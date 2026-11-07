@@ -34,6 +34,49 @@ final class SettingsPageCatalog
         'tmux' => ['session_name', 'monitor_delay', 'niceness', 'sequential_mode', 'sequential_timer', 'binaries_enabled', 'binaries_timer', 'binaries_kill_timer', 'backfill_mode', 'backfill_groups', 'backfill_timer', 'progressive_backfill', 'releases_enabled', 'release_timer', 'post_mode', 'post_timer', 'post_kill_timer', 'post_amazon_mode', 'post_amazon_timer', 'post_non_mode', 'post_non_timer', 'fix_names_enabled', 'fix_timer', 'cleanup_mode', 'cleanup_timer', 'run_irc_scraper', 'console_enabled', 'htop_enabled', 'mytop_enabled', 'nmon_enabled', 'vnstat_enabled', 'vnstat_args', 'tcp_track_enabled', 'tcp_track_args', 'bwmng_enabled', 'redis_enabled', 'redis_args', 'write_logs', 'collections_kill_threshold', 'post_process_kill_threshold', 'colors_start', 'colors_end', 'cleanup_rules', 'color_exclusions'],
     ];
 
+    /**
+     * Visual grouping of each settings page. Columns not listed fall under "General".
+     *
+     * @var array<string, array<string, list<string>>>
+     */
+    private const array SECTIONS = [
+        'site' => [
+            'Identity' => ['title', 'home_link', 'site_logo', 'strapline'],
+            'Search engines' => ['meta_title', 'meta_description', 'meta_keywords'],
+            'Content & links' => ['footer', 'dereferrer_link', 'terms'],
+            'Trailers' => ['trailers_display', 'trailers_size_x', 'trailers_size_y'],
+        ],
+        'ingestion' => [
+            'Threads' => ['binary_threads', 'backfill_threads', 'release_threads'],
+            'Collections & releases' => ['collection_delay_hours', 'collection_timeout_hours', 'cross_post_hours', 'completion_percent', 'grab_status', 'max_headers_per_iteration', 'max_messages', 'max_releases_created', 'nntp_retries', 'nzb_split_level', 'min_files_to_form_release', 'min_size_to_form_release', 'max_size_to_form_release'],
+            'Retention' => ['part_retention_hours', 'release_retention_days', 'misc_other_retention_hours', 'misc_hashed_retention_hours'],
+            'New groups' => ['new_group_scan_method', 'new_group_days_to_scan', 'new_group_messages_to_scan'],
+            'Backfill' => ['safe_backfill_date', 'disable_backfill_group', 'backfill_days_mode', 'backfill_order', 'backfill_quantity'],
+            'Part repair' => ['part_repair', 'safe_part_repair', 'max_part_repair', 'part_repair_max_tries'],
+            'Categories & passwords' => ['categorize_foreign', 'categorize_web_dl', 'show_passworded_releases', 'delete_passworded_releases'],
+        ],
+        'post-processing' => [
+            'Video & movies' => ['post_non_mode', 'movie_lookup', 'max_movies_processed'],
+            'Threads' => ['post_threads', 'post_threads_amazon', 'post_threads_non', 'nfo_threads', 'fix_name_threads'],
+            'Timeouts & limits' => ['timeout_seconds', 'release_timeout_seconds', 'max_timeout_count', 'max_additional_processed', 'max_parts_processed', 'password_check_attempts', 'fix_names_per_run', 'max_nested_levels'],
+            'Archives & media' => ['extract_using_rar_info', 'segments_to_download', 'ffmpeg_duration', 'inner_file_blacklist', 'process_jpg', 'process_thumbnails', 'process_videos', 'save_audio_preview', 'min_size_to_post_process', 'max_size_to_post_process'],
+            'NFO & PAR2' => ['min_size_to_process_nfo', 'max_size_to_process_nfo', 'max_nfo_processed', 'max_nfo_retries', 'lookup_nfo', 'lookup_par2'],
+        ],
+        'metadata' => [
+            'Lookups' => ['anime_lookup', 'book_lookup', 'game_lookup', 'movie_lookup', 'music_lookup', 'tv_lookup'],
+            'Movies' => ['movie_language', 'imdb_alternate_url'],
+            'Batch limits' => ['max_anime_processed', 'max_books_processed', 'max_games_processed', 'max_movies_processed', 'max_music_processed', 'max_tv_processed', 'amazon_sleep_milliseconds'],
+        ],
+        'tmux' => [
+            'Session' => ['session_name', 'monitor_delay', 'niceness', 'sequential_mode', 'sequential_timer', 'write_logs'],
+            'Binaries & backfill' => ['binaries_enabled', 'binaries_timer', 'binaries_kill_timer', 'backfill_mode', 'backfill_groups', 'backfill_timer', 'progressive_backfill'],
+            'Releases & post-processing' => ['releases_enabled', 'release_timer', 'post_mode', 'post_timer', 'post_kill_timer', 'post_amazon_mode', 'post_amazon_timer', 'post_non_mode', 'post_non_timer', 'fix_names_enabled', 'fix_timer'],
+            'Cleanup' => ['cleanup_mode', 'cleanup_timer', 'cleanup_rules', 'collections_kill_threshold', 'post_process_kill_threshold'],
+            'Monitoring panes' => ['run_irc_scraper', 'console_enabled', 'htop_enabled', 'mytop_enabled', 'nmon_enabled', 'vnstat_enabled', 'vnstat_args', 'tcp_track_enabled', 'tcp_track_args', 'bwmng_enabled', 'redis_enabled', 'redis_args'],
+            'Colors' => ['colors_start', 'colors_end', 'color_exclusions'],
+        ],
+    ];
+
     /** @var list<string> */
     private const array BOOLEANS = ['trailers_display', 'grab_status', 'disable_backfill_group', 'part_repair', 'safe_part_repair', 'categorize_foreign', 'categorize_web_dl', 'show_passworded_releases', 'delete_passworded_releases', 'extract_using_rar_info', 'process_jpg', 'process_thumbnails', 'process_videos', 'save_audio_preview', 'lookup_nfo', 'lookup_par2', 'imdb_alternate_url', 'binaries_enabled', 'progressive_backfill', 'releases_enabled', 'fix_names_enabled', 'run_irc_scraper', 'console_enabled', 'htop_enabled', 'mytop_enabled', 'nmon_enabled', 'vnstat_enabled', 'tcp_track_enabled', 'bwmng_enabled', 'redis_enabled', 'write_logs'];
 
@@ -64,6 +107,28 @@ final class SettingsPageCatalog
     public function fields(ConfigurationDomain $domain): array
     {
         return array_map(fn (string $column): ConfigurationField => $this->field($domain, $column), self::COLUMNS[$domain->value]);
+    }
+
+    /**
+     * The page's fields grouped into titled sections, in display order.
+     *
+     * @return array<string, list<ConfigurationField>>
+     */
+    public function sectionsForPage(ConfigurationDomain $domain): array
+    {
+        $sectionOf = [];
+        foreach (self::SECTIONS[$domain->value] ?? [] as $section => $columns) {
+            foreach ($columns as $column) {
+                $sectionOf[$column] = $section;
+            }
+        }
+
+        $sections = array_fill_keys(array_keys(self::SECTIONS[$domain->value] ?? []), []);
+        foreach ($this->fieldsForPage($domain) as $field) {
+            $sections[$sectionOf[$field->column] ?? 'General'][] = $field;
+        }
+
+        return array_filter($sections, static fn (array $fields): bool => $fields !== []);
     }
 
     /** @return list<ConfigurationField> */

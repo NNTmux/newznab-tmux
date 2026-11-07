@@ -5,13 +5,13 @@
     <div class="max-w-md w-full space-y-8">
         <div class="text-center">
             <a href="{{ url('/') }}" class="inline-flex items-center justify-center mb-4">
-                <div class="w-16 h-16 bg-primary-600 dark:bg-primary-700 rounded-full flex items-center justify-center shadow-lg">
-                    <i class="fas fa-shield-alt text-3xl text-white"></i>
+                <div class="w-16 h-16 bg-accent dark:bg-accent-hover rounded-full flex items-center justify-center shadow-lg">
+                    <i aria-hidden="true" class="fas fa-shield-alt text-3xl text-white"></i>
                 </div>
             </a>
-            <h2 class="mt-4 text-3xl font-extrabold text-gray-900 dark:text-white">
+            <h1 class="mt-4 text-3xl font-extrabold text-gray-900 dark:text-white">
                 Two Factor Authentication
-            </h2>
+            </h1>
             <p class="mt-2 text-sm text-gray-700 dark:text-gray-300">
                 Enter the pin from your Google Authenticator app
             </p>
@@ -27,7 +27,7 @@
                         </label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <i class="fas fa-key text-gray-400"></i>
+                                <i aria-hidden="true" class="fas fa-key text-gray-400"></i>
                             </div>
                             <input
                                 id="one_time_password"
@@ -46,9 +46,9 @@
 
                     <button
                         type="submit"
-                        class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary-600 dark:bg-primary-700 hover:bg-primary-700 dark:hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition"
+                        class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-accent dark:bg-accent-hover hover:bg-accent-hover dark:hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition"
                     >
-                        <i class="fas fa-sign-in-alt mr-2"></i>
+                        <i aria-hidden="true" class="fas fa-sign-in-alt mr-2"></i>
                         Authenticate
                     </button>
                 </form>
@@ -56,7 +56,7 @@
 
             <div class="px-8 py-4 surface-panel-alt border-t border-gray-200 dark:border-gray-700">
                 <a href="{{ url('/') }}" class="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition">
-                    <i class="fas fa-home mr-1"></i> Back to home
+                    <i aria-hidden="true" class="fas fa-home mr-1"></i> Back to home
                 </a>
             </div>
         </div>

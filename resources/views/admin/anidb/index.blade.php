@@ -2,14 +2,14 @@
 
 @section('content')
 <div class="space-y-6">
+    <x-admin.page-header :title="$title" icon="fas fa-dragon">
+        <x-slot:actions>
+            <span class="inline-flex min-h-11 items-center rounded-xl border border-gray-200 bg-white/70 px-4 text-sm font-medium text-gray-700 dark:border-gray-600 dark:bg-gray-800/70 dark:text-gray-200">
+                {{ number_format($anidblist->total()) }} anime
+            </span>
+        </x-slot:actions>
+    </x-admin.page-header>
     <x-admin.card>
-        <x-admin.page-header :title="$title" icon="fas fa-dragon">
-            <x-slot:actions>
-                <span class="inline-flex min-h-11 items-center rounded-xl border border-gray-200 bg-white/70 px-4 text-sm font-medium text-gray-700 dark:border-gray-600 dark:bg-gray-800/70 dark:text-gray-200">
-                    {{ number_format($anidblist->total()) }} anime
-                </span>
-            </x-slot:actions>
-        </x-admin.page-header>
 
         <!-- Search Form -->
         <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
@@ -23,15 +23,15 @@
                            name="animetitle"
                            value="{{ $animetitle }}"
                            placeholder="Enter anime title..."
-                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">
                 </div>
                 <div class="flex items-end space-x-2">
-                    <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                        <i class="fas fa-search mr-2"></i>Search
+                    <button type="submit" class="px-6 py-2 bg-accent text-white rounded-lg hover:bg-accent-hover">
+                        <i aria-hidden="true" class="fas fa-search mr-2"></i>Search
                     </button>
                     @if($animetitle)
                         <a href="{{ url('admin/anidb-list') }}" class="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
-                            <i class="fas fa-times mr-2"></i>Clear
+                            <i aria-hidden="true" class="fas fa-times mr-2"></i>Clear
                         </a>
                     @endif
                 </div>
@@ -63,7 +63,7 @@
                                          loading="lazy">
                                 @else
                                     <div class="h-16 w-12 bg-gray-200 dark:bg-gray-700 rounded flex items-center justify-center">
-                                        <i class="fas fa-dragon text-gray-400 text-sm"></i>
+                                        <i aria-hidden="true" class="fas fa-dragon text-gray-400 text-sm"></i>
                                     </div>
                                 @endif
                             </td>
@@ -95,7 +95,7 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @if($anime->rating)
                                     <div class="flex items-center">
-                                        <i class="fas fa-star text-yellow-400 mr-1"></i>
+                                        <i aria-hidden="true" class="fas fa-star text-amber-400 mr-1"></i>
                                         <span class="text-sm text-gray-900 dark:text-gray-200">{{ number_format($anime->rating / 100, 1) }}</span>
                                     </div>
                                 @else
@@ -103,15 +103,15 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                <a href="{{ url('admin/anidb-edit/' . $anime->anidbid) }}"
-                                   class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
+                                <a aria-label="Edit" href="{{ url('admin/anidb-edit/' . $anime->anidbid) }}"
+                                   class="text-link dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300"
                                    title="Edit">
-                                    <i class="fas fa-edit"></i>
+                                    <i aria-hidden="true" class="fas fa-edit"></i>
                                 </a>
-                                <a href="{{ url('admin/anidb-delete/' . $anime->anidbid) }}"
+                                <a aria-label="Remove from Releases" href="{{ url('admin/anidb-delete/' . $anime->anidbid) }}"
                                    class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
                                    title="Remove from Releases">
-                                    <i class="fas fa-unlink"></i>
+                                    <i aria-hidden="true" class="fas fa-unlink"></i>
                                 </a>
                             </td>
                         </tr>
@@ -123,7 +123,7 @@
                             <td colspan="7" class="p-0">
                                 <x-admin.empty-state :icon="$animetitle ? 'fas fa-search' : 'fas fa-dragon'" :title="$anidbEmptyTitle">
                                     @if($animetitle)
-                                        <a href="{{ url('admin/anidb-list') }}" class="text-blue-600 dark:text-blue-400 hover:underline">
+                                        <a href="{{ url('admin/anidb-list') }}" class="text-link dark:text-primary-400 hover:underline">
                                             Clear search and view all
                                         </a>
                                     @endif

@@ -16,70 +16,39 @@
 @endphp
 
 <div class="space-y-5" x-data="moviesPage" data-movie-layout="{{ $movie_layout ?? 2 }}">
-    <section class="movies-hero relative overflow-hidden rounded-2xl px-5 py-4 text-white shadow-lg sm:px-7 sm:py-5" aria-labelledby="movies-heading">
-        <div class="movies-hero__glow movies-hero__glow--one" aria-hidden="true"></div>
-        <div class="movies-hero__glow movies-hero__glow--two" aria-hidden="true"></div>
-
-        <div class="relative z-10 flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
-            <div class="min-w-0 max-w-3xl xl:flex-1">
-                <nav aria-label="Breadcrumb" class="mb-2 text-sm text-white/70">
-                    <ol class="flex flex-wrap items-center gap-2">
-                        <li><a href="{{ url($site->homeLink ?? '/') }}" class="rounded hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70">Home</a></li>
-                        <li aria-hidden="true"><i class="fas fa-chevron-right text-[0.65rem]"></i></li>
-                        <li aria-current="page" class="font-medium text-white">{{ $currentMovieCategory }}</li>
-                    </ol>
-                </nav>
-
-                <div class="flex items-center gap-3">
-                    <span class="movies-hero__icon" aria-hidden="true"><i class="fas fa-clapperboard"></i></span>
-                    <div>
-                        <p class="mb-1 text-xs font-semibold uppercase tracking-[0.18em] text-white/65">Discover and download</p>
-                        <h1 id="movies-heading" class="text-3xl font-bold tracking-tight text-white sm:text-4xl">Movies</h1>
-                    </div>
-                </div>
-
-                <p class="mt-2 max-w-2xl text-sm leading-5 text-white/75 sm:text-base">
-                    Browse available movies, compare recent releases, and narrow the catalog by title, genre, year, or rating.
-                </p>
-
-            </div>
-
-            <div class="movies-hero__meta flex min-w-0 flex-wrap items-center gap-3 xl:max-w-[48%] xl:justify-end">
-                <div class="flex flex-wrap gap-2 text-sm xl:justify-end">
-                    <span class="movies-hero__stat">
-                        <i class="fas fa-film" aria-hidden="true"></i>
-                        {{ isset($results) ? number_format($results->total()) : 0 }} movies
-                    </span>
-                    <span class="movies-hero__stat">
-                        <i class="fas fa-folder-open" aria-hidden="true"></i>
-                        {{ $currentMovieCategory }}
-                    </span>
-                    @if($activeMovieFilters->isNotEmpty())
-                        <span class="movies-hero__stat">
-                            <i class="fas fa-filter" aria-hidden="true"></i>
-                            {{ $activeMovieFilters->count() }} active {{ Str::plural('filter', $activeMovieFilters->count()) }}
-                        </span>
-                    @endif
-                </div>
-
-                <div class="flex flex-wrap items-center gap-3">
-                    <button type="button"
-                            @click="toggleLayout()"
-                            class="movies-hero__action"
-                            :aria-label="layout === 1 ? 'Switch to two-column movie grid' : 'Switch to one-column movie list'"
-                            title="Change movie layout">
-                        <i :class="layoutIcon" aria-hidden="true"></i>
-                        <span x-text="layoutLabel"></span>
-                    </button>
-
-                    <a href="{{ route('trending-movies') }}" class="movies-hero__action movies-hero__action--accent">
-                        <i class="fas fa-fire" aria-hidden="true"></i>
-                        Trending now
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
+    <x-page-header title="Movies" icon="fas fa-clapperboard" eyebrow="Discover and download" :current="$currentMovieCategory"
+                   description="Browse available movies, compare recent releases, and narrow the catalog by title, genre, year, or rating.">
+        <x-slot:stats>
+            <span class="workspace-hero__stat">
+                <i class="fas fa-film" aria-hidden="true"></i>
+                {{ isset($results) ? number_format($results->total()) : 0 }} movies
+            </span>
+            <span class="workspace-hero__stat">
+                <i class="fas fa-folder-open" aria-hidden="true"></i>
+                {{ $currentMovieCategory }}
+            </span>
+            @if($activeMovieFilters->isNotEmpty())
+                <span class="workspace-hero__stat">
+                    <i class="fas fa-filter" aria-hidden="true"></i>
+                    {{ $activeMovieFilters->count() }} active {{ Str::plural('filter', $activeMovieFilters->count()) }}
+                </span>
+            @endif
+        </x-slot:stats>
+        <x-slot:actions>
+            <button type="button"
+                    @click="toggleLayout()"
+                    class="workspace-hero__action"
+                    :aria-label="layout === 1 ? 'Switch to two-column movie grid' : 'Switch to one-column movie list'"
+                    title="Change movie layout">
+                <i :class="layoutIcon" aria-hidden="true"></i>
+                <span x-text="layoutLabel"></span>
+            </button>
+            <a href="{{ route('trending-movies') }}" class="workspace-hero__action workspace-hero__action--accent">
+                <i class="fas fa-fire" aria-hidden="true"></i>
+                Trending now
+            </a>
+        </x-slot:actions>
+    </x-page-header>
 
     <section class="surface-panel overflow-hidden rounded-2xl border shadow-sm" aria-labelledby="movie-filters-heading">
         <div class="flex flex-col gap-3 border-b border-gray-200 px-5 py-4 dark:border-gray-700 sm:flex-row sm:items-center sm:justify-between sm:px-6">
@@ -99,7 +68,7 @@
                     :shows="false"
                 />
                 @if($activeMovieFilters->isNotEmpty())
-                    <a href="{{ route('Movies') }}" class="text-sm font-medium text-gray-500 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400">
+                    <a href="{{ route('Movies') }}" class="text-sm font-medium text-gray-500 hover:text-link dark:text-gray-400 dark:hover:text-primary-400">
                         <i class="fas fa-rotate-left mr-1" aria-hidden="true"></i>Clear filters
                     </a>
                 @endif
@@ -112,7 +81,7 @@
                     <label for="title" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Title</label>
                     <div class="relative">
                         <span class="pointer-events-none absolute inset-y-0 left-0 flex w-10 items-center justify-center text-gray-400" aria-hidden="true">
-                            <i class="fas fa-magnifying-glass text-sm"></i>
+                            <i aria-hidden="true" class="fas fa-magnifying-glass text-sm"></i>
                         </span>
                         <input type="search"
                                id="title"
@@ -164,7 +133,7 @@
                     @endforelse
                 </div>
 
-                <button type="submit" class="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 dark:bg-primary-700 dark:hover:bg-primary-600">
+                <button type="submit" class="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-accent px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 dark:bg-accent-hover dark:hover:bg-accent">
                     <i class="fas fa-search" aria-hidden="true"></i>
                     Search movies
                 </button>
@@ -174,7 +143,7 @@
 
     @if(isset($results) && $results->count() > 0)
         <section aria-labelledby="movie-results-heading">
-            <div class="mb-4 flex flex-col gap-4 rounded-2xl border border-gray-200 bg-white px-4 py-3 shadow-sm dark:border-gray-700 dark:bg-gray-800 sm:px-5 lg:flex-row lg:items-center lg:justify-between">
+            <div class="mb-4 flex flex-col gap-4 rounded-card border border-line bg-surface px-4 py-3 shadow-raised sm:px-5 lg:flex-row lg:items-center lg:justify-between">
                 <div>
                     <h2 id="movie-results-heading" class="font-semibold text-gray-900 dark:text-gray-100">
                         {{ number_format($results->total()) }} {{ Str::plural('movie', $results->total()) }} found
@@ -184,9 +153,10 @@
                     </p>
                 </div>
 
-                <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+                    <x-link-dropdown label="Category" icon="fas fa-folder-open" :items="\App\Support\Navigation\ListFilters::categoryItems($catlist ?? [], $category ?? null, route('Movies'), 'All movies')" />
+                    <x-sort-dropdown :ordering="$ordering ?? []" />
                     <x-inline-search placeholder="Quick release search..." :category="$category ?? null" />
-                    <div class="overflow-x-auto">{{ $results->links() }}</div>
                 </div>
             </div>
 
@@ -196,7 +166,7 @@
                 @endforeach
             </div>
 
-            <div class="mt-6 flex justify-center rounded-2xl border border-gray-200 bg-white px-4 py-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+            <div class="mt-6 rounded-card border border-line bg-surface px-4 py-3 shadow-raised">
                 {{ $results->links() }}
             </div>
         </section>

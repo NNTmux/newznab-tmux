@@ -3,58 +3,33 @@
 @section('content')
 <div x-data="adminReleaseReports">
     <div class="space-y-6">
-    <!-- Flash Messages -->
-    @if(session('success'))
-        <div x-data="dismissible" x-show="show" class="mb-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 flex items-center justify-between">
-            <div class="flex items-center">
-                <i class="fas fa-check-circle text-green-600 dark:text-green-400 mr-3 text-xl"></i>
-                <p class="text-sm text-green-800 dark:text-green-200 font-medium">{{ session('success') }}</p>
+    <x-admin.page-header :title="$title" icon="fas fa-flag" subtitle="Manage release reports submitted by users.">
+        <x-slot:actions>
+            <div class="flex flex-wrap gap-2">
+                <a href="{{ route('admin.release-reports', ['status' => 'pending']) }}"
+                   class="px-3 py-1.5 rounded-full text-sm font-medium transition {{ $status === 'pending' ? 'bg-warning-500 text-white' : 'bg-warning-100 dark:bg-warning-900 text-warning-800 dark:text-warning-200 hover:bg-warning-200 dark:hover:bg-warning-800' }}">
+                    <i aria-hidden="true" class="fas fa-clock mr-1"></i> Pending ({{ $statusCounts['pending'] }})
+                </a>
+                <a href="{{ route('admin.release-reports', ['status' => 'reviewed']) }}"
+                   class="px-3 py-1.5 rounded-full text-sm font-medium transition {{ $status === 'reviewed' ? 'bg-primary-500 text-white' : 'bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 hover:bg-primary-200 dark:hover:bg-primary-800' }}">
+                    <i aria-hidden="true" class="fas fa-eye mr-1"></i> Reviewed ({{ $statusCounts['reviewed'] }})
+                </a>
+                <a href="{{ route('admin.release-reports', ['status' => 'resolved']) }}"
+                   class="px-3 py-1.5 rounded-full text-sm font-medium transition {{ $status === 'resolved' ? 'bg-success-500 text-white' : 'bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200 hover:bg-success-200 dark:hover:bg-success-800' }}">
+                    <i aria-hidden="true" class="fas fa-check mr-1"></i> Resolved ({{ $statusCounts['resolved'] }})
+                </a>
+                <a href="{{ route('admin.release-reports', ['status' => 'dismissed']) }}"
+                   class="px-3 py-1.5 rounded-full text-sm font-medium transition {{ $status === 'dismissed' ? 'bg-gray-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
+                    <i aria-hidden="true" class="fas fa-ban mr-1"></i> Dismissed ({{ $statusCounts['dismissed'] }})
+                </a>
+                <a href="{{ route('admin.release-reports', ['status' => 'all']) }}"
+                   class="px-3 py-1.5 rounded-full text-sm font-medium transition {{ $status === 'all' ? 'bg-purple-500 text-white' : 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 hover:bg-purple-200 dark:hover:bg-purple-800' }}">
+                    <i aria-hidden="true" class="fas fa-list mr-1"></i> All ({{ $statusCounts['total'] }})
+                </a>
             </div>
-            <button @click="dismiss()" class="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-200">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-    @endif
-
-    @if(session('error'))
-        <div x-data="dismissible" x-show="show" class="mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 flex items-center justify-between">
-            <div class="flex items-center">
-                <i class="fas fa-exclamation-circle text-red-600 dark:text-red-400 mr-3 text-xl"></i>
-                <p class="text-sm text-red-800 dark:text-red-200 font-medium">{{ session('error') }}</p>
-            </div>
-            <button @click="dismiss()" class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-    @endif
-
+        </x-slot:actions>
+    </x-admin.page-header>
     <x-admin.card>
-        <x-admin.page-header :title="$title" icon="fas fa-flag" subtitle="Manage release reports submitted by users.">
-            <x-slot:actions>
-                <div class="flex flex-wrap gap-2">
-                    <a href="{{ route('admin.release-reports', ['status' => 'pending']) }}"
-                       class="px-3 py-1.5 rounded-full text-sm font-medium transition {{ $status === 'pending' ? 'bg-yellow-500 text-white' : 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 hover:bg-yellow-200 dark:hover:bg-yellow-800' }}">
-                        <i class="fas fa-clock mr-1"></i> Pending ({{ $statusCounts['pending'] }})
-                    </a>
-                    <a href="{{ route('admin.release-reports', ['status' => 'reviewed']) }}"
-                       class="px-3 py-1.5 rounded-full text-sm font-medium transition {{ $status === 'reviewed' ? 'bg-blue-500 text-white' : 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800' }}">
-                        <i class="fas fa-eye mr-1"></i> Reviewed ({{ $statusCounts['reviewed'] }})
-                    </a>
-                    <a href="{{ route('admin.release-reports', ['status' => 'resolved']) }}"
-                       class="px-3 py-1.5 rounded-full text-sm font-medium transition {{ $status === 'resolved' ? 'bg-green-500 text-white' : 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 hover:bg-green-200 dark:hover:bg-green-800' }}">
-                        <i class="fas fa-check mr-1"></i> Resolved ({{ $statusCounts['resolved'] }})
-                    </a>
-                    <a href="{{ route('admin.release-reports', ['status' => 'dismissed']) }}"
-                       class="px-3 py-1.5 rounded-full text-sm font-medium transition {{ $status === 'dismissed' ? 'bg-gray-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
-                        <i class="fas fa-ban mr-1"></i> Dismissed ({{ $statusCounts['dismissed'] }})
-                    </a>
-                    <a href="{{ route('admin.release-reports', ['status' => 'all']) }}"
-                       class="px-3 py-1.5 rounded-full text-sm font-medium transition {{ $status === 'all' ? 'bg-purple-500 text-white' : 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 hover:bg-purple-200 dark:hover:bg-purple-800' }}">
-                        <i class="fas fa-list mr-1"></i> All ({{ $statusCounts['total'] }})
-                    </a>
-                </div>
-            </x-slot:actions>
-        </x-admin.page-header>
 
         <!-- Reports Table -->
         @if($reportsList->count() > 0)
@@ -80,7 +55,7 @@
                     </div>
 
                     <div class="flex flex-wrap items-center gap-3">
-                        <select name="action" class="text-sm border-gray-300 dark:border-gray-600 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200">
+                        <select name="action" class="text-sm border-gray-300 dark:border-gray-600 rounded-lg focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-200">
                             <option value="">Bulk Actions</option>
                             <option value="reviewed">Mark as Reviewed</option>
                             <option value="resolve">Mark as Resolved</option>
@@ -108,12 +83,12 @@
                         @foreach($reportsList as $report)
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                                 <td class="px-4 py-4 whitespace-nowrap">
-                                    <input type="checkbox"
+                                    <input aria-label="Select item" type="checkbox"
                                            form="bulk-action-form"
                                            name="report_ids[]"
                                            value="{{ $report->id }}"
                                            @change="onCheckboxChange()"
-                                           class="report-checkbox rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:bg-gray-700">
+                                           class="report-checkbox rounded border-gray-300 dark:border-gray-600 text-link focus:ring-primary-500 dark:bg-gray-700">
                                 </td>
                                 <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200 font-mono">
                                     #{{ $report->id }}
@@ -123,7 +98,7 @@
                                         @if($report->release)
                                             <a href="{{ url('/details/' . $report->release->guid) }}"
                                                target="_blank"
-                                               class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 font-medium text-sm break-all">
+                                               class="text-link dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300 font-medium text-sm break-all">
                                                 {{ Str::limit($report->release->searchname, 80) }}
                                             </a>
                                             <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -131,7 +106,7 @@
                                             </div>
                                         @else
                                             <span class="text-red-500 dark:text-red-400 text-sm">
-                                                <i class="fas fa-exclamation-triangle mr-1"></i> Release Deleted
+                                                <i aria-hidden="true" class="fas fa-exclamation-triangle mr-1"></i> Release Deleted
                                             </span>
                                             <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                                 Original ID: {{ $report->releases_id }}
@@ -153,22 +128,22 @@
                                         {{ $report->reason_label }}
                                     </span>
                                     @if($report->description)
-                                        <button type="button"
+                                        <button aria-label="View description" type="button"
                                                 class="report-description-btn ml-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                                                 data-description="{{ $report->description }}"
                                                 data-reason="{{ $report->reason_label }}"
                                                 data-reporter="{{ $report->user ? $report->user->username : 'Unknown' }}"
                                                 @click="showDescription($event.currentTarget.dataset.description, $event.currentTarget.dataset.reason, $event.currentTarget.dataset.reporter)"
                                                 title="View description">
-                                            <i class="fas fa-comment-dots"></i>
+                                            <i aria-hidden="true" class="fas fa-comment-dots"></i>
                                         </button>
                                     @endif
                                 </td>
                                 <td class="px-4 py-4">
                                     @if($report->response)
                                         <div class="max-w-xs space-y-1">
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $report->response_is_public ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200' }}">
-                                                <i class="fas fa-reply mr-1"></i>
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $report->response_is_public ? 'bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200' }}">
+                                                <i aria-hidden="true" class="fas fa-reply mr-1"></i>
                                                 {{ $report->response_is_public ? 'Public response' : 'Private note' }}
                                             </span>
                                             <p class="text-xs text-gray-700 dark:text-gray-300 break-words">{{ Str::limit($report->response, 90) }}</p>
@@ -185,9 +160,9 @@
                                 <td class="px-4 py-4 whitespace-nowrap">
                                     @php
                                         $statusColors = [
-                                            'pending' => 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200',
-                                            'reviewed' => 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200',
-                                            'resolved' => 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200',
+                                            'pending' => 'bg-warning-100 dark:bg-warning-900 text-warning-800 dark:text-warning-200',
+                                            'reviewed' => 'bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200',
+                                            'resolved' => 'bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200',
                                             'dismissed' => 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200',
                                         ];
                                         $statusIcons = [
@@ -197,8 +172,8 @@
                                             'dismissed' => 'fa-ban',
                                         ];
                                     @endphp
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $statusColors[$report->status] ?? 'bg-gray-100 text-gray-800' }}">
-                                        <i class="fas {{ $statusIcons[$report->status] ?? 'fa-question' }} mr-1"></i>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $statusColors[$report->status] ?? 'bg-gray-100 text-gray-800 dark:text-gray-200' }}">
+                                        <i aria-hidden="true" class="fas {{ $statusIcons[$report->status] ?? 'fa-question' }} mr-1"></i>
                                         {{ ucfirst($report->status) }}
                                     </span>
                                     @if($report->reviewer && $report->reviewed_at)
@@ -226,7 +201,7 @@
                                                 <button type="submit"
                                                         class="px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm inline-flex items-center"
                                                         title="Delete Release">
-                                                    <i class="fas fa-trash mr-1"></i> Delete
+                                                    <i aria-hidden="true" class="fas fa-trash mr-1"></i> Delete
                                                 </button>
                                             </form>
                                         @endif
@@ -237,9 +212,9 @@
                                                 @csrf
                                                 <input type="hidden" name="status" value="reviewed">
                                                 <button type="submit"
-                                                        class="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm inline-flex items-center"
+                                                        class="px-3 py-1.5 bg-accent text-white rounded-lg hover:bg-accent-hover transition text-sm inline-flex items-center"
                                                         title="Mark as Reviewed">
-                                                    <i class="fas fa-eye mr-1"></i> Reviewed
+                                                    <i aria-hidden="true" class="fas fa-eye mr-1"></i> Reviewed
                                                 </button>
                                             </form>
 
@@ -249,7 +224,7 @@
                                                 <button type="submit"
                                                         class="px-3 py-1.5 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition text-sm inline-flex items-center"
                                                         title="Dismiss Report">
-                                                    <i class="fas fa-ban mr-1"></i> Dismiss
+                                                    <i aria-hidden="true" class="fas fa-ban mr-1"></i> Dismiss
                                                 </button>
                                             </form>
                                         @elseif($report->status === 'reviewed')
@@ -258,9 +233,9 @@
                                                 @csrf
                                                 <input type="hidden" name="status" value="resolved">
                                                 <button type="submit"
-                                                        class="px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm inline-flex items-center"
+                                                        class="px-3 py-1.5 bg-success-600 text-white rounded-lg hover:bg-success-700 transition text-sm inline-flex items-center"
                                                         title="Mark as Resolved">
-                                                    <i class="fas fa-check mr-1"></i> Resolve
+                                                    <i aria-hidden="true" class="fas fa-check mr-1"></i> Resolve
                                                 </button>
                                             </form>
 
@@ -270,7 +245,7 @@
                                                 <button type="submit"
                                                         class="px-3 py-1.5 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition text-sm inline-flex items-center"
                                                         title="Dismiss Report">
-                                                    <i class="fas fa-ban mr-1"></i> Dismiss
+                                                    <i aria-hidden="true" class="fas fa-ban mr-1"></i> Dismiss
                                                 </button>
                                             </form>
                                         @elseif(!$report->release)
@@ -284,15 +259,15 @@
                                                     data-action-url="{{ route('admin.release-reports.revert', $report->id) }}"
                                                     @click="showRevert($event.currentTarget.dataset.actionUrl, $event.currentTarget.dataset.reportStatus)"
                                                     title="Revert to Reviewed for further action">
-                                                <i class="fas fa-undo mr-1"></i> Revert
+                                                <i aria-hidden="true" class="fas fa-undo mr-1"></i> Revert
                                             </button>
                                              <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium {{ $statusColors[$report->status] ?? 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200' }}">
-                                                 <i class="fas {{ $statusIcons[$report->status] ?? 'fa-question' }} mr-1"></i>
+                                                 <i aria-hidden="true" class="fas {{ $statusIcons[$report->status] ?? 'fa-question' }} mr-1"></i>
                                                  {{ ucfirst($report->status) }}
                                              </span>
                                         @else
                                              <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium {{ $statusColors[$report->status] ?? 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200' }}">
-                                                 <i class="fas {{ $statusIcons[$report->status] ?? 'fa-question' }} mr-1"></i>
+                                                 <i aria-hidden="true" class="fas {{ $statusIcons[$report->status] ?? 'fa-question' }} mr-1"></i>
                                                  {{ ucfirst($report->status) }}
                                              </span>
                                         @endif
@@ -304,15 +279,15 @@
                                                 data-public="{{ $report->response_is_public ? '1' : '0' }}"
                                                 @click="showResponse($event.currentTarget.dataset.actionUrl, $event.currentTarget.dataset.response, $event.currentTarget.dataset.public === '1')"
                                                 title="{{ $report->response ? 'Edit response' : 'Add response' }}">
-                                            <i class="fas fa-reply mr-1"></i> {{ $report->response ? 'Edit Response' : 'Add Response' }}
+                                            <i aria-hidden="true" class="fas fa-reply mr-1"></i> {{ $report->response ? 'Edit Response' : 'Add Response' }}
                                         </button>
 
                                         @if($report->release)
-                                            <a href="{{ url('/details/' . $report->release->guid) }}"
+                                            <a aria-label="View Release" href="{{ url('/details/' . $report->release->guid) }}"
                                                target="_blank"
-                                               class="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm inline-flex items-center"
+                                               class="px-3 py-1.5 bg-accent text-white rounded-lg hover:bg-accent-hover transition text-sm inline-flex items-center"
                                                title="View Release">
-                                                <i class="fas fa-external-link-alt"></i>
+                                                <i aria-hidden="true" class="fas fa-external-link-alt"></i>
                                             </a>
                                         @endif
                                     </div>
@@ -327,12 +302,12 @@
             </div>
         @else
             <div class="px-6 py-12 text-center">
-                <i class="fas fa-flag text-gray-300 dark:text-gray-600 text-6xl mb-4"></i>
+                <i aria-hidden="true" class="fas fa-flag text-gray-300 dark:text-gray-600 text-6xl mb-4"></i>
                 <h3 class="text-xl font-medium text-gray-700 dark:text-gray-300 mb-2">No Reports Found</h3>
                 <p class="text-gray-500 dark:text-gray-400">
                     @if($status !== 'all')
                         No {{ $status }} reports at this time.
-                        <a href="{{ route('admin.release-reports', ['status' => 'all']) }}" class="text-blue-600 dark:text-blue-400 hover:underline">View all reports</a>
+                        <a href="{{ route('admin.release-reports', ['status' => 'all']) }}" class="text-link dark:text-primary-400 hover:underline">View all reports</a>
                     @else
                         No release reports have been submitted yet.
                     @endif
@@ -356,13 +331,13 @@
     <div class="fixed inset-0 z-10 overflow-y-auto" @click.self="closeDescription()">
         <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
             <!-- Modal Content -->
-            <div class="relative w-full max-w-lg p-6 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-lg">
+            <div role="dialog" aria-modal="true" aria-labelledby="report-modal-title-0" class="relative w-full max-w-lg p-6 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-lg">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                    <i class="fas fa-comment-dots text-blue-500 mr-2"></i>Report Details
+                <h3 id="report-modal-title-0" class="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                    <i aria-hidden="true" class="fas fa-comment-dots text-primary-500 mr-2"></i>Report Details
                 </h3>
-                <button type="button" class="report-desc-modal-close text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" @click="closeDescription()">
-                    <i class="fas fa-times"></i>
+                <button type="button" aria-label="Close dialog" class="report-desc-modal-close text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" @click="closeDescription()">
+                    <i aria-hidden="true" class="fas fa-times"></i>
                 </button>
             </div>
 
@@ -405,13 +380,13 @@
     <div class="fixed inset-0 z-10 overflow-y-auto" @click.self="closeResponse()">
         <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
             <!-- Modal Content -->
-            <div class="relative w-full max-w-2xl p-6 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-lg">
+            <div role="dialog" aria-modal="true" aria-labelledby="report-modal-title-1" class="relative w-full max-w-2xl p-6 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-lg">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                    <i class="fas fa-reply text-indigo-500 mr-2"></i>Staff Response
+                <h3 id="report-modal-title-1" class="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                    <i aria-hidden="true" class="fas fa-reply text-indigo-500 mr-2"></i>Staff Response
                 </h3>
-                <button type="button" class="response-modal-close text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" @click="closeResponse()">
-                    <i class="fas fa-times"></i>
+                <button type="button" aria-label="Close dialog" class="response-modal-close text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" @click="closeResponse()">
+                    <i aria-hidden="true" class="fas fa-times"></i>
                 </button>
             </div>
 
@@ -451,7 +426,7 @@
                         Cancel
                     </button>
                     <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition">
-                        <i class="fas fa-save mr-1"></i> Save Response
+                        <i aria-hidden="true" class="fas fa-save mr-1"></i> Save Response
                     </button>
                 </div>
             </form>
@@ -474,19 +449,19 @@
     <div class="fixed inset-0 z-10 overflow-y-auto" @click.self="closeRevert()">
         <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
             <!-- Modal Content -->
-            <div class="relative w-full max-w-md p-6 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-lg">
+            <div role="dialog" aria-modal="true" aria-labelledby="report-modal-title-2" class="relative w-full max-w-md p-6 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-lg">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                    <i class="fas fa-undo text-orange-500 mr-2"></i>Confirm Revert
+                <h3 id="report-modal-title-2" class="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                    <i aria-hidden="true" class="fas fa-undo text-orange-500 mr-2"></i>Confirm Revert
                 </h3>
-                <button type="button" class="revert-modal-close text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" @click="closeRevert()">
-                    <i class="fas fa-times"></i>
+                <button type="button" aria-label="Close dialog" class="revert-modal-close text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" @click="closeRevert()">
+                    <i aria-hidden="true" class="fas fa-times"></i>
                 </button>
             </div>
 
             <div class="mb-6">
                 <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                    Are you sure you want to revert this <span id="revertReportStatus" x-text="revertStatus" class="font-semibold text-orange-600 dark:text-orange-400"></span> report back to <span class="font-semibold text-blue-600 dark:text-blue-400">Reviewed</span> status?
+                    Are you sure you want to revert this <span id="revertReportStatus" x-text="revertStatus" class="font-semibold text-orange-600 dark:text-orange-400"></span> report back to <span class="font-semibold text-link dark:text-primary-400">Reviewed</span> status?
                 </p>
                 <p class="text-sm text-gray-500 dark:text-gray-500">
                     This will allow further action to be taken on the report if an issue was found with the release.
@@ -500,7 +475,7 @@
                         Cancel
                     </button>
                     <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-orange-600 rounded-lg hover:bg-orange-700 transition">
-                        <i class="fas fa-undo mr-1"></i> Revert to Reviewed
+                        <i aria-hidden="true" class="fas fa-undo mr-1"></i> Revert to Reviewed
                     </button>
                 </div>
             </form>

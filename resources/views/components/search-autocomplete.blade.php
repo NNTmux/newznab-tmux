@@ -74,7 +74,7 @@
         @if($submitButton)
             <button type="submit"
                     aria-label="Search releases"
-                    class="min-h-11 rounded-r-xl bg-primary-600 text-white {{ $sizeClasses }} font-semibold transition hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:bg-primary-700 dark:hover:bg-primary-600">
+                    class="min-h-11 rounded-r-xl bg-accent text-white {{ $sizeClasses }} font-semibold transition hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:bg-accent-hover dark:hover:bg-accent">
                 <i class="fas fa-search" aria-hidden="true"></i>
                 <span class="sr-only">Search</span>
             </button>
@@ -85,7 +85,7 @@
         <div class="mt-2 text-sm">
             <span class="text-gray-600 dark:text-gray-400">Did you mean: </span>
             <a href="{{ route('search', ['search' => $suggestion]) }}"
-               class="text-primary-600 dark:text-primary-400 hover:underline font-medium">
+               class="text-link dark:text-primary-400 hover:underline font-medium">
                 {{ $suggestion }}
             </a>
             <span class="text-gray-500 dark:text-gray-500">?</span>

@@ -17,7 +17,7 @@
                 </div>
             @else
                 <div class="bg-gray-100 dark:bg-gray-800 p-12 rounded-lg text-center mb-6">
-                    <i class="fas fa-video-slash text-gray-400 text-6xl mb-4"></i>
+                    <i aria-hidden="true" class="fas fa-video-slash text-gray-400 text-6xl mb-4"></i>
                     <p class="text-gray-600 dark:text-gray-400 text-lg">No trailer available for this movie.</p>
                 </div>
             @endif
@@ -49,7 +49,7 @@
                             <div class="flex">
                                 <span class="font-semibold text-gray-700 dark:text-gray-300 w-32">Rating:</span>
                                 <span class="text-gray-600">
-                                    <i class="fas fa-star text-yellow-500"></i> {{ $movie['rating'] }} / 10
+                                    <i aria-hidden="true" class="fas fa-star text-amber-500"></i> {{ $movie['rating'] }} / 10
                                 </span>
                             </div>
                         @endif
@@ -58,7 +58,7 @@
             </div>
         @else
             <div class="text-center py-12">
-                <i class="fas fa-exclamation-circle text-gray-400 text-5xl mb-4"></i>
+                <i aria-hidden="true" class="fas fa-exclamation-circle text-gray-400 text-5xl mb-4"></i>
                 <p class="text-gray-600 dark:text-gray-400 text-lg">Movie information not available.</p>
             </div>
         @endif

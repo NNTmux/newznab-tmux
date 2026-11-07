@@ -1,24 +1,25 @@
 @extends('layouts.main')
 
 @section('content')
+<x-page-header title="Download basket" eyebrow="Your saved releases" description="Review saved NZBs, download selected releases, or use the private RSS feed with your downloader." icon="fas fa-basket-shopping">
+    <x-slot:stats>
+        <span class="workspace-hero__stat"><i class="fas fa-box-archive" aria-hidden="true"></i>{{ number_format(count($results)) }} saved</span>
+    </x-slot:stats>
+</x-page-header>
+
 <div class="surface-panel rounded-xl shadow-sm">
-    <x-page-header title="Download basket" eyebrow="Your saved releases" description="Review saved NZBs, download selected releases, or use the private RSS feed with your downloader." icon="fas fa-basket-shopping">
-        <x-slot:stats>
-            <span class="workspace-hero__stat"><i class="fas fa-box-archive" aria-hidden="true"></i>{{ number_format(count($results)) }} saved</span>
-        </x-slot:stats>
-    </x-page-header>
 
     <div class="px-6 py-4">
 
         <!-- RSS Feed Alert -->
         <div class="surface-panel-alt border rounded-lg p-4 mb-6 flex items-start">
-            <i class="fa fa-rss-square text-primary-600 dark:text-primary-400 text-2xl mr-4 mt-1"></i>
+            <i aria-hidden="true" class="fa-solid fa-rss-square text-link dark:text-primary-400 text-2xl mr-4 mt-1"></i>
             <div>
                 <strong class="text-gray-900 dark:text-gray-100">RSS Feed</strong>
                 <p class="text-gray-700 dark:text-gray-300 mt-1">
                     Your download basket can also be accessed via an
                     <a href="{{ url('/rss/cart?dl=1&i=' . auth()->id() . '&api_token=' . auth()->user()->api_token . '&del=1') }}"
-                       class="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 underline">RSS feed</a>.
+                       class="text-link dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 underline">RSS feed</a>.
                     Some NZB downloaders can read this feed and automatically start downloading.
                 </p>
             </div>
@@ -27,18 +28,18 @@
         @if(count($results) > 0)
             <!-- Cart Items -->
             <div class="surface-panel-alt border rounded-xl shadow-sm" x-data="cartPage">
-                <div class="px-4 py-3 surface-panel-alt border-b flex justify-between items-center">
-                    <h5 class="text-lg font-semibold text-gray-800 dark:text-gray-200">My Download Basket</h5>
-                    <div class="flex items-center gap-2">
-                        <small class="text-gray-600 dark:text-gray-400">With Selected:</small>
-                        <div class="flex gap-1">
-                            <button type="button" class="nzb_multi_operations_download_cart px-3 py-1 bg-green-600 dark:bg-green-700 text-white rounded hover:bg-green-700 dark:hover:bg-green-800 text-sm" title="Download NZBs">
-                                <i class="fa fa-cloud-download"></i>
-                            </button>
-                            <button type="button" class="nzb_multi_operations_cartdelete px-3 py-1 bg-red-600 dark:bg-red-700 text-white rounded hover:bg-red-700 dark:hover:bg-red-800 text-sm" title="Delete from cart">
-                                <i class="fa fa-trash"></i>
-                            </button>
-                        </div>
+                <div class="flex flex-wrap items-center justify-between gap-3 border-b border-line px-4 py-3">
+                    <h2 class="text-lg font-semibold text-fg">My Download Basket</h2>
+                    <div class="release-bulk-actions" role="group" aria-label="Actions for selected releases">
+                        <span class="release-bulk-actions__label">With selected</span>
+                        <button type="button" class="nzb_multi_operations_download_cart release-bulk-actions__button release-bulk-actions__download" title="Download selected NZBs">
+                            <i class="fa-solid fa-cloud-download" aria-hidden="true"></i>
+                            <span>Download</span>
+                        </button>
+                        <button type="button" class="nzb_multi_operations_cartdelete release-bulk-actions__button release-bulk-actions__delete" title="Remove selected releases from the basket">
+                            <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                            <span>Remove</span>
+                        </button>
                     </div>
                 </div>
 
@@ -49,7 +50,7 @@
                             <tr>
                                 <th class="px-4 py-3 text-left w-8">
                                     <label class="inline-flex items-center cursor-pointer">
-                                        <input id="check-all" type="checkbox" class="form-checkbox h-4 w-4 text-primary-600 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded focus:ring-primary-500 dark:focus:ring-primary-600 focus:ring-2" x-model="allChecked" @change="toggleAll()">
+                                        <input id="check-all" type="checkbox" aria-label="Select all releases" class="form-checkbox h-4 w-4 text-link bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded focus:ring-primary-500 dark:focus:ring-primary-600 focus:ring-2" x-model="allChecked" @change="toggleAll()">
                                     </label>
                                 </th>
                                 <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">Name</th>
@@ -65,40 +66,40 @@
                                         <input id="chk{{ substr($result->release->guid, 0, 7) }}"
                                                type="checkbox"
                                                name="table_records"
-                                               class="cart-checkbox form-checkbox h-4 w-4 text-primary-600 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded focus:ring-primary-500 dark:focus:ring-primary-600 focus:ring-2 cursor-pointer"
+                                               class="cart-checkbox form-checkbox h-4 w-4 text-link bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded focus:ring-primary-500 dark:focus:ring-primary-600 focus:ring-2 cursor-pointer"
                                                value="{{ $result->release->guid }}"
                                                @change="onCheckboxChange()">
                                     </td>
                                     <td class="px-4 py-3">
                                         <a href="{{ url('/details/' . $result->release->guid) }}"
-                                           class="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 font-semibold wrap-break-word break-all">
+                                           class="text-link dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 font-semibold wrap-break-word break-all">
                                             {{ $result->release->searchname }}
                                         </a>
                                     </td>
                                     <td class="px-4 py-3">
                                         <div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                                            <i class="fa fa-clock-o mr-2"></i>
+                                            <i aria-hidden="true" class="fa-regular fa-clock mr-2"></i>
                                             <span title="{{ $result->created_at }}">{{ \Carbon\Carbon::parse($result->created_at)->diffForHumans() }}</span>
                                         </div>
                                     </td>
                                     <td class="px-4 py-3">
                                         <div class="flex justify-end gap-2">
-                                            <a href="{{ url('/getnzb?id=' . $result->release->guid) }}"
+                                            <a aria-label="Download NZB" href="{{ url('/getnzb?id=' . $result->release->guid) }}"
                                                class="px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-300 dark:hover:bg-gray-600 text-sm"
                                                title="Download NZB">
-                                                <i class="fa fa-cloud-download"></i>
+                                                <i aria-hidden="true" class="fa-solid fa-cloud-download"></i>
                                             </a>
-                                            <a href="{{ url('/details/' . $result->release->guid) }}"
-                                               class="px-2 py-1 bg-primary-600 dark:bg-primary-700 text-white rounded hover:bg-primary-700 dark:hover:bg-primary-800 text-sm"
+                                            <a aria-label="View details" href="{{ url('/details/' . $result->release->guid) }}"
+                                               class="px-2 py-1 bg-accent dark:bg-accent-hover text-white rounded hover:bg-accent-hover dark:hover:bg-primary-800 text-sm"
                                                title="View details">
-                                                <i class="fa fa-info-circle"></i>
+                                                <i aria-hidden="true" class="fa-solid fa-info-circle"></i>
                                             </a>
-                                            <button type="button"
+                                            <button aria-label="Delete from cart" type="button"
                                                class="cart-delete-link px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded hover:bg-red-200 dark:hover:bg-red-900/50 text-sm"
                                                title="Delete from cart"
                                                data-delete-url="{{ url('/cart/delete/' . $result->release->guid) }}"
                                                data-release-name="{{ Str::limit($result->release->searchname, 50) }}">
-                                                <i class="fa fa-trash"></i>
+                                                <i aria-hidden="true" class="fa-solid fa-trash"></i>
                                             </button>
                                         </div>
                                     </td>
@@ -114,31 +115,31 @@
                         @continue(!$result->release)
                         <div id="m-guid{{ $result->release->guid }}" class="p-4 space-y-3">
                             <div class="flex items-start gap-3">
-                                <input type="checkbox"
+                                <input aria-label="Select item" type="checkbox"
                                        name="table_records"
-                                       class="cart-checkbox form-checkbox h-4 w-4 mt-1 text-primary-600 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded focus:ring-primary-500 dark:focus:ring-primary-600 focus:ring-2 cursor-pointer shrink-0"
+                                       class="cart-checkbox form-checkbox h-4 w-4 mt-1 text-link bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded focus:ring-primary-500 dark:focus:ring-primary-600 focus:ring-2 cursor-pointer shrink-0"
                                        value="{{ $result->release->guid }}"
                                        @change="onCheckboxChange()">
                                 <a href="{{ url('/details/' . $result->release->guid) }}"
-                                   class="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 font-semibold text-sm break-all flex-1">
+                                   class="text-link dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 font-semibold text-sm break-all flex-1">
                                     {{ $result->release->searchname }}
                                 </a>
                             </div>
                             <div class="flex items-center justify-between">
                                 <span class="text-xs text-gray-500 dark:text-gray-400">
-                                    <i class="fa fa-clock-o mr-1"></i>{{ \Carbon\Carbon::parse($result->created_at)->diffForHumans() }}
+                                    <i aria-hidden="true" class="fa-regular fa-clock mr-1"></i>{{ \Carbon\Carbon::parse($result->created_at)->diffForHumans() }}
                                 </span>
                                 <div class="flex gap-2">
-                                    <a href="{{ url('/getnzb?id=' . $result->release->guid) }}" class="px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded text-sm" title="Download NZB">
-                                        <i class="fa fa-cloud-download"></i>
+                                    <a aria-label="Download NZB" href="{{ url('/getnzb?id=' . $result->release->guid) }}" class="px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded text-sm" title="Download NZB">
+                                        <i aria-hidden="true" class="fa-solid fa-cloud-download"></i>
                                     </a>
-                                    <a href="{{ url('/details/' . $result->release->guid) }}" class="px-2 py-1 bg-primary-600 dark:bg-primary-700 text-white rounded text-sm" title="View details">
-                                        <i class="fa fa-info-circle"></i>
+                                    <a aria-label="View details" href="{{ url('/details/' . $result->release->guid) }}" class="px-2 py-1 bg-accent dark:bg-accent-hover text-white rounded text-sm" title="View details">
+                                        <i aria-hidden="true" class="fa-solid fa-info-circle"></i>
                                     </a>
-                                    <button type="button" class="cart-delete-link px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded text-sm" title="Delete"
+                                    <button aria-label="Delete" type="button" class="cart-delete-link px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded text-sm" title="Delete"
                                             data-delete-url="{{ url('/cart/delete/' . $result->release->guid) }}"
                                             data-release-name="{{ Str::limit($result->release->searchname, 50) }}">
-                                        <i class="fa fa-trash"></i>
+                                        <i aria-hidden="true" class="fa-solid fa-trash"></i>
                                     </button>
                                 </div>
                             </div>
@@ -151,11 +152,11 @@
                     <div class="flex items-center gap-2">
                         <small class="text-gray-600 dark:text-gray-400">With Selected:</small>
                         <div class="flex gap-1">
-                            <button type="button" class="nzb_multi_operations_download_cart px-3 py-1 bg-green-600 dark:bg-green-700 text-white rounded hover:bg-green-700 dark:hover:bg-green-800 text-sm" title="Download NZBs">
-                                <i class="fa fa-cloud-download"></i>
+                            <button aria-label="Download NZBs" type="button" class="nzb_multi_operations_download_cart px-3 py-1 bg-success-600 dark:bg-success-700 text-white rounded hover:bg-success-700 dark:hover:bg-success-800 text-sm" title="Download NZBs">
+                                <i aria-hidden="true" class="fa-solid fa-cloud-download"></i>
                             </button>
-                            <button type="button" class="nzb_multi_operations_cartdelete px-3 py-1 bg-red-600 dark:bg-red-700 text-white rounded hover:bg-red-700 dark:hover:bg-red-800 text-sm" title="Delete from cart">
-                                <i class="fa fa-trash"></i>
+                            <button aria-label="Delete from cart" type="button" class="nzb_multi_operations_cartdelete px-3 py-1 bg-red-600 dark:bg-red-700 text-white rounded hover:bg-red-700 dark:hover:bg-red-800 text-sm" title="Delete from cart">
+                                <i aria-hidden="true" class="fa-solid fa-trash"></i>
                             </button>
                         </div>
                     </div>
@@ -163,12 +164,12 @@
             </div>
         @else
             <!-- Empty Cart -->
-            <div class="bg-yellow-50 dark:bg-gray-700 border border-yellow-200 dark:border-gray-600 rounded-lg p-8 text-center">
-                <i class="fa fa-shopping-basket text-yellow-600 dark:text-yellow-400 text-5xl mb-4"></i>
+            <div class="bg-warning-50 dark:bg-gray-700 border border-warning-200 dark:border-gray-600 rounded-lg p-8 text-center">
+                <i aria-hidden="true" class="fa-solid fa-shopping-basket text-warning-600 dark:text-warning-400 text-5xl mb-4"></i>
                 <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">Your basket is empty</h3>
                 <p class="text-gray-600 dark:text-gray-400 mb-4">Add some releases to your download basket to get started.</p>
-                <a href="{{ url('/browse/All') }}" class="inline-flex items-center px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800">
-                    <i class="fa fa-search mr-2"></i> Browse Releases
+                <a href="{{ url('/browse/All') }}" class="inline-flex items-center px-4 py-2 bg-accent dark:bg-accent-hover text-white rounded-lg hover:bg-accent-hover dark:hover:bg-primary-800">
+                    <i aria-hidden="true" class="fa-solid fa-search mr-2"></i> Browse Releases
                 </a>
             </div>
         @endif

@@ -5,33 +5,22 @@
 @endpush
 
 @section('content')
+<x-page-header title="Games" :current="!empty($catname) ? $catname : 'All games'" eyebrow="Play and discover" description="Browse PC games and refine the catalog by title, genre, year, or category." icon="fas fa-dice-d20">
+    <x-slot:stats>
+        <span class="workspace-hero__stat"><i class="fas fa-gamepad" aria-hidden="true"></i>{{ number_format($results->total()) }} games</span>
+        <span class="workspace-hero__stat"><i class="fas fa-folder-open" aria-hidden="true"></i>{{ $catname ?: 'All games' }}</span>
+    </x-slot:stats>
+</x-page-header>
+
 <div class="surface-panel rounded-xl shadow-sm">
-    <x-page-header title="Games" :current="!empty($catname) ? $catname : 'All games'" eyebrow="Play and discover" description="Browse PC games and refine the catalog by title, genre, year, or category." icon="fas fa-dice-d20">
-        <x-slot:stats>
-            <span class="workspace-hero__stat"><i class="fas fa-gamepad" aria-hidden="true"></i>{{ number_format($results->total()) }} games</span>
-            <span class="workspace-hero__stat"><i class="fas fa-folder-open" aria-hidden="true"></i>{{ $catname ?: 'All games' }}</span>
-        </x-slot:stats>
-    </x-page-header>
 
     <div class="px-6 py-4">
         <!-- Search Filters -->
         <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 mb-6">
             <form method="get" action="{{ url('/Games') }}">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <!-- Category Filter -->
-                    <div>
-                        <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category</label>
-                        <select id="category"
-                                name="t"
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                            <option value="">All Categories</option>
-                            @foreach($catlist ?? [] as $cat)
-                                <option value="{{ $cat['id'] }}" {{ ($category ?? '') == $cat['id'] ? 'selected' : '' }}>
-                                    {{ $cat['title'] }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
+                    {{-- Category is chosen with the Category dropdown in the results toolbar. --}}
+                    <input type="hidden" name="t" value="{{ $category ?? '' }}">
 
                     <!-- Title Filter -->
                     <div>
@@ -41,7 +30,7 @@
                                name="title"
                                value="{{ $title ?? '' }}"
                                placeholder="Search by title"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                     </div>
 
                     <!-- Genre Filter -->
@@ -49,7 +38,7 @@
                         <label for="genre" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Genre</label>
                         <select id="genre"
                                 name="genre"
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <option value="">All Genres</option>
                             @foreach($genres ?? [] as $g)
                                 <option value="{{ $g->id }}" {{ ($genre ?? '') == $g->id ? 'selected' : '' }}>
@@ -64,7 +53,7 @@
                         <label for="year" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Year</label>
                         <select id="year"
                                 name="year"
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <option value="">All Years</option>
                             @foreach($years ?? [] as $y)
                                 <option value="{{ $y }}" {{ ($year ?? '') == $y ? 'selected' : '' }}>
@@ -76,11 +65,11 @@
                 </div>
 
                 <div class="mt-4 flex gap-2">
-                    <button type="submit" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700">
-                        <i class="fa fa-search mr-2"></i>Search
+                    <button type="submit" class="px-4 py-2 bg-accent dark:bg-accent-hover text-white rounded-md hover:bg-accent-hover">
+                        <i aria-hidden="true" class="fa-solid fa-search mr-2"></i>Search
                     </button>
                     <a href="{{ url('/Games') }}" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300">
-                        <i class="fa fa-times mr-2"></i>Clear
+                        <i aria-hidden="true" class="fa-solid fa-times mr-2"></i>Clear
                     </a>
                 </div>
             </form>
@@ -90,13 +79,15 @@
         @if(count($results) > 0)
             <x-cover-results-toolbar
                 :results="$results"
-                icon="fa fa-gamepad"
+                icon="fa-solid fa-gamepad"
                 :title="($catname ?? 'All') . ' Games'"
                 covgroup="games"
                 :category="$catname ?? 'All'"
                 parentcat="PC"
                 search-placeholder="Search in Games..."
                 :search-category="$category ?? null"
+                :category-items="\App\Support\Navigation\ListFilters::categoryItems($catlist ?? [], $category ?? null, url('/Games'), 'All games', false)"
+                :ordering="$ordering ?? null"
             />
 
             <!-- Games Grid - Card Layout with Multiple Releases -->
@@ -123,13 +114,13 @@
                                                  data-fallback-src="{{ url('/images/no-cover.png') }}">
                                         @else
                                             <div class="w-32 h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                                                <i class="fas fa-gamepad text-gray-400 text-2xl"></i>
+                                                <i aria-hidden="true" class="fas fa-gamepad text-gray-400 text-2xl"></i>
                                             </div>
                                         @endif
                                     </a>
                                 @else
                                     <div class="w-32 h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                                        <i class="fas fa-gamepad text-gray-400 text-2xl"></i>
+                                        <i aria-hidden="true" class="fas fa-gamepad text-gray-400 text-2xl"></i>
                                     </div>
                                 @endif
                             </div>
@@ -141,20 +132,20 @@
                                         <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100">{{ $result->title ?? $result->searchname }}</h3>
 
                                         @if($totalFailed > 0)
-                                            <div class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-800 border border-red-200 mt-1">
-                                                <i class="fas fa-exclamation-triangle mr-1"></i>
+                                            <div class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-200 border border-red-200 mt-1">
+                                                <i aria-hidden="true" class="fas fa-exclamation-triangle mr-1"></i>
                                                 <span>{{ $totalFailed }} failed report{{ $totalFailed > 1 ? 's' : '' }}</span>
                                             </div>
                                         @endif
 
                                         <div class="flex items-center gap-4 mt-1 text-sm text-gray-600 dark:text-gray-400">
                                             @if(!empty($result->releasedate))
-                                                <span><i class="fas fa-calendar mr-1"></i> {{ date('Y', strtotime($result->releasedate)) }}</span>
+                                                <span><i aria-hidden="true" class="fas fa-calendar mr-1"></i> {{ date('Y', strtotime($result->releasedate)) }}</span>
                                             @elseif(!empty($result->year))
-                                                <span><i class="fas fa-calendar mr-1"></i> {{ $result->year }}</span>
+                                                <span><i aria-hidden="true" class="fas fa-calendar mr-1"></i> {{ $result->year }}</span>
                                             @endif
                                             @if(!empty($result->platform))
-                                                <span><i class="fas fa-desktop mr-1"></i> {{ $result->platform }}</span>
+                                                <span><i aria-hidden="true" class="fas fa-desktop mr-1"></i> {{ $result->platform }}</span>
                                             @endif
                                         </div>
 
@@ -182,12 +173,12 @@
             </div>
         @else
             <x-empty-state
-                icon="fa fa-gamepad"
+                icon="fa-solid fa-gamepad"
                 title="No games found"
                 message="Try adjusting your search filters or browse all games."
                 :action-url="url('/Games')"
                 action-label="Browse All Games"
-                action-icon="fa fa-gamepad"
+                action-icon="fa-solid fa-gamepad"
             />
         @endif
     </div>

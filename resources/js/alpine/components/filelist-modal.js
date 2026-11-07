@@ -42,7 +42,7 @@ Alpine.data('filelistModal', () => ({
                 this.loading = false;
             })
             .catch(err => {
-                this._setContent('<div class="text-center py-8"><i class="fas fa-exclamation-circle text-3xl text-red-600"></i><p class="text-red-600 mt-2">' + escapeHtml(err.message) + '</p></div>');
+                this._setContent('<div class="text-center py-8"><i aria-hidden="true" class="fas fa-exclamation-circle text-3xl text-red-600"></i><p class="text-red-600 mt-2">' + escapeHtml(err.message) + '</p></div>');
                 this.loading = false;
             });
     },
@@ -51,7 +51,7 @@ Alpine.data('filelistModal', () => ({
 
     _buildHtml(data) {
         let html = '<div class="space-y-4">';
-        html += '<div class="bg-linear-to-r from-green-50 to-teal-50 dark:from-green-900 dark:to-teal-900 rounded-lg p-4 mb-4">';
+        html += '<div class="bg-linear-to-r from-success-50 to-teal-50 dark:from-success-900 dark:to-teal-900 rounded-lg p-4 mb-4">';
         html += '<h4 class="text-md font-semibold text-gray-800 dark:text-gray-200 mb-2">' + escapeHtml(data.release.searchname) + '</h4>';
         html += '<p class="text-sm text-gray-600 dark:text-gray-400">Total Files: ' + data.total + '</p></div>';
         html += '<div class="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">';

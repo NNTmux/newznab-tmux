@@ -4,10 +4,10 @@
      @if(! empty($grafanaTokenUrl)) data-token-url="{{ $grafanaTokenUrl }}" @endif>
     <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
         <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 flex items-center">
-            <i class="fas fa-server mr-2 text-orange-600 dark:text-orange-400"></i>
+            <i aria-hidden="true" class="fas fa-server mr-2 text-orange-600 dark:text-orange-400"></i>
             System Resources
         </h3>
-        <a href="{{ route('admin.monitoring') }}" class="text-sm font-semibold text-blue-600 hover:underline dark:text-blue-400">
+        <a href="{{ route('admin.monitoring') }}" class="text-sm font-semibold text-link hover:underline dark:text-primary-400">
             <i class="fas fa-chart-area mr-1" aria-hidden="true"></i>Full monitoring
         </a>
     </div>

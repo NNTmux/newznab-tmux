@@ -6,7 +6,7 @@
         aria-haspopup="menu"
         x-bind:aria-expanded="open"
     >
-        <i class="fas {{ $currentIcon }} text-primary-600 dark:text-primary-400" aria-hidden="true"></i>
+        <i class="fas {{ $currentIcon }} text-link dark:text-primary-400" aria-hidden="true"></i>
         <span>Sort: {{ $currentLabel }}</span>
         <i class="fas fa-chevron-down text-xs text-gray-400 transition-transform dark:text-gray-300" :class="chevronClass()" aria-hidden="true"></i>
     </button>
@@ -25,13 +25,13 @@
             @foreach($sortOptions as $sortKey => $sortData)
                 <a
                     href="{{ $sortUrls[$sortKey] }}"
-                    class="flex min-h-10 items-center gap-3 px-4 py-2 text-sm transition {{ $currentSort === $sortKey ? 'bg-primary-100 dark:bg-primary-700 text-primary-800 dark:text-white font-semibold' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700' }}"
+                    class="flex min-h-10 items-center gap-3 px-4 py-2 text-sm transition {{ $currentSort === $sortKey ? 'bg-primary-100 dark:bg-accent-hover text-primary-800 dark:text-white font-semibold' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700' }}"
                     role="menuitem"
                 >
-                    <i class="fas {{ $sortData['icon'] }} w-4 text-center {{ $currentSort === $sortKey ? 'text-primary-600 dark:text-primary-200' : 'text-gray-400 dark:text-gray-400' }}"></i>
+                    <i aria-hidden="true" class="fas {{ $sortData['icon'] }} w-4 text-center {{ $currentSort === $sortKey ? 'text-link dark:text-primary-200' : 'text-gray-400 dark:text-gray-400' }}"></i>
                     <span class="flex-1">{{ $sortData['label'] }}</span>
                     @if($currentSort === $sortKey)
-                        <i class="fas fa-check text-primary-600 dark:text-primary-200"></i>
+                        <i aria-hidden="true" class="fas fa-check text-link dark:text-primary-200"></i>
                     @endif
                 </a>
             @endforeach

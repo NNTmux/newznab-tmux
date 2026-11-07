@@ -9,9 +9,9 @@
     $serviceBadge = static function (ServiceStatusEnum $s): string {
         $base = 'px-2 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full';
         return $base.' '.match ($s) {
-            ServiceStatusEnum::Operational => 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200',
-            ServiceStatusEnum::Degraded => 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200',
-            ServiceStatusEnum::Maintenance => 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200',
+            ServiceStatusEnum::Operational => 'bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200',
+            ServiceStatusEnum::Degraded => 'bg-warning-100 dark:bg-warning-900 text-warning-800 dark:text-warning-200',
+            ServiceStatusEnum::Maintenance => 'bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200',
             ServiceStatusEnum::PartialOutage => 'bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200',
             ServiceStatusEnum::MajorOutage => 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200',
         };
@@ -21,7 +21,7 @@
         $base = 'px-2 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full';
         return $base.' '.match ($i) {
             IncidentImpactEnum::None => 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200',
-            IncidentImpactEnum::Minor => 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200',
+            IncidentImpactEnum::Minor => 'bg-warning-100 dark:bg-warning-900 text-warning-800 dark:text-warning-200',
             IncidentImpactEnum::Major => 'bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200',
             IncidentImpactEnum::Critical => 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200',
         };
@@ -31,25 +31,25 @@
         $base = 'px-2 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full';
         return $base.' '.match ($st) {
             IncidentStatusEnum::Investigating => 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200',
-            IncidentStatusEnum::Identified => 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200',
+            IncidentStatusEnum::Identified => 'bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200',
             IncidentStatusEnum::Monitoring => 'bg-cyan-100 dark:bg-cyan-900 text-cyan-800 dark:text-cyan-200',
-            IncidentStatusEnum::Resolved => 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200',
+            IncidentStatusEnum::Resolved => 'bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200',
         };
     };
 @endphp
 
 <div class="space-y-6">
+    <x-admin.page-header :title="$title" icon="fas fa-signal">
+        <x-slot:actions>
+            <a href="{{ route('admin.status.create') }}" class="px-4 py-2 bg-accent dark:bg-accent-hover text-white rounded-lg hover:bg-accent-hover dark:hover:bg-primary-800">
+                <i aria-hidden="true" class="fas fa-plus mr-2"></i>Create incident
+            </a>
+            <a href="{{ route('status') }}" target="_blank" rel="noopener" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600">
+                <i aria-hidden="true" class="fas fa-external-link-alt mr-2"></i>Public page
+            </a>
+        </x-slot:actions>
+    </x-admin.page-header>
     <x-admin.card>
-        <x-admin.page-header :title="$title" icon="fas fa-signal">
-            <x-slot:actions>
-                <a href="{{ route('admin.status.create') }}" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800">
-                    <i class="fas fa-plus mr-2"></i>Create incident
-                </a>
-                <a href="{{ route('status') }}" target="_blank" rel="noopener" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600">
-                    <i class="fas fa-external-link-alt mr-2"></i>Public page
-                </a>
-            </x-slot:actions>
-        </x-admin.page-header>
 
         <div class="px-6 py-6 border-t border-gray-200 dark:border-gray-700">
             <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Service health</h2>
@@ -71,7 +71,7 @@
                                     <option value="{{ $opt->value }}" @selected($svc->status === $opt)>{{ $opt->label() }}</option>
                                 @endforeach
                             </select>
-                            <button type="submit" class="w-full py-2 px-3 text-sm font-medium rounded-lg bg-primary-600 text-white hover:bg-primary-700 dark:hover:bg-primary-600">
+                            <button type="submit" class="w-full py-2 px-3 text-sm font-medium rounded-lg bg-accent text-white hover:bg-accent-hover dark:hover:bg-accent">
                                 Update
                             </button>
                         </form>
@@ -114,7 +114,7 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">{{ formatDateTime($incident->started_at) }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm space-x-2">
-                            <a href="{{ route('admin.status.edit', $incident) }}" class="text-blue-600 dark:text-blue-400 hover:underline">Edit</a>
+                            <a href="{{ route('admin.status.edit', $incident) }}" class="text-link dark:text-primary-400 hover:underline">Edit</a>
                             @if($incident->status !== IncidentStatusEnum::Resolved)
                                 <form action="{{ route('admin.status.resolve', $incident) }}" method="post" class="inline">
                                     @csrf

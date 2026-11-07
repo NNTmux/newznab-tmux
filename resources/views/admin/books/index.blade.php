@@ -2,14 +2,14 @@
 
 @section('content')
 <div class="space-y-6">
+    <x-admin.page-header :title="$title" icon="fas fa-book">
+        <x-slot:actions>
+            <span class="inline-flex min-h-11 items-center rounded-xl border border-gray-200 bg-white/70 px-4 text-sm font-medium text-gray-700 dark:border-gray-600 dark:bg-gray-800/70 dark:text-gray-200">
+                {{ number_format($bookList->total()) }} books
+            </span>
+        </x-slot:actions>
+    </x-admin.page-header>
     <x-admin.card>
-        <x-admin.page-header :title="$title" icon="fas fa-book">
-            <x-slot:actions>
-                <span class="inline-flex min-h-11 items-center rounded-xl border border-gray-200 bg-white/70 px-4 text-sm font-medium text-gray-700 dark:border-gray-600 dark:bg-gray-800/70 dark:text-gray-200">
-                    {{ number_format($bookList->total()) }} books
-                </span>
-            </x-slot:actions>
-        </x-admin.page-header>
 
         <!-- Books Table -->
         <x-admin.data-table>
@@ -34,7 +34,7 @@
                                          data-fallback-src="{{ asset('images/no-cover.png') }}">
                                 @else
                                     <div class="h-16 w-12 bg-gray-200 dark:bg-gray-700 rounded flex items-center justify-center">
-                                        <i class="fas fa-book text-gray-400"></i>
+                                        <i aria-hidden="true" class="fas fa-book text-gray-400"></i>
                                     </div>
                                 @endif
                             </td>
@@ -65,17 +65,17 @@
                                 {{ $book->created_at ? formatDate($book->created_at) : '—' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <a href="{{ url('admin/book-edit?id=' . $book->id) }}"
-                                   class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
+                                <a aria-label="Edit" href="{{ url('admin/book-edit?id=' . $book->id) }}"
+                                   class="text-link dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300"
                                    title="Edit">
-                                    <i class="fas fa-edit"></i>
+                                    <i aria-hidden="true" class="fas fa-edit"></i>
                                 </a>
                                 @if($book->url)
-                                    <a href="{{ $book->url }}"
+                                    <a aria-label="View Source" href="{{ $book->url }}"
                                        target="_blank"
-                                       class="ml-3 text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300"
+                                       class="ml-3 text-success-600 dark:text-success-400 hover:text-success-900 dark:hover:text-success-300"
                                        title="View Source">
-                                        <i class="fas fa-external-link-alt"></i>
+                                        <i aria-hidden="true" class="fas fa-external-link-alt"></i>
                                     </a>
                                 @endif
                             </td>

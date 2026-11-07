@@ -5,8 +5,8 @@
 }
 
 .form-checkbox:checked {
-    background-color: rgb(37, 99, 235); /* blue-600 */
-    border-color: rgb(37, 99, 235);
+    background-color: var(--ui-accent);
+    border-color: var(--ui-accent);
 }
 
 .dark .form-checkbox {
@@ -15,17 +15,17 @@
 }
 
 .dark .form-checkbox:checked {
-    background-color: rgb(59, 130, 246); /* blue-500 */
-    border-color: rgb(59, 130, 246);
+    background-color: var(--color-primary-500);
+    border-color: var(--color-primary-500);
 }
 
 .dark .form-checkbox:hover {
-    border-color: rgb(96, 165, 250); /* blue-400 */
+    border-color: var(--color-primary-400);
 }
 
 .form-checkbox:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary-500) 50%, transparent);
 }
 
 .dark .form-checkbox:focus {
@@ -93,11 +93,6 @@
 [data-metric] {
     transition: color 0.3s ease-in-out, transform 0.3s ease-in-out;
 }
-
-[data-metric].metric-updated {
-    animation: pulse 0.5s ease-in-out;
-}
-
 @keyframes pulse {
     0%, 100% {
         opacity: 1;
@@ -106,17 +101,6 @@
         opacity: 0.7;
     }
 }
-
-/* Quick Links hover effects */
-.quick-link-item {
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-}
-
-.quick-link-item:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-}
-
 /* Profile Charts - Progress Bars */
 .progress-bar {
     transition: width 0.3s ease-in-out;
@@ -154,136 +138,6 @@ code.api-token::-webkit-scrollbar-thumb:hover {
     display: none;
 }
 
-/* Toast Notifications */
-#toast-container {
-    position: fixed;
-    top: 5rem;
-    right: 1rem;
-    z-index: 99999;
-    max-width: 420px;
-    pointer-events: none;
-}
-
-@media (max-width: 640px) {
-    #toast-container {
-        top: 1rem;
-        right: 0.5rem;
-        left: 0.5rem;
-        max-width: none;
-    }
-}
-
-.toast-notification {
-    display: flex;
-    align-items: center;
-    min-width: 320px;
-    padding: 1rem 1.25rem;
-    margin-bottom: 0.75rem;
-    border-radius: 0.5rem;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    animation: slideIn 0.3s ease-out;
-    transition: all 0.3s ease-in-out;
-    pointer-events: auto;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-@media (max-width: 640px) {
-    .toast-notification {
-        min-width: auto;
-    }
-}
-
-.toast-notification.removing {
-    opacity: 0;
-    transform: translateX(100%);
-}
-
-.toast-notification.success {
-    background: linear-gradient(135deg, rgb(16, 185, 129) 0%, rgb(5, 150, 105) 100%);
-    color: white;
-}
-
-.dark .toast-notification.success {
-    background: linear-gradient(135deg, rgb(5, 150, 105) 0%, rgb(4, 120, 87) 100%);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
-}
-
-.toast-notification.error {
-    background: linear-gradient(135deg, rgb(239, 68, 68) 0%, rgb(220, 38, 38) 100%);
-    color: white;
-}
-
-.dark .toast-notification.error {
-    background: linear-gradient(135deg, rgb(220, 38, 38) 0%, rgb(185, 28, 28) 100%);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
-}
-
-.toast-notification.info {
-    background: linear-gradient(135deg, rgb(59, 130, 246) 0%, rgb(37, 99, 235) 100%);
-    color: white;
-}
-
-.dark .toast-notification.info {
-    background: linear-gradient(135deg, rgb(29, 78, 216) 0%, rgb(30, 64, 175) 100%);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
-}
-
-.toast-notification.warning {
-    background: linear-gradient(135deg, rgb(245, 158, 11) 0%, rgb(217, 119, 6) 100%);
-    color: white;
-}
-
-.dark .toast-notification.warning {
-    background: linear-gradient(135deg, rgb(217, 119, 6) 0%, rgb(180, 83, 9) 100%);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
-}
-
-.toast-icon {
-    flex-shrink: 0;
-    margin-right: 0.75rem;
-    font-size: 1.25rem;
-}
-
-.toast-message {
-    flex: 1;
-    font-size: 0.875rem;
-    font-weight: 500;
-}
-
-.toast-close {
-    flex-shrink: 0;
-    margin-left: 0.75rem;
-    background: transparent;
-    border: none;
-    color: white;
-    font-size: 1.5rem;
-    line-height: 1;
-    cursor: pointer;
-    opacity: 0.8;
-    padding: 0;
-    width: 1.5rem;
-    height: 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: opacity 0.2s ease-in-out;
-}
-
-.toast-close:hover {
-    opacity: 1;
-}
-
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateX(100%);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
 /* Confirmation Modal - Cart Delete Confirmation */
 .confirmation-modal {
     position: fixed;
@@ -304,175 +158,6 @@ code.api-token::-webkit-scrollbar-thumb:hover {
 .dark .confirmation-modal {
     background-color: rgba(0, 0, 0, 0.85);
 }
-
-.confirmation-modal-content {
-    background-color: white;
-    border-radius: 0.75rem;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-    max-width: 28rem;
-    width: 100%;
-    overflow: hidden;
-    animation: modalSlideIn 0.3s ease-out;
-}
-
-.dark .confirmation-modal-content {
-    background-color: rgb(31, 41, 55); /* gray-800 */
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-}
-
-.confirmation-modal-header {
-    display: flex;
-    align-items: center;
-    padding: 1.5rem;
-    border-bottom: 1px solid rgb(229, 231, 235); /* gray-200 */
-}
-
-.dark .confirmation-modal-header {
-    border-bottom-color: rgb(55, 65, 81); /* gray-700 */
-}
-
-.confirmation-modal-icon {
-    flex-shrink: 0;
-    width: 3rem;
-    height: 3rem;
-    border-radius: 50%;
-    background: linear-gradient(135deg, rgb(254, 226, 226) 0%, rgb(254, 202, 202) 100%); /* red-100 to red-200 */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 1rem;
-}
-
-.dark .confirmation-modal-icon {
-    background: linear-gradient(135deg, rgb(127, 29, 29) 0%, rgb(153, 27, 27) 100%); /* red-900 to red-800 */
-}
-
-.confirmation-modal-icon i {
-    color: rgb(220, 38, 38); /* red-600 */
-    font-size: 1.5rem;
-}
-
-.dark .confirmation-modal-icon i {
-    color: rgb(248, 113, 113); /* red-400 */
-}
-
-.confirmation-modal-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: rgb(17, 24, 39); /* gray-900 */
-    margin: 0;
-}
-
-.dark .confirmation-modal-title {
-    color: rgb(243, 244, 246); /* gray-100 */
-}
-
-.confirmation-modal-body {
-    padding: 1.5rem;
-    color: rgb(55, 65, 81); /* gray-700 */
-    font-size: 0.9375rem;
-    line-height: 1.625;
-}
-
-.dark .confirmation-modal-body {
-    color: rgb(209, 213, 219); /* gray-300 */
-}
-
-.confirmation-modal-body strong {
-    color: rgb(17, 24, 39); /* gray-900 */
-    font-weight: 600;
-}
-
-.dark .confirmation-modal-body strong {
-    color: rgb(243, 244, 246); /* gray-100 */
-}
-
-.confirmation-modal-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 0.75rem;
-    padding: 1.25rem 1.5rem;
-    background-color: rgb(249, 250, 251); /* gray-50 */
-}
-
-.dark .confirmation-modal-footer {
-    background-color: rgb(17, 24, 39); /* gray-900 */
-}
-
-.confirmation-modal-footer .btn-cancel {
-    padding: 0.625rem 1.25rem;
-    background-color: white;
-    border: 1px solid rgb(209, 213, 219); /* gray-300 */
-    border-radius: 0.375rem;
-    color: rgb(55, 65, 81); /* gray-700 */
-    font-weight: 500;
-    font-size: 0.875rem;
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-}
-
-.dark .confirmation-modal-footer .btn-cancel {
-    background-color: rgb(55, 65, 81); /* gray-700 */
-    border-color: rgb(75, 85, 99); /* gray-600 */
-    color: rgb(229, 231, 235); /* gray-200 */
-}
-
-.confirmation-modal-footer .btn-cancel:hover {
-    background-color: rgb(249, 250, 251); /* gray-50 */
-    border-color: rgb(156, 163, 175); /* gray-400 */
-}
-
-.dark .confirmation-modal-footer .btn-cancel:hover {
-    background-color: rgb(75, 85, 99); /* gray-600 */
-    border-color: rgb(107, 114, 128); /* gray-500 */
-}
-
-.confirmation-modal-footer .btn-cancel:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
-}
-
-.dark .confirmation-modal-footer .btn-cancel:focus {
-    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.5);
-}
-
-.confirmation-modal-footer .btn-confirm {
-    padding: 0.625rem 1.25rem;
-    background: linear-gradient(135deg, rgb(220, 38, 38) 0%, rgb(185, 28, 28) 100%); /* red-600 to red-700 */
-    border: 1px solid rgb(220, 38, 38);
-    border-radius: 0.375rem;
-    color: white;
-    font-weight: 500;
-    font-size: 0.875rem;
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-}
-
-.dark .confirmation-modal-footer .btn-confirm {
-    background: linear-gradient(135deg, rgb(185, 28, 28) 0%, rgb(153, 27, 27) 100%); /* red-700 to red-800 */
-    border-color: rgb(185, 28, 28);
-}
-
-.confirmation-modal-footer .btn-confirm:hover {
-    background: linear-gradient(135deg, rgb(185, 28, 28) 0%, rgb(153, 27, 27) 100%);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-}
-
-.dark .confirmation-modal-footer .btn-confirm:hover {
-    background: linear-gradient(135deg, rgb(153, 27, 27) 0%, rgb(127, 29, 29) 100%);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
-}
-
-.confirmation-modal-footer .btn-confirm:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.5);
-}
-
-.dark .confirmation-modal-footer .btn-confirm:focus {
-    box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.5);
-}
-
 /* Image Modal Styles */
 .image-modal-backdrop {
     position: fixed;
@@ -548,11 +233,6 @@ code.api-token::-webkit-scrollbar-thumb:hover {
 .dropdown-menu {
     display: none;
 }
-
-.confirmation-modal-footer .btn-confirm:active {
-    transform: translateY(0);
-}
-
 @keyframes modalSlideIn {
     from {
         opacity: 0;
@@ -574,30 +254,6 @@ code.api-token::-webkit-scrollbar-thumb:hover {
 }
 
 /* Mobile responsiveness for confirmation modal */
-@media (max-width: 640px) {
-    .confirmation-modal-content {
-        margin: 0 1rem;
-    }
-
-    .confirmation-modal-header {
-        padding: 1.25rem 1rem;
-    }
-
-    .confirmation-modal-body {
-        padding: 1.25rem 1rem;
-    }
-
-    .confirmation-modal-footer {
-        padding: 1rem;
-        flex-direction: column-reverse;
-    }
-
-    .confirmation-modal-footer .btn-cancel,
-    .confirmation-modal-footer .btn-confirm {
-        width: 100%;
-        justify-content: center;
-    }
-}
 
 /* Tmux Edit - Remove Crap Types Container Styles */
 #crap_types_container {
@@ -644,66 +300,6 @@ code.api-token::-webkit-scrollbar-thumb:hover {
 .content-toggle-status i {
     font-size: 1.125rem; /* 18px */
 }
-
-/* Admin Theme Selector Styles */
-.admin-theme-selector .theme-option {
-    border-color: rgb(55, 65, 81); /* gray-700 */
-    background-color: rgba(31, 41, 55, 0.5); /* gray-800/50 */
-}
-
-.admin-theme-selector .theme-option:hover {
-    background-color: rgb(31, 41, 55); /* gray-800 */
-}
-
-.admin-theme-selector .theme-option.theme-option-active {
-    border-color: rgb(59, 130, 246); /* blue-500 */
-    background-color: rgba(30, 64, 175, 0.3); /* blue-900/30 */
-}
-
-/* Fallback for browsers that support :has() */
-.admin-theme-selector .theme-option:has(.theme-radio:checked) {
-    border-color: rgb(59, 130, 246); /* blue-500 */
-    background-color: rgba(30, 64, 175, 0.3); /* blue-900/30 */
-}
-
-/* User Area Theme Selector Styles (for consistency) */
-.theme-option {
-    border-color: rgb(209, 213, 219); /* gray-300 */
-    background-color: rgb(249, 250, 251); /* gray-50 */
-}
-
-.dark .theme-option {
-    border-color: rgb(75, 85, 99); /* gray-600 */
-    background-color: rgb(55, 65, 81); /* gray-700 */
-}
-
-.theme-option:hover {
-    background-color: rgb(243, 244, 246); /* gray-100 */
-}
-
-.dark .theme-option:hover {
-    background-color: rgb(31, 41, 55); /* gray-800 */
-}
-
-.theme-option.theme-option-active {
-    border-color: rgb(59, 130, 246); /* blue-500 */
-    background-color: rgb(239, 246, 255); /* blue-50 */
-}
-
-.dark .theme-option.theme-option-active {
-    background-color: rgba(30, 64, 175, 0.2); /* blue-900/20 */
-}
-
-/* Fallback for browsers that support :has() */
-.theme-option:has(.theme-radio:checked) {
-    border-color: rgb(59, 130, 246); /* blue-500 */
-    background-color: rgb(239, 246, 255); /* blue-50 */
-}
-
-.dark .theme-option:has(.theme-radio:checked) {
-    background-color: rgba(30, 64, 175, 0.2); /* blue-900/20 */
-}
-
 /* Group Selection Styles */
 .group-checkbox {
     cursor: pointer;
@@ -711,11 +307,11 @@ code.api-token::-webkit-scrollbar-thumb:hover {
 }
 
 .group-row.selected {
-    background-color: rgba(59, 130, 246, 0.1); /* blue-500/10 */
+    background-color: color-mix(in srgb, var(--color-primary-500) 10%, transparent);
 }
 
 .dark .group-row.selected {
-    background-color: rgba(59, 130, 246, 0.15); /* blue-500/15 */
+    background-color: color-mix(in srgb, var(--color-primary-500) 15%, transparent);
 }
 
 /* Selection counter animation */
@@ -785,94 +381,6 @@ code.api-token::-webkit-scrollbar-thumb:hover {
 .dark #reset-selected-list::-webkit-scrollbar-thumb {
     background: rgb(107, 114, 128); /* gray-500 */
 }
-
-/* ------------------------------------------------------------------ */
-/* Movies library                                                     */
-/* ------------------------------------------------------------------ */
-
-.movies-hero {
-    background:
-        linear-gradient(135deg, color-mix(in srgb, var(--color-primary-950) 92%, #020617), var(--color-primary-700));
-}
-
-.movies-hero__glow {
-    position: absolute;
-    border-radius: 9999px;
-    background: rgb(255 255 255 / 0.12);
-    filter: blur(1px);
-    pointer-events: none;
-}
-
-.movies-hero__glow--one {
-    width: 18rem;
-    height: 18rem;
-    top: -11rem;
-    right: 8%;
-}
-
-.movies-hero__glow--two {
-    width: 11rem;
-    height: 11rem;
-    right: -4rem;
-    bottom: -6rem;
-    background: rgb(255 255 255 / 0.08);
-}
-
-.movies-hero__icon {
-    display: inline-flex;
-    width: 3.25rem;
-    height: 3.25rem;
-    flex-shrink: 0;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid rgb(255 255 255 / 0.18);
-    border-radius: 1rem;
-    background: rgb(255 255 255 / 0.12);
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.12);
-    font-size: 1.25rem;
-}
-
-.movies-hero__stat,
-.movies-hero__action {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    border: 1px solid rgb(255 255 255 / 0.16);
-    border-radius: 9999px;
-    background: rgb(15 23 42 / 0.24);
-    color: rgb(255 255 255 / 0.88);
-    backdrop-filter: blur(8px);
-}
-
-.movies-hero__stat {
-    padding: 0.4rem 0.75rem;
-}
-
-.movies-hero__action {
-    min-height: 2.75rem;
-    padding: 0.65rem 1rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-    transition: background-color 160ms ease, border-color 160ms ease, transform 160ms ease;
-}
-
-.movies-hero__action:hover {
-    border-color: rgb(255 255 255 / 0.3);
-    background: rgb(255 255 255 / 0.16);
-    transform: translateY(-1px);
-}
-
-.movies-hero__action:focus-visible {
-    outline: 2px solid rgb(255 255 255 / 0.9);
-    outline-offset: 2px;
-}
-
-.movies-hero__action--accent {
-    border-color: rgb(251 146 60 / 0.45);
-    background: linear-gradient(135deg, rgb(249 115 22 / 0.94), rgb(220 38 38 / 0.94));
-    color: #fff;
-}
-
 .movie-filter-control {
     width: 100%;
     min-height: 2.75rem;
@@ -925,13 +433,13 @@ code.api-token::-webkit-scrollbar-thumb:hover {
 }
 
 .movie-card:hover {
-    border-color: color-mix(in srgb, var(--color-primary-500) 38%, var(--border-default));
+    border-color: color-mix(in srgb, var(--color-primary-500) 38%, var(--ui-border));
     box-shadow: 0 16px 36px -24px rgb(15 23 42 / 0.55);
     transform: translateY(-2px);
 }
 
 .dark .movie-card:hover {
-    border-color: color-mix(in srgb, var(--color-primary-400) 45%, var(--border-default-dark));
+    border-color: color-mix(in srgb, var(--color-primary-400) 45%, var(--ui-border));
     box-shadow: 0 18px 42px -24px rgb(0 0 0 / 0.8);
 }
 
@@ -945,11 +453,7 @@ code.api-token::-webkit-scrollbar-thumb:hover {
     position: relative;
     flex-shrink: 0;
     overflow: hidden;
-    background: var(--surface-panel-alt);
-}
-
-.dark .movie-card__poster-wrap {
-    background: var(--surface-panel-alt-dark);
+    background: var(--ui-surface-sunken);
 }
 
 .movie-card__poster-link {
@@ -974,11 +478,7 @@ code.api-token::-webkit-scrollbar-thumb:hover {
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    color: var(--text-muted);
-}
-
-.dark .movie-card__poster-placeholder {
-    color: var(--text-muted-dark);
+    color: var(--ui-fg-muted);
 }
 
 .movie-card__poster-placeholder i {
@@ -1024,14 +524,9 @@ code.api-token::-webkit-scrollbar-thumb:hover {
     align-items: center;
     gap: 0.35rem;
     border-radius: 9999px;
-    background: var(--surface-panel-alt);
+    background: var(--ui-surface-sunken);
     padding: 0.35rem 0.6rem;
-    color: var(--text-muted);
-}
-
-.dark .movie-meta-chip {
-    background: var(--surface-panel-alt-dark);
-    color: var(--text-muted-dark);
+    color: var(--ui-fg-muted);
 }
 
 .movie-meta-chip--rating {
@@ -1042,6 +537,27 @@ code.api-token::-webkit-scrollbar-thumb:hover {
 .dark .movie-meta-chip--rating {
     background: rgb(113 63 18 / 0.45);
     color: rgb(253 224 71);
+}
+
+/* Rotten Tomatoes chip on movie cards: fresh (red) vs rotten (green) */
+.movie-meta-chip--rt-fresh {
+    background: rgb(254 226 226);
+    color: rgb(185 28 28);
+}
+
+.dark .movie-meta-chip--rt-fresh {
+    background: rgb(127 29 29 / 0.45);
+    color: rgb(252 165 165);
+}
+
+.movie-meta-chip--rt-rotten {
+    background: rgb(220 252 231);
+    color: rgb(21 128 61);
+}
+
+.dark .movie-meta-chip--rt-rotten {
+    background: rgb(20 83 45 / 0.45);
+    color: rgb(134 239 172);
 }
 
 .movie-card__metadata-row {
@@ -1055,15 +571,11 @@ code.api-token::-webkit-scrollbar-thumb:hover {
     display: flex;
     align-items: baseline;
     gap: 0.4rem;
-    color: var(--text-muted);
+    color: var(--ui-fg-muted);
     font-size: 0.75rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-}
-
-.dark .movie-card__metadata-row dt {
-    color: var(--text-muted-dark);
 }
 
 .movie-card__metadata-row dd {
@@ -1159,7 +671,7 @@ code.api-token::-webkit-scrollbar-thumb:hover {
 }
 
 .movie-release-row:hover {
-    border-color: color-mix(in srgb, var(--color-primary-500) 28%, var(--border-default));
+    border-color: color-mix(in srgb, var(--color-primary-500) 28%, var(--ui-border));
 }
 
 @media (min-width: 640px) {
@@ -1205,16 +717,14 @@ code.api-token::-webkit-scrollbar-thumb:hover {
 
 @media (prefers-reduced-motion: reduce) {
     .movie-card,
-    .movie-cover,
-    .movies-hero__action,
-    .movie-source-link {
+.movie-cover,
+.movie-source-link {
         transition: none;
     }
 
     .movie-card:hover,
-    .movie-card:hover .movie-cover,
-    .movies-hero__action:hover,
-    .movie-source-link:hover {
+.movie-card:hover .movie-cover,
+.movie-source-link:hover {
         transform: none;
     }
 }
@@ -1320,12 +830,7 @@ code.api-token::-webkit-scrollbar-thumb:hover {
 
 .release-detail-page .surface-panel-alt,
 .release-detail-page .detail-password-card,
-.release-detail-page .detail-file-list,
 .release-detail-page .detail-info-sidebar,
-.release-detail-page .detail-empty-comments {
-    @apply shadow-sm;
-}
-
 .release-detail-page .detail-comment-card {
     @apply shadow-sm hover:shadow-md transition-shadow duration-300;
 }
@@ -1340,6 +845,27 @@ code.api-token::-webkit-scrollbar-thumb:hover {
 
 .movie-detail-page {
     @apply shadow-md;
+}
+
+/* Release details: metadata panels side by side on wide screens */
+.detail-info-grid {
+    display: grid;
+    gap: 1.5rem;
+    align-items: start;
+}
+
+.detail-info-grid:not(:has(> *)) {
+    display: none;
+}
+
+@media (min-width: 1280px) {
+    .detail-info-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .detail-info-grid > :only-child {
+        grid-column: 1 / -1;
+    }
 }
 
 .movie-detail-page .movie-detail-poster {

@@ -18,6 +18,6 @@
     ];
 @endphp
 
-<div {{ $attributes->merge(['class' => 'rounded-2xl '.($surfaces[$variant] ?? $surfaces['default']).' '.($paddings[$padding] ?? $paddings['md'])]) }}>
+<div {{ $attributes->merge(['class' => 'rounded-card '.($surfaces[$variant] ?? $surfaces['default']).' '.($paddings[$padding] ?? $paddings['md'])]) }}>
     {{ $slot }}
 </div>

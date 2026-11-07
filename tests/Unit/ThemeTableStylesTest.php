@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use App\Enums\ColorScheme;
 use App\Http\Requests\UpdateThemeRequest;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
@@ -31,9 +32,10 @@ class ThemeTableStylesTest extends TestCase
         $this->assertStringContainsString('--surface-hover: #fef2f2;', $stylesheet);
         $this->assertStringContainsString('--surface-hover: #fdf2f8;', $stylesheet);
         $this->assertMatchesRegularExpression(
-            '/main tbody tr:hover\s*\{\s*background-color: var\(--surface-hover\) !important;\s*\}/',
+            '/main tbody tr:hover\s*\{\s*background-color: var\(--ui-surface-hover\) !important;\s*\}/',
             $stylesheet,
         );
+        $this->assertMatchesRegularExpression('/:root \{[^}]*--ui-surface-hover: var\(--surface-hover\);/s', $stylesheet);
     }
 
     public function test_dark_table_hover_styles_remain_unchanged(): void
@@ -51,10 +53,9 @@ class ThemeTableStylesTest extends TestCase
         $this->assertStringContainsString('--surface-hover-dark: #7c2d12;', $stylesheet);
         $this->assertStringContainsString('--surface-hover-dark: #7f1d1d;', $stylesheet);
         $this->assertStringContainsString('--surface-hover-dark: #831843;', $stylesheet);
-        $this->assertMatchesRegularExpression(
-            '/\.dark main tbody tr:hover\s*\{\s*background-color: var\(--surface-hover-dark\) !important;\s*\}/',
-            $stylesheet,
-        );
+        // Dark mode reuses the single hover rule through the semantic token.
+        $this->assertMatchesRegularExpression('/:root\.dark \{[^}]*--ui-surface-hover: var\(--surface-hover-dark\);/s', $stylesheet);
+        $this->assertStringNotContainsString('.dark main tbody tr:hover', $stylesheet);
     }
 
     public function test_every_color_scheme_defines_complete_surface_and_accent_tokens(): void
@@ -78,27 +79,24 @@ class ThemeTableStylesTest extends TestCase
 
     public function test_color_scheme_options_stay_in_sync_across_the_ui_and_persistence_layers(): void
     {
-        $switcher = (string) file_get_contents(__DIR__.'/../../resources/views/partials/scheme-switcher.blade.php');
-        $profile = (string) file_get_contents(__DIR__.'/../../resources/views/profile/edit.blade.php');
-        $themeInit = (string) file_get_contents(__DIR__.'/../../resources/views/partials/theme-init.blade.php');
-        $themeStore = (string) file_get_contents(__DIR__.'/../../resources/js/alpine/stores/theme.js');
-        $profileRequest = (string) file_get_contents(__DIR__.'/../../app/Http/Requests/UpdateProfileRequest.php');
-        $profileController = (string) file_get_contents(__DIR__.'/../../app/Http/Controllers/ProfileController.php');
-        $schemeList = implode(',', self::COLOR_SCHEMES);
-        $javascriptSchemeList = "'".implode("', '", self::COLOR_SCHEMES)."'";
+        $source = static fn (string $path): string => (string) file_get_contents(__DIR__.'/../../'.$path);
 
-        $this->assertStringContainsString("const colorSchemes = [{$javascriptSchemeList}]", $themeStore);
-        $this->assertStringContainsString("in:{$schemeList}", $profileRequest);
-        $this->assertStringContainsString($javascriptSchemeList, $themeInit);
-        $this->assertStringContainsString($javascriptSchemeList, $profileController);
+        $this->assertSame(self::COLOR_SCHEMES, ColorScheme::values());
 
-        foreach (self::COLOR_SCHEMES as $scheme) {
-            $this->assertStringContainsString("'value' => '{$scheme}'", $switcher);
-            $this->assertStringContainsString("'value' => '{$scheme}'", $profile);
+        // The Alpine store keeps a literal list (it is unit-tested without a DOM), so pin it to the enum.
+        preg_match('/const colorSchemes = \[(?<list>[^\]]*)\]/', $source('resources/js/alpine/stores/theme.js'), $matches);
+        $storeSchemes = array_map(static fn (string $value): string => trim($value, " '\""), explode(',', $matches['list'] ?? ''));
+        $this->assertSame(ColorScheme::values(), $storeSchemes);
 
-            if ($scheme !== 'blue') {
-                $this->assertStringContainsString("data-color-scheme=\"{$scheme}\"", $themeInit);
-            }
+        foreach (['app/Http/Requests/UpdateProfileRequest.php', 'app/Http/Requests/UpdateThemeRequest.php'] as $request) {
+            $this->assertStringContainsString('Rule::in(ColorScheme::values())', $source($request));
+        }
+
+        $this->assertStringContainsString('ColorScheme::tryFrom(', $source('app/Http/Controllers/ProfileController.php'));
+
+        foreach (['resources/views/partials/scheme-switcher.blade.php', 'resources/views/profile/edit.blade.php', 'resources/views/partials/theme-init.blade.php'] as $view) {
+            $this->assertStringContainsString('\\App\\Enums\\ColorScheme::cases()', $source($view), $view);
+            $this->assertStringNotContainsString("'value' => 'indigo'", $source($view), $view);
         }
     }
 

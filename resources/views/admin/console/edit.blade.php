@@ -2,17 +2,18 @@
 
 @section('content')
 <div class="space-y-6">
+    <x-admin.page-header :title="$title" icon="fas fa-edit">
+        <x-slot:actions>
+            <x-admin.button :href="route('admin.console-list')" tone="gray" icon="fas fa-arrow-left">Back to List</x-admin.button>
+        </x-slot:actions>
+    </x-admin.page-header>
     <x-admin.card>
-        <x-admin.page-header :title="$title" icon="fas fa-edit">
-            <x-slot:actions>
-                <x-admin.button :href="route('admin.console-list')" tone="gray" icon="fas fa-arrow-left">Back to List</x-admin.button>
-            </x-slot:actions>
-        </x-admin.page-header>
 
         <!-- Edit Form -->
         <div class="p-6">
             <form method="POST" action="{{ url('admin/console-edit?id=' . $con['id']) }}" enctype="multipart/form-data">
                 @csrf
+                <x-form-errors class="mb-6" />
                 <input type="hidden" name="action" value="submit">
                 <input type="hidden" name="id" value="{{ $con['id'] }}">
 
@@ -29,7 +30,7 @@
                                    name="title"
                                    value="{{ $con['title'] ?? '' }}"
                                    required
-                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">
                         </div>
 
                         <!-- Platform -->
@@ -41,7 +42,7 @@
                                    id="platform"
                                    name="platform"
                                    value="{{ $con['platform'] ?? '' }}"
-                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">
                         </div>
 
                         <!-- Publisher -->
@@ -53,7 +54,7 @@
                                    id="publisher"
                                    name="publisher"
                                    value="{{ $con['publisher'] ?? '' }}"
-                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">
                         </div>
 
                         <!-- Release Date -->
@@ -65,7 +66,7 @@
                                    id="releasedate"
                                    name="releasedate"
                                    value="{{ isset($con['releasedate']) && $con['releasedate'] ? date('Y-m-d', $con['releasedate']) : '' }}"
-                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">
                         </div>
 
                         <!-- ASIN -->
@@ -77,7 +78,7 @@
                                    id="asin"
                                    name="asin"
                                    value="{{ $con['asin'] ?? '' }}"
-                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">
                         </div>
 
                         <!-- URL -->
@@ -89,10 +90,10 @@
                                    id="url"
                                    name="url"
                                    value="{{ $con['url'] ?? '' }}"
-                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">
                             @if(!empty($con['url']))
-                                <a href="{{ $con['url'] }}" target="_blank" class="text-sm text-blue-600 dark:text-blue-400 hover:underline mt-1 inline-block">
-                                    <i class="fas fa-external-link-alt mr-1"></i>View Source
+                                <a href="{{ $con['url'] }}" target="_blank" class="text-sm text-link dark:text-primary-400 hover:underline mt-1 inline-block">
+                                    <i aria-hidden="true" class="fas fa-external-link-alt mr-1"></i>View Source
                                 </a>
                             @endif
                         </div>
@@ -104,7 +105,7 @@
                             </label>
                             <select id="esrb"
                                     name="esrb"
-                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">
                                 <option value="">Select Rating</option>
                                 <option value="E" {{ isset($con['esrb']) && $con['esrb'] == 'E' ? 'selected' : '' }}>E - Everyone</option>
                                 <option value="E10+" {{ isset($con['esrb']) && $con['esrb'] == 'E10+' ? 'selected' : '' }}>E10+ - Everyone 10+</option>
@@ -124,7 +125,7 @@
                                    id="salesrank"
                                    name="salesrank"
                                    value="{{ $con['salesrank'] ?? '' }}"
-                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">
                         </div>
 
                         <!-- Genre -->
@@ -134,7 +135,7 @@
                             </label>
                             <select id="genre"
                                     name="genre"
-                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">
                                 <option value="">Select Genre</option>
                                 @foreach($genres as $genre)
                                     <option value="{{ $genre->id }}" {{ isset($con['genre_id']) && $con['genre_id'] == $genre->id ? 'selected' : '' }}>
@@ -164,7 +165,7 @@
                                          class="max-w-full h-auto mx-auto rounded shadow-lg img-max-h-400">
                                 @else
                                     <div class="flex flex-col items-center justify-center py-12 text-gray-400 dark:text-gray-500">
-                                        <i class="fas fa-gamepad text-6xl mb-3"></i>
+                                        <i aria-hidden="true" class="fas fa-gamepad text-6xl mb-3"></i>
                                         <p>No cover image available</p>
                                     </div>
                                 @endif
@@ -185,9 +186,9 @@
                                               file:mr-4 file:py-2 file:px-4
                                               file:rounded-md file:border-0
                                               file:text-sm file:font-semibold
-                                              file:bg-blue-50 file:text-blue-700
-                                              hover:file:bg-blue-100
-                                              dark:file:bg-blue-900 dark:file:text-blue-200">
+                                              file:bg-primary-50 file:text-link
+                                              hover:file:bg-primary-100
+                                              dark:file:bg-primary-900 dark:file:text-primary-200">
                                 <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
                                     PNG, JPG, GIF up to 10MB
                                 </p>
@@ -222,10 +223,10 @@
                 <!-- Action Buttons -->
                 <div class="mt-6 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 pt-6">
                     <a href="{{ route('admin.console-list') }}" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600">
-                        <i class="fas fa-times mr-2"></i>Cancel
+                        <i aria-hidden="true" class="fas fa-times mr-2"></i>Cancel
                     </a>
-                    <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                        <i class="fas fa-save mr-2"></i>Save Changes
+                    <button type="submit" class="px-6 py-2 bg-accent text-white rounded-lg hover:bg-accent-hover">
+                        <i aria-hidden="true" class="fas fa-save mr-2"></i>Save Changes
                     </button>
                 </div>
             </form>

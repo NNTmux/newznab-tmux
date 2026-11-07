@@ -42,7 +42,7 @@ Alpine.data('mediainfoModal', () => ({
                 this.loading = false;
             })
             .catch(err => {
-                this._setContent('<div class="text-center py-8"><i class="fas fa-exclamation-circle text-3xl text-red-600"></i><p class="text-red-600 mt-2">' + escapeHtml(err.message) + '</p></div>');
+                this._setContent('<div class="text-center py-8"><i aria-hidden="true" class="fas fa-exclamation-circle text-3xl text-red-600"></i><p class="text-red-600 mt-2">' + escapeHtml(err.message) + '</p></div>');
                 this.loading = false;
             });
     },
@@ -53,8 +53,8 @@ Alpine.data('mediainfoModal', () => ({
         let html = '<div class="space-y-6">';
 
         if (data.video) {
-            html += '<div class="bg-linear-to-r from-blue-50 to-indigo-50 dark:from-blue-900 dark:to-indigo-900 rounded-lg p-4">';
-            html += '<h4 class="text-md font-semibold text-gray-800 dark:text-gray-200 mb-3 flex items-center"><i class="fas fa-video mr-2 text-blue-600 dark:text-blue-400"></i> Video Information</h4>';
+            html += '<div class="bg-linear-to-r from-primary-50 to-indigo-50 dark:from-primary-900 dark:to-indigo-900 rounded-lg p-4">';
+            html += '<h4 class="text-md font-semibold text-gray-800 dark:text-gray-200 mb-3 flex items-center"><i aria-hidden="true" class="fas fa-video mr-2 text-link dark:text-primary-400"></i> Video Information</h4>';
             html += '<dl class="grid grid-cols-2 gap-3">';
             const v = data.video;
             if (v.containerformat) html += this._dl('Container', v.containerformat);
@@ -70,8 +70,8 @@ Alpine.data('mediainfoModal', () => ({
         }
 
         if (data.audio && data.audio.length > 0) {
-            html += '<div class="bg-linear-to-r from-green-50 to-teal-50 dark:from-green-900 dark:to-teal-900 rounded-lg p-4">';
-            html += '<h4 class="text-md font-semibold text-gray-800 dark:text-gray-200 mb-3 flex items-center"><i class="fas fa-volume-up mr-2 text-green-600 dark:text-green-400"></i> Audio Information</h4>';
+            html += '<div class="bg-linear-to-r from-success-50 to-teal-50 dark:from-success-900 dark:to-teal-900 rounded-lg p-4">';
+            html += '<h4 class="text-md font-semibold text-gray-800 dark:text-gray-200 mb-3 flex items-center"><i aria-hidden="true" class="fas fa-volume-up mr-2 text-success-600 dark:text-success-400"></i> Audio Information</h4>';
             data.audio.forEach((a, i) => {
                 if (i > 0) html += '<hr class="my-3 border-gray-200 dark:border-gray-700">';
                 html += '<dl class="grid grid-cols-2 gap-3">';
@@ -87,7 +87,7 @@ Alpine.data('mediainfoModal', () => ({
 
         if (data.subs) {
             html += '<div class="bg-linear-to-r from-purple-50 to-pink-50 dark:from-purple-900 dark:to-pink-900 rounded-lg p-4">';
-            html += '<h4 class="text-md font-semibold text-gray-800 dark:text-gray-200 mb-3 flex items-center"><i class="fas fa-closed-captioning mr-2 text-purple-600 dark:text-purple-400"></i> Subtitles</h4>';
+            html += '<h4 class="text-md font-semibold text-gray-800 dark:text-gray-200 mb-3 flex items-center"><i aria-hidden="true" class="fas fa-closed-captioning mr-2 text-purple-600 dark:text-purple-400"></i> Subtitles</h4>';
             html += '<p class="text-sm text-gray-900 dark:text-gray-100">' + escapeHtml(data.subs) + '</p></div>';
         }
 

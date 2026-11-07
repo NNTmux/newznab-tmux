@@ -12,8 +12,8 @@
 @endphp
 
 <div class="space-y-6">
+    <x-admin.page-header :title="$title" icon="fas fa-plus" />
     <x-admin.card>
-        <x-admin.page-header :title="$title" icon="fas fa-plus" />
 
         <div class="px-6 py-6">
             <form action="{{ route('admin.status.store') }}" method="post" class="space-y-6 max-w-2xl">
@@ -44,7 +44,7 @@
                         @foreach($services as $svc)
                             <label class="flex items-center gap-3 text-sm text-gray-800 dark:text-gray-200 cursor-pointer">
                                 <input type="checkbox" name="service_status_ids[]" value="{{ $svc->id }}"
-                                       class="rounded border-gray-300 text-primary-600 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-800"
+                                       class="rounded border-gray-300 text-link focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-800"
                                        @checked(in_array($svc->id, $oldServiceIds, true))>
                                 <span>{{ $svc->name }}</span>
                             </label>
@@ -100,7 +100,7 @@
                 </div>
 
                 <div class="flex gap-3">
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Create</button>
+                    <button type="submit" class="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent-hover">Create</button>
                     <a href="{{ route('admin.status.index') }}" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600">Cancel</a>
                 </div>
             </form>

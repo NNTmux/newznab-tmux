@@ -17,15 +17,9 @@
     <meta name="keywords" content="{{ $meta_keywords ?? '' }}">
     <meta name="description" content="{{ $meta_description ?? '' }}">
 
-    <!-- Theme Preference - Set via meta tag for CSP compliance -->
-    <meta name="theme-preference" content="{{ $userTheme }}">
-    <meta name="color-scheme-preference" content="{{ $userColorScheme }}">
+    @include('partials.theme-meta')
     <!-- CSP Nonce for dynamic script loading -->
     <meta name="csp-nonce" content="{{ csp_nonce() }}">
-    @auth
-        <meta name="user-authenticated" content="true">
-        <meta name="update-theme-url" content="{{ route('profile.update-theme') }}">
-    @endauth
 
     <!-- Styles -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -63,35 +57,25 @@
             <!-- Top Navigation -->
             @auth
                 <header class="layout-topbar surface-header z-30 shrink-0 text-white">
-                    @include('partials.header-menu')
+                    <div class="flex items-center">
+                        <button type="button" id="mobile-sidebar-toggle" class="touch-target ml-2 inline-flex items-center justify-center rounded-xl p-2 text-gray-300 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 md:hidden" aria-label="Open account navigation" aria-controls="sidebar" aria-expanded="false">
+                            <i class="fa-solid fa-bars text-lg" aria-hidden="true"></i>
+                        </button>
+                        <div class="min-w-0 flex-1">
+                            @include('partials.header-menu')
+                        </div>
+                    </div>
+                </header>
+            @else
+                <header class="layout-topbar surface-header z-30 shrink-0 text-white">
+                    @include('partials.guest-topbar')
                 </header>
             @endauth
 
             <!-- Page Content - This is the scrollable area -->
             <main id="main-content" class="layout-main flex-1 overflow-y-auto" data-scroll-container tabindex="-1">
                 <div class="app-view-stack layout-page-container container mx-auto max-w-[1600px] px-3 py-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:px-5 sm:py-6 lg:px-8">
-                    @if(session('success'))
-                        <div class="layout-flash layout-flash--success mb-5" role="status">
-                            <i class="fas fa-circle-check" aria-hidden="true"></i>
-                            <div>{{ session('success') }}</div>
-                        </div>
-                    @endif
-
-                    @if(session('error'))
-                        <div class="layout-flash layout-flash--error mb-5" role="alert">
-                            <i class="fas fa-circle-exclamation" aria-hidden="true"></i>
-                            <div>
-                                @if(is_array(session('error')))
-                                    @foreach(session('error') as $error)
-                                        <div>{{ $error }}</div>
-                                    @endforeach
-                                @else
-                                    {{ session('error') }}
-                                @endif
-                            </div>
-                        </div>
-                    @endif
-
+                    {{-- Flash messages are shown as toasts (partials.toast-notifications). --}}
                     @yield('content')
                     @if(isset($content) && is_string($content))
                         {!! $content !!}
@@ -106,27 +90,10 @@
         </div>
     </div>
 
-    <!-- Mobile Sidebar Toggle -->
-    @auth
-        <button type="button" id="mobile-sidebar-toggle" class="layout-mobile-sidebar-toggle touch-target fixed z-30 inline-flex items-center gap-2 rounded-full bg-primary-600 px-4 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:ring-offset-2 dark:bg-primary-700 dark:hover:bg-primary-600 md:hidden bottom-[max(5rem,calc(env(safe-area-inset-bottom)+4rem))] right-[max(1rem,env(safe-area-inset-right))]" aria-label="Open account navigation" aria-controls="sidebar" aria-expanded="false">
-            <i class="fas fa-compass" aria-hidden="true"></i>
-            <span>Navigate</span>
-        </button>
-    @endauth
-
     <!-- Back to Top -->
     @include('partials.back-to-top')
 
-    <!-- Theme Toggle -->
     @php $themePreference = $userTheme; @endphp
-    @guest
-        <button id="theme-toggle" class="fixed z-50 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-3 rounded-full shadow-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-200 flex items-center gap-2 touch-target bottom-[max(1rem,env(safe-area-inset-bottom))] right-[max(1rem,env(safe-area-inset-right))]"
-                title="{{ ucfirst($themePreference) }} Mode"
-                aria-label="Change theme. Current theme: {{ $themePreference }}">
-            <i id="theme-icon" class="fas {{ $themePreference === 'dark' ? 'fa-moon' : ($themePreference === 'system' ? 'fa-desktop' : 'fa-sun') }}"></i>
-            <span id="theme-label" class="text-xs font-medium hidden sm:inline">{{ ucfirst($themePreference) }}</span>
-        </button>
-    @endguest
 
     <!-- Confirmation Modal (used on many pages) -->
     @include('partials.confirmation-modal')

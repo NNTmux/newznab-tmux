@@ -50,7 +50,7 @@
                     <div class="min-w-0">
                         @if($movieUrl)
                             <a href="{{ $movieUrl }}" class="group/title rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
-                                <h3 class="movie-card__title text-xl font-bold tracking-tight text-gray-900 transition group-hover/title:text-primary-600 dark:text-gray-100 dark:group-hover/title:text-primary-400">
+                                <h3 class="movie-card__title text-xl font-bold tracking-tight text-gray-900 transition group-hover/title:text-link dark:text-gray-100 dark:group-hover/title:text-primary-400">
                                     {{ $result->title }}
                                 </h3>
                             </a>
@@ -69,6 +69,7 @@
                                     <i class="fas fa-star" aria-hidden="true"></i>{{ $result->rating }} / 10
                                 </span>
                             @endif
+                            <x-rotten-tomatoes-score :score="$result->rtrating ?? null" size="chip" />
                             @if(!empty($result->latest_postdate))
                                 <span class="movie-meta-chip">
                                     <i class="fas fa-clock" aria-hidden="true"></i>Updated {{ userDateDiffForHumans($result->latest_postdate) }}
@@ -140,7 +141,7 @@
                             <i class="fas fa-box-open mr-1.5 text-primary-500" aria-hidden="true"></i>Latest releases
                         </h4>
                         @if($totalReleases > count($releases) && !empty($result->imdbid))
-                            <a href="{{ route('movie.view', ['imdbid' => $result->imdbid]) }}" class="text-xs font-semibold text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300">
+                            <a href="{{ route('movie.view', ['imdbid' => $result->imdbid]) }}" class="text-xs font-semibold text-link hover:text-link dark:text-primary-400 dark:hover:text-primary-300">
                                 View all {{ $totalReleases }} <i class="fas fa-arrow-right ml-1" aria-hidden="true"></i>
                             </a>
                         @endif

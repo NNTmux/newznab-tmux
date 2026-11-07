@@ -21,9 +21,9 @@
         <x-slot:actions>
             <div class="rounded-xl border border-gray-200 bg-white/70 px-4 py-2 text-sm text-gray-600 dark:border-gray-600 dark:bg-gray-800/70 dark:text-gray-300 lg:text-right">
                 <p class="font-medium text-gray-700 dark:text-gray-200">
-                    <i class="fas fa-sync-alt mr-1"></i> Last dashboard refresh: <span data-stat="last-refresh">{{ $dashboardLastRefreshedAt }}</span>
+                    <i aria-hidden="true" class="fas fa-sync-alt mr-1"></i> Last dashboard refresh: <span data-stat="last-refresh">{{ $dashboardLastRefreshedAt }}</span>
                 </p>
-                <p class="mt-1 text-xs text-green-600 dark:text-green-400">Auto-refreshes every 15 minutes</p>
+                <p class="mt-1 text-xs text-success-600 dark:text-success-400">Auto-refreshes every 15 minutes</p>
             </div>
         </x-slot:actions>
     </x-admin.page-header>
@@ -31,120 +31,78 @@
     <!-- Stats Grid -->
     <div class="admin-dashboard-page__stats-grid grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         <!-- Total Releases -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Total Releases</p>
-                    <p class="text-3xl font-bold text-gray-800 dark:text-gray-200" data-stat="releases">{{ number_format($stats['releases'] ?? 0) }}</p>
+        <x-admin.stat-card label="Total Releases" :value="number_format($stats['releases'] ?? 0)" stat-key="releases" icon="fas fa-download" color="primary">
+            <x-slot:footerSlot>
+                <div class="mt-4">
+                    <span class="text-sm text-success-600 dark:text-success-400">
+                        <i aria-hidden="true" class="fas fa-arrow-up"></i> <span data-stat="releases-today">{{ number_format($stats['releases_today'] ?? 0) }}</span> today
+                    </span>
                 </div>
-                <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-download text-2xl text-blue-600 dark:text-blue-400"></i>
-                </div>
-            </div>
-            <div class="mt-4">
-                <span class="text-sm text-green-600 dark:text-green-400">
-                    <i class="fas fa-arrow-up"></i> <span data-stat="releases-today">{{ number_format($stats['releases_today'] ?? 0) }}</span> today
-                </span>
-            </div>
-        </div>
+            </x-slot:footerSlot>
+        </x-admin.stat-card>
 
         <!-- Active Users -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Active Users</p>
-                    <p class="text-3xl font-bold text-gray-800 dark:text-gray-200" data-stat="users">{{ number_format($stats['users'] ?? 0) }}</p>
+        <x-admin.stat-card label="Active Users" :value="number_format($stats['users'] ?? 0)" stat-key="users" icon="fas fa-users" color="success">
+            <x-slot:footerSlot>
+                <div class="mt-4">
+                    <span class="text-sm text-link dark:text-primary-400">
+                        <i aria-hidden="true" class="fas fa-user-plus"></i> <span data-stat="users-today">{{ $stats['users_today'] ?? 0 }}</span> registered today
+                    </span>
                 </div>
-                <div class="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-users text-2xl text-green-600 dark:text-green-400"></i>
-                </div>
-            </div>
-            <div class="mt-4">
-                <span class="text-sm text-blue-600 dark:text-blue-400">
-                    <i class="fas fa-user-plus"></i> <span data-stat="users-today">{{ $stats['users_today'] ?? 0 }}</span> registered today
-                </span>
-            </div>
-        </div>
+            </x-slot:footerSlot>
+        </x-admin.stat-card>
 
         <!-- Active Groups -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Active Groups</p>
-                    <p class="text-3xl font-bold text-gray-800 dark:text-gray-200" data-stat="active-groups">{{ number_format($stats['active_groups'] ?? 0) }}</p>
+        <x-admin.stat-card label="Active Groups" :value="number_format($stats['active_groups'] ?? 0)" stat-key="active-groups" icon="fas fa-layer-group" color="violet">
+            <x-slot:footerSlot>
+                <div class="mt-4">
+                    <span class="text-sm text-gray-600 dark:text-gray-400">
+                        <span data-stat="groups">{{ number_format($stats['groups'] ?? 0) }}</span> total groups
+                    </span>
                 </div>
-                <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-layer-group text-2xl text-purple-600 dark:text-purple-400"></i>
-                </div>
-            </div>
-            <div class="mt-4">
-                <span class="text-sm text-gray-600 dark:text-gray-400">
-                    <span data-stat="groups">{{ number_format($stats['groups'] ?? 0) }}</span> total groups
-                </span>
-            </div>
-        </div>
+            </x-slot:footerSlot>
+        </x-admin.stat-card>
 
         <!-- Failed Releases -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Failed Releases</p>
-                    <p class="text-3xl font-bold text-gray-800 dark:text-gray-200" data-stat="failed">{{ number_format($stats['failed'] ?? 0) }}</p>
+        <x-admin.stat-card label="Failed Releases" :value="number_format($stats['failed'] ?? 0)" stat-key="failed" icon="fas fa-exclamation-triangle" color="danger">
+            <x-slot:footerSlot>
+                <div class="mt-4">
+                    <a href="{{ url('/admin/failrel-list') }}" class="text-sm text-link dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300">
+                        View failed releases <i aria-hidden="true" class="fas fa-arrow-right"></i>
+                    </a>
                 </div>
-                <div class="w-12 h-12 bg-red-100 dark:bg-red-900 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-exclamation-triangle text-2xl text-red-600 dark:text-red-400"></i>
-                </div>
-            </div>
-            <div class="mt-4">
-                <a href="{{ url('/admin/failrel-list') }}" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
-                    View failed releases <i class="fas fa-arrow-right"></i>
-                </a>
-            </div>
-        </div>
+            </x-slot:footerSlot>
+        </x-admin.stat-card>
 
         <!-- Reported Releases -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Reported Releases</p>
-                    <p class="text-3xl font-bold text-gray-800 dark:text-gray-200" data-stat="reported">{{ number_format($stats['reported'] ?? 0) }}</p>
+        <x-admin.stat-card label="Reported Releases" :value="number_format($stats['reported'] ?? 0)" stat-key="reported" icon="fas fa-flag" color="orange">
+            <x-slot:footerSlot>
+                <div class="mt-4">
+                    <a href="{{ url('/admin/release-reports') }}" class="text-sm text-link dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300">
+                        View reports <i aria-hidden="true" class="fas fa-arrow-right"></i>
+                    </a>
                 </div>
-                <div class="w-12 h-12 bg-orange-100 dark:bg-orange-900 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-flag text-2xl text-orange-600 dark:text-orange-400"></i>
-                </div>
-            </div>
-            <div class="mt-4">
-                <a href="{{ url('/admin/release-reports') }}" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
-                    View reports <i class="fas fa-arrow-right"></i>
-                </a>
-            </div>
-        </div>
+            </x-slot:footerSlot>
+        </x-admin.stat-card>
 
         <!-- Deleted Users -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Deleted Users</p>
-                    <p class="text-3xl font-bold text-gray-800 dark:text-gray-200" data-stat="deleted-users-total">{{ number_format(($stats['soft_deleted_users'] ?? 0) + ($stats['permanently_deleted_users'] ?? 0)) }}</p>
+        <x-admin.stat-card label="Deleted Users" :value="number_format(($stats['soft_deleted_users'] ?? 0) + ($stats['permanently_deleted_users'] ?? 0))" stat-key="deleted-users-total" icon="fas fa-user-slash" color="danger">
+            <x-slot:footerSlot>
+                <div class="mt-4 space-y-1">
+                    <span class="text-sm text-warning-600 dark:text-warning-400 block">
+                        <i aria-hidden="true" class="fas fa-trash"></i> <span data-stat="soft-deleted-users">{{ number_format($stats['soft_deleted_users'] ?? 0) }}</span> soft deleted
+                    </span>
+                    <span class="text-sm text-red-600 dark:text-red-400 block">
+                        <i aria-hidden="true" class="fas fa-trash-alt"></i> <span data-stat="permanently-deleted-users">{{ number_format($stats['permanently_deleted_users'] ?? 0) }}</span> permanently deleted
+                    </span>
                 </div>
-                <div class="w-12 h-12 bg-red-100 dark:bg-red-900 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-user-slash text-2xl text-red-600 dark:text-red-400"></i>
+                <div class="mt-2">
+                    <a href="{{ route('admin.deleted.users.index') }}" class="text-sm text-link dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300">
+                        View deleted users <i aria-hidden="true" class="fas fa-arrow-right"></i>
+                    </a>
                 </div>
-            </div>
-            <div class="mt-4 space-y-1">
-                <span class="text-sm text-yellow-600 dark:text-yellow-400 block">
-                    <i class="fas fa-trash"></i> <span data-stat="soft-deleted-users">{{ number_format($stats['soft_deleted_users'] ?? 0) }}</span> soft deleted
-                </span>
-                <span class="text-sm text-red-600 dark:text-red-400 block">
-                    <i class="fas fa-trash-alt"></i> <span data-stat="permanently-deleted-users">{{ number_format($stats['permanently_deleted_users'] ?? 0) }}</span> permanently deleted
-                </span>
-            </div>
-            <div class="mt-2">
-                <a href="{{ route('admin.deleted.users.index') }}" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
-                    View deleted users <i class="fas fa-arrow-right"></i>
-                </a>
-            </div>
-        </div>
+            </x-slot:footerSlot>
+        </x-admin.stat-card>
     </div>
 
     <!-- Site Status & Active Incidents (deferred — populated by Alpine on mount) -->
@@ -152,10 +110,10 @@
          data-widget="site-status">
         <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center justify-between">
             <span>
-                <i class="fas fa-signal mr-2 text-blue-600 dark:text-blue-400"></i>
+                <i aria-hidden="true" class="fas fa-signal mr-2 text-link dark:text-primary-400"></i>
                 Site Status
             </span>
-            <a href="{{ route('admin.status.index') }}" class="text-xs text-blue-600 dark:text-blue-400 hover:underline font-normal">Manage &rarr;</a>
+            <a href="{{ route('admin.status.index') }}" class="text-xs text-link dark:text-primary-400 hover:underline font-normal">Manage &rarr;</a>
         </h3>
         <div data-widget-loading class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
             <div class="h-14 rounded-lg bg-gray-100 dark:bg-gray-900 animate-pulse"></div>
@@ -174,7 +132,7 @@
         <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
                 <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 flex items-center">
-                    <i class="fas fa-user-plus mr-2 text-blue-600 dark:text-blue-400"></i>
+                    <i aria-hidden="true" class="fas fa-user-plus mr-2 text-link dark:text-primary-400"></i>
                     Site Registration Status
                 </h3>
                 <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
@@ -182,8 +140,8 @@
                 </p>
             </div>
             <a href="{{ route('admin.registrations.index') }}"
-               class="inline-flex items-center rounded-lg border border-blue-700 bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-blue-300/20 dark:bg-blue-500 dark:text-white dark:hover:bg-blue-400 dark:focus:ring-offset-gray-900">
-                <i class="fas fa-arrow-up-right-from-square mr-2"></i>Manage Registrations
+               class="inline-flex items-center rounded-lg border border-primary-700 bg-accent px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:border-primary-300/20 dark:bg-primary-500 dark:text-white dark:hover:bg-primary-400 dark:focus:ring-offset-gray-900">
+                <i aria-hidden="true" class="fas fa-arrow-up-right-from-square mr-2"></i>Manage Registrations
             </a>
         </div>
 
@@ -197,7 +155,7 @@
                     </span>
                     <span data-registration="scheduled-override"
                           @class([
-                              'inline-flex items-center justify-center rounded-full border border-blue-500/30 bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm dark:border-blue-300/20 dark:bg-blue-500 dark:text-white',
+                              'inline-flex items-center justify-center rounded-full border border-primary-500/30 bg-accent px-3 py-1.5 text-xs font-semibold text-white shadow-sm dark:border-primary-300/20 dark:bg-primary-500 dark:text-white',
                               'hidden' => ! $registrationStatus['scheduled_override_active'],
                           ])>
                         Scheduled Override
@@ -254,7 +212,7 @@
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700"
          data-widget="user-stats">
         <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-6 flex items-center">
-            <i class="fas fa-chart-line mr-2 text-blue-600 dark:text-blue-400"></i>
+            <i aria-hidden="true" class="fas fa-chart-line mr-2 text-link dark:text-primary-400"></i>
             User Statistics
         </h3>
         <div data-widget-loading class="space-y-4">
@@ -277,14 +235,14 @@
                 <!-- Users by Role Table -->
                 <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
                     <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
-                        <i class="fas fa-user-tag mr-2 text-indigo-600 dark:text-indigo-400"></i>
+                        <i aria-hidden="true" class="fas fa-user-tag mr-2 text-indigo-600 dark:text-indigo-400"></i>
                         Users by Role
                     </h4>
                     <div class="overflow-x-auto"><table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                         <thead><tr>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Role</th>
-                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Count</th>
-                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Percentage</th>
+                            <x-admin.th>Role</x-admin.th>
+                            <x-admin.th align="right">Count</x-admin.th>
+                            <x-admin.th align="right">Percentage</x-admin.th>
                         </tr></thead>
                         <tbody class="divide-y divide-gray-200 dark:divide-gray-700" data-roles-tbody></tbody>
                     </table></div>
@@ -293,14 +251,14 @@
                 <!-- Top Downloaders Table -->
                 <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
                     <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
-                        <i class="fas fa-trophy mr-2 text-yellow-600 dark:text-yellow-400"></i>
+                        <i aria-hidden="true" class="fas fa-trophy mr-2 text-amber-600 dark:text-amber-400"></i>
                         Top Downloaders (Last 7 Days)
                     </h4>
                     <div class="overflow-x-auto"><table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                         <thead><tr>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Rank</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Username</th>
-                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Downloads</th>
+                            <x-admin.th>Rank</x-admin.th>
+                            <x-admin.th>Username</x-admin.th>
+                            <x-admin.th align="right">Downloads</x-admin.th>
                         </tr></thead>
                         <tbody class="divide-y divide-gray-200 dark:divide-gray-700" data-downloaders-tbody></tbody>
                     </table></div>
@@ -309,28 +267,28 @@
                 <!-- Charts -->
                 <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
                     <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
-                        <i class="fas fa-chart-bar mr-2 text-green-600 dark:text-green-400"></i>
+                        <i aria-hidden="true" class="fas fa-chart-bar mr-2 text-success-600 dark:text-success-400"></i>
                         Downloads (Last 7 Days - Hourly)
                     </h4>
                     <div class="chart-container"><canvas id="downloadsChart"></canvas></div>
                 </div>
                 <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
                     <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
-                        <i class="fas fa-chart-area mr-2 text-purple-600 dark:text-purple-400"></i>
+                        <i aria-hidden="true" class="fas fa-chart-area mr-2 text-purple-600 dark:text-purple-400"></i>
                         API/RSS Hits (Last 7 Days - Hourly)
                     </h4>
                     <div class="chart-container"><canvas id="apiHitsChart"></canvas></div>
                 </div>
                 <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
                     <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
-                        <i class="fas fa-chart-line mr-2 text-green-600 dark:text-green-400"></i>
+                        <i aria-hidden="true" class="fas fa-chart-line mr-2 text-success-600 dark:text-success-400"></i>
                         Downloads (Last 60 Minutes)
                     </h4>
                     <div class="chart-container"><canvas id="downloadsMinuteChart"></canvas></div>
                 </div>
                 <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
                     <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
-                        <i class="fas fa-chart-line mr-2 text-purple-600 dark:text-purple-400"></i>
+                        <i aria-hidden="true" class="fas fa-chart-line mr-2 text-purple-600 dark:text-purple-400"></i>
                         API/RSS Hits (Last 60 Minutes)
                     </h4>
                     <div class="chart-container"><canvas id="apiHitsMinuteChart"></canvas></div>
@@ -346,7 +304,7 @@
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700"
          data-widget="system-metrics">
         <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-6 flex items-center">
-            <i class="fas fa-server mr-2 text-orange-600 dark:text-orange-400"></i>
+            <i aria-hidden="true" class="fas fa-server mr-2 text-orange-600 dark:text-orange-400"></i>
             System Resources
         </h3>
         <div data-widget-loading class="space-y-4">
@@ -370,7 +328,7 @@
                             <p class="text-3xl font-bold text-orange-800 dark:text-orange-100" data-metric="cpu-current">—</p>
                         </div>
                         <div class="w-12 h-12 bg-orange-200 dark:bg-orange-700 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-microchip text-2xl text-orange-600 dark:text-orange-300"></i>
+                            <i aria-hidden="true" class="fas fa-microchip text-2xl text-orange-600 dark:text-orange-300"></i>
                         </div>
                     </div>
                     <div class="border-t border-orange-200 dark:border-orange-700 pt-3 space-y-2 text-xs">
@@ -394,7 +352,7 @@
                             <p class="text-xs text-cyan-600 dark:text-cyan-300 mt-1" data-metric="ram-details">—</p>
                         </div>
                         <div class="w-12 h-12 bg-cyan-200 dark:bg-cyan-700 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-memory text-2xl text-cyan-600 dark:text-cyan-300"></i>
+                            <i aria-hidden="true" class="fas fa-memory text-2xl text-cyan-600 dark:text-cyan-300"></i>
                         </div>
                     </div>
                 </div>
@@ -403,32 +361,32 @@
             <div class="space-y-6">
                 <div>
                     <h4 class="text-md font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center">
-                        <i class="fas fa-clock mr-2 text-blue-600 dark:text-blue-400"></i>
+                        <i aria-hidden="true" class="fas fa-clock mr-2 text-link dark:text-primary-400"></i>
                         Last 24 Hours (Hour by Hour)
                     </h4>
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
-                            <h5 class="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-3"><i class="fas fa-microchip mr-2 text-orange-600 dark:text-orange-400"></i>CPU Usage</h5>
+                            <h5 class="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-3"><i aria-hidden="true" class="fas fa-microchip mr-2 text-orange-600 dark:text-orange-400"></i>CPU Usage</h5>
                             <div class="chart-container"><canvas id="cpuHistory24hChart" data-chart-label="CPU Usage %"></canvas></div>
                         </div>
                         <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
-                            <h5 class="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-3"><i class="fas fa-memory mr-2 text-cyan-600 dark:text-cyan-400"></i>RAM Usage</h5>
+                            <h5 class="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-3"><i aria-hidden="true" class="fas fa-memory mr-2 text-cyan-600 dark:text-cyan-400"></i>RAM Usage</h5>
                             <div class="chart-container"><canvas id="ramHistory24hChart" data-chart-label="RAM Usage %"></canvas></div>
                         </div>
                     </div>
                 </div>
                 <div>
                     <h4 class="text-md font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center">
-                        <i class="fas fa-calendar-alt mr-2 text-purple-600 dark:text-purple-400"></i>
+                        <i aria-hidden="true" class="fas fa-calendar-alt mr-2 text-purple-600 dark:text-purple-400"></i>
                         Last 30 Days (Day by Day)
                     </h4>
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
-                            <h5 class="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-3"><i class="fas fa-microchip mr-2 text-orange-600 dark:text-orange-400"></i>CPU Usage</h5>
+                            <h5 class="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-3"><i aria-hidden="true" class="fas fa-microchip mr-2 text-orange-600 dark:text-orange-400"></i>CPU Usage</h5>
                             <div class="chart-container"><canvas id="cpuHistory30dChart" data-chart-label="CPU Usage %"></canvas></div>
                         </div>
                         <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
-                            <h5 class="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-3"><i class="fas fa-memory mr-2 text-cyan-600 dark:text-cyan-400"></i>RAM Usage</h5>
+                            <h5 class="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-3"><i aria-hidden="true" class="fas fa-memory mr-2 text-cyan-600 dark:text-cyan-400"></i>RAM Usage</h5>
                             <div class="chart-container"><canvas id="ramHistory30dChart" data-chart-label="RAM Usage %"></canvas></div>
                         </div>
                     </div>
@@ -457,11 +415,11 @@
              data-widget="recent-activity">
             <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center justify-between">
                 <span>
-                    <i class="fas fa-history mr-2 text-indigo-600 dark:text-indigo-400"></i>
+                    <i aria-hidden="true" class="fas fa-history mr-2 text-indigo-600 dark:text-indigo-400"></i>
                     Recent User Activity
                 </span>
                 <span class="text-xs text-gray-500 dark:text-gray-400" id="activity-last-updated">
-                    <i class="fas fa-sync-alt"></i> <span data-metric="activity-updated">loading…</span>
+                    <i aria-hidden="true" class="fas fa-sync-alt"></i> <span data-metric="activity-updated">loading…</span>
                 </span>
             </h3>
             <div data-widget-loading class="space-y-3">
@@ -479,10 +437,10 @@
          data-widget="recent-payments">
         <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center justify-between">
             <span>
-                <i class="fas fa-credit-card mr-2 text-emerald-600 dark:text-emerald-400"></i>
+                <i aria-hidden="true" class="fas fa-credit-card mr-2 text-emerald-600 dark:text-emerald-400"></i>
                 Last 5 Payments
             </span>
-            <a href="{{ route('admin.payment-list') }}" class="text-xs text-blue-600 dark:text-blue-400 hover:underline font-normal">View all &rarr;</a>
+            <a href="{{ route('admin.payment-list') }}" class="text-xs text-link dark:text-primary-400 hover:underline font-normal">View all &rarr;</a>
         </h3>
         <div data-widget-loading class="space-y-3">
             @for($i = 0; $i < 5; $i++)
@@ -494,11 +452,11 @@
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                     <thead>
                         <tr>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Date</th>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">User</th>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Item</th>
-                            <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Amount</th>
-                            <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                            <x-admin.th>Date</x-admin.th>
+                            <x-admin.th>User</x-admin.th>
+                            <x-admin.th>Item</x-admin.th>
+                            <x-admin.th align="right">Amount</x-admin.th>
+                            <x-admin.th align="center">Status</x-admin.th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200 dark:divide-gray-700" data-payments-tbody></tbody>
@@ -512,21 +470,21 @@
     <x-admin.card class="p-6">
         <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Quick Links</h3>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <a href="{{ url('/admin/user-list') }}" class="flex flex-col items-center p-4 bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:bg-gray-800 rounded-lg transition">
-                <i class="fas fa-users text-3xl text-blue-600 dark:text-blue-400 mb-2"></i>
-                <span class="text-sm font-medium text-gray-700">Manage Users</span>
+            <a href="{{ url('/admin/user-list') }}" class="flex flex-col items-center p-4 bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition">
+                <i aria-hidden="true" class="fas fa-users text-3xl text-link dark:text-primary-400 mb-2"></i>
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Manage Users</span>
             </a>
-            <a href="{{ url('/admin/release-list') }}" class="flex flex-col items-center p-4 bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:bg-gray-800 rounded-lg transition">
-                <i class="fas fa-download text-3xl text-green-600 mb-2"></i>
-                <span class="text-sm font-medium text-gray-700">Manage Releases</span>
+            <a href="{{ url('/admin/release-list') }}" class="flex flex-col items-center p-4 bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition">
+                <i aria-hidden="true" class="fas fa-download text-3xl text-success-600 mb-2"></i>
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Manage Releases</span>
             </a>
-            <a href="{{ url('/admin/category-list') }}" class="flex flex-col items-center p-4 bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:bg-gray-800 rounded-lg transition">
-                <i class="fas fa-folder text-3xl text-purple-600 mb-2"></i>
-                <span class="text-sm font-medium text-gray-700">Categories</span>
+            <a href="{{ url('/admin/category-list') }}" class="flex flex-col items-center p-4 bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition">
+                <i aria-hidden="true" class="fas fa-folder text-3xl text-purple-600 mb-2"></i>
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Categories</span>
             </a>
-            <a href="{{ route('admin.settings.show', ['domain' => 'site']) }}" class="flex flex-col items-center p-4 bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:bg-gray-800 rounded-lg transition">
-                <i class="fas fa-cog text-3xl text-orange-600 mb-2"></i>
-                <span class="text-sm font-medium text-gray-700">Settings</span>
+            <a href="{{ route('admin.settings.show', ['domain' => 'site']) }}" class="flex flex-col items-center p-4 bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition">
+                <i aria-hidden="true" class="fas fa-cog text-3xl text-orange-600 mb-2"></i>
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Settings</span>
             </a>
         </div>
     </x-admin.card>

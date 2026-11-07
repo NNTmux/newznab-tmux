@@ -12,35 +12,14 @@
 
 @section('content')
 <div class="space-y-6" x-data="showAddForm" data-config="{{ $configJson }}">
+    <x-admin.page-header :title="$title" icon="fas fa-tv">
+        <x-slot:actions>
+            <x-admin.button :href="url('admin/show-list')" tone="gray" icon="fas fa-arrow-left">Back to TV Shows List</x-admin.button>
+        </x-slot:actions>
+    </x-admin.page-header>
     <x-admin.card>
-        <x-admin.page-header :title="$title" icon="fas fa-tv">
-            <x-slot:actions>
-                <x-admin.button :href="url('admin/show-list')" tone="gray" icon="fas fa-arrow-left">Back to TV Shows List</x-admin.button>
-            </x-slot:actions>
-        </x-admin.page-header>
 
         <!-- Flash Messages -->
-        @if(session('success'))
-            <div class="mx-6 mt-4 p-4 bg-green-50 dark:bg-green-900 border border-green-200 dark:border-green-700 rounded-lg">
-                <p class="text-green-800 dark:text-green-200">
-                    <i class="fas fa-check-circle mr-2"></i>{{ session('success') }}
-                </p>
-            </div>
-        @endif
-        @if(session('warning'))
-            <div class="mx-6 mt-4 p-4 bg-yellow-50 dark:bg-yellow-900 border border-yellow-200 dark:border-yellow-700 rounded-lg">
-                <p class="text-yellow-800 dark:text-yellow-200">
-                    <i class="fas fa-exclamation-triangle mr-2"></i>{{ session('warning') }}
-                </p>
-            </div>
-        @endif
-        @if(session('error'))
-            <div class="mx-6 mt-4 p-4 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-lg">
-                <p class="text-red-800 dark:text-red-200">
-                    <i class="fas fa-exclamation-circle mr-2"></i>{{ session('error') }}
-                </p>
-            </div>
-        @endif
         @if($errors->any())
             <div class="mx-6 mt-4 p-4 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-lg">
                 <ul class="list-disc list-inside text-red-800 dark:text-red-200">
@@ -52,12 +31,12 @@
         @endif
 
         <!-- Info Alert -->
-        <div class="px-6 py-4 bg-blue-50 dark:bg-blue-900 border-b border-blue-100 dark:border-blue-800">
+        <div class="px-6 py-4 bg-info-50 dark:bg-info-900 border-b border-info-100 dark:border-info-800">
             <div class="flex">
-                <i class="fas fa-info-circle text-blue-500 text-xl mr-3 mt-0.5"></i>
-                <div class="text-sm text-blue-700 dark:text-blue-300 space-y-1">
+                <i aria-hidden="true" class="fas fa-info-circle text-info-500 text-xl mr-3 mt-0.5"></i>
+                <div class="text-sm text-info-700 dark:text-info-300 space-y-1">
                     <p>Add a TV show to the database by entering any supported external identifier. The matching provider will be queried to fetch title, summary, poster and cross-reference IDs.</p>
-                    <ul class="list-disc list-inside text-xs text-blue-600 dark:text-blue-400">
+                    <ul class="list-disc list-inside text-xs text-info-600 dark:text-info-400">
                         <li><strong>TVDB</strong> &mdash; numeric series id (e.g. <code>81189</code>)</li>
                         <li><strong>TVMaze</strong> &mdash; numeric show id (e.g. <code>169</code>)</li>
                         <li><strong>TMDB</strong> &mdash; numeric tv id (e.g. <code>1396</code>)</li>
@@ -77,7 +56,7 @@
                         Source <span class="text-red-500">*</span>
                     </label>
                     <select id="source" name="source" x-model="source" required
-                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
                         @foreach($sources as $s)
                             <option value="{{ $s }}" @selected(old('source', 'tvdb') === $s)>{{ strtoupper($s) }}</option>
                         @endforeach
@@ -90,13 +69,13 @@
                     </label>
                     <input type="text" id="external_id" name="external_id" x-model="externalId" required
                            x-bind:placeholder="placeholder"
-                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
                 </div>
 
                 <div class="md:col-span-2">
                     <label for="type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Type</label>
                     <select id="type" name="type" x-model="type"
-                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
                         <option value="0">TV</option>
                         <option value="2">Anime</option>
                     </select>
@@ -107,7 +86,7 @@
                             @click="preview"
                             x-bind:class="buttonClasses"
                             x-bind:disabled="loading">
-                        <i class="fas fa-search mr-1"></i><span x-text="buttonLabel"></span>
+                        <i aria-hidden="true" class="fas fa-search mr-1"></i><span x-text="buttonLabel"></span>
                     </button>
                 </div>
             </div>
@@ -131,7 +110,7 @@
                         <p class="text-sm text-gray-700 dark:text-gray-300 mb-3" x-text="summary"></p>
                         <div class="flex flex-wrap gap-2 text-xs">
                             <template x-for="entry in idEntries" x-bind:key="entry.label">
-                                <span class="px-2 py-0.5 bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-100 rounded">
+                                <span class="px-2 py-0.5 bg-primary-100 dark:bg-primary-800 text-primary-800 dark:text-primary-100 rounded">
                                     <span x-text="entry.label"></span>: <span x-text="entry.value"></span>
                                 </span>
                             </template>
@@ -146,11 +125,11 @@
                  x-text="previewError"></div>
 
             <div class="mt-6 flex gap-3">
-                <button type="submit" class="px-6 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700">
-                    <i class="fas fa-plus mr-2"></i>Add TV Show
+                <button type="submit" class="px-6 py-2 bg-accent dark:bg-accent-hover text-white rounded-lg hover:bg-accent-hover">
+                    <i aria-hidden="true" class="fas fa-plus mr-2"></i>Add TV Show
                 </button>
                 <a href="{{ url('admin/show-list') }}" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
-                    <i class="fas fa-times mr-2"></i>Cancel
+                    <i aria-hidden="true" class="fas fa-times mr-2"></i>Cancel
                 </a>
             </div>
         </form>

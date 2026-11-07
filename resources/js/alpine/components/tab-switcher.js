@@ -94,9 +94,9 @@ Alpine.data('profileTabs', () => ({
             document.querySelectorAll('.tab-content').forEach(function(t) { t.style.display = 'none'; });
             var sel = document.getElementById(tabId);
             if (sel) sel.style.display = 'block';
-            document.querySelectorAll('[data-tab-trigger]').forEach(function(t) { t.classList.remove('active', 'border-blue-500', 'text-blue-600'); t.classList.add('border-transparent', 'text-gray-500'); });
+            document.querySelectorAll('[data-tab-trigger]').forEach(function(t) { t.classList.remove('active', 'border-primary-500', 'text-link'); t.classList.add('border-transparent', 'text-gray-500'); });
             this.classList.remove('border-transparent', 'text-gray-500');
-            this.classList.add('active', 'border-blue-500', 'text-blue-600');
+            this.classList.add('active', 'border-primary-500', 'text-link');
         });
     });
 
@@ -109,8 +109,8 @@ Alpine.data('profileTabs', () => ({
             link.addEventListener('click', function(ev) {
                 ev.preventDefault();
                 var targetId = this.getAttribute('href').substring(1);
-                links.forEach(function(l) { l.classList.remove('bg-blue-50', 'text-blue-700', 'font-medium'); l.classList.add('text-gray-700', 'dark:text-gray-300'); });
-                this.classList.add('bg-blue-50', 'text-blue-700', 'font-medium');
+                links.forEach(function(l) { l.classList.remove('bg-primary-50', 'text-link', 'font-medium'); l.classList.add('text-gray-700', 'dark:text-gray-300'); });
+                this.classList.add('bg-primary-50', 'text-link', 'font-medium');
                 this.classList.remove('text-gray-700', 'dark:text-gray-300');
                 contents.forEach(function(c) { c.style.display = 'none'; });
                 var target = document.getElementById(targetId);

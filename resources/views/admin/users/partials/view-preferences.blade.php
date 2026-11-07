@@ -11,7 +11,7 @@
                                        name="movieview"
                                        value="1"
                                        {{ (is_array($user) ? ($user['movieview'] ?? 0) : ($user->movieview ?? 0)) ? 'checked' : '' }}
-                                       class="h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded">
+                                       class="h-4 w-4 text-link dark:text-primary-400 focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded">
                                 <label for="movieview" class="ml-2 text-sm text-gray-700 dark:text-gray-300">Movies</label>
                             </div>
                             <div class="flex items-center">
@@ -20,7 +20,7 @@
                                        name="musicview"
                                        value="1"
                                        {{ (is_array($user) ? ($user['musicview'] ?? 0) : ($user->musicview ?? 0)) ? 'checked' : '' }}
-                                       class="h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded">
+                                       class="h-4 w-4 text-link dark:text-primary-400 focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded">
                                 <label for="musicview" class="ml-2 text-sm text-gray-700 dark:text-gray-300">Music</label>
                             </div>
                             <div class="flex items-center">
@@ -29,7 +29,7 @@
                                        name="gameview"
                                        value="1"
                                        {{ (is_array($user) ? ($user['gameview'] ?? 0) : ($user->gameview ?? 0)) ? 'checked' : '' }}
-                                       class="h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded">
+                                       class="h-4 w-4 text-link dark:text-primary-400 focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded">
                                 <label for="gameview" class="ml-2 text-sm text-gray-700 dark:text-gray-300">Games</label>
                             </div>
                             <div class="flex items-center">
@@ -38,7 +38,7 @@
                                        name="consoleview"
                                        value="1"
                                        {{ (is_array($user) ? ($user['consoleview'] ?? 0) : ($user->consoleview ?? 0)) ? 'checked' : '' }}
-                                       class="h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded">
+                                       class="h-4 w-4 text-link dark:text-primary-400 focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded">
                                 <label for="consoleview" class="ml-2 text-sm text-gray-700 dark:text-gray-300">Console</label>
                             </div>
                             <div class="flex items-center">
@@ -47,7 +47,7 @@
                                        name="bookview"
                                        value="1"
                                        {{ (is_array($user) ? ($user['bookview'] ?? 0) : ($user->bookview ?? 0)) ? 'checked' : '' }}
-                                       class="h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded">
+                                       class="h-4 w-4 text-link dark:text-primary-400 focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded">
                                 <label for="bookview" class="ml-2 text-sm text-gray-700 dark:text-gray-300">Books</label>
                             </div>
                         </div>
@@ -60,9 +60,9 @@
                     <div class="mt-6 rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900" @if($user->passkeys->isNotEmpty()) x-data="adminUserPasskeys" @endif>
                         <div class="flex items-center justify-between">
                             <h3 class="text-sm font-semibold text-gray-800 dark:text-gray-200">
-                                <i class="fas fa-fingerprint mr-2 text-blue-600 dark:text-blue-400"></i>Passkeys (WebAuthn)
+                                <i aria-hidden="true" class="fas fa-fingerprint mr-2 text-link dark:text-primary-400"></i>Passkeys (WebAuthn)
                             </h3>
-                            <span class="rounded-full bg-blue-100 px-2.5 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-200">
+                            <span class="rounded-full bg-primary-100 px-2.5 py-1 text-xs font-medium text-primary-800 dark:bg-primary-900/30 dark:text-primary-200">
                                 {{ $user->passkeys->count() }} registered
                             </span>
                         </div>
@@ -76,10 +76,10 @@
                                 <table class="min-w-full divide-y divide-gray-200 text-sm dark:divide-gray-700">
                                     <thead class="bg-gray-50 dark:bg-gray-800">
                                         <tr>
-                                            <th class="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300">Name</th>
-                                            <th class="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300">Created</th>
-                                            <th class="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300">Last used</th>
-                                            <th class="px-4 py-3 text-right font-semibold text-gray-700 dark:text-gray-300">Actions</th>
+                                            <x-admin.th>Name</x-admin.th>
+                                            <x-admin.th>Created</x-admin.th>
+                                            <x-admin.th>Last used</x-admin.th>
+                                            <x-admin.th align="right">Actions</x-admin.th>
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-900">
@@ -115,7 +115,7 @@
                                 @click="toggleDangerZone()"
                                 class="text-sm font-semibold text-red-700 hover:text-red-800 dark:text-red-300 dark:hover:text-red-200"
                             >
-                                <i class="fas fa-exclamation-triangle mr-2"></i>Emergency actions
+                                <i aria-hidden="true" class="fas fa-exclamation-triangle mr-2"></i>Emergency actions
                             </button>
 
                             <div x-show="showDangerZone" x-cloak class="mt-3 space-y-3">

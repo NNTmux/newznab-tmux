@@ -2,23 +2,24 @@
 
 @section('content')
 <div class="space-y-6">
+    <x-admin.page-header :title="$title ?? 'Binary Black/Whitelist Edit'" icon="fas fa-edit">
+        <x-slot:actions>
+            <x-admin.button :href="url('/admin/binaryblacklist-list')" tone="gray" icon="fas fa-arrow-left">Back to List</x-admin.button>
+        </x-slot:actions>
+    </x-admin.page-header>
     <x-admin.card>
-        <x-admin.page-header :title="$title ?? 'Binary Black/Whitelist Edit'" icon="fas fa-edit">
-            <x-slot:actions>
-                <x-admin.button :href="url('/admin/binaryblacklist-list')" tone="gray" icon="fas fa-arrow-left">Back to List</x-admin.button>
-            </x-slot:actions>
-        </x-admin.page-header>
 
         <!-- Form -->
         <form action="{{ url('/admin/binaryblacklist-edit?action=submit') }}" method="POST" id="blacklistForm" class="px-6 py-6">
             @csrf
+            <x-form-errors class="mb-6" />
             <input type="hidden" name="id" value="{{ $regex->id ?? '' }}"/>
 
             <!-- Error Message -->
             @if($error)
                 <div class="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
                     <div class="flex">
-                        <i class="fas fa-exclamation-triangle text-red-500 dark:text-red-400 mr-3"></i>
+                        <i aria-hidden="true" class="fas fa-exclamation-triangle text-red-500 dark:text-red-400 mr-3"></i>
                         <p class="text-red-800 dark:text-red-300">{{ $error }}</p>
                     </div>
                 </div>
@@ -31,17 +32,17 @@
                 </label>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i class="fas fa-layer-group text-gray-400"></i>
+                        <i aria-hidden="true" class="fas fa-layer-group text-gray-400"></i>
                     </div>
                     <input type="text"
                            id="groupname"
                            name="groupname"
-                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                            value="{{ htmlspecialchars($regex->groupname ?? '') }}"
                            required>
                 </div>
                 <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                    <i class="fas fa-info-circle mr-1"></i>The full name of a valid newsgroup. (Wildcard in the format 'alt.binaries.*')
+                    <i aria-hidden="true" class="fas fa-info-circle mr-1"></i>The full name of a valid newsgroup. (Wildcard in the format 'alt.binaries.*')
                 </p>
             </div>
 
@@ -52,16 +53,16 @@
                 </label>
                 <div class="relative">
                     <div class="absolute top-3 left-3 pointer-events-none">
-                        <i class="fas fa-code text-gray-400"></i>
+                        <i aria-hidden="true" class="fas fa-code text-gray-400"></i>
                     </div>
                     <textarea id="regex"
                               name="regex"
-                              class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
+                              class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 font-mono text-sm"
                               rows="4"
                               required>{{ htmlspecialchars($regex->regex ?? '') }}</textarea>
                 </div>
                 <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                    <i class="fas fa-info-circle mr-1"></i>The regex to be applied. (Note: Beginning and Ending / are already included)
+                    <i aria-hidden="true" class="fas fa-info-circle mr-1"></i>The regex to be applied. (Note: Beginning and Ending / are already included)
                 </p>
             </div>
 
@@ -72,15 +73,15 @@
                 </label>
                 <div class="relative">
                     <div class="absolute top-3 left-3 pointer-events-none">
-                        <i class="fas fa-align-left text-gray-400"></i>
+                        <i aria-hidden="true" class="fas fa-align-left text-gray-400"></i>
                     </div>
                     <textarea id="description"
                               name="description"
-                              class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                               rows="3">{{ htmlspecialchars($regex->description ?? '') }}</textarea>
                 </div>
                 <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                    <i class="fas fa-info-circle mr-1"></i>A description for this regex
+                    <i aria-hidden="true" class="fas fa-info-circle mr-1"></i>A description for this regex
                 </p>
             </div>
 
@@ -96,7 +97,7 @@
                                    name="msgcol"
                                    id="msgcol{{ $id }}"
                                    value="{{ $id }}"
-                                   class="w-4 h-4 text-blue-600 dark:text-blue-400 border-gray-300 dark:border-gray-600 focus:ring-blue-500"
+                                   class="w-4 h-4 text-link dark:text-primary-400 border-gray-300 dark:border-gray-600 focus:ring-primary-500"
                                    {{ ($regex->msgcol ?? 1) == $id ? 'checked' : '' }}>
                             <label for="msgcol{{ $id }}" class="ml-3 text-sm text-gray-700 dark:text-gray-300">
                                 {{ $msgcol_names[$i] }}
@@ -105,7 +106,7 @@
                     @endforeach
                 </div>
                 <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                    <i class="fas fa-info-circle mr-1"></i>Which field in the message to apply the black/white list to.
+                    <i aria-hidden="true" class="fas fa-info-circle mr-1"></i>Which field in the message to apply the black/white list to.
                 </p>
             </div>
 
@@ -121,7 +122,7 @@
                                    name="status"
                                    id="status{{ $id }}"
                                    value="{{ $id }}"
-                                   class="w-4 h-4 text-blue-600 dark:text-blue-400 border-gray-300 dark:border-gray-600 focus:ring-blue-500"
+                                   class="w-4 h-4 text-link dark:text-primary-400 border-gray-300 dark:border-gray-600 focus:ring-primary-500"
                                    {{ ($regex->status ?? 1) == $id ? 'checked' : '' }}>
                             <label for="status{{ $id }}" class="ml-3 text-sm text-gray-700 dark:text-gray-300">
                                 {{ $status_names[$i] }}
@@ -130,7 +131,7 @@
                     @endforeach
                 </div>
                 <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                    <i class="fas fa-info-circle mr-1"></i>Only active regexes are applied during the release process.
+                    <i aria-hidden="true" class="fas fa-info-circle mr-1"></i>Only active regexes are applied during the release process.
                 </p>
             </div>
 
@@ -146,7 +147,7 @@
                                    name="optype"
                                    id="optype{{ $id }}"
                                    value="{{ $id }}"
-                                   class="w-4 h-4 text-blue-600 dark:text-blue-400 border-gray-300 dark:border-gray-600 focus:ring-blue-500"
+                                   class="w-4 h-4 text-link dark:text-primary-400 border-gray-300 dark:border-gray-600 focus:ring-primary-500"
                                    {{ ($regex->optype ?? 1) == $id ? 'checked' : '' }}>
                             <label for="optype{{ $id }}" class="ml-3 text-sm text-gray-700 dark:text-gray-300">
                                 {{ $optype_names[$i] }}
@@ -155,7 +156,7 @@
                     @endforeach
                 </div>
                 <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                    <i class="fas fa-info-circle mr-1"></i>Black will exclude all messages for a group which match this regex. White will include only those which match.
+                    <i aria-hidden="true" class="fas fa-info-circle mr-1"></i>Black will exclude all messages for a group which match this regex. White will include only those which match.
                 </p>
             </div>
         </form>
@@ -164,10 +165,10 @@
         <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
             <div class="flex justify-between">
                 <a href="{{ url('/admin/binaryblacklist-list') }}" class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500">
-                    <i class="fas fa-times mr-2"></i>Cancel
+                    <i aria-hidden="true" class="fas fa-times mr-2"></i>Cancel
                 </a>
-                <button type="submit" form="blacklistForm" class="px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-800">
-                    <i class="fas fa-save mr-2"></i>Save Changes
+                <button type="submit" form="blacklistForm" class="px-4 py-2 bg-success-600 dark:bg-success-700 text-white rounded-lg hover:bg-success-700 dark:hover:bg-success-800">
+                    <i aria-hidden="true" class="fas fa-save mr-2"></i>Save Changes
                 </button>
             </div>
         </div>

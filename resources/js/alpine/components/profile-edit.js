@@ -100,8 +100,8 @@ Alpine.data('copyToClipboard', () => ({
     function showCopyFeedback(button) {
         if (!button) return; var icon = button.querySelector('i');
         if (icon) { icon.classList.remove('fa-copy'); icon.classList.add('fa-check'); }
-        button.classList.add('text-green-600');
-        setTimeout(function() { if (icon) { icon.classList.remove('fa-check'); icon.classList.add('fa-copy'); } button.classList.remove('text-green-600'); }, 2000);
+        button.classList.add('text-success-600');
+        setTimeout(function() { if (icon) { icon.classList.remove('fa-check'); icon.classList.add('fa-copy'); } button.classList.remove('text-success-600'); }, 2000);
     }
     document.addEventListener('click', function(ev) {
         var copyBtn = ev.target.closest('.copy-btn');

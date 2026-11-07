@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
+use App\Enums\ColorScheme;
+use App\Enums\ThemePreference;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateThemeRequest extends FormRequest
 {
@@ -14,8 +17,8 @@ class UpdateThemeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'theme_preference' => ['sometimes', 'in:light,dark,system'],
-            'color_scheme' => ['sometimes', 'in:blue,indigo,cyan,teal,emerald,violet,pink,rose,red,orange,amber'],
+            'theme_preference' => ['sometimes', Rule::in(ThemePreference::values())],
+            'color_scheme' => ['sometimes', Rule::in(ColorScheme::values())],
         ];
     }
 }

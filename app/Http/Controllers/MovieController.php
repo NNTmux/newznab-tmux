@@ -79,6 +79,7 @@ class MovieController extends BasePageController
             'cpapi' => $this->userdata->cp_api,
             'cpurl' => $this->userdata->cp_url,
             'catlist' => $moviecats,
+            'ordering' => $ordering,
             'category' => $category,
             'categorytitle' => $id,
             'title' => stripslashes($this->scalarInput($request, 'title')),

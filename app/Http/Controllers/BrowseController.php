@@ -34,6 +34,7 @@ class BrowseController extends BasePageController
         $orderByUrls = $this->buildOrderByUrls($ordering, 'browse/All');
 
         $this->viewData = array_merge($this->viewData, [
+            'browseMenu' => $this->browseMenu(),
             'category' => -1,
             'catname' => 'All',
             'results' => $results,
@@ -126,6 +127,7 @@ class BrowseController extends BasePageController
         }
 
         $viewData = [
+            'browseMenu' => $this->browseMenu(),
             'parentcat' => ucfirst($parentCategory),
             'category' => $category,
             'catname' => $catname,
@@ -175,6 +177,16 @@ class BrowseController extends BasePageController
         }
 
         return redirect()->back()->with('error', 'Group parameter is required');
+    }
+
+    /**
+     * Main categories with their subcategories for the browse filters (honours the user's exclusions).
+     *
+     * @return array<string, mixed>
+     */
+    private function browseMenu(): array
+    {
+        return Category::getForMenu((array) ($this->userdata->categoryexclusions ?? []));
     }
 
     /**

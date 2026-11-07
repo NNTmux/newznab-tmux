@@ -2,26 +2,16 @@
 
 @section('content')
 <div class="space-y-6">
+    <x-admin.page-header :title="$title" icon="fas fa-shield-alt">
+        <x-slot:actions>
+            <x-admin.button :href="route('admin.gdpr-requests.index')" tone="gray" icon="fas fa-arrow-left">Back</x-admin.button>
+        </x-slot:actions>
+    </x-admin.page-header>
     <x-admin.card>
-        <x-admin.page-header :title="$title" icon="fas fa-shield-alt">
-            <x-slot:actions>
-                <x-admin.button :href="route('admin.gdpr-requests.index')" tone="gray" icon="fas fa-arrow-left">Back</x-admin.button>
-            </x-slot:actions>
-        </x-admin.page-header>
 
-        @if(session('success'))
-            <div class="mx-6 mt-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg text-green-800 dark:text-green-200">
-                <i class="fas fa-check-circle mr-2"></i>{{ session('success') }}
-            </div>
-        @endif
-        @if(session('error'))
-            <div class="mx-6 mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-800 dark:text-red-200">
-                <i class="fas fa-exclamation-circle mr-2"></i>{{ session('error') }}
-            </div>
-        @endif
         @if($errors->any())
             <div class="mx-6 mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-800 dark:text-red-200">
-                <i class="fas fa-exclamation-circle mr-2"></i>{{ $errors->first() }}
+                <i aria-hidden="true" class="fas fa-exclamation-circle mr-2"></i>{{ $errors->first() }}
             </div>
         @endif
 
@@ -81,7 +71,7 @@
                     <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">Audit Trail</h2>
                     <div class="space-y-3">
                         @forelse($gdprRequest->auditLogs as $auditLog)
-                            <div class="border-l-4 border-blue-500 pl-3">
+                            <div class="border-l-4 border-primary-500 pl-3">
                                 <div class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ $auditLog->event }}</div>
                                 <div class="text-sm text-gray-600 dark:text-gray-400">{{ $auditLog->description }}</div>
                                 <div class="text-xs text-gray-500 dark:text-gray-500">{{ formatDateTimeSeconds($auditLog->created_at) }}</div>
@@ -100,8 +90,8 @@
                     @if($gdprRequest->type === \App\Models\GdprRequest::TYPE_EXPORT && in_array($gdprRequest->status, [\App\Models\GdprRequest::STATUS_PENDING, \App\Models\GdprRequest::STATUS_PROCESSING], true))
                         <form method="post" action="{{ route('admin.gdpr-requests.generate-export', $gdprRequest) }}" class="mb-3">
                             @csrf
-                            <button type="submit" class="w-full px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700">
-                                <i class="fas fa-file-export mr-2"></i>Generate Export
+                            <button type="submit" class="w-full px-4 py-2 bg-accent dark:bg-accent-hover text-white rounded-md hover:bg-accent-hover">
+                                <i aria-hidden="true" class="fas fa-file-export mr-2"></i>Generate Export
                             </button>
                         </form>
                     @endif
@@ -110,7 +100,7 @@
                         <form method="post" action="{{ route('admin.gdpr-requests.complete-erasure', $gdprRequest) }}" class="mb-3">
                             @csrf
                             <button type="submit" class="w-full px-4 py-2 bg-red-600 dark:bg-red-700 text-white rounded-md hover:bg-red-700" data-confirm="Complete GDPR erasure for this account? Retained payment and audit records will be anonymized or minimized where practical.">
-                                <i class="fas fa-user-slash mr-2"></i>Complete Erasure
+                                <i aria-hidden="true" class="fas fa-user-slash mr-2"></i>Complete Erasure
                             </button>
                         </form>
                     @endif
@@ -121,7 +111,7 @@
                             <label for="admin_notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Rejection reason</label>
                             <textarea id="admin_notes" name="admin_notes" rows="4" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md" required></textarea>
                             <button type="submit" class="mt-3 w-full px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800">
-                                <i class="fas fa-ban mr-2"></i>Reject Request
+                                <i aria-hidden="true" class="fas fa-ban mr-2"></i>Reject Request
                             </button>
                         </form>
                     @else
@@ -130,9 +120,9 @@
                 </div>
 
                 @if($gdprRequest->isDownloadableExport())
-                    <div class="border border-green-200 dark:border-green-800 rounded-lg p-5 bg-green-50 dark:bg-green-900/10">
-                        <h2 class="text-lg font-semibold text-green-800 dark:text-green-200 mb-2">Export Ready</h2>
-                        <p class="text-sm text-green-700 dark:text-green-300">The user can download this export until {{ formatDateTime($gdprRequest->export_expires_at) }}.</p>
+                    <div class="border border-success-200 dark:border-success-800 rounded-lg p-5 bg-success-50 dark:bg-success-900/10">
+                        <h2 class="text-lg font-semibold text-success-800 dark:text-success-200 mb-2">Export Ready</h2>
+                        <p class="text-sm text-success-700 dark:text-success-300">The user can download this export until {{ formatDateTime($gdprRequest->export_expires_at) }}.</p>
                     </div>
                 @endif
             </div>

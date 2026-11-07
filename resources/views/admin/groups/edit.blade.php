@@ -2,18 +2,18 @@
 
 @section('content')
 <div class="space-y-6">
+    <x-admin.page-header :title="$title ?? 'Group Edit'" icon="fas fa-edit">
+        <x-slot:actions>
+            <x-admin.button :href="url('/admin/group-list')" tone="gray" icon="fas fa-arrow-left">Back to Groups</x-admin.button>
+        </x-slot:actions>
+    </x-admin.page-header>
     <x-admin.card>
-        <x-admin.page-header :title="$title ?? 'Group Edit'" icon="fas fa-edit">
-            <x-slot:actions>
-                <x-admin.button :href="url('/admin/group-list')" tone="gray" icon="fas fa-arrow-left">Back to Groups</x-admin.button>
-            </x-slot:actions>
-        </x-admin.page-header>
 
         <!-- Error Message -->
         @if(isset($error) && $error != '')
             <div class="mx-6 mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900 rounded-lg">
                 <div class="flex">
-                    <i class="fas fa-exclamation-circle text-red-500 dark:text-red-400 mr-3"></i>
+                    <i aria-hidden="true" class="fas fa-exclamation-circle text-red-500 dark:text-red-400 mr-3"></i>
                     <p class="text-red-800 dark:text-red-300">{{ $error }}</p>
                 </div>
             </div>
@@ -22,6 +22,7 @@
         <!-- Form -->
         <form action="{{ url('/admin/group-edit?action=submit') }}" method="POST" id="groupForm" class="px-6 py-6">
             @csrf
+            <x-form-errors class="mb-6" />
             <input type="hidden" name="id" value="{{ $group['id'] ?? '' }}"/>
 
             <!-- Group Name -->
@@ -31,12 +32,12 @@
                 </label>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i class="fas fa-users text-gray-400"></i>
+                        <i aria-hidden="true" class="fas fa-users text-gray-400"></i>
                     </div>
                     <input type="text"
                            id="name"
                            name="name"
-                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100"
+                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100"
                            value="{{ $group['name'] ?? '' }}"/>
                 </div>
                 <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
@@ -51,11 +52,11 @@
                 </label>
                 <div class="relative">
                     <div class="absolute top-3 left-3 pointer-events-none">
-                        <i class="fas fa-align-left text-gray-400"></i>
+                        <i aria-hidden="true" class="fas fa-align-left text-gray-400"></i>
                     </div>
                     <textarea id="description"
                               name="description"
-                              class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100"
+                              class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100"
                               rows="3">{{ $group['description'] ?? '' }}</textarea>
                 </div>
                 <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
@@ -70,12 +71,12 @@
                 </label>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i class="fas fa-calendar text-gray-400"></i>
+                        <i aria-hidden="true" class="fas fa-calendar text-gray-400"></i>
                     </div>
                     <input type="number"
                            id="backfill_target"
                            name="backfill_target"
-                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100"
+                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100"
                            value="{{ $group['backfill_target'] ?? 0 }}"/>
                 </div>
                 <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
@@ -90,12 +91,12 @@
                 </label>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i class="fas fa-file text-gray-400"></i>
+                        <i aria-hidden="true" class="fas fa-file text-gray-400"></i>
                     </div>
                     <input type="number"
                            id="minfilestoformrelease"
                            name="minfilestoformrelease"
-                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100"
+                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100"
                            value="{{ $group['minfilestoformrelease'] ?? 0 }}"/>
                 </div>
                 <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
@@ -111,19 +112,19 @@
                 <div class="flex gap-2">
                     <div class="relative flex-1">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i class="fas fa-download text-gray-400"></i>
+                            <i aria-hidden="true" class="fas fa-download text-gray-400"></i>
                         </div>
                         <input type="number"
                                step="any"
                                min="0"
                                id="minsizetoformrelease"
                                name="minsizetoformrelease"
-                               class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100"
+                               class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100"
                                value="{{ $groupMinSize['value'] ?? 0 }}"/>
                     </div>
                     <select id="minsizetoformrelease_unit"
                             name="minsizetoformrelease_unit"
-                            class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
+                            class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100">
                         @foreach($sizeUnits as $unit)
                             <option value="{{ $unit }}" {{ ($groupMinSize['unit'] ?? 'MB') === $unit ? 'selected' : '' }}>{{ $unit }}</option>
                         @endforeach
@@ -141,12 +142,12 @@
                 </label>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i class="fas fa-angle-double-left text-gray-400"></i>
+                        <i aria-hidden="true" class="fas fa-angle-double-left text-gray-400"></i>
                     </div>
                     <input type="number"
                            id="first_record"
                            name="first_record"
-                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100"
+                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100"
                            value="{{ $group['first_record'] ?? 0 }}"/>
                 </div>
                 <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
@@ -161,12 +162,12 @@
                 </label>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i class="fas fa-angle-double-right text-gray-400"></i>
+                        <i aria-hidden="true" class="fas fa-angle-double-right text-gray-400"></i>
                     </div>
                     <input type="number"
                            id="last_record"
                            name="last_record"
-                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100"
+                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100"
                            value="{{ $group['last_record'] ?? 0 }}"/>
                 </div>
                 <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
@@ -183,7 +184,7 @@
                                id="active_1"
                                name="active"
                                value="1"
-                               class="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 focus:ring-blue-500 dark:bg-gray-700"
+                               class="w-4 h-4 text-link border-gray-300 dark:border-gray-600 focus:ring-primary-500 dark:bg-gray-700"
                                {{ (isset($group['active']) && $group['active'] == 1) ? 'checked' : '' }}>
                         <label for="active_1" class="ml-2 text-sm text-gray-700 dark:text-gray-300">Yes</label>
                     </div>
@@ -192,7 +193,7 @@
                                id="active_0"
                                name="active"
                                value="0"
-                               class="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 focus:ring-blue-500 dark:bg-gray-700"
+                               class="w-4 h-4 text-link border-gray-300 dark:border-gray-600 focus:ring-primary-500 dark:bg-gray-700"
                                {{ (isset($group['active']) && $group['active'] == 0) ? 'checked' : '' }}>
                         <label for="active_0" class="ml-2 text-sm text-gray-700 dark:text-gray-300">No</label>
                     </div>
@@ -211,7 +212,7 @@
                                id="backfill_1"
                                name="backfill"
                                value="1"
-                               class="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 focus:ring-blue-500 dark:bg-gray-700"
+                               class="w-4 h-4 text-link border-gray-300 dark:border-gray-600 focus:ring-primary-500 dark:bg-gray-700"
                                {{ (isset($group['backfill']) && $group['backfill'] == 1) ? 'checked' : '' }}>
                         <label for="backfill_1" class="ml-2 text-sm text-gray-700 dark:text-gray-300">Yes</label>
                     </div>
@@ -220,7 +221,7 @@
                                id="backfill_0"
                                name="backfill"
                                value="0"
-                               class="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 focus:ring-blue-500 dark:bg-gray-700"
+                               class="w-4 h-4 text-link border-gray-300 dark:border-gray-600 focus:ring-primary-500 dark:bg-gray-700"
                                {{ (isset($group['backfill']) && $group['backfill'] == 0) ? 'checked' : '' }}>
                         <label for="backfill_0" class="ml-2 text-sm text-gray-700 dark:text-gray-300">No</label>
                     </div>
@@ -237,19 +238,19 @@
                 <div class="flex gap-2">
                     <a href="{{ url('/admin/group-list') }}"
                             class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600">
-                        <i class="fas fa-times mr-2"></i>Cancel
+                        <i aria-hidden="true" class="fas fa-times mr-2"></i>Cancel
                     </a>
                     <button type="button"
                             data-action="reset-group"
                             data-group-id="{{ $group['id'] ?? '' }}"
-                            class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700">
-                        <i class="fas fa-refresh mr-2"></i>Reset Group
+                            class="px-4 py-2 bg-warning-600 text-white rounded-lg hover:bg-warning-700">
+                        <i aria-hidden="true" class="fas fa-refresh mr-2"></i>Reset Group
                     </button>
                 </div>
                 <button type="submit"
                         form="groupForm"
-                        class="px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-600">
-                    <i class="fas fa-save mr-2"></i>Save Changes
+                        class="px-4 py-2 bg-success-600 dark:bg-success-700 text-white rounded-lg hover:bg-success-700 dark:hover:bg-success-600">
+                    <i aria-hidden="true" class="fas fa-save mr-2"></i>Save Changes
                 </button>
             </div>
         </div>

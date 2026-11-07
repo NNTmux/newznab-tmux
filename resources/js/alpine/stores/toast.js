@@ -7,31 +7,60 @@ import Alpine from '@alpinejs/csp';
 Alpine.store('toast', {
     items: [],
     _nextId: 0,
+    _timers: {},
 
     init() {
         // Process server-side flash messages on load
         this._processFlashMessages();
     },
 
+    /** How long a toast stays visible; errors and warnings wait for the user to dismiss them. */
+    durationFor(type) {
+        return type === 'error' || type === 'warning' ? null : 5000;
+    },
+
     /** Show a toast notification */
     show(message, type) {
         type = type || 'success';
         const id = ++this._nextId;
-        this.items.push({ id, message, type, removing: false });
+        const duration = this.durationFor(type);
+        this.items.push({ id, message, type, removing: false, remaining: duration });
+        this._schedule(id);
+    },
 
-        // Auto-remove after 5 seconds
-        setTimeout(() => this.dismiss(id), 5000);
+    /** Pause auto-dismiss while the pointer or keyboard focus is on a toast. */
+    pause(id) {
+        const item = this.items.find(t => t.id === id);
+        if (!item || item.remaining === null || !this._timers[id]) return;
+        clearTimeout(this._timers[id].handle);
+        item.remaining = Math.max(0, item.remaining - (Date.now() - this._timers[id].startedAt));
+        delete this._timers[id];
+    },
+
+    /** Resume auto-dismiss with the time that was left. */
+    resume(id) {
+        this._schedule(id);
     },
 
     /** Dismiss a toast by id */
     dismiss(id) {
         const item = this.items.find(t => t.id === id);
+        if (this._timers[id]) {
+            clearTimeout(this._timers[id].handle);
+            delete this._timers[id];
+        }
         if (item) {
             item.removing = true;
             setTimeout(() => {
                 this.items = this.items.filter(t => t.id !== id);
             }, 300);
         }
+    },
+
+    _schedule(id) {
+        const item = this.items.find(t => t.id === id);
+        if (!item || item.remaining === null || this._timers[id]) return;
+        this._timers[id] = { startedAt: Date.now(), handle: setTimeout(() => this.dismiss(id), item.remaining) };
     },
 
     /** Get icon class for a toast type */

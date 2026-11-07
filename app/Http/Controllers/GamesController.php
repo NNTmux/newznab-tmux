@@ -80,6 +80,7 @@ class GamesController extends BasePageController
 
         $this->viewData = array_merge($this->viewData, [
             'catlist' => $ctmp,
+            'ordering' => $ordering,
             'category' => $category,
             'catname' => $catname,
             'title' => $title,

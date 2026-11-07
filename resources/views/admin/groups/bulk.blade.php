@@ -2,20 +2,20 @@
 
 @section('content')
 <div class="space-y-6">
+    <x-admin.page-header :title="$title ?? 'Bulk Add Newsgroups'" icon="fas fa-plus-square">
+        <x-slot:actions>
+            <x-admin.button :href="url('/admin/group-list')" tone="gray" icon="fas fa-list">View All Groups</x-admin.button>
+        </x-slot:actions>
+    </x-admin.page-header>
     <x-admin.card>
-        <x-admin.page-header :title="$title ?? 'Bulk Add Newsgroups'" icon="fas fa-plus-square">
-            <x-slot:actions>
-                <x-admin.button :href="url('/admin/group-list')" tone="gray" icon="fas fa-list">View All Groups</x-admin.button>
-            </x-slot:actions>
-        </x-admin.page-header>
 
         <div class="px-6 py-6">
             @if(!empty($groupmsglist))
                 <!-- Success Info -->
-                <div class="mb-6 p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg">
+                <div class="mb-6 p-4 bg-info-50 dark:bg-info-900/30 border border-info-200 dark:border-info-800 rounded-lg">
                     <div class="flex">
-                        <i class="fas fa-info-circle text-blue-500 dark:text-blue-400 text-xl mr-3"></i>
-                        <p class="text-blue-700 dark:text-blue-300">
+                        <i aria-hidden="true" class="fas fa-info-circle text-info-500 dark:text-info-400 text-xl mr-3"></i>
+                        <p class="text-info-700 dark:text-info-300">
                             The following groups have been processed. You can now view them in the group list.
                         </p>
                     </div>
@@ -26,8 +26,8 @@
                     <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                         <thead class="bg-gray-50 dark:bg-gray-900">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Group</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                                <x-admin.th>Group</x-admin.th>
+                                <x-admin.th>Status</x-admin.th>
                             </tr>
                         </thead>
                         <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -35,22 +35,22 @@
                                 <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="flex items-center">
-                                            <i class="fas fa-users text-gray-400 dark:text-gray-500 mr-3"></i>
+                                            <i aria-hidden="true" class="fas fa-users text-gray-400 dark:text-gray-500 mr-3"></i>
                                             <span class="font-medium text-gray-900 dark:text-gray-100">{{ $group['group'] }}</span>
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         @if(strpos($group['msg'], 'Error') !== false)
                                             <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300">
-                                                <i class="fas fa-exclamation-circle mr-1"></i>{{ $group['msg'] }}
+                                                <i aria-hidden="true" class="fas fa-exclamation-circle mr-1"></i>{{ $group['msg'] }}
                                             </span>
                                         @elseif(strpos($group['msg'], 'exists') !== false)
-                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300">
-                                                <i class="fas fa-exclamation-triangle mr-1"></i>{{ $group['msg'] }}
+                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-warning-100 dark:bg-warning-900/30 text-warning-800 dark:text-warning-300">
+                                                <i aria-hidden="true" class="fas fa-exclamation-triangle mr-1"></i>{{ $group['msg'] }}
                                             </span>
                                         @else
-                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">
-                                                <i class="fas fa-check-circle mr-1"></i>{{ $group['msg'] }}
+                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-success-100 dark:bg-success-900/30 text-success-800 dark:text-success-300">
+                                                <i aria-hidden="true" class="fas fa-check-circle mr-1"></i>{{ $group['msg'] }}
                                             </span>
                                         @endif
                                     </td>
@@ -61,10 +61,10 @@
                 </div>
             @else
                 <!-- Info Alert -->
-                <div class="mb-6 p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg">
+                <div class="mb-6 p-4 bg-info-50 dark:bg-info-900/30 border border-info-200 dark:border-info-800 rounded-lg">
                     <div class="flex">
-                        <i class="fas fa-info-circle text-blue-500 dark:text-blue-400 text-xl mr-3"></i>
-                        <p class="text-blue-700 dark:text-blue-300">
+                        <i aria-hidden="true" class="fas fa-info-circle text-info-500 dark:text-info-400 text-xl mr-3"></i>
+                        <p class="text-info-700 dark:text-info-300">
                             Enter a regular expression to match multiple groups for bulk addition to the system.
                         </p>
                     </div>
@@ -73,6 +73,7 @@
                 <!-- Form -->
                 <form action="{{ url('/admin/group-bulk?action=submit') }}" method="POST" id="groupBulkForm">
                     @csrf
+                    <x-form-errors class="mb-6" />
 
                     <!-- Group Pattern -->
                     <div class="mb-6">
@@ -81,11 +82,11 @@
                         </label>
                         <div class="relative">
                             <div class="absolute top-3 left-3 pointer-events-none">
-                                <i class="fas fa-filter text-gray-400"></i>
+                                <i aria-hidden="true" class="fas fa-filter text-gray-400"></i>
                             </div>
                             <textarea id="groupfilter"
                                       name="groupfilter"
-                                      class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
+                                      class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 font-mono text-sm"
                                       rows="5"
                                       placeholder="e.g. alt.binaries.cd.image.linux|alt.binaries.warez.linux"></textarea>
                         </div>
@@ -104,7 +105,7 @@
                                        name="active"
                                        id="active_yes"
                                        value="1"
-                                       class="w-4 h-4 text-blue-600 dark:text-blue-400 border-gray-300 dark:border-gray-600 focus:ring-blue-500"
+                                       class="w-4 h-4 text-link dark:text-primary-400 border-gray-300 dark:border-gray-600 focus:ring-primary-500"
                                        checked>
                                 <label for="active_yes" class="ml-2 text-sm text-gray-700 dark:text-gray-300">Yes</label>
                             </div>
@@ -113,7 +114,7 @@
                                        name="active"
                                        id="active_no"
                                        value="0"
-                                       class="w-4 h-4 text-blue-600 dark:text-blue-400 border-gray-300 dark:border-gray-600 focus:ring-blue-500">
+                                       class="w-4 h-4 text-link dark:text-primary-400 border-gray-300 dark:border-gray-600 focus:ring-primary-500">
                                 <label for="active_no" class="ml-2 text-sm text-gray-700 dark:text-gray-300">No</label>
                             </div>
                         </div>
@@ -131,7 +132,7 @@
                                        name="backfill"
                                        id="backfill_yes"
                                        value="1"
-                                       class="w-4 h-4 text-blue-600 dark:text-blue-400 border-gray-300 dark:border-gray-600 focus:ring-blue-500">
+                                       class="w-4 h-4 text-link dark:text-primary-400 border-gray-300 dark:border-gray-600 focus:ring-primary-500">
                                 <label for="backfill_yes" class="ml-2 text-sm text-gray-700 dark:text-gray-300">Yes</label>
                             </div>
                             <div class="flex items-center">
@@ -139,7 +140,7 @@
                                        name="backfill"
                                        id="backfill_no"
                                        value="0"
-                                       class="w-4 h-4 text-blue-600 dark:text-blue-400 border-gray-300 dark:border-gray-600 focus:ring-blue-500"
+                                       class="w-4 h-4 text-link dark:text-primary-400 border-gray-300 dark:border-gray-600 focus:ring-primary-500"
                                        checked>
                                 <label for="backfill_no" class="ml-2 text-sm text-gray-700 dark:text-gray-300">No</label>
                             </div>
@@ -156,15 +157,15 @@
         <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
             <div class="flex justify-between">
                 <a href="{{ url('/admin/group-list') }}" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600">
-                    <i class="fas fa-arrow-left mr-2"></i>Back to Groups
+                    <i aria-hidden="true" class="fas fa-arrow-left mr-2"></i>Back to Groups
                 </a>
                 @if(empty($groupmsglist))
-                    <button type="submit" form="groupBulkForm" class="px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-600">
-                        <i class="fas fa-plus-circle mr-2"></i>Add Groups
+                    <button type="submit" form="groupBulkForm" class="px-4 py-2 bg-success-600 dark:bg-success-700 text-white rounded-lg hover:bg-success-700 dark:hover:bg-success-600">
+                        <i aria-hidden="true" class="fas fa-plus-circle mr-2"></i>Add Groups
                     </button>
                 @else
-                    <a href="{{ url('/admin/group-bulk') }}" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600">
-                        <i class="fas fa-plus-circle mr-2"></i>Add More Groups
+                    <a href="{{ url('/admin/group-bulk') }}" class="px-4 py-2 bg-accent dark:bg-accent-hover text-white rounded-lg hover:bg-accent-hover dark:hover:bg-accent">
+                        <i aria-hidden="true" class="fas fa-plus-circle mr-2"></i>Add More Groups
                     </a>
                 @endif
             </div>

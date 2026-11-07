@@ -2,8 +2,8 @@
 
 @section('content')
 <div class="space-y-6">
+    <x-admin.page-header :title="$title" icon="fas fa-chart-area" subtitle="Host, service and processing metrics collected by Prometheus and rendered by Grafana." />
     <x-admin.card>
-        <x-admin.page-header :title="$title" icon="fas fa-chart-area" subtitle="Host, service and processing metrics collected by Prometheus and rendered by Grafana." />
 
         @if($enabled)
             <div x-data="adminMonitoring"
@@ -13,17 +13,22 @@
                  data-default-refresh="{{ $defaultRefresh }}"
                  class="space-y-4 px-6 pb-6">
                 <div class="flex flex-wrap items-center justify-between gap-3">
-                    <nav class="flex flex-wrap gap-2" aria-label="Dashboards">
+                    <div class="flex flex-wrap gap-2" role="tablist" aria-label="Dashboards" @keydown="onTabKeydown">
                         @foreach($dashboards as $key => $dashboard)
                             <button type="button"
-                                    class="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition"
+                                    role="tab"
+                                    id="monitoring-tab-{{ $key }}"
+                                    aria-controls="monitoring-panel-{{ $key }}"
+                                    data-tab-key="{{ $key }}"
+                                    class="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
                                     :class="tabClass('{{ $key }}')"
-                                    :aria-pressed="isActive('{{ $key }}')"
+                                    :aria-selected="isActive('{{ $key }}') ? 'true' : 'false'"
+                                    :tabindex="isActive('{{ $key }}') ? '0' : '-1'"
                                     @click="selectTab('{{ $key }}')">
                                 <i class="{{ $dashboard['icon'] }}" aria-hidden="true"></i>{{ $dashboard['title'] }}
                             </button>
                         @endforeach
-                    </nav>
+                    </div>
 
                     <div class="flex flex-wrap items-center gap-2 text-sm">
                         <label class="flex items-center gap-2 text-gray-600 dark:text-gray-400">
@@ -55,7 +60,7 @@
 
                 {{-- Alpine's CSP build refuses directives on <iframe>, so visibility lives on a wrapper. --}}
                 @foreach($dashboards as $key => $dashboard)
-                    <div x-show="isActive('{{ $key }}')" x-cloak>
+                    <div x-show="isActive('{{ $key }}')" x-cloak role="tabpanel" id="monitoring-panel-{{ $key }}" aria-labelledby="monitoring-tab-{{ $key }}">
                         <iframe data-dashboard="{{ $key }}"
                                 data-src-base="{{ $dashboard['url'] }}"
                                 data-open-url="{{ $dashboard['open_url'] }}"
@@ -73,9 +78,9 @@
                     <p><strong>Ubuntu server:</strong> run <code>php artisan monitoring:install</code>, then the <code>sudo scripts/install-monitoring.sh</code> command it prints. An existing node_exporter is detected and reused.</p>
                     <p><strong>Sail:</strong> run <code>php artisan monitoring:install --sail</code>, then <code>make build &amp;&amp; make up</code>.</p>
                     <p class="pt-2">
-                        <a href="{{ url(config('pulse.path', 'pulse')) }}" class="font-semibold text-blue-600 hover:underline dark:text-blue-400">Pulse</a>
+                        <a href="{{ url(config('pulse.path', 'pulse')) }}" class="font-semibold text-link hover:underline dark:text-primary-400">Pulse</a>
                         and
-                        <a href="{{ url(config('horizon.path', 'horizon')) }}" class="font-semibold text-blue-600 hover:underline dark:text-blue-400">Horizon</a>
+                        <a href="{{ url(config('horizon.path', 'horizon')) }}" class="font-semibold text-link hover:underline dark:text-primary-400">Horizon</a>
                         remain available in the meantime.
                     </p>
                 </div>

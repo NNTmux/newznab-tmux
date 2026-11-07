@@ -52,11 +52,11 @@ Alpine.data('qualityFilter', () => ({
             const isActive = filter === this.activeResolution;
 
             // Remove all state classes first
-            btn.classList.remove('bg-blue-600', 'text-white', 'hover:bg-blue-700');
+            btn.classList.remove('bg-accent', 'text-white', 'hover:bg-accent-hover');
             btn.classList.remove('bg-gray-200', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300', 'hover:bg-gray-300', 'dark:hover:bg-gray-600');
 
             if (isActive) {
-                btn.classList.add('bg-blue-600', 'text-white', 'hover:bg-blue-700');
+                btn.classList.add('bg-accent', 'text-white', 'hover:bg-accent-hover');
             } else {
                 btn.classList.add('bg-gray-200', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300', 'hover:bg-gray-300', 'dark:hover:bg-gray-600');
             }

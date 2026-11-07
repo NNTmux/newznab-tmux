@@ -2,17 +2,18 @@
 
 @section('content')
 <div class="space-y-6">
+    <x-admin.page-header :title="$title" icon="fas fa-edit">
+        <x-slot:actions>
+            <x-admin.button :href="route('admin.anidb-list')" tone="gray" icon="fas fa-arrow-left">Back to List</x-admin.button>
+        </x-slot:actions>
+    </x-admin.page-header>
     <x-admin.card>
-        <x-admin.page-header :title="$title" icon="fas fa-edit">
-            <x-slot:actions>
-                <x-admin.button :href="route('admin.anidb-list')" tone="gray" icon="fas fa-arrow-left">Back to List</x-admin.button>
-            </x-slot:actions>
-        </x-admin.page-header>
 
         <!-- Edit Form -->
         <div class="p-6">
             <form method="POST" action="{{ url('admin/anidb-edit/' . $anime->anidbid) }}">
                 @csrf
+                <x-form-errors class="mb-6" />
                 <input type="hidden" name="action" value="submit">
                 <input type="hidden" name="anidbid" value="{{ $anime->anidbid }}">
 
@@ -29,7 +30,7 @@
                                    name="title"
                                    value="{{ $anime->title ?? '' }}"
                                    required
-                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">
                         </div>
 
                         <!-- Type -->
@@ -41,7 +42,7 @@
                                    id="type"
                                    name="type"
                                    value="{{ $anime->type ?? '' }}"
-                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">
                         </div>
 
                         <!-- Start Date -->
@@ -54,7 +55,7 @@
                                    name="startdate"
                                    value="{{ $anime->startdate ?? '' }}"
                                    placeholder="YYYY-MM-DD"
-                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">
                         </div>
 
                         <!-- End Date -->
@@ -67,7 +68,7 @@
                                    name="enddate"
                                    value="{{ $anime->enddate ?? '' }}"
                                    placeholder="YYYY-MM-DD"
-                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">
                         </div>
 
                         <!-- Rating -->
@@ -79,7 +80,7 @@
                                    id="rating"
                                    name="rating"
                                    value="{{ $anime->rating ?? '' }}"
-                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">
                             @if(!empty($anime->rating))
                                 <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
                                     Display: {{ number_format($anime->rating / 100, 1) }} / 10
@@ -95,7 +96,7 @@
                             <textarea id="related"
                                       name="related"
                                       rows="3"
-                                      class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">{{ $anime->related ?? '' }}</textarea>
+                                      class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">{{ $anime->related ?? '' }}</textarea>
                         </div>
 
                         <!-- Similar -->
@@ -106,7 +107,7 @@
                             <textarea id="similar"
                                       name="similar"
                                       rows="3"
-                                      class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">{{ $anime->similar ?? '' }}</textarea>
+                                      class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">{{ $anime->similar ?? '' }}</textarea>
                         </div>
                     </div>
 
@@ -127,7 +128,7 @@
                                          class="max-w-full h-auto mx-auto rounded shadow-lg max-h-[400px]">
                                 @else
                                     <div class="flex flex-col items-center justify-center py-12 text-gray-400 dark:text-gray-500">
-                                        <i class="fas fa-dragon text-6xl mb-3"></i>
+                                        <i aria-hidden="true" class="fas fa-dragon text-6xl mb-3"></i>
                                         <p>No cover image available</p>
                                         <p class="text-xs mt-2">Cover will be downloaded from AniList when data is populated</p>
                                     </div>
@@ -147,13 +148,13 @@
                                 </label>
                                 <div class="flex flex-wrap gap-2">
                                     @if(!empty($anilistId))
-                                        <a href="{{ $site->dereferrerLink ?? '' }}https://anilist.co/anime/{{ $anilistId }}" target="_blank" class="inline-flex items-center px-3 py-2 bg-blue-100 text-blue-800 rounded-lg hover:bg-blue-200 transition text-sm">
-                                            <i class="fas fa-external-link-alt mr-2"></i> AniList
+                                        <a href="{{ $site->dereferrerLink ?? '' }}https://anilist.co/anime/{{ $anilistId }}" target="_blank" class="inline-flex items-center px-3 py-2 bg-primary-100 dark:bg-primary-900/40 text-primary-800 dark:text-primary-200 rounded-lg hover:bg-primary-200 transition text-sm">
+                                            <i aria-hidden="true" class="fas fa-external-link-alt mr-2"></i> AniList
                                         </a>
                                     @endif
                                     @if(!empty($malId))
-                                        <a href="{{ $site->dereferrerLink ?? '' }}https://myanimelist.net/anime/{{ $malId }}" target="_blank" class="inline-flex items-center px-3 py-2 bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200 transition text-sm">
-                                            <i class="fas fa-external-link-alt mr-2"></i> MyAnimeList
+                                        <a href="{{ $site->dereferrerLink ?? '' }}https://myanimelist.net/anime/{{ $malId }}" target="_blank" class="inline-flex items-center px-3 py-2 bg-warning-100 dark:bg-warning-900/40 text-warning-800 dark:text-warning-200 rounded-lg hover:bg-warning-200 transition text-sm">
+                                            <i aria-hidden="true" class="fas fa-external-link-alt mr-2"></i> MyAnimeList
                                         </a>
                                     @endif
                                 </div>
@@ -168,7 +169,7 @@
                             <textarea id="description"
                                       name="description"
                                       rows="8"
-                                      class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">{{ $anime->description ?? '' }}</textarea>
+                                      class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">{{ $anime->description ?? '' }}</textarea>
                         </div>
 
                         <!-- Creators -->
@@ -179,7 +180,7 @@
                             <textarea id="creators"
                                       name="creators"
                                       rows="3"
-                                      class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">{{ $anime->creators ?? '' }}</textarea>
+                                      class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">{{ $anime->creators ?? '' }}</textarea>
                         </div>
 
                         <!-- Categories -->
@@ -190,7 +191,7 @@
                             <textarea id="categories"
                                       name="categories"
                                       rows="3"
-                                      class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">{{ $anime->categories ?? '' }}</textarea>
+                                      class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">{{ $anime->categories ?? '' }}</textarea>
                         </div>
 
                         <!-- Characters -->
@@ -201,7 +202,7 @@
                             <textarea id="characters"
                                       name="characters"
                                       rows="3"
-                                      class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">{{ $anime->characters ?? '' }}</textarea>
+                                      class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">{{ $anime->characters ?? '' }}</textarea>
                         </div>
                     </div>
                 </div>
@@ -215,7 +216,7 @@
                         <textarea id="epnos"
                                   name="epnos"
                                   rows="4"
-                                  class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">{{ $anime->epnos ?? '' }}</textarea>
+                                  class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">{{ $anime->epnos ?? '' }}</textarea>
                     </div>
 
                     <div>
@@ -225,7 +226,7 @@
                         <textarea id="airdates"
                                   name="airdates"
                                   rows="4"
-                                  class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">{{ $anime->airdates ?? '' }}</textarea>
+                                  class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">{{ $anime->airdates ?? '' }}</textarea>
                     </div>
 
                     <div>
@@ -235,17 +236,17 @@
                         <textarea id="episodetitles"
                                   name="episodetitles"
                                   rows="4"
-                                  class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">{{ $anime->episodetitles ?? '' }}</textarea>
+                                  class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">{{ $anime->episodetitles ?? '' }}</textarea>
                     </div>
                 </div>
 
                 <!-- Action Buttons -->
                 <div class="mt-6 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 pt-6">
                     <a href="{{ route('admin.anidb-list') }}" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600">
-                        <i class="fas fa-times mr-2"></i>Cancel
+                        <i aria-hidden="true" class="fas fa-times mr-2"></i>Cancel
                     </a>
-                    <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                        <i class="fas fa-save mr-2"></i>Save Changes
+                    <button type="submit" class="px-6 py-2 bg-accent text-white rounded-lg hover:bg-accent-hover">
+                        <i aria-hidden="true" class="fas fa-save mr-2"></i>Save Changes
                     </button>
                 </div>
             </form>

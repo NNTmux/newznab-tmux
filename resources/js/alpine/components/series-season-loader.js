@@ -97,9 +97,9 @@ Alpine.data('seriesSeasonLoader', () => ({
     },
 
     _setActiveSeason(season) {
-        const activeClasses = ['border-blue-500', 'text-blue-600'];
+        const activeClasses = ['border-primary-500', 'text-link'];
         const inactiveClasses = ['border-transparent', 'text-gray-500', 'hover:text-gray-700', 'dark:text-gray-300', 'hover:border-gray-300'];
-        const activeBadgeClasses = ['bg-blue-100', 'text-blue-800'];
+        const activeBadgeClasses = ['bg-primary-100', 'text-primary-800'];
         const inactiveBadgeClasses = ['bg-gray-100', 'dark:bg-gray-800', 'text-gray-600'];
 
         this.$el.querySelectorAll('[data-series-season-link]').forEach(tab => {

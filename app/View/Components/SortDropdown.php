@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\View\Components;
 
+use App\Support\Navigation\ListFilters;
 use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
@@ -56,16 +57,26 @@ class SortDropdown extends Component
      *
      * @param  array<string, array{label: string, icon: string}>|null  $options
      * @param  array<string, mixed>|null  $queryParams
+     * @param  list<string>|null  $ordering  Controller ordering keys (e.g. getBrowseOrdering()); adds readable labels and a "Default order" entry
      */
     public function __construct(
         ?string $currentSort = null,
         ?array $options = null,
         ?string $baseUrl = null,
-        ?array $queryParams = null
+        ?array $queryParams = null,
+        ?array $ordering = null,
     ) {
-        $this->currentSort = $currentSort ?? request('ob', 'posted_desc');
         $this->baseUrl = $baseUrl ?? request()->url();
         $this->queryParams = $queryParams ?? request()->except(['ob', 'page']);
+
+        // A controller ordering list: readable labels plus "Default order" for requests without ?ob=.
+        if ($ordering !== null) {
+            $options = ['' => ['label' => __('Default order'), 'icon' => 'fa-arrow-down-wide-short']] + ListFilters::sortOptions($ordering);
+            $requested = request('ob');
+            $currentSort ??= is_string($requested) && isset($options[$requested]) ? $requested : '';
+        }
+
+        $this->currentSort = $currentSort ?? request('ob', 'posted_desc');
 
         // Default sort options for releases
         $this->sortOptions = $options ?? [
@@ -90,8 +101,8 @@ class SortDropdown extends Component
         // Pre-compute all sort URLs
         $this->sortUrls = [];
         foreach ($this->sortOptions as $sortKey => $sortData) {
-            $params = array_merge($this->queryParams, ['ob' => $sortKey]);
-            $this->sortUrls[$sortKey] = $this->baseUrl.'?'.http_build_query($params);
+            $params = $sortKey === '' ? $this->queryParams : array_merge($this->queryParams, ['ob' => $sortKey]);
+            $this->sortUrls[$sortKey] = $params === [] ? $this->baseUrl : $this->baseUrl.'?'.http_build_query($params);
         }
     }
 

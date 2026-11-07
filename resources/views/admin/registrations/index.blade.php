@@ -17,8 +17,8 @@
             : 'border border-slate-400/30 bg-slate-600 text-white shadow-sm dark:border-slate-300/20 dark:bg-slate-500 dark:text-slate-950';
     };
     $periodDoneClasses = 'border border-cyan-500/30 bg-cyan-600 text-white shadow-sm dark:border-cyan-300/20 dark:bg-cyan-500 dark:text-slate-950';
-    $primaryButtonClasses = 'inline-flex items-center rounded-lg border border-blue-700 bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-blue-300/20 dark:bg-blue-500 dark:text-white dark:hover:bg-blue-400 dark:focus:ring-offset-gray-900';
-    $secondaryButtonClasses = 'inline-flex items-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-gray-500 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600 dark:focus:ring-offset-gray-900';
+    $primaryButtonClasses = 'inline-flex items-center rounded-lg border border-primary-700 bg-accent px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:border-primary-300/20 dark:bg-primary-500 dark:text-white dark:hover:bg-primary-400 dark:focus:ring-offset-gray-900';
+    $secondaryButtonClasses = 'inline-flex items-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:border-gray-500 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600 dark:focus:ring-offset-gray-900';
     $editButtonClasses = 'inline-flex items-center rounded-md border border-sky-700 bg-sky-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 dark:border-sky-300/20 dark:bg-sky-500 dark:text-white dark:hover:bg-sky-400 dark:focus:ring-offset-gray-900';
     $toggleButtonClasses = 'inline-flex items-center rounded-md border border-amber-500/40 bg-amber-500 px-3 py-1.5 text-xs font-medium text-slate-950 shadow-sm transition hover:bg-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 dark:border-amber-200/20 dark:bg-amber-400 dark:text-slate-950 dark:hover:bg-amber-300 dark:focus:ring-offset-gray-900';
     $deleteButtonClasses = 'inline-flex items-center rounded-md border border-rose-700 bg-rose-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2 dark:border-rose-300/20 dark:bg-rose-500 dark:text-white dark:hover:bg-rose-400 dark:focus:ring-offset-gray-900';
@@ -36,12 +36,12 @@
         </div>
     @endif
 
+    <x-admin.page-header
+        :title="$title"
+        icon="fas fa-user-plus"
+        subtitle="Manage the manual registration mode, schedule temporary open periods, and review recent registration activity."
+    />
     <x-admin.card>
-        <x-admin.page-header
-            :title="$title"
-            icon="fas fa-user-plus"
-            subtitle="Manage the manual registration mode, schedule temporary open periods, and review recent registration activity."
-        />
 
         <div class="grid grid-cols-1 gap-4 px-6 py-6 lg:grid-cols-3">
             <div class="rounded-xl border border-gray-200 bg-gray-50 p-5 dark:border-gray-700 dark:bg-gray-900">
@@ -51,7 +51,7 @@
                         {{ $registrationStatus['effective_status_label'] }}
                     </span>
                     @if($registrationStatus['scheduled_override_active'])
-                        <span class="inline-flex items-center justify-center rounded-full border border-blue-500/30 bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm dark:border-blue-300/20 dark:bg-blue-500 dark:text-white">
+                        <span class="inline-flex items-center justify-center rounded-full border border-primary-500/30 bg-accent px-3 py-1.5 text-xs font-semibold text-white shadow-sm dark:border-primary-300/20 dark:bg-primary-500 dark:text-white">
                             Scheduled Override
                         </span>
                     @endif
@@ -109,12 +109,12 @@
                     <textarea id="note"
                               name="note"
                               rows="3"
-                              class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+                              class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
                               placeholder="Example: opening signups for the weekend after maintenance.">{{ old('note') }}</textarea>
                 </x-form.group>
 
                 <button type="submit" class="{{ $primaryButtonClasses }}">
-                    <i class="fas fa-save mr-2"></i>Save Manual Status
+                    <i aria-hidden="true" class="fas fa-save mr-2"></i>Save Manual Status
                 </button>
             </form>
         </x-admin.card>
@@ -165,7 +165,7 @@
                     <textarea id="notes"
                               name="notes"
                               rows="3"
-                              class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+                              class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
                               placeholder="Example: announce on Discord and monitor spam rate.">{{ old('notes', $editingPeriod?->notes) }}</textarea>
                 </x-form.group>
 
@@ -174,19 +174,19 @@
                            name="is_enabled"
                            value="1"
                            @checked(old('is_enabled', $editingPeriod?->is_enabled ?? true))
-                           class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800">
+                           class="rounded border-gray-300 text-link focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-800">
                     Enable this period immediately
                 </label>
 
                 <div class="flex flex-wrap items-center gap-3">
                     <button type="submit" class="{{ $primaryButtonClasses }}">
-                        <i class="fas fa-calendar-plus mr-2"></i>{{ $editingPeriod ? 'Update Period' : 'Create Period' }}
+                        <i aria-hidden="true" class="fas fa-calendar-plus mr-2"></i>{{ $editingPeriod ? 'Update Period' : 'Create Period' }}
                     </button>
 
                     @if($editingPeriod)
                         <a href="{{ route('admin.registrations.index') }}"
                            class="{{ $secondaryButtonClasses }}">
-                            <i class="fas fa-xmark mr-2"></i>Cancel Edit
+                            <i aria-hidden="true" class="fas fa-xmark mr-2"></i>Cancel Edit
                         </a>
                     @endif
                 </div>
@@ -203,7 +203,7 @@
 
             @if($currentPeriods->isEmpty())
                 <div class="px-6 py-10 text-center text-gray-500 dark:text-gray-400">
-                    <i class="fas fa-calendar-plus mb-3 text-3xl"></i>
+                    <i aria-hidden="true" class="fas fa-calendar-plus mb-3 text-3xl"></i>
                     <p>No current or upcoming open-registration periods are scheduled.</p>
                 </div>
             @else
@@ -222,7 +222,7 @@
                                     <td class="px-6 py-4 align-top">
                                         <p class="font-medium text-gray-900 dark:text-gray-100">{{ $period->name }}</p>
                                         @if($registrationStatus['active_period'] && $registrationStatus['active_period']->id === $period->id)
-                                            <span class="mt-2 inline-flex items-center justify-center rounded-full border border-blue-500/30 bg-blue-600 px-2.5 py-1.5 text-xs font-semibold text-white shadow-sm dark:border-blue-300/20 dark:bg-blue-500 dark:text-white">
+                                            <span class="mt-2 inline-flex items-center justify-center rounded-full border border-primary-500/30 bg-accent px-2.5 py-1.5 text-xs font-semibold text-white shadow-sm dark:border-primary-300/20 dark:bg-primary-500 dark:text-white">
                                                 Active Right Now
                                             </span>
                                         @endif
@@ -246,7 +246,7 @@
                                         <div class="flex flex-wrap gap-2">
                                             <a href="{{ route('admin.registrations.index', ['edit_period' => $period->id]) }}"
                                                class="{{ $editButtonClasses }}">
-                                                <i class="fas fa-pen mr-1.5"></i>Edit
+                                                <i aria-hidden="true" class="fas fa-pen mr-1.5"></i>Edit
                                             </a>
 
                                             <form method="POST"
@@ -262,7 +262,7 @@
                                                 @csrf
                                                 <button type="submit"
                                                         class="{{ $toggleButtonClasses }}">
-                                                    <i class="fas {{ $period->is_enabled ? 'fa-pause' : 'fa-play' }} mr-1.5"></i>{{ $period->is_enabled ? 'Disable' : 'Enable' }}
+                                                    <i aria-hidden="true" class="fas {{ $period->is_enabled ? 'fa-pause' : 'fa-play' }} mr-1.5"></i>{{ $period->is_enabled ? 'Disable' : 'Enable' }}
                                                 </button>
                                             </form>
 
@@ -278,7 +278,7 @@
                                                 @method('DELETE')
                                                 <button type="submit"
                                                         class="{{ $deleteButtonClasses }}">
-                                                    <i class="fas fa-trash mr-1.5"></i>Delete
+                                                    <i aria-hidden="true" class="fas fa-trash mr-1.5"></i>Delete
                                                 </button>
                                             </form>
                                         </div>
@@ -297,7 +297,7 @@
 
             @if($pastPeriods->isEmpty())
                 <div class="px-6 py-10 text-center text-gray-500 dark:text-gray-400">
-                    <i class="fas fa-clock mb-3 text-3xl"></i>
+                    <i aria-hidden="true" class="fas fa-clock mb-3 text-3xl"></i>
                     <p>No past open-registration periods have been recorded yet.</p>
                 </div>
             @else
@@ -335,7 +335,7 @@
                                         <div class="flex flex-wrap gap-2">
                                             <a href="{{ route('admin.registrations.index', ['edit_period' => $period->id]) }}"
                                                class="{{ $editButtonClasses }}">
-                                                <i class="fas fa-pen mr-1.5"></i>Edit
+                                                <i aria-hidden="true" class="fas fa-pen mr-1.5"></i>Edit
                                             </a>
 
                                             <form method="POST"
@@ -350,7 +350,7 @@
                                                 @method('DELETE')
                                                 <button type="submit"
                                                         class="{{ $deleteButtonClasses }}">
-                                                    <i class="fas fa-trash mr-1.5"></i>Delete
+                                                    <i aria-hidden="true" class="fas fa-trash mr-1.5"></i>Delete
                                                 </button>
                                             </form>
                                         </div>
@@ -371,7 +371,7 @@
 
             @if($history->isEmpty())
                 <div class="px-6 py-10 text-center text-gray-500 dark:text-gray-400">
-                    <i class="fas fa-clock-rotate-left mb-3 text-3xl"></i>
+                    <i aria-hidden="true" class="fas fa-clock-rotate-left mb-3 text-3xl"></i>
                     <p>No registration history has been recorded yet.</p>
                 </div>
             @else

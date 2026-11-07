@@ -1,144 +1,112 @@
-            <!-- Video/Audio Metadata -->
-            @if(!empty($reVideo) || !empty($reAudio) || !empty($reSubs))
-                <div class="surface-panel-alt rounded-lg p-6 border">
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
-                        <i class="fas fa-photo-video mr-2 text-primary-600 dark:text-primary-400"></i> Media Information
+            {{-- Video/Audio Metadata: compact summary lines, only rendered when a field has a real value.
+                 The subtitle lookup is an aggregate query, so it returns a row (subs = null) even when empty. --}}
+            @php
+                $mediaValue = static function ($row, string $field): string {
+                    $value = trim((string) data_get($row, $field, ''));
+
+                    return $value === '0' ? '' : $value;
+                };
+
+                $videoParts = [];
+                if (! empty($reVideo)) {
+                    $durationMinutes = (int) round(((int) $mediaValue($reVideo, 'videoduration')) / 60000);
+                    $width = $mediaValue($reVideo, 'videowidth');
+                    $height = $mediaValue($reVideo, 'videoheight');
+                    $videoParts = array_values(array_filter([
+                        'Container' => $mediaValue($reVideo, 'containerformat'),
+                        'Format' => $mediaValue($reVideo, 'videoformat'),
+                        'Codec' => $mediaValue($reVideo, 'videocodec'),
+                        'Resolution' => $width !== '' && $height !== '' ? $width.'×'.$height : '',
+                        'Aspect' => $mediaValue($reVideo, 'videoaspect'),
+                        'Frame rate' => $mediaValue($reVideo, 'videoframerate') !== '' ? $mediaValue($reVideo, 'videoframerate').' fps' : '',
+                        'Duration' => $durationMinutes > 0 ? $durationMinutes.' min' : '',
+                        'Bit rate' => $mediaValue($reVideo, 'overallbitrate'),
+                        'Encoder' => $mediaValue($reVideo, 'videolibrary'),
+                    ], static fn (string $value): bool => $value !== ''));
+                }
+
+                $audioTracks = [];
+                foreach ((array) ($reAudio ?: []) as $track) {
+                    $rate = $mediaValue($track, 'audiosamplerate');
+                    $channels = $mediaValue($track, 'audiochannels');
+                    $parts = array_values(array_filter([
+                        $mediaValue($track, 'audiolanguage'),
+                        $mediaValue($track, 'audioformat'),
+                        $mediaValue($track, 'audiocodec'),
+                        $channels !== '' ? $channels.' ch' : '',
+                        $mediaValue($track, 'audiobitrate'),
+                        // Some sources already include the unit ("48.0 kHz").
+                        $rate !== '' ? (preg_match('/[a-z]/i', $rate) ? $rate : $rate.' Hz') : '',
+                    ], static fn (string $value): bool => $value !== ''));
+                    if ($parts !== []) {
+                        $audioTracks[] = $parts;
+                    }
+                }
+
+                $subtitleLanguages = collect(explode(',', (string) data_get($reSubs ?? null, 'subs', '')))
+                    ->map(static fn (string $language): string => trim($language))
+                    ->filter()
+                    ->unique()
+                    ->values();
+                $visibleSubtitles = 12;
+            @endphp
+            @if($videoParts !== [] || $audioTracks !== [] || $subtitleLanguages->isNotEmpty())
+                <section class="surface-panel-alt rounded-lg border p-5" aria-labelledby="media-info-heading">
+                    <h3 id="media-info-heading" class="flex items-center text-lg font-semibold text-gray-800 dark:text-gray-200">
+                        <i aria-hidden="true" class="fas fa-photo-video mr-2 text-link dark:text-primary-400"></i> Media Information
                     </h3>
 
-                    @if(!empty($reVideo))
-                        <div class="mb-6">
-                            <h4 class="text-md font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center">
-                                <i class="fas fa-video mr-2 text-primary-500 dark:text-primary-400"></i> Video Details
-                            </h4>
-                            <div class="surface-panel rounded-lg p-4 shadow-sm border">
-                                <dl class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                                    @if(!empty($reVideo['containerformat']))
-                                        <div>
-                                            <dt class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Container Format</dt>
-                                            <dd class="text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ $reVideo['containerformat'] }}</dd>
-                                        </div>
-                                    @endif
-                                    @if(!empty($reVideo['videocodec']))
-                                        <div>
-                                            <dt class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Video Codec</dt>
-                                            <dd class="text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ $reVideo['videocodec'] }}</dd>
-                                        </div>
-                                    @endif
-                                    @if(!empty($reVideo['videoformat']))
-                                        <div>
-                                            <dt class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Video Format</dt>
-                                            <dd class="text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ $reVideo['videoformat'] }}</dd>
-                                        </div>
-                                    @endif
-                                    @if(!empty($reVideo['videowidth']) && !empty($reVideo['videoheight']))
-                                        <div>
-                                            <dt class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Resolution</dt>
-                                            <dd class="text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ $reVideo['videowidth'] }}x{{ $reVideo['videoheight'] }}</dd>
-                                        </div>
-                                    @endif
-                                    @if(!empty($reVideo['videoaspect']))
-                                        <div>
-                                            <dt class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Aspect Ratio</dt>
-                                            <dd class="text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ $reVideo['videoaspect'] }}</dd>
-                                        </div>
-                                    @endif
-                                    @if(!empty($reVideo['videoframerate']))
-                                        <div>
-                                            <dt class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Frame Rate</dt>
-                                            <dd class="text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ $reVideo['videoframerate'] }} fps</dd>
-                                        </div>
-                                    @endif
-                                    @if(!empty($reVideo['videoduration']))
-                                        @php
-                                            $durationMs = intval($reVideo['videoduration']);
-                                            $durationMinutes = $durationMs > 0 ? round($durationMs / 1000 / 60) : 0;
-                                        @endphp
-                                        @if($durationMinutes > 0)
-                                            <div>
-                                                <dt class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Duration</dt>
-                                                <dd class="text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ $durationMinutes }} minutes</dd>
-                                            </div>
-                                        @endif
-                                    @endif
-                                    @if(!empty($reVideo['overallbitrate']))
-                                        <div>
-                                            <dt class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Bit Rate</dt>
-                                            <dd class="text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ $reVideo['overallbitrate'] }}</dd>
-                                        </div>
-                                    @endif
-                                    @if(!empty($reVideo['videolibrary']))
-                                        <div>
-                                            <dt class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Encoder Library</dt>
-                                            <dd class="text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ $reVideo['videolibrary'] }}</dd>
-                                        </div>
-                                    @endif
-                                </dl>
+                    <dl class="mt-3 space-y-3 text-sm">
+                        @if($videoParts !== [])
+                            <div>
+                                <dt class="flex items-center gap-2 font-medium text-gray-600 dark:text-gray-400">
+                                    <i aria-hidden="true" class="fas fa-video text-primary-500 dark:text-primary-400"></i> Video Details
+                                </dt>
+                                <dd class="mt-1 text-gray-900 dark:text-gray-100">{{ implode(' · ', $videoParts) }}</dd>
                             </div>
-                        </div>
-                    @endif
+                        @endif
 
-                    @if(!empty($reAudio))
-                        <div class="mb-6">
-                            <h4 class="text-md font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center">
-                                <i class="fas fa-volume-up mr-2 text-primary-500 dark:text-primary-400"></i> Audio Details
-                            </h4>
-                            @foreach($reAudio as $index => $audio)
-                                <div class="surface-panel rounded-lg p-4 shadow-sm border {{ $index > 0 ? 'mt-3' : '' }}">
-                                    @if(count($reAudio) > 1)
-                                        <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">Track {{ $index + 1 }}</p>
+                        @if($audioTracks !== [])
+                            <div>
+                                <dt class="flex items-center gap-2 font-medium text-gray-600 dark:text-gray-400">
+                                    <i aria-hidden="true" class="fas fa-volume-up text-primary-500 dark:text-primary-400"></i> Audio Details
+                                    @if(count($audioTracks) > 1)
+                                        <span class="text-xs font-normal">({{ count($audioTracks) }} tracks)</span>
                                     @endif
-                                    <dl class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                                        @if(!empty($audio['audioformat']))
-                                            <div>
-                                                <dt class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Audio Format</dt>
-                                                <dd class="text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ $audio['audioformat'] }}</dd>
-                                            </div>
-                                        @endif
-                                        @if(!empty($audio['audiocodec']))
-                                            <div>
-                                                <dt class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Codec</dt>
-                                                <dd class="text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ $audio['audiocodec'] }}</dd>
-                                            </div>
-                                        @endif
-                                        @if(!empty($audio['audiochannels']))
-                                            <div>
-                                                <dt class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Channels</dt>
-                                                <dd class="text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ $audio['audiochannels'] }}</dd>
-                                            </div>
-                                        @endif
-                                        @if(!empty($audio['audiobitrate']))
-                                            <div>
-                                                <dt class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Bit Rate</dt>
-                                                <dd class="text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ $audio['audiobitrate'] }}</dd>
-                                            </div>
-                                        @endif
-                                        @if(!empty($audio['audiolanguage']))
-                                            <div>
-                                                <dt class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Language</dt>
-                                                <dd class="text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ $audio['audiolanguage'] }}</dd>
-                                            </div>
-                                        @endif
-                                        @if(!empty($audio['audiosamplerate']))
-                                            <div>
-                                                <dt class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Sample Rate</dt>
-                                                <dd class="text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ $audio['audiosamplerate'] }} Hz</dd>
-                                            </div>
-                                        @endif
-                                    </dl>
-                                </div>
-                            @endforeach
-                        </div>
-                    @endif
-
-                    @if(!empty($reSubs))
-                        <div>
-                            <h4 class="text-md font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center">
-                                <i class="fas fa-closed-captioning mr-2 text-primary-500"></i> Subtitles
-                            </h4>
-                            <div class="surface-panel rounded-lg p-4 shadow-sm">
-                                <p class="text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ $reSubs->subs }}</p>
+                                </dt>
+                                <dd class="mt-1">
+                                    <ol class="space-y-0.5 text-gray-900 dark:text-gray-100">
+                                        @foreach($audioTracks as $track)
+                                            <li>{{ implode(' · ', $track) }}</li>
+                                        @endforeach
+                                    </ol>
+                                </dd>
                             </div>
-                        </div>
-                    @endif
-                </div>
+                        @endif
+
+                        @if($subtitleLanguages->isNotEmpty())
+                            <div>
+                                <dt class="flex items-center gap-2 font-medium text-gray-600 dark:text-gray-400">
+                                    <i aria-hidden="true" class="fas fa-closed-captioning text-primary-500 dark:text-primary-400"></i> Subtitles
+                                    <span class="text-xs font-normal">({{ $subtitleLanguages->count() }})</span>
+                                </dt>
+                                <dd class="mt-1.5 flex flex-wrap gap-1.5">
+                                    @foreach($subtitleLanguages->take($visibleSubtitles) as $language)
+                                        <span class="movie-meta-chip text-xs">{{ $language }}</span>
+                                    @endforeach
+                                    @if($subtitleLanguages->count() > $visibleSubtitles)
+                                        <details class="w-full">
+                                            <summary class="cursor-pointer text-xs font-medium text-link dark:text-primary-400">+{{ $subtitleLanguages->count() - $visibleSubtitles }} more</summary>
+                                            <div class="mt-1.5 flex flex-wrap gap-1.5">
+                                                @foreach($subtitleLanguages->slice($visibleSubtitles) as $language)
+                                                    <span class="movie-meta-chip text-xs">{{ $language }}</span>
+                                                @endforeach
+                                            </div>
+                                        </details>
+                                    @endif
+                                </dd>
+                            </div>
+                        @endif
+                    </dl>
+                </section>
             @endif

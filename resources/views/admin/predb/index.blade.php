@@ -2,14 +2,14 @@
 
 @section('content')
 <div class="space-y-6">
+    <x-admin.page-header :title="$title" icon="fas fa-database">
+        <x-slot:actions>
+            <span class="inline-flex min-h-11 items-center rounded-xl border border-gray-200 bg-white/70 px-4 text-sm font-medium text-gray-700 dark:border-gray-600 dark:bg-gray-800/70 dark:text-gray-200">
+                {{ number_format($results->total()) }} entries
+            </span>
+        </x-slot:actions>
+    </x-admin.page-header>
     <x-admin.card>
-        <x-admin.page-header :title="$title" icon="fas fa-database">
-            <x-slot:actions>
-                <span class="inline-flex min-h-11 items-center rounded-xl border border-gray-200 bg-white/70 px-4 text-sm font-medium text-gray-700 dark:border-gray-600 dark:bg-gray-800/70 dark:text-gray-200">
-                    {{ number_format($results->total()) }} entries
-                </span>
-            </x-slot:actions>
-        </x-admin.page-header>
 
         <!-- Search Form -->
         <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
@@ -23,15 +23,15 @@
                            name="presearch"
                            value="{{ $lastSearch }}"
                            placeholder="Enter search term..."
-                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">
                 </div>
                 <div class="flex items-end space-x-2">
-                    <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                        <i class="fas fa-search mr-2"></i>Search
+                    <button type="submit" class="px-6 py-2 bg-accent text-white rounded-lg hover:bg-accent-hover">
+                        <i aria-hidden="true" class="fas fa-search mr-2"></i>Search
                     </button>
                     @if($lastSearch)
                         <a href="{{ url('admin/predb') }}" class="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
-                            <i class="fas fa-times mr-2"></i>Clear
+                            <i aria-hidden="true" class="fas fa-times mr-2"></i>Clear
                         </a>
                     @endif
                 </div>
@@ -85,20 +85,20 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @if($pre->nuked == 0)
-                                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                                        <i class="fas fa-check-circle mr-1"></i>Not Nuked
+                                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-success-100 text-success-800 dark:bg-success-900 dark:text-success-200">
+                                        <i aria-hidden="true" class="fas fa-check-circle mr-1"></i>Not Nuked
                                     </span>
                                 @elseif($pre->nuked == 1)
-                                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                                        <i class="fas fa-undo mr-1"></i>Un-Nuked
+                                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-200">
+                                        <i aria-hidden="true" class="fas fa-undo mr-1"></i>Un-Nuked
                                     </span>
                                 @elseif($pre->nuked == 2)
                                     <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
-                                        <i class="fas fa-radiation mr-1"></i>Nuked
+                                        <i aria-hidden="true" class="fas fa-radiation mr-1"></i>Nuked
                                     </span>
                                 @elseif($pre->nuked == 3)
-                                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
-                                        <i class="fas fa-exclamation-triangle mr-1"></i>Mod Nuked
+                                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-warning-100 text-warning-800 dark:bg-warning-900 dark:text-warning-200">
+                                        <i aria-hidden="true" class="fas fa-exclamation-triangle mr-1"></i>Mod Nuked
                                     </span>
                                 @endif
                                 @if($pre->nuked > 0 && $pre->nukereason)
@@ -111,8 +111,8 @@
                                 @if(isset($pre->guid))
                                     <a href="{{ url('details/' . $pre->guid) }}"
                                        target="_blank"
-                                       class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">
-                                        <i class="fas fa-external-link-alt mr-1"></i>View
+                                       class="text-link dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300">
+                                        <i aria-hidden="true" class="fas fa-external-link-alt mr-1"></i>View
                                     </a>
                                 @else
                                     <span class="text-gray-400 dark:text-gray-500">—</span>
@@ -127,7 +127,7 @@
                             <td colspan="8" class="p-0">
                                 <x-admin.empty-state :icon="$lastSearch ? 'fas fa-search' : 'fas fa-database'" :title="$predbEmptyTitle">
                                     @if($lastSearch)
-                                        <a href="{{ url('admin/predb') }}" class="text-blue-600 dark:text-blue-400 hover:underline">
+                                        <a href="{{ url('admin/predb') }}" class="text-link dark:text-primary-400 hover:underline">
                                             Clear search and view all
                                         </a>
                                     @endif
@@ -152,13 +152,13 @@
 
     <!-- Info Box -->
     @if($lastSearch)
-    <div class="mt-6 bg-blue-50 dark:bg-blue-900 border-l-4 border-blue-500 dark:border-blue-600 p-4 rounded">
+    <div class="mt-6 bg-info-50 dark:bg-info-900 border-l-4 border-info-500 dark:border-info-600 p-4 rounded">
         <div class="flex">
             <div class="shrink-0">
-                <i class="fas fa-info-circle text-blue-600 dark:text-blue-400"></i>
+                <i aria-hidden="true" class="fas fa-info-circle text-info-600 dark:text-info-400"></i>
             </div>
             <div class="ml-3">
-                <p class="text-sm text-blue-800 dark:text-blue-200">
+                <p class="text-sm text-info-800 dark:text-info-200">
                     Showing search results for: <strong>{{ $lastSearch }}</strong>
                 </p>
             </div>

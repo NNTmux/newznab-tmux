@@ -93,9 +93,9 @@ class AdminDashboardAutoRefreshTest extends TestCase
             'deleted-users-total',
             'last-refresh',
         ] as $hook) {
-            $this->assertStringContainsString(
-                'data-stat="'.$hook.'"',
-                $content,
+            // Headline tiles pass the hook as stat-key; x-admin.stat-card renders it as data-stat.
+            $this->assertTrue(
+                str_contains($content, 'data-stat="'.$hook.'"') || str_contains($content, 'stat-key="'.$hook.'"'),
                 "Missing data-stat=\"$hook\" hook required by the auto-refresh JS."
             );
         }

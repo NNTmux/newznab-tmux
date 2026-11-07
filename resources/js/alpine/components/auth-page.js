@@ -9,7 +9,7 @@ Alpine.data('authPage', () => ({
         // Auto-hide success messages after 5 seconds on login page
         if (window.location.pathname.includes('/login')) {
             setTimeout(() => {
-                this.$el.querySelectorAll('.bg-green-50, .bg-blue-50').forEach(alert => {
+                this.$el.querySelectorAll('.bg-success-50, .bg-primary-50').forEach(alert => {
                     alert.style.transition = 'opacity 0.5s ease-out';
                     alert.style.opacity = '0';
                     setTimeout(() => alert.remove(), 500);
@@ -43,7 +43,7 @@ Alpine.data('otpInput', () => ({
 (function() {
     if (window.location.pathname.includes('/login')) {
         setTimeout(function() {
-            document.querySelectorAll('.bg-green-50, .bg-blue-50').forEach(function(el) {
+            document.querySelectorAll('.bg-success-50, .bg-primary-50').forEach(function(el) {
                 el.style.transition = 'opacity 0.5s ease-out'; el.style.opacity = '0';
                 setTimeout(function() { el.remove(); }, 500);
             });

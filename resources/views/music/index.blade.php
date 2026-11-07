@@ -5,13 +5,14 @@
 @endpush
 
 @section('content')
+<x-page-header title="Music" :current="!empty($categorytitle) ? $categorytitle : 'All audio'" eyebrow="Listen and discover" description="Browse indexed music and refine the catalog by artist, title, genre, or year." icon="fas fa-headphones">
+    <x-slot:stats>
+        <span class="workspace-hero__stat"><i class="fas fa-compact-disc" aria-hidden="true"></i>{{ number_format($results->total()) }} releases</span>
+        <span class="workspace-hero__stat"><i class="fas fa-folder-open" aria-hidden="true"></i>{{ $categorytitle ?: 'All audio' }}</span>
+    </x-slot:stats>
+</x-page-header>
+
 <div class="surface-panel rounded-xl shadow-sm">
-    <x-page-header title="Music" :current="!empty($categorytitle) ? $categorytitle : 'All audio'" eyebrow="Listen and discover" description="Browse indexed music and refine the catalog by artist, title, genre, or year." icon="fas fa-headphones">
-        <x-slot:stats>
-            <span class="workspace-hero__stat"><i class="fas fa-compact-disc" aria-hidden="true"></i>{{ number_format($results->total()) }} releases</span>
-            <span class="workspace-hero__stat"><i class="fas fa-folder-open" aria-hidden="true"></i>{{ $categorytitle ?: 'All audio' }}</span>
-        </x-slot:stats>
-    </x-page-header>
 
     <div class="px-6 py-4">
         <!-- Search Filters -->
@@ -26,7 +27,7 @@
                                name="artist"
                                value="{{ $artist ?? '' }}"
                                placeholder="Search by artist"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500">
                     </div>
 
                     <!-- Title Filter -->
@@ -37,7 +38,7 @@
                                name="title"
                                value="{{ $title ?? '' }}"
                                placeholder="Search by title"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500">
                     </div>
 
                     <!-- Genre Filter -->
@@ -45,7 +46,7 @@
                         <label for="genre" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Genre</label>
                         <select id="genre"
                                 name="genre"
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <option value="">All Genres</option>
                             @foreach($genres ?? [] as $g)
                                 <option value="{{ $g->id }}" {{ ($genre ?? '') == $g->id ? 'selected' : '' }}>
@@ -60,7 +61,7 @@
                         <label for="year" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Year</label>
                         <select id="year"
                                 name="year"
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <option value="">All Years</option>
                             @foreach($years ?? [] as $y)
                                 <option value="{{ $y }}" {{ ($year ?? '') == $y ? 'selected' : '' }}>
@@ -72,11 +73,11 @@
                 </div>
 
                 <div class="mt-4 flex gap-2">
-                    <button type="submit" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-800">
-                        <i class="fa fa-search mr-2"></i>Search
+                    <button type="submit" class="px-4 py-2 bg-accent dark:bg-accent-hover text-white rounded-md hover:bg-accent-hover dark:hover:bg-primary-800">
+                        <i aria-hidden="true" class="fa-solid fa-search mr-2"></i>Search
                     </button>
                     <a href="{{ url('/browse/Audio/' . ($categorytitle ?: 'All')) }}" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600">
-                        <i class="fa fa-times mr-2"></i>Clear
+                        <i aria-hidden="true" class="fa-solid fa-times mr-2"></i>Clear
                     </a>
                 </div>
             </form>
@@ -87,13 +88,15 @@
         @if(count($results) > 0)
             <x-cover-results-toolbar
                 :results="$results"
-                icon="fa fa-music"
+                icon="fa-solid fa-music"
                 :title="($catname ?? 'All') . ' Albums'"
                 covgroup="music"
                 :category="$categorytitle ?? 'All'"
                 parentcat="Audio"
                 search-placeholder="Search in Audio..."
                 :search-category="$category ?? null"
+                :category-items="\App\Support\Navigation\ListFilters::categoryItems($catlist ?? [], $category ?? null, route('Audio'), 'All audio', true)"
+                :ordering="$ordering ?? null"
             />
 
             <!-- Album Grid - Card Layout with Multiple Releases -->
@@ -120,13 +123,13 @@
                                                  data-fallback-src="{{ url('/images/no-cover.png') }}">
                                         @else
                                             <div class="w-32 h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                                                <i class="fas fa-music text-gray-400 text-2xl"></i>
+                                                <i aria-hidden="true" class="fas fa-music text-gray-400 text-2xl"></i>
                                             </div>
                                         @endif
                                     </a>
                                 @else
                                     <div class="w-32 h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                                        <i class="fas fa-music text-gray-400 text-2xl"></i>
+                                        <i aria-hidden="true" class="fas fa-music text-gray-400 text-2xl"></i>
                                     </div>
                                 @endif
                             </div>
@@ -139,18 +142,18 @@
                                         <p class="text-sm text-gray-600 dark:text-gray-400">{{ $result->artist ?? 'Unknown Artist' }}</p>
 
                                         @if($totalFailed > 0)
-                                            <div class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-800 border border-red-200 mt-1">
-                                                <i class="fas fa-exclamation-triangle mr-1"></i>
+                                            <div class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-200 border border-red-200 mt-1">
+                                                <i aria-hidden="true" class="fas fa-exclamation-triangle mr-1"></i>
                                                 <span>{{ $totalFailed }} failed report{{ $totalFailed > 1 ? 's' : '' }}</span>
                                             </div>
                                         @endif
 
                                         <div class="flex items-center gap-4 mt-1 text-sm text-gray-600 dark:text-gray-400">
                                             @if(!empty($result->year))
-                                                <span><i class="fas fa-calendar mr-1"></i> {{ $result->year }}</span>
+                                                <span><i aria-hidden="true" class="fas fa-calendar mr-1"></i> {{ $result->year }}</span>
                                             @endif
                                             @if(!empty($result->genre))
-                                                <span><i class="fas fa-tag mr-1"></i> {{ $result->genre }}</span>
+                                                <span><i aria-hidden="true" class="fas fa-tag mr-1"></i> {{ $result->genre }}</span>
                                             @endif
                                         </div>
 
@@ -175,12 +178,12 @@
             </div>
         @else
             <x-empty-state
-                icon="fa fa-music"
+                icon="fa-solid fa-music"
                 title="No albums found"
                 message="Try adjusting your search filters or browse all music."
                 :action-url="url('/browse/Audio/All')"
                 action-label="Browse All Audio"
-                action-icon="fa fa-music"
+                action-icon="fa-solid fa-music"
             />
         @endif
     </div>

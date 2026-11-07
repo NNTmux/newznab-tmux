@@ -6,16 +6,16 @@
         <!-- Logo and Title -->
         <div class="text-center">
             <a aria-label="Home" href="{{ url('/') }}" class="mb-3 inline-flex items-center justify-center sm:mb-4">
-                <div class="flex h-14 w-14 items-center justify-center rounded-full bg-primary-600 shadow-lg dark:bg-primary-700 sm:h-16 sm:w-16">
-                    <i class="fas fa-file-download text-2xl text-white sm:text-3xl"></i>
+                <div class="flex h-14 w-14 items-center justify-center rounded-full bg-accent shadow-lg dark:bg-accent-hover sm:h-16 sm:w-16">
+                    <i aria-hidden="true" class="fas fa-file-download text-2xl text-white sm:text-3xl"></i>
                 </div>
             </a>
-            <h2 class="mt-3 text-3xl font-extrabold text-gray-900 dark:text-white sm:mt-4 sm:text-4xl">
+            <p class="mt-3 text-3xl font-extrabold text-gray-900 dark:text-white sm:mt-4 sm:text-4xl">
                 {{ config('app.name') }}
-            </h2>
-            <p class="mt-2 text-sm text-gray-700 dark:text-gray-300">
-                Create your account
             </p>
+            <h1 class="mt-2 text-base font-medium text-gray-700 dark:text-gray-300">
+                Create your account
+            </h1>
         </div>
 
         <!-- Register Card -->
@@ -23,15 +23,15 @@
             <div class="px-5 py-5 sm:px-8 sm:py-6">
                 <!-- Registration Status Error Message -->
                 @if(!empty($error) && $showregister == 0)
-                    <div class="p-6 rounded-lg bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-700">
+                    <div class="p-6 rounded-lg bg-warning-50 dark:bg-warning-900/30 border border-warning-200 dark:border-warning-700">
                         <div class="flex items-start">
-                            <i class="fas fa-info-circle text-yellow-600 dark:text-yellow-400 mr-3 mt-0.5 text-xl"></i>
+                            <i aria-hidden="true" class="fas fa-info-circle text-warning-600 dark:text-warning-400 mr-3 mt-0.5 text-xl"></i>
                             <div class="flex-1">
-                                <h3 class="text-lg font-semibold text-yellow-800 dark:text-yellow-200 mb-2">Registration Not Available</h3>
-                                <p class="text-sm text-yellow-700 dark:text-yellow-300">{{ $error }}</p>
+                                <h3 class="text-lg font-semibold text-warning-800 dark:text-warning-200 mb-2">Registration Not Available</h3>
+                                <p class="text-sm text-warning-700 dark:text-warning-300">{{ $error }}</p>
                                 @if(strpos($error, 'invite only') !== false)
-                                    <p class="mt-3 text-sm text-yellow-700 dark:text-yellow-300">
-                                        <i class="fas fa-envelope mr-1"></i>
+                                    <p class="mt-3 text-sm text-warning-700 dark:text-warning-300">
+                                        <i aria-hidden="true" class="fas fa-envelope mr-1"></i>
                                         You need a valid invitation link to register. Please check your email or contact an existing member.
                                     </p>
                                 @endif
@@ -41,10 +41,10 @@
                 @endif
 
                 @if(!empty($notice))
-                    <div class="mb-4 p-4 rounded-lg bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700">
+                    <div class="mb-4 p-4 rounded-lg bg-primary-50 dark:bg-primary-900/30 border border-primary-200 dark:border-primary-700">
                         <div class="flex items-start">
-                            <i class="fas fa-circle-info text-primary-600 dark:text-primary-400 mr-3 mt-0.5"></i>
-                            <p class="text-sm text-blue-800 dark:text-blue-200">{{ $notice }}</p>
+                            <i aria-hidden="true" class="fas fa-circle-info text-link dark:text-primary-400 mr-3 mt-0.5"></i>
+                            <p class="text-sm text-primary-800 dark:text-primary-200">{{ $notice }}</p>
                         </div>
                     </div>
                 @endif
@@ -53,7 +53,7 @@
                 @if($errors->any())
                     <div role="alert" class="mb-4 p-4 rounded-lg bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700">
                         <div class="flex items-start">
-                            <i class="fas fa-exclamation-circle text-red-600 dark:text-red-400 mr-3 mt-0.5"></i>
+                            <i aria-hidden="true" class="fas fa-exclamation-circle text-red-600 dark:text-red-400 mr-3 mt-0.5"></i>
                             <div class="flex-1">
                                 <p class="text-sm font-medium text-red-800 dark:text-red-200">There were some errors with your submission:</p>
                                 <ul class="mt-2 text-sm text-red-700 dark:text-red-300 list-disc list-inside">
@@ -79,7 +79,7 @@
                         </label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <i class="fas fa-user text-gray-400"></i>
+                                <i aria-hidden="true" class="fas fa-user text-gray-400"></i>
                             </div>
                             <input
                                 id="username"
@@ -106,7 +106,7 @@
                         </label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <i class="fas fa-envelope text-gray-400"></i>
+                                <i aria-hidden="true" class="fas fa-envelope text-gray-400"></i>
                             </div>
                             <input
                                 id="email"
@@ -132,7 +132,7 @@
                         </label>
                         <div class="relative" x-data="passwordToggle">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <i class="fas fa-lock text-gray-400"></i>
+                                <i aria-hidden="true" class="fas fa-lock text-gray-400"></i>
                             </div>
                             <input
                                 id="password"
@@ -170,7 +170,7 @@
                         </label>
                         <div class="relative" x-data="passwordToggle">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <i class="fas fa-lock text-gray-400"></i>
+                                <i aria-hidden="true" class="fas fa-lock text-gray-400"></i>
                             </div>
                             <input
                                 id="password_confirmation"
@@ -205,13 +205,13 @@
                             name="terms"
                             type="checkbox"
                             required
-                            class="h-4 w-4 text-primary-600 dark:text-primary-400 focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded mt-1"
+                            class="h-4 w-4 text-link dark:text-primary-400 focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded mt-1"
                         >
                         <label for="terms" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
                             I agree to the
-                            <a href="{{ url('/terms-and-conditions') }}" target="_blank" class="text-primary-600 dark:text-primary-400 hover:text-primary-500">Terms and Conditions</a>
+                            <a href="{{ url('/terms-and-conditions') }}" target="_blank" class="text-link dark:text-primary-400 hover:text-primary-500">Terms and Conditions</a>
                             and
-                            <a href="{{ url('/privacy-policy') }}" target="_blank" class="text-primary-600 dark:text-primary-400 hover:text-primary-500">Privacy Policy</a>
+                            <a href="{{ url('/privacy-policy') }}" target="_blank" class="text-link dark:text-primary-400 hover:text-primary-500">Privacy Policy</a>
                         </label>
                     </div>
 
@@ -219,9 +219,9 @@
                     <div>
                         <button
                             type="submit"
-                            class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary-600 dark:bg-primary-700 hover:bg-primary-700 dark:hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition duration-150 ease-in-out"
+                            class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-accent dark:bg-accent-hover hover:bg-accent-hover dark:hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition duration-150 ease-in-out"
                         >
-                            <i class="fas fa-user-plus mr-2"></i>
+                            <i aria-hidden="true" class="fas fa-user-plus mr-2"></i>
                             Create Account
                         </button>
                     </div>
@@ -232,12 +232,12 @@
             <!-- Card Footer -->
             <div class="border-t border-gray-200 surface-panel-alt px-5 py-4 dark:border-gray-700 sm:px-8">
                 <div class="flex flex-col sm:flex-row justify-between items-center gap-3 text-sm">
-                    <a href="{{ route('login') }}" class="text-primary-600 dark:text-primary-400 hover:text-primary-500 font-medium transition">
-                        <i class="fas fa-sign-in-alt mr-1"></i> Already have an account? Sign in
+                    <a href="{{ route('login') }}" class="text-link dark:text-primary-400 hover:text-primary-500 font-medium transition">
+                        <i aria-hidden="true" class="fas fa-sign-in-alt mr-1"></i> Already have an account? Sign in
                     </a>
 
                     <a href="{{ url('/') }}" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition">
-                        <i class="fas fa-home mr-1"></i> Back to home
+                        <i aria-hidden="true" class="fas fa-home mr-1"></i> Back to home
                     </a>
                 </div>
             </div>

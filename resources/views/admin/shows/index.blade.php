@@ -2,15 +2,15 @@
 
 @section('content')
 <div class="space-y-6">
+    <x-admin.page-header :title="$title" icon="fas fa-tv">
+        <x-slot:actions>
+            <span class="inline-flex min-h-11 items-center rounded-xl border border-gray-200 bg-white/70 px-4 text-sm font-medium text-gray-700 dark:border-gray-600 dark:bg-gray-800/70 dark:text-gray-200">
+                {{ number_format($tvshowlist->total()) }} shows
+            </span>
+            <x-admin.button :href="route('admin.show-add')" tone="success" icon="fas fa-plus">Add TV Show</x-admin.button>
+        </x-slot:actions>
+    </x-admin.page-header>
     <x-admin.card>
-        <x-admin.page-header :title="$title" icon="fas fa-tv">
-            <x-slot:actions>
-                <span class="inline-flex min-h-11 items-center rounded-xl border border-gray-200 bg-white/70 px-4 text-sm font-medium text-gray-700 dark:border-gray-600 dark:bg-gray-800/70 dark:text-gray-200">
-                    {{ number_format($tvshowlist->total()) }} shows
-                </span>
-                <x-admin.button :href="route('admin.show-add')" tone="success" icon="fas fa-plus">Add TV Show</x-admin.button>
-            </x-slot:actions>
-        </x-admin.page-header>
 
         <!-- Search Form -->
         <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
@@ -24,15 +24,15 @@
                            name="showname"
                            value="{{ $showname }}"
                            placeholder="Enter show name..."
-                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">
                 </div>
                 <div class="flex items-end space-x-2">
-                    <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                        <i class="fas fa-search mr-2"></i>Search
+                    <button type="submit" class="px-6 py-2 bg-accent text-white rounded-lg hover:bg-accent-hover">
+                        <i aria-hidden="true" class="fas fa-search mr-2"></i>Search
                     </button>
                     @if($showname)
                         <a href="{{ url('admin/show-list') }}" class="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
-                            <i class="fas fa-times mr-2"></i>Clear
+                            <i aria-hidden="true" class="fas fa-times mr-2"></i>Clear
                         </a>
                     @endif
                 </div>
@@ -66,7 +66,7 @@
                                          loading="lazy">
                                 @else
                                     <div class="h-16 w-12 bg-gray-200 dark:bg-gray-700 rounded flex items-center justify-center">
-                                        <i class="fas fa-tv text-gray-400 text-sm"></i>
+                                        <i aria-hidden="true" class="fas fa-tv text-gray-400 text-sm"></i>
                                     </div>
                                 @endif
                             </td>
@@ -82,16 +82,16 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @if($show->type == 0)
-                                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                                        <i class="fas fa-tv mr-1"></i>TV
+                                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-200">
+                                        <i aria-hidden="true" class="fas fa-tv mr-1"></i>TV
                                     </span>
                                 @elseif($show->type == 1)
                                     <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
-                                        <i class="fas fa-film mr-1"></i>Film
+                                        <i aria-hidden="true" class="fas fa-film mr-1"></i>Film
                                     </span>
                                 @elseif($show->type == 2)
                                     <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200">
-                                        <i class="fas fa-dragon mr-1"></i>Anime
+                                        <i aria-hidden="true" class="fas fa-dragon mr-1"></i>Anime
                                     </span>
                                 @endif
                             </td>
@@ -136,18 +136,18 @@
                                 {{ $show->publisher ?? '—' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                <a href="{{ url('admin/show-edit?id=' . $show->id) }}"
-                                   class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
+                                <a aria-label="Edit" href="{{ url('admin/show-edit?id=' . $show->id) }}"
+                                   class="text-link dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300"
                                    title="Edit">
-                                    <i class="fas fa-edit"></i>
+                                    <i aria-hidden="true" class="fas fa-edit"></i>
                                 </a>
                                 <form method="POST" action="{{ route('admin.show-remove', $show->id) }}" class="inline">
                                     @csrf
-                                    <button type="submit"
+                                    <button aria-label="Remove from Releases" type="submit"
                                         class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
                                         title="Remove from Releases"
                                         data-confirm="Remove this TV show ID from all linked releases?">
-                                        <i class="fas fa-unlink"></i>
+                                        <i aria-hidden="true" class="fas fa-unlink"></i>
                                     </button>
                                 </form>
                             </td>
@@ -160,7 +160,7 @@
                             <td colspan="7" class="p-0">
                                 <x-admin.empty-state :icon="$showname ? 'fas fa-search' : 'fas fa-tv'" :title="$showsEmptyTitle">
                                     @if($showname)
-                                        <a href="{{ url('admin/show-list') }}" class="text-blue-600 dark:text-blue-400 hover:underline">
+                                        <a href="{{ url('admin/show-list') }}" class="text-link dark:text-primary-400 hover:underline">
                                             Clear search and view all
                                         </a>
                                     @endif

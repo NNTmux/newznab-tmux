@@ -36,7 +36,7 @@
 
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100" id="report-modal-title">
-                        <i class="fas fa-flag text-red-500 mr-2"></i>Report Release
+                        <i aria-hidden="true" class="fas fa-flag text-red-500 mr-2"></i>Report Release
                     </h3>
                     <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" @click="close()" aria-label="Close report form">
                         <i class="fas fa-times" aria-hidden="true"></i>
@@ -84,8 +84,8 @@
                     </div>
 
                     <!-- Success Message -->
-                    <div role="status" x-show="successMsg" x-cloak class="mb-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-                        <p class="text-sm text-green-600 dark:text-green-400" x-text="successMsg"></p>
+                    <div role="status" x-show="successMsg" x-cloak class="mb-4 p-3 bg-success-50 dark:bg-success-900/20 border border-success-200 dark:border-success-800 rounded-lg">
+                        <p class="text-sm text-success-600 dark:text-success-400" x-text="successMsg"></p>
                     </div>
 
                     <!-- Action Buttons -->
@@ -98,7 +98,7 @@
                         <button type="submit"
                                 :disabled="!canSubmit()"
                                 class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center">
-                            <i x-show="isSubmitting" class="fas fa-spinner fa-spin mr-2"></i>
+                            <i aria-hidden="true" x-show="isSubmitting" class="fas fa-spinner fa-spin mr-2"></i>
                             <span x-text="submitText()"></span>
                         </button>
                     </div>

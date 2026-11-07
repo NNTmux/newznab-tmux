@@ -2,7 +2,7 @@
             @if(!empty($predb) && is_array($predb))
                 <div class="surface-panel-alt rounded-lg p-6 border">
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
-                        <i class="fas fa-database mr-2 text-primary-600"></i> PreDB Information
+                        <i aria-hidden="true" class="fas fa-database mr-2 text-link"></i> PreDB Information
                     </h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         @if(!empty($predb['title']))

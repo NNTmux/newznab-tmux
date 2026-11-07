@@ -11,7 +11,7 @@
             </div>
 
             @if (session('status') === 'resent')
-                <div class="rounded-md bg-green-50 dark:bg-green-900/30 p-4 text-sm text-green-700 dark:text-green-200">
+                <div class="rounded-md bg-success-50 dark:bg-success-900/30 p-4 text-sm text-success-700 dark:text-success-200">
                     A fresh verification link has been sent to your email address.
                 </div>
             @endif
@@ -20,7 +20,7 @@
                 @csrf
                 <button
                     type="submit"
-                    class="w-full inline-flex justify-center rounded-md bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                    class="w-full inline-flex justify-center rounded-md bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                 >
                     Resend verification email
                 </button>

@@ -90,21 +90,21 @@
 
     @if($currentView === 'covers')
         {{-- Currently in cover view --}}
-        <span class="inline-flex min-h-9 items-center rounded-lg bg-primary-600 px-3 font-semibold text-white shadow-sm">Covers</span>
+        <span class="inline-flex min-h-9 items-center rounded-lg bg-accent px-3 font-semibold text-white shadow-sm">Covers</span>
         <a href="{{ $listUrl }}" class="inline-flex min-h-9 items-center rounded-lg px-3 font-medium text-gray-600 transition hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white">List</a>
     @else
         {{-- Currently in list view --}}
         @if($covgroup || $shows)
             <a href="{{ $coverUrl }}" class="inline-flex min-h-9 items-center rounded-lg px-3 font-medium text-gray-600 transition hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white">Covers</a>
         @endif
-        <span class="inline-flex min-h-9 items-center rounded-lg bg-primary-600 px-3 font-semibold text-white shadow-sm">List</span>
+        <span class="inline-flex min-h-9 items-center rounded-lg bg-accent px-3 font-semibold text-white shadow-sm">List</span>
 
         {{-- Thumbnail toggle in list view - client-side via Alpine --}}
         @if($covgroup || $shows)
             <button type="button"
                @click="toggleThumbs()"
                class="inline-flex min-h-9 cursor-pointer items-center gap-1.5 rounded-lg px-3 font-medium transition hover:bg-gray-100 dark:hover:bg-gray-700"
-               x-bind:class="showThumbs ? 'text-green-700 dark:text-green-300' : 'text-gray-600 dark:text-gray-300'"
+               x-bind:class="showThumbs ? 'text-success-700 dark:text-success-300' : 'text-gray-600 dark:text-gray-300'"
                x-bind:title="showThumbs ? 'Hide thumbnails' : 'Show thumbnails'">
                 <i class="fas fa-image text-xs" aria-hidden="true"></i>
                 <span x-text="showThumbs ? 'Hide Thumbs' : 'Show Thumbs'"></span>

@@ -15,18 +15,18 @@
 <div class="surface-panel rounded-xl shadow-sm overflow-hidden">
         <!-- Profile Header -->
         <div class="surface-panel-alt border-b px-6 py-4 flex justify-between items-center">
-            <h2 class="text-xl font-semibold text-gray-800">
-                <i class="fas fa-user mr-2"></i>User Profile
+            <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
+                <i aria-hidden="true" class="fas fa-user mr-2"></i>User Profile
             </h2>
             <div class="flex gap-2">
                 @if(($isadmin ?? false) || !$publicview)
-                    <a href="{{ route('profileedit') }}" class="px-4 py-2 bg-green-600 dark:bg-green-700 text-white text-sm rounded hover:bg-green-700 dark:hover:bg-green-800 transition">
-                        <i class="fa fa-edit mr-1"></i>Edit Profile
+                    <a href="{{ route('profileedit') }}" class="px-4 py-2 bg-success-600 dark:bg-success-700 text-white text-sm rounded hover:bg-success-700 dark:hover:bg-success-800 transition">
+                        <i aria-hidden="true" class="fa-solid fa-edit mr-1"></i>Edit Profile
                     </a>
                 @endif
                 @if(!($isadmin ?? false) && !$publicview)
-                    <a href="{{ route('privacy-center.index') }}" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white text-sm rounded hover:bg-blue-700 dark:hover:bg-blue-800 transition">
-                        <i class="fa fa-shield-alt mr-1"></i>Privacy Center
+                    <a href="{{ route('privacy-center.index') }}" class="px-4 py-2 bg-accent dark:bg-accent-hover text-white text-sm rounded hover:bg-accent-hover dark:hover:bg-primary-800 transition">
+                        <i aria-hidden="true" class="fa-solid fa-shield-alt mr-1"></i>Privacy Center
                     </a>
                 @endif
                 @if(!($isadmin ?? false) && !$publicview)
@@ -37,7 +37,7 @@
                         <button type="submit"
                             class="px-4 py-2 bg-red-600 dark:bg-red-700 text-white text-sm rounded hover:bg-red-700 dark:hover:bg-red-800 transition"
                             data-confirm="Are you sure you want to delete your account? This action cannot be undone.">
-                            <i class="fa fa-trash mr-1"></i>Delete Account
+                            <i aria-hidden="true" class="fa-solid fa-trash mr-1"></i>Delete Account
                         </button>
                     </form>
                 @endif
@@ -58,18 +58,18 @@
 
                     <!-- Tab Navigation -->
                     <div class="space-y-1">
-                        <a href="#general" class="tab-link flex items-center px-4 py-3 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 rounded-lg font-medium">
-                            <i class="fa fa-info-circle mr-3"></i>General Information
+                        <a href="#general" class="tab-link flex items-center px-4 py-3 bg-primary-50 dark:bg-primary-900/20 text-link dark:text-primary-300 rounded-lg font-medium">
+                            <i aria-hidden="true" class="fa-solid fa-info-circle mr-3"></i>General Information
                         </a>
-                        <a href="#preferences" class="tab-link flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 rounded-lg">
-                            <i class="fa fa-sliders-h mr-3"></i>UI Preferences
+                        <a href="#preferences" class="tab-link flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 rounded-lg">
+                            <i aria-hidden="true" class="fa-solid fa-sliders-h mr-3"></i>UI Preferences
                         </a>
-                        <a href="#api" class="tab-link flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 rounded-lg">
-                            <i class="fa fa-key mr-3"></i>API & Downloads
+                        <a href="#api" class="tab-link flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 rounded-lg">
+                            <i aria-hidden="true" class="fa-solid fa-key mr-3"></i>API & Downloads
                         </a>
                         @if(($user->id === auth()->id() || ($isadmin ?? false)) && config('nntmux.registerstatus') == 1)
-                            <a href="{{ route('invitations.index') }}" class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 rounded-lg">
-                                <i class="fa fa-envelope mr-3"></i>My Invitations
+                            <a href="{{ route('invitations.index') }}" class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 rounded-lg">
+                                <i aria-hidden="true" class="fa-solid fa-envelope mr-3"></i>My Invitations
                             </a>
                         @endif
                     </div>
@@ -81,7 +81,7 @@
                     <div id="general" class="tab-content">
                         <div class="surface-panel-alt rounded-lg p-6 mb-6 border">
                             <div class="flex items-center mb-4">
-                                <i class="fa fa-info-circle text-primary-600 dark:text-primary-400 mr-2"></i>
+                                <i aria-hidden="true" class="fa-solid fa-info-circle text-link dark:text-primary-400 mr-2"></i>
                                 <h2 class="text-lg font-semibold">General Information</h2>
                             </div>
                             <div class="space-y-4">
@@ -100,7 +100,7 @@
                                 <div class="flex border-b border-gray-200 dark:border-gray-700 pb-3">
                                     <div class="w-1/3 text-gray-600">Registered</div>
                                     <div class="w-2/3">
-                                        <i class="fa fa-calendar text-gray-400 mr-2"></i>
+                                        <i aria-hidden="true" class="fa-solid fa-calendar text-gray-400 mr-2"></i>
                                         {{ \Carbon\Carbon::parse($user->created_at)->format('M d, Y') }}
                                         <span class="ml-2 px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs rounded">{{ \Carbon\Carbon::parse($user->created_at)->diffForHumans() }}</span>
                                     </div>
@@ -110,7 +110,7 @@
                                     <div class="w-1/3 text-gray-600">Role</div>
                                     <div class="w-2/3">
                                         <span class="px-3 py-1 bg-primary-100 dark:bg-primary-900/50 text-primary-800 dark:text-primary-200 text-sm rounded-full">
-                                            <i class="fa fa-id-badge mr-1"></i>{{ $user->roles->first()->name ?? 'User' }}
+                                            <i aria-hidden="true" class="fa-solid fa-id-badge mr-1"></i>{{ $user->roles->first()->name ?? 'User' }}
                                         </span>
                                     </div>
                                 </div>
@@ -127,23 +127,23 @@
                                                 $expiryDiff = $roleExpiryDate->diffForHumans(['parts' => 2]);
                                             @endphp
                                             <div class="flex items-center">
-                                                <i class="fa fa-calendar-times text-gray-400 mr-2"></i>
+                                                <i aria-hidden="true" class="fa-solid fa-calendar-times text-gray-400 mr-2"></i>
                                                 <span class="font-medium">{{ $roleExpiryDate->format('M d, Y') }}</span>
                                                 @if($isExpired)
                                                     <span class="ml-2 px-2 py-1 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 text-xs rounded">
-                                                        <i class="fa fa-exclamation-circle mr-1"></i>Expired {{ $expiryDiff }}
+                                                        <i aria-hidden="true" class="fa-solid fa-exclamation-circle mr-1"></i>Expired {{ $expiryDiff }}
                                                     </span>
                                                 @elseif($daysUntilExpiry <= 7)
                                                     <span class="ml-2 px-2 py-1 bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 text-xs rounded">
-                                                        <i class="fa fa-clock mr-1"></i>Expires {{ $expiryDiff }}
+                                                        <i aria-hidden="true" class="fa-solid fa-clock mr-1"></i>Expires {{ $expiryDiff }}
                                                     </span>
                                                 @elseif($daysUntilExpiry <= 30)
-                                                    <span class="ml-2 px-2 py-1 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 text-xs rounded">
-                                                        <i class="fa fa-clock mr-1"></i>Expires {{ $expiryDiff }}
+                                                    <span class="ml-2 px-2 py-1 bg-warning-100 dark:bg-warning-900 text-warning-800 dark:text-warning-200 text-xs rounded">
+                                                        <i aria-hidden="true" class="fa-solid fa-clock mr-1"></i>Expires {{ $expiryDiff }}
                                                     </span>
                                                 @else
-                                                    <span class="ml-2 px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs rounded">
-                                                        <i class="fa fa-check-circle mr-1"></i>Expires {{ $expiryDiff }}
+                                                    <span class="ml-2 px-2 py-1 bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200 text-xs rounded">
+                                                        <i aria-hidden="true" class="fa-solid fa-check-circle mr-1"></i>Expires {{ $expiryDiff }}
                                                     </span>
                                                 @endif
                                             </div>
@@ -162,32 +162,32 @@
                                                 @foreach($allPendingRoles as $index => $pendingRoleInfo)
                                                     <div class="@if(!$loop->last) pb-3 border-b border-gray-100 dark:border-gray-700 @endif">
                                                         <div class="flex items-center">
-                                                            <span class="flex items-center justify-center w-6 h-6 bg-primary-100 dark:bg-primary-900/50 text-primary-600 dark:text-primary-400 text-xs font-bold rounded-full mr-2">
+                                                            <span class="flex items-center justify-center w-6 h-6 bg-primary-100 dark:bg-primary-900/50 text-link dark:text-primary-400 text-xs font-bold rounded-full mr-2">
                                                                 {{ $index + 1 }}
                                                             </span>
-                                                            <i class="fa fa-layer-group text-primary-400 mr-2"></i>
-                                                            <span class="font-medium text-primary-600 dark:text-primary-400">{{ $pendingRoleInfo['role_name'] }}</span>
+                                                            <i aria-hidden="true" class="fa-solid fa-layer-group text-primary-400 mr-2"></i>
+                                                            <span class="font-medium text-link dark:text-primary-400">{{ $pendingRoleInfo['role_name'] }}</span>
                                                             <span class="ml-2 px-2 py-1 bg-primary-100 dark:bg-primary-900/50 text-primary-800 dark:text-primary-200 text-xs rounded">
-                                                                <i class="fa fa-clock mr-1"></i>Scheduled
+                                                                <i aria-hidden="true" class="fa-solid fa-clock mr-1"></i>Scheduled
                                                             </span>
                                                         </div>
                                                         <div class="ml-8 mt-1 text-sm text-gray-600 dark:text-gray-400">
                                                             <div>
-                                                                <i class="fa fa-play-circle text-green-500 mr-1"></i>
+                                                                <i aria-hidden="true" class="fa-solid fa-play-circle text-success-500 mr-1"></i>
                                                                 <span class="font-medium">Starts:</span> {{ $pendingRoleInfo['start_date']->format('M d, Y g:i A') }}
                                                                 <span class="text-gray-400">({{ $pendingRoleInfo['start_date']->diffForHumans() }})</span>
                                                             </div>
                                                             @if($pendingRoleInfo['end_date'])
                                                                 <div class="mt-1">
-                                                                    <i class="fa fa-stop-circle text-red-400 mr-1"></i>
+                                                                    <i aria-hidden="true" class="fa-solid fa-stop-circle text-red-400 mr-1"></i>
                                                                     <span class="font-medium">Ends:</span> {{ $pendingRoleInfo['end_date']->format('M d, Y g:i A') }}
                                                                 </div>
                                                             @endif
                                                         </div>
                                                     </div>
                                                 @endforeach
-                                                <div class="text-xs text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20 p-2 rounded mt-2">
-                                                    <i class="fa fa-info-circle mr-1"></i>
+                                                <div class="text-xs text-link dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20 p-2 rounded mt-2">
+                                                    <i aria-hidden="true" class="fa-solid fa-info-circle mr-1"></i>
                                                     These roles will automatically activate in sequence as each previous role expires
                                                 </div>
                                             </div>
@@ -204,18 +204,18 @@
                                             @endphp
                                             <div class="space-y-2">
                                                 <div class="flex items-center">
-                                                    <i class="fa fa-layer-group text-primary-400 mr-2"></i>
-                                                    <span class="font-medium text-primary-600 dark:text-primary-400">{{ $pendingRole->name ?? 'Unknown' }}</span>
+                                                    <i aria-hidden="true" class="fa-solid fa-layer-group text-primary-400 mr-2"></i>
+                                                    <span class="font-medium text-link dark:text-primary-400">{{ $pendingRole->name ?? 'Unknown' }}</span>
                                                     <span class="ml-2 px-2 py-1 bg-primary-100 dark:bg-primary-900/50 text-primary-800 dark:text-primary-200 text-xs rounded">
-                                                        <i class="fa fa-clock mr-1"></i>Scheduled
+                                                        <i aria-hidden="true" class="fa-solid fa-clock mr-1"></i>Scheduled
                                                     </span>
                                                 </div>
                                                 <div class="text-sm text-gray-600 dark:text-gray-400">
-                                                    <i class="fa fa-calendar-alt mr-1"></i>
+                                                    <i aria-hidden="true" class="fa-solid fa-calendar-alt mr-1"></i>
                                                     Will activate {{ $pendingStartDate->diffForHumans() }} on {{ $pendingStartDate->format('M d, Y g:i A') }}
                                                 </div>
-                                                <div class="text-xs text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20 p-2 rounded">
-                                                    <i class="fa fa-info-circle mr-1"></i>
+                                                <div class="text-xs text-link dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20 p-2 rounded">
+                                                    <i aria-hidden="true" class="fa-solid fa-info-circle mr-1"></i>
                                                     This role will automatically activate when your current role expires
                                                 </div>
                                             </div>
@@ -232,7 +232,7 @@
                                     <div class="flex border-b border-gray-200 dark:border-gray-700 pb-3">
                                         <div class="w-1/3 text-gray-600">Invited By</div>
                                         <div class="w-2/3">
-                                            <a href="{{ url('/profile?id=' . $userinvitedby->id) }}" class="text-primary-600 dark:text-primary-400 hover:text-primary-800">
+                                            <a href="{{ url('/profile?id=' . $userinvitedby->id) }}" class="text-link dark:text-primary-400 hover:text-primary-800">
                                                 {{ $userinvitedby->username }}
                                             </a>
                                         </div>
@@ -241,7 +241,7 @@
 
                                 <div class="flex border-b border-gray-200 dark:border-gray-700 pb-3">
                                     <div class="w-1/3 text-gray-600">Grabs</div>
-                                    <div class="w-2/3 font-semibold text-green-600">{{ number_format($user->grabs ?? 0) }}</div>
+                                    <div class="w-2/3 font-semibold text-success-600">{{ number_format($user->grabs ?? 0) }}</div>
                                 </div>
 
                                 <div class="flex pb-3">
@@ -261,11 +261,11 @@
                                             }
                                         @endphp
                                         <div class="flex items-center">
-                                            <i class="fa fa-clock text-primary-600 dark:text-primary-400 mr-2"></i>
+                                            <i aria-hidden="true" class="fa-solid fa-clock text-link dark:text-primary-400 mr-2"></i>
                                             <span class="font-medium">{{ $timezoneDisplay }}</span>
                                         </div>
                                         <div class="mt-1 text-sm text-gray-500">
-                                            <i class="fa fa-calendar-alt text-gray-400 mr-1"></i>
+                                            <i aria-hidden="true" class="fa-solid fa-calendar-alt text-gray-400 mr-1"></i>
                                             Current time: {{ $currentDate }} {{ $currentTime }}
                                         </div>
                                     </div>
@@ -278,14 +278,14 @@
                     <div id="preferences" class="tab-content hidden-by-default">
                         <div class="surface-panel-alt rounded-lg p-6 mb-6 border">
                             <div class="flex items-center mb-4">
-                                <i class="fa fa-sliders-h text-primary-600 dark:text-primary-400 mr-2"></i>
+                                <i aria-hidden="true" class="fa-solid fa-sliders-h text-link dark:text-primary-400 mr-2"></i>
                                 <h2 class="text-lg font-semibold">UI Preferences</h2>
                             </div>
 
                             <!-- Theme Preference -->
                             <div class="mb-6 pb-6 border-b border-gray-200 dark:border-gray-700">
                                 <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-                                    <i class="fa fa-palette mr-2"></i>Theme Mode
+                                    <i aria-hidden="true" class="fa-solid fa-palette mr-2"></i>Theme Mode
                                 </h3>
                                 <div class="flex items-center">
                                     @php
@@ -293,17 +293,17 @@
                                     @endphp
                                     @if($themePreference === 'dark')
                                         <div class="flex items-center px-4 py-2 bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 rounded-lg">
-                                            <i class="fas fa-moon text-indigo-600 dark:text-indigo-400 text-lg mr-2"></i>
+                                            <i aria-hidden="true" class="fas fa-moon text-indigo-600 dark:text-indigo-400 text-lg mr-2"></i>
                                             <span class="font-medium">Dark Mode</span>
                                         </div>
                                     @elseif($themePreference === 'system')
                                         <div class="flex items-center px-4 py-2 bg-primary-100 dark:bg-primary-900/50 text-primary-800 dark:text-primary-200 rounded-lg">
-                                            <i class="fas fa-desktop text-primary-600 dark:text-primary-400 text-lg mr-2"></i>
+                                            <i aria-hidden="true" class="fas fa-desktop text-link dark:text-primary-400 text-lg mr-2"></i>
                                             <span class="font-medium">System (Auto)</span>
                                         </div>
                                     @else
-                                        <div class="flex items-center px-4 py-2 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-lg">
-                                            <i class="fas fa-sun text-yellow-600 dark:text-yellow-400 text-lg mr-2"></i>
+                                        <div class="flex items-center px-4 py-2 bg-warning-100 dark:bg-warning-900 text-warning-800 dark:text-warning-200 rounded-lg">
+                                            <i aria-hidden="true" class="fas fa-sun text-amber-600 dark:text-amber-400 text-lg mr-2"></i>
                                             <span class="font-medium">Light Mode</span>
                                         </div>
                                     @endif
@@ -313,27 +313,27 @@
                             <!-- Cover Preferences -->
                             <div>
                                 <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-                                    <i class="fa fa-images mr-2"></i>Cover Display
+                                    <i aria-hidden="true" class="fa-solid fa-images mr-2"></i>Cover Display
                                 </h3>
                                 <div class="grid grid-cols-2 gap-4">
                                     <div class="flex items-center">
-                                        <i class="fa {{ $user->movieview ? 'fa-check-square text-green-600' : 'fa-square text-gray-400' }} mr-2"></i>
+                                        <i aria-hidden="true" class="fa {{ $user->movieview ? 'fa-check-square text-success-600' : 'fa-square text-gray-400' }} mr-2"></i>
                                         <span>Movie Covers</span>
                                     </div>
                                     <div class="flex items-center">
-                                        <i class="fa {{ $user->musicview ? 'fa-check-square text-green-600' : 'fa-square text-gray-400' }} mr-2"></i>
+                                        <i aria-hidden="true" class="fa {{ $user->musicview ? 'fa-check-square text-success-600' : 'fa-square text-gray-400' }} mr-2"></i>
                                         <span>Music Covers</span>
                                     </div>
                                     <div class="flex items-center">
-                                        <i class="fa {{ $user->consoleview ? 'fa-check-square text-green-600' : 'fa-square text-gray-400' }} mr-2"></i>
+                                        <i aria-hidden="true" class="fa {{ $user->consoleview ? 'fa-check-square text-success-600' : 'fa-square text-gray-400' }} mr-2"></i>
                                         <span>Console Covers</span>
                                     </div>
                                     <div class="flex items-center">
-                                        <i class="fa {{ $user->gameview ? 'fa-check-square text-green-600' : 'fa-square text-gray-400' }} mr-2"></i>
+                                        <i aria-hidden="true" class="fa {{ $user->gameview ? 'fa-check-square text-success-600' : 'fa-square text-gray-400' }} mr-2"></i>
                                         <span>Game Covers</span>
                                     </div>
                                     <div class="flex items-center">
-                                        <i class="fa {{ $user->bookview ? 'fa-check-square text-green-600' : 'fa-square text-gray-400' }} mr-2"></i>
+                                        <i aria-hidden="true" class="fa {{ $user->bookview ? 'fa-check-square text-success-600' : 'fa-square text-gray-400' }} mr-2"></i>
                                         <span>Book Covers</span>
                                     </div>
                                 </div>
@@ -345,7 +345,7 @@
                     <div id="api" class="tab-content hidden-by-default">
                         <div class="surface-panel-alt rounded-lg p-6 mb-6 border">
                             <div class="flex items-center mb-4">
-                                <i class="fa fa-key text-primary-600 dark:text-primary-400 mr-2"></i>
+                                <i aria-hidden="true" class="fa-solid fa-key text-link dark:text-primary-400 mr-2"></i>
                                 <h2 class="text-lg font-semibold">API & Downloads</h2>
                             </div>
 
@@ -356,7 +356,7 @@
                                     <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
                                         @php
                                             $downloadPercentage = $downloadLimit > 0 ? min(($grabstoday / $downloadLimit) * 100, 100) : 0;
-                                            $downloadColor = $downloadPercentage >= 90 ? 'bg-red-600' : ($downloadPercentage >= 70 ? 'bg-yellow-500' : 'bg-green-600');
+                                            $downloadColor = $downloadPercentage >= 90 ? 'bg-red-600' : ($downloadPercentage >= 70 ? 'bg-warning-500' : 'bg-success-600');
                                         @endphp
                                         <div class="{{ $downloadColor }} h-3 rounded-full progress-bar" data-width="{{ $downloadPercentage }}"></div>
                                     </div>
@@ -369,16 +369,16 @@
                                 <div class="surface-panel rounded-lg p-4 shadow">
                                     <div class="flex justify-between items-center mb-2">
                                         <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                            <i class="fa fa-server text-purple-600 mr-2"></i>API Requests (24h)
+                                            <i aria-hidden="true" class="fa-solid fa-server text-purple-600 mr-2"></i>API Requests (24h)
                                         </h3>
-                                        <span class="text-sm font-bold {{ $apirequests >= $apiLimit ? 'text-red-600' : 'text-green-600' }}">
+                                        <span class="text-sm font-bold {{ $apirequests >= $apiLimit ? 'text-red-600' : 'text-success-600' }}">
                                             {{ $apirequests ?? 0 }} / {{ $apiLimit }}
                                         </span>
                                     </div>
                                     <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
                                         @php
                                             $apiPercentage = $apiLimit > 0 ? min(($apirequests / $apiLimit) * 100, 100) : 0;
-                                            $apiColor = $apiPercentage >= 90 ? 'bg-red-600' : ($apiPercentage >= 70 ? 'bg-yellow-500' : 'bg-purple-600');
+                                            $apiColor = $apiPercentage >= 90 ? 'bg-red-600' : ($apiPercentage >= 70 ? 'bg-warning-500' : 'bg-purple-600');
                                         @endphp
                                         <div class="{{ $apiColor }} h-3 rounded-full progress-bar" data-width="{{ $apiPercentage }}"></div>
                                     </div>
@@ -391,11 +391,11 @@
                             <!-- Stats Cards -->
                             <div class="grid grid-cols-3 gap-4 mb-6">
                                 <div class="surface-panel rounded-lg p-4 text-center shadow">
-                                    <div class="text-3xl font-bold text-primary-600 dark:text-primary-400">{{ $user->grabs ?? 0 }}</div>
+                                    <div class="text-3xl font-bold text-link dark:text-primary-400">{{ $user->grabs ?? 0 }}</div>
                                     <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">Total Grabs</div>
                                 </div>
                                 <div class="surface-panel rounded-lg p-4 text-center shadow">
-                                    <div class="text-3xl font-bold text-green-600">{{ $grabstoday ?? 0 }}</div>
+                                    <div class="text-3xl font-bold text-success-600">{{ $grabstoday ?? 0 }}</div>
                                     <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">Today</div>
                                 </div>
                                 <div class="surface-panel rounded-lg p-4 text-center shadow">
@@ -410,7 +410,7 @@
                                 <div class="space-y-4">
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">API Token</label>
-                                        <code class="api-token block text-xs bg-gray-800 text-green-400 p-3 rounded break-all">{{ $user->api_token }}</code>
+                                        <code class="api-token block text-xs bg-gray-800 text-success-400 p-3 rounded break-all">{{ $user->api_token }}</code>
                                     </div>
                                 </div>
                             @endif

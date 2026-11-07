@@ -15,25 +15,12 @@
 
     <div class="px-6 py-4">
         <!-- Category and order -->
-        <div class="mb-4 flex flex-wrap items-center gap-4">
-            <div class="flex items-center gap-2 flex-wrap">
-                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Category:</span>
-                @foreach($catlist ?? [] as $c)
-                    <a href="{{ url('/XXX/' . $c['title']) }}?t={{ $c['id'] }}"
-                       class="px-3 py-1 rounded-lg text-sm {{ (string)($category ?? '') === (string)$c['id'] ? 'bg-primary-600 dark:bg-primary-700 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600' }}">
-                        {{ $c['title'] }}
-                    </a>
-                @endforeach
-            </div>
-            <div class="flex items-center gap-2 flex-wrap ml-auto">
+        <div class="mb-4 flex flex-wrap items-center gap-3">
+            <x-view-toggle current-view="covers" covgroup="xxx" :category="!empty($categorytitle) ? $categorytitle : 'All'" parentcat="XXX" :shows="false" />
+            <x-link-dropdown label="Category" icon="fas fa-folder-open" :items="\App\Support\Navigation\ListFilters::categoryItems($catlist ?? [], $category ?? null, url('/XXX'), 'All categories')" />
+            <x-sort-dropdown :ordering="$ordering ?? []" />
+            <div class="ml-auto">
                 <x-inline-search placeholder="Search in XXX{{ !empty($categorytitle) && $categorytitle !== 'All' ? ' ' . $categorytitle : '' }}..." :category="$category ?? null" />
-                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Order by:</span>
-                @foreach($ordering ?? [] as $ob)
-                    <a href="{{ $orderByUrls['orderby'.$ob] ?? url('/XXX/' . ($categorytitle ?: 'All') . '?ob=' . $ob) }}"
-                       class="px-2 py-1 rounded text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600">
-                        {{ str_replace('_', ' ', $ob) }}
-                    </a>
-                @endforeach
             </div>
         </div>
 
@@ -59,15 +46,15 @@
                                 <td class="px-3 py-4">
                                     <div class="flex items-start gap-3">
                                         <div class="shrink-0 w-12 h-16 bg-gray-200 dark:bg-gray-700 rounded flex items-center justify-center">
-                                            <i class="fas fa-film text-gray-400 text-lg"></i>
+                                            <i aria-hidden="true" class="fas fa-film text-gray-400 text-lg"></i>
                                         </div>
                                         <div class="flex-1 min-w-0">
-                                            <a href="{{ url('/details/' . $result->guid) }}" class="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 font-medium break-all block">
+                                            <a href="{{ url('/details/' . $result->guid) }}" class="text-link dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 font-medium break-all block">
                                                 {{ $result->searchname }}
                                             </a>
                                             @if(!empty($result->failed_count) && $result->failed_count > 0)
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 mt-1">
-                                                    <i class="fas fa-exclamation-triangle mr-1"></i> Failed ({{ $result->failed_count }})
+                                                    <i aria-hidden="true" class="fas fa-exclamation-triangle mr-1"></i> Failed ({{ $result->failed_count }})
                                                 </span>
                                             @endif
                                             @if(!empty($result->group_name))
@@ -91,14 +78,14 @@
                                 </td>
                                 <td class="px-3 py-4 whitespace-nowrap">
                                     <div class="flex items-center gap-1">
-                                        <a href="{{ url('/getnzb/' . $result->guid) }}" class="px-2 py-1 bg-green-600 dark:bg-green-700 text-white rounded text-sm hover:bg-green-700 dark:hover:bg-green-800" title="Download NZB">
-                                            <i class="fa fa-download"></i>
+                                        <a aria-label="Download NZB" href="{{ url('/getnzb/' . $result->guid) }}" class="px-2 py-1 bg-success-600 dark:bg-success-700 text-white rounded text-sm hover:bg-success-700 dark:hover:bg-success-800" title="Download NZB">
+                                            <i aria-hidden="true" class="fa-solid fa-download"></i>
                                         </a>
-                                        <a href="{{ url('/details/' . $result->guid) }}" class="px-2 py-1 bg-primary-600 dark:bg-primary-700 text-white rounded text-sm hover:bg-primary-700 dark:hover:bg-primary-800" title="Details">
-                                            <i class="fa fa-info"></i>
+                                        <a aria-label="Details" href="{{ url('/details/' . $result->guid) }}" class="px-2 py-1 bg-accent dark:bg-accent-hover text-white rounded text-sm hover:bg-accent-hover dark:hover:bg-primary-800" title="Details">
+                                            <i aria-hidden="true" class="fa-solid fa-info"></i>
                                         </a>
-                                        <a href="#" class="add-to-cart px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded text-sm hover:bg-gray-300 dark:hover:bg-gray-600" data-guid="{{ $result->guid }}" title="Add to Cart">
-                                            <i class="fa fa-shopping-cart"></i>
+                                        <a aria-label="Add to Cart" href="#" class="add-to-cart px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded text-sm hover:bg-gray-300 dark:hover:bg-gray-600" data-guid="{{ $result->guid }}" title="Add to Cart">
+                                            <i aria-hidden="true" class="fa-solid fa-shopping-cart"></i>
                                         </a>
                                     </div>
                                 </td>

@@ -41,14 +41,14 @@
                 </div>
 
                 <!-- Loading state -->
-                <div x-show="!imageLoaded && !imageError" class="flex items-center justify-center py-8">
-                    <i class="fas fa-spinner fa-spin text-2xl mr-2 text-purple-600 dark:text-purple-400"></i>
-                    <span class="text-gray-600 dark:text-gray-400">Loading image...</span>
+                <div x-show="!imageLoaded && !imageError" class="py-2" role="status">
+                    <span class="sr-only">Loading image…</span>
+                    <div aria-hidden="true" class="skeleton aspect-video w-full rounded-card"></div>
                 </div>
 
                 <!-- Error state -->
                 <div x-show="imageError" class="text-center py-8">
-                    <i class="fas fa-image text-3xl text-gray-400 dark:text-gray-500"></i>
+                    <i aria-hidden="true" class="fas fa-image text-3xl text-gray-400 dark:text-gray-500"></i>
                     <p class="text-gray-500 dark:text-gray-400 mt-2" x-text="errorMessage()">Image not available</p>
                 </div>
 
@@ -66,7 +66,7 @@
             <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                 <button type="button"
                         @click="close()"
-                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-600 text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-600 text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
                     Close
                 </button>
             </div>

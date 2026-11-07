@@ -23,6 +23,7 @@
     },
     "dependencies": {
         "@alpinejs/csp": "^3.17.5",
+        "@fontsource-variable/figtree": "^5.3.0",
         "@fortawesome/fontawesome-free": "^7.3.1",
         "@melloware/coloris": "^0.25.1",
         "@simonwep/pickr": "^1.10.2",

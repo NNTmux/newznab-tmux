@@ -24,7 +24,7 @@
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div class="flex items-center justify-between">
                 <h3 id="confirmation-title" class="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center">
-                    <i class="fas mr-2" :class="iconClass()"></i>
+                    <i aria-hidden="true" class="fas mr-2" :class="iconClass()"></i>
                     <span x-text="title">Confirm Action</span>
                 </h3>
                 <button type="button" @click="cancel()" class="touch-target text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" aria-label="Close confirmation">
@@ -45,12 +45,12 @@
                     autofocus
                     @click="cancel()"
                     class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition font-medium">
-                <i class="fas fa-times mr-2"></i><span x-text="cancelText">Cancel</span>
+                <i aria-hidden="true" class="fas fa-times mr-2"></i><span x-text="cancelText">Cancel</span>
             </button>
             <button type="button"
                     @click="confirm()"
                     :class="confirmBtnClass()">
-                <i class="fas fa-check mr-2"></i><span x-text="confirmText">Confirm</span>
+                <i aria-hidden="true" class="fas fa-check mr-2"></i><span x-text="confirmText">Confirm</span>
             </button>
         </div>
     </div>

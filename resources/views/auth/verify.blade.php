@@ -5,13 +5,13 @@
     <div class="max-w-md w-full space-y-8">
         <div class="text-center">
             <a href="{{ url('/') }}" class="inline-flex items-center justify-center mb-4">
-                <div class="w-16 h-16 bg-primary-600 dark:bg-primary-700 rounded-full flex items-center justify-center shadow-lg">
-                    <i class="fas fa-envelope-open-text text-3xl text-white"></i>
+                <div class="w-16 h-16 bg-accent dark:bg-accent-hover rounded-full flex items-center justify-center shadow-lg">
+                    <i aria-hidden="true" class="fas fa-envelope-open-text text-3xl text-white"></i>
                 </div>
             </a>
-            <h2 class="mt-4 text-3xl font-extrabold text-gray-900 dark:text-white">
+            <h1 class="mt-4 text-3xl font-extrabold text-gray-900 dark:text-white">
                 {{ __('Verify Your Email Address') }}
-            </h2>
+            </h1>
         </div>
 
         <div class="auth-card rounded-xl shadow-xl overflow-hidden">
@@ -23,7 +23,7 @@
                     {{ __('If you did not receive the email') }},
                     <form class="inline" method="POST" action="{{ route('verification.resend') }}">
                         @csrf
-                        <button type="submit" class="text-primary-600 dark:text-primary-400 hover:text-primary-500 font-medium transition">
+                        <button type="submit" class="text-link dark:text-primary-400 hover:text-primary-500 font-medium transition">
                             {{ __('click here to request another') }}
                         </button>.
                     </form>
@@ -32,7 +32,7 @@
 
             <div class="px-8 py-4 surface-panel-alt border-t border-gray-200 dark:border-gray-700">
                 <a href="{{ url('/') }}" class="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition">
-                    <i class="fas fa-home mr-1"></i> Back to home
+                    <i aria-hidden="true" class="fas fa-home mr-1"></i> Back to home
                 </a>
             </div>
         </div>

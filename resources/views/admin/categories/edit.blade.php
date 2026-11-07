@@ -4,18 +4,19 @@
 
 @section('content')
 <div class="space-y-6">
+    <x-admin.page-header :title="$title" :icon="($isCreate ?? false) ? 'fas fa-plus' : 'fas fa-edit'">
+        <x-slot:actions>
+            <a href="{{ url('/admin/category-list') }}" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+                <i aria-hidden="true" class="fas fa-arrow-left mr-2"></i>Back to Categories
+            </a>
+        </x-slot:actions>
+    </x-admin.page-header>
     <x-admin.card>
-        <x-admin.page-header :title="$title" :icon="($isCreate ?? false) ? 'fas fa-plus' : 'fas fa-edit'">
-            <x-slot:actions>
-                <a href="{{ url('/admin/category-list') }}" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">
-                    <i class="fas fa-arrow-left mr-2"></i>Back to Categories
-                </a>
-            </x-slot:actions>
-        </x-admin.page-header>
 
         <div class="px-6 py-6">
             <form action="{{ url($isCreate ?? false ? '/admin/category-add?action=submit' : '/admin/category-edit?action=submit') }}" method="POST" id="categoryForm">
                 @csrf
+                <x-form-errors class="mb-6" />
                 @if(!($isCreate ?? false) && $category)
                     <input type="hidden" name="id" value="{{ $category->id }}"/>
                 @endif
@@ -28,10 +29,10 @@
                         </label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <i class="fas fa-hashtag text-gray-400"></i>
+                                <i aria-hidden="true" class="fas fa-hashtag text-gray-400"></i>
                             </div>
                             <input type="number" id="id" name="id"
-                                   class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100"
+                                   class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100"
                                    placeholder="Leave empty for auto-generated ID"
                                    value="{{ old('id') }}"/>
                         </div>
@@ -45,10 +46,10 @@
                         </label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <i class="fas fa-tag text-gray-400"></i>
+                                <i aria-hidden="true" class="fas fa-tag text-gray-400"></i>
                             </div>
                             <input type="text" id="title" name="title" required
-                                   class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100"
+                                   class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100"
                                    placeholder="Enter category title"
                                    value="{{ old('title') }}"/>
                         </div>
@@ -79,10 +80,10 @@
                     </label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i class="fas fa-folder-open text-gray-400"></i>
+                            <i aria-hidden="true" class="fas fa-folder-open text-gray-400"></i>
                         </div>
                         <select id="root_categories_id" name="root_categories_id"
-                                class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
+                                class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100">
                             <option value="">-- No Root Category --</option>
                             @foreach($rootCategories ?? [] as $rootCat)
                                 <option value="{{ $rootCat->id }}" {{ ($category->root_categories_id ?? null) == $rootCat->id ? 'selected' : '' }}>
@@ -99,10 +100,10 @@
                     <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Description:</label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i class="fas fa-align-left text-gray-400"></i>
+                            <i aria-hidden="true" class="fas fa-align-left text-gray-400"></i>
                         </div>
                         <input type="text" id="description" name="description"
-                               class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100"
+                               class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100"
                                value="{{ $category->description ?? '' }}"
                                placeholder="Brief explanation of what belongs in this category"/>
                     </div>
@@ -112,10 +113,10 @@
                 <div class="flex justify-between items-center pt-6 border-t border-gray-200 dark:border-gray-700">
                     <a href="{{ url('/admin/category-list') }}"
                        class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">
-                        <i class="fas fa-times mr-2"></i>Cancel
+                        <i aria-hidden="true" class="fas fa-times mr-2"></i>Cancel
                     </a>
-                    <button type="submit" class="px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition">
-                        <i class="fas fa-save mr-2"></i>{{ $isCreate ?? false ? 'Create Category' : 'Save Changes' }}
+                    <button type="submit" class="px-4 py-2 bg-success-600 dark:bg-success-700 text-white rounded-lg hover:bg-success-700 dark:hover:bg-success-800 transition">
+                        <i aria-hidden="true" class="fas fa-save mr-2"></i>{{ $isCreate ?? false ? 'Create Category' : 'Save Changes' }}
                     </button>
                 </div>
             </form>

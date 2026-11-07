@@ -10,7 +10,7 @@ class MoviesPageMarkupTest extends TestCase
     {
         $markup = $this->resource('views/movies/index.blade.php');
 
-        $this->assertStringContainsString('<h1 id="movies-heading"', $markup);
+        $this->assertStringContainsString('<x-page-header title="Movies"', $markup);
         $this->assertStringContainsString('aria-label="Movie filters"', $markup);
         $this->assertStringContainsString('<label for="title"', $markup);
         $this->assertStringContainsString('<label for="genre"', $markup);
@@ -23,18 +23,14 @@ class MoviesPageMarkupTest extends TestCase
         $this->assertStringContainsString(':aria-label="layout === 1', $markup);
     }
 
-    public function test_movie_hero_matches_the_compact_shared_hero_spacing(): void
+    public function test_movie_page_uses_the_shared_hero_and_paginates_once(): void
     {
         $markup = $this->resource('views/movies/index.blade.php');
 
-        $this->assertStringContainsString('movies-hero relative overflow-hidden rounded-2xl px-5 py-4', $markup);
-        $this->assertStringContainsString('sm:px-7 sm:py-5', $markup);
-        $this->assertStringContainsString('relative z-10 flex flex-col gap-4', $markup);
-        $this->assertStringContainsString('aria-label="Breadcrumb" class="mb-2', $markup);
-        $this->assertStringContainsString('class="mt-2 max-w-2xl text-sm leading-5', $markup);
-        $this->assertStringContainsString('movies-hero__meta flex min-w-0 flex-wrap', $markup);
-        $this->assertStringNotContainsString('mt-3 flex flex-wrap gap-2 text-sm', $markup);
-        $this->assertStringNotContainsString('sm:py-8', $markup);
+        $this->assertStringNotContainsString('movies-hero', $markup);
+        $this->assertStringContainsString('<x-slot:actions>', $markup);
+        $this->assertStringContainsString('workspace-hero__action--accent', $markup);
+        $this->assertSame(1, substr_count($markup, '$results->links()'));
     }
 
     public function test_movie_cards_reserve_poster_space_and_reuse_release_rows(): void

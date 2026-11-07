@@ -147,7 +147,7 @@ class MovieBrowseService
             $outerOrderBy = $order[0];
         }
 
-        $moviesSql = 'SELECT m.imdbid, m.tmdbid, m.traktid, m.title, m.year, m.rating, '
+        $moviesSql = 'SELECT m.imdbid, m.tmdbid, m.traktid, m.title, m.year, m.rating, m.rtrating, '
             .'m.plot, m.genre, m.director, m.actors, m.cover, '
             .'stats.latest_postdate, stats.total_releases '
             .'FROM ('

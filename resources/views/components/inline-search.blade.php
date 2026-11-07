@@ -25,7 +25,7 @@
     </div>
     <button type="button"
             data-role="inline-search-btn"
-            class="inline-search-widget__button inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-600 text-sm text-white shadow-sm transition hover:bg-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 dark:bg-primary-700 dark:hover:bg-primary-600"
+            class="inline-search-widget__button inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent text-sm text-white shadow-sm transition hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 dark:bg-accent-hover dark:hover:bg-accent"
             aria-label="Search">
         <i class="fas fa-search" aria-hidden="true"></i>
     </button>

@@ -15,9 +15,9 @@
 
 @unless($invite_mode)
 <div class="max-w-4xl mx-auto px-4 py-3">
-    <div class="bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-lg p-6 shadow-sm dark:bg-yellow-900 dark:border-yellow-700 dark:text-yellow-300">
+    <div class="bg-warning-50 border border-warning-200 text-warning-800 rounded-lg p-6 shadow-sm dark:bg-warning-900 dark:border-warning-700 dark:text-warning-300">
         <h5 class="text-lg font-semibold mb-2 flex items-center">
-            <i class="fa fa-ban mr-2"></i>Invitations Disabled
+            <i aria-hidden="true" class="fa-solid fa-ban mr-2"></i>Invitations Disabled
         </h5>
         <p class="mb-0">User invitations are currently disabled on this site. If you believe this is an error, please contact an administrator.</p>
     </div>
@@ -27,15 +27,15 @@
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm mb-4 dark:bg-gray-800">
         <div class="bg-gray-50 dark:bg-gray-900 px-6 py-4 border-b border-gray-200 dark:border-gray-700 rounded-t-lg flex justify-between items-center dark:bg-gray-700 dark:border-gray-600">
             <h5 class="text-lg font-semibold text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
-                <i class="fa fa-envelope mr-2"></i>My Invitations
+                <i aria-hidden="true" class="fa-solid fa-envelope mr-2"></i>My Invitations
             </h5>
-            <a href="{{ url('/invitations/create') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                <i class="fas fa-plus mr-1"></i> Send New Invitation
+            <a href="{{ url('/invitations/create') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-accent dark:bg-accent-hover hover:bg-accent-hover dark:hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                <i aria-hidden="true" class="fas fa-plus mr-1"></i> Send New Invitation
             </a>
         </div>
         <div class="p-6">
             @if(session('success'))
-                <div class="mb-4 bg-green-50 border border-green-200 text-green-800 rounded-lg p-4 dark:bg-green-900 dark:border-green-700 dark:text-green-200" role="alert">
+                <div class="mb-4 bg-success-50 border border-success-200 text-success-800 rounded-lg p-4 dark:bg-success-900 dark:border-success-700 dark:text-success-200" role="alert">
                     {{ session('success') }}
                 </div>
             @endif
@@ -48,22 +48,22 @@
 
             <!-- Stats Cards -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                <div class="bg-blue-600 dark:bg-blue-700 text-white rounded-lg shadow dark:bg-blue-700">
+                <div class="bg-accent dark:bg-accent-hover text-white rounded-lg shadow dark:bg-accent-hover">
                     <div class="p-4 text-center">
                         <h4 class="text-3xl font-bold mb-1">{{ $stats['total'] ?? 0 }}</h4>
-                        <small class="text-blue-100">Total Sent</small>
+                        <small class="text-primary-100">Total Sent</small>
                     </div>
                 </div>
-                <div class="bg-green-600 dark:bg-green-700 text-white rounded-lg shadow dark:bg-green-700">
+                <div class="bg-success-600 dark:bg-success-700 text-white rounded-lg shadow dark:bg-success-700">
                     <div class="p-4 text-center">
                         <h4 class="text-3xl font-bold mb-1">{{ $stats['used'] ?? 0 }}</h4>
-                        <small class="text-green-100">Accepted</small>
+                        <small class="text-success-100">Accepted</small>
                     </div>
                 </div>
-                <div class="bg-yellow-500 text-white rounded-lg shadow dark:bg-yellow-600">
+                <div class="bg-warning-500 text-white rounded-lg shadow dark:bg-warning-600">
                     <div class="p-4 text-center">
                         <h4 class="text-3xl font-bold mb-1">{{ $stats['pending'] ?? 0 }}</h4>
-                        <small class="text-yellow-100">Pending</small>
+                        <small class="text-warning-100">Pending</small>
                     </div>
                 </div>
                 <div class="bg-red-600 dark:bg-red-700 text-white rounded-lg shadow dark:bg-red-700">
@@ -77,17 +77,17 @@
             <!-- Filter Tabs -->
             <div class="border-b border-gray-200 dark:border-gray-700 mb-4">
                 <nav class="flex flex-wrap -mb-px" aria-label="Tabs">
-                    <a href="{{ url('/invitations') }}" class="inline-flex items-center px-4 py-2 border-b-2 text-sm font-medium {{ empty($status) ? 'border-blue-500 text-blue-600 dark:text-blue-400 dark:border-blue-400 dark:text-blue-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:border-gray-600 dark:text-gray-400 dark:hover:text-gray-300' }}">
-                        <i class="fa fa-list mr-1"></i>All
+                    <a href="{{ url('/invitations') }}" class="inline-flex items-center px-4 py-2 border-b-2 text-sm font-medium {{ empty($status) ? 'border-primary-500 text-link dark:text-primary-400 dark:border-primary-400 dark:text-primary-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:border-gray-600 dark:text-gray-400 dark:hover:text-gray-300' }}">
+                        <i aria-hidden="true" class="fa-solid fa-list mr-1"></i>All
                     </a>
-                    <a href="{{ url('/invitations?status=pending') }}" class="inline-flex items-center px-4 py-2 border-b-2 text-sm font-medium {{ ($status ?? '') == 'pending' ? 'border-blue-500 text-blue-600 dark:text-blue-400 dark:border-blue-400 dark:text-blue-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:border-gray-600 dark:text-gray-400 dark:hover:text-gray-300' }}">
-                        <i class="fa fa-clock-o mr-1"></i>Pending
+                    <a href="{{ url('/invitations?status=pending') }}" class="inline-flex items-center px-4 py-2 border-b-2 text-sm font-medium {{ ($status ?? '') == 'pending' ? 'border-primary-500 text-link dark:text-primary-400 dark:border-primary-400 dark:text-primary-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:border-gray-600 dark:text-gray-400 dark:hover:text-gray-300' }}">
+                        <i aria-hidden="true" class="fa-regular fa-clock mr-1"></i>Pending
                     </a>
-                    <a href="{{ url('/invitations?status=used') }}" class="inline-flex items-center px-4 py-2 border-b-2 text-sm font-medium {{ ($status ?? '') == 'used' ? 'border-blue-500 text-blue-600 dark:text-blue-400 dark:border-blue-400 dark:text-blue-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:border-gray-600 dark:text-gray-400 dark:hover:text-gray-300' }}">
-                        <i class="fa fa-check mr-1"></i>Accepted
+                    <a href="{{ url('/invitations?status=used') }}" class="inline-flex items-center px-4 py-2 border-b-2 text-sm font-medium {{ ($status ?? '') == 'used' ? 'border-primary-500 text-link dark:text-primary-400 dark:border-primary-400 dark:text-primary-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:border-gray-600 dark:text-gray-400 dark:hover:text-gray-300' }}">
+                        <i aria-hidden="true" class="fa-solid fa-check mr-1"></i>Accepted
                     </a>
-                    <a href="{{ url('/invitations?status=expired') }}" class="inline-flex items-center px-4 py-2 border-b-2 text-sm font-medium {{ ($status ?? '') == 'expired' ? 'border-blue-500 text-blue-600 dark:text-blue-400 dark:border-blue-400 dark:text-blue-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:border-gray-600 dark:text-gray-400 dark:hover:text-gray-300' }}">
-                        <i class="fa fa-times mr-1"></i>Expired
+                    <a href="{{ url('/invitations?status=expired') }}" class="inline-flex items-center px-4 py-2 border-b-2 text-sm font-medium {{ ($status ?? '') == 'expired' ? 'border-primary-500 text-link dark:text-primary-400 dark:border-primary-400 dark:text-primary-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:border-gray-600 dark:text-gray-400 dark:hover:text-gray-300' }}">
+                        <i aria-hidden="true" class="fa-solid fa-times mr-1"></i>Expired
                     </a>
                 </nav>
             </div>
@@ -113,17 +113,17 @@
                 @endif
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                                 <td class="px-4 py-3 whitespace-nowrap">
-                                    <span class="text-sm text-gray-900 dark:text-gray-100"><i class="fa fa-envelope text-gray-400 mr-1"></i>{{ $invitation['email'] }}</span>
+                                    <span class="text-sm text-gray-900 dark:text-gray-100"><i aria-hidden="true" class="fa-solid fa-envelope text-gray-400 mr-1"></i>{{ $invitation['email'] }}</span>
                                 </td>
                                 <td class="px-4 py-3 whitespace-nowrap">
                                     @if($invitation['used_at'])
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"><i class="fa fa-check mr-1"></i>Accepted</span>
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-success-100 text-success-800 dark:bg-success-900 dark:text-success-200"><i aria-hidden="true" class="fa-solid fa-check mr-1"></i>Accepted</span>
                                     @elseif($invitation['expires_at'] < time())
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"><i class="fa fa-times mr-1"></i>Expired</span>
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"><i aria-hidden="true" class="fa-solid fa-times mr-1"></i>Expired</span>
                                     @elseif(!$invitation['is_active'])
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"><i class="fa fa-ban mr-1"></i>Cancelled</span>
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"><i aria-hidden="true" class="fa-solid fa-ban mr-1"></i>Cancelled</span>
                                     @else
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"><i class="fa fa-clock-o mr-1"></i>Pending</span>
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-warning-100 text-warning-800 dark:bg-warning-900 dark:text-warning-200"><i aria-hidden="true" class="fa-regular fa-clock mr-1"></i>Pending</span>
                                     @endif
                                 </td>
                                 <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
@@ -134,7 +134,7 @@
                                 </td>
                                 <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                     @if(isset($invitation['used_by_user']))
-                                        <i class="fa fa-user text-gray-400 mr-1"></i>{{ $invitation['used_by_user']['username'] ?? $invitation['used_by_user']['email'] }}
+                                        <i aria-hidden="true" class="fa-solid fa-user text-gray-400 mr-1"></i>{{ $invitation['used_by_user']['username'] ?? $invitation['used_by_user']['email'] }}
                                     @else
                                         <span class="text-gray-400">-</span>
                                     @endif
@@ -151,12 +151,12 @@
                                         <div class="flex items-center space-x-2">
                                             <form method="POST" action="{{ url('/invitations/' . $invitation['id'] . '/resend') }}" class="inline">
                                                 @csrf
-                                                <button type="submit" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white hover:bg-blue-50 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600" title="Resend"><i class="fas fa-paper-plane"></i></button>
+                                                <button aria-label="Resend" type="submit" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-link bg-white hover:bg-primary-50 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600" title="Resend"><i aria-hidden="true" class="fas fa-paper-plane"></i></button>
                                             </form>
                                             <form method="POST" action="{{ url('/invitations/' . $invitation['id']) }}" class="inline">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="inline-flex items-center px-3 py-1.5 border border-red-300 rounded text-xs font-medium text-red-700 bg-white hover:bg-red-50 dark:bg-gray-700 dark:text-red-400 dark:border-red-600 dark:hover:bg-gray-600" title="Cancel" data-confirm="Are you sure you want to cancel this invitation?"><i class="fas fa-times"></i></button>
+                                                <button aria-label="Cancel" type="submit" class="inline-flex items-center px-3 py-1.5 border border-red-300 rounded text-xs font-medium text-red-700 bg-white hover:bg-red-50 dark:bg-gray-700 dark:text-red-400 dark:border-red-600 dark:hover:bg-gray-600" title="Cancel" data-confirm="Are you sure you want to cancel this invitation?"><i aria-hidden="true" class="fas fa-times"></i></button>
                                             </form>
                                         </div>
                                     @else
@@ -170,12 +170,12 @@
                 </div>
                 @endif
             @empty
-                <div class="bg-blue-50 border border-blue-200 text-blue-800 rounded-lg p-6 text-center dark:bg-blue-900 dark:border-blue-700 dark:text-blue-300">
-                    <i class="fa fa-info-circle text-4xl mb-3"></i>
+                <div class="bg-primary-50 border border-primary-200 text-primary-800 rounded-lg p-6 text-center dark:bg-primary-900 dark:border-primary-700 dark:text-primary-300">
+                    <i aria-hidden="true" class="fa-solid fa-info-circle text-4xl mb-3"></i>
                     <h5 class="text-lg font-semibold mb-2">No Invitations Found</h5>
                     <p class="mb-4">You haven't sent any invitations yet.</p>
-                    <a href="{{ url('/invitations/create') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800">
-                        <i class="fas fa-plus mr-1"></i> Send Your First Invitation
+                    <a href="{{ url('/invitations/create') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-accent dark:bg-accent-hover hover:bg-accent-hover dark:hover:bg-primary-800">
+                        <i aria-hidden="true" class="fas fa-plus mr-1"></i> Send Your First Invitation
                     </a>
                 </div>
             @endforelse
@@ -188,17 +188,17 @@
                         <div class="flex items-start justify-between gap-2">
                             <div class="min-w-0">
                                 <div class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-                                    <i class="fa fa-envelope text-gray-400 mr-1"></i>{{ $invitation['email'] }}
+                                    <i aria-hidden="true" class="fa-solid fa-envelope text-gray-400 mr-1"></i>{{ $invitation['email'] }}
                                 </div>
                                 <div class="mt-1">
                                     @if($invitation['used_at'])
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"><i class="fa fa-check mr-1"></i>Accepted</span>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-success-100 text-success-800 dark:bg-success-900 dark:text-success-200"><i aria-hidden="true" class="fa-solid fa-check mr-1"></i>Accepted</span>
                                     @elseif($invitation['expires_at'] < time())
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"><i class="fa fa-times mr-1"></i>Expired</span>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"><i aria-hidden="true" class="fa-solid fa-times mr-1"></i>Expired</span>
                                     @elseif(!$invitation['is_active'])
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"><i class="fa fa-ban mr-1"></i>Cancelled</span>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"><i aria-hidden="true" class="fa-solid fa-ban mr-1"></i>Cancelled</span>
                                     @else
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"><i class="fa fa-clock-o mr-1"></i>Pending</span>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-warning-100 text-warning-800 dark:bg-warning-900 dark:text-warning-200"><i aria-hidden="true" class="fa-regular fa-clock mr-1"></i>Pending</span>
                                     @endif
                                 </div>
                             </div>
@@ -206,12 +206,12 @@
                                 <div class="flex gap-1 shrink-0">
                                     <form method="POST" action="{{ url('/invitations/' . $invitation['id'] . '/resend') }}" class="inline">
                                         @csrf
-                                        <button type="submit" class="px-2 py-1 border border-blue-300 rounded text-xs text-blue-700 bg-white dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600" title="Resend"><i class="fas fa-paper-plane"></i></button>
+                                        <button aria-label="Resend" type="submit" class="px-2 py-1 border border-primary-300 rounded text-xs text-link bg-white dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600" title="Resend"><i aria-hidden="true" class="fas fa-paper-plane"></i></button>
                                     </form>
                                     <form method="POST" action="{{ url('/invitations/' . $invitation['id']) }}" class="inline">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="px-2 py-1 border border-red-300 rounded text-xs text-red-700 bg-white dark:bg-gray-700 dark:text-red-400 dark:border-red-600" title="Cancel"><i class="fas fa-times"></i></button>
+                                        <button aria-label="Cancel" type="submit" class="px-2 py-1 border border-red-300 rounded text-xs text-red-700 bg-white dark:bg-gray-700 dark:text-red-400 dark:border-red-600" title="Cancel"><i aria-hidden="true" class="fas fa-times"></i></button>
                                     </form>
                                 </div>
                             @endif

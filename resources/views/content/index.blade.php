@@ -1,8 +1,9 @@
 @extends('layouts.main')
 
 @section('content')
+<x-page-header :title="$front ? auth()->user()->username : 'Content'" :eyebrow="$front ? 'Welcome' : 'Explore the site'" :description="$front ? 'Discover the latest site information and start exploring the index.' : 'Browse our published information and useful content pages.'" icon="fas fa-file-alt" />
+
 <div class="surface-panel rounded-xl shadow-sm">
-    <x-page-header :title="$front ? auth()->user()->username : 'Content'" :eyebrow="$front ? 'Welcome' : 'Explore the site'" :description="$front ? 'Discover the latest site information and start exploring the index.' : 'Browse our published information and useful content pages.'" icon="fas fa-file-alt" />
 
     @if($front)
         <!-- Front Page Content -->
@@ -46,7 +47,7 @@
                         @if($item)
                             <div class="surface-panel-alt rounded-lg border p-6 transition hover:shadow-md">
                                 <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3">
-                                    <a href="{{ url('/content?page=content&id=' . $item->id) }}" class="hover:text-primary-600 dark:hover:text-primary-400 transition">
+                                    <a href="{{ url('/content?page=content&id=' . $item->id) }}" class="hover:text-link dark:hover:text-primary-400 transition">
                                         {{ filled($item->title) ? $item->title : 'Untitled' }}
                                     </a>
                                 </h3>
@@ -55,8 +56,8 @@
                                     <p class="text-gray-600 dark:text-gray-400 mb-4">{{ Str::limit($item->metadescription, 150) }}</p>
                                 @endif
 
-                                <a href="{{ url('/content?page=content&id=' . $item->id) }}" class="inline-flex items-center text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 font-medium">
-                                    Read More <i class="fas fa-arrow-right ml-2"></i>
+                                <a href="{{ url('/content?page=content&id=' . $item->id) }}" class="inline-flex items-center text-link dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 font-medium">
+                                    Read More <i aria-hidden="true" class="fas fa-arrow-right ml-2"></i>
                                 </a>
                             </div>
                         @endif

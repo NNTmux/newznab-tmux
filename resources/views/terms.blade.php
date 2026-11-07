@@ -9,7 +9,7 @@
                     <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-2">Terms and Conditions</h1>
                     <nav aria-label="breadcrumb">
                         <ol class="flex text-sm text-gray-600 dark:text-gray-400">
-                            <li><a href="{{ url('/') }}" class="hover:text-blue-600 dark:hover:text-blue-400">Home</a></li>
+                            <li><a href="{{ url('/') }}" class="hover:text-link dark:hover:text-primary-400">Home</a></li>
                             <li class="mx-2">/</li>
                             <li class="text-gray-500 dark:text-gray-500">Terms and Conditions</li>
                         </ol>
@@ -17,9 +17,9 @@
                 </div>
 
                 <!-- Info Alert -->
-                <div class="mx-6 mt-4 p-4 bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-lg flex items-start">
-                    <i class="fas fa-info-circle text-blue-600 dark:text-blue-400 text-xl mr-3 mt-0.5"></i>
-                    <div class="text-blue-800 dark:text-blue-200">
+                <div class="mx-6 mt-4 p-4 bg-info-50 dark:bg-info-900 border border-info-200 dark:border-info-700 rounded-lg flex items-start">
+                    <i aria-hidden="true" class="fas fa-info-circle text-info-600 dark:text-info-400 text-xl mr-3 mt-0.5"></i>
+                    <div class="text-info-800 dark:text-info-200">
                         Please read our terms and conditions carefully. By using our services, you agree to be bound by these terms.
                     </div>
                 </div>
@@ -48,13 +48,13 @@
                                 <li>Ensuring that all information you provide is accurate and up to date.</li>
                             </ul>
                             <div class="p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-lg mb-4">
-                                <p class="text-red-800 dark:text-red-200 font-semibold mb-2"><i class="fas fa-exclamation-triangle mr-2"></i>Strictly Prohibited:</p>
+                                <p class="text-red-800 dark:text-red-200 font-semibold mb-2"><i aria-hidden="true" class="fas fa-exclamation-triangle mr-2"></i>Strictly Prohibited:</p>
                                 <ul class="list-disc pl-10 ml-4 text-red-700 dark:text-red-300">
                                     <li><strong>API Key Sharing:</strong> Sharing your API key with others is strictly prohibited.</li>
                                     <li><strong>Account Sharing:</strong> Sharing your account credentials with others is strictly prohibited.</li>
                                     <li><strong>Multiple IP Addresses:</strong> Using your account from multiple IP addresses simultaneously or from an excessive number of different IP addresses is not allowed.</li>
                                 </ul>
-                                <p class="text-red-800 dark:text-red-200 font-semibold mt-3"><i class="fas fa-ban mr-2"></i>Violation of these rules will result in immediate and permanent account ban.</p>
+                                <p class="text-red-800 dark:text-red-200 font-semibold mt-3"><i aria-hidden="true" class="fas fa-ban mr-2"></i>Violation of these rules will result in immediate and permanent account ban.</p>
                             </div>
 
                             <h2 class="text-xl font-semibold mb-4 mt-6">4. Acceptable Use</h2>
@@ -96,7 +96,7 @@
                 <!-- Footer -->
                 <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-center">
                 <span class="text-sm text-gray-600 dark:text-gray-400">
-                    <i class="fas fa-calendar-alt mr-1"></i>
+                    <i aria-hidden="true" class="fas fa-calendar-alt mr-1"></i>
                     Last updated: {{ now()->format('F j, Y') }}
                 </span>
                 </div>

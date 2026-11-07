@@ -55,6 +55,7 @@ final class AdminSettingsController extends BasePageController
             'domain' => $configurationDomain,
             'domains' => ConfigurationDomain::cases(),
             'fields' => $this->catalog->fieldsForPage($configurationDomain),
+            'sections' => $this->catalog->sectionsForPage($configurationDomain),
             'configuration' => $model,
             'configurationValues' => $configurationValues,
             'sizeUnits' => SizeUnit::UNITS,

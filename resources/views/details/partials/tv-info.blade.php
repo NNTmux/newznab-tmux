@@ -8,7 +8,7 @@
                 @endphp
                 <div class="surface-panel-alt rounded-lg p-6 border">
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
-                        <i class="fas fa-tv mr-2 text-primary-600 dark:text-primary-400"></i> TV Show Information
+                        <i aria-hidden="true" class="fas fa-tv mr-2 text-link dark:text-primary-400"></i> TV Show Information
                     </h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         @if(!empty($showTitle))
@@ -27,8 +27,8 @@
                             <div>
                                 <dt class="text-sm font-medium text-gray-600 dark:text-gray-400">TVDB</dt>
                                 <dd class="mt-1">
-                                    <a href="{{ $site->dereferrerLink }}https://thetvdb.com/?tab=series&id={{ $showTvdb }}" target="_blank" class="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
-                                        View on TVDB <i class="fas fa-external-link-alt text-xs"></i>
+                                    <a href="{{ $site->dereferrerLink }}https://thetvdb.com/?tab=series&id={{ $showTvdb }}" target="_blank" class="text-sm text-link dark:text-primary-400 hover:text-link dark:hover:text-primary-300">
+                                        View on TVDB <i aria-hidden="true" class="fas fa-external-link-alt text-xs"></i>
                                     </a>
                                 </dd>
                             </div>

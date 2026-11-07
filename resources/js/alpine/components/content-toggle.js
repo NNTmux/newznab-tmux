@@ -230,13 +230,13 @@ Alpine.data('contentToggle', () => ({
                 const ns = data.status;
 
                 if (ns === 1) {
-                    statusCell.innerHTML = '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100"><i class="fa fa-check mr-1"></i>Enabled</span>';
-                    el.className = 'content-toggle-status text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300';
-                    el.innerHTML = '<i class="fa fa-toggle-on"></i>';
+                    statusCell.innerHTML = '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-100"><i aria-hidden="true" class="fa-solid fa-check mr-1"></i>Enabled</span>';
+                    el.className = 'content-toggle-status text-success-600 dark:text-success-400 hover:text-success-900 dark:hover:text-success-300';
+                    el.innerHTML = '<i aria-hidden="true" class="fa-solid fa-toggle-on"></i>';
                 } else {
-                    statusCell.innerHTML = '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100"><i class="fa fa-times mr-1"></i>Disabled</span>';
+                    statusCell.innerHTML = '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100"><i aria-hidden="true" class="fa-solid fa-times mr-1"></i>Disabled</span>';
                     el.className = 'content-toggle-status text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300';
-                    el.innerHTML = '<i class="fa fa-toggle-off"></i>';
+                    el.innerHTML = '<i aria-hidden="true" class="fa-solid fa-toggle-off"></i>';
                 }
                 el.setAttribute('data-current-status', ns);
                 el.title = ns === 1 ? 'Disable' : 'Enable';

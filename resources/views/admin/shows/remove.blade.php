@@ -2,26 +2,26 @@
 
 @section('content')
 <div class="space-y-6">
+    <x-admin.page-header :title="$title" icon="fas fa-unlink">
+        <x-slot:actions>
+            <x-admin.button :href="route('admin.show-list')" tone="gray" icon="fas fa-arrow-left">Back to List</x-admin.button>
+        </x-slot:actions>
+    </x-admin.page-header>
     <x-admin.card>
-        <x-admin.page-header :title="$title" icon="fas fa-unlink">
-            <x-slot:actions>
-                <x-admin.button :href="route('admin.show-list')" tone="gray" icon="fas fa-arrow-left">Back to List</x-admin.button>
-            </x-slot:actions>
-        </x-admin.page-header>
 
         <!-- Content -->
         <div class="p-6">
             @if($success)
-                <div class="bg-green-50 dark:bg-green-900 border-l-4 border-green-500 dark:border-green-600 p-4 rounded mb-6">
+                <div class="bg-success-50 dark:bg-success-900 border-l-4 border-success-500 dark:border-success-600 p-4 rounded mb-6">
                     <div class="flex">
                         <div class="shrink-0">
-                            <i class="fas fa-check-circle text-green-600 dark:text-green-400 text-xl"></i>
+                            <i aria-hidden="true" class="fas fa-check-circle text-success-600 dark:text-success-400 text-xl"></i>
                         </div>
                         <div class="ml-3">
-                            <h3 class="text-sm font-medium text-green-800 dark:text-green-200">
+                            <h3 class="text-sm font-medium text-success-800 dark:text-success-200">
                                 Successfully Removed Video IDs
                             </h3>
-                            <div class="mt-2 text-sm text-green-700 dark:text-green-300">
+                            <div class="mt-2 text-sm text-success-700 dark:text-success-300">
                                 <p>Video ID <strong class="font-mono">{{ $videoid }}</strong> and its associated episode IDs have been successfully removed from all releases.</p>
                             </div>
                         </div>
@@ -34,15 +34,15 @@
                     </h3>
                     <ul class="space-y-2 text-gray-600 dark:text-gray-400">
                         <li class="flex items-start">
-                            <i class="fas fa-check text-green-600 dark:text-green-400 mt-1 mr-2"></i>
+                            <i aria-hidden="true" class="fas fa-check text-success-600 dark:text-success-400 mt-1 mr-2"></i>
                             <span>All releases linked to video ID <strong class="font-mono text-gray-900 dark:text-gray-200">{{ $videoid }}</strong> have been unlinked</span>
                         </li>
                         <li class="flex items-start">
-                            <i class="fas fa-check text-green-600 dark:text-green-400 mt-1 mr-2"></i>
+                            <i aria-hidden="true" class="fas fa-check text-success-600 dark:text-success-400 mt-1 mr-2"></i>
                             <span>All episode IDs associated with this video have been removed from releases</span>
                         </li>
                         <li class="flex items-start">
-                            <i class="fas fa-info-circle text-blue-600 dark:text-blue-400 mt-1 mr-2"></i>
+                            <i aria-hidden="true" class="fas fa-info-circle text-info-600 dark:text-info-400 mt-1 mr-2"></i>
                             <span>The TV show data itself remains in the database and can be re-linked if needed</span>
                         </li>
                     </ul>
@@ -51,7 +51,7 @@
                 <div class="bg-red-50 dark:bg-red-900 border-l-4 border-red-500 dark:border-red-600 p-4 rounded mb-6">
                     <div class="flex">
                         <div class="shrink-0">
-                            <i class="fas fa-exclamation-circle text-red-600 dark:text-red-400 text-xl"></i>
+                            <i aria-hidden="true" class="fas fa-exclamation-circle text-red-600 dark:text-red-400 text-xl"></i>
                         </div>
                         <div class="ml-3">
                             <h3 class="text-sm font-medium text-red-800 dark:text-red-200">
@@ -71,16 +71,16 @@
             @endif
 
             <!-- Info Box -->
-            <div class="mt-6 bg-blue-50 dark:bg-blue-900 border-l-4 border-blue-500 dark:border-blue-600 p-4 rounded">
+            <div class="mt-6 bg-info-50 dark:bg-info-900 border-l-4 border-info-500 dark:border-info-600 p-4 rounded">
                 <div class="flex">
                     <div class="shrink-0">
-                        <i class="fas fa-info-circle text-blue-600 dark:text-blue-400"></i>
+                        <i aria-hidden="true" class="fas fa-info-circle text-info-600 dark:text-info-400"></i>
                     </div>
                     <div class="ml-3">
-                        <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">
+                        <h3 class="text-sm font-medium text-info-800 dark:text-info-200">
                             About This Operation
                         </h3>
-                        <div class="mt-2 text-sm text-blue-700 dark:text-blue-300">
+                        <div class="mt-2 text-sm text-info-700 dark:text-info-300">
                             <p>This operation removes the association between TV show data and releases in your database. It's useful when:</p>
                             <ul class="list-disc list-inside mt-2 space-y-1">
                                 <li>Incorrect TV show data has been linked to releases</li>
@@ -95,12 +95,12 @@
 
             <!-- Action Buttons -->
             <div class="mt-6 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 pt-6">
-                <a href="{{ route('admin.show-list') }}" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                    <i class="fas fa-list mr-2"></i>Return to TV Shows List
+                <a href="{{ route('admin.show-list') }}" class="px-6 py-2 bg-accent text-white rounded-lg hover:bg-accent-hover">
+                    <i aria-hidden="true" class="fas fa-list mr-2"></i>Return to TV Shows List
                 </a>
                 @if($videoid)
                     <a href="{{ url('admin/show-edit?id=' . $videoid) }}" class="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
-                        <i class="fas fa-eye mr-2"></i>View TV Show Details
+                        <i aria-hidden="true" class="fas fa-eye mr-2"></i>View TV Show Details
                     </a>
                 @endif
             </div>

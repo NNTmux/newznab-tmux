@@ -6,27 +6,27 @@
 
     <div class="surface-panel rounded-xl shadow-sm overflow-hidden">
         @if(session('success'))
-            <div class="mx-6 mt-6 p-4 bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 text-green-800 dark:text-green-200 rounded">
-                <i class="fas fa-check-circle mr-2"></i>{{ session('success') }}
+            <div class="mx-6 mt-6 p-4 bg-success-50 dark:bg-success-900/20 border-l-4 border-success-500 text-success-800 dark:text-success-200 rounded">
+                <i aria-hidden="true" class="fas fa-check-circle mr-2"></i>{{ session('success') }}
             </div>
         @endif
 
         @if(session('error'))
             <div class="mx-6 mt-6 p-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 text-red-800 dark:text-red-200 rounded">
-                <i class="fas fa-exclamation-circle mr-2"></i>{{ session('error') }}
+                <i aria-hidden="true" class="fas fa-exclamation-circle mr-2"></i>{{ session('error') }}
             </div>
         @endif
 
         @if($errors->any())
             <div class="mx-6 mt-6 p-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 text-red-800 dark:text-red-200 rounded">
-                <i class="fas fa-exclamation-circle mr-2"></i>{{ $errors->first() }}
+                <i aria-hidden="true" class="fas fa-exclamation-circle mr-2"></i>{{ $errors->first() }}
             </div>
         @endif
 
         <div class="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-5 bg-white dark:bg-gray-800">
                 <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-3">
-                    <i class="fas fa-file-export mr-2 text-blue-600 dark:text-blue-400"></i>Download Your Data
+                    <i aria-hidden="true" class="fas fa-file-export mr-2 text-link dark:text-primary-400"></i>Download Your Data
                 </h2>
                 <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
                     Generate a JSON export containing your account profile, usage records, comments, requests, GDPR history, and retained payment/audit records that relate to your account.
@@ -35,15 +35,15 @@
                     @csrf
                     <label for="export_notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Optional notes</label>
                     <textarea id="export_notes" name="notes" rows="3" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md" placeholder="Anything administrators should know?"></textarea>
-                    <button type="submit" class="mt-4 px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700">
-                        <i class="fas fa-download mr-2"></i>Generate Export
+                    <button type="submit" class="mt-4 px-4 py-2 bg-accent dark:bg-accent-hover text-white rounded-md hover:bg-accent-hover">
+                        <i aria-hidden="true" class="fas fa-download mr-2"></i>Generate Export
                     </button>
                 </form>
             </div>
 
             <div class="border border-red-200 dark:border-red-800 rounded-lg p-5 bg-red-50 dark:bg-red-900/10">
                 <h2 class="text-lg font-semibold text-red-800 dark:text-red-200 mb-3">
-                    <i class="fas fa-user-slash mr-2"></i>Request Account Erasure
+                    <i aria-hidden="true" class="fas fa-user-slash mr-2"></i>Request Account Erasure
                 </h2>
                 <p class="text-sm text-red-700 dark:text-red-300 mb-4">
                     Submit a GDPR erasure request for administrator review. Account/profile data and usage records will be removed or anonymized. Payment and audit records are retained only where required and direct account identifiers are anonymized or minimized where practical.
@@ -55,7 +55,7 @@
                     <label for="confirmation" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mt-4 mb-1">Type ERASE to confirm</label>
                     <input id="confirmation" name="confirmation" type="text" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md" autocomplete="off">
                     <button type="submit" class="mt-4 px-4 py-2 bg-red-600 dark:bg-red-700 text-white rounded-md hover:bg-red-700">
-                        <i class="fas fa-paper-plane mr-2"></i>Submit Erasure Request
+                        <i aria-hidden="true" class="fas fa-paper-plane mr-2"></i>Submit Erasure Request
                     </button>
                 </form>
             </div>
@@ -86,8 +86,8 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
                                 @if($gdprRequest->isDownloadableExport())
-                                    <a href="{{ route('privacy-center.export.download', $gdprRequest) }}" class="text-blue-600 dark:text-blue-400 hover:underline">
-                                        <i class="fas fa-download mr-1"></i>Download export
+                                    <a href="{{ route('privacy-center.export.download', $gdprRequest) }}" class="text-link dark:text-primary-400 hover:underline">
+                                        <i aria-hidden="true" class="fas fa-download mr-1"></i>Download export
                                     </a>
                                     <span class="block text-xs text-gray-500 dark:text-gray-500">Expires {{ $gdprRequest->export_expires_at?->diffForHumans() }}</span>
                                 @elseif($gdprRequest->admin_notes)

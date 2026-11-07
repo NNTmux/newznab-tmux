@@ -2,24 +2,25 @@
 
 @section('content')
 <div class="space-y-6">
+    <x-admin.page-header :title="$title ?? 'Category Regex Edit'" icon="fas fa-edit">
+        <x-slot:actions>
+            <x-admin.button :href="url('/admin/category_regexes-list')" tone="gray" icon="fas fa-arrow-left">Back to List</x-admin.button>
+        </x-slot:actions>
+    </x-admin.page-header>
     <x-admin.card>
-        <x-admin.page-header :title="$title ?? 'Category Regex Edit'" icon="fas fa-edit">
-            <x-slot:actions>
-                <x-admin.button :href="url('/admin/category_regexes-list')" tone="gray" icon="fas fa-arrow-left">Back to List</x-admin.button>
-            </x-slot:actions>
-        </x-admin.page-header>
 
         <!-- Form -->
         <form action="{{ url('/admin/category_regexes-edit?action=submit') }}" method="POST" id="regexForm" class="px-6 py-6">
             @csrf
+            <x-form-errors class="mb-6" />
             <input type="hidden" name="id" value="{{ $regex->id ?? '' }}"/>
 
             <!-- Error Message -->
             @if($error)
-                <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <div class="mb-6 p-4 bg-red-50 dark:bg-red-950/40 border border-red-200 rounded-lg">
                     <div class="flex">
-                        <i class="fas fa-exclamation-triangle text-red-500 mr-3"></i>
-                        <p class="text-red-800">{{ $error }}</p>
+                        <i aria-hidden="true" class="fas fa-exclamation-triangle text-red-500 mr-3"></i>
+                        <p class="text-red-800 dark:text-red-200">{{ $error }}</p>
                     </div>
                 </div>
             @endif
@@ -31,12 +32,12 @@
                 </label>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i class="fas fa-users text-gray-400"></i>
+                        <i aria-hidden="true" class="fas fa-users text-gray-400"></i>
                     </div>
                     <input type="text"
                            id="group_regex"
                            name="group_regex"
-                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                            value="{{ $regex->group_regex ?? '' }}"
                            required>
                 </div>
@@ -54,17 +55,17 @@
                 </label>
                 <div class="relative">
                     <div class="absolute top-3 left-3 pointer-events-none">
-                        <i class="fas fa-code text-gray-400"></i>
+                        <i aria-hidden="true" class="fas fa-code text-gray-400"></i>
                     </div>
                     <textarea id="regex"
                               name="regex"
-                              class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
+                              class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 font-mono text-sm"
                               rows="4"
                               required>{{ regex_display_value($regex->regex ?? '') }}</textarea>
                 </div>
                 <p class="mt-2 text-sm text-gray-500">
                     Regex to use when categorizing releases.<br>
-                    The regex delimiters are not added, you MUST add them. See <a href="http://php.net/manual/en/regexp.reference.delimiters" target="_blank" class="text-blue-600 dark:text-blue-400 hover:text-blue-800">this</a> page.<br>
+                    The regex delimiters are not added, you MUST add them. See <a href="http://php.net/manual/en/regexp.reference.delimiters" target="_blank" class="text-link dark:text-primary-400 hover:text-primary-800">this</a> page.<br>
                     To make the regex case insensitive, add <code class="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">i</code> after the last delimiter.
                 </p>
             </div>
@@ -76,11 +77,11 @@
                 </label>
                 <div class="relative">
                     <div class="absolute top-3 left-3 pointer-events-none">
-                        <i class="fas fa-align-left text-gray-400"></i>
+                        <i aria-hidden="true" class="fas fa-align-left text-gray-400"></i>
                     </div>
                     <textarea id="description"
                               name="description"
-                              class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                               rows="3">{{ $regex->description ?? '' }}</textarea>
                 </div>
                 <p class="mt-2 text-sm text-gray-500">
@@ -95,12 +96,12 @@
                 </label>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i class="fas fa-sort-numeric-asc text-gray-400"></i>
+                        <i aria-hidden="true" class="fas fa-sort-numeric-asc text-gray-400"></i>
                     </div>
                     <input type="number"
                            id="ordinal"
                            name="ordinal"
-                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                            value="{{ $regex->ordinal ?? 0 }}"
                            min="0"
                            required>
@@ -123,9 +124,9 @@
                                    name="status"
                                    id="status{{ $id }}"
                                    value="{{ $id }}"
-                                   class="w-4 h-4 text-blue-600 dark:text-blue-400 border-gray-300 dark:border-gray-600 focus:ring-blue-500"
+                                   class="w-4 h-4 text-link dark:text-primary-400 border-gray-300 dark:border-gray-600 focus:ring-primary-500"
                                    {{ ($regex->status ?? 1) == $id ? 'checked' : '' }}>
-                            <label for="status{{ $id }}" class="ml-3 text-sm text-gray-700">
+                            <label for="status{{ $id }}" class="ml-3 text-sm text-gray-700 dark:text-gray-300">
                                 {{ $status_names[$k] }}
                             </label>
                         </div>
@@ -143,11 +144,11 @@
                 </label>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i class="fas fa-folder-open text-gray-400"></i>
+                        <i aria-hidden="true" class="fas fa-folder-open text-gray-400"></i>
                     </div>
                     <select id="categories_id"
                             name="categories_id"
-                            class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                             required>
                         @foreach($category_ids as $k => $catId)
                             <option value="{{ $catId }}" {{ ($regex->categories_id ?? '') == $catId ? 'selected' : '' }}>
@@ -166,10 +167,10 @@
         <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50">
             <div class="flex justify-between">
                 <a href="{{ url('/admin/category_regexes-list') }}" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300">
-                    <i class="fas fa-times mr-2"></i>Cancel
+                    <i aria-hidden="true" class="fas fa-times mr-2"></i>Cancel
                 </a>
-                <button type="submit" form="regexForm" class="px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700">
-                    <i class="fas fa-save mr-2"></i>Save Changes
+                <button type="submit" form="regexForm" class="px-4 py-2 bg-success-600 dark:bg-success-700 text-white rounded-lg hover:bg-success-700">
+                    <i aria-hidden="true" class="fas fa-save mr-2"></i>Save Changes
                 </button>
             </div>
         </div>

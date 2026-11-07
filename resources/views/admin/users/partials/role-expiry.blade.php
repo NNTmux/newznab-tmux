@@ -2,7 +2,7 @@
                 <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-linear-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
                     <div class="flex items-center justify-between mb-3">
                         <label for="rolechangedate" class="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center">
-                            <i class="fas fa-calendar-alt mr-2 text-blue-600 dark:text-blue-400"></i>
+                            <i aria-hidden="true" class="fas fa-calendar-alt mr-2 text-link dark:text-primary-400"></i>
                             Role Expiry Date
                         </label>
                         @if(!empty($user->rolechangedate ?? ''))
@@ -15,24 +15,24 @@
                             @endphp
                             @if($isExpired)
                                 <span class="px-3 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 animate-pulse">
-                                    <i class="fas fa-exclamation-triangle mr-1"></i> Expired
+                                    <i aria-hidden="true" class="fas fa-exclamation-triangle mr-1"></i> Expired
                                 </span>
                             @elseif($daysUntilExpiry <= 7)
-                                <span class="px-3 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200">
-                                    <i class="fas fa-exclamation-circle mr-1"></i> Expiring Soon
+                                <span class="px-3 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full bg-warning-100 dark:bg-warning-900 text-warning-800 dark:text-warning-200">
+                                    <i aria-hidden="true" class="fas fa-exclamation-circle mr-1"></i> Expiring Soon
                                 </span>
                             @elseif($daysUntilExpiry <= 30)
-                                <span class="px-3 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
-                                    <i class="fas fa-check-circle mr-1"></i> Active
+                                <span class="px-3 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200">
+                                    <i aria-hidden="true" class="fas fa-check-circle mr-1"></i> Active
                                 </span>
                             @else
-                                <span class="px-3 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-                                    <i class="fas fa-check-circle mr-1"></i> Active
+                                <span class="px-3 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200">
+                                    <i aria-hidden="true" class="fas fa-check-circle mr-1"></i> Active
                                 </span>
                             @endif
                         @else
                             <span class="px-3 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300">
-                                <i class="fas fa-infinity mr-1"></i> No Expiry
+                                <i aria-hidden="true" class="fas fa-infinity mr-1"></i> No Expiry
                             </span>
                         @endif
                     </div>
@@ -48,10 +48,10 @@
                         <!-- Year Selector -->
                         <div>
                             <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
-                                <i class="fas fa-calendar-alt mr-1"></i>Year
+                                <i aria-hidden="true" class="fas fa-calendar-alt mr-1"></i>Year
                             </label>
                             <select id="expiry_year"
-                                    class="w-full px-2 py-3 text-lg font-semibold bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 transition-all shadow-sm hover:shadow-md hover:border-blue-400 dark:hover:border-blue-500">
+                                    class="w-full px-2 py-3 text-lg font-semibold bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-primary-500 dark:focus:border-primary-400 transition-all shadow-sm hover:shadow-md hover:border-primary-400 dark:hover:border-primary-500">
                                 <option value="">--</option>
                                 @for($y = date('Y'); $y <= date('Y') + 50; $y++)
                                     <option value="{{ $y }}">{{ $y }}</option>
@@ -62,10 +62,10 @@
                         <!-- Month Selector -->
                         <div>
                             <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
-                                <i class="fas fa-calendar mr-1"></i>Month
+                                <i aria-hidden="true" class="fas fa-calendar mr-1"></i>Month
                             </label>
                             <select id="expiry_month"
-                                    class="w-full px-2 py-3 text-lg font-semibold bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 transition-all shadow-sm hover:shadow-md hover:border-blue-400 dark:hover:border-blue-500">
+                                    class="w-full px-2 py-3 text-lg font-semibold bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-primary-500 dark:focus:border-primary-400 transition-all shadow-sm hover:shadow-md hover:border-primary-400 dark:hover:border-primary-500">
                                 <option value="">--</option>
                                 <option value="01">Jan</option>
                                 <option value="02">Feb</option>
@@ -85,10 +85,10 @@
                         <!-- Day Selector -->
                         <div>
                             <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
-                                <i class="fas fa-calendar-day mr-1"></i>Day
+                                <i aria-hidden="true" class="fas fa-calendar-day mr-1"></i>Day
                             </label>
                             <select id="expiry_day"
-                                    class="w-full px-2 py-3 text-lg font-semibold bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 transition-all shadow-sm hover:shadow-md hover:border-blue-400 dark:hover:border-blue-500">
+                                    class="w-full px-2 py-3 text-lg font-semibold bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-primary-500 dark:focus:border-primary-400 transition-all shadow-sm hover:shadow-md hover:border-primary-400 dark:hover:border-primary-500">
                                 <option value="">--</option>
                                 @for($d = 1; $d <= 31; $d++)
                                     <option value="{{ sprintf('%02d', $d) }}">{{ $d }}</option>
@@ -99,10 +99,10 @@
                         <!-- Hour Selector -->
                         <div>
                             <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
-                                <i class="fas fa-clock mr-1"></i>Hour
+                                <i aria-hidden="true" class="fas fa-clock mr-1"></i>Hour
                             </label>
                             <select id="expiry_hour"
-                                    class="w-full px-2 py-3 text-lg font-semibold bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 transition-all shadow-sm hover:shadow-md hover:border-blue-400 dark:hover:border-blue-500">
+                                    class="w-full px-2 py-3 text-lg font-semibold bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-primary-500 dark:focus:border-primary-400 transition-all shadow-sm hover:shadow-md hover:border-primary-400 dark:hover:border-primary-500">
                                 <option value="">--</option>
                                 @for($h = 0; $h <= 23; $h++)
                                     <option value="{{ sprintf('%02d', $h) }}">{{ sprintf('%02d', $h) }}</option>
@@ -113,10 +113,10 @@
                         <!-- Minute Selector -->
                         <div>
                             <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
-                                <i class="fas fa-hourglass-half mr-1"></i>Min
+                                <i aria-hidden="true" class="fas fa-hourglass-half mr-1"></i>Min
                             </label>
                             <select id="expiry_minute"
-                                    class="w-full px-2 py-3 text-lg font-semibold bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 transition-all shadow-sm hover:shadow-md hover:border-blue-400 dark:hover:border-blue-500">
+                                    class="w-full px-2 py-3 text-lg font-semibold bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-primary-500 dark:focus:border-primary-400 transition-all shadow-sm hover:shadow-md hover:border-primary-400 dark:hover:border-primary-500">
                                 <option value="">--</option>
                                 @for($m = 0; $m <= 59; $m++)
                                     <option value="{{ sprintf('%02d', $m) }}">{{ sprintf('%02d', $m) }}</option>
@@ -129,74 +129,74 @@
                     <div id="datetime_preview" class="mt-3 p-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg hidden">
                         <div class="flex items-center justify-between">
                             <span class="text-sm text-gray-600 dark:text-gray-400">
-                                <i class="fas fa-info-circle mr-2"></i>Selected:
+                                <i aria-hidden="true" class="fas fa-info-circle mr-2"></i>Selected:
                             </span>
-                            <span id="datetime_display" class="text-base font-bold text-blue-600 dark:text-blue-400"></span>
+                            <span id="datetime_display" class="text-base font-bold text-link dark:text-primary-400"></span>
                         </div>
                     </div>
 
                     <!-- Quick Action Buttons -->
                     <div class="mt-3 space-y-2">
                         <div class="flex flex-wrap gap-2">
-                            <button type="button" data-expiry-action="set" data-days="1" data-hours="0" class="px-3 py-1.5 text-xs font-medium text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all hover:scale-105">
-                                <i class="fas fa-clock mr-1"></i> +1 Day
+                            <button type="button" data-expiry-action="set" data-days="1" data-hours="0" class="px-3 py-1.5 text-xs font-medium text-link dark:text-primary-300 bg-primary-50 dark:bg-primary-900/30 border border-primary-200 dark:border-primary-800 rounded-md hover:bg-primary-100 dark:hover:bg-primary-900/50 transition-all hover:scale-105">
+                                <i aria-hidden="true" class="fas fa-clock mr-1"></i> +1 Day
                             </button>
-                            <button type="button" data-expiry-action="set" data-days="7" data-hours="0" class="px-3 py-1.5 text-xs font-medium text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all hover:scale-105">
-                                <i class="fas fa-calendar-week mr-1"></i> +1 Week
+                            <button type="button" data-expiry-action="set" data-days="7" data-hours="0" class="px-3 py-1.5 text-xs font-medium text-link dark:text-primary-300 bg-primary-50 dark:bg-primary-900/30 border border-primary-200 dark:border-primary-800 rounded-md hover:bg-primary-100 dark:hover:bg-primary-900/50 transition-all hover:scale-105">
+                                <i aria-hidden="true" class="fas fa-calendar-week mr-1"></i> +1 Week
                             </button>
-                            <button type="button" data-expiry-action="set" data-days="30" data-hours="0" class="px-3 py-1.5 text-xs font-medium text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all hover:scale-105">
-                                <i class="fas fa-calendar-alt mr-1"></i> +1 Month
+                            <button type="button" data-expiry-action="set" data-days="30" data-hours="0" class="px-3 py-1.5 text-xs font-medium text-link dark:text-primary-300 bg-primary-50 dark:bg-primary-900/30 border border-primary-200 dark:border-primary-800 rounded-md hover:bg-primary-100 dark:hover:bg-primary-900/50 transition-all hover:scale-105">
+                                <i aria-hidden="true" class="fas fa-calendar-alt mr-1"></i> +1 Month
                             </button>
-                            <button type="button" data-expiry-action="set" data-days="90" data-hours="0" class="px-3 py-1.5 text-xs font-medium text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all hover:scale-105">
-                                <i class="fas fa-calendar mr-1"></i> +3 Months
+                            <button type="button" data-expiry-action="set" data-days="90" data-hours="0" class="px-3 py-1.5 text-xs font-medium text-link dark:text-primary-300 bg-primary-50 dark:bg-primary-900/30 border border-primary-200 dark:border-primary-800 rounded-md hover:bg-primary-100 dark:hover:bg-primary-900/50 transition-all hover:scale-105">
+                                <i aria-hidden="true" class="fas fa-calendar mr-1"></i> +3 Months
                             </button>
                             <button type="button" data-expiry-action="set" data-days="365" data-hours="0" class="px-3 py-1.5 text-xs font-medium text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-900/30 border border-purple-200 dark:border-purple-800 rounded-md hover:bg-purple-100 dark:hover:bg-purple-900/50 transition-all hover:scale-105">
-                                <i class="fas fa-calendar-check mr-1"></i> +1 Year
+                                <i aria-hidden="true" class="fas fa-calendar-check mr-1"></i> +1 Year
                             </button>
                         </div>
                         <div class="flex flex-wrap gap-2">
-                            <button type="button" data-expiry-action="set" data-days="0" data-hours="1" class="px-3 py-1.5 text-xs font-medium text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-md hover:bg-green-100 dark:hover:bg-green-900/50 transition-all hover:scale-105">
-                                <i class="fas fa-hourglass-start mr-1"></i> +1 Hour
+                            <button type="button" data-expiry-action="set" data-days="0" data-hours="1" class="px-3 py-1.5 text-xs font-medium text-success-700 dark:text-success-300 bg-success-50 dark:bg-success-900/30 border border-success-200 dark:border-success-800 rounded-md hover:bg-success-100 dark:hover:bg-success-900/50 transition-all hover:scale-105">
+                                <i aria-hidden="true" class="fas fa-hourglass-start mr-1"></i> +1 Hour
                             </button>
-                            <button type="button" data-expiry-action="set" data-days="0" data-hours="6" class="px-3 py-1.5 text-xs font-medium text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-md hover:bg-green-100 dark:hover:bg-green-900/50 transition-all hover:scale-105">
-                                <i class="fas fa-hourglass-half mr-1"></i> +6 Hours
+                            <button type="button" data-expiry-action="set" data-days="0" data-hours="6" class="px-3 py-1.5 text-xs font-medium text-success-700 dark:text-success-300 bg-success-50 dark:bg-success-900/30 border border-success-200 dark:border-success-800 rounded-md hover:bg-success-100 dark:hover:bg-success-900/50 transition-all hover:scale-105">
+                                <i aria-hidden="true" class="fas fa-hourglass-half mr-1"></i> +6 Hours
                             </button>
-                            <button type="button" data-expiry-action="set" data-days="0" data-hours="12" class="px-3 py-1.5 text-xs font-medium text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-md hover:bg-green-100 dark:hover:bg-green-900/50 transition-all hover:scale-105">
-                                <i class="fas fa-hourglass-end mr-1"></i> +12 Hours
+                            <button type="button" data-expiry-action="set" data-days="0" data-hours="12" class="px-3 py-1.5 text-xs font-medium text-success-700 dark:text-success-300 bg-success-50 dark:bg-success-900/30 border border-success-200 dark:border-success-800 rounded-md hover:bg-success-100 dark:hover:bg-success-900/50 transition-all hover:scale-105">
+                                <i aria-hidden="true" class="fas fa-hourglass-end mr-1"></i> +12 Hours
                             </button>
-                            <button type="button" data-expiry-action="set" data-days="0" data-hours="24" class="px-3 py-1.5 text-xs font-medium text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-md hover:bg-green-100 dark:hover:bg-green-900/50 transition-all hover:scale-105">
-                                <i class="fas fa-clock mr-1"></i> +24 Hours
+                            <button type="button" data-expiry-action="set" data-days="0" data-hours="24" class="px-3 py-1.5 text-xs font-medium text-success-700 dark:text-success-300 bg-success-50 dark:bg-success-900/30 border border-success-200 dark:border-success-800 rounded-md hover:bg-success-100 dark:hover:bg-success-900/50 transition-all hover:scale-105">
+                                <i aria-hidden="true" class="fas fa-clock mr-1"></i> +24 Hours
                             </button>
                             <button type="button" data-expiry-action="end-of-day" class="px-3 py-1.5 text-xs font-medium text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800 rounded-md hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-all hover:scale-105">
-                                <i class="fas fa-moon mr-1"></i> End of Today
+                                <i aria-hidden="true" class="fas fa-moon mr-1"></i> End of Today
                             </button>
                             <button type="button" data-expiry-action="clear" class="px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-md hover:bg-gray-100 dark:hover:bg-gray-600 transition-all hover:scale-105">
-                                <i class="fas fa-times-circle mr-1"></i> Clear
+                                <i aria-hidden="true" class="fas fa-times-circle mr-1"></i> Clear
                             </button>
                         </div>
                     </div>
 
                     <!-- Status Information -->
                     @if(!empty($user->rolechangedate ?? ''))
-                        <div class="mt-3 p-3 rounded-lg {{ $isExpired ? 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800' : ($daysUntilExpiry <= 7 ? 'bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800' : 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800') }}">
+                        <div class="mt-3 p-3 rounded-lg {{ $isExpired ? 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800' : ($daysUntilExpiry <= 7 ? 'bg-warning-50 dark:bg-warning-900/20 border border-warning-200 dark:border-warning-800' : 'bg-info-50 dark:bg-info-900/20 border border-info-200 dark:border-info-800') }}">
                             <div class="flex items-start">
-                                <i class="fa {{ $isExpired ? 'fa-exclamation-triangle text-red-600 dark:text-red-400' : ($daysUntilExpiry <= 7 ? 'fa-clock text-yellow-600 dark:text-yellow-400' : 'fa-info-circle text-blue-600 dark:text-blue-400') }} mt-0.5 mr-2"></i>
+                                <i aria-hidden="true" class="fa {{ $isExpired ? 'fa-exclamation-triangle text-red-600 dark:text-red-400' : ($daysUntilExpiry <= 7 ? 'fa-clock text-warning-600 dark:text-warning-400' : 'fa-info-circle text-info-600 dark:text-info-400') }} mt-0.5 mr-2"></i>
                                 <div class="flex-1">
-                                    <p class="text-sm font-medium {{ $isExpired ? 'text-red-800 dark:text-red-200' : ($daysUntilExpiry <= 7 ? 'text-yellow-800 dark:text-yellow-200' : 'text-blue-800 dark:text-blue-200') }}">
+                                    <p class="text-sm font-medium {{ $isExpired ? 'text-red-800 dark:text-red-200' : ($daysUntilExpiry <= 7 ? 'text-warning-800 dark:text-warning-200' : 'text-info-800 dark:text-info-200') }}">
                                         @if($isExpired)
                                             Role expired {{ $expiryDate->diffForHumans() }}
                                         @else
                                             Role expires {{ $expiryDate->diffForHumans() }}
                                         @endif
                                     </p>
-                                    <p class="text-xs {{ $isExpired ? 'text-red-700 dark:text-red-300' : ($daysUntilExpiry <= 7 ? 'text-yellow-700 dark:text-yellow-300' : 'text-blue-700 dark:text-blue-300') }} mt-1">
-                                        <i class="fas fa-calendar-alt mr-1"></i>{{ $expiryDate->format('F j, Y') }}
+                                    <p class="text-xs {{ $isExpired ? 'text-red-700 dark:text-red-300' : ($daysUntilExpiry <= 7 ? 'text-warning-700 dark:text-warning-300' : 'text-info-700 dark:text-info-300') }} mt-1">
+                                        <i aria-hidden="true" class="fas fa-calendar-alt mr-1"></i>{{ $expiryDate->format('F j, Y') }}
                                         <span class="mx-2">•</span>
-                                        <i class="fas fa-clock mr-1"></i>{{ $expiryDate->format('g:i A') }}
+                                        <i aria-hidden="true" class="fas fa-clock mr-1"></i>{{ $expiryDate->format('g:i A') }}
                                     </p>
                                     @if($daysUntilExpiry <= 7 && !$isExpired)
-                                        <p class="text-xs text-yellow-700 dark:text-yellow-300 mt-1">
-                                            <i class="fas fa-hourglass-half mr-1"></i>{{ $daysUntilExpiry }} day{{ $daysUntilExpiry != 1 ? 's' : '' }} and {{ $hoursUntilExpiry }} hour{{ $hoursUntilExpiry != 1 ? 's' : '' }} remaining
+                                        <p class="text-xs text-warning-700 dark:text-warning-300 mt-1">
+                                            <i aria-hidden="true" class="fas fa-hourglass-half mr-1"></i>{{ $daysUntilExpiry }} day{{ $daysUntilExpiry != 1 ? 's' : '' }} and {{ $hoursUntilExpiry }} hour{{ $hoursUntilExpiry != 1 ? 's' : '' }} remaining
                                         </p>
                                     @endif
                                 </div>
@@ -204,7 +204,7 @@
                         </div>
                     @else
                         <p class="mt-3 text-xs text-gray-600 dark:text-gray-400 flex items-center">
-                            <i class="fas fa-lightbulb mr-1.5 text-yellow-500"></i>
+                            <i aria-hidden="true" class="fas fa-lightbulb mr-1.5 text-amber-500"></i>
                             <span>Leave empty for permanent role assignment, or use quick actions above to set an expiry date and time.</span>
                         </p>
                     @endif

@@ -94,6 +94,7 @@ class BooksController extends BasePageController
 
         $this->viewData = array_merge($this->viewData, [
             'catlist' => $btmp,
+            'ordering' => $ordering,
             'category' => $category,
             'categorytitle' => $id,
             'catname' => $catname,

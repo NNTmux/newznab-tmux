@@ -123,7 +123,9 @@ class ReleaseResultsViewTest extends TestCase
         $html = view('details.partials.cover-actions', compact('release'))->render();
         $document = HTMLDocument::createFromString('<!doctype html><html><head><title>Release</title></head><body>'.$html.'</body></html>');
 
-        $this->assertSame($release->searchname, $document->querySelector('h2')->textContent);
+        // The long name is the page heading (compact, wrapping header), not repeated next to the actions.
+        $this->assertNull($document->querySelector('h2'));
+        $this->assertStringContainsString(':compact-title="true"', (string) file_get_contents(resource_path('views/details/index.blade.php')));
         $actions = $document->querySelector('.release-detail-actions');
         $this->assertSame('group', $actions->getAttribute('role'));
         $this->assertSame('Release actions', $actions->getAttribute('aria-label'));

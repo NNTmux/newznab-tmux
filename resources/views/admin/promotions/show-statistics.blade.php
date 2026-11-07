@@ -15,12 +15,12 @@
             <div>
                 <p class="text-sm text-gray-500 dark:text-gray-400">Status</p>
                 @if($promotion->is_active && $promotion->isCurrentlyActive())
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-                        <i class="fas fa-check-circle mr-2"></i>Active
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200">
+                        <i aria-hidden="true" class="fas fa-check-circle mr-2"></i>Active
                     </span>
                 @else
                     <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-                        <i class="fas fa-pause-circle mr-2"></i>Inactive
+                        <i aria-hidden="true" class="fas fa-pause-circle mr-2"></i>Inactive
                     </span>
                 @endif
             </div>
@@ -69,8 +69,8 @@
                     <input type="date" name="end_date" value="{{ formatDate($endDate) }}" class="form-input rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200">
                 </div>
                 <div>
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                        <i class="fas fa-filter mr-2"></i>Apply
+                    <button type="submit" class="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent-hover">
+                        <i aria-hidden="true" class="fas fa-filter mr-2"></i>Apply
                     </button>
                 </div>
             </div>
@@ -81,8 +81,8 @@
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
         <x-admin.card class="p-6">
             <div class="flex items-center">
-                <div class="shrink-0 bg-blue-100 dark:bg-blue-900 rounded-full p-3">
-                    <i class="fas fa-arrow-up text-2xl text-blue-600 dark:text-blue-400"></i>
+                <div class="shrink-0 bg-primary-100 dark:bg-primary-900 rounded-full p-3">
+                    <i aria-hidden="true" class="fas fa-arrow-up text-2xl text-link dark:text-primary-400"></i>
                 </div>
                 <div class="ml-4">
                     <p class="text-sm text-gray-500 dark:text-gray-400">Total Upgrades</p>
@@ -93,8 +93,8 @@
 
         <x-admin.card class="p-6">
             <div class="flex items-center">
-                <div class="shrink-0 bg-green-100 dark:bg-green-900 rounded-full p-3">
-                    <i class="fas fa-users text-2xl text-green-600 dark:text-green-400"></i>
+                <div class="shrink-0 bg-success-100 dark:bg-success-900 rounded-full p-3">
+                    <i aria-hidden="true" class="fas fa-users text-2xl text-success-600 dark:text-success-400"></i>
                 </div>
                 <div class="ml-4">
                     <p class="text-sm text-gray-500 dark:text-gray-400">Unique Users</p>
@@ -106,7 +106,7 @@
         <x-admin.card class="p-6">
             <div class="flex items-center">
                 <div class="shrink-0 bg-purple-100 dark:bg-purple-900 rounded-full p-3">
-                    <i class="fas fa-calendar-plus text-2xl text-purple-600 dark:text-purple-400"></i>
+                    <i aria-hidden="true" class="fas fa-calendar-plus text-2xl text-purple-600 dark:text-purple-400"></i>
                 </div>
                 <div class="ml-4">
                     <p class="text-sm text-gray-500 dark:text-gray-400">Total Days Added</p>
@@ -117,8 +117,8 @@
 
         <x-admin.card class="p-6">
             <div class="flex items-center">
-                <div class="shrink-0 bg-yellow-100 dark:bg-yellow-900 rounded-full p-3">
-                    <i class="fas fa-user-tag text-2xl text-yellow-600 dark:text-yellow-400"></i>
+                <div class="shrink-0 bg-warning-100 dark:bg-warning-900 rounded-full p-3">
+                    <i aria-hidden="true" class="fas fa-user-tag text-2xl text-warning-600 dark:text-warning-400"></i>
                 </div>
                 <div class="ml-4">
                     <p class="text-sm text-gray-500 dark:text-gray-400">Roles Affected</p>
@@ -133,24 +133,24 @@
     <x-admin.card class="mb-6">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
-                <i class="fas fa-user-tag mr-2"></i>Statistics by Role
+                <i aria-hidden="true" class="fas fa-user-tag mr-2"></i>Statistics by Role
             </h2>
         </div>
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead class="bg-gray-50 dark:bg-gray-900">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Role</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Upgrades</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Unique Users</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Days Added</th>
+                        <x-admin.th>Role</x-admin.th>
+                        <x-admin.th>Total Upgrades</x-admin.th>
+                        <x-admin.th>Unique Users</x-admin.th>
+                        <x-admin.th>Total Days Added</x-admin.th>
                     </tr>
                 </thead>
                 <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                     @foreach($statsByRole as $roleStat)
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded font-medium">
+                                <span class="px-3 py-1 bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 rounded font-medium">
                                     {{ $roleStat['role_name'] ?? 'Unknown' }}
                                 </span>
                             </td>
@@ -176,7 +176,7 @@
     <x-admin.card class="mb-6">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
-                <i class="fas fa-chart-area mr-2"></i>Daily Activity
+                <i aria-hidden="true" class="fas fa-chart-area mr-2"></i>Daily Activity
             </h2>
         </div>
         <div class="p-6">
@@ -184,10 +184,10 @@
                 <table class="min-w-full text-sm">
                     <thead>
                         <tr class="border-b border-gray-200 dark:border-gray-700">
-                            <th class="text-left py-2 text-gray-600 dark:text-gray-400">Date</th>
-                            <th class="text-right py-2 text-gray-600 dark:text-gray-400">Applications</th>
-                            <th class="text-right py-2 text-gray-600 dark:text-gray-400">Days Added</th>
-                            <th class="py-2"></th>
+                            <x-admin.th>Date</x-admin.th>
+                            <x-admin.th align="right">Applications</x-admin.th>
+                            <x-admin.th align="right">Days Added</x-admin.th>
+                            <x-admin.th></x-admin.th>
                         </tr>
                     </thead>
                     <tbody>
@@ -200,7 +200,7 @@
                                 <td class="text-right font-bold text-gray-800 dark:text-gray-200">{{ $dayStat->count }}</td>
                                 <td class="text-right font-bold text-gray-800 dark:text-gray-200">{{ $dayStat->days }}</td>
                                 <td class="pl-4">
-                                    <div class="bg-blue-200 dark:bg-blue-600 h-4 rounded" style="width: {{ ($dayStat->count / $maxCount) * 100 }}%"></div>
+                                    <div class="bg-primary-200 dark:bg-accent h-4 rounded" style="width: {{ ($dayStat->count / $maxCount) * 100 }}%"></div>
                                 </td>
                             </tr>
                         @endforeach
@@ -215,19 +215,19 @@
     <x-admin.card>
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
-                <i class="fas fa-list mr-2"></i>Recent Applications
+                <i aria-hidden="true" class="fas fa-list mr-2"></i>Recent Applications
             </h2>
         </div>
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead class="bg-gray-50 dark:bg-gray-900">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">User</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Role</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Days Added</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Previous Expiry</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">New Expiry</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Applied At</th>
+                        <x-admin.th>User</x-admin.th>
+                        <x-admin.th>Role</x-admin.th>
+                        <x-admin.th>Days Added</x-admin.th>
+                        <x-admin.th>Previous Expiry</x-admin.th>
+                        <x-admin.th>New Expiry</x-admin.th>
+                        <x-admin.th>Applied At</x-admin.th>
                     </tr>
                 </thead>
                 <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -244,12 +244,12 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded text-xs font-medium">
+                                <span class="px-2 py-1 bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 rounded text-xs font-medium">
                                     {{ $application->role->name ?? 'Unknown Role' }}
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="text-lg font-bold text-green-600 dark:text-green-400">+{{ $application->days_added }}</span>
+                                <span class="text-lg font-bold text-success-600 dark:text-success-400">+{{ $application->days_added }}</span>
                                 <span class="text-sm text-gray-500 dark:text-gray-400">days</span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">

@@ -1,6 +1,11 @@
 @extends('layouts.main')
 
 @section('content')
+@php
+    // OMDb stores the Tomatometer as e.g. "78%"; "N/A" or an empty value means no score.
+    $rtPercent = preg_match('/^(\d{1,3})%$/', trim((string) ($movie['rtrating'] ?? '')), $rtMatch) === 1 ? (int) $rtMatch[1] : null;
+    $rtFresh = $rtPercent !== null && $rtPercent >= 60;
+@endphp
 <div class="movie-detail-page bg-white dark:bg-gray-800 rounded-xl shadow-sm">
     <x-page-header :title="$movie['title'] ?? 'Movie details'" eyebrow="Movie information" description="Explore the movie metadata, synopsis, ratings, and related release information." icon="fas fa-clapperboard">
         <x-slot:stats>
@@ -10,36 +15,44 @@
             @if(!empty($movie['rating'] ?? null))
                 <span class="workspace-hero__stat"><i class="fas fa-star" aria-hidden="true"></i>{{ $movie['rating'] }}/10</span>
             @endif
+            @if($rtPercent !== null)
+                <span class="workspace-hero__stat" title="Rotten Tomatoes Tomatometer"><i class="fas {{ $rtFresh ? 'fa-apple-whole' : 'fa-splotch' }}" aria-hidden="true"></i>{{ $rtPercent }}%</span>
+            @endif
         </x-slot:stats>
     </x-page-header>
 
     @if(isset($movie))
         <div class="px-6 py-6">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Movie Poster -->
-                <div class="lg:col-span-1">
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-[12rem_minmax(0,1fr)] lg:grid-cols-[15rem_minmax(0,1fr)]">
+                <!-- Movie Poster (fixed narrow column) -->
+                <div>
                     @if(!empty($movie['cover'] ?? null))
-                        <img src="{{ $movie['cover'] }}" alt="{{ $movie['title'] ?? 'Movie' }}" class="movie-detail-poster w-full rounded-lg" loading="lazy">
+                        <img src="{{ $movie['cover'] }}" alt="{{ $movie['title'] ?? 'Movie' }}" class="movie-detail-poster mx-auto w-full max-w-60 rounded-lg sm:max-w-none" width="320" height="480" loading="lazy" decoding="async">
                     @else
-                        <div class="movie-detail-poster w-full h-96 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-film text-gray-400 text-6xl"></i>
+                        <div class="movie-detail-poster mx-auto flex aspect-[2/3] w-full max-w-60 items-center justify-center rounded-lg bg-gray-200 dark:bg-gray-700 sm:max-w-none">
+                            <i aria-hidden="true" class="fas fa-film text-gray-400 text-6xl"></i>
                         </div>
                     @endif
                 </div>
 
                 <!-- Movie Details -->
-                <div class="lg:col-span-2">
+                <div class="min-w-0">
                     @if(!empty($movie['tagline'] ?? null))
                         <p class="text-lg text-gray-600 dark:text-gray-400 italic mb-4">"{{ $movie['tagline'] }}"</p>
                     @endif
 
-                    @if(!empty($movie['rating'] ?? null))
-                        <div class="flex items-center mb-4">
-                            <span class="text-yellow-500 text-2xl mr-2">
-                                <i class="fas fa-star"></i>
-                            </span>
-                            <span class="text-2xl font-semibold text-gray-900">{{ $movie['rating'] }}</span>
-                            <span class="text-gray-600 dark:text-gray-400 ml-2">/ 10</span>
+                    @if(!empty($movie['rating'] ?? null) || $rtPercent !== null)
+                        <div class="mb-4 flex flex-wrap items-center gap-x-6 gap-y-3">
+                            @if(!empty($movie['rating'] ?? null))
+                                <div class="flex items-center" title="Rating">
+                                    <span class="text-warning-500 text-2xl mr-2">
+                                        <i aria-hidden="true" class="fas fa-star"></i>
+                                    </span>
+                                    <span class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ $movie['rating'] }}</span>
+                                    <span class="text-gray-600 dark:text-gray-400 ml-2">/ 10</span>
+                                </div>
+                            @endif
+                            <x-rotten-tomatoes-score :score="$movie['rtrating'] ?? null" />
                         </div>
                     @endif
 
@@ -47,35 +60,35 @@
                         @if(!empty($movie['year'] ?? null))
                             <div class="flex">
                                 <span class="font-semibold text-gray-700 dark:text-gray-300 w-32">Year:</span>
-                                <span class="text-gray-600">{{ $movie['year'] }}</span>
+                                <span class="text-gray-700 dark:text-gray-300">{{ $movie['year'] }}</span>
                             </div>
                         @endif
 
                         @if(!empty($movie['genre'] ?? null))
                             <div class="flex">
                                 <span class="font-semibold text-gray-700 dark:text-gray-300 w-32">Genre:</span>
-                                <span class="text-gray-600">{!! $movie['genre'] !!}</span>
+                                <span class="text-gray-700 dark:text-gray-300">{!! $movie['genre'] !!}</span>
                             </div>
                         @endif
 
                         @if(!empty($movie['director'] ?? null))
                             <div class="flex">
                                 <span class="font-semibold text-gray-700 dark:text-gray-300 w-32">Director:</span>
-                                <span class="text-gray-600">{!! $movie['director'] !!}</span>
+                                <span class="text-gray-700 dark:text-gray-300">{!! $movie['director'] !!}</span>
                             </div>
                         @endif
 
                         @if(!empty($movie['actors'] ?? null))
                             <div class="flex">
                                 <span class="font-semibold text-gray-700 dark:text-gray-300 w-32">Cast:</span>
-                                <span class="text-gray-600">{!! $movie['actors'] !!}</span>
+                                <span class="text-gray-700 dark:text-gray-300">{!! $movie['actors'] !!}</span>
                             </div>
                         @endif
 
                         @if(!empty($movie['language'] ?? null))
                             <div class="flex">
                                 <span class="font-semibold text-gray-700 dark:text-gray-300 w-32">Language:</span>
-                                <span class="text-gray-600">{{ $movie['language'] }}</span>
+                                <span class="text-gray-700 dark:text-gray-300">{{ $movie['language'] }}</span>
                             </div>
                         @endif
                     </div>
@@ -92,23 +105,23 @@
                         <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3">External Links</h2>
                         <div class="flex flex-wrap gap-3">
                             @if(!empty($movie['imdbid'] ?? null))
-                                <a href="{{ $site->dereferrerLink }}https://www.imdb.com/title/tt{{ $movie['imdbid'] }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200 transition">
-                                    <i class="fab fa-imdb mr-2 text-xl"></i> View on IMDb
+                                <a href="{{ $site->dereferrerLink }}https://www.imdb.com/title/tt{{ $movie['imdbid'] }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-warning-100 dark:bg-warning-900/40 text-warning-800 dark:text-warning-200 rounded-lg hover:bg-warning-200 transition">
+                                    <i aria-hidden="true" class="fab fa-imdb mr-2 text-xl"></i> View on IMDb
                                 </a>
                             @endif
                             @if(!empty($movie['tmdbid'] ?? null))
-                                <a href="{{ $site->dereferrerLink }}https://www.themoviedb.org/movie/{{ $movie['tmdbid'] }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-800 rounded-lg hover:bg-blue-200 transition">
-                                    <i class="fas fa-film mr-2"></i> View on TMDb
+                                <a href="{{ $site->dereferrerLink }}https://www.themoviedb.org/movie/{{ $movie['tmdbid'] }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-primary-100 dark:bg-primary-900/40 text-primary-800 dark:text-primary-200 rounded-lg hover:bg-primary-200 transition">
+                                    <i aria-hidden="true" class="fas fa-film mr-2"></i> View on TMDb
                                 </a>
                             @endif
                             @if(!empty($movie['traktid'] ?? null))
-                                <a href="{{ $site->dereferrerLink }}https://trakt.tv/movies/{{ $movie['traktid'] }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-red-100 text-red-800 rounded-lg hover:bg-red-200 transition">
-                                    <i class="fas fa-heart mr-2"></i> View on Trakt
+                                <a href="{{ $site->dereferrerLink }}https://trakt.tv/movies/{{ $movie['traktid'] }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-200 rounded-lg hover:bg-red-200 transition">
+                                    <i aria-hidden="true" class="fas fa-heart mr-2"></i> View on Trakt
                                 </a>
                             @endif
                             @if(!empty($movie['imdbid'] ?? null) && auth()->check())
-                                <a href="{{ url('/mymovies?id=add&imdb=' . $movie['imdbid'] . '&from=' . urlencode(request()->fullUrl())) }}" class="inline-flex items-center px-4 py-2 bg-purple-100 text-purple-800 rounded-lg hover:bg-purple-200 transition">
-                                    <i class="fas fa-plus-circle mr-2"></i> Add to My Movies
+                                <a href="{{ url('/mymovies?id=add&imdb=' . $movie['imdbid'] . '&from=' . urlencode(request()->fullUrl())) }}" class="inline-flex items-center px-4 py-2 bg-purple-100 dark:bg-purple-900/40 text-purple-800 dark:text-purple-200 rounded-lg hover:bg-purple-200 transition">
+                                    <i aria-hidden="true" class="fas fa-plus-circle mr-2"></i> Add to My Movies
                                 </a>
                             @endif
                         </div>
@@ -141,20 +154,20 @@
                             <div class="flex flex-wrap gap-2 items-center">
                                 <span class="text-sm font-medium text-gray-700 dark:text-gray-300 mr-2">Resolution:</span>
                                 <button data-resolution="all"
-                                        class="px-4 py-2 rounded-lg text-sm font-medium transition bg-blue-600 text-white hover:bg-blue-700">
-                                    <i class="fas fa-list mr-1"></i> All
+                                        class="px-4 py-2 rounded-lg text-sm font-medium transition bg-accent text-white hover:bg-accent-hover">
+                                    <i aria-hidden="true" class="fas fa-list mr-1"></i> All
                                 </button>
                                 <button data-resolution="720p"
                                         class="px-4 py-2 rounded-lg text-sm font-medium transition bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600">
-                                    <i class="fas fa-tv mr-1"></i> 720p
+                                    <i aria-hidden="true" class="fas fa-tv mr-1"></i> 720p
                                 </button>
                                 <button data-resolution="1080p"
                                         class="px-4 py-2 rounded-lg text-sm font-medium transition bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600">
-                                    <i class="fas fa-desktop mr-1"></i> 1080p
+                                    <i aria-hidden="true" class="fas fa-desktop mr-1"></i> 1080p
                                 </button>
                                 <button data-resolution="2160p"
                                         class="px-4 py-2 rounded-lg text-sm font-medium transition bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600">
-                                    <i class="fas fa-film mr-1"></i> 2160p / 4K
+                                    <i aria-hidden="true" class="fas fa-film mr-1"></i> 2160p / 4K
                                 </button>
                             </div>
 
@@ -163,19 +176,19 @@
                                 <span class="text-sm font-medium text-gray-700 dark:text-gray-300 mr-2">Source:</span>
                                 <button data-source="all"
                                         class="px-4 py-2 rounded-lg text-sm font-medium transition bg-purple-600 text-white hover:bg-purple-700">
-                                    <i class="fas fa-list mr-1"></i> All
+                                    <i aria-hidden="true" class="fas fa-list mr-1"></i> All
                                 </button>
                                 <button data-source="bluray"
                                         class="px-4 py-2 rounded-lg text-sm font-medium transition bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600">
-                                    <i class="fas fa-compact-disc mr-1"></i> Bluray
+                                    <i aria-hidden="true" class="fas fa-compact-disc mr-1"></i> Bluray
                                 </button>
                                 <button data-source="web-dl"
                                         class="px-4 py-2 rounded-lg text-sm font-medium transition bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600">
-                                    <i class="fas fa-cloud-download-alt mr-1"></i> WEB-DL
+                                    <i aria-hidden="true" class="fas fa-cloud-download-alt mr-1"></i> WEB-DL
                                 </button>
                                 <button data-source="webrip"
                                         class="px-4 py-2 rounded-lg text-sm font-medium transition bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600">
-                                    <i class="fas fa-globe mr-1"></i> WEBRip
+                                    <i aria-hidden="true" class="fas fa-globe mr-1"></i> WEBRip
                                 </button>
                             </div>
                         </div>
@@ -186,41 +199,41 @@
                             <div class="movie-release-card release-item bg-gray-50 dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-700" data-release-name="{{ strtolower($release->searchname) }}">
                                 <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
                                     <div class="flex-1 min-w-0">
-                                        <a href="{{ url('/details/' . $release->guid) }}" class="text-base text-gray-800 dark:text-gray-200 hover:text-blue-600 dark:text-blue-400 font-medium block truncate" title="{{ $release->searchname }}">
+                                        <a href="{{ url('/details/' . $release->guid) }}" class="text-base text-gray-800 dark:text-gray-200 hover:text-link dark:text-primary-400 font-medium block truncate" title="{{ $release->searchname }}">
                                             {{ $release->searchname }}
                                         </a>
                                         <div class="flex flex-wrap items-center gap-4 mt-2 text-sm text-gray-500">
                                             <span>
-                                                <i class="fas fa-hdd mr-1"></i>{{ number_format($release->size / 1073741824, 2) }} GB
+                                                <i aria-hidden="true" class="fas fa-hdd mr-1"></i>{{ number_format($release->size / 1073741824, 2) }} GB
                                             </span>
                                             @if($release->postdate)
                                                 <span>
-                                                    <i class="fas fa-calendar-alt mr-1"></i>Posted: {{ userDate($release->postdate, 'M d, Y H:i') }}
+                                                    <i aria-hidden="true" class="fas fa-calendar-alt mr-1"></i>Posted: {{ userDate($release->postdate, 'M d, Y H:i') }}
                                                 </span>
                                             @endif
                                         </div>
                                         <div class="flex flex-wrap gap-2 mt-2 text-xs">
                                             @if($release->postdate)
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-                                                    <i class="fas fa-calendar-alt mr-1"></i>Posted: {{ \Carbon\Carbon::parse($release->postdate)->format('M d, Y H:i') }}
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200">
+                                                    <i aria-hidden="true" class="fas fa-calendar-alt mr-1"></i>Posted: {{ \Carbon\Carbon::parse($release->postdate)->format('M d, Y H:i') }}
                                                 </span>
                                             @endif
                                             @if($release->adddate)
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
-                                                    <i class="fas fa-plus-circle mr-1"></i>Added: {{ userDateDiffForHumans($release->adddate) }}
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200">
+                                                    <i aria-hidden="true" class="fas fa-plus-circle mr-1"></i>Added: {{ userDateDiffForHumans($release->adddate) }}
                                                 </span>
                                             @endif
                                         </div>
                                     </div>
                                     <div class="flex gap-2 shrink-0">
-                                        <a href="{{ url('/getnzb/' . $release->guid) }}" class="inline-flex items-center px-4 py-2 bg-green-600 dark:bg-green-700 text-white text-sm font-medium rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition">
-                                            <i class="fas fa-download mr-2"></i> Download
+                                        <a href="{{ url('/getnzb/' . $release->guid) }}" class="inline-flex items-center px-4 py-2 bg-success-600 dark:bg-success-700 text-white text-sm font-medium rounded-lg hover:bg-success-700 dark:hover:bg-success-800 transition">
+                                            <i aria-hidden="true" class="fas fa-download mr-2"></i> Download
                                         </a>
-                                        <button class="add-to-cart inline-flex items-center px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white text-sm font-medium rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 transition" data-guid="{{ $release->guid }}">
-                                            <i class="fas fa-shopping-cart mr-2"></i> Add to Cart
+                                        <button class="add-to-cart inline-flex items-center px-4 py-2 bg-accent dark:bg-accent-hover text-white text-sm font-medium rounded-lg hover:bg-accent-hover dark:hover:bg-primary-800 transition" data-guid="{{ $release->guid }}">
+                                            <i aria-hidden="true" class="fas fa-shopping-cart mr-2"></i> Add to Cart
                                         </button>
                                         <a href="{{ url('/details/' . $release->guid) }}" class="inline-flex items-center px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-lg hover:bg-gray-700 transition">
-                                            <i class="fas fa-info-circle mr-2"></i> Details
+                                            <i aria-hidden="true" class="fas fa-info-circle mr-2"></i> Details
                                         </a>
                                     </div>
                                 </div>
@@ -231,7 +244,7 @@
             @else
                 <div class="mt-8 pt-8 border-t border-gray-200">
                     <div class="text-center py-8">
-                        <i class="fas fa-inbox text-gray-400 text-5xl mb-4"></i>
+                        <i aria-hidden="true" class="fas fa-inbox text-gray-400 text-5xl mb-4"></i>
                         <p class="text-gray-600 dark:text-gray-400 text-lg">No releases available for this movie.</p>
                     </div>
                 </div>
@@ -239,7 +252,7 @@
         </div>
     @else
         <div class="px-6 py-12 text-center">
-            <i class="fas fa-exclamation-circle text-gray-400 text-5xl mb-4"></i>
+            <i aria-hidden="true" class="fas fa-exclamation-circle text-gray-400 text-5xl mb-4"></i>
             <p class="text-gray-600 dark:text-gray-400 text-lg">Movie details not available.</p>
         </div>
     @endif

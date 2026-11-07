@@ -2,12 +2,12 @@
 
 @section('content')
 <div class="space-y-6" x-data="adminDeletedUsers">
+    <x-admin.page-header :title="$title" icon="fas fa-trash-restore">
+        <x-slot:actions>
+            <x-admin.button :href="url('admin/user-list')" tone="gray" icon="fas fa-arrow-left">Back to Active Users</x-admin.button>
+        </x-slot:actions>
+    </x-admin.page-header>
     <x-admin.card>
-        <x-admin.page-header :title="$title" icon="fas fa-trash-restore">
-            <x-slot:actions>
-                <x-admin.button :href="url('admin/user-list')" tone="gray" icon="fas fa-arrow-left">Back to Active Users</x-admin.button>
-            </x-slot:actions>
-        </x-admin.page-header>
 
         <!-- Search Filters -->
         <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
@@ -20,7 +20,7 @@
                                name="username"
                                value="{{ $username ?? '' }}"
                                placeholder="Filter by username"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 rounded-md focus:ring-primary-500 focus:border-primary-500">
                     </div>
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
@@ -29,7 +29,7 @@
                                name="email"
                                value="{{ $email ?? '' }}"
                                placeholder="Filter by email"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 rounded-md focus:ring-primary-500 focus:border-primary-500">
                     </div>
                     <div>
                         <label for="host" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Host/IP</label>
@@ -38,7 +38,7 @@
                                name="host"
                                value="{{ $host ?? '' }}"
                                placeholder="Filter by host"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 rounded-md focus:ring-primary-500 focus:border-primary-500">
                     </div>
                     <div>
                         <label for="created_from" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Created From</label>
@@ -46,7 +46,7 @@
                                id="created_from"
                                name="created_from"
                                value="{{ $created_from ?? '' }}"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:ring-primary-500 focus:border-primary-500">
                     </div>
                     <div>
                         <label for="created_to" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Created To</label>
@@ -54,7 +54,7 @@
                                id="created_to"
                                name="created_to"
                                value="{{ $created_to ?? '' }}"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:ring-primary-500 focus:border-primary-500">
                     </div>
                     <div>
                         <label for="deleted_from" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Deleted From</label>
@@ -62,7 +62,7 @@
                                id="deleted_from"
                                name="deleted_from"
                                value="{{ $deleted_from ?? '' }}"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:ring-primary-500 focus:border-primary-500">
                     </div>
                     <div>
                         <label for="deleted_to" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Deleted To</label>
@@ -70,15 +70,15 @@
                                id="deleted_to"
                                name="deleted_to"
                                value="{{ $deleted_to ?? '' }}"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:ring-primary-500 focus:border-primary-500">
                     </div>
                 </div>
                 <div class="mt-4 flex gap-2">
-                    <button type="submit" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700">
-                        <i class="fas fa-search mr-2"></i>Filter
+                    <button type="submit" class="px-4 py-2 bg-accent dark:bg-accent-hover text-white rounded-md hover:bg-accent-hover">
+                        <i aria-hidden="true" class="fas fa-search mr-2"></i>Filter
                     </button>
                     <a href="{{ url('admin/deleted-users') }}" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600">
-                        <i class="fas fa-times mr-2"></i>Clear
+                        <i aria-hidden="true" class="fas fa-times mr-2"></i>Clear
                     </a>
                 </div>
             </form>
@@ -86,9 +86,9 @@
 
 
         <!-- Validation Error Messages (for bulk actions) -->
-        <div id="validationError" class="mx-6 mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg hidden">
-            <p class="text-yellow-800 dark:text-yellow-300">
-                <i class="fas fa-exclamation-triangle mr-2"></i><span id="validationErrorMessage"></span>
+        <div id="validationError" class="mx-6 mt-4 p-4 bg-warning-50 dark:bg-warning-900/20 border border-warning-200 dark:border-warning-800 rounded-lg hidden">
+            <p class="text-warning-800 dark:text-warning-300">
+                <i aria-hidden="true" class="fas fa-exclamation-triangle mr-2"></i><span id="validationErrorMessage"></span>
             </p>
         </div>
 
@@ -99,15 +99,15 @@
                 <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
                     <div class="flex items-center gap-4">
                         <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Bulk Actions:</label>
-                        <select name="action" id="bulkAction" class="px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                        <select name="action" id="bulkAction" class="px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:ring-primary-500 focus:border-primary-500">
                             <option value="">Select Action</option>
                             <option value="restore">Restore Selected</option>
                             <option value="delete">Permanently Delete Selected</option>
                         </select>
                         <button type="submit"
                                 id="bulkActionBtn"
-                                class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700">
-                            <i class="fas fa-check mr-2"></i>Apply
+                                class="px-4 py-2 bg-accent dark:bg-accent-hover text-white rounded-md hover:bg-accent-hover">
+                            <i aria-hidden="true" class="fas fa-check mr-2"></i>Apply
                         </button>
                     </div>
                 </div>
@@ -116,54 +116,54 @@
                     <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                         <thead class="bg-gray-50 dark:bg-gray-900">
                             <tr>
-                                <th class="px-6 py-3 text-left">
-                                    <input type="checkbox" id="selectAll" class="h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded">
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                <x-admin.th>
+                                    <input aria-label="Select all" type="checkbox" id="selectAll" class="h-4 w-4 text-link dark:text-primary-400 focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded">
+                                </x-admin.th>
+                                <x-admin.th :sort="str_starts_with($orderby ?? '', 'username') ? (str_ends_with($orderby, 'desc') ? 'desc' : 'asc') : null">
                                     <a href="{{ url('admin/deleted-users?ob=username_' . ($orderby == 'username_asc' ? 'desc' : 'asc') . ($queryString ? '&' . $queryString : '')) }}" class="hover:text-gray-700 dark:hover:text-gray-300">
                                         Username
                                         @if(str_starts_with($orderby ?? '', 'username'))
-                                            <i class="fas fa-sort-{{ str_ends_with($orderby, 'desc') ? 'down' : 'up' }} ml-1"></i>
+                                            <i aria-hidden="true" class="fas fa-sort-{{ str_ends_with($orderby, 'desc') ? 'down' : 'up' }} ml-1"></i>
                                         @endif
                                     </a>
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                </x-admin.th>
+                                <x-admin.th :sort="str_starts_with($orderby ?? '', 'email') ? (str_ends_with($orderby, 'desc') ? 'desc' : 'asc') : null">
                                     <a href="{{ url('admin/deleted-users?ob=email_' . ($orderby == 'email_asc' ? 'desc' : 'asc') . ($queryString ? '&' . $queryString : '')) }}" class="hover:text-gray-700 dark:hover:text-gray-300">
                                         Email
                                         @if(str_starts_with($orderby ?? '', 'email'))
-                                            <i class="fas fa-sort-{{ str_ends_with($orderby, 'desc') ? 'down' : 'up' }} ml-1"></i>
+                                            <i aria-hidden="true" class="fas fa-sort-{{ str_ends_with($orderby, 'desc') ? 'down' : 'up' }} ml-1"></i>
                                         @endif
                                     </a>
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Role</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Host</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Verified</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                </x-admin.th>
+                                <x-admin.th>Role</x-admin.th>
+                                <x-admin.th>Host</x-admin.th>
+                                <x-admin.th>Verified</x-admin.th>
+                                <x-admin.th :sort="str_starts_with($orderby ?? '', 'createdat') ? (str_ends_with($orderby, 'desc') ? 'desc' : 'asc') : null">
                                     <a href="{{ url('admin/deleted-users?ob=createdat_' . ($orderby == 'createdat_asc' ? 'desc' : 'asc') . ($queryString ? '&' . $queryString : '')) }}" class="hover:text-gray-700 dark:hover:text-gray-300">
                                         Created
                                         @if(str_starts_with($orderby ?? '', 'createdat'))
-                                            <i class="fas fa-sort-{{ str_ends_with($orderby, 'desc') ? 'down' : 'up' }} ml-1"></i>
+                                            <i aria-hidden="true" class="fas fa-sort-{{ str_ends_with($orderby, 'desc') ? 'down' : 'up' }} ml-1"></i>
                                         @endif
                                     </a>
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                </x-admin.th>
+                                <x-admin.th :sort="str_starts_with($orderby ?? '', 'deletedat') ? (str_ends_with($orderby, 'desc') ? 'desc' : 'asc') : null">
                                     <a href="{{ url('admin/deleted-users?ob=deletedat_' . ($orderby == 'deletedat_asc' ? 'desc' : 'asc') . ($queryString ? '&' . $queryString : '')) }}" class="hover:text-gray-700 dark:hover:text-gray-300">
                                         Deleted
                                         @if(str_starts_with($orderby ?? '', 'deletedat'))
-                                            <i class="fas fa-sort-{{ str_ends_with($orderby, 'desc') ? 'down' : 'up' }} ml-1"></i>
+                                            <i aria-hidden="true" class="fas fa-sort-{{ str_ends_with($orderby, 'desc') ? 'down' : 'up' }} ml-1"></i>
                                         @endif
                                     </a>
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Deleted By</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">GDPR Erasure</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+                                </x-admin.th>
+                                <x-admin.th>Deleted By</x-admin.th>
+                                <x-admin.th>GDPR Erasure</x-admin.th>
+                                <x-admin.th>Actions</x-admin.th>
                             </tr>
                         </thead>
                         <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                             @foreach($deletedusers as $user)
                                 <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <input type="checkbox" name="user_ids[]" value="{{ $user->id }}" class="user-checkbox h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded">
+                                        <input aria-label="Select item" type="checkbox" name="user_ids[]" value="{{ $user->id }}" class="user-checkbox h-4 w-4 text-link dark:text-primary-400 focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded">
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ $user->username }}</div>
@@ -177,12 +177,12 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ $user->host ?? 'N/A' }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         @if($user->verified)
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-                                                <i class="fas fa-check mr-1"></i>Yes
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200">
+                                                <i aria-hidden="true" class="fas fa-check mr-1"></i>Yes
                                             </span>
                                         @else
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">
-                                                <i class="fas fa-times mr-1"></i>No
+                                                <i aria-hidden="true" class="fas fa-times mr-1"></i>No
                                             </span>
                                         @endif
                                     </td>
@@ -194,16 +194,16 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         @if($user->deleted_by === 'Self')
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
-                                                <i class="fas fa-user mr-1"></i>Self
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200">
+                                                <i aria-hidden="true" class="fas fa-user mr-1"></i>Self
                                             </span>
                                         @elseif($user->deleted_by === 'System')
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-                                                <i class="fas fa-robot mr-1"></i>System
+                                                <i aria-hidden="true" class="fas fa-robot mr-1"></i>System
                                             </span>
                                         @elseif($user->deleted_by)
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200" title="Deleted by admin: {{ $user->deleted_by }}">
-                                                <i class="fas fa-user-shield mr-1"></i>{{ $user->deleted_by }}
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-warning-100 dark:bg-warning-900 text-warning-800 dark:text-warning-200" title="Deleted by admin: {{ $user->deleted_by }}">
+                                                <i aria-hidden="true" class="fas fa-user-shield mr-1"></i>{{ $user->deleted_by }}
                                             </span>
                                         @else
                                             <span class="text-gray-400 dark:text-gray-500">N/A</span>
@@ -212,29 +212,29 @@
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         @if($user->gdpr_erasure_request_id)
                                             <a href="{{ route('admin.gdpr-requests.show', $user->gdpr_erasure_request_id) }}" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-teal-100 dark:bg-teal-900 text-teal-800 dark:text-teal-200 hover:bg-teal-200 dark:hover:bg-teal-800" title="View completed GDPR erasure request #{{ $user->gdpr_erasure_request_id }}">
-                                                <i class="fas fa-shield-alt mr-1"></i>GDPR
+                                                <i aria-hidden="true" class="fas fa-shield-alt mr-1"></i>GDPR
                                             </a>
                                         @else
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
-                                                <i class="fas fa-minus mr-1"></i>No
+                                                <i aria-hidden="true" class="fas fa-minus mr-1"></i>No
                                             </span>
                                         @endif
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <div class="flex gap-2">
-                                            <button type="button"
-                                                    class="restore-user-btn text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300 bg-transparent border-0 p-0 cursor-pointer"
+                                            <button aria-label="Restore User" type="button"
+                                                    class="restore-user-btn text-success-600 dark:text-success-400 hover:text-success-900 dark:hover:text-success-300 bg-transparent border-0 p-0 cursor-pointer"
                                                     title="Restore User"
                                                     data-user-id="{{ $user->id }}"
                                                     data-username="{{ $user->username }}">
-                                                <i class="fas fa-undo"></i>
+                                                <i aria-hidden="true" class="fas fa-undo"></i>
                                             </button>
-                                            <button type="button"
+                                            <button aria-label="Permanently Delete" type="button"
                                                     class="delete-user-btn text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 bg-transparent border-0 p-0 cursor-pointer"
                                                     title="Permanently Delete"
                                                     data-user-id="{{ $user->id }}"
                                                     data-username="{{ $user->username }}">
-                                                <i class="fas fa-trash-alt"></i>
+                                                <i aria-hidden="true" class="fas fa-trash-alt"></i>
                                             </button>
                                         </div>
                                     </td>

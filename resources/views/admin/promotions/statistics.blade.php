@@ -32,8 +32,8 @@
                     <input type="date" name="end_date" value="{{ formatDate($endDate) }}" class="form-input rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200">
                 </div>
                 <div>
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                        <i class="fas fa-filter mr-2"></i>Apply
+                    <button type="submit" class="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent-hover">
+                        <i aria-hidden="true" class="fas fa-filter mr-2"></i>Apply
                     </button>
                 </div>
             </div>
@@ -44,8 +44,8 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-6">
         <x-admin.card class="p-6">
             <div class="flex items-center">
-                <div class="shrink-0 bg-blue-100 dark:bg-blue-900 rounded-full p-3">
-                    <i class="fas fa-gift text-2xl text-blue-600 dark:text-blue-400"></i>
+                <div class="shrink-0 bg-primary-100 dark:bg-primary-900 rounded-full p-3">
+                    <i aria-hidden="true" class="fas fa-gift text-2xl text-link dark:text-primary-400"></i>
                 </div>
                 <div class="ml-4">
                     <p class="text-sm text-gray-500 dark:text-gray-400">Total Promotions</p>
@@ -56,8 +56,8 @@
 
         <x-admin.card class="p-6">
             <div class="flex items-center">
-                <div class="shrink-0 bg-green-100 dark:bg-green-900 rounded-full p-3">
-                    <i class="fas fa-check-circle text-2xl text-green-600 dark:text-green-400"></i>
+                <div class="shrink-0 bg-success-100 dark:bg-success-900 rounded-full p-3">
+                    <i aria-hidden="true" class="fas fa-check-circle text-2xl text-success-600 dark:text-success-400"></i>
                 </div>
                 <div class="ml-4">
                     <p class="text-sm text-gray-500 dark:text-gray-400">Active Promotions</p>
@@ -69,7 +69,7 @@
         <x-admin.card class="p-6">
             <div class="flex items-center">
                 <div class="shrink-0 bg-purple-100 dark:bg-purple-900 rounded-full p-3">
-                    <i class="fas fa-arrow-up text-2xl text-purple-600 dark:text-purple-400"></i>
+                    <i aria-hidden="true" class="fas fa-arrow-up text-2xl text-purple-600 dark:text-purple-400"></i>
                 </div>
                 <div class="ml-4">
                     <p class="text-sm text-gray-500 dark:text-gray-400">Total Applications</p>
@@ -80,8 +80,8 @@
 
         <x-admin.card class="p-6">
             <div class="flex items-center">
-                <div class="shrink-0 bg-yellow-100 dark:bg-yellow-900 rounded-full p-3">
-                    <i class="fas fa-users text-2xl text-yellow-600 dark:text-yellow-400"></i>
+                <div class="shrink-0 bg-warning-100 dark:bg-warning-900 rounded-full p-3">
+                    <i aria-hidden="true" class="fas fa-users text-2xl text-warning-600 dark:text-warning-400"></i>
                 </div>
                 <div class="ml-4">
                     <p class="text-sm text-gray-500 dark:text-gray-400">Unique Users</p>
@@ -93,7 +93,7 @@
         <x-admin.card class="p-6">
             <div class="flex items-center">
                 <div class="shrink-0 bg-red-100 dark:bg-red-900 rounded-full p-3">
-                    <i class="fas fa-calendar-plus text-2xl text-red-600 dark:text-red-400"></i>
+                    <i aria-hidden="true" class="fas fa-calendar-plus text-2xl text-red-600 dark:text-red-400"></i>
                 </div>
                 <div class="ml-4">
                     <p class="text-sm text-gray-500 dark:text-gray-400">Total Days Added</p>
@@ -108,7 +108,7 @@
         <x-admin.card>
             <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                 <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
-                    <i class="fas fa-trophy mr-2 text-yellow-500"></i>Top Promotions by Usage
+                    <i aria-hidden="true" class="fas fa-trophy mr-2 text-amber-500"></i>Top Promotions by Usage
                 </h2>
             </div>
             <div class="p-6">
@@ -121,11 +121,11 @@
                                 <div class="flex-1">
                                     <h3 class="font-semibold text-gray-800 dark:text-gray-200">{{ $promotion->name }}</h3>
                                     <div class="flex gap-4 mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                        <span><i class="fas fa-arrow-up mr-1"></i>{{ $promotion->statistics_count }} applications</span>
-                                        <span><i class="fas fa-calendar mr-1"></i>{{ $promotion->additional_days }} days</span>
+                                        <span><i aria-hidden="true" class="fas fa-arrow-up mr-1"></i>{{ $promotion->statistics_count }} applications</span>
+                                        <span><i aria-hidden="true" class="fas fa-calendar mr-1"></i>{{ $promotion->additional_days }} days</span>
                                     </div>
                                 </div>
-                                <a href="{{ route('admin.promotions.show-statistics', $promotion->id) }}" class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">
+                                <a href="{{ route('admin.promotions.show-statistics', $promotion->id) }}" class="px-3 py-1 bg-accent text-white text-sm rounded hover:bg-accent-hover">
                                     View Details
                                 </a>
                             </div>
@@ -139,7 +139,7 @@
         <x-admin.card>
             <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                 <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
-                    <i class="fas fa-user-tag mr-2"></i>Statistics by Role
+                    <i aria-hidden="true" class="fas fa-user-tag mr-2"></i>Statistics by Role
                 </h2>
             </div>
             <div class="p-6">
@@ -178,18 +178,18 @@
     <x-admin.card>
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
-                <i class="fas fa-list mr-2"></i>All Promotions Statistics
+                <i aria-hidden="true" class="fas fa-list mr-2"></i>All Promotions Statistics
             </h2>
         </div>
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead class="bg-gray-50 dark:bg-gray-900">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Promotion</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Applications</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Days/Application</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+                        <x-admin.th>Promotion</x-admin.th>
+                        <x-admin.th>Applications</x-admin.th>
+                        <x-admin.th>Days/Application</x-admin.th>
+                        <x-admin.th>Status</x-admin.th>
+                        <x-admin.th>Actions</x-admin.th>
                     </tr>
                 </thead>
                 <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -211,8 +211,8 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @if($promotion->is_active && $promotion->isCurrentlyActive())
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-                                        <i class="fas fa-check mr-1"></i>Active
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200">
+                                        <i aria-hidden="true" class="fas fa-check mr-1"></i>Active
                                     </span>
                                 @else
                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
@@ -221,8 +221,8 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <a href="{{ route('admin.promotions.show-statistics', $promotion->id) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">
-                                    View Details <i class="fas fa-arrow-right ml-1"></i>
+                                <a href="{{ route('admin.promotions.show-statistics', $promotion->id) }}" class="text-link dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300">
+                                    View Details <i aria-hidden="true" class="fas fa-arrow-right ml-1"></i>
                                 </a>
                             </td>
                         </tr>
@@ -242,18 +242,18 @@
     <x-admin.card class="mt-6">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
-                <i class="fas fa-clock mr-2"></i>Recent Promotion Activity
+                <i aria-hidden="true" class="fas fa-clock mr-2"></i>Recent Promotion Activity
             </h2>
         </div>
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead class="bg-gray-50 dark:bg-gray-900">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">User</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Promotion</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Role</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Days Added</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Applied At</th>
+                        <x-admin.th>User</x-admin.th>
+                        <x-admin.th>Promotion</x-admin.th>
+                        <x-admin.th>Role</x-admin.th>
+                        <x-admin.th>Days Added</x-admin.th>
+                        <x-admin.th>Applied At</x-admin.th>
                     </tr>
                 </thead>
                 <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -266,7 +266,7 @@
                                 {{ $activity->promotion->name ?? 'Unknown Promotion' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                <span class="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded text-xs">
+                                <span class="px-2 py-1 bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 rounded text-xs">
                                     {{ $activity->role->name ?? 'Unknown Role' }}
                                 </span>
                             </td>

@@ -86,8 +86,8 @@ Alpine.data('adminGroups', () => ({
                 if (cell && data.newStatus !== undefined) {
                     const active = data.newStatus == 1;
                     cell.innerHTML = active
-                        ? '<button type="button" data-action="toggle-group-status" data-group-id="' + id + '" data-status="0" class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 hover:bg-green-200"><i class="fa fa-check-circle mr-1"></i>Active</button>'
-                        : '<button type="button" data-action="toggle-group-status" data-group-id="' + id + '" data-status="1" class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-200"><i class="fa fa-times-circle mr-1"></i>Inactive</button>';
+                        ? '<button type="button" data-action="toggle-group-status" data-group-id="' + id + '" data-status="0" class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-success-100 text-success-800 hover:bg-success-200"><i aria-hidden="true" class="fa-solid fa-check-circle mr-1"></i>Active</button>'
+                        : '<button type="button" data-action="toggle-group-status" data-group-id="' + id + '" data-status="1" class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-200"><i aria-hidden="true" class="fa-solid fa-times-circle mr-1"></i>Inactive</button>';
                 }
                 showToast(data.message || 'Group status updated', 'success');
             } else showToast(data.message || 'Error', 'error');
@@ -101,8 +101,8 @@ Alpine.data('adminGroups', () => ({
                 if (cell && data.newStatus !== undefined) {
                     const en = data.newStatus == 1;
                     cell.innerHTML = en
-                        ? '<button type="button" data-action="toggle-backfill" data-group-id="' + id + '" data-status="0" class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 hover:bg-blue-200"><i class="fa fa-check-circle mr-1"></i>Enabled</button>'
-                        : '<button type="button" data-action="toggle-backfill" data-group-id="' + id + '" data-status="1" class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-200"><i class="fa fa-times-circle mr-1"></i>Disabled</button>';
+                        ? '<button type="button" data-action="toggle-backfill" data-group-id="' + id + '" data-status="0" class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-primary-100 text-primary-800 hover:bg-primary-200"><i aria-hidden="true" class="fa-solid fa-check-circle mr-1"></i>Enabled</button>'
+                        : '<button type="button" data-action="toggle-backfill" data-group-id="' + id + '" data-status="1" class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-200"><i aria-hidden="true" class="fa-solid fa-times-circle mr-1"></i>Disabled</button>';
                 }
                 showToast(data.message || 'Backfill status updated', 'success');
             } else showToast(data.message || 'Error', 'error');

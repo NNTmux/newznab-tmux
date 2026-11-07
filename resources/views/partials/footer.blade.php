@@ -12,11 +12,11 @@
         </div>
 
         <div class="flex items-center gap-3">
-            <a href="https://github.com/NNTmux/newznab-tmux" class="text-gray-300 dark:text-gray-400 hover:text-white transition" title="GitHub">
-                <i class="fab fa-github text-lg"></i>
+            <a aria-label="GitHub" href="https://github.com/NNTmux/newznab-tmux" class="text-gray-300 dark:text-gray-400 hover:text-white transition" title="GitHub">
+                <i aria-hidden="true" class="fab fa-github text-lg"></i>
             </a>
-            <a href="{{ url('/rss') }}" class="text-gray-300 dark:text-gray-400 hover:text-white transition" title="RSS Feeds">
-                <i class="fas fa-rss text-lg"></i>
+            <a aria-label="RSS Feeds" href="{{ url('/rss') }}" class="text-gray-300 dark:text-gray-400 hover:text-white transition" title="RSS Feeds">
+                <i aria-hidden="true" class="fas fa-rss text-lg"></i>
             </a>
         </div>
     </div>

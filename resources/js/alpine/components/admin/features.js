@@ -40,7 +40,7 @@ Alpine.data('tinyMceEditor', () => ({
                 if (ta.parentElement) {
                     const err = document.createElement('div');
                     err.className = 'mt-2 p-3 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 text-red-800 dark:text-red-200 rounded';
-                    err.innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i>TinyMCE editor failed to load.';
+                    err.innerHTML = '<i aria-hidden="true" class="fas fa-exclamation-triangle mr-2"></i>TinyMCE editor failed to load.';
                     ta.parentElement.insertBefore(err, ta.nextSibling);
                 }
             });
@@ -192,10 +192,10 @@ Alpine.data('adminUserEdit', () => ({
         display.textContent = d.toLocaleDateString('en-US', { weekday:'short', year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' });
         preview.classList.remove('hidden');
         const diff = d - new Date();
-        display.classList.remove('text-red-600','dark:text-red-400','text-yellow-600','dark:text-yellow-400','text-blue-600','dark:text-blue-400');
+        display.classList.remove('text-red-600','dark:text-red-400','text-warning-600','dark:text-warning-400','text-link','dark:text-primary-400');
         if (diff < 0) display.classList.add('text-red-600','dark:text-red-400');
-        else if (diff < 7*24*60*60*1000) display.classList.add('text-yellow-600','dark:text-yellow-400');
-        else display.classList.add('text-blue-600','dark:text-blue-400');
+        else if (diff < 7*24*60*60*1000) display.classList.add('text-warning-600','dark:text-warning-400');
+        else display.classList.add('text-link','dark:text-primary-400');
     }
 }));
 
@@ -517,8 +517,8 @@ Alpine.data('myMovies', () => ({
             }).then(function(r) { return r.json(); }).then(function(data) {
                 if (data.success) {
                     var row = contentToggle.closest('tr'), sc = row.cells[5], ns = data.status;
-                    if (ns === 1) { sc.innerHTML = '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100"><i class="fa fa-check mr-1"></i>Enabled</span>'; contentToggle.className = 'content-toggle-status text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300'; contentToggle.innerHTML = '<i class="fa fa-toggle-on"></i>'; }
-                    else { sc.innerHTML = '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100"><i class="fa fa-times mr-1"></i>Disabled</span>'; contentToggle.className = 'content-toggle-status text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300'; contentToggle.innerHTML = '<i class="fa fa-toggle-off"></i>'; }
+                    if (ns === 1) { sc.innerHTML = '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-100"><i aria-hidden="true" class="fa-solid fa-check mr-1"></i>Enabled</span>'; contentToggle.className = 'content-toggle-status text-success-600 dark:text-success-400 hover:text-success-900 dark:hover:text-success-300'; contentToggle.innerHTML = '<i aria-hidden="true" class="fa-solid fa-toggle-on"></i>'; }
+                    else { sc.innerHTML = '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100"><i aria-hidden="true" class="fa-solid fa-times mr-1"></i>Disabled</span>'; contentToggle.className = 'content-toggle-status text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300'; contentToggle.innerHTML = '<i aria-hidden="true" class="fa-solid fa-toggle-off"></i>'; }
                     contentToggle.setAttribute('data-current-status', ns); contentToggle.title = ns === 1 ? 'Disable' : 'Enable';
                     showToast(data.message, 'success');
                 } else showToast(data.message || 'Failed', 'error');

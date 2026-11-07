@@ -10,55 +10,55 @@
                         @foreach($releases as $release)
                             <div class="series-episode-card flex items-center gap-3 bg-gray-50 dark:bg-gray-900 rounded-lg p-3 hover:bg-gray-100 dark:hover:bg-gray-800">
                                 <div class="shrink-0">
-                                    <input type="checkbox" class="chkRelease rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400 dark:bg-gray-700" name="release[]" value="{{ $release->guid }}" @change="onCheckboxChange()">
+                                    <input aria-label="Select item" type="checkbox" class="chkRelease rounded border-gray-300 dark:border-gray-600 text-link dark:text-primary-500 focus:ring-primary-500 dark:focus:ring-primary-400 dark:bg-gray-700" name="release[]" value="{{ $release->guid }}" @change="onCheckboxChange()">
                                 </div>
                                 <div class="flex-1">
                                     <div class="flex items-center gap-2 flex-wrap">
                                         <a href="{{ url('/details/' . $release->guid) }}"
-                                           class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium wrap-break-word break-all">
+                                           class="text-link dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 font-medium wrap-break-word break-all">
                                             {{ $release->searchname }}
                                         </a>
                                         @if(($release->failed_count ?? 0) > 0)
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800"
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-200"
                                                   title="{{ $release->failed_count }} user(s) reported download failure">
-                                                <i class="fas fa-exclamation-triangle mr-1"></i> Failed ({{ $release->failed_count }})
+                                                <i aria-hidden="true" class="fas fa-exclamation-triangle mr-1"></i> Failed ({{ $release->failed_count }})
                                             </span>
                                         @endif
                                     </div>
                                     <div class="text-xs text-gray-500 mt-1 flex flex-wrap gap-2">
                                         <span class="mr-3">
-                                            <i class="fa fa-hdd-o mr-1"></i>{{ formatBytes($release->size) }}
+                                            <i aria-hidden="true" class="fa-regular fa-hard-drive mr-1"></i>{{ formatBytes($release->size) }}
                                         </span>
                                         <span>
-                                            <i class="fa fa-clock-o mr-1"></i>Added: {{ userDateDiffForHumans($release->adddate) }}
+                                            <i aria-hidden="true" class="fa-regular fa-clock mr-1"></i>Added: {{ userDateDiffForHumans($release->adddate) }}
                                         </span>
                                         @if(!empty($release->postdate))
                                             <span>
-                                                <i class="fas fa-calendar mr-1"></i> Posted: {{ userDate($release->postdate, 'M d, Y H:i') }}
+                                                <i aria-hidden="true" class="fas fa-calendar mr-1"></i> Posted: {{ userDate($release->postdate, 'M d, Y H:i') }}
                                             </span>
                                         @endif
                                         @if(!empty($release->fromname))
                                             <span class="inline-flex items-center px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 font-mono">
-                                                <i class="fas fa-user mr-1"></i>{{ $release->fromname }}
+                                                <i aria-hidden="true" class="fas fa-user mr-1"></i>{{ $release->fromname }}
                                             </span>
                                         @endif
                                     </div>
                                 </div>
                                 <div class="flex gap-2">
-                                    <a href="{{ url('/getnzb?id=' . $release->guid) }}"
-                                       class="download-nzb px-3 py-1 bg-green-600 dark:bg-green-700 text-white rounded hover:bg-green-700 dark:hover:bg-green-800 text-sm"
+                                    <a aria-label="Download NZB" href="{{ url('/getnzb?id=' . $release->guid) }}"
+                                       class="download-nzb px-3 py-1 bg-success-600 dark:bg-success-700 text-white rounded hover:bg-success-700 dark:hover:bg-success-800 text-sm"
                                        title="Download NZB">
-                                        <i class="fa fa-download"></i>
+                                        <i aria-hidden="true" class="fa-solid fa-download"></i>
                                     </a>
-                                    <a href="{{ url('/details/' . $release->guid) }}"
-                                       class="px-3 py-1 bg-blue-600 dark:bg-blue-700 text-white rounded hover:bg-blue-700 dark:hover:bg-blue-800 text-sm"
+                                    <a aria-label="View Details" href="{{ url('/details/' . $release->guid) }}"
+                                       class="px-3 py-1 bg-accent dark:bg-accent-hover text-white rounded hover:bg-accent-hover dark:hover:bg-primary-800 text-sm"
                                        title="View Details">
-                                        <i class="fa fa-info-circle"></i>
+                                        <i aria-hidden="true" class="fa-solid fa-info-circle"></i>
                                     </a>
-                                    <a href="#" class="add-to-cart px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-300 text-sm"
+                                    <a aria-label="Add to cart" href="#" class="add-to-cart px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-300 text-sm"
                                        data-guid="{{ $release->guid }}"
                                        title="Add to cart">
-                                        <i class="icon_cart fa fa-shopping-basket"></i>
+                                        <i aria-hidden="true" class="icon_cart fa-solid fa-shopping-basket"></i>
                                     </a>
                                 </div>
                             </div>
@@ -68,8 +68,8 @@
             @endforeach
         </div>
     @empty
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-blue-800">
-            <i class="fa fa-info-circle mr-2"></i>
+        <div class="bg-primary-50 dark:bg-primary-950/40 border border-primary-200 rounded-lg p-4 text-primary-800 dark:text-primary-200">
+            <i aria-hidden="true" class="fa-solid fa-info-circle mr-2"></i>
             No releases found on this page for the selected season.
         </div>
     @endforelse

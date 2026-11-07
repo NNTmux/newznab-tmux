@@ -7,14 +7,13 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     {{-- Apply dark mode BEFORE any CSS loads to prevent white flash --}}
-    @include('partials.theme-init')
+    @include('partials.theme-init', ['adminRail' => true])
 
     <title>{{ $meta_title ?? 'Admin' }} - {{ config('app.name') }}</title>
 
     <meta name="description" content="{{ $meta_description ?? 'Admin panel' }}">
 
-    <!-- Dark Mode - Set via meta tag for CSP compliance -->
-    <meta name="theme-preference" content="{{ $userTheme }}">
+    @include('partials.theme-meta')
 
     <!-- TinyMCE API Key -->
     <meta name="tinymce-api-key" content="{{ config('tinymce.api_key', 'no-api-key') }}">
@@ -38,9 +37,9 @@
                     <span class="layout-sidebar__logo flex h-11 w-11 shrink-0 items-center justify-center rounded-xl">
                         <x-site-logo :url="$siteLogoUrl ?? null" fallback-icon="fas fa-sliders" />
                     </span>
-                    <span class="min-w-0">
+                    <span class="layout-sidebar__brand-name min-w-0">
                         <span class="block truncate text-lg font-semibold">Admin Panel</span>
-                        <span class="block text-xs font-medium text-white/55">Operations workspace</span>
+                        <span class="block text-xs font-medium text-white/65">Operations workspace</span>
                     </span>
                 </a>
                 <button type="button" id="mobile-sidebar-close" class="touch-target inline-flex items-center justify-center rounded-xl text-white/70 hover:bg-white/10 hover:text-white md:hidden" aria-label="Close admin navigation">
@@ -63,16 +62,33 @@
                         <button id="mobile-sidebar-toggle" type="button" class="touch-target inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 text-white/80 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 md:hidden" aria-label="Open admin navigation" aria-controls="sidebar" aria-expanded="false">
                             <i class="fas fa-bars" aria-hidden="true"></i>
                         </button>
+                        <button id="admin-sidebar-collapse" type="button" x-data="adminSidebarRail" @click="toggle()" :aria-pressed="collapsed ? 'true' : 'false'"
+                                class="touch-target hidden items-center justify-center rounded-xl border border-white/10 bg-white/5 text-white/80 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 md:inline-flex"
+                                aria-controls="sidebar" aria-label="Collapse admin navigation" title="Collapse or expand the navigation">
+                            <i class="fa-solid fa-angles-left transition-transform" :class="collapsed ? 'rotate-180' : ''" aria-hidden="true"></i>
+                        </button>
+                        @php
+                            $adminCrumbs = $adminTrail ?? [];
+                            $adminHeading = $page_title ?? (end($adminCrumbs) ?: 'Dashboard');
+                        @endphp
                         <div class="min-w-0">
-                            <p class="text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-white/45">Administration</p>
-                            <p class="truncate text-sm font-semibold text-white sm:text-base">{{ $page_title ?? 'Dashboard' }}</p>
+                            <nav aria-label="Breadcrumb">
+                                <ol class="flex min-w-0 items-center gap-1.5 text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-white/65">
+                                    <li><a href="{{ route('admin.index') }}" class="rounded hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400">Admin</a></li>
+                                    @foreach(array_slice($adminCrumbs, 0, -1) as $crumb)
+                                        <li aria-hidden="true">/</li>
+                                        <li class="truncate">{{ $crumb }}</li>
+                                    @endforeach
+                                </ol>
+                            </nav>
+                            <p class="truncate text-sm font-semibold text-white sm:text-base">{{ $adminHeading }}</p>
                         </div>
                     </div>
                     <div class="layout-topbar__tools flex items-center gap-1 rounded-2xl border border-white/10 bg-white/5 p-1 shadow-sm backdrop-blur-sm sm:gap-2">
                         <button id="theme-toggle" class="touch-target flex items-center gap-2 rounded-xl px-3 py-2 text-gray-100 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400"
                                 title="{{ ucfirst($userTheme) }} Mode"
                                 aria-label="Change theme. Current theme: {{ $userTheme }}">
-                            <i id="theme-icon" class="fas
+                            <i aria-hidden="true" id="theme-icon" class="fas
                                 @if($userTheme === 'dark')
                                     fa-moon
                                 @elseif($userTheme === 'system')
@@ -102,25 +118,7 @@
 
             <!-- Page Content - Scrollable Area -->
             <main id="main-content" class="app-view-stack app-view-stack--admin layout-main flex-1 overflow-y-auto p-3 sm:p-5 lg:p-6" data-scroll-container tabindex="-1">
-                @unless(trim($__env->yieldContent('suppress_layout_flash')))
-                    @if(session('success'))
-                        <div class="layout-flash layout-flash--success mb-5" role="status">
-                            <i class="fas fa-circle-check" aria-hidden="true"></i><div>{{ session('success') }}</div>
-                        </div>
-                    @endif
-
-                    @if(session('error'))
-                        <div class="layout-flash layout-flash--error mb-5" role="alert">
-                            <i class="fas fa-circle-exclamation" aria-hidden="true"></i><div>{{ session('error') }}</div>
-                        </div>
-                    @endif
-
-                    @if(session('warning'))
-                        <div class="layout-flash layout-flash--warning mb-5" role="status">
-                            <i class="fas fa-triangle-exclamation" aria-hidden="true"></i><div>{{ session('warning') }}</div>
-                        </div>
-                    @endif
-                @endunless
+                {{-- Flash messages are shown as toasts (partials.toast-notifications). --}}
 
                 @yield('content')
             </main>

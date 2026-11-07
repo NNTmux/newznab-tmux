@@ -136,10 +136,17 @@ final class AdminSettingsControllerTest extends TestCase
                 ->getContent();
 
             foreach ($booleanFields as $field) {
+                // Booleans render as switches: a hidden "0" plus an unchecked role="switch" checkbox.
+                $this->assertStringContainsString('<input type="hidden" name="'.$field->column.'" value="0">', $markup);
                 $this->assertMatchesRegularExpression(
-                    '/<select[^>]*id="'.preg_quote($field->column, '/').'"[^>]*>.*?<option value="0" selected>Disabled<\/option>.*?<\/select>/s',
+                    '/<input type="checkbox" role="switch" id="'.preg_quote($field->column, '/').'" name="'.preg_quote($field->column, '/').'" value="1"\s*(?!checked)[^>]*>/',
                     $markup,
-                    "{$domain->value}.{$field->column} did not render Disabled as selected.",
+                    "{$domain->value}.{$field->column} did not render as a switch.",
+                );
+                $this->assertDoesNotMatchRegularExpression(
+                    '/<input type="checkbox" role="switch" id="'.preg_quote($field->column, '/').'"[^>]*\bchecked\b/',
+                    $markup,
+                    "{$domain->value}.{$field->column} did not render Disabled as switched off.",
                 );
             }
         }
@@ -303,6 +310,17 @@ final class AdminSettingsControllerTest extends TestCase
         $this->assertSame(2, (int) DB::table('post_processing_configurations')->value('post_threads'));
         $this->assertSame(LookupMode::Renamed, app(ConfigurationProvider::class)->metadata(fresh: true)->movieLookup);
         $this->assertSame(65, app(ConfigurationProvider::class)->metadata(fresh: true)->maxMoviesProcessed);
+    }
+
+    public function test_enabled_booleans_render_as_checked_switches_inside_titled_sections(): void
+    {
+        DB::table('site_configurations')->where('id', 1)->update(['trailers_display' => 1]);
+
+        $markup = $this->get(route('admin.settings.show', ['domain' => 'site']))->assertOk()->getContent();
+
+        $this->assertMatchesRegularExpression('/<input type="checkbox" role="switch" id="trailers_display"[^>]*\bchecked\b/', $markup);
+        $this->assertStringContainsString('>Trailers</h2>', $markup);
+        $this->assertStringContainsString('settings-page__action-bar surface-panel-alt sticky bottom-0', $markup);
     }
 
     public function test_legacy_nonzero_pane_modes_render_enabled_and_save_as_switches(): void

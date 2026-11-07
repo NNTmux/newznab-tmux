@@ -178,8 +178,25 @@ Alpine.data('adminMonitoring', () => ({
 
     tabClass(key) {
         return this.active === key
-            ? 'bg-blue-600 text-white shadow-sm'
-            : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600';
+            ? 'bg-accent text-on-accent shadow-raised'
+            : 'bg-surface-sunken text-fg hover:bg-surface-hover';
+    },
+
+    /** Arrow keys, Home and End move between dashboard tabs (WAI-ARIA tabs pattern). */
+    onTabKeydown(event) {
+        const tabs = Array.from(event.currentTarget.querySelectorAll('[role="tab"]'));
+        const current = tabs.indexOf(event.target);
+        if (current === -1) return;
+        const next = {
+            ArrowRight: (current + 1) % tabs.length,
+            ArrowLeft: (current - 1 + tabs.length) % tabs.length,
+            Home: 0,
+            End: tabs.length - 1,
+        }[event.key];
+        if (next === undefined) return;
+        event.preventDefault();
+        this.selectTab(tabs[next].dataset.tabKey);
+        tabs[next].focus();
     },
 
     selectTab(key) {

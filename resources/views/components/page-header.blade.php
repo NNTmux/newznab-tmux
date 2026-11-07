@@ -4,6 +4,7 @@
     'icon' => null,
     'eyebrow' => 'Explore',
     'current' => null,
+    'compactTitle' => false,
 ])
 
 <header {{ $attributes->merge(['class' => 'app-page-header workspace-hero relative mb-6 overflow-hidden rounded-2xl px-5 py-4 text-white shadow-lg sm:px-7 sm:py-5']) }}>
@@ -15,7 +16,7 @@
             <nav aria-label="Breadcrumb" class="mb-2 text-sm text-white/70">
                 <ol class="flex flex-wrap items-center gap-2">
                     <li><a href="{{ url('/') }}" class="rounded hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70">Home</a></li>
-                    <li aria-hidden="true"><i class="fas fa-chevron-right text-[0.65rem]"></i></li>
+                    <li aria-hidden="true"><i aria-hidden="true" class="fas fa-chevron-right text-[0.65rem]"></i></li>
                     <li aria-current="page" class="font-medium text-white">{{ $current ?? $title }}</li>
                 </ol>
             </nav>
@@ -28,7 +29,11 @@
                     @if($eyebrow)
                         <p class="mb-1 text-xs font-semibold uppercase tracking-[0.18em] text-white/65">{{ $eyebrow }}</p>
                     @endif
-                    <h1 class="break-words text-3xl font-bold tracking-tight text-white sm:text-4xl">{{ $title }}</h1>
+                    <h1 @class([
+                        'break-words font-bold tracking-tight text-white',
+                        'text-3xl sm:text-4xl' => ! $compactTitle,
+                        'text-xl sm:text-2xl [overflow-wrap:anywhere]' => $compactTitle,
+                    ])>{{ $title }}</h1>
                 </div>
             </div>
 

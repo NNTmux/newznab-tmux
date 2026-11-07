@@ -31,11 +31,13 @@ class ReleaseStat extends Model
             ->orderByDesc('count')
             ->get();
 
+        $current = [];
         foreach ($categories as $category) {
             // Build the category display name with root category prefix
             $categoryDisplay = $category->parent
                 ? $category->parent->title.' > '.$category->title
                 : $category->title;
+            $current[] = $categoryDisplay;
 
             // Check if we already have the information and if we do just update the count
             if (self::query()->where('category', $categoryDisplay)->exists()) {
@@ -45,6 +47,9 @@ class ReleaseStat extends Model
             }
             self::query()->create(['category' => $categoryDisplay, 'count' => $category->count]);
         }
+
+        // Categories with no releases in the past week no longer belong in the "recently added" list.
+        self::query()->whereNotIn('category', $current)->delete();
     }
 
     /**
@@ -52,6 +57,6 @@ class ReleaseStat extends Model
      */
     public static function getRecentlyAdded(): array
     {
-        return self::query()->select(['category', 'count'])->get()->toArray();
+        return self::query()->select(['category', 'count'])->orderByDesc('count')->orderBy('category')->get()->toArray();
     }
 }

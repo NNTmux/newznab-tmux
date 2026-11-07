@@ -101,6 +101,7 @@ class ConsoleController extends BasePageController
 
         $this->viewData = array_merge($this->viewData, [
             'catlist' => $ctmp,
+            'ordering' => $ordering,
             'category' => $category,
             'categorytitle' => $id,
             'platform' => $platform,

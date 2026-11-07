@@ -55,7 +55,7 @@
                 @endphp
                 <div class="surface-panel-alt rounded-lg p-6 border">
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
-                        <i class="fas fa-dragon mr-2 text-primary-600 dark:text-primary-400"></i>
+                        <i aria-hidden="true" class="fas fa-dragon mr-2 text-link dark:text-primary-400"></i>
                         @if($anidbMediaType === 'MANGA')
                             Manga Information
                         @else
@@ -98,7 +98,7 @@
                                     @if(!empty($anidbHashtag))
                                         <div class="text-sm text-gray-900 dark:text-gray-100">
                                             <span class="text-xs text-gray-500 dark:text-gray-400 font-normal mr-2">Hashtag:</span>
-                                            <span class="font-mono text-primary-600 dark:text-primary-400">{{ $anidbHashtag }}</span>
+                                            <span class="font-mono text-link dark:text-primary-400">{{ $anidbHashtag }}</span>
                                         </div>
                                     @endif
                                     @if(empty($anidbEnglishTitle) && empty($anidbOriginalTitle) && empty($anidbRomajiTitle) && !empty($anidbTitle))
@@ -188,7 +188,7 @@
                                 <dt class="text-sm font-medium text-gray-600 dark:text-gray-400">Rating</dt>
                                 <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100">
                                     <span class="inline-flex items-center">
-                                        <i class="fas fa-star text-yellow-500 dark:text-yellow-400 mr-1"></i>
+                                        <i aria-hidden="true" class="fas fa-star text-amber-500 dark:text-amber-400 mr-1"></i>
                                         @php
                                             $ratingValue = is_numeric($anidbRating) ? (float)$anidbRating : 0;
                                             // AniList rating is out of 100, convert to /10
@@ -230,12 +230,12 @@
                             <div class="flex flex-wrap gap-3">
                                 @if(!empty($anilistId))
                                     <a href="{{ $site->dereferrerLink ?? '' }}https://anilist.co/anime/{{ $anilistId }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-primary-100 text-primary-800 rounded-lg hover:bg-primary-200 transition dark:bg-primary-900/30 dark:text-primary-200 dark:hover:bg-primary-800/30">
-                                        <i class="fas fa-external-link-alt mr-2"></i> View on AniList
+                                        <i aria-hidden="true" class="fas fa-external-link-alt mr-2"></i> View on AniList
                                     </a>
                                 @endif
                                 @if(!empty($malId))
-                                    <a href="{{ $site->dereferrerLink ?? '' }}https://myanimelist.net/anime/{{ $malId }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200 transition">
-                                        <i class="fas fa-external-link-alt mr-2"></i> View on MyAnimeList
+                                    <a href="{{ $site->dereferrerLink ?? '' }}https://myanimelist.net/anime/{{ $malId }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-warning-100 dark:bg-warning-900/40 text-warning-800 dark:text-warning-200 rounded-lg hover:bg-warning-200 transition">
+                                        <i aria-hidden="true" class="fas fa-external-link-alt mr-2"></i> View on MyAnimeList
                                     </a>
                                 @endif
                             </div>

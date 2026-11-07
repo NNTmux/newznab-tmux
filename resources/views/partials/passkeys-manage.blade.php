@@ -26,7 +26,7 @@
     </p>
 
     <template x-if="!supported">
-        <div class="mt-4 rounded-lg border border-yellow-200 bg-yellow-50 p-3 text-sm text-yellow-800 dark:border-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-200">
+        <div class="mt-4 rounded-lg border border-warning-200 bg-warning-50 p-3 text-sm text-warning-800 dark:border-warning-700 dark:bg-warning-900/20 dark:text-warning-200">
             Your browser does not support passkeys.
         </div>
     </template>
@@ -50,13 +50,13 @@
                     <button
                         type="submit"
                         :disabled="busy || browserPasskeyBlocked()"
-                        class="rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-primary-700 dark:hover:bg-primary-800"
+                        class="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-60 dark:bg-accent-hover dark:hover:bg-primary-800"
                     >
-                        <i class="fas fa-plus mr-2"></i>
+                        <i aria-hidden="true" class="fas fa-plus mr-2"></i>
                         <span x-text="busy ? 'Creating...' : 'Create browser/app passkey'"></span>
                     </button>
                 </div>
-                <p x-show="browserPasskeyNotice()" x-text="browserPasskeyNotice()" x-cloak class="text-xs text-yellow-700 dark:text-yellow-300">
+                <p x-show="browserPasskeyNotice()" x-text="browserPasskeyNotice()" x-cloak class="text-xs text-warning-700 dark:text-warning-300">
                 </p>
                 <button
                     type="button"
@@ -64,13 +64,13 @@
                     :disabled="busy || !name"
                     class="inline-flex items-center rounded-lg border border-gray-300 px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
                 >
-                    <i class="fas fa-key mr-2"></i>
+                    <i aria-hidden="true" class="fas fa-key mr-2"></i>
                     Use USB security key
                 </button>
             </form>
 
             <p x-show="error" x-text="error" class="text-sm text-red-600 dark:text-red-400"></p>
-            <p x-show="success" x-text="success" class="text-sm text-green-600 dark:text-green-400"></p>
+            <p x-show="success" x-text="success" class="text-sm text-success-600 dark:text-success-400"></p>
 
             <template x-if="passkeys.length === 0">
                 <div class="rounded-lg border border-dashed border-gray-300 p-4 text-sm text-gray-600 dark:border-gray-600 dark:text-gray-300">

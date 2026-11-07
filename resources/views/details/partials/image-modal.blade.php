@@ -1,8 +1,8 @@
 <!-- Image Modal -->
 <div id="imageModal" class="image-modal-backdrop hidden modal-hidden">
     <div class="image-modal-container">
-        <button type="button" class="image-modal-close" data-close-image-modal>
-            <i class="fas fa-times"></i>
+        <button aria-label="Close" type="button" class="image-modal-close" data-close-image-modal>
+            <i aria-hidden="true" class="fas fa-times"></i>
         </button>
         <div class="text-center">
             <h3 id="imageModalTitle" class="text-white text-xl font-semibold mb-4 drop-shadow-lg"></h3>

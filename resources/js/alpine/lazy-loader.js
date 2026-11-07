@@ -16,6 +16,7 @@ import Alpine from '@alpinejs/csp';
 const lazyComponentMap = {
     // --- Components only needed on specific pages ---
     'adminSubmenu':    () => import('./components/admin-submenu.js'),
+    'adminSidebarRail': () => import('./components/admin/sidebar-rail.js'),
     'passwordToggle':  () => import('./components/password-toggle.js'),
 
     // --- Modal components (only on release pages) ---

@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace App\View\Composers;
 
+use App\Enums\ColorScheme;
+use App\Enums\ThemePreference;
 use App\Models\User;
 use App\Services\Configuration\ConfigurationProvider;
 use App\Services\SiteLogoService;
+use App\Support\Navigation\AdminNavigation;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
@@ -27,6 +30,8 @@ class AdminDataComposer
         $site = $this->configuration->site();
 
         $view->with([
+            'adminNav' => AdminNavigation::forRequest(request()),
+            'adminTrail' => AdminNavigation::trailFor(request()),
             'serverroot' => url('/'),
             'site' => $site,
             'siteLogoUrl' => $this->siteLogoService->url($site->logoPath),
@@ -34,8 +39,8 @@ class AdminDataComposer
             'loggedin' => $user !== null,
             'isadmin' => $isNntmuxUser && $user->hasRole('Admin'),
             'ismod' => $isNntmuxUser && $user->hasRole('Moderator'),
-            'userTheme' => $isNntmuxUser ? ($user->theme_preference ?? 'light') : 'light',
-            'userColorScheme' => $isNntmuxUser ? ($user->color_scheme ?? 'blue') : 'blue',
+            'userTheme' => ThemePreference::fromPreference($isNntmuxUser ? $user->theme_preference : null)->value,
+            'userColorScheme' => ColorScheme::fromPreference($isNntmuxUser ? $user->color_scheme : null)->value,
         ]);
     }
 }

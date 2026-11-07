@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Enums\ColorScheme;
+use App\Enums\ThemePreference;
 use App\Http\Requests\UpdateThemeRequest;
 use App\Jobs\SendAccountDeletedEmail;
 use App\Models\Category;
@@ -166,7 +168,7 @@ class ProfileController extends BasePageController
                     // Update theme preference
                     if ($request->has('theme_preference')) {
                         $themeValue = $request->input('theme_preference');
-                        if (in_array($themeValue, ['light', 'dark', 'system'], true)) {
+                        if (ThemePreference::tryFrom((string) $themeValue) !== null) {
                             User::where('id', $userid)->update(['theme_preference' => $themeValue]);
                         }
                     }
@@ -174,7 +176,7 @@ class ProfileController extends BasePageController
                     // Update color scheme
                     if ($request->has('color_scheme')) {
                         $schemeValue = $request->input('color_scheme');
-                        if (in_array($schemeValue, ['blue', 'indigo', 'cyan', 'teal', 'emerald', 'violet', 'pink', 'rose', 'red', 'orange', 'amber'], true)) {
+                        if (ColorScheme::tryFrom((string) $schemeValue) !== null) {
                             User::where('id', $userid)->update(['color_scheme' => $schemeValue]);
                         }
                     }

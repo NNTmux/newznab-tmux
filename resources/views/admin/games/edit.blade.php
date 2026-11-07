@@ -2,37 +2,17 @@
 
 @section('content')
 <div class="space-y-6">
+    <x-admin.page-header :title="$title" icon="fas fa-gamepad" />
     <x-admin.card>
-        <x-admin.page-header :title="$title" icon="fas fa-gamepad" />
 
         <!-- Success/Error/Warning Messages -->
-        @if(session('success'))
-            <div class="mx-6 mt-4 p-4 bg-green-50 dark:bg-green-900 border border-green-200 dark:border-green-700 rounded-lg">
-                <p class="text-green-800 dark:text-green-200">
-                    <i class="fas fa-check-circle mr-2"></i>{{ session('success') }}
-                </p>
-            </div>
-        @endif
 
-        @if(session('error'))
-            <div class="mx-6 mt-4 p-4 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-lg">
-                <p class="text-red-800 dark:text-red-200">
-                    <i class="fas fa-exclamation-circle mr-2"></i>{{ session('error') }}
-                </p>
-            </div>
-        @endif
 
-        @if(session('warning'))
-            <div class="mx-6 mt-4 p-4 bg-yellow-50 dark:bg-yellow-900 border border-yellow-200 dark:border-yellow-700 rounded-lg">
-                <p class="text-yellow-800 dark:text-yellow-200">
-                    <i class="fas fa-exclamation-triangle mr-2"></i>{{ session('warning') }}
-                </p>
-            </div>
-        @endif
 
         <!-- Edit Game Form -->
         <form method="POST" action="{{ url('admin/game-edit') }}" enctype="multipart/form-data" class="p-6">
             @csrf
+            <x-form-errors class="mb-6" />
             <input type="hidden" name="id" value="{{ $game['id'] }}">
             <input type="hidden" name="action" value="submit">
 
@@ -49,7 +29,7 @@
                                name="title"
                                value="{{ $game['title'] ?? '' }}"
                                required
-                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>
 
                     <!-- Publisher -->
@@ -61,7 +41,7 @@
                                id="publisher"
                                name="publisher"
                                value="{{ $game['publisher'] ?? '' }}"
-                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>
 
                     <!-- ASIN -->
@@ -73,7 +53,7 @@
                                id="asin"
                                name="asin"
                                value="{{ $game['asin'] ?? '' }}"
-                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>
 
                     <!-- URL -->
@@ -85,7 +65,7 @@
                                id="url"
                                name="url"
                                value="{{ $game['url'] ?? '' }}"
-                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>
 
                     <!-- Trailer URL -->
@@ -97,7 +77,7 @@
                                id="trailerurl"
                                name="trailerurl"
                                value="{{ $game['trailerurl'] ?? '' }}"
-                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>
                 </div>
 
@@ -110,7 +90,7 @@
                         </label>
                         <select id="genre"
                                 name="genre"
-                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
                             <option value="">-- Select Genre --</option>
                             @if(!empty($genres))
                                 @foreach($genres as $genreItem)
@@ -130,7 +110,7 @@
                         </label>
                         <select id="esrb"
                                 name="esrb"
-                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
                             <option value="">-- Select Rating --</option>
                             <option value="eC - Early Childhood" {{ (isset($game['esrb']) && $game['esrb'] == 'eC - Early Childhood') ? 'selected' : '' }}>eC - Early Childhood</option>
                             <option value="E - Everyone" {{ (isset($game['esrb']) && $game['esrb'] == 'E - Everyone') ? 'selected' : '' }}>E - Everyone</option>
@@ -151,7 +131,7 @@
                                id="releasedate"
                                name="releasedate"
                                value="{{ !empty($game['releasedate']) ? date('Y-m-d', $game['releasedate']) : '' }}"
-                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>
 
                     <!-- Cover Image -->
@@ -170,7 +150,7 @@
                                id="cover"
                                name="cover"
                                accept="image/jpeg,image/jpg"
-                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
                         <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
                             Upload a new cover image (JPG format)
                         </p>
@@ -182,12 +162,12 @@
                             Current Cover Status
                         </label>
                         @if(!empty($game['cover']) && $game['cover'] == 1)
-                            <span class="inline-flex items-center px-3 py-1 text-sm font-semibold rounded-full bg-green-100 text-green-800">
-                                <i class="fas fa-check mr-2"></i> Cover Available
+                            <span class="inline-flex items-center px-3 py-1 text-sm font-semibold rounded-full bg-success-100 dark:bg-success-900/40 text-success-800 dark:text-success-200">
+                                <i aria-hidden="true" class="fas fa-check mr-2"></i> Cover Available
                             </span>
                         @else
-                            <span class="inline-flex items-center px-3 py-1 text-sm font-semibold rounded-full bg-red-100 text-red-800">
-                                <i class="fas fa-times mr-2"></i> No Cover
+                            <span class="inline-flex items-center px-3 py-1 text-sm font-semibold rounded-full bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-200">
+                                <i aria-hidden="true" class="fas fa-times mr-2"></i> No Cover
                             </span>
                         @endif
                     </div>
@@ -196,11 +176,11 @@
 
             <!-- Action Buttons -->
             <div class="mt-8 flex gap-3 border-t border-gray-200 pt-6">
-                <button type="submit" class="px-6 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700">
-                    <i class="fas fa-save mr-2"></i>Save Changes
+                <button type="submit" class="px-6 py-2 bg-accent dark:bg-accent-hover text-white rounded-lg hover:bg-accent-hover">
+                    <i aria-hidden="true" class="fas fa-save mr-2"></i>Save Changes
                 </button>
                 <a href="{{ route('admin.game-list') }}" class="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
-                    <i class="fas fa-arrow-left mr-2"></i>Back to Game List
+                    <i aria-hidden="true" class="fas fa-arrow-left mr-2"></i>Back to Game List
                 </a>
             </div>
         </form>

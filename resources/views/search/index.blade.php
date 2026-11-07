@@ -5,13 +5,9 @@
 @endpush
 
 @section('content')
-<div class="surface-panel rounded-xl shadow-sm">
-    <x-breadcrumb :items="[
-        ['label' => 'Home', 'url' => url($site->homeLink ?? '/'), 'icon' => 'fas fa-home'],
-        ['label' => 'Search'],
-    ]" />
+<x-page-header title="Search Releases" description="Find exactly what you're looking for" icon="fas fa-search" />
 
-    <x-page-header title="Search Releases" description="Find exactly what you're looking for" icon="fas fa-search" />
+<div class="surface-panel rounded-xl shadow-sm">
 
     <!-- Search Form -->
     <form method="GET" action="{{ route('search') }}" class="px-6 pb-6" id="searchForm">
@@ -38,7 +34,7 @@
                     <div class="mt-2 text-sm">
                         <span class="text-gray-600 dark:text-gray-400">Did you mean: </span>
                         <a href="{{ route('search', array_merge(request()->except('search'), ['search' => $spellSuggestion])) }}"
-                           class="text-primary-600 dark:text-primary-400 hover:underline font-medium">
+                           class="text-link dark:text-primary-400 hover:underline font-medium">
                             {{ $spellSuggestion }}
                         </a>
                         <span class="text-gray-500 dark:text-gray-500">?</span>

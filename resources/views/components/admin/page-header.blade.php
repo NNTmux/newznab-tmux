@@ -1,27 +1,27 @@
-{{-- Admin page header with title, icon, optional subtitle and action buttons --}}
+{{-- Admin page title row: icon, title, optional subtitle and actions. Sits above the page's cards. --}}
 @props([
     'title',
     'icon' => null,
     'subtitle' => null,
 ])
 
-<header {{ $attributes->merge(['class' => 'admin-page-header workspace-page-header overflow-hidden rounded-2xl px-5 py-6 shadow-sm sm:px-7']) }}>
-    <div class="flex flex-wrap items-start justify-between gap-4">
-        <div class="min-w-0">
-            <h1 class="flex items-center gap-3 text-2xl font-semibold tracking-tight text-gray-950 dark:text-white">
-                @if($icon)
-                    <span class="admin-page-header__icon flex h-10 w-10 shrink-0 items-center justify-center rounded-xl" aria-hidden="true">
-                        <i class="{{ $icon }}"></i>
-                    </span>
-                @endif
-                <span class="break-words">{{ $title }}</span>
-            </h1>
-            @if($subtitle)
-                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ $subtitle }}</p>
+<header {{ $attributes->merge(['class' => 'admin-page-header workspace-page-header mb-5']) }}>
+    <div class="flex flex-wrap items-center justify-between gap-4">
+        <div class="flex min-w-0 items-center gap-3">
+            @if($icon)
+                <span class="admin-page-header__icon" aria-hidden="true">
+                    <i class="{{ $icon }}"></i>
+                </span>
             @endif
+            <div class="min-w-0">
+                <h1 class="break-words text-2xl font-semibold tracking-tight text-fg">{{ $title }}</h1>
+                @if($subtitle)
+                    <p class="mt-0.5 text-sm text-fg-muted">{{ $subtitle }}</p>
+                @endif
+            </div>
         </div>
         @if(isset($actions))
-            <div class="admin-page-header__actions flex flex-wrap gap-2">
+            <div class="admin-page-header__actions flex flex-wrap items-center gap-2">
                 {{ $actions }}
             </div>
         @endif

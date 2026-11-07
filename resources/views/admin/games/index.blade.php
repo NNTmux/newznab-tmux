@@ -2,33 +2,12 @@
 
 @section('content')
 <div class="space-y-6">
+    <x-admin.page-header :title="$title" icon="fas fa-gamepad" />
     <x-admin.card>
-        <x-admin.page-header :title="$title" icon="fas fa-gamepad" />
 
         <!-- Success/Error/Warning Messages -->
-        @if(session('success'))
-            <div class="mx-6 mt-4 p-4 bg-green-50 dark:bg-green-900 border border-green-200 dark:border-green-700 rounded-lg">
-                <p class="text-green-800 dark:text-green-200">
-                    <i class="fas fa-check-circle mr-2"></i>{{ session('success') }}
-                </p>
-            </div>
-        @endif
 
-        @if(session('error'))
-            <div class="mx-6 mt-4 p-4 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-lg">
-                <p class="text-red-800 dark:text-red-200">
-                    <i class="fas fa-exclamation-circle mr-2"></i>{{ session('error') }}
-                </p>
-            </div>
-        @endif
 
-        @if(session('warning'))
-            <div class="mx-6 mt-4 p-4 bg-yellow-50 dark:bg-yellow-900 border border-yellow-200 dark:border-yellow-700 rounded-lg">
-                <p class="text-yellow-800 dark:text-yellow-200">
-                    <i class="fas fa-exclamation-triangle mr-2"></i>{{ session('warning') }}
-                </p>
-            </div>
-        @endif
 
         <!-- Search Form -->
         <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
@@ -36,15 +15,15 @@
                 <div class="flex gap-2">
                     <div class="relative flex-1">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i class="fas fa-search text-gray-400"></i>
+                            <i aria-hidden="true" class="fas fa-search text-gray-400"></i>
                         </div>
                         <input type="text"
                                name="gamesearch"
                                value="{{ $lastSearch ?? '' }}"
                                placeholder="Search by game title..."
-                               class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                               class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>
-                    <button type="submit" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700">
+                    <button type="submit" class="px-4 py-2 bg-accent dark:bg-accent-hover text-white rounded-lg hover:bg-accent-hover">
                         Search
                     </button>
                     @if(!empty($lastSearch))
@@ -98,18 +77,18 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm">
                                     @if(!empty($game['cover']) && $game['cover'] == 1)
-                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                                            <i class="fas fa-check"></i> Yes
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-success-100 dark:bg-success-900/40 text-success-800 dark:text-success-200">
+                                            <i aria-hidden="true" class="fas fa-check"></i> Yes
                                         </span>
                                     @else
-                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
-                                            <i class="fas fa-times"></i> No
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-200">
+                                            <i aria-hidden="true" class="fas fa-times"></i> No
                                         </span>
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <a href="{{ url('admin/game-edit?id=' . $game['id']) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-900">
-                                        <i class="fas fa-edit"></i> Edit
+                                    <a href="{{ url('admin/game-edit?id=' . $game['id']) }}" class="text-link dark:text-primary-400 hover:text-primary-900">
+                                        <i aria-hidden="true" class="fas fa-edit"></i> Edit
                                     </a>
                                 </td>
                             </tr>

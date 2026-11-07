@@ -16,7 +16,8 @@ class GrabStat extends Model
     public static function insertTopGrabbers(): void
     {
         $users = User::query()->selectRaw('id, username, SUM(grabs) as grabs')->groupBy('id', 'username')->having('grabs', '>', 0)->orderByDesc('grabs')->limit(10)->get();
-        // Insert data into the grab_stats table
+        // Keep only the current top grabbers
+        self::query()->whereNotIn('username', $users->pluck('username')->all())->delete();
         foreach ($users as $user) {
             self::updateOrCreate(['username' => $user->username], ['grabs' => $user->grabs]);
         }

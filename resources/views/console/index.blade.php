@@ -5,53 +5,35 @@
 @endpush
 
 @section('content')
+@php
+    $consoleCategory = is_object($catname) ? $catname->title : ($catname ?: 'All consoles');
+@endphp
+<x-page-header title="Console" :current="$consoleCategory" eyebrow="Games and releases" description="Explore console titles and compare every indexed release in one place." icon="fas fa-gamepad">
+    <x-slot:stats>
+        <span class="workspace-hero__stat"><i class="fas fa-gamepad" aria-hidden="true"></i>{{ number_format($results->total()) }} releases</span>
+        <span class="workspace-hero__stat"><i class="fas fa-folder-open" aria-hidden="true"></i>{{ $consoleCategory }}</span>
+    </x-slot:stats>
+</x-page-header>
+
 <div class="surface-panel rounded-xl shadow-sm">
-    @php
-        $consoleCategory = is_object($catname) ? $catname->title : ($catname ?: 'All consoles');
-    @endphp
-    <x-page-header title="Console" :current="$consoleCategory" eyebrow="Games and releases" description="Explore console titles and compare every indexed release in one place." icon="fas fa-gamepad">
-        <x-slot:stats>
-            <span class="workspace-hero__stat"><i class="fas fa-gamepad" aria-hidden="true"></i>{{ number_format($results->total()) }} releases</span>
-            <span class="workspace-hero__stat"><i class="fas fa-folder-open" aria-hidden="true"></i>{{ $consoleCategory }}</span>
-        </x-slot:stats>
-    </x-page-header>
 
     @if($results->count() > 0)
         <form id="nzb_multi_operations_form" method="get" x-data="releaseMultiOps">
-            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-200">
-                <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-                    <!-- Left Section -->
-                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                        <x-view-toggle
-                            current-view="covers"
-                            covgroup="console"
-                            :category="$categorytitle ?? 'All'"
-                            parentcat="Console"
-                            :shows="false"
-                        />
-
-                        <div class="flex items-center gap-2">
-                            <small class="text-gray-600 dark:text-gray-400">With Selected:</small>
-                            <div class="flex gap-1">
-                                <button type="button" class="nzb_multi_operations_download px-3 py-1 bg-green-600 dark:bg-green-700 text-white rounded hover:bg-green-700 dark:hover:bg-green-800 transition text-sm" title="Download NZBs">
-                                    <i class="fa fa-cloud-download"></i>
-                                </button>
-                                <button type="button" class="nzb_multi_operations_cart px-3 py-1 bg-blue-600 dark:bg-blue-700 text-white rounded hover:bg-blue-700 dark:hover:bg-blue-800 transition text-sm" title="Send to Download Basket">
-                                    <i class="fa fa-shopping-basket"></i>
-                                </button>
-                                @if(isset($isadmin) && $isadmin)
-                                    <button type="button" class="nzb_multi_operations_edit px-3 py-1 bg-yellow-600 text-white rounded hover:bg-yellow-700 transition text-sm">Edit</button>
-                                    <button type="button" class="nzb_multi_operations_delete px-3 py-1 bg-red-600 dark:bg-red-700 text-white rounded hover:bg-red-700 dark:hover:bg-red-800 transition text-sm">Delete</button>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Right Section - Inline Search -->
-                    <div class="flex items-center">
-                        <x-inline-search placeholder="Search in Console..." :category="$category ?? null" />
-                    </div>
-                </div>
+            <div class="space-y-3 px-6 pt-4">
+                <x-cover-results-toolbar
+                    :results="$results"
+                    icon="fa-solid fa-gamepad"
+                    :title="$consoleCategory"
+                    covgroup="console"
+                    :category="$categorytitle ?? 'All'"
+                    parentcat="Console"
+                    search-placeholder="Search in Console..."
+                    :search-category="$category ?? null"
+                    total-label="releases"
+                    :category-items="\App\Support\Navigation\ListFilters::categoryItems($catlist ?? [], $category ?? null, route('Console'), 'All consoles', true)"
+                    :ordering="$ordering ?? null"
+                />
+                <x-release-bulk-actions />
             </div>
 
             <!-- Results Grid -->
@@ -79,14 +61,14 @@
                                             @if($totalFailed > 0)
                                                 <div class="absolute top-2 right-2">
                                                     <span class="px-2 py-1 bg-red-600 dark:bg-red-700 text-white text-xs rounded-full">
-                                                        <i class="fa fa-exclamation-circle mr-1"></i>{{ $totalFailed }} Failed
+                                                        <i aria-hidden="true" class="fa-solid fa-exclamation-circle mr-1"></i>{{ $totalFailed }} Failed
                                                     </span>
                                                 </div>
                                             @endif
                                         </a>
                                     @else
                                         <div class="w-32 h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                                            <i class="fas fa-gamepad text-gray-400 text-2xl"></i>
+                                            <i aria-hidden="true" class="fas fa-gamepad text-gray-400 text-2xl"></i>
                                         </div>
                                     @endif
                                 </div>
@@ -99,10 +81,10 @@
 
                                             <div class="flex items-center gap-4 mt-1 text-sm text-gray-600 dark:text-gray-400">
                                                 @if(isset($result->releasedate) && $result->releasedate != "")
-                                                    <span><i class="fas fa-calendar mr-1"></i> {{ \Carbon\Carbon::parse($result->releasedate)->format('Y') }}</span>
+                                                    <span><i aria-hidden="true" class="fas fa-calendar mr-1"></i> {{ \Carbon\Carbon::parse($result->releasedate)->format('Y') }}</span>
                                                 @endif
                                                 @if(isset($result->platform) && $result->platform != "")
-                                                    <span><i class="fas fa-gamepad mr-1"></i> {{ $result->platform }}</span>
+                                                    <span><i aria-hidden="true" class="fas fa-gamepad mr-1"></i> {{ $result->platform }}</span>
                                                 @endif
                                             </div>
 
@@ -128,7 +110,7 @@
                                                 <div class="mt-2">
                                                     <a target="_blank" href="{{ $site->dereferrerLink }}{{ $result->url }}"
                                                        title="View Game page" class="inline-flex items-center px-2 py-1 bg-gray-600 text-white text-xs rounded hover:bg-gray-700">
-                                                       <i class="fa fa-shopping-cart mr-1"></i>Source
+                                                       <i aria-hidden="true" class="fa-solid fa-shopping-cart mr-1"></i>Source
                                                     </a>
                                                 </div>
                                             @endif

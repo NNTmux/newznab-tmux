@@ -3,39 +3,42 @@
     'label',
     'value',
     'icon' => 'fas fa-chart-bar',
-    'color' => 'blue',
+    'color' => 'primary',
     'footer' => null,
+    'statKey' => null,
 ])
 
 @php
     $colorMap = [
-        'blue'   => ['bg' => 'bg-blue-100 dark:bg-blue-900', 'text' => 'text-blue-600 dark:text-blue-400'],
-        'green'  => ['bg' => 'bg-green-100 dark:bg-green-900', 'text' => 'text-green-600 dark:text-green-400'],
-        'red'    => ['bg' => 'bg-red-100 dark:bg-red-900', 'text' => 'text-red-600 dark:text-red-400'],
-        'purple' => ['bg' => 'bg-purple-100 dark:bg-purple-900', 'text' => 'text-purple-600 dark:text-purple-400'],
-        'yellow' => ['bg' => 'bg-yellow-100 dark:bg-yellow-900', 'text' => 'text-yellow-600 dark:text-yellow-400'],
-        'indigo' => ['bg' => 'bg-indigo-100 dark:bg-indigo-900', 'text' => 'text-indigo-600 dark:text-indigo-400'],
+        'primary' => ['bg' => 'bg-primary-100 dark:bg-primary-900', 'text' => 'text-link dark:text-primary-300'],
+        'success' => ['bg' => 'bg-success-100 dark:bg-success-900', 'text' => 'text-success-700 dark:text-success-300'],
+        'danger' => ['bg' => 'bg-danger-100 dark:bg-danger-900', 'text' => 'text-danger-700 dark:text-danger-300'],
+        'warning' => ['bg' => 'bg-warning-100 dark:bg-warning-900', 'text' => 'text-warning-700 dark:text-warning-300'],
+        'info' => ['bg' => 'bg-info-100 dark:bg-info-900', 'text' => 'text-info-700 dark:text-info-300'],
+        'violet' => ['bg' => 'bg-violet-100 dark:bg-violet-900', 'text' => 'text-violet-700 dark:text-violet-300'],
+        'orange' => ['bg' => 'bg-orange-100 dark:bg-orange-900', 'text' => 'text-orange-700 dark:text-orange-300'],
+        'pink' => ['bg' => 'bg-pink-100 dark:bg-pink-900', 'text' => 'text-pink-700 dark:text-pink-300'],
+        'indigo' => ['bg' => 'bg-indigo-100 dark:bg-indigo-900', 'text' => 'text-indigo-700 dark:text-indigo-300'],
     ];
-    $colors = $colorMap[$color] ?? $colorMap['blue'];
+    $legacy = ['blue' => 'primary', 'green' => 'success', 'red' => 'danger', 'yellow' => 'warning', 'purple' => 'violet'];
+    $colors = $colorMap[$legacy[$color] ?? $color] ?? $colorMap['primary'];
 @endphp
 
 <div {{ $attributes->merge(['class' => 'admin-stat-card surface-panel rounded-2xl border p-5 shadow-sm sm:p-6']) }}>
     <div class="flex items-center justify-between">
         <div>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">{{ $label }}</p>
-            <p class="text-3xl font-bold text-gray-800 dark:text-gray-200">{{ $value }}</p>
+            <p class="mb-1 text-sm text-fg-muted">{{ $label }}</p>
+            <p class="text-3xl font-bold tracking-tight text-fg tabular-nums" @if($statKey) data-stat="{{ $statKey }}" @endif>{{ $value }}</p>
         </div>
         <div class="flex h-12 w-12 items-center justify-center rounded-xl {{ $colors['bg'] }}">
             <i class="{{ $icon }} text-xl {{ $colors['text'] }}" aria-hidden="true"></i>
         </div>
     </div>
-    @if($footer || isset($footerSlot))
+    @if(isset($footerSlot))
+        {{ $footerSlot }}
+    @elseif($footer)
         <div class="mt-4">
-            @if(isset($footerSlot))
-                {{ $footerSlot }}
-            @else
-                <span class="text-sm text-gray-600 dark:text-gray-400">{{ $footer }}</span>
-            @endif
+            <span class="text-sm text-fg-muted">{{ $footer }}</span>
         </div>
     @endif
 </div>

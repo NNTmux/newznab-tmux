@@ -6,13 +6,13 @@
         <!-- Logo and Title -->
         <div class="text-center">
             <a href="{{ url('/') }}" class="inline-flex items-center justify-center mb-4">
-                <div class="w-16 h-16 bg-primary-600 dark:bg-primary-700 rounded-full flex items-center justify-center shadow-lg">
-                    <i class="fas fa-shield-alt text-3xl text-white"></i>
+                <div class="w-16 h-16 bg-accent dark:bg-accent-hover rounded-full flex items-center justify-center shadow-lg">
+                    <i aria-hidden="true" class="fas fa-shield-alt text-3xl text-white"></i>
                 </div>
             </a>
-            <h2 class="mt-4 text-3xl font-extrabold text-gray-900 dark:text-white">
+            <h1 class="mt-4 text-3xl font-extrabold text-gray-900 dark:text-white">
                 Two-Factor Authentication
-            </h2>
+            </h1>
             <p class="mt-2 text-sm text-gray-700 dark:text-gray-300">
                 Enter the code from your authenticator app
             </p>
@@ -24,7 +24,7 @@
                 @if($errors->any())
                     <div class="mb-4 p-4 rounded-lg bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700">
                         <div class="flex items-start">
-                            <i class="fas fa-exclamation-circle text-red-600 dark:text-red-400 mr-3 mt-0.5"></i>
+                            <i aria-hidden="true" class="fas fa-exclamation-circle text-red-600 dark:text-red-400 mr-3 mt-0.5"></i>
                             <div class="flex-1">
                                 <p class="text-sm font-medium text-red-800 dark:text-red-200">There were some errors:</p>
                                 <ul class="mt-2 text-sm text-red-700 dark:text-red-300 list-disc list-inside">
@@ -38,10 +38,10 @@
                 @endif
 
                 <div class="mb-6">
-                    <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
+                    <div class="bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-700 rounded-lg p-4">
                         <div class="flex items-start">
-                            <i class="fas fa-info-circle text-primary-600 dark:text-primary-400 mr-3 mt-0.5"></i>
-                            <div class="text-sm text-blue-800 dark:text-blue-200">
+                            <i aria-hidden="true" class="fas fa-info-circle text-link dark:text-primary-400 mr-3 mt-0.5"></i>
+                            <div class="text-sm text-primary-800 dark:text-primary-200">
                                 <p class="font-medium mb-1">Security Verification Required</p>
                                 <p>Open your authenticator app and enter the 6-digit verification code to complete your login.</p>
                             </div>
@@ -86,7 +86,7 @@
                             name="trust_device"
                             id="trust_device"
                             value="1"
-                            class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 checked:bg-primary-600 dark:checked:bg-primary-600"
+                            class="h-4 w-4 text-link focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 checked:bg-accent dark:checked:bg-accent"
                         >
                         <label for="trust_device" class="ml-2 block text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
                             Trust this device for 30 days
@@ -97,9 +97,9 @@
                     <div>
                         <button
                             type="submit"
-                            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors duration-200"
+                            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-accent hover:bg-accent-hover dark:bg-accent-hover dark:hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors duration-200"
                         >
-                            <i class="fas fa-sign-in-alt mr-2"></i>
+                            <i aria-hidden="true" class="fas fa-sign-in-alt mr-2"></i>
                             Verify and Continue
                         </button>
                     </div>
@@ -107,8 +107,8 @@
 
                 <!-- Back to Login Link -->
                 <div class="mt-6 text-center">
-                    <a href="{{ route('login') }}" class="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 transition-colors">
-                        <i class="fas fa-arrow-left mr-1"></i>
+                    <a href="{{ route('login') }}" class="text-sm text-link dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 transition-colors">
+                        <i aria-hidden="true" class="fas fa-arrow-left mr-1"></i>
                         Back to login
                     </a>
                 </div>
@@ -118,7 +118,7 @@
             <div class="surface-panel-alt px-8 py-4 border-t border-gray-200 dark:border-gray-700">
                 <div class="text-xs text-gray-600 dark:text-gray-400">
                     <p class="mb-2">
-                        <i class="fas fa-question-circle mr-1"></i>
+                        <i aria-hidden="true" class="fas fa-question-circle mr-1"></i>
                         <strong>Can't access your authenticator?</strong>
                     </p>
                     <p>

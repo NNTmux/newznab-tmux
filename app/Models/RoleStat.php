@@ -17,6 +17,8 @@ class RoleStat extends Model
     public static function insertUsersByRole(): void
     {
         $roles = Role::query()->select(['name'])->withCount('users')->groupBy('name')->having('users_count', '>', 0)->orderByDesc('users_count')->get();
+        self::query()->whereNotIn('role', $roles->pluck('name')->all())->delete();
+
         foreach ($roles as $role) {
             // Check if we already have the information and if we do just update the count
             if (self::query()->where('role', $role->name)->exists()) {
@@ -33,6 +35,6 @@ class RoleStat extends Model
      */
     public static function getUsersByRole(): array
     {
-        return self::query()->select(['role', 'users'])->get()->toArray();
+        return self::query()->select(['role', 'users'])->orderByDesc('users')->orderBy('role')->get()->toArray();
     }
 }

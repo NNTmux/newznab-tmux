@@ -2,21 +2,21 @@
 
 @section('content')
 <div x-data="adminGroups" class="space-y-6" data-ajax-url="{{ url('/admin/ajax') }}" data-csrf-token="{{ csrf_token() }}">
+    <x-admin.page-header :title="$title ?? 'Group List'" icon="fas fa-users" subtitle="Activate, backfill, reset, and purge indexed Usenet groups.">
+        <x-slot:actions>
+            <x-admin.button :href="url('/admin/group-list-active')" icon="fas fa-check-circle">Active</x-admin.button>
+            <x-admin.button :href="url('/admin/group-list-inactive')" tone="gray" icon="fas fa-times-circle">Inactive</x-admin.button>
+            <x-admin.button :href="url('/admin/group-list')" tone="gray" icon="fas fa-list">All</x-admin.button>
+            <x-admin.button :href="url('/admin/group-bulk')" tone="success" icon="fas fa-plus-circle">Bulk Add</x-admin.button>
+        </x-slot:actions>
+    </x-admin.page-header>
     <x-admin.card>
-        <x-admin.page-header :title="$title ?? 'Group List'" icon="fas fa-users" subtitle="Activate, backfill, reset, and purge indexed Usenet groups.">
-            <x-slot:actions>
-                <x-admin.button :href="url('/admin/group-list-active')" icon="fas fa-check-circle">Active</x-admin.button>
-                <x-admin.button :href="url('/admin/group-list-inactive')" tone="gray" icon="fas fa-times-circle">Inactive</x-admin.button>
-                <x-admin.button :href="url('/admin/group-list')" tone="gray" icon="fas fa-list">All</x-admin.button>
-                <x-admin.button :href="url('/admin/group-bulk')" tone="success" icon="fas fa-plus-circle">Bulk Add</x-admin.button>
-            </x-slot:actions>
-        </x-admin.page-header>
 
         <!-- Info Alert -->
-        <div class="px-6 py-4 bg-blue-50 dark:bg-blue-900/20 border-b border-blue-100 dark:border-blue-900">
+        <div class="px-6 py-4 bg-info-50 dark:bg-info-900/20 border-b border-info-100 dark:border-info-900">
             <div class="flex">
-                <i class="fas fa-info-circle text-blue-500 dark:text-blue-400 text-xl mr-3"></i>
-                <p class="text-sm text-blue-700 dark:text-blue-300">
+                <i aria-hidden="true" class="fas fa-info-circle text-info-500 dark:text-info-400 text-xl mr-3"></i>
+                <p class="text-sm text-info-700 dark:text-info-300">
                     Below is a list of all usenet groups available to be indexed. Click 'Activate' to start indexing a group.
                     Backfill works independently of active.
                 </p>
@@ -24,8 +24,8 @@
         </div>
 
         @if(isset($msg) && $msg != '')
-            <div class="mx-6 mt-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-900 rounded-lg" id="message">
-                <p class="text-green-800 dark:text-green-300">{{ $msg }}</p>
+            <div class="mx-6 mt-4 p-4 bg-success-50 dark:bg-success-900/20 border border-success-200 dark:border-success-900 rounded-lg" id="message">
+                <p class="text-success-800 dark:text-success-300">{{ $msg }}</p>
             </div>
         @endif
 
@@ -38,13 +38,13 @@
                             <div class="flex gap-2">
                                 <div class="relative flex-1">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <i class="fas fa-search text-gray-400"></i>
+                                        <i aria-hidden="true" class="fas fa-search text-gray-400"></i>
                                     </div>
                                     <input id="groupname"
                                            type="text"
                                            name="groupname"
                                            value="{{ $groupname ?? '' }}"
-                                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400"
+                                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400"
                                            placeholder="Search for group...">
                                 </div>
                                 <x-admin.button type="submit" icon="fas fa-search">Go</x-admin.button>
@@ -95,11 +95,11 @@
             <x-admin.data-table sticky>
                 <x-slot:head>
                             <x-admin.th align="center" class="w-12">
-                                <input type="checkbox"
+                                <input aria-label="Select all groups on this page" type="checkbox"
                                        id="select-all-groups"
                                        x-model="allChecked"
                                        @change="toggleAllCheckboxes()"
-                                       class="form-checkbox h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 dark:bg-gray-700"
+                                       class="form-checkbox h-4 w-4 text-link border-gray-300 dark:border-gray-600 rounded focus:ring-primary-500 dark:bg-gray-700"
                                        title="Select all groups on this page">
                             </x-admin.th>
                             <x-admin.th>Group</x-admin.th>
@@ -117,14 +117,14 @@
                         @foreach($grouplist as $group)
                             <tr id="grouprow-{{ $group->id }}" class="hover:bg-gray-50 dark:hover:bg-gray-700 group-row">
                                 <td class="px-4 py-4 text-center">
-                                    <input type="checkbox"
-                                           class="group-checkbox form-checkbox h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 dark:bg-gray-700"
+                                    <input aria-label="Select item" type="checkbox"
+                                           class="group-checkbox form-checkbox h-4 w-4 text-link border-gray-300 dark:border-gray-600 rounded focus:ring-primary-500 dark:bg-gray-700"
                                            data-group-id="{{ $group->id }}"
                                            data-group-name="{{ $group->name }}"
                                            @change="onGroupCheckboxChange()">
                                 </td>
                                 <td class="px-6 py-4">
-                                    <a href="{{ url('/admin/group-edit?id=' . $group->id) }}" class="font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
+                                    <a href="{{ url('/admin/group-edit?id=' . $group->id) }}" class="font-semibold text-link dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300">
                                         {{ str_replace('alt.binaries', 'a.b', $group->name) }}
                                     </a>
                                     @if($group->description)
@@ -145,14 +145,14 @@
                                     @if($group->active == 1)
                                         <button type="button"
                                                 @click="handleAction('toggle-group-status', '{{ $group->id }}', '0')"
-                                                class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 hover:bg-green-200">
-                                            <i class="fas fa-check-circle mr-1"></i>Active
+                                                class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-success-100 dark:bg-success-900/40 text-success-800 dark:text-success-200 hover:bg-success-200">
+                                            <i aria-hidden="true" class="fas fa-check-circle mr-1"></i>Active
                                         </button>
                                     @else
                                         <button type="button"
                                                 @click="handleAction('toggle-group-status', '{{ $group->id }}', '1')"
                                                 class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-200">
-                                            <i class="fas fa-times-circle mr-1"></i>Inactive
+                                            <i aria-hidden="true" class="fas fa-times-circle mr-1"></i>Inactive
                                         </button>
                                     @endif
                                 </td>
@@ -160,14 +160,14 @@
                                     @if($group->backfill == 1)
                                         <button type="button"
                                                 @click="handleAction('toggle-backfill', '{{ $group->id }}', '0')"
-                                                class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 hover:bg-blue-200">
-                                            <i class="fas fa-check-circle mr-1"></i>Enabled
+                                                class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-primary-100 dark:bg-primary-900/40 text-primary-800 dark:text-primary-200 hover:bg-primary-200">
+                                            <i aria-hidden="true" class="fas fa-check-circle mr-1"></i>Enabled
                                         </button>
                                     @else
                                         <button type="button"
                                                 @click="handleAction('toggle-backfill', '{{ $group->id }}', '1')"
                                                 class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-200">
-                                            <i class="fas fa-times-circle mr-1"></i>Disabled
+                                            <i aria-hidden="true" class="fas fa-times-circle mr-1"></i>Disabled
                                         </button>
                                     @endif
                                 </td>
@@ -201,28 +201,28 @@
                                 </td>
                                 <td class="px-6 py-4 text-center" id="groupdel-{{ $group->id }}">
                                     <div class="flex gap-1 justify-center">
-                                        <a href="{{ url('/admin/group-edit?id=' . $group->id) }}"
-                                           class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
+                                        <a aria-label="Edit this group" href="{{ url('/admin/group-edit?id=' . $group->id) }}"
+                                           class="text-link dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300"
                                            title="Edit this group">
-                                            <i class="fas fa-pencil"></i>
+                                            <i aria-hidden="true" class="fas fa-pencil"></i>
                                         </a>
-                                        <button type="button"
+                                        <button aria-label="Reset this group" type="button"
                                                 @click="handleAction('reset-group', '{{ $group->id }}')"
-                                                class="text-yellow-600 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-300"
+                                                class="text-warning-600 dark:text-warning-400 hover:text-warning-900 dark:hover:text-warning-300"
                                                 title="Reset this group">
-                                            <i class="fas fa-refresh"></i>
+                                            <i aria-hidden="true" class="fas fa-refresh"></i>
                                         </button>
-                                        <button type="button"
+                                        <button aria-label="Delete this group" type="button"
                                                 @click="handleAction('delete-group', '{{ $group->id }}')"
                                                 class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
                                                 title="Delete this group">
-                                            <i class="fas fa-trash"></i>
+                                            <i aria-hidden="true" class="fas fa-trash"></i>
                                         </button>
-                                        <button type="button"
+                                        <button aria-label="Purge this group" type="button"
                                                 @click="handleAction('purge-group', '{{ $group->id }}')"
                                                 class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
                                                 title="Purge this group">
-                                            <i class="fas fa-eraser"></i>
+                                            <i aria-hidden="true" class="fas fa-eraser"></i>
                                         </button>
                                     </div>
                                 </td>
@@ -258,12 +258,12 @@
      x-transition:leave-start="opacity-100"
      x-transition:leave-end="opacity-0"
      class="fixed inset-0 bg-gray-600/50 overflow-y-auto h-full w-full z-50">
-    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800"
+    <div role="dialog" aria-modal="true" aria-labelledby="groups-modal-title-0" class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800"
          @click.outside="handleAction('hide-reset-modal')">
         <div class="mt-3">
-            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Confirm Reset All Groups</h3>
+            <h3 id="groups-modal-title-0" class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Confirm Reset All Groups</h3>
             <p class="text-sm text-red-600 dark:text-red-400 mb-2">
-                <i class="fas fa-exclamation-triangle mr-2"></i>Are you sure you want to reset all groups?
+                <i aria-hidden="true" class="fas fa-exclamation-triangle mr-2"></i>Are you sure you want to reset all groups?
             </p>
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
                 This will reset the article pointers for all groups back to their current state.
@@ -276,7 +276,7 @@
                 </button>
                 <button type="button"
                         @click="handleAction('reset-all')"
-                        class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700">
+                        class="px-4 py-2 bg-warning-600 text-white rounded-lg hover:bg-warning-700">
                     Reset All
                 </button>
             </div>
@@ -294,12 +294,12 @@
      x-transition:leave-start="opacity-100"
      x-transition:leave-end="opacity-0"
      class="fixed inset-0 bg-gray-600/50 overflow-y-auto h-full w-full z-50">
-    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800"
+    <div role="dialog" aria-modal="true" aria-labelledby="groups-modal-title-1" class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800"
          @click.outside="handleAction('hide-purge-modal')">
         <div class="mt-3">
-            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Confirm Purge All Groups</h3>
+            <h3 id="groups-modal-title-1" class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Confirm Purge All Groups</h3>
             <p class="text-sm text-red-600 dark:text-red-400 mb-2">
-                <i class="fas fa-exclamation-triangle mr-2"></i>Are you sure you want to purge all groups?
+                <i aria-hidden="true" class="fas fa-exclamation-triangle mr-2"></i>Are you sure you want to purge all groups?
             </p>
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
                 This will delete all releases and binaries for all groups. This action cannot be undone!
@@ -330,12 +330,12 @@
      x-transition:leave-start="opacity-100"
      x-transition:leave-end="opacity-0"
      class="fixed inset-0 bg-gray-600/50 overflow-y-auto h-full w-full z-50">
-    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800"
+    <div role="dialog" aria-modal="true" aria-labelledby="groups-modal-title-2" class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800"
          @click.outside="handleAction('hide-reset-selected-modal')">
         <div class="mt-3">
-            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Confirm Reset Selected Groups</h3>
+            <h3 id="groups-modal-title-2" class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Confirm Reset Selected Groups</h3>
             <p class="text-sm text-orange-600 dark:text-orange-400 mb-2">
-                <i class="fas fa-exclamation-triangle mr-2"></i>Are you sure you want to reset <span x-text="selectedGroupNames.length">0</span> selected group(s)?
+                <i aria-hidden="true" class="fas fa-exclamation-triangle mr-2"></i>Are you sure you want to reset <span x-text="selectedGroupNames.length">0</span> selected group(s)?
             </p>
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
                 This will reset the article pointers for the selected groups back to their current state.

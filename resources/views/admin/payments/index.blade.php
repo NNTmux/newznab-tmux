@@ -4,9 +4,9 @@
 
 @section('content')
 <div class="space-y-6">
+    <x-admin.page-header :title="$title" icon="fas fa-credit-card">
+    </x-admin.page-header>
     <x-admin.card>
-        <x-admin.page-header :title="$title" icon="fas fa-credit-card">
-        </x-admin.page-header>
 
         <x-admin.info-alert>
             BTCPay webhook records appear here after invoices are settled. Use filters to find a user or status.
@@ -18,19 +18,19 @@
                     <div>
                         <label for="filter-username" class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Username</label>
                         <input type="text" name="username" id="filter-username" value="{{ $filters['username'] }}"
-                               class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-500 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-400 dark:focus:border-blue-400 dark:focus:ring-blue-400"
+                               class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-500 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-400 dark:focus:border-primary-400 dark:focus:ring-primary-400"
                                placeholder="Contains…">
                     </div>
                     <div>
                         <label for="filter-email" class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
                         <input type="text" name="email" id="filter-email" value="{{ $filters['email'] }}"
-                               class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-500 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-400 dark:focus:border-blue-400 dark:focus:ring-blue-400"
+                               class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-500 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-400 dark:focus:border-primary-400 dark:focus:ring-primary-400"
                                placeholder="Contains…">
                     </div>
                     <div>
                         <label for="filter-payment-status" class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Payment status</label>
                         <select name="payment_status" id="filter-payment-status"
-                                class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-blue-400 dark:focus:ring-blue-400">
+                                class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-primary-400 dark:focus:ring-primary-400">
                             <option value="">All</option>
                             @foreach($paymentStatuses as $ps)
                                 <option value="{{ $ps }}" @selected($filters['payment_status'] === $ps)>{{ $ps }}</option>
@@ -40,7 +40,7 @@
                     <div>
                         <label for="filter-invoice-status" class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Invoice status</label>
                         <select name="invoice_status" id="filter-invoice-status"
-                                class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-blue-400 dark:focus:ring-blue-400">
+                                class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-primary-400 dark:focus:ring-primary-400">
                             <option value="">All</option>
                             @foreach($invoiceStatuses as $is)
                                 <option value="{{ $is }}" @selected($filters['invoice_status'] === $is)>{{ $is }}</option>
@@ -50,19 +50,19 @@
                     <div>
                         <label for="filter-start-date" class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">From date</label>
                         <input type="date" name="start_date" id="filter-start-date" value="{{ $filters['start_date'] }}"
-                               class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-blue-400 dark:focus:ring-blue-400">
+                               class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-primary-400 dark:focus:ring-primary-400">
                     </div>
                     <div>
                         <label for="filter-end-date" class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">To date</label>
                         <input type="date" name="end_date" id="filter-end-date" value="{{ $filters['end_date'] }}"
-                               class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-blue-400 dark:focus:ring-blue-400">
+                               class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-primary-400 dark:focus:ring-primary-400">
                     </div>
                 </div>
                 <div class="flex flex-wrap gap-2">
                     <input type="hidden" name="sort" value="{{ $sort }}">
                     <input type="hidden" name="order" value="{{ $order }}">
-                    <button type="submit" class="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800">
-                        <i class="fas fa-filter mr-2"></i>Apply filters
+                    <button type="submit" class="inline-flex items-center rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent-hover dark:bg-accent-hover dark:hover:bg-primary-800">
+                        <i aria-hidden="true" class="fas fa-filter mr-2"></i>Apply filters
                     </button>
                     <a href="{{ route('admin.payment-list') }}" class="inline-flex items-center rounded-md bg-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600">
                         Reset
@@ -74,7 +74,7 @@
         @if($summary->isNotEmpty())
             <div class="border-b border-gray-200 px-6 py-4 dark:border-gray-700">
                 <h3 class="mb-3 flex items-center text-sm font-semibold text-gray-700 dark:text-gray-200">
-                    <i class="fas fa-chart-pie mr-2 text-blue-600 dark:text-blue-400"></i>
+                    <i aria-hidden="true" class="fas fa-chart-pie mr-2 text-link dark:text-primary-400"></i>
                     Summary by payment method
                     @if(!empty($filters['start_date']) || !empty($filters['end_date']))
                         <span class="ml-2 text-xs font-normal text-gray-500 dark:text-gray-400">
@@ -86,10 +86,10 @@
                     <table class="min-w-full text-sm">
                         <thead class="text-gray-500 dark:text-gray-400">
                             <tr>
-                                <th class="py-1 pr-4 text-left font-medium">Method</th>
-                                <th class="py-1 pr-4 text-right font-medium">Transactions</th>
-                                <th class="py-1 pr-4 text-right font-medium">Invoice amount total</th>
-                                <th class="py-1 text-right font-medium">Payment value total</th>
+                                <x-admin.th>Method</x-admin.th>
+                                <x-admin.th align="right">Transactions</x-admin.th>
+                                <x-admin.th align="right">Invoice amount total</x-admin.th>
+                                <x-admin.th align="right">Payment value total</x-admin.th>
                             </tr>
                         </thead>
                         <tbody>
@@ -125,11 +125,11 @@
                         <div class="flex items-center justify-center gap-2">
                             <span>ID</span>
                             <div class="flex flex-col gap-0.5">
-                                <a href="{{ request()->fullUrlWithQuery(['sort' => 'id', 'order' => 'asc', 'page' => null]) }}" class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 {{ ($sort === 'id' && $order === 'asc') ? 'text-blue-600 dark:text-blue-400' : '' }}" title="Sort Ascending">
-                                    <i class="fas fa-sort-numeric-down text-xs"></i>
+                                <a aria-label="Sort Ascending" href="{{ request()->fullUrlWithQuery(['sort' => 'id', 'order' => 'asc', 'page' => null]) }}" class="text-gray-400 hover:text-link dark:hover:text-primary-400 {{ ($sort === 'id' && $order === 'asc') ? 'text-link dark:text-primary-400' : '' }}" title="Sort Ascending">
+                                    <i aria-hidden="true" class="fas fa-sort-numeric-down text-xs"></i>
                                 </a>
-                                <a href="{{ request()->fullUrlWithQuery(['sort' => 'id', 'order' => 'desc', 'page' => null]) }}" class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 {{ ($sort === 'id' && $order === 'desc') ? 'text-blue-600 dark:text-blue-400' : '' }}" title="Sort Descending">
-                                    <i class="fas fa-sort-numeric-down-alt text-xs"></i>
+                                <a aria-label="Sort Descending" href="{{ request()->fullUrlWithQuery(['sort' => 'id', 'order' => 'desc', 'page' => null]) }}" class="text-gray-400 hover:text-link dark:hover:text-primary-400 {{ ($sort === 'id' && $order === 'desc') ? 'text-link dark:text-primary-400' : '' }}" title="Sort Descending">
+                                    <i aria-hidden="true" class="fas fa-sort-numeric-down-alt text-xs"></i>
                                 </a>
                             </div>
                         </div>
@@ -138,11 +138,11 @@
                         <div class="flex items-center gap-2">
                             <span>Date</span>
                             <div class="flex flex-col gap-0.5">
-                                <a href="{{ request()->fullUrlWithQuery(['sort' => 'created_at', 'order' => 'asc', 'page' => null]) }}" class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 {{ ($sort === 'created_at' && $order === 'asc') ? 'text-blue-600 dark:text-blue-400' : '' }}" title="Sort Ascending">
-                                    <i class="fas fa-sort-numeric-down text-xs"></i>
+                                <a aria-label="Sort Ascending" href="{{ request()->fullUrlWithQuery(['sort' => 'created_at', 'order' => 'asc', 'page' => null]) }}" class="text-gray-400 hover:text-link dark:hover:text-primary-400 {{ ($sort === 'created_at' && $order === 'asc') ? 'text-link dark:text-primary-400' : '' }}" title="Sort Ascending">
+                                    <i aria-hidden="true" class="fas fa-sort-numeric-down text-xs"></i>
                                 </a>
-                                <a href="{{ request()->fullUrlWithQuery(['sort' => 'created_at', 'order' => 'desc', 'page' => null]) }}" class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 {{ ($sort === 'created_at' && $order === 'desc') ? 'text-blue-600 dark:text-blue-400' : '' }}" title="Sort Descending">
-                                    <i class="fas fa-sort-numeric-down-alt text-xs"></i>
+                                <a aria-label="Sort Descending" href="{{ request()->fullUrlWithQuery(['sort' => 'created_at', 'order' => 'desc', 'page' => null]) }}" class="text-gray-400 hover:text-link dark:hover:text-primary-400 {{ ($sort === 'created_at' && $order === 'desc') ? 'text-link dark:text-primary-400' : '' }}" title="Sort Descending">
+                                    <i aria-hidden="true" class="fas fa-sort-numeric-down-alt text-xs"></i>
                                 </a>
                             </div>
                         </div>
@@ -151,11 +151,11 @@
                         <div class="flex items-center gap-2">
                             <span>Username</span>
                             <div class="flex flex-col gap-0.5">
-                                <a href="{{ request()->fullUrlWithQuery(['sort' => 'username', 'order' => 'asc', 'page' => null]) }}" class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 {{ ($sort === 'username' && $order === 'asc') ? 'text-blue-600 dark:text-blue-400' : '' }}" title="Sort Ascending">
-                                    <i class="fas fa-sort-alpha-down text-xs"></i>
+                                <a aria-label="Sort Ascending" href="{{ request()->fullUrlWithQuery(['sort' => 'username', 'order' => 'asc', 'page' => null]) }}" class="text-gray-400 hover:text-link dark:hover:text-primary-400 {{ ($sort === 'username' && $order === 'asc') ? 'text-link dark:text-primary-400' : '' }}" title="Sort Ascending">
+                                    <i aria-hidden="true" class="fas fa-sort-alpha-down text-xs"></i>
                                 </a>
-                                <a href="{{ request()->fullUrlWithQuery(['sort' => 'username', 'order' => 'desc', 'page' => null]) }}" class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 {{ ($sort === 'username' && $order === 'desc') ? 'text-blue-600 dark:text-blue-400' : '' }}" title="Sort Descending">
-                                    <i class="fas fa-sort-alpha-down-alt text-xs"></i>
+                                <a aria-label="Sort Descending" href="{{ request()->fullUrlWithQuery(['sort' => 'username', 'order' => 'desc', 'page' => null]) }}" class="text-gray-400 hover:text-link dark:hover:text-primary-400 {{ ($sort === 'username' && $order === 'desc') ? 'text-link dark:text-primary-400' : '' }}" title="Sort Descending">
+                                    <i aria-hidden="true" class="fas fa-sort-alpha-down-alt text-xs"></i>
                                 </a>
                             </div>
                         </div>
@@ -164,11 +164,11 @@
                         <div class="flex items-center gap-2">
                             <span>Email</span>
                             <div class="flex flex-col gap-0.5">
-                                <a href="{{ request()->fullUrlWithQuery(['sort' => 'email', 'order' => 'asc', 'page' => null]) }}" class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 {{ ($sort === 'email' && $order === 'asc') ? 'text-blue-600 dark:text-blue-400' : '' }}" title="Sort Ascending">
-                                    <i class="fas fa-sort-alpha-down text-xs"></i>
+                                <a aria-label="Sort Ascending" href="{{ request()->fullUrlWithQuery(['sort' => 'email', 'order' => 'asc', 'page' => null]) }}" class="text-gray-400 hover:text-link dark:hover:text-primary-400 {{ ($sort === 'email' && $order === 'asc') ? 'text-link dark:text-primary-400' : '' }}" title="Sort Ascending">
+                                    <i aria-hidden="true" class="fas fa-sort-alpha-down text-xs"></i>
                                 </a>
-                                <a href="{{ request()->fullUrlWithQuery(['sort' => 'email', 'order' => 'desc', 'page' => null]) }}" class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 {{ ($sort === 'email' && $order === 'desc') ? 'text-blue-600 dark:text-blue-400' : '' }}" title="Sort Descending">
-                                    <i class="fas fa-sort-alpha-down-alt text-xs"></i>
+                                <a aria-label="Sort Descending" href="{{ request()->fullUrlWithQuery(['sort' => 'email', 'order' => 'desc', 'page' => null]) }}" class="text-gray-400 hover:text-link dark:hover:text-primary-400 {{ ($sort === 'email' && $order === 'desc') ? 'text-link dark:text-primary-400' : '' }}" title="Sort Descending">
+                                    <i aria-hidden="true" class="fas fa-sort-alpha-down-alt text-xs"></i>
                                 </a>
                             </div>
                         </div>
@@ -178,11 +178,11 @@
                         <div class="flex items-center gap-2">
                             <span>Order ID</span>
                             <div class="flex flex-col gap-0.5">
-                                <a href="{{ request()->fullUrlWithQuery(['sort' => 'order_id', 'order' => 'asc', 'page' => null]) }}" class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 {{ ($sort === 'order_id' && $order === 'asc') ? 'text-blue-600 dark:text-blue-400' : '' }}" title="Sort Ascending">
-                                    <i class="fas fa-sort-alpha-down text-xs"></i>
+                                <a aria-label="Sort Ascending" href="{{ request()->fullUrlWithQuery(['sort' => 'order_id', 'order' => 'asc', 'page' => null]) }}" class="text-gray-400 hover:text-link dark:hover:text-primary-400 {{ ($sort === 'order_id' && $order === 'asc') ? 'text-link dark:text-primary-400' : '' }}" title="Sort Ascending">
+                                    <i aria-hidden="true" class="fas fa-sort-alpha-down text-xs"></i>
                                 </a>
-                                <a href="{{ request()->fullUrlWithQuery(['sort' => 'order_id', 'order' => 'desc', 'page' => null]) }}" class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 {{ ($sort === 'order_id' && $order === 'desc') ? 'text-blue-600 dark:text-blue-400' : '' }}" title="Sort Descending">
-                                    <i class="fas fa-sort-alpha-down-alt text-xs"></i>
+                                <a aria-label="Sort Descending" href="{{ request()->fullUrlWithQuery(['sort' => 'order_id', 'order' => 'desc', 'page' => null]) }}" class="text-gray-400 hover:text-link dark:hover:text-primary-400 {{ ($sort === 'order_id' && $order === 'desc') ? 'text-link dark:text-primary-400' : '' }}" title="Sort Descending">
+                                    <i aria-hidden="true" class="fas fa-sort-alpha-down-alt text-xs"></i>
                                 </a>
                             </div>
                         </div>
@@ -191,11 +191,11 @@
                         <div class="flex items-center gap-2">
                             <span>Amount</span>
                             <div class="flex flex-col gap-0.5">
-                                <a href="{{ request()->fullUrlWithQuery(['sort' => 'invoice_amount', 'order' => 'asc', 'page' => null]) }}" class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 {{ ($sort === 'invoice_amount' && $order === 'asc') ? 'text-blue-600 dark:text-blue-400' : '' }}" title="Sort Ascending">
-                                    <i class="fas fa-sort-numeric-down text-xs"></i>
+                                <a aria-label="Sort Ascending" href="{{ request()->fullUrlWithQuery(['sort' => 'invoice_amount', 'order' => 'asc', 'page' => null]) }}" class="text-gray-400 hover:text-link dark:hover:text-primary-400 {{ ($sort === 'invoice_amount' && $order === 'asc') ? 'text-link dark:text-primary-400' : '' }}" title="Sort Ascending">
+                                    <i aria-hidden="true" class="fas fa-sort-numeric-down text-xs"></i>
                                 </a>
-                                <a href="{{ request()->fullUrlWithQuery(['sort' => 'invoice_amount', 'order' => 'desc', 'page' => null]) }}" class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 {{ ($sort === 'invoice_amount' && $order === 'desc') ? 'text-blue-600 dark:text-blue-400' : '' }}" title="Sort Descending">
-                                    <i class="fas fa-sort-numeric-down-alt text-xs"></i>
+                                <a aria-label="Sort Descending" href="{{ request()->fullUrlWithQuery(['sort' => 'invoice_amount', 'order' => 'desc', 'page' => null]) }}" class="text-gray-400 hover:text-link dark:hover:text-primary-400 {{ ($sort === 'invoice_amount' && $order === 'desc') ? 'text-link dark:text-primary-400' : '' }}" title="Sort Descending">
+                                    <i aria-hidden="true" class="fas fa-sort-numeric-down-alt text-xs"></i>
                                 </a>
                             </div>
                         </div>
@@ -205,11 +205,11 @@
                         <div class="flex items-center gap-2">
                             <span>Pay. status</span>
                             <div class="flex flex-col gap-0.5">
-                                <a href="{{ request()->fullUrlWithQuery(['sort' => 'payment_status', 'order' => 'asc', 'page' => null]) }}" class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 {{ ($sort === 'payment_status' && $order === 'asc') ? 'text-blue-600 dark:text-blue-400' : '' }}" title="Sort Ascending">
-                                    <i class="fas fa-sort-alpha-down text-xs"></i>
+                                <a aria-label="Sort Ascending" href="{{ request()->fullUrlWithQuery(['sort' => 'payment_status', 'order' => 'asc', 'page' => null]) }}" class="text-gray-400 hover:text-link dark:hover:text-primary-400 {{ ($sort === 'payment_status' && $order === 'asc') ? 'text-link dark:text-primary-400' : '' }}" title="Sort Ascending">
+                                    <i aria-hidden="true" class="fas fa-sort-alpha-down text-xs"></i>
                                 </a>
-                                <a href="{{ request()->fullUrlWithQuery(['sort' => 'payment_status', 'order' => 'desc', 'page' => null]) }}" class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 {{ ($sort === 'payment_status' && $order === 'desc') ? 'text-blue-600 dark:text-blue-400' : '' }}" title="Sort Descending">
-                                    <i class="fas fa-sort-alpha-down-alt text-xs"></i>
+                                <a aria-label="Sort Descending" href="{{ request()->fullUrlWithQuery(['sort' => 'payment_status', 'order' => 'desc', 'page' => null]) }}" class="text-gray-400 hover:text-link dark:hover:text-primary-400 {{ ($sort === 'payment_status' && $order === 'desc') ? 'text-link dark:text-primary-400' : '' }}" title="Sort Descending">
+                                    <i aria-hidden="true" class="fas fa-sort-alpha-down-alt text-xs"></i>
                                 </a>
                             </div>
                         </div>
@@ -218,11 +218,11 @@
                         <div class="flex items-center gap-2">
                             <span>Inv. status</span>
                             <div class="flex flex-col gap-0.5">
-                                <a href="{{ request()->fullUrlWithQuery(['sort' => 'invoice_status', 'order' => 'asc', 'page' => null]) }}" class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 {{ ($sort === 'invoice_status' && $order === 'asc') ? 'text-blue-600 dark:text-blue-400' : '' }}" title="Sort Ascending">
-                                    <i class="fas fa-sort-alpha-down text-xs"></i>
+                                <a aria-label="Sort Ascending" href="{{ request()->fullUrlWithQuery(['sort' => 'invoice_status', 'order' => 'asc', 'page' => null]) }}" class="text-gray-400 hover:text-link dark:hover:text-primary-400 {{ ($sort === 'invoice_status' && $order === 'asc') ? 'text-link dark:text-primary-400' : '' }}" title="Sort Ascending">
+                                    <i aria-hidden="true" class="fas fa-sort-alpha-down text-xs"></i>
                                 </a>
-                                <a href="{{ request()->fullUrlWithQuery(['sort' => 'invoice_status', 'order' => 'desc', 'page' => null]) }}" class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 {{ ($sort === 'invoice_status' && $order === 'desc') ? 'text-blue-600 dark:text-blue-400' : '' }}" title="Sort Descending">
-                                    <i class="fas fa-sort-alpha-down-alt text-xs"></i>
+                                <a aria-label="Sort Descending" href="{{ request()->fullUrlWithQuery(['sort' => 'invoice_status', 'order' => 'desc', 'page' => null]) }}" class="text-gray-400 hover:text-link dark:hover:text-primary-400 {{ ($sort === 'invoice_status' && $order === 'desc') ? 'text-link dark:text-primary-400' : '' }}" title="Sort Descending">
+                                    <i aria-hidden="true" class="fas fa-sort-alpha-down-alt text-xs"></i>
                                 </a>
                             </div>
                         </div>
@@ -243,7 +243,7 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">{{ Str::limit($payment->payment_method, 20) }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             @if(strcasecmp((string) $payment->payment_status, \App\Models\Payment::PAYMENT_STATUS_SETTLED) === 0)
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200">
                                     {{ $payment->payment_status }}
                                 </span>
                             @else
@@ -257,11 +257,11 @@
                                 $inv = $payment->invoice_status ?? \App\Models\Payment::INVOICE_STATUS_PENDING;
                             @endphp
                             @if(strcasecmp((string) $inv, \App\Models\Payment::INVOICE_STATUS_SETTLED) === 0)
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200">
                                     {{ $inv }}
                                 </span>
                             @else
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-warning-100 dark:bg-warning-900 text-warning-800 dark:text-warning-200">
                                     {{ $inv }}
                                 </span>
                             @endif

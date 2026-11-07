@@ -2,20 +2,10 @@
 
 @section('content')
 <div x-data="adminReleaseList" class="space-y-6">
+    <x-admin.page-header :title="$title" icon="fas fa-list" />
     <x-admin.card>
-        <x-admin.page-header :title="$title" icon="fas fa-list" />
 
-        @if(session('success'))
-            <div class="mx-6 mt-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg text-green-800 dark:text-green-200 text-sm" role="alert">
-                <i class="fas fa-check-circle mr-2"></i>{{ session('success') }}
-            </div>
-        @endif
 
-        @if(session('error'))
-            <div class="mx-6 mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-800 dark:text-red-200 text-sm" role="alert">
-                <i class="fas fa-exclamation-circle mr-2"></i>{{ session('error') }}
-            </div>
-        @endif
 
         <x-admin.filter-panel>
             <form method="GET" action="{{ route('admin.release-list') }}" class="flex flex-col sm:flex-row gap-2">
@@ -27,10 +17,10 @@
                            name="search"
                            value="{{ request('search') }}"
                            placeholder="Search by release name..."
-                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
                 </div>
                 <select name="category_id"
-                        class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white sm:min-w-[220px]">
+                        class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white sm:min-w-[220px]">
                     @foreach($catlist as $catId => $catTitle)
                         <option value="{{ $catId }}" {{ (int) request('category_id', -1) === (int) $catId ? 'selected' : '' }}>
                             {{ $catTitle }}
@@ -74,7 +64,7 @@
                     </div>
                     <div class="flex flex-wrap items-center gap-3">
                         <select name="categories_id"
-                                class="text-sm border-gray-300 dark:border-gray-600 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200 min-w-[200px]">
+                                class="text-sm border-gray-300 dark:border-gray-600 rounded-lg focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-200 min-w-[200px]">
                             @foreach($catlist as $catId => $catTitle)
                                 @if((int) $catId > 0)
                                     <option value="{{ $catId }}">{{ $catTitle }}</option>
@@ -105,12 +95,12 @@
                 @foreach($releaselist as $release)
                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <input type="checkbox"
+                            <input aria-label="Select item" type="checkbox"
                                    form="bulk-category-form"
                                    name="guids[]"
                                    value="{{ $release->guid }}"
                                    @change="onCheckboxChange()"
-                                   class="release-checkbox rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:bg-gray-700">
+                                   class="release-checkbox rounded border-gray-300 dark:border-gray-600 text-link focus:ring-primary-500 dark:bg-gray-700">
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ $release->id }}</td>
                         <td class="px-6 py-4 text-sm">
@@ -124,7 +114,7 @@
                             @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-primary-100 dark:bg-primary-900/20 text-primary-800 dark:text-primary-300">
                                 {{ $release->category_name ?? 'N/A' }}
                             </span>
                         </td>
@@ -145,24 +135,24 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             <div class="flex gap-2">
-                                <a href="{{ url('/details/' . $release->guid) }}"
-                                   class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
+                                <a aria-label="View Details" href="{{ url('/details/' . $release->guid) }}"
+                                   class="text-link dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300"
                                    title="View Details"
                                    target="_blank">
-                                    <i class="fas fa-eye"></i>
+                                    <i aria-hidden="true" class="fas fa-eye"></i>
                                 </a>
-                                <a href="{{ url('admin/release-edit?id=' . $release->guid . '&action=view') }}"
-                                   class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300"
+                                <a aria-label="Edit" href="{{ url('admin/release-edit?id=' . $release->guid . '&action=view') }}"
+                                   class="text-success-600 dark:text-success-400 hover:text-success-900 dark:hover:text-success-300"
                                    title="Edit">
-                                    <i class="fas fa-edit"></i>
+                                    <i aria-hidden="true" class="fas fa-edit"></i>
                                 </a>
-                                <button type="button"
+                                <button aria-label="Delete" type="button"
                                        class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
                                         @click="deleteRelease($event)"
                                        data-delete-release="{{ $release->guid }}"
                                        data-delete-url="{{ url('admin/release-delete/' . $release->guid) }}"
                                        title="Delete">
-                                    <i class="fas fa-trash"></i>
+                                    <i aria-hidden="true" class="fas fa-trash"></i>
                                 </button>
                             </div>
                         </td>

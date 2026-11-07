@@ -16,24 +16,24 @@
                 <div class="flex-1">
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i class="fa fa-search text-gray-400"></i>
+                            <i aria-hidden="true" class="fa-solid fa-search text-gray-400"></i>
                         </div>
                         <input
                             type="text"
                             name="search"
                             value="{{ $search ?? '' }}"
                             placeholder="Search group names..."
-                            class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                            class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
                         />
                     </div>
                 </div>
                 <div class="flex gap-2">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fa fa-search"></i>Search
+                    <button type="submit" class="inline-flex min-h-11 items-center gap-2 rounded-control px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 bg-accent text-on-accent shadow-raised hover:bg-accent-hover">
+                        <i aria-hidden="true" class="fa-solid fa-search"></i>Search
                     </button>
                     @if(!empty($search))
-                        <a href="{{ url('/browsegroup') }}" class="btn bg-gray-500 text-white border-gray-500 hover:bg-gray-600">
-                            <i class="fa fa-times"></i>Clear
+                        <a href="{{ url('/browsegroup') }}" class="inline-flex min-h-11 items-center gap-2 rounded-control px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 border border-line bg-surface text-fg shadow-raised hover:bg-surface-hover">
+                            <i aria-hidden="true" class="fa-solid fa-times"></i>Clear
                         </a>
                     @endif
                 </div>
@@ -75,7 +75,7 @@
                                 <a
                                     href="{{ url('/browse/group?g=' . $result->name) }}"
                                     title="Browse releases from {{ str_replace('alt.binaries', 'a.b', $result->name) }}"
-                                    class="font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+                                    class="font-semibold text-link dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 transition-colors"
                                 >
                                     {{ str_replace('alt.binaries', 'a.b', $result->name) }}
                                 </a>
@@ -84,7 +84,7 @@
                                 {{ $result->description ?? '' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-gray-600 dark:text-gray-400">
-                                <i class="fa fa-clock-o text-gray-400 mr-2"></i>
+                                <i aria-hidden="true" class="fa-regular fa-clock text-gray-400 mr-2"></i>
                                 <span title="{{ $result->last_updated ?? '' }}">
                                     {{ isset($result->last_updated) ? \Carbon\Carbon::parse($result->last_updated)->diffForHumans() : 'N/A' }}
                                 </span>
@@ -111,13 +111,13 @@
         </div>
     </div>
 @else
-    <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded">
+    <div class="bg-info-50 dark:bg-info-950/40 border-l-4 border-info-400 p-4 rounded">
         <div class="flex items-start">
-            <i class="fa fa-info-circle text-blue-400 text-xl mr-3 mt-0.5"></i>
-            <div class="text-blue-800">
+            <i aria-hidden="true" class="fa-solid fa-info-circle text-info-400 text-xl mr-3 mt-0.5"></i>
+            <div class="text-info-800 dark:text-info-200">
                 @if(!empty($search))
                     No groups found matching "<strong>{{ $search }}</strong>".
-                    <a href="{{ url('/browsegroup') }}" class="font-medium underline hover:text-blue-900">Show all groups</a>
+                    <a href="{{ url('/browsegroup') }}" class="font-medium underline hover:text-info-900">Show all groups</a>
                 @else
                     No groups found.
                 @endif

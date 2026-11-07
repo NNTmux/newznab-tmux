@@ -18,7 +18,7 @@ const MAX_FACET_FILES = 200;
 
 const LEVEL_BADGES = {
     debug: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200',
-    info: 'bg-blue-100 text-blue-800 dark:bg-blue-900/60 dark:text-blue-200',
+    info: 'bg-primary-100 text-primary-800 dark:bg-primary-900/60 dark:text-primary-200',
     notice: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/60 dark:text-cyan-200',
     warning: 'bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-200',
     error: 'bg-red-100 text-red-800 dark:bg-red-900/60 dark:text-red-200',
@@ -29,7 +29,7 @@ const LEVEL_BADGES = {
 
 const LEVEL_BORDERS = {
     debug: 'border-l-gray-300 dark:border-l-gray-600',
-    info: 'border-l-blue-400',
+    info: 'border-l-primary-400',
     notice: 'border-l-cyan-400',
     warning: 'border-l-amber-400',
     error: 'border-l-red-500',
@@ -158,7 +158,7 @@ Alpine.data('adminLogViewer', () => ({
 
     fileRowClass(path) {
         return this.isSelected(path)
-            ? 'bg-blue-50 text-blue-900 ring-1 ring-inset ring-blue-200 dark:bg-blue-900/40 dark:text-blue-100 dark:ring-blue-800'
+            ? 'bg-primary-50 text-primary-900 ring-1 ring-inset ring-primary-200 dark:bg-primary-900/40 dark:text-primary-100 dark:ring-primary-800'
             : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800';
     },
 
@@ -308,13 +308,13 @@ Alpine.data('adminLogViewer', () => ({
 
     scopeButtonClass(scope) {
         return this.scope === scope
-            ? 'bg-blue-600 text-white shadow-sm'
+            ? 'bg-accent text-white shadow-sm'
             : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700';
     },
 
     toggleButtonClass(active) {
         return active
-            ? 'border-blue-500 bg-blue-600 text-white'
+            ? 'border-primary-500 bg-accent text-white'
             : 'border-gray-300 bg-white text-gray-600 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700';
     },
 
@@ -340,7 +340,7 @@ Alpine.data('adminLogViewer', () => ({
 
     levelChipClass(level) {
         return this.levels.includes(level)
-            ? `${LEVEL_BADGES[level] ?? ''} ring-2 ring-offset-1 ring-blue-500 dark:ring-offset-gray-900`
+            ? `${LEVEL_BADGES[level] ?? ''} ring-2 ring-offset-1 ring-primary-500 dark:ring-offset-gray-900`
             : 'bg-white text-gray-600 border border-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700';
     },
 
@@ -401,7 +401,7 @@ Alpine.data('adminLogViewer', () => ({
 
     channelChipClass(channel) {
         return this.channels.includes(channel)
-            ? 'bg-indigo-100 text-indigo-800 ring-2 ring-offset-1 ring-blue-500 dark:bg-indigo-900/60 dark:text-indigo-200 dark:ring-offset-gray-900'
+            ? 'bg-indigo-100 text-indigo-800 ring-2 ring-offset-1 ring-primary-500 dark:bg-indigo-900/60 dark:text-indigo-200 dark:ring-offset-gray-900'
             : 'bg-white text-gray-600 border border-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700';
     },
 
@@ -920,13 +920,13 @@ Alpine.data('adminLogViewer', () => ({
     },
 
     segmentClass(segment) {
-        return segment.hit ? 'rounded-sm bg-yellow-200 px-0.5 text-gray-900 dark:bg-yellow-500/70 dark:text-gray-950' : '';
+        return segment.hit ? 'rounded-sm bg-warning-200 px-0.5 text-gray-900 dark:bg-warning-500/70 dark:text-gray-950' : '';
     },
 
     entryClass(entry) {
         const border = LEVEL_BORDERS[entry.level] ?? 'border-l-gray-200 dark:border-l-gray-700';
         const anchor = this.anchorOffset !== null && entry.offset === this.anchorOffset && entry._path === this.selectedPath
-            ? ' bg-yellow-50 dark:bg-yellow-900/20'
+            ? ' bg-warning-50 dark:bg-warning-900/20'
             : '';
         return `${border}${anchor}`;
     },
@@ -998,7 +998,7 @@ Alpine.data('adminLogViewer', () => ({
     },
 
     copyIconClass(entry) {
-        return this.copiedKey === entry._key ? 'fa-check text-green-500' : 'fa-copy';
+        return this.copiedKey === entry._key ? 'fa-check text-success-500' : 'fa-copy';
     },
 
     // ----------------------------------------------------------------- file actions

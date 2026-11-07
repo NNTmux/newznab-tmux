@@ -33,12 +33,12 @@
                     <div class="catalog-release-row surface-panel-alt rounded-xl border p-3">
                         <div class="space-y-2">
                             <div class="{{ $shouldShowCheckbox ? 'flex items-start justify-between gap-2' : '' }}">
-                                <a href="{{ url('/details/' . $release->guid) }}" class="text-sm text-gray-800 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 font-medium block break-all {{ $shouldShowCheckbox ? 'flex-1' : '' }}" title="{{ $release->searchname }}">
+                                <a href="{{ url('/details/' . $release->guid) }}" class="text-sm text-gray-800 dark:text-gray-200 hover:text-link dark:hover:text-primary-400 font-medium block break-all {{ $shouldShowCheckbox ? 'flex-1' : '' }}" title="{{ $release->searchname }}">
                                     {{ $release->searchname }}
                                 </a>
                                 @if($shouldShowCheckbox)
                                     <label class="inline-flex shrink-0 items-center" aria-label="Select {{ $release->searchname }}">
-                                        <input type="checkbox" class="chkRelease form-checkbox h-4 w-4 text-primary-600" value="{{ $release->guid }}" name="release[]" @change="onCheckboxChange()">
+                                        <input type="checkbox" class="chkRelease form-checkbox h-4 w-4 text-link" value="{{ $release->guid }}" name="release[]" @change="onCheckboxChange()">
                                     </label>
                                 @endif
                             </div>
@@ -56,36 +56,36 @@
                                 @endif
                                 @if($shouldShowAddDate && isset($release->adddate))
                                     <span class="release-chip">
-                                        <i class="fas fa-plus-circle mr-1"></i>{{ userDateDiffForHumans($release->adddate) }}
+                                        <i aria-hidden="true" class="fas fa-plus-circle mr-1"></i>{{ userDateDiffForHumans($release->adddate) }}
                                     </span>
                                 @endif
                                 @if((isset($release->nfoid) && !empty($release->nfoid)) || (isset($release->nfostatus) && (int) $release->nfostatus === 1))
                                     <button type="button"
-                                            class="nfo-badge inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 hover:bg-yellow-200 dark:hover:bg-yellow-800 transition cursor-pointer"
+                                            class="nfo-badge inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-warning-100 dark:bg-warning-900 text-warning-800 dark:text-warning-200 hover:bg-warning-200 dark:hover:bg-warning-800 transition cursor-pointer"
                                             data-guid="{{ $release->guid }}"
                                             title="View NFO file">
-                                        <i class="fas fa-file-alt mr-1"></i> NFO
+                                        <i aria-hidden="true" class="fas fa-file-alt mr-1"></i> NFO
                                     </button>
                                 @endif
                                 @if($shouldShowGroup && isset($release->group_name) && !empty($release->group_name))
                                     <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200" title="Poster/Uploader">
-                                        <i class="fas fa-user mr-1"></i> {{ $release->group_name }}
+                                        <i aria-hidden="true" class="fas fa-user mr-1"></i> {{ $release->group_name }}
                                     </span>
                                 @endif
                             </div>
 
                             <div class="flex flex-wrap items-center gap-1.5">
                                 <a href="{{ url('/getnzb/' . $release->guid) }}" class="release-action-sm release-action-download px-2 py-0.5">
-                                    <i class="fas fa-download mr-1"></i> Download
+                                    <i aria-hidden="true" class="fas fa-download mr-1"></i> Download
                                     @if($shouldShowStats && isset($release->grabs) && $release->grabs > 0)
                                         <span class="ml-1 px-1 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-xs rounded">{{ $release->grabs }}</span>
                                     @endif
                                 </a>
                                 <button type="button" class="add-to-cart release-action-sm release-action-primary px-2 py-0.5" data-guid="{{ $release->guid }}">
-                                    <i class="fas fa-shopping-cart mr-1"></i> Cart
+                                    <i aria-hidden="true" class="fas fa-shopping-cart mr-1"></i> Cart
                                 </button>
                                 <a href="{{ url('/details/' . $release->guid) }}" class="release-action-sm release-action-muted px-2 py-0.5">
-                                    <i class="fas fa-info-circle mr-1"></i> Details
+                                    <i aria-hidden="true" class="fas fa-info-circle mr-1"></i> Details
                                     @if($shouldShowStats && isset($release->comments) && $release->comments > 0)
                                         <span class="ml-1 px-1 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-xs rounded">{{ $release->comments }}</span>
                                     @endif

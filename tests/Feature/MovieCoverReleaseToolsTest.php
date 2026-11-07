@@ -33,7 +33,7 @@ class MovieCoverReleaseToolsTest extends TestCase
 
         Schema::create('movieinfo', function (Blueprint $table): void {
             $table->id();
-            foreach (['imdbid', 'tmdbid', 'traktid', 'title', 'year', 'rating', 'plot', 'genre', 'director', 'actors', 'cover'] as $column) {
+            foreach (['imdbid', 'tmdbid', 'traktid', 'title', 'year', 'rating', 'rtrating', 'plot', 'genre', 'director', 'actors', 'cover'] as $column) {
                 $table->string($column)->nullable();
             }
         });
@@ -55,8 +55,8 @@ class MovieCoverReleaseToolsTest extends TestCase
             $table->unsignedBigInteger('releases_id')->primary();
         });
         DB::table('movieinfo')->insert([
-            ['imdbid' => '1234567', 'title' => 'First movie'],
-            ['imdbid' => '7654321', 'title' => 'Second movie'],
+            ['imdbid' => '1234567', 'title' => 'First movie', 'rtrating' => '78%'],
+            ['imdbid' => '7654321', 'title' => 'Second movie', 'rtrating' => 'N/A'],
         ]);
         foreach ([1, 2, 3, 4] as $id) {
             DB::table('releases')->insert([
@@ -107,6 +107,7 @@ class MovieCoverReleaseToolsTest extends TestCase
 
         $this->assertCount(2, $movies);
         $this->assertSame(3, (int) $movies[0]->total_releases);
+        $this->assertSame('78%', $movies[0]->rtrating, 'Movie cards need the Rotten Tomatoes score');
         $this->assertSame([1, 2], array_column($movies[0]->releases, 'id'));
         $this->assertReleaseTools($movies[0]->releases[0], ['preview-badge', 'sample-badge', 'mediainfo-badge', 'nfo-badge']);
         $this->assertReleaseTools($movies[0]->releases[1], ['sample-badge', 'mediainfo-badge']);

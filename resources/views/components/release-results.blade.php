@@ -16,7 +16,7 @@
         <thead class="bg-gray-100 dark:bg-gray-900">
             <tr>
                 <th scope="col" class="px-3 py-3 text-left">
-                    <input type="checkbox" class="rounded border-gray-300 dark:border-gray-600 text-primary-600 dark:text-primary-500 focus:ring-primary-500 dark:focus:ring-primary-400 dark:bg-gray-700" aria-label="Select all releases" id="chkSelectAll" x-model="allChecked" @change="toggleAll()">
+                    <input type="checkbox" class="rounded border-gray-300 dark:border-gray-600 text-link dark:text-primary-500 focus:ring-primary-500 dark:focus:ring-primary-400 dark:bg-gray-700" aria-label="Select all releases" id="chkSelectAll" x-model="allChecked" @change="toggleAll()">
                 </th>
                 <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">Name</th>
                 <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">Category</th>
@@ -35,7 +35,7 @@
                 @endphp
                 <tr class="release-result-row">
                     <td class="px-3 py-4 whitespace-nowrap">
-                        <input type="checkbox" class="chkRelease rounded border-gray-300 dark:border-gray-600 text-primary-600 dark:text-primary-500 focus:ring-primary-500 dark:focus:ring-primary-400 dark:bg-gray-700" aria-label="Select {{ $result->searchname }}" name="release[]" value="{{ $result->guid }}" @change="onCheckboxChange()">
+                        <input type="checkbox" class="chkRelease rounded border-gray-300 dark:border-gray-600 text-link dark:text-primary-500 focus:ring-primary-500 dark:focus:ring-primary-400 dark:bg-gray-700" aria-label="Select {{ $result->searchname }}" name="release[]" value="{{ $result->guid }}" @change="onCheckboxChange()">
                     </td>
                     <td class="release-result-name px-3 py-4">
                         <div class="flex items-start">
@@ -51,22 +51,22 @@
                                 @endif
                             @endif
                             <div class="min-w-0 flex-1">
-                                <a href="{{ url('/details/' . $result->guid) }}" class="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 release-result-title">{{ $result->searchname }}</a>
+                                <a href="{{ url('/details/' . $result->guid) }}" class="text-link dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 release-result-title line-clamp-2 break-words">{{ $result->searchname }}</a>
                                 <x-release-badges :result="$result" />
                                 <div class="release-result-source mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-gray-500 dark:text-gray-400">
                                     @if(!empty($result->group_name))
                                         <span class="min-w-0">
-                                            <i class="fas fa-users mr-1"></i> {{ $result->group_name }}
+                                            <i aria-hidden="true" class="fas fa-users mr-1"></i> {{ $result->group_name }}
                                         </span>
                                     @endif
                                     @if(!empty($result->postdate))
                                         <span class="min-w-0">
-                                            <i class="fas fa-calendar mr-1"></i> Posted: {{ userDate($result->postdate, 'M d, Y H:i') }}
+                                            <i aria-hidden="true" class="fas fa-calendar mr-1"></i> Posted: {{ userDate($result->postdate, 'M d, Y H:i') }}
                                         </span>
                                     @endif
                                     @if(!empty($result->fromname))
                                         <span class="min-w-0">
-                                            <i class="fas fa-user mr-1"></i> {{ $result->fromname }}
+                                            <i aria-hidden="true" class="fas fa-user mr-1"></i> {{ $result->fromname }}
                                         </span>
                                     @endif
                                 </div>
@@ -80,16 +80,16 @@
                             :sub-category="$result->sub_category ?? null"
                         />
                     </td>
-                    <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
+                    <td class="px-3 py-4 whitespace-nowrap text-sm tabular-nums text-gray-600 dark:text-gray-400">
                         {{ $dateValue ? userDateDiffForHumans($dateValue) : 'Unknown' }}
                     </td>
-                    <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
+                    <td class="px-3 py-4 whitespace-nowrap text-sm tabular-nums text-gray-600 dark:text-gray-400">
                         {{ $sizeLabel }}
                     </td>
-                    <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
+                    <td class="px-3 py-4 whitespace-nowrap text-sm tabular-nums text-gray-600 dark:text-gray-400">
                         @if(($result->totalpart ?? 0) > 0)
                             <button type="button"
-                                    class="filelist-badge text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 font-medium cursor-pointer hover:underline"
+                                    class="filelist-badge text-link dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 font-medium cursor-pointer hover:underline"
                                     data-guid="{{ $result->guid }}"
                                     title="View file list">
                                 {{ $result->totalpart ?? 0 }}
@@ -98,10 +98,10 @@
                             {{ $result->totalpart ?? 0 }}
                         @endif
                     </td>
-                    <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
+                    <td class="px-3 py-4 whitespace-nowrap text-sm tabular-nums text-gray-600 dark:text-gray-400">
                         <div class="flex items-center gap-2">
-                            <span title="Grabs"><i class="fas fa-download text-green-600 dark:text-green-400"></i> {{ $result->grabs ?? 0 }}</span>
-                            <span title="Comments"><i class="fas fa-comment text-primary-600 dark:text-primary-400"></i> {{ $result->comments ?? 0 }}</span>
+                            <span title="Grabs"><i aria-hidden="true" class="fas fa-download text-success-600 dark:text-success-400"></i> {{ $result->grabs ?? 0 }}</span>
+                            <span title="Comments"><i aria-hidden="true" class="fas fa-comment text-link dark:text-primary-400"></i> {{ $result->comments ?? 0 }}</span>
                         </div>
                     </td>
                     <td class="px-3 py-4 whitespace-nowrap">
@@ -122,7 +122,7 @@
         @endphp
         <article class="release-result-card surface-panel border rounded-xl p-4">
             <div class="flex items-start gap-3">
-                <input type="checkbox" class="chkRelease rounded border-gray-300 dark:border-gray-600 text-primary-600 dark:text-primary-500 focus:ring-primary-500 dark:focus:ring-primary-400 dark:bg-gray-700 mt-1" aria-label="Select {{ $result->searchname }}" name="release[]" value="{{ $result->guid }}" @change="onCheckboxChange()">
+                <input type="checkbox" class="chkRelease rounded border-gray-300 dark:border-gray-600 text-link dark:text-primary-500 focus:ring-primary-500 dark:focus:ring-primary-400 dark:bg-gray-700 mt-1" aria-label="Select {{ $result->searchname }}" name="release[]" value="{{ $result->guid }}" @change="onCheckboxChange()">
                 <div class="flex-1 min-w-0">
                     @if($shouldShowThumbs)
                         @php
@@ -135,7 +135,7 @@
                             </a>
                         @endif
                     @endif
-                    <a href="{{ url('/details/' . $result->guid) }}" class="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 release-result-title">
+                    <a href="{{ url('/details/' . $result->guid) }}" class="text-link dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 release-result-title line-clamp-2 break-words">
                         {{ $result->searchname }}
                     </a>
                     <x-release-badges :result="$result" />
@@ -145,9 +145,9 @@
                             :parent-category="$result->parent_category ?? null"
                             :sub-category="$result->sub_category ?? null"
                         />
-                        <span><i class="fas fa-clock mr-1"></i>{{ $dateValue ? userDateDiffForHumans($dateValue) : 'Unknown' }}</span>
-                        <span><i class="fas fa-hdd mr-1"></i>{{ $sizeLabel }}</span>
-                        <span><i class="fas fa-file mr-1"></i>{{ $result->totalpart ?? 0 }} files</span>
+                        <span><i aria-hidden="true" class="fas fa-clock mr-1"></i>{{ $dateValue ? userDateDiffForHumans($dateValue) : 'Unknown' }}</span>
+                        <span><i aria-hidden="true" class="fas fa-hdd mr-1"></i>{{ $sizeLabel }}</span>
+                        <span><i aria-hidden="true" class="fas fa-file mr-1"></i>{{ $result->totalpart ?? 0 }} files</span>
                         <span><i class="fas fa-download mr-1" aria-hidden="true"></i>{{ $result->grabs ?? 0 }} grabs</span>
                         <span><i class="fas fa-comment mr-1" aria-hidden="true"></i>{{ $result->comments ?? 0 }} comments</span>
                     </div>

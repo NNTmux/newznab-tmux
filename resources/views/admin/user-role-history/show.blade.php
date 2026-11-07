@@ -2,13 +2,13 @@
 
 @section('content')
 <div class="space-y-6">
+    <x-admin.page-header :title="$title" icon="fas fa-history">
+        <x-slot:actions>
+            <x-admin.button :href="url('admin/user-edit?id='.$user->id)" icon="fas fa-edit">Edit User</x-admin.button>
+            <x-admin.button :href="url('admin/user-role-history')" tone="gray" icon="fas fa-arrow-left">Back to All</x-admin.button>
+        </x-slot:actions>
+    </x-admin.page-header>
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-        <x-admin.page-header :title="$title" icon="fas fa-history">
-            <x-slot:actions>
-                <x-admin.button :href="url('admin/user-edit?id='.$user->id)" icon="fas fa-edit">Edit User</x-admin.button>
-                <x-admin.button :href="url('admin/user-role-history')" tone="gray" icon="fas fa-arrow-left">Back to All</x-admin.button>
-            </x-slot:actions>
-        </x-admin.page-header>
 
         <!-- User Info -->
         <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
@@ -25,7 +25,7 @@
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Current Role</label>
                     <div class="text-lg text-gray-900 dark:text-gray-100">
                         @if($user->role)
-                            <span class="px-3 py-1 text-sm font-medium rounded bg-blue-200 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                            <span class="px-3 py-1 text-sm font-medium rounded bg-primary-200 dark:bg-primary-900 text-primary-800 dark:text-primary-200">
                                 {{ $user->role->name }}
                             </span>
                         @else
@@ -44,7 +44,7 @@
                                 Expired
                             </span>
                         @else
-                            <span class="ml-2 px-2 py-1 text-xs font-medium rounded bg-green-200 dark:bg-green-900 text-green-800 dark:text-green-200">
+                            <span class="ml-2 px-2 py-1 text-xs font-medium rounded bg-success-200 dark:bg-success-900 text-success-800 dark:text-success-200">
                                 Active
                             </span>
                         @endif
@@ -58,33 +58,33 @@
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead class="bg-gray-50 dark:bg-gray-900">
                     <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        <x-admin.th>
                             Date
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        </x-admin.th>
+                        <x-admin.th>
                             Old Role
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        </x-admin.th>
+                        <x-admin.th>
                             New Role
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        </x-admin.th>
+                        <x-admin.th>
                             Old Expiry
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        </x-admin.th>
+                        <x-admin.th>
                             New Expiry
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        </x-admin.th>
+                        <x-admin.th>
                             Effective Date
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        </x-admin.th>
+                        <x-admin.th>
                             Stacked
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        </x-admin.th>
+                        <x-admin.th>
                             Reason
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        </x-admin.th>
+                        <x-admin.th>
                             Changed By
-                        </th>
+                        </x-admin.th>
                     </tr>
                 </thead>
                 <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -104,7 +104,7 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                 @if($record->newRole)
-                                    <span class="px-2 py-1 text-xs font-medium rounded bg-blue-200 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                                    <span class="px-2 py-1 text-xs font-medium rounded bg-primary-200 dark:bg-primary-900 text-primary-800 dark:text-primary-200">
                                         {{ $record->newRole->name }}
                                     </span>
                                 @else
@@ -122,7 +122,7 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
                                 @if($record->is_stacked)
-                                    <span class="px-2 py-1 text-xs font-medium rounded bg-green-200 dark:bg-green-900 text-green-800 dark:text-green-200">
+                                    <span class="px-2 py-1 text-xs font-medium rounded bg-success-200 dark:bg-success-900 text-success-800 dark:text-success-200">
                                         Yes
                                     </span>
                                 @else
@@ -143,7 +143,7 @@
                     @empty
                         <tr>
                             <td colspan="9" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
-                                <i class="fas fa-info-circle mr-2"></i>No role history records found for this user
+                                <i aria-hidden="true" class="fas fa-info-circle mr-2"></i>No role history records found for this user
                             </td>
                         </tr>
                     @endforelse

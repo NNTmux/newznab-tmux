@@ -108,6 +108,7 @@ class MusicController extends BasePageController
 
         $this->viewData = array_merge($this->viewData, [
             'catlist' => $mtmp,
+            'ordering' => $ordering,
             'category' => $category,
             'categorytitle' => $id,
             'catname' => $catname,

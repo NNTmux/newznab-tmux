@@ -24,8 +24,8 @@
      data-download-url="{{ route('admin.logs.download') }}"
      data-truncate-url="{{ route('admin.logs.truncate') }}"
      data-destroy-url="{{ route('admin.logs.destroy') }}">
+    <x-admin.page-header :title="$title" icon="fas fa-file-lines" subtitle="Browse entries in storage/logs and search one file or every log at once, by text, level, channel or time. Press / to search." />
     <x-admin.card>
-        <x-admin.page-header :title="$title" icon="fas fa-file-lines" subtitle="Browse entries in storage/logs and search one file or every log at once, by text, level, channel or time. Press / to search." />
 
         <noscript>
             <div class="px-6 py-4 text-sm text-amber-800 bg-amber-50 dark:bg-amber-900/30 dark:text-amber-200">The log viewer requires JavaScript.</div>
@@ -44,14 +44,14 @@
                                    x-model="fileFilter"
                                    placeholder="Filter files"
                                    aria-label="Filter log files"
-                                   class="w-full rounded-lg border border-gray-300 bg-white py-2 pl-8 pr-3 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100">
+                                   class="w-full rounded-lg border border-gray-300 bg-white py-2 pl-8 pr-3 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100">
                         </div>
 
                         <div x-show="isAllScope()" x-cloak class="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
                             <span x-text="includedLabel()"></span>
                             <span class="flex gap-2">
-                                <button type="button" class="font-semibold text-blue-600 hover:underline dark:text-blue-400" @click="includeAll()">All</button>
-                                <button type="button" class="font-semibold text-blue-600 hover:underline dark:text-blue-400" @click="includeNone()">None</button>
+                                <button type="button" class="font-semibold text-link hover:underline dark:text-primary-400" @click="includeAll()">All</button>
+                                <button type="button" class="font-semibold text-link hover:underline dark:text-primary-400" @click="includeNone()">None</button>
                             </span>
                         </div>
 
@@ -60,7 +60,7 @@
                                 <li class="flex items-stretch gap-1">
                                     <label x-show="isAllScope()" class="flex items-center px-1" :title="includeTitle(file)">
                                         <input type="checkbox"
-                                               class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800"
+                                               class="rounded border-gray-300 text-link focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-800"
                                                :checked="isIncluded(file.path)"
                                                @change="toggleIncluded(file.path)">
                                     </label>
@@ -70,7 +70,7 @@
                                             :aria-selected="isSelected(file.path)"
                                             @click="selectFile(file.path)">
                                         <span class="flex items-center gap-2">
-                                            <span x-show="file.active" class="h-2 w-2 shrink-0 rounded-full bg-green-500" title="Written to recently"></span>
+                                            <span x-show="file.active" class="h-2 w-2 shrink-0 rounded-full bg-success-500" title="Written to recently"></span>
                                             <span class="truncate text-sm font-medium" x-text="file.name"></span>
                                             <i x-show="hasIndexState(file)" class="fas fa-bolt ml-auto shrink-0 text-[10px]" :class="indexStateClass(file)" :title="indexStateTitle(file)" aria-hidden="true"></i>
                                         </span>
@@ -101,7 +101,7 @@
                                        aria-label="Search logs"
                                        autocomplete="off"
                                        spellcheck="false"
-                                       class="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-9 pr-24 font-mono text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100">
+                                       class="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-9 pr-24 font-mono text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100">
                                 <div class="absolute right-1.5 top-1/2 flex -translate-y-1/2 gap-1">
                                     <button type="button"
                                             class="rounded-md border px-2 py-1 font-mono text-xs font-semibold transition"
@@ -133,7 +133,7 @@
                                     <select x-model.number="limit"
                                             @change="onLimitChange()"
                                             aria-label="Entries per page"
-                                            class="rounded-lg border border-gray-300 bg-white py-1.5 pl-2 pr-8 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100">
+                                            class="rounded-lg border border-gray-300 bg-white py-1.5 pl-2 pr-8 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100">
                                         <template x-for="option in limitOptions" :key="option">
                                             <option :value="option" x-text="option" :selected="option === limit"></option>
                                         </template>
@@ -153,7 +153,7 @@
                                     <span class="rounded-full bg-black/10 px-1.5 text-[10px] dark:bg-white/10" x-show="levelCount(level) > 0" x-text="levelCountLabel(level)"></span>
                                 </button>
                             </template>
-                            <button type="button" x-show="hasLevels()" x-cloak class="ml-1 text-xs font-semibold text-blue-600 hover:underline dark:text-blue-400" @click="clearLevels()">Clear levels</button>
+                            <button type="button" x-show="hasLevels()" x-cloak class="ml-1 text-xs font-semibold text-link hover:underline dark:text-primary-400" @click="clearLevels()">Clear levels</button>
                         </div>
 
                         <div x-show="hasChannelOptions()" x-cloak class="flex flex-wrap items-center gap-1.5" :title="countsTitle()">
@@ -168,7 +168,7 @@
                                     <span class="rounded-full bg-black/10 px-1.5 text-[10px] dark:bg-white/10" x-show="channelCount(channel) > 0" x-text="channelCountLabel(channel)"></span>
                                 </button>
                             </template>
-                            <button type="button" x-show="hasChannels()" x-cloak class="ml-1 text-xs font-semibold text-blue-600 hover:underline dark:text-blue-400" @click="clearChannels()">Clear channels</button>
+                            <button type="button" x-show="hasChannels()" x-cloak class="ml-1 text-xs font-semibold text-link hover:underline dark:text-primary-400" @click="clearChannels()">Clear channels</button>
                         </div>
 
                         <div class="flex flex-wrap items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
@@ -179,7 +179,7 @@
                                        x-model="from"
                                        @change="onRangeChange()"
                                        aria-label="Entries logged from"
-                                       class="rounded-lg border border-gray-300 bg-white px-2 py-1 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100">
+                                       class="rounded-lg border border-gray-300 bg-white px-2 py-1 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100">
                             </label>
                             <label class="flex items-center gap-1.5">
                                 <span>To</span>
@@ -188,9 +188,9 @@
                                        x-model="to"
                                        @change="onRangeChange()"
                                        aria-label="Entries logged until"
-                                       class="rounded-lg border border-gray-300 bg-white px-2 py-1 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100">
+                                       class="rounded-lg border border-gray-300 bg-white px-2 py-1 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100">
                             </label>
-                            <button type="button" x-show="hasTimeRange()" x-cloak class="text-xs font-semibold text-blue-600 hover:underline dark:text-blue-400" @click="clearRange()">Clear time range</button>
+                            <button type="button" x-show="hasTimeRange()" x-cloak class="text-xs font-semibold text-link hover:underline dark:text-primary-400" @click="clearRange()">Clear time range</button>
                         </div>
 
                         <p x-show="searchError" x-cloak class="text-sm text-red-600 dark:text-red-400" x-text="searchError"></p>
@@ -222,23 +222,23 @@
                     <div x-show="isSearchMode()" x-cloak class="border-b border-gray-200 px-4 py-3 sm:px-6 dark:border-gray-700">
                         <div class="flex flex-wrap items-center justify-between gap-2 text-sm text-gray-700 dark:text-gray-300">
                             <span class="flex items-center gap-2">
-                                <i x-show="searching" class="fas fa-circle-notch fa-spin text-blue-500" aria-hidden="true"></i>
+                                <i x-show="searching" class="fas fa-circle-notch fa-spin text-primary-500" aria-hidden="true"></i>
                                 <span x-text="progressLabel()"></span>
                             </span>
                             <span class="flex gap-3 text-xs">
-                                <button type="button" class="font-semibold text-blue-600 hover:underline dark:text-blue-400" @click="expandAllGroups()">Expand all</button>
-                                <button type="button" class="font-semibold text-blue-600 hover:underline dark:text-blue-400" @click="collapseAllGroups()">Collapse all</button>
-                                <button type="button" class="font-semibold text-blue-600 hover:underline dark:text-blue-400" @click="clearSearch()">Clear search</button>
+                                <button type="button" class="font-semibold text-link hover:underline dark:text-primary-400" @click="expandAllGroups()">Expand all</button>
+                                <button type="button" class="font-semibold text-link hover:underline dark:text-primary-400" @click="collapseAllGroups()">Collapse all</button>
+                                <button type="button" class="font-semibold text-link hover:underline dark:text-primary-400" @click="clearSearch()">Clear search</button>
                             </span>
                         </div>
                         <div class="mt-2 h-1 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700" x-show="searching">
-                            <div class="h-full bg-blue-500 transition-all duration-300" :style="progressStyle()"></div>
+                            <div class="h-full bg-primary-500 transition-all duration-300" :style="progressStyle()"></div>
                         </div>
                     </div>
 
                     {{-- Browse mode --}}
                     <div x-show="isBrowseMode()">
-                        <div x-show="isBrowsingFromAnchor()" x-cloak class="flex items-center justify-between gap-2 border-b border-yellow-200 bg-yellow-50 px-4 py-2 text-sm text-yellow-800 sm:px-6 dark:border-yellow-900 dark:bg-yellow-900/20 dark:text-yellow-200">
+                        <div x-show="isBrowsingFromAnchor()" x-cloak class="flex items-center justify-between gap-2 border-b border-warning-200 bg-warning-50 px-4 py-2 text-sm text-warning-800 sm:px-6 dark:border-warning-900 dark:bg-warning-900/20 dark:text-warning-200">
                             <span>Showing entries from the selected match backwards.</span>
                             <button type="button" class="font-semibold hover:underline" @click="jumpToLatest()">Jump to latest</button>
                         </div>
