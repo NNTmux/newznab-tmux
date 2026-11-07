@@ -1,5 +1,5 @@
 
-<div class="max-w-7xl mx-auto">
+<div>
     <x-page-header title="My movies" eyebrow="Your watchlist" description="Manage saved movies and receive automatic updates when releases become available." icon="fas fa-film">
         <x-slot:stats>
             <span class="workspace-hero__stat"><i class="fas fa-bookmark" aria-hidden="true"></i>{{ number_format(count($movies ?? [])) }} saved</span>

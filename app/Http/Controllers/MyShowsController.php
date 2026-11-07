@@ -10,6 +10,7 @@ use App\Models\Video;
 use App\Services\Configuration\ConfigurationProvider;
 use App\Services\Releases\ReleaseBrowseService;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class MyShowsController extends BasePageController
 {
@@ -142,7 +143,7 @@ class MyShowsController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function browse(Request $request): mixed
+    public function browse(Request $request): View
     {
         $title = 'Browse My Shows';
         $meta_title = 'My Shows';
@@ -161,20 +162,22 @@ class MyShowsController extends BasePageController
         $rslt = $this->releaseBrowseService->getShowsRange($shows ?? [], $offset, $perPage, $orderby, -1, (array) $this->userdata->categoryexclusions);
         $results = $this->paginate($rslt ?? [], $browseCount, $perPage, $page, $request->url(), $request->query());
 
-        $this->viewData['covgroup'] = '';
+        $this->viewData = array_merge($this->viewData, $this->buildOrderByUrls($ordering, 'myshows/browse'), [
+            'covgroup' => '',
+            'lastvisit' => $this->userdata->lastlogin,
+            'results' => $results,
+            'resultsadd' => $rslt,
+            'shows' => true,
+            'pageHeading' => [
+                'title' => 'My show releases',
+                'eyebrow' => 'Your watchlist',
+                'description' => 'The latest releases from the shows you follow.',
+                'icon' => 'fas fa-tv',
+            ],
+        ], compact('title', 'meta_title', 'meta_keywords', 'meta_description'));
 
-        foreach ($ordering as $ordertype) {
-            $this->viewData['orderby'.$ordertype] = url('/myshows/browse?ob='.$ordertype.'&amp;offset=0');
-        }
-
-        $this->viewData['lastvisit'] = $this->userdata->lastlogin;
-        $this->viewData['results'] = $results;
-        $this->viewData['resultsadd'] = $rslt;
-        $this->viewData['shows'] = true;
-        $this->viewData['content'] = view('browse.index', $this->viewData)->render();
-        $this->viewData = array_merge($this->viewData, compact('title', 'meta_title', 'meta_keywords', 'meta_description'));
-
-        return $this->pagerender();
+        // browse.index extends the main layout itself, so it must not be wrapped by pagerender().
+        return view('browse.index', $this->viewData);
     }
 
     /**
