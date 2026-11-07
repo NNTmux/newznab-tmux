@@ -170,10 +170,12 @@ class SharedComponentKitTest extends TestCase
         $this->assertStringContainsString('78%</span>', $fresh);
         $this->assertStringContainsString('Rotten Tomatoes · Fresh', $fresh);
         $this->assertStringContainsString('fa-apple-whole', $fresh);
+        $this->assertStringContainsString('text-success-700', $fresh, 'Fresh is green (good).');
 
         $rotten = Blade::render('<x-rotten-tomatoes-score score="17%" />');
         $this->assertStringContainsString('Rotten Tomatoes · Rotten', $rotten);
         $this->assertStringContainsString('fa-splotch', $rotten);
+        $this->assertStringContainsString('text-danger-600', $rotten, 'Rotten is red (bad).');
 
         foreach (['N/A', '', 'abc'] as $missing) {
             $this->assertSame('', trim(Blade::render('<x-rotten-tomatoes-score :score="$score" />', ['score' => $missing])), $missing);

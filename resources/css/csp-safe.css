@@ -540,24 +540,25 @@ code.api-token::-webkit-scrollbar-thumb:hover {
 }
 
 /* Rotten Tomatoes chip on movie cards: fresh (red) vs rotten (green) */
+/* Fresh is green (good) and Rotten is red (bad), like the rest of the site. */
 .movie-meta-chip--rt-fresh {
-    background: rgb(254 226 226);
-    color: rgb(185 28 28);
-}
-
-.dark .movie-meta-chip--rt-fresh {
-    background: rgb(127 29 29 / 0.45);
-    color: rgb(252 165 165);
-}
-
-.movie-meta-chip--rt-rotten {
     background: rgb(220 252 231);
     color: rgb(21 128 61);
 }
 
-.dark .movie-meta-chip--rt-rotten {
+.dark .movie-meta-chip--rt-fresh {
     background: rgb(20 83 45 / 0.45);
     color: rgb(134 239 172);
+}
+
+.movie-meta-chip--rt-rotten {
+    background: rgb(254 226 226);
+    color: rgb(185 28 28);
+}
+
+.dark .movie-meta-chip--rt-rotten {
+    background: rgb(127 29 29 / 0.45);
+    color: rgb(252 165 165);
 }
 
 .movie-card__metadata-row {

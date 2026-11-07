@@ -1,6 +1,6 @@
 {{--
     Rotten Tomatoes Tomatometer from OMDb ("78%"). Renders nothing for "N/A" or empty values.
-    60% and above is "Fresh" (red tomato), below is "Rotten" (green splat).
+    60% and above is "Fresh" (green, good), below is "Rotten" (red, bad), matching the site-wide good/bad colors.
     size="chip" renders a compact pill for movie cards; the default is the large detail-page badge.
 --}}
 @props([
@@ -23,8 +23,8 @@
     <div {{ $attributes->merge(['class' => 'movie-rt-score flex items-center gap-2']) }} title="Rotten Tomatoes Tomatometer">
         <span @class([
             'flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-lg',
-            'bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-400' => $fresh,
-            'bg-success-100 text-success-700 dark:bg-success-900/40 dark:text-success-400' => ! $fresh,
+            'bg-success-100 text-success-700 dark:bg-success-900/40 dark:text-success-400' => $fresh,
+            'bg-danger-100 text-danger-600 dark:bg-danger-900/40 dark:text-danger-400' => ! $fresh,
         ]) aria-hidden="true">
             <i aria-hidden="true" class="fas {{ $fresh ? 'fa-apple-whole' : 'fa-splotch' }}"></i>
         </span>
