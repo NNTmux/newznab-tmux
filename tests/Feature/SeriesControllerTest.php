@@ -114,6 +114,27 @@ class SeriesControllerTest extends TestCase
         $seasonTwo->assertDontSee('Only.Season.One.S01E01.720p-GROUP');
     }
 
+    public function test_series_details_show_the_title_once_with_compact_facts_and_actions(): void
+    {
+        $user = $this->createUser();
+        $videoId = $this->createShow();
+        $this->createMatchedRelease($videoId, 1, 1, 'Paged.Test.Show.S01E01.720p-GROUP');
+
+        $html = (string) $this->actingAs($user)->get(route('series', ['id' => $videoId]))
+            ->assertOk()
+            ->assertSee('aria-label="Series information"', false)
+            ->assertSee('Test Network')
+            ->assertSee('Jan 01, 2024')
+            ->assertSee('A test show.')
+            ->assertSee('Add to My shows')
+            ->assertSee('RSS feed')
+            ->getContent();
+
+        $body = substr($html, (int) strpos($html, 'aria-label="Series information"'));
+        $this->assertStringNotContainsString('>Paged Test Show<', $body, 'The series name is only shown in the page header.');
+        $this->assertStringNotContainsString('series-stat-card bg-linear', $html);
+    }
+
     public function test_season_links_preserve_category_and_reset_page(): void
     {
         $user = $this->createUser();

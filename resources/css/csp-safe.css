@@ -880,10 +880,6 @@ code.api-token::-webkit-scrollbar-thumb:hover {
     @apply shadow-sm hover:shadow-md transition-shadow duration-300;
 }
 
-.series-detail-page {
-    @apply shadow-md;
-}
-
 .series-detail-page .series-main-card,
 .series-detail-page .series-episodes-card {
     @apply shadow-md;
