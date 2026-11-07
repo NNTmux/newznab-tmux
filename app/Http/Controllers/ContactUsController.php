@@ -6,54 +6,40 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ContactContactURequest;
 use App\Jobs\SendContactUsEmail;
-use App\Support\CaptchaHelper;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 class ContactUsController extends BasePageController
 {
-    /**
-     * @throws ValidationException
-     */
-    public function contact(ContactContactURequest $request): mixed
+    public function contact(ContactContactURequest $request): RedirectResponse
     {
+        $replyTo = $request->replyToAddress();
 
-        $msg = '';
+        $lines = [
+            'Name: '.$request->validated('username'),
+            'Email: '.$replyTo,
+        ];
+        if ($request->user() !== null) {
+            $lines[] = 'Account: '.$request->user()->username.($replyTo !== $request->user()->email ? ' ('.$request->user()->email.')' : '');
+        }
+        $lines[] = '';
+        $lines[] = (string) $request->validated('comment');
 
-        if ($request->has('useremail')) {
-            $email = $request->input('useremail');
-            $mailTo = config('mail.from.address');
-            $mailBody = 'Values submitted from contact form: ';
-
-            $captchaFieldName = CaptchaHelper::getResponseFieldName();
-            foreach ($request->all() as $key => $value) {
-                if ($key !== 'submit' && $key !== '_token' && $key !== 'g-recaptcha-response' && $key !== 'cf-turnstile-response') {
-                    $mailBody .= "$key : $value".PHP_EOL;
-                }
-            }
-
-            if (! preg_match("/\n/i", $request->input('useremail'))) {
-                SendContactUsEmail::dispatch($email, $mailTo, $mailBody)->onQueue('contactemail');
-            }
-            $msg = "<h2 style='text-align:center;'>Thank you for getting in touch with ".config('app.name').'.</h2>';
+        // Guard against header injection through the reply-to address.
+        if ($replyTo !== '' && ! preg_match('/[\r\n]/', $replyTo)) {
+            SendContactUsEmail::dispatch($replyTo, (string) config('mail.from.address'), implode(PHP_EOL, $lines))->onQueue('contactemail');
         }
 
-        return $this->showContactForm($msg);
+        return redirect()->route('contact-us')->with('success', 'Thank you for getting in touch with '.config('app.name').'. We will reply to '.$replyTo.'.');
     }
 
-    /**
-     * @return View
-     *
-     * @throws \Exception
-     */
-    public function showContactForm(string $msg = '')
+    public function showContactForm(): View
     {
         return view('contact.index', [
             'title' => 'Contact '.config('app.name'),
             'meta_title' => 'Contact '.config('app.name'),
             'meta_keywords' => 'contact us,contact,get in touch,email',
             'meta_description' => 'Contact us at '.config('app.name').' and submit your feedback',
-            'msg' => $msg,
         ]);
     }
 }

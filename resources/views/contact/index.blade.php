@@ -7,90 +7,48 @@
 
     <div class="surface-panel rounded-xl shadow-sm mb-6">
 
-        <div class="px-6 py-8 lg:px-12 lg:py-10">
-            @if(isset($msg) && $msg != '')
-                <div class="mb-6 p-4 bg-success-50 dark:bg-success-900/30 border border-success-200 dark:border-success-700 text-success-800 dark:text-success-200 rounded-lg">
-                    <i aria-hidden="true" class="fa-solid fa-check-circle mr-2"></i>{!! $msg !!}
-                </div>
-            @endif
-
-            @if(session('success'))
-                <div class="mb-6 p-4 bg-success-50 dark:bg-success-900/30 border border-success-200 dark:border-success-700 text-success-800 dark:text-success-200 rounded-lg">
-                    <i aria-hidden="true" class="fa-solid fa-check-circle mr-2"></i>{{ session('success') }}
-                </div>
-            @endif
-
-            @if($errors->any())
-                <div class="mb-6 p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 text-red-800 dark:text-red-200 rounded-lg">
-                    <i aria-hidden="true" class="fa-solid fa-exclamation-circle mr-2"></i>
-                    <ul class="mb-0 list-disc list-inside">
-                        @foreach($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
+        <div class="mx-auto w-full max-w-2xl px-6 py-8 lg:py-10">
+            <x-form-errors class="mb-6" />
 
             <div class="mb-6">
                 <h3 class="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-3">Have a question?</h3>
                 <p class="text-gray-600 dark:text-gray-400">Don't hesitate to send us a message. Our team will be happy to help you.</p>
             </div>
 
-            <form method="POST" action="{{ route('contact-us') }}">
+            <form method="POST" action="{{ route('contact-us') }}" class="space-y-6">
                 @csrf
-                <div class="mb-6">
-                    <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Name <span class="text-red-500">*</span>
-                    </label>
-                    <div class="flex">
-                        <span class="inline-flex items-center px-3 bg-gray-50 dark:bg-gray-900 border border-r-0 border-gray-300 dark:border-gray-600 rounded-l-md">
-                            <i aria-hidden="true" class="fas fa-user text-gray-500 dark:text-gray-400"></i>
-                        </span>
-                        <input id="username" type="text" name="username" value="{{ old('username') }}"
-                               placeholder="Your name"
-                               class="flex-1 block w-full px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-r-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder-gray-400 dark:placeholder-gray-500 @error('username') border-red-500 @enderror"
-                               required>
-                    </div>
-                    @error('username')
-                        <div class="text-red-500 dark:text-red-400 text-sm mt-1">{{ $message }}</div>
-                    @enderror
-                </div>
+                <x-field label="Name" for="username" name="username" required>
+                    <x-input id="username" name="username" :value="old('username', auth()->user()?->username)" placeholder="Your name" autocomplete="name" required />
+                </x-field>
 
-                <div class="mb-6">
-                    <label for="useremail" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Email <span class="text-red-500">*</span>
-                    </label>
-                    <div class="flex">
-                        <span class="inline-flex items-center px-3 bg-gray-50 dark:bg-gray-900 border border-r-0 border-gray-300 dark:border-gray-600 rounded-l-md">
-                            <i aria-hidden="true" class="fas fa-envelope text-gray-500 dark:text-gray-400"></i>
-                        </span>
-                        <input type="email" id="useremail" name="useremail" value="{{ old('useremail') }}"
-                               placeholder="Your email address"
-                               class="flex-1 block w-full px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-r-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder-gray-400 dark:placeholder-gray-500 @error('useremail') border-red-500 @enderror"
-                               required>
+                @auth
+                    {{-- Replies go to the account email; ticking the box reveals an optional other address (pure CSS, no JS). --}}
+                    <div class="group/reply space-y-3">
+                        <div class="rounded-control border border-line bg-surface-sunken px-4 py-3">
+                            <p class="text-sm font-semibold text-fg">Reply email</p>
+                            <p class="mt-1 flex items-center gap-2 text-sm text-fg-muted">
+                                <i aria-hidden="true" class="fas fa-envelope"></i>
+                                <span>We will reply to <span class="font-medium text-fg">{{ auth()->user()->email }}</span></span>
+                            </p>
+                            <div class="mt-3">
+                                <x-checkbox name="use_different_email" value="1" :checked="(bool) old('use_different_email')" aria-controls="useremail-field">
+                                    Use a different email address
+                                </x-checkbox>
+                            </div>
+                        </div>
+                        <x-field id="useremail-field" class="hidden group-has-[:checked]/reply:block" label="Different email" for="useremail" name="useremail" help="Optional. Only used to reply to this message.">
+                            <x-input type="email" id="useremail" name="useremail" :value="old('useremail')" placeholder="other@example.com" autocomplete="email" />
+                        </x-field>
                     </div>
-                    @error('useremail')
-                        <div class="text-red-500 dark:text-red-400 text-sm mt-1">{{ $message }}</div>
-                    @enderror
-                </div>
+                @else
+                    <x-field label="Email" for="useremail" name="useremail" required>
+                        <x-input type="email" id="useremail" name="useremail" :value="old('useremail')" placeholder="Your email address" autocomplete="email" required />
+                    </x-field>
+                @endauth
 
-                <div class="mb-6">
-                    <label for="comment" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Message <span class="text-red-500">*</span>
-                    </label>
-                    <div class="flex">
-                        <span class="inline-flex items-start px-3 pt-3 bg-gray-50 dark:bg-gray-900 border border-r-0 border-gray-300 dark:border-gray-600 rounded-tl-md rounded-bl-md">
-                            <i aria-hidden="true" class="fas fa-comment text-gray-500 dark:text-gray-400"></i>
-                        </span>
-                        <textarea rows="7" name="comment" id="comment"
-                                  placeholder="Your message"
-                                  class="flex-1 block w-full px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-r-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder-gray-400 dark:placeholder-gray-500 @error('comment') border-red-500 @enderror"
-                                  required>{{ old('comment') }}</textarea>
-                    </div>
-                    @error('comment')
-                        <div class="text-red-500 dark:text-red-400 text-sm mt-1">{{ $message }}</div>
-                    @enderror
-                </div>
+                <x-field label="Message" for="comment" name="comment" required>
+                    <x-textarea id="comment" name="comment" rows="7" placeholder="Your message" required>{{ old('comment') }}</x-textarea>
+                </x-field>
 
                 @if(\App\Support\CaptchaHelper::isEnabled())
                     <div class="mb-6 flex justify-center">
@@ -102,7 +60,7 @@
                 @endif
 
                 <div class="w-full">
-                    <button type="submit" class="w-full bg-success-600 dark:bg-success-700 hover:bg-success-700 dark:hover:bg-success-800 text-white font-semibold py-3 px-6 rounded-lg transition duration-150 ease-in-out flex items-center justify-center text-lg">
+                    <button type="submit" class="w-full bg-success-600 dark:bg-success-700 hover:bg-success-700 dark:hover:bg-success-800 text-white font-semibold py-2.5 px-6 rounded-control transition duration-150 ease-in-out flex items-center justify-center">
                         <i aria-hidden="true" class="fas fa-paper-plane mr-2"></i>Send Message
                     </button>
                 </div>
