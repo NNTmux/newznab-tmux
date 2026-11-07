@@ -73,7 +73,7 @@
         "spatie/laravel-typescript-transformer": "^2",
         "stechstudio/laravel-zipstream": "^5.4",
         "symfony/process": "^7.0",
-        "voku/simple_html_dom": "^4.8"
+        "voku/simple_html_dom": "^5.1"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.7",
