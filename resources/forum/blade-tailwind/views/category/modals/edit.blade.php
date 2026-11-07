@@ -49,7 +49,7 @@
 
     @if ($privateAncestor != null)
         <div class="alert alert-primary" role="alert">
-            {!! trans('forum::categories.access_controlled_by_private_ancestor', ['category' => "<a href=\"{$privateAncestor->route}\">{$privateAncestor->title}</a>"]) !!}
+            {!! trans('forum::categories.access_controlled_by_private_ancestor', ['category' => '<a href="'.e($privateAncestor->route).'">'.e($privateAncestor->title).'</a>']) !!}
         </div>
     @endif
 

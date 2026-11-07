@@ -230,6 +230,37 @@ final class XMLResponseTest extends TestCase
         self::assertNotFalse($parsed);
     }
 
+    public function test_rss_description_escapes_usenet_fields_and_cannot_break_out_of_cdata(): void
+    {
+        $release = $this->release([
+            'searchname' => '<img src=x onerror=alert(1)>',
+            'group_name' => 'alt.binaries.testing',
+            'fromname' => 'poster]]></description><enclosure url="http://evil.test/x.nzb"/><description><![CDATA[',
+            'postdate' => '2026-05-28 08:30:00',
+            'passwordstatus' => 0,
+            'nfostatus' => 0,
+            'parentid' => Category::MOVIE_ROOT,
+            'imdbid' => '',
+            'musicinfo_id' => 0,
+            'consoleinfo_id' => 0,
+        ]);
+
+        $xml = $this->response([$release], ['uid' => 1], 'rss')->returnXML();
+
+        self::assertIsString($xml);
+        $parsed = simplexml_load_string($xml);
+        self::assertNotFalse($parsed);
+
+        $item = $parsed->channel->item[0];
+        self::assertCount(1, $item->enclosure);
+        self::assertStringNotContainsString('evil.test', (string) $item->enclosure['url']);
+
+        $description = (string) $item->description;
+        self::assertStringNotContainsString('<img', $description);
+        self::assertStringContainsString('&lt;img src=x onerror=alert(1)&gt;', $description);
+        self::assertStringContainsString('&lt;/description&gt;&lt;enclosure', $description);
+    }
+
     /**
      * @param  array<string, mixed>  $overrides
      */

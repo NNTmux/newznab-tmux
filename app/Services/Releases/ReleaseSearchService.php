@@ -1237,8 +1237,8 @@ class ReleaseSearchService
             $this->showPasswords(),
             ($aniDbID > -1 ? sprintf(' AND r.anidbid = %d ', $aniDbID) : ''),
             $anidbIdFilter,
-            (! empty($searchResult) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
-            ! empty($excludedCategories) ? sprintf('AND r.categories_id NOT IN('.implode(',', $excludedCategories).')') : '',
+            (! empty($searchResult) ? 'AND r.id IN ('.implode(',', array_map('intval', $searchResult)).')' : ''),
+            ! empty($excludedCategories) ? 'AND r.categories_id NOT IN('.implode(',', array_map('intval', $excludedCategories)).')' : '',
             Category::getCategorySearch($cat, 'anime'),
             ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : ''),
             ($minSize > 0 ? sprintf(' AND r.size >= %d ', $minSize) : '')

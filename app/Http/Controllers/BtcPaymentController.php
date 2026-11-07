@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserRole;
 use App\Models\Payment;
 use App\Models\User;
 use App\Services\AdminDashboardSnapshotService;
@@ -11,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Spatie\Permission\Models\Role;
 
 class BtcPaymentController extends BasePageController
 {
@@ -20,7 +22,7 @@ class BtcPaymentController extends BasePageController
     public function btcPayCallback(Request $request): Response
     {
         $hashCheck = 'sha256='.hash_hmac('sha256', $request->getContent(), config('nntmux.btcpay_webhook_secret'));
-        if ($hashCheck !== $request->header('btcpay-sig')) {
+        if (! hash_equals($hashCheck, (string) $request->header('btcpay-sig'))) {
             Log::channel('btc_payment')->error('BTCPay webhook hash check failed: '.$request->header('btcpay-sig'));
 
             return response('Not Found', 404);
@@ -88,6 +90,12 @@ class BtcPaymentController extends BasePageController
                         $addYears = null;
                     }
 
+                    if (! $this->isPurchasableRole($roleName)) {
+                        Log::channel('btc_payment')->error('BTCPay webhook asked for a role that cannot be bought: '.$roleName.' (webhook: '.$checkOrder->webhook_id.')');
+
+                        return response('Not Found', 404);
+                    }
+
                     User::updateUserRole($user->id, $roleName, addYears: $addYears);
                     $checkOrder->update(['invoice_status' => Payment::INVOICE_STATUS_SETTLED]);
                     Log::channel('btc_payment')->info('User: '.$user->username.' upgraded to '.$roleName.' (+'.$addYears.' years) for BTCPay webhook: '.$checkOrder->webhook_id);
@@ -111,6 +119,25 @@ class BtcPaymentController extends BasePageController
         }
 
         return response('OK', 200);
+    }
+
+    /**
+     * Only an existing role without staff or disabled status can be bought.
+     */
+    private function isPurchasableRole(string $roleName): bool
+    {
+        $role = Role::query()->where('name', $roleName)->where('guard_name', 'web')->first();
+        if ($role === null) {
+            return false;
+        }
+
+        foreach ([UserRole::ADMIN, UserRole::MODERATOR, UserRole::DISABLED] as $blockedRole) {
+            if (strcasecmp((string) $role->name, $blockedRole->label()) === 0) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

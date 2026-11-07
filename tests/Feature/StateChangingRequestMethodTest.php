@@ -27,7 +27,6 @@ class StateChangingRequestMethodTest extends TestCase
     public static function mutationRouteProvider(): array
     {
         return [
-            'invitation creation' => ['ajax_profile', 'POST'],
             'cart addition' => ['cart.add', 'POST'],
             'cart deletion' => ['cart.delete', 'POST'],
             'profile deletion' => ['profile_delete', 'DELETE'],
@@ -35,6 +34,15 @@ class StateChangingRequestMethodTest extends TestCase
             'promotion toggle' => ['admin.promotions.toggle', 'PATCH'],
             'show unlink' => ['admin.show-remove', 'POST'],
         ];
+    }
+
+    public function test_removed_invite_and_release_inform_endpoints_are_not_routed(): void
+    {
+        $routes = app('router')->getRoutes();
+
+        $this->assertNull($routes->getByName('ajax_profile'));
+        $this->assertSame(404, $this->post('/ajax_profile')->getStatusCode());
+        $this->assertSame(404, $this->get('/api/inform/release?api_token=x&relo=a&relp=b')->getStatusCode());
     }
 
     #[DataProvider('legacyFormRouteProvider')]

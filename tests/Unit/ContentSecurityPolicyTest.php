@@ -77,6 +77,22 @@ class ContentSecurityPolicyTest extends TestCase
         $this->assertSame(4, substr_count((string) $response->getContent(), 'nonce="'.$nonce.'"'));
     }
 
+    public function test_csp_is_still_sent_when_turnstile_is_enabled(): void
+    {
+        config()->set('captcha.provider', 'turnstile');
+        config()->set('captcha.turnstile.enabled', true);
+
+        $response = (new ContentSecurityPolicy)->handle(
+            Request::create('/login'),
+            static fn (): Response => new Response,
+        );
+
+        $csp = (string) $response->headers->get('Content-Security-Policy');
+
+        $this->assertStringContainsString("script-src-attr 'none'", $csp);
+        $this->assertStringContainsString('https://challenges.cloudflare.com', $csp);
+    }
+
     public function test_local_vite_hot_reload_sources_are_added_to_the_csp(): void
     {
         config()->set('app.env', 'local');

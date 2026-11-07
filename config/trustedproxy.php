@@ -26,6 +26,7 @@ return [
         'retry_times' => env('CLOUDFLARE_IPS_RETRY_TIMES', 2),
         'retry_sleep_ms' => env('CLOUDFLARE_IPS_RETRY_SLEEP_MS', 250),
         'storage_path' => env('CLOUDFLARE_IPS_STORAGE_PATH', storage_path('app/cloudflare/trusted-proxies.json')),
+        // When no proxy ranges are known, trust proxies on loopback/private networks only.
         'fallback_to_remote_addr' => env('CLOUDFLARE_TRUST_REMOTE_ADDR_FALLBACK', true),
     ],
 ];

@@ -128,11 +128,11 @@
                     </div>
 
                     <!-- Trailer -->
-                    @if(!empty($movie['trailer'] ?? null))
+                    @if(is_string($movie['trailer'] ?? null) && str_starts_with($movie['trailer'], 'https://'))
                         <div class="mb-6">
                             <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">Trailer</h2>
                             <div class="movie-detail-trailer aspect-video">
-                                {!! $movie['trailer'] !!}
+                                <iframe src="{{ $movie['trailer'] }}" title="Trailer" class="w-full h-full" loading="lazy" allowfullscreen></iframe>
                             </div>
                         </div>
                     @endif

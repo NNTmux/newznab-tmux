@@ -12,7 +12,6 @@ use App\Jobs\SendAccountWillExpireEmail;
 use App\Notifications\VerifyEmailBranded;
 use App\Rules\ValidEmailDomain;
 use App\Services\Configuration\ConfigurationProvider;
-use App\Services\InvitationService;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\MustVerifyEmail as MustVerifyEmailTrait;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
@@ -1545,7 +1544,7 @@ final class User extends Authenticatable implements CanResetPasswordContract, Ha
             default => 'username',
         };
 
-        $direction = isset($parts[1]) && preg_match('/^asc|desc$/i', $parts[1])
+        $direction = isset($parts[1]) && preg_match('/^(asc|desc)$/i', $parts[1])
             ? $parts[1]
             : 'desc';
 
@@ -1753,7 +1752,7 @@ final class User extends Authenticatable implements CanResetPasswordContract, Ha
     ): int {
         $hashedPassword = Hash::make($password);
 
-        $storeIps = config('nntmux:settings.store_user_ip') === true ? $host : '';
+        $storeIps = config('nntmux_settings.store_user_ip') ? $host : '';
 
         $user = self::create([
             'username' => $userName,
@@ -1885,25 +1884,6 @@ final class User extends Authenticatable implements CanResetPasswordContract, Ha
             : null;
 
         return $user ? self::getCategoryExclusionById($user->id) : [];
-    }
-
-    // ===== Invitation Methods =====
-
-    /**
-     * Send an invitation email.
-     *
-     * @throws \Exception
-     */
-    public static function sendInvite(string $serverUrl, int $uid, string $emailTo): string
-    {
-        $user = self::findOrFail($uid);
-
-        $invitation = Invitation::createInvitation($emailTo, $user->id);
-        $url = "{$serverUrl}/register?token={$invitation->token}";
-
-        app(InvitationService::class)->sendInvitationEmail($invitation);
-
-        return $url;
     }
 
     // ===== Cleanup Methods =====

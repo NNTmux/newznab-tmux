@@ -279,8 +279,7 @@ class GetNzbController extends BasePageController
         Release::updateGrabsByGuids($guids);
         UserDownload::addDownloadRequestsBatch($uid, $releaseIds);
 
-        $shouldDeleteFromCart = $request->has('del') && (int) $request->input('del') === 1;
-        if ($shouldDeleteFromCart && $releaseIds !== []) {
+        if ($this->cartRemovalRequested($request) && $releaseIds !== []) {
             UsersRelease::delCartByUserAndReleases($uid, $releaseIds);
         }
     }
@@ -294,16 +293,16 @@ class GetNzbController extends BasePageController
         string $rssToken,
         string $releaseId
     ): JsonResponse|Response|StreamedResponse {
-        // Get NZB file path and validate
-        $nzbPath = app(NzbService::class)->nzbPath($releaseId);
-        if ($nzbPath === false) {
-            return $this->apiError(300, 'NZB file not found!');
-        }
-
-        // Get release data
+        // Get release data first so the NZB path is only built for a stored release
         $releaseData = Release::getByGuid($releaseId);
         if ($releaseData === null) {
             return $this->apiError(300, 'Release not found!');
+        }
+
+        // Get NZB file path and validate
+        $nzbPath = app(NzbService::class)->nzbPath((string) $releaseData->guid);
+        if ($nzbPath === false) {
+            return $this->apiError(300, 'NZB file not found!');
         }
 
         // Update statistics
@@ -343,9 +342,18 @@ class GetNzbController extends BasePageController
         UserDownload::addDownloadRequest($uid, $releaseDbId);
         User::incrementGrabs($uid);
 
-        if ($request->has('del') && (int) $request->input('del') === 1) {
+        if ($this->cartRemovalRequested($request)) {
             UsersRelease::delCartByUserAndRelease($releaseId, $uid);
         }
+    }
+
+    /**
+     * `del=1` is for feed downloaders that sign in with their API token. A browser session is ignored,
+     * so a link on another site cannot empty a logged-in user's cart.
+     */
+    private function cartRemovalRequested(Request $request): bool
+    {
+        return $request->user() === null && (int) $request->input('del') === 1;
     }
 
     /**

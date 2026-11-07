@@ -213,7 +213,7 @@ class ReleaseBrowseService
             $this->showPasswords(),
             Category::getCategorySearch($cat),
             ($maxAge > 0 ? (' AND postdate > NOW() - INTERVAL '.$maxAge.' DAY ') : ''),
-            (\count($excludedCats) ? (' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')') : ''),
+            (\count($excludedCats) ? (' AND r.categories_id NOT IN ('.implode(',', array_map('intval', $excludedCats)).')') : ''),
             ((int) $groupName !== -1 ? sprintf(' AND g.name = %s ', escapeString($groupName)) : ''),
             ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''),
             $searchIndexFilter,
@@ -614,7 +614,7 @@ class ReleaseBrowseService
 				GROUP BY r.id
 				ORDER BY %s %s %s",
             $this->uSQL($userShows, 'videos_id'),
-            (! empty($excludedCats) ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
+            (! empty($excludedCats) ? ' AND r.categories_id NOT IN ('.implode(',', array_map('intval', $excludedCats)).')' : ''),
             Category::TV_ROOT,
             Category::TV_OTHER,
             $this->showPasswords(),
@@ -649,7 +649,7 @@ class ReleaseBrowseService
 				AND r.passwordstatus %s
 				%s',
                 $this->uSQL($userShows, 'videos_id'),
-                (\count($excludedCats) ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
+                (\count($excludedCats) ? ' AND r.categories_id NOT IN ('.implode(',', array_map('intval', $excludedCats)).')' : ''),
                 Category::TV_ROOT,
                 Category::TV_OTHER,
                 $this->showPasswords(),
@@ -671,7 +671,7 @@ class ReleaseBrowseService
             if (! empty($query->categories)) {
                 $catsArr = explode('|', $query->categories);
                 if (\count($catsArr) > 1) {
-                    $sql .= sprintf(' AND r.categories_id IN (%s)', implode(',', $catsArr));
+                    $sql .= sprintf(' AND r.categories_id IN (%s)', implode(',', array_map('intval', $catsArr)));
                 } else {
                     $sql .= sprintf(' AND r.categories_id = %d', $catsArr[0]);
                 }

@@ -24,11 +24,11 @@ class SearchSuggestController extends Controller
     public function autocomplete(Request $request): JsonResponse
     {
         $query = $request->input('q', '');
-        // Use the index from search engine config, or allow override via request
-        $index = $request->input('index') ?? $this->searchEngine->getReleasesIndex();
+        // Always the configured releases index; callers cannot pick another index.
+        $index = $this->searchEngine->getReleasesIndex();
 
-        // Rate limiting: 60 requests per minute per IP
-        $key = 'autocomplete:'.$request->ip();
+        // Rate limiting: 60 requests per minute per user
+        $key = 'autocomplete:'.($request->user()?->getAuthIdentifier() ?? $request->ip());
         if (RateLimiter::tooManyAttempts($key, 60)) {
             return response()->json([
                 'success' => false,
@@ -74,10 +74,10 @@ class SearchSuggestController extends Controller
     public function suggest(Request $request): JsonResponse
     {
         $query = $request->input('q', '');
-        $index = $request->input('index') ?? $this->searchEngine->getReleasesIndex();
+        $index = $this->searchEngine->getReleasesIndex();
 
-        // Rate limiting: 30 requests per minute per IP
-        $key = 'suggest:'.$request->ip();
+        // Rate limiting: 30 requests per minute per user
+        $key = 'suggest:'.($request->user()?->getAuthIdentifier() ?? $request->ip());
         if (RateLimiter::tooManyAttempts($key, 30)) {
             return response()->json([
                 'success' => false,
@@ -131,10 +131,10 @@ class SearchSuggestController extends Controller
     public function searchAssist(Request $request): JsonResponse
     {
         $query = $request->input('q', '');
-        $index = $request->input('index') ?? $this->searchEngine->getReleasesIndex();
+        $index = $this->searchEngine->getReleasesIndex();
 
         // Rate limiting
-        $key = 'searchassist:'.$request->ip();
+        $key = 'searchassist:'.($request->user()?->getAuthIdentifier() ?? $request->ip());
         if (RateLimiter::tooManyAttempts($key, 60)) {
             return response()->json([
                 'success' => false,

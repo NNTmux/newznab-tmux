@@ -8,7 +8,7 @@ $colorClasses = match ($type) {
 
 <div class="alert alert-{{ $type }} alert-dismissable rounded-md my-4 p-4 flex justify-between gap-4 {{ $colorClasses }} transition-colors">
     <div class="message">
-        {!! $message !!}
+        {{ $message }}
     </div>
     <button type="button" data-dismiss="alert" aria-hidden="true" class="hover:opacity-70 transition-opacity">
         <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">

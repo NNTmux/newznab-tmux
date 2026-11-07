@@ -27,6 +27,11 @@ class TurnstileServiceTest extends TestCase
         Log::spy();
     }
 
+    public function test_script_tag_carries_the_csp_nonce(): void
+    {
+        $this->assertStringContainsString('nonce="'.csp_nonce().'"', TurnstileService::renderJs());
+    }
+
     public function test_successful_verification_sends_the_token_without_logging_it(): void
     {
         Http::fake(['challenges.cloudflare.com/*' => Http::response(['success' => true])]);

@@ -60,7 +60,6 @@ final class AdditionalProcessingSeasonPackRenameTest extends TestCase
         DB::purge();
         DB::reconnect();
         DB::statement('CREATE TABLE predb (id INTEGER PRIMARY KEY, title TEXT)');
-        DB::statement('CREATE TABLE release_informs (id INTEGER PRIMARY KEY, relOName TEXT, relPName TEXT)');
 
         $nameFixer = $this->createStub(NameFixingService::class);
         $nameFixer->method('isSeasonPack')->willReturnCallback(static fn (string $name): bool => SeasonPackDetector::isSeasonPack($name));

@@ -139,10 +139,29 @@ Alpine.data('sortDropdown', () => ({
             var limit = maxItems || 10;
             var sizeClass = itemClass === 'header-autocomplete-item' ? 'px-3 py-2 text-sm' : 'px-4 py-2';
             var iconSize = itemClass === 'header-autocomplete-item' ? 'text-xs' : '';
-            dropdown.innerHTML = items.slice(0, limit).map(function(item, i) {
-                var hl = item.replace(regex, '<mark class="bg-warning-200 dark:bg-warning-700 px-0.5 rounded">$1</mark>');
-                return '<div class="' + itemClass + ' ' + sizeClass + ' cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100" data-index="' + i + '"><i aria-hidden="true" class="fas fa-search text-gray-400 mr-2 ' + iconSize + '"></i>' + hl + '</div>';
-            }).join('');
+            // Suggestions are Usenet release names: build nodes with textContent so they never become markup.
+            dropdown.replaceChildren();
+            items.slice(0, limit).forEach(function(item, i) {
+                var row = document.createElement('div');
+                row.className = itemClass + ' ' + sizeClass + ' cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100';
+                row.dataset.index = String(i);
+                var icon = document.createElement('i');
+                icon.setAttribute('aria-hidden', 'true');
+                icon.className = ('fas fa-search text-gray-400 mr-2 ' + iconSize).trim();
+                row.appendChild(icon);
+                String(item).split(regex).forEach(function(part, partIndex) {
+                    if (part === '') return;
+                    if (partIndex % 2 === 1) {
+                        var mark = document.createElement('mark');
+                        mark.className = 'bg-warning-200 dark:bg-warning-700 px-0.5 rounded';
+                        mark.textContent = part;
+                        row.appendChild(mark);
+                    } else {
+                        row.appendChild(document.createTextNode(part));
+                    }
+                });
+                dropdown.appendChild(row);
+            });
             dropdown.querySelectorAll('.' + itemClass).forEach(function(el, i) {
                 el.addEventListener('click', function() { input.value = suggestions[i]; hideDropdown(); if (form) form.submit(); });
                 el.addEventListener('mouseenter', function() { currentIndex = i; updateSelection(dropdown.querySelectorAll('.' + itemClass)); });

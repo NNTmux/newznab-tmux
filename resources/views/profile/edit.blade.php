@@ -45,7 +45,7 @@
 
             <!-- Current Password -->
             <div>
-                <label for="current_password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Current Password (required to set a new password)</label>
+                <label for="current_password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Current Password (required to change your email or password)</label>
                 <div class="relative">
                     <input type="password" name="current_password" id="current_password" autocomplete="current-password"
                         class="w-full px-4 py-2 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 @error('current_password') border-red-500 dark:border-red-600 @enderror">
@@ -360,7 +360,7 @@
                                         <div class="flex items-start">
                                             <i aria-hidden="true" class="fas fa-exclamation-triangle text-warning-600 dark:text-warning-400 mr-2 mt-0.5"></i>
                                             <div class="text-sm text-warning-800 dark:text-warning-200">
-                                                <strong>Warning:</strong> Disabling 2FA will make your account less secure. Please enter your password to confirm.
+                                                <strong>Warning:</strong> Disabling 2FA will make your account less secure. Please enter your password and a current authentication code to confirm.
                                             </div>
                                         </div>
                                     </div>
@@ -382,6 +382,21 @@
                                                     <i aria-hidden="true" class="fas fa-eye" id="disable_2fa_password-eye"></i>
                                                 </button>
                                             </div>
+                                        </div>
+                                        <div>
+                                            <label for="disable_2fa_code" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                                Authentication Code
+                                            </label>
+                                            <input type="text"
+                                                   id="disable_2fa_code"
+                                                   name="one_time_password"
+                                                   required
+                                                   inputmode="numeric"
+                                                   pattern="[0-9]{6}"
+                                                   maxlength="6"
+                                                   autocomplete="one-time-code"
+                                                   class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+                                                   placeholder="6-digit code from your authenticator app">
                                         </div>
                                         <div class="flex gap-2">
                                             <button type="submit"

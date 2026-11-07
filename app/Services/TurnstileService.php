@@ -103,6 +103,8 @@ class TurnstileService
      */
     public static function renderJs(): string
     {
-        return '<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>';
+        $nonce = function_exists('csp_nonce') ? ' nonce="'.e(csp_nonce()).'"' : '';
+
+        return '<script src="https://challenges.cloudflare.com/turnstile/v0/api.js"'.$nonce.' async defer></script>';
     }
 }

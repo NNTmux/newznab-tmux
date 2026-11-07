@@ -92,7 +92,7 @@
                         </div>
 
                         <p class="text-gray-700 dark:text-gray-300 text-sm">
-                            To disable Two Factor Authentication, confirm your password and click the button below.
+                            To disable Two Factor Authentication, confirm your password and a current authentication code.
                         </p>
 
                         <form method="POST" action="{{ route('disable2fa') }}" class="space-y-4">
@@ -112,6 +112,15 @@
                                 @error('current-password')
                                     <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                                 @enderror
+                            </div>
+                            <div>
+                                <label for="disable-one-time-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Authentication Code
+                                </label>
+                                <input id="disable-one-time-password" type="text" name="one_time_password" required
+                                       inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code"
+                                       class="block w-full px-3 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition"
+                                       placeholder="6-digit code from your authenticator app">
                             </div>
                             <button type="submit" class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-red-600 dark:bg-red-700 hover:bg-red-700 dark:hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition">
                                 <i aria-hidden="true" class="fas fa-times mr-2"></i>

@@ -170,8 +170,9 @@ class RegisterController extends Controller
 
                     // Apply invitation metadata if available
                     if ($invitation && $invitation->metadata) {
-                        if (isset($invitation->metadata['role'])) {
-                            $userData['roles_id'] = $invitation->metadata['role'];
+                        $invitedRoleId = $this->invitableRoleId($invitation->metadata['role'] ?? null);
+                        if ($invitedRoleId !== null) {
+                            $userData['roles_id'] = $invitedRoleId;
                         }
                     }
 
@@ -272,6 +273,28 @@ class RegisterController extends Controller
     /**
      * Check if invitation is valid for given email
      */
+    /**
+     * An invitation may pre-select an existing ordinary role, never a staff or disabled one.
+     */
+    private function invitableRoleId(mixed $roleId): ?int
+    {
+        if (! is_numeric($roleId)) {
+            return null;
+        }
+
+        $roleId = (int) $roleId;
+        if (\in_array(UserRole::tryFrom($roleId), [UserRole::ADMIN, UserRole::MODERATOR, UserRole::DISABLED], true)) {
+            return null;
+        }
+
+        $role = Role::query()->find($roleId);
+        if ($role === null || \in_array($role->name, ['Admin', 'Moderator', 'Disabled'], true)) {
+            return null;
+        }
+
+        return $roleId;
+    }
+
     private function isInvitationValid(string $token, string $email): bool
     {
         if (empty($token)) {

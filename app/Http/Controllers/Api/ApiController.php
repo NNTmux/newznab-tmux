@@ -761,7 +761,7 @@ class ApiController extends BasePageController
 
                 $successXml = sprintf(
                     "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<success id=\"0\" guid=\"\" categoryid=\"%s\" name=\"%s\" />\n",
-                    (string) $request->input('cat', ''),
+                    htmlspecialchars((string) $request->input('cat', ''), ENT_QUOTES | ENT_XML1, 'UTF-8'),
                     htmlspecialchars($name, ENT_QUOTES, 'UTF-8')
                 );
 

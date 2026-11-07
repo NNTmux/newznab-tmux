@@ -124,7 +124,7 @@ if (! function_exists('getUserBrowseOrder')) {
             'rolechangedate' => 'rolechangedate',
             default => 'username',
         };
-        $orderSort = (isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'desc';
+        $orderSort = (isset($orderArr[1]) && preg_match('/^(asc|desc)$/i', $orderArr[1])) ? $orderArr[1] : 'desc';
 
         return [$orderField, $orderSort];
     }
@@ -358,16 +358,16 @@ if (! function_exists('getStreamingZip')) {
         $nzb = app(NzbService::class);
         $zipped = ZipStream::create(now()->format('Ymdhis').'.zip');
         foreach ($guids as $guid) {
-            $nzbPath = $nzb->nzbPath($guid);
+            // Only stored releases are zipped, and their path comes from the stored guid, never the raw input.
+            $release = Release::query()->where('guid', $guid)->first(['guid', 'searchname']);
+            if ($release === null || $release->guid !== $guid) {
+                continue;
+            }
+            $nzbPath = $nzb->nzbPath($release->guid);
             if ($nzbPath) {
                 $nzbContents = unzipGzipFile($nzbPath);
                 if ($nzbContents) {
-                    $filename = $guid;
-                    $r = Release::query()->where('guid', $guid)->first();
-                    if ($r) {
-                        $filename = $r['searchname'];
-                    }
-                    $zipped->addRaw($nzbContents, $filename.'.nzb');
+                    $zipped->addRaw($nzbContents, $release->searchname.'.nzb');
                 }
             }
         }

@@ -10,6 +10,7 @@ use App\Models\Category;
 use App\Models\User;
 use App\Models\UserDownload;
 use App\Models\UserRequest;
+use App\Services\Api\ApiUsageService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -17,6 +18,8 @@ use Illuminate\Support\Carbon;
 
 class RssController extends BasePageController
 {
+    private const int MAX_FEED_ITEMS = 100;
+
     private RSS $rss;
 
     public function __construct(RSS $rss)
@@ -226,14 +229,14 @@ class RssController extends BasePageController
     {
         $userShow = $userAnidb = -1;
         if ($request->has('show')) {
-            $userShow = (int) $request->input('show') === 0 ? -1 : $request->input('show') + 0;
+            $userShow = is_numeric($request->input('show')) && (int) $request->input('show') !== 0 ? (int) $request->input('show') : -1;
         } elseif ($request->has('anidb')) {
-            $userAnidb = (int) $request->input('anidb') === 0 ? -1 : $request->input('anidb') + 0;
+            $userAnidb = is_numeric($request->input('anidb')) && (int) $request->input('anidb') !== 0 ? (int) $request->input('anidb') : -1;
         }
 
         $userAirDate = $request->has('airdate') && is_numeric($request->input('airdate')) ? abs((int) $request->input('airdate')) : -1;
         $userNum = $request->has('num') && is_numeric($request->input('num')) ? abs((int) $request->input('num')) : 0;
-        $userLimit = $request->has('limit') && is_numeric($request->input('limit')) ? $request->input('limit') : 100;
+        $userLimit = $request->has('limit') && is_numeric($request->input('limit')) ? min(self::MAX_FEED_ITEMS, max(1, (int) $request->input('limit'))) : self::MAX_FEED_ITEMS;
         $outputXML = ! ($request->has('o') && $request->input('o') === 'json');
 
         return [$userShow, $userAnidb, $userAirDate, $userNum, $userLimit, $outputXML];
@@ -274,7 +277,7 @@ class RssController extends BasePageController
             return apiJsonError(500, 'Request limit reached ('.$usedRequests.'/'.$maxRequests.')');
         }
 
-        UserRequest::addApiRequest($rssToken, $request->getRequestUri());
+        UserRequest::addApiRequest($rssToken, app(ApiUsageService::class)->auditEntry($request));
         event(new UserAccessedApi($res, $request->ip()));
 
         $params = [

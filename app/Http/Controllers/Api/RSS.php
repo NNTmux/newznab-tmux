@@ -208,7 +208,7 @@ class RSS extends ApiController
 
             "SELECT DISTINCT r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, v.id, v.title, g.name AS group_name, CONCAT(cp.title, '-', c.title) AS category_name, COALESCE(cp.id,0) AS parentid FROM releases r INNER JOIN user_series us ON us.videos_id = r.videos_id AND us.users_id = %d LEFT JOIN categories c ON c.id = r.categories_id INNER JOIN root_categories cp ON cp.id = c.root_categories_id LEFT JOIN usenet_groups g ON g.id = r.groups_id LEFT OUTER JOIN videos v ON v.id = r.videos_id LEFT OUTER JOIN tv_episodes tve ON tve.id = r.tv_episodes_id WHERE (us.categories IS NULL OR us.categories = '' OR us.categories = 'NULL' OR FIND_IN_SET(r.categories_id, REPLACE(us.categories,'|',',')) > 0)%s%s AND r.categories_id BETWEEN %d AND %d AND r.passwordstatus %s ORDER BY postdate DESC %s",
             $userID,
-            (\count($excludedCats) ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
+            (\count($excludedCats) ? ' AND r.categories_id NOT IN ('.implode(',', array_map('intval', $excludedCats)).')' : ''),
             ($airDate > -1 ? sprintf(' AND tve.firstaired >= DATE_SUB(CURDATE(), INTERVAL %d DAY)', $airDate) : ''),
             Category::TV_ROOT,
             Category::TV_OTHER,
@@ -239,7 +239,7 @@ class RSS extends ApiController
         $sql = sprintf(
             "SELECT DISTINCT r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, mi.title AS releasetitle, g.name AS group_name, CONCAT(cp.title, '-', c.title) AS category_name, COALESCE(cp.id,0) AS parentid FROM releases r INNER JOIN user_movies um ON um.imdbid = r.imdbid AND um.users_id = %d LEFT JOIN categories c ON c.id = r.categories_id INNER JOIN root_categories cp ON cp.id = c.root_categories_id LEFT JOIN usenet_groups g ON g.id = r.groups_id LEFT JOIN movieinfo mi ON mi.imdbid = r.imdbid WHERE r.imdbid IS NOT NULL AND (um.categories IS NULL OR um.categories = '' OR um.categories = 'NULL' OR FIND_IN_SET(r.categories_id, REPLACE(um.categories,'|',',')) > 0)%s AND r.categories_id BETWEEN %d AND %d AND r.passwordstatus %s ORDER BY postdate DESC %s",
             $userID,
-            (\count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
+            (\count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', array_map('intval', $excludedCats)).')' : ''),
             Category::MOVIE_ROOT,
             Category::MOVIE_OTHER,
             $this->releaseBrowseService->showPasswordsForRss(),

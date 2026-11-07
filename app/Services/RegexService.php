@@ -74,7 +74,7 @@ class RegexService
                 $data['status'],
                 trim(escapeString($data['description'])),
                 $data['ordinal'],
-                ($this->tableName === 'category_regexes' ? (', '.$data['categories_id']) : '')
+                ($this->tableName === 'category_regexes' ? (', '.(int) $data['categories_id']) : '')
             )
         );
     }
@@ -97,7 +97,7 @@ class RegexService
                 $data['status'],
                 trim(escapeString($data['description'])),
                 $data['ordinal'],
-                ($this->tableName === 'category_regexes' ? (', categories_id = '.$data['categories_id']) : ''),
+                ($this->tableName === 'category_regexes' ? (', categories_id = '.(int) $data['categories_id']) : ''),
                 $data['id']
             )
         );

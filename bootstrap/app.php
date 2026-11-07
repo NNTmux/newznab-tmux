@@ -8,6 +8,7 @@ use App\Http\Middleware\DegradeWhenRedisUnreachable;
 use App\Http\Middleware\EnforceSessionToken;
 use App\Http\Middleware\ForceJsonOnAPI;
 use App\Http\Middleware\Google2FAMiddleware;
+use App\Http\Middleware\LogoutDisabledUsers;
 use App\Http\Middleware\MeasureApiPerformance;
 use App\Http\Middleware\NoCacheForAuthenticatedUsers;
 use App\Http\Middleware\ThrottleApiRequestsByToken;
@@ -80,6 +81,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web([
             AuthenticateSession::class,
             EnforceSessionToken::class,
+            LogoutDisabledUsers::class, // End sessions of users disabled after login
             TrustedDevice2FAMiddleware::class, // Add our new trusted device middleware
             ContentSecurityPolicy::class, // Add CSP middleware for security
             NoCacheForAuthenticatedUsers::class, // Prevent Cloudflare/CDN caching of authenticated pages

@@ -12,10 +12,8 @@
 */
 
 use App\Http\Controllers\Api\ApiController;
-use App\Http\Controllers\Api\ApiInformController;
 use App\Http\Controllers\Api\ApiQueryOptionsController;
 use App\Http\Controllers\Api\ApiV2Controller;
-use App\Services\ReleaseExtraService;
 
 // HTTP QUERY (RFC 10008) is accepted on read-only search endpoints only; see ValidateHttpQueryInput.
 Route::prefix('v1')->group(function () {
@@ -45,25 +43,6 @@ Route::prefix('v2')->group(function () {
         Route::options($uri, ApiQueryOptionsController::class);
     }
 });
-
-Route::prefix('inform')->group(function () {
-    Route::get('release', [ApiInformController::class, 'release']);
-});
-
-// Mediainfo endpoint (no auth required for internal use)
-Route::get('release/{id}/mediainfo', function ($id) {
-    $releaseExtra = app(ReleaseExtraService::class);
-
-    $video = $releaseExtra->getVideo($id);
-    $audio = $releaseExtra->getAudio($id);
-    $subs = $releaseExtra->getSubs($id);
-
-    return response()->json([
-        'video' => $video ?: null,
-        'audio' => $audio ?: null,
-        'subs' => $subs ? $subs->subs : null, // @phpstan-ignore property.notFound
-    ]);
-})->middleware('throttle:60,1');
 
 Route::fallback(function () {
     return response()->json(['message' => 'Not Found!'], 404);

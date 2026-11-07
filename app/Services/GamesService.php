@@ -238,7 +238,7 @@ class GamesService
         }
         $exccatlist = '';
         if (count($excludedCats) > 0) {
-            $exccatlist = ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')';
+            $exccatlist = ' AND r.categories_id NOT IN ('.implode(',', array_map('intval', $excludedCats)).')';
         }
         $order = $this->getGamesOrder($orderBy);
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
@@ -357,7 +357,7 @@ class GamesService
             'stats' => 'r.grabs',
             default => 'r.postdate',
         };
-        $orderSort = (isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'desc';
+        $orderSort = (isset($orderArr[1]) && preg_match('/^(asc|desc)$/i', $orderArr[1])) ? $orderArr[1] : 'desc';
 
         return [$orderField, $orderSort];
     }

@@ -126,7 +126,16 @@ class XML_Response
 
     protected function writeXmlCdata(mixed $content): void
     {
-        $this->xml->writeCdata($this->xmlString($content));
+        // A literal "]]>" would end the CDATA section early; split it across two sections instead.
+        $this->xml->writeCdata(str_replace(']]>', ']]]]><![CDATA[>', $this->xmlString($content)));
+    }
+
+    /**
+     * Escape a release or metadata value for the HTML inside an RSS description.
+     */
+    protected function escapeHtml(mixed $value): string
+    {
+        return htmlspecialchars($this->xmlString($value), ENT_QUOTES | ENT_HTML5, 'UTF-8');
     }
 
     protected function xmlString(mixed $value): string
@@ -674,17 +683,17 @@ class XML_Response
             $this->cdata .=
                 "\t<img style=\"margin-left:10px;margin-bottom:10px;float:right;\" ".
                 "src=\"{$this->server['server']['url']}/covers/{$dir}/{$filename}\" ".
-                "width=\"120\" alt=\"{$this->release->searchname}\" />\n";
+                "width=\"120\" alt=\"{$this->escapeHtml($this->release->searchname)}\" />\n";
         }
         $size = human_filesize($this->release->size);
         $this->cdata .=
             "\t<li>ID: <a href=\"{$this->server['server']['url']}/details/{$this->release->guid}\">{$this->release->guid}</a></li>\n".
-            "\t<li>Name: {$this->release->searchname}</li>\n".
+            "\t<li>Name: {$this->escapeHtml($this->release->searchname)}</li>\n".
             "\t<li>Size: {$size}</li>\n".
-            "\t<li>Category: <a href=\"{$this->server['server']['url']}/browse/{$this->release->category_name}\">{$this->release->category_name}</a></li>\n".
-            "\t<li>Group: <a href=\"{$this->server['server']['url']}/browse/group?g={$this->release->group_name}\">{$this->release->group_name}</a></li>\n".
-            "\t<li>Poster: {$this->release->fromname}</li>\n".
-            "\t<li>Posted: {$this->release->postdate}</li>\n";
+            "\t<li>Category: <a href=\"{$this->server['server']['url']}/browse/{$this->escapeHtml(rawurlencode($this->xmlString($this->release->category_name)))}\">{$this->escapeHtml($this->release->category_name)}</a></li>\n".
+            "\t<li>Group: <a href=\"{$this->server['server']['url']}/browse/group?g={$this->escapeHtml(rawurlencode($this->xmlString($this->release->group_name)))}\">{$this->escapeHtml($this->release->group_name)}</a></li>\n".
+            "\t<li>Poster: {$this->escapeHtml($this->release->fromname)}</li>\n".
+            "\t<li>Posted: {$this->escapeHtml($this->release->postdate)}</li>\n";
 
         $pstatus = match ($this->release->passwordstatus ?? 0) {
             0 => 'None',
@@ -698,7 +707,7 @@ class XML_Response
             $this->cdata .=
                 "\t<li>Nfo: ".
                 "<a href=\"{$this->server['server']['url']}/api?t=nfo&id={$this->release->guid}&raw=1&i={$this->parameters['uid']}&r={$this->parameters['token']}\">".
-                "{$this->release->searchname}.nfo</a></li>\n";
+                "{$this->escapeHtml($this->release->searchname)}.nfo</a></li>\n";
         }
 
         if ($this->release->parentid === Category::MOVIE_ROOT && $this->release->imdbid !== '') {
@@ -725,7 +734,7 @@ class XML_Response
         $this->cdata .=
             "\t<li>Imdb Info:
 				\t<ul>
-					\t<li>IMDB Link: <a href=\"http://www.imdb.com/title/tt{$this->release->imdbid}/\">{$this->release->searchname}</a></li>\n
+					\t<li>IMDB Link: <a href=\"http://www.imdb.com/title/tt{$this->escapeHtml($this->release->imdbid)}/\">{$this->escapeHtml($this->release->searchname)}</a></li>\n
 					\t{$cData}
 				\t</ul>
 			\t</li>
@@ -744,7 +753,7 @@ class XML_Response
         $cData = $this->buildCdata($musicCol); // @phpstan-ignore argument.type
 
         if ($this->release->mu_url !== '') {
-            $cDataUrl = "<li>Amazon: <a href=\"{$this->release->mu_url}\">{$this->release->mu_title}</a></li>";
+            $cDataUrl = "<li>Amazon: <a href=\"{$this->escapeHtml($this->release->mu_url)}\">{$this->escapeHtml($this->release->mu_title)}</a></li>";
         }
 
         $this->cdata .=
@@ -759,7 +768,7 @@ class XML_Response
             if (\count($tracks) > 0) {
                 foreach ($tracks as $track) {
                     $track = trim($track);
-                    $tData .= "<li>{$track}</li>";
+                    $tData .= "<li>{$this->escapeHtml($track)}</li>";
                 }
             }
             $this->cdata .= "
@@ -783,7 +792,7 @@ class XML_Response
         $this->cdata .= "
 		<li>Console Info:
 			<ul>
-				<li>Amazon: <a href=\"{$this->release->co_url}\">{$this->release->co_title}</a></li>\n
+				<li>Amazon: <a href=\"{$this->escapeHtml($this->release->co_url)}\">{$this->escapeHtml($this->release->co_title)}</a></li>\n
 				{$cData}
 			</ul>
 		</li>\n";
@@ -807,7 +816,7 @@ class XML_Response
                     $cData .= "<li>{$ucInfo}: {$rDate}</li>\n";
                 } else {
                     $ucInfo = ucfirst(preg_replace('/^[a-z]{2}_/i', '', $info));
-                    $cData .= "<li>{$ucInfo}: {$this->release->$info}</li>\n";
+                    $cData .= "<li>{$ucInfo}: {$this->escapeHtml($this->release->$info)}</li>\n";
                 }
             }
         }

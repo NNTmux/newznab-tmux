@@ -76,14 +76,17 @@ class TrustProxiesTest extends TestCase
         ], SymfonyRequest::getTrustedProxies());
     }
 
-    public function test_it_falls_back_to_the_calling_ip_when_no_manifest_exists(): void
+    public function test_it_falls_back_to_private_networks_not_the_calling_ip_when_no_manifest_exists(): void
     {
         $middleware = new TrustProxies;
         $request = Request::create('/', 'GET', [], [], [], ['REMOTE_ADDR' => '198.51.100.7']);
 
         $middleware->handle($request, static fn (Request $request) => response('ok'));
 
-        $this->assertSame(['198.51.100.7'], SymfonyRequest::getTrustedProxies());
+        $trustedProxies = SymfonyRequest::getTrustedProxies();
+        $this->assertNotContains('198.51.100.7', $trustedProxies);
+        $this->assertContains('10.0.0.0/8', $trustedProxies);
+        $this->assertContains('127.0.0.0/8', $trustedProxies);
     }
 
     /**

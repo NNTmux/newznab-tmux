@@ -11,7 +11,8 @@ final class ApiUserResolver
 {
     public function v1(string $token): ?User
     {
-        return Cache::remember('api_user:'.md5($token), 300, static function () use ($token): ?User {
+        // v1 only accepts verified users, so it must never share a cache entry with v2.
+        return Cache::remember(self::v1CacheKey($token), 300, static function () use ($token): ?User {
             $user = User::findVerifiedByApiToken($token);
             $user?->load('role');
 
@@ -21,9 +22,29 @@ final class ApiUserResolver
 
     public function v2(string $token): ?User
     {
-        return Cache::remember('api_user:'.md5($token), 300, static fn (): ?User => User::query()
+        return Cache::remember(self::v2CacheKey($token), 300, static fn (): ?User => User::query()
             ->whereApiToken($token)
             ->with('role')
             ->first());
+    }
+
+    /**
+     * Every cache key that may hold the user for this API token.
+     *
+     * @return list<string>
+     */
+    public static function cacheKeys(string $token): array
+    {
+        return [self::v1CacheKey($token), self::v2CacheKey($token)];
+    }
+
+    private static function v1CacheKey(string $token): string
+    {
+        return 'api_user:v1:'.md5($token);
+    }
+
+    private static function v2CacheKey(string $token): string
+    {
+        return 'api_user:v2:'.md5($token);
     }
 }

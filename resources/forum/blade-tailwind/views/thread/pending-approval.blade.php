@@ -40,7 +40,7 @@
                                                 <span>({{ $thread->created_at->diffForHumans() }})</span>
                                             </div>
                                             <div class="mt-3 text-sm text-gray-700 dark:text-gray-300">
-                                                {!! $thread->firstPost->content !!}
+                                                {!! Forum::render($thread->firstPost->content) !!}
                                             </div>
                                         </div>
                                     </div>

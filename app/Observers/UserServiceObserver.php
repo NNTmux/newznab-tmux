@@ -6,6 +6,7 @@ namespace App\Observers;
 
 use App\Jobs\SendNewRegisteredAccountMail;
 use App\Jobs\SendWelcomeEmail;
+use App\Models\TrustedDevice;
 use App\Models\User;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
@@ -32,6 +33,17 @@ class UserServiceObserver
             SendNewRegisteredAccountMail::dispatch($user)->onQueue('newreg');
             SendWelcomeEmail::dispatch($user)->onQueue('welcomeemails');
             $user->sendEmailVerificationNotification();
+        }
+    }
+
+    /**
+     * A new password ends every "trust this device" 2FA skip issued under the old one.
+     */
+    public function updated(User $user): void
+    {
+        // A brand-new account has no trusted devices; skip the nested update made in created().
+        if (! $user->wasRecentlyCreated && $user->wasChanged('password')) {
+            TrustedDevice::query()->where('user_id', $user->id)->delete();
         }
     }
 }

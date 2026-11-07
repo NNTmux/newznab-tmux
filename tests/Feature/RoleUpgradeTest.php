@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Testing\TestResponse;
 use PDO;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
@@ -653,6 +654,75 @@ final class RoleUpgradeTest extends TestCase
             "BtcPay 'Supporter 2' order should result in 2-year subscription. Expected {$expectedExpiryDate->toDateString()}, got {$actualExpiryDate->toDateString()}"
         );
         Carbon::setTestNow();
+    }
+
+    public function test_btcpay_webhook_refuses_to_sell_the_admin_role(): void
+    {
+        DB::table('roles')->insert(['name' => 'Admin', 'guard_name' => 'web', 'created_at' => now(), 'updated_at' => now()]);
+        $this->createSettledPayment('Admin 1');
+
+        $response = $this->postSignedBtcPayWebhook();
+
+        $response->assertNotFound();
+        $this->assertSame($this->userRole->id, $this->user->fresh()?->roles_id);
+        $this->assertSame('Pending', DB::table('payments')->value('invoice_status'));
+    }
+
+    public function test_btcpay_webhook_applies_a_purchasable_role(): void
+    {
+        $this->createSettledPayment('Supporter 1');
+
+        $response = $this->postSignedBtcPayWebhook();
+
+        $response->assertOk();
+        $this->assertSame($this->supporterRole->id, $this->user->fresh()?->roles_id);
+        $this->assertSame('Settled', DB::table('payments')->value('invoice_status'));
+    }
+
+    public function test_btcpay_webhook_rejects_a_bad_signature(): void
+    {
+        $this->createSettledPayment('Supporter 1');
+
+        $response = $this->postSignedBtcPayWebhook('wrong-secret');
+
+        $response->assertNotFound();
+        $this->assertSame($this->userRole->id, $this->user->fresh()?->roles_id);
+    }
+
+    private function createSettledPayment(string $itemDescription): void
+    {
+        DB::statement('CREATE TABLE IF NOT EXISTS payments (
+            id INTEGER PRIMARY KEY AUTOINCREMENT, created_at DATETIME NULL, updated_at DATETIME NULL,
+            email VARCHAR NOT NULL, username VARCHAR NOT NULL, item_description VARCHAR NOT NULL,
+            order_id VARCHAR NOT NULL, payment_id VARCHAR NOT NULL, payment_status VARCHAR NOT NULL,
+            invoice_status VARCHAR DEFAULT \'Pending\', invoice_amount VARCHAR NOT NULL, payment_method VARCHAR NOT NULL,
+            payment_value VARCHAR NOT NULL, webhook_id VARCHAR NOT NULL, invoice_id VARCHAR NOT NULL
+        )');
+        DB::table('payments')->insert([
+            'email' => $this->user->email,
+            'username' => $this->user->username,
+            'item_description' => $itemDescription,
+            'order_id' => 'order-1',
+            'payment_id' => 'payment-1',
+            'payment_status' => 'Settled',
+            'invoice_status' => 'Pending',
+            'invoice_amount' => '10',
+            'payment_method' => 'BTC',
+            'payment_value' => '10',
+            'webhook_id' => 'webhook-1',
+            'invoice_id' => 'invoice-1',
+        ]);
+    }
+
+    private function postSignedBtcPayWebhook(string $signingSecret = 'webhook-secret'): TestResponse
+    {
+        config(['nntmux.btcpay_webhook_secret' => 'webhook-secret', 'app.key' => 'base64:'.base64_encode(random_bytes(32))]);
+        $body = (string) json_encode(['type' => 'InvoiceSettled', 'invoiceId' => 'invoice-1']);
+
+        return $this->call('POST', route('btcpay.webhook'), [], [], [], [
+            'CONTENT_TYPE' => 'application/json',
+            'HTTP_BTCPAY_SIG' => 'sha256='.hash_hmac('sha256', $body, $signingSecret),
+        ], $body);
     }
 
     /**

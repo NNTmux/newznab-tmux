@@ -284,6 +284,40 @@ class RegisterControllerTest extends TestCase
         );
     }
 
+    public function test_invitation_cannot_grant_the_admin_role(): void
+    {
+        ConfigurationTestBuilder::update(ConfigurationDomain::Registration, ['status' => 1]);
+        DB::table('roles')->insert(['id' => 2, 'name' => 'Admin', 'guard_name' => 'web', 'created_at' => now(), 'updated_at' => now()]);
+        DB::table('invitations')->insert([
+            'token' => 'admin-token',
+            'email' => 'invitee@example.com',
+            'invited_by' => 1,
+            'expires_at' => now()->addDay(),
+            'is_active' => true,
+            'metadata' => json_encode(['role' => 2]),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $this->mockRegisterControllerCreate(new User([
+            'id' => 321,
+            'username' => 'inviteemember',
+            'email' => 'invitee@example.com',
+            'roles_id' => 1,
+        ]), expectedRoleId: 1);
+
+        $response = $this->post(route('register.post'), [
+            'action' => 'submit',
+            'token' => 'admin-token',
+            'username' => 'inviteemember',
+            'email' => 'invitee@example.com',
+            'password' => 'ValidPass1!',
+            'password_confirmation' => 'ValidPass1!',
+            'terms' => 'on',
+        ]);
+
+        $response->assertRedirect(route('login'));
+    }
+
     public function test_closed_registration_rejects_even_valid_invitation(): void
     {
         ConfigurationTestBuilder::update(ConfigurationDomain::Registration, ['status' => 2]);
@@ -346,7 +380,7 @@ class RegisterControllerTest extends TestCase
         $response->assertRedirect(route('login'));
     }
 
-    private function mockRegisterControllerCreate(User|\Throwable $result): void
+    private function mockRegisterControllerCreate(User|\Throwable $result, ?int $expectedRoleId = null): void
     {
         $mock = Mockery::mock(RegisterController::class)->makePartial();
 
@@ -357,6 +391,9 @@ class RegisterControllerTest extends TestCase
         $reflection->setValue($mock, app(RegistrationStatusService::class));
 
         $expectation = $mock->shouldReceive('create')->once();
+        if ($expectedRoleId !== null) {
+            $expectation->with(Mockery::on(static fn (array $data): bool => (int) $data['roles_id'] === $expectedRoleId));
+        }
 
         if ($result instanceof \Throwable) {
             $expectation->andThrow($result);

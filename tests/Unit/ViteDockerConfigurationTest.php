@@ -21,6 +21,18 @@ class ViteDockerConfigurationTest extends TestCase
         $this->assertServicesUseLatestTags('docker-compose.yml.prod-dist');
     }
 
+    public function test_production_compose_keeps_data_services_off_public_interfaces(): void
+    {
+        $services = Yaml::parse($this->projectFile('docker-compose.yml.prod-dist'))['services'];
+
+        foreach (['mariadb', 'redis', 'manticore', 'mailpit', 'elasticsearch'] as $service) {
+            foreach ($services[$service]['ports'] as $port) {
+                $this->assertStringStartsWith('127.0.0.1:', (string) $port, "{$service} publishes {$port} on every interface");
+            }
+        }
+        $this->assertArrayNotHasKey('MYSQL_ALLOW_EMPTY_PASSWORD', $services['mariadb']['environment']);
+    }
+
     /**
      * docker-compose.yml is the developer's local Sail file and is gitignored, so it only exists outside CI.
      */

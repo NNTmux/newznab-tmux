@@ -122,6 +122,7 @@ class PasswordResetSecurityTest extends TestCase
     {
         Event::fake([PasswordReset::class]);
         $user = $this->createUser('reset@example.test', ['resetguid' => 'legacy-guid']);
+        DB::table('trusted_devices')->insert(['user_id' => $user->id, 'token_hash' => str_repeat('a', 64), 'expires_at' => now()->addDays(30)]);
         $token = Password::broker()->createToken($user);
 
         $response = $this->post(route('password.update'), [
@@ -137,6 +138,7 @@ class PasswordResetSecurityTest extends TestCase
         $this->assertTrue(Hash::check('new-secure-password', $user->password));
         $this->assertNull($user->resetguid);
         $this->assertNotNull($user->remember_token);
+        $this->assertDatabaseMissing('trusted_devices', ['user_id' => $user->id]);
         $this->assertDatabaseMissing('password_reset_tokens', [
             'email' => $user->email,
         ]);
@@ -185,6 +187,14 @@ class PasswordResetSecurityTest extends TestCase
             $table->increments('id');
             $table->string('name');
             $table->string('guard_name');
+            $table->timestamps();
+        });
+
+        Schema::create('trusted_devices', function (Blueprint $table): void {
+            $table->increments('id');
+            $table->unsignedInteger('user_id');
+            $table->string('token_hash', 64);
+            $table->timestamp('expires_at');
             $table->timestamps();
         });
 

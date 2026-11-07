@@ -55,7 +55,7 @@ class MovieBrowseService
             $whereExcluded = '';
         } else {
             $catFilter = '';
-            $whereExcluded = count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : '';
+            $whereExcluded = count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', array_map('intval', $excludedCats)).')' : '';
         }
 
         $order = $this->getMovieOrder($orderBy);
@@ -219,7 +219,7 @@ class MovieBrowseService
      */
     public function getMovieReleases(string $imdbid, array $excludedCats = []): array
     {
-        $whereExcluded = count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : '';
+        $whereExcluded = count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', array_map('intval', $excludedCats)).')' : '';
         $quotedId = escapeString($imdbid);
 
         $sql = 'SELECT r.id, r.guid, r.searchname, r.size, r.postdate, r.adddate, r.haspreview, '
@@ -249,7 +249,7 @@ class MovieBrowseService
             default => 'MAX(r.postdate)',
         };
 
-        return [$orderField, isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1]) ? $orderArr[1] : 'desc'];
+        return [$orderField, isset($orderArr[1]) && preg_match('/^(asc|desc)$/i', $orderArr[1]) ? $orderArr[1] : 'desc'];
     }
 
     /**

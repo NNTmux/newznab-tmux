@@ -77,8 +77,10 @@ class CloudflareIpRangeService
             return $proxies;
         }
 
+        // Without known proxy ranges, only trust proxies on loopback or private networks (local nginx, Docker),
+        // never every client, so X-Forwarded-For/Host cannot be spoofed from the internet.
         if ((bool) config('trustedproxy.cloudflare.fallback_to_remote_addr', true)) {
-            return ['REMOTE_ADDR'];
+            return ['PRIVATE_SUBNETS'];
         }
 
         return [];

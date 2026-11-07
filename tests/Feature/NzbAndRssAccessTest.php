@@ -223,20 +223,9 @@ class NzbAndRssAccessTest extends TestCase
         $response->assertDontSee('<title>Login', false);
     }
 
-    public function test_api_inform_rejects_unverified_users(): void
+    public function test_release_mediainfo_requires_a_logged_in_user(): void
     {
-        DB::table('users')->insert([
-            'username' => 'unverified-inform-user',
-            'email' => 'unverified-inform@example.test',
-            'password' => 'secret',
-            'api_token' => 'unverified-inform-token',
-            'verified' => 0,
-            'email_verified_at' => null,
-        ]);
-
-        $this->getJson('/api/inform/release?api_token=unverified-inform-token&relo=old.name&relp=new.name')
-            ->assertUnauthorized()
-            ->assertJsonPath('error', 'Incorrect user credentials');
+        $this->getJson('/api/release/1/mediainfo')->assertUnauthorized();
     }
 
     public function test_rss_health_endpoint_is_public_for_status_monitoring(): void
@@ -321,6 +310,10 @@ class NzbAndRssAccessTest extends TestCase
         $this->get('/rss/full-feed?api_token=valid-rss-token')
             ->assertOk()
             ->assertSee('<rss>ok</rss>', false);
+
+        $loggedRequest = (string) DB::table('user_requests')->value('request');
+        $this->assertStringStartsWith('/rss/full-feed', $loggedRequest);
+        $this->assertStringNotContainsString('valid-rss-token', $loggedRequest);
     }
 
     public function test_contact_form_is_publicly_accessible_to_guests(): void

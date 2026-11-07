@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use PragmaRX\Google2FA\Exceptions\IncompatibleWithGoogleAuthenticatorException;
 use PragmaRX\Google2FA\Exceptions\InvalidCharactersException;
@@ -25,6 +26,13 @@ use PragmaRX\Google2FALaravel\Facade as Google2FA;
 
 class PasswordSecurityController extends Controller
 {
+    /**
+     * Wrong one-time codes allowed per account before verification is locked.
+     */
+    private const int OTP_MAX_ATTEMPTS = 5;
+
+    private const int OTP_LOCK_SECONDS = 900;
+
     public function show2faForm(Request $request): Application|View|Factory|\Illuminate\Contracts\Foundation\Application|RedirectResponse
     {
         $user = $request->user();
@@ -33,14 +41,7 @@ class PasswordSecurityController extends Controller
             return $this->redirectToLoginWithError('Please log in to access 2FA settings.');
         }
 
-        $google2fa_url = '';
-        if ($user->passwordSecurity()->exists()) {
-            $google2fa_url = Google2FA::getQRCodeInline(
-                config('app.name'),
-                $user->email,
-                $user->passwordSecurity->google2fa_secret
-            );
-        }
+        $google2fa_url = $this->setupQrCode($user);
         $data = [
             'user' => $user,
             'google2fa_url' => $google2fa_url,
@@ -60,6 +61,10 @@ class PasswordSecurityController extends Controller
 
         if (! $user) {
             return $this->redirectToLoginWithError('Please log in to access 2FA settings.');
+        }
+
+        if ($user->passwordSecurity()->exists()) {
+            return redirect()->to('profileedit#security')->with('error_2fa', '2FA is already set up for this account.');
         }
 
         // Add the secret key to the registration data
@@ -137,15 +142,24 @@ class PasswordSecurityController extends Controller
             return redirect()->to('profileedit#security')->with('error_2fa', 'Your password does not match with your account password. Please try again.');
         }
 
-        $validatedData = $request->validated();
-
-        // Delete the password security record entirely to fully disable 2FA
-        if ($user->passwordSecurity) {
-            $user->passwordSecurity->delete();
+        // Turning off active 2FA also needs a current code, so a stolen password and session are not enough.
+        if ($user->passwordSecurity?->google2fa_enable) {
+            $validCode = $this->checkOneTimePassword($user, (string) $request->input('one_time_password', ''));
+            if ($validCode !== true) {
+                return redirect()->to('profileedit#security')->with('error_2fa', $validCode === null
+                    ? $this->lockedOutMessage($user)
+                    : 'Invalid authentication code. Please try again.');
+            }
         }
 
+        // Delete the password security record entirely to fully disable 2FA
+        $user->passwordSecurity?->delete();
+        TrustedDevice::query()->where('user_id', $user->id)->delete();
+
         // Always redirect to profile page after disabling 2FA
-        return redirect()->to('profileedit#security')->with('success_2fa', '2FA is now Disabled.');
+        return redirect()->to('profileedit#security')
+            ->with('success_2fa', '2FA is now Disabled.')
+            ->withoutCookie('2fa_trusted_device');
     }
 
     /**
@@ -168,10 +182,11 @@ class PasswordSecurityController extends Controller
         }
 
         // Verify the OTP code
-        $valid = Google2FA::verifyKey(
-            $user->passwordSecurity->google2fa_secret,
-            $request->input('one_time_password')
-        );
+        $valid = $this->checkOneTimePassword($user, (string) $request->input('one_time_password'));
+
+        if ($valid === null) {
+            return redirect()->route('2fa.verify')->with('error', $this->lockedOutMessage($user));
+        }
 
         if (! $valid) {
             return redirect()->route('2fa.verify')
@@ -254,34 +269,6 @@ class PasswordSecurityController extends Controller
     }
 
     /**
-     * Handle disabling 2FA directly from profile page to avoid form conflicts.
-     * This route is specifically for the profile page 2FA section.
-     */
-    public function profileDisable2fa(Request $request): RedirectResponse
-    {
-        $user = $request->user();
-
-        if (! $user) {
-            return $this->redirectToLoginWithError('Please log in to access 2FA settings.');
-        }
-
-        $request->validate([
-            'current-password' => 'required',
-        ]);
-
-        if (! (Hash::check($request->get('current-password'), $user->password))) {
-            return redirect()->to('profileedit#security')->with('error_2fa', 'Your password does not match with your account password. Please try again.');
-        }
-
-        if ($user->passwordSecurity) {
-            $user->passwordSecurity->google2fa_enable = 0;
-            $user->passwordSecurity->save();
-        }
-
-        return redirect()->to('profileedit#security')->with('success_2fa', '2FA is now Disabled.');
-    }
-
-    /**
      * Show the 2FA enable form on a dedicated page
      */
     public function showEnable2faForm(Request $request): Application|View|Factory|\Illuminate\Contracts\Foundation\Application|RedirectResponse
@@ -292,14 +279,7 @@ class PasswordSecurityController extends Controller
             return $this->redirectToLoginWithError('Please log in to access 2FA settings.');
         }
 
-        $google2fa_url = '';
-        if ($user->passwordSecurity()->exists()) {
-            $google2fa_url = Google2FA::getQRCodeInline(
-                config('app.name'),
-                $user->email,
-                $user->passwordSecurity->google2fa_secret
-            );
-        }
+        $google2fa_url = $this->setupQrCode($user);
 
         $data = [
             'user' => $user,
@@ -320,14 +300,7 @@ class PasswordSecurityController extends Controller
             return $this->redirectToLoginWithError('Please log in to access 2FA settings.');
         }
 
-        $google2fa_url = '';
-        if ($user->passwordSecurity()->exists()) {
-            $google2fa_url = Google2FA::getQRCodeInline(
-                config('app.name'),
-                $user->email,
-                $user->passwordSecurity->google2fa_secret
-            );
-        }
+        $google2fa_url = $this->setupQrCode($user);
 
         $data = [
             'user' => $user,
@@ -335,6 +308,55 @@ class PasswordSecurityController extends Controller
         ];
 
         return view('auth.2fa')->with('data', $data);
+    }
+
+    /**
+     * The setup QR code holds the 2FA secret, so it is only shown while 2FA is being set up.
+     */
+    private function setupQrCode(User $user): string
+    {
+        $security = $user->passwordSecurity;
+        if ($security === null || $security->google2fa_enable) {
+            return '';
+        }
+
+        return Google2FA::getQRCodeInline(config('app.name'), $user->email, $security->google2fa_secret);
+    }
+
+    /**
+     * Check a one-time code against the account's per-account attempt limit.
+     *
+     * @return bool|null null when the account is locked out after too many wrong codes
+     */
+    private function checkOneTimePassword(User $user, string $code): ?bool
+    {
+        $throttleKey = $this->otpThrottleKey($user);
+        if (RateLimiter::tooManyAttempts($throttleKey, self::OTP_MAX_ATTEMPTS)) {
+            return null;
+        }
+
+        $secret = (string) $user->passwordSecurity?->google2fa_secret;
+        $valid = $secret !== '' && preg_match('/^\d{6}$/', $code) === 1 && (bool) Google2FA::verifyKey($secret, $code);
+
+        if ($valid) {
+            RateLimiter::clear($throttleKey);
+        } else {
+            RateLimiter::hit($throttleKey, self::OTP_LOCK_SECONDS);
+        }
+
+        return $valid;
+    }
+
+    private function lockedOutMessage(User $user): string
+    {
+        $minutes = max(1, (int) ceil(RateLimiter::availableIn($this->otpThrottleKey($user)) / 60));
+
+        return "Too many invalid authentication codes. Please try again in {$minutes} minute(s).";
+    }
+
+    private function otpThrottleKey(User $user): string
+    {
+        return '2fa-otp:'.$user->id;
     }
 
     private function redirectToLoginWithError(string $message): RedirectResponse

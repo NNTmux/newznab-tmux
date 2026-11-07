@@ -152,7 +152,7 @@ class MusicService
         }
         $exccatlist = '';
         if (\count($excludedCats) > 0) {
-            $exccatlist = ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')';
+            $exccatlist = ' AND r.categories_id NOT IN ('.implode(',', array_map('intval', $excludedCats)).')';
         }
         $order = $this->getMusicOrder($orderBy);
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
@@ -273,7 +273,7 @@ class MusicService
             default => 'r.postdate',
         };
 
-        $ordersort = (isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'desc';
+        $ordersort = (isset($orderArr[1]) && preg_match('/^(asc|desc)$/i', $orderArr[1])) ? $orderArr[1] : 'desc';
 
         return [$orderfield, $ordersort];
     }
@@ -316,10 +316,10 @@ class MusicService
             if ($skipArtistTitleLike && ($bbk === 'artist' || $bbk === 'title')) {
                 continue;
             }
-            if (! empty($_REQUEST[$bbk])) {
-                $bbs = stripslashes($_REQUEST[$bbk]);
+            if (! empty($_REQUEST[$bbk]) && \is_scalar($_REQUEST[$bbk])) {
+                $bbs = stripslashes((string) $_REQUEST[$bbk]);
                 if (stripos($bbv, 'id') !== false) {
-                    $browseby .= ' AND m.'.$bbv.' = '.$bbs;
+                    $browseby .= ' AND m.'.$bbv.' = '.(int) $bbs;
                 } else {
                     $browseby .= ' AND m.'.$bbv.' '.'LIKE '.escapeString('%'.$bbs.'%');
                 }

@@ -28,7 +28,7 @@
                                 </div>
                                 <div class="flex-1">
                                     <div class="mt-2 text-sm text-gray-700 dark:text-gray-300">
-                                        {!! $post->content !!}
+                                        {!! Forum::render($post->content) !!}
                                     </div>
                                     <div class="mt-2 inline-flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-gray-500 dark:text-gray-400">
                                         <span>{{ $post->authorName }}</span>

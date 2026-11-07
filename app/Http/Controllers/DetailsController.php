@@ -22,10 +22,19 @@ use App\Services\MusicService;
 use App\Services\PopulateAniListService;
 use App\Services\ReleaseExtraService;
 use App\Services\Releases\ReleaseSearchService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
 
 class DetailsController extends BasePageController
 {
+    /**
+     * Matches the release_comments.text varchar(2000) column.
+     */
+    private const int MAX_COMMENT_LENGTH = 2000;
+
+    private const int MAX_COMMENTS_PER_MINUTE = 5;
+
     private ReleaseSearchService $releaseSearchService;
 
     private MovieService $movieService;
@@ -56,9 +65,7 @@ class DetailsController extends BasePageController
         }
 
         if ($this->isPostBack($request)) {
-            ReleaseComment::addComment((int) $data['id'], (string) $request->input('txtAddComment'), (int) $this->userdata->id, $request->ip());
-
-            return redirect()->route('details', ['guid' => $guid])->with('success', 'Comment posted successfully!');
+            return $this->postComment($request, (int) $data['id'], $guid);
         }
 
         $reVideo = $this->releaseExtraService->getVideo($data['id']);
@@ -206,5 +213,32 @@ class DetailsController extends BasePageController
         ]);
 
         return view('details.index', $this->viewData);
+    }
+
+    /**
+     * Add a comment, honouring the user's posting rights, a length limit and a per-user rate limit.
+     */
+    private function postComment(Request $request, int $releaseId, string $guid): RedirectResponse
+    {
+        $detailsPage = redirect()->route('details', ['guid' => $guid]);
+
+        if (! $this->userdata->can_post) {
+            return $detailsPage->with('error', 'You are not allowed to post comments.');
+        }
+
+        $text = trim((string) $request->input('txtAddComment', ''));
+        if ($text === '' || mb_strlen($text) > self::MAX_COMMENT_LENGTH) {
+            return $detailsPage->with('error', 'Comments must be between 1 and '.self::MAX_COMMENT_LENGTH.' characters.');
+        }
+
+        $throttleKey = 'release-comment:'.$this->userdata->id;
+        if (RateLimiter::tooManyAttempts($throttleKey, self::MAX_COMMENTS_PER_MINUTE)) {
+            return $detailsPage->with('error', 'You are posting comments too quickly. Please wait a minute and try again.');
+        }
+        RateLimiter::hit($throttleKey, 60);
+
+        ReleaseComment::addComment($releaseId, $text, (int) $this->userdata->id, $request->ip());
+
+        return $detailsPage->with('success', 'Comment posted successfully!');
     }
 }

@@ -4,17 +4,20 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Http\Controllers\ProfileController;
 use App\Http\Middleware\Google2FAMiddleware;
 use App\Models\User;
 use App\Notifications\VerifyEmailBranded;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Illuminate\View\View;
 use PDO;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -111,6 +114,7 @@ final class ProfileControllerTest extends TestCase
         $response = $this->actingAs($authenticatedUser)->post(route('profileedit'), [
             'action' => 'submit',
             'email' => 'changed@example.com',
+            'current_password' => 'password',
             'theme_preference' => 'light',
             'color_scheme' => 'blue',
             'timezone' => 'UTC',
@@ -134,6 +138,107 @@ final class ProfileControllerTest extends TestCase
         $this->assertNull($updatedUser->email_verified_at);
 
         Notification::assertSentTo($updatedUser, VerifyEmailBranded::class);
+    }
+
+    public function test_email_change_without_current_password_is_rejected(): void
+    {
+        Notification::fake();
+        $user = $this->createUserWithRole('User');
+        $originalEmail = $user->email;
+        /** @var Authenticatable $authenticatedUser */
+        $authenticatedUser = $user;
+
+        $this->actingAs($authenticatedUser)->post(route('profileedit'), [
+            'action' => 'submit',
+            'email' => 'attacker@example.com',
+        ]);
+
+        $this->assertAuthenticated();
+        $this->assertSame($originalEmail, $user->fresh()?->email);
+        Notification::assertNothingSent();
+    }
+
+    public function test_moderator_viewing_admin_profile_by_name_gets_public_view_without_admin_privileges(): void
+    {
+        $moderator = $this->createUserWithRole('Moderator');
+        $admin = $this->createUserWithRole('Admin');
+
+        $data = $this->profileViewData($moderator, ['name' => $admin->username]);
+
+        $this->assertSame($admin->id, $data['user']->id);
+        $this->assertTrue($data['publicview']);
+        $this->assertFalse($data['isadmin']);
+    }
+
+    public function test_user_viewing_another_profile_by_name_gets_public_view_when_profiles_are_public(): void
+    {
+        config(['nntmux_settings.private_profiles' => false]);
+        $viewer = $this->createUserWithRole('User');
+        $other = $this->createUserWithRole('User');
+
+        $data = $this->profileViewData($viewer, ['name' => $other->username]);
+
+        $this->assertSame($other->id, $data['user']->id);
+        $this->assertTrue($data['publicview']);
+        $this->assertFalse($data['isadmin']);
+    }
+
+    public function test_own_profile_is_not_a_public_view(): void
+    {
+        $user = $this->createUserWithRole('User');
+
+        $data = $this->profileViewData($user, ['name' => $user->username]);
+
+        $this->assertFalse($data['publicview']);
+    }
+
+    /**
+     * @param  array<string, string>  $query
+     * @return array<string, mixed>
+     */
+    private function profileViewData(User $viewer, array $query): array
+    {
+        $this->createProfileActivitySchema();
+        /** @var Authenticatable $authenticatedViewer */
+        $authenticatedViewer = $viewer;
+        $this->actingAs($authenticatedViewer);
+
+        $controller = app(ProfileController::class);
+        $controller->userdata = $viewer;
+
+        $view = $controller->show(Request::create('/profile', 'GET', $query));
+
+        $this->assertInstanceOf(View::class, $view);
+
+        return $view->getData();
+    }
+
+    private function createProfileActivitySchema(): void
+    {
+        Schema::create('releases', function (Blueprint $table): void {
+            $table->increments('id');
+            $table->string('guid')->nullable();
+            $table->string('searchname')->nullable();
+        });
+        Schema::create('user_downloads', function (Blueprint $table): void {
+            $table->increments('id');
+            $table->unsignedInteger('users_id');
+            $table->unsignedInteger('releases_id')->nullable();
+            $table->timestamp('timestamp')->nullable();
+        });
+        Schema::create('user_requests', function (Blueprint $table): void {
+            $table->increments('id');
+            $table->unsignedInteger('users_id');
+            $table->string('request')->nullable();
+            $table->timestamp('timestamp')->nullable();
+        });
+        Schema::create('release_comments', function (Blueprint $table): void {
+            $table->increments('id');
+            $table->unsignedInteger('releases_id');
+            $table->unsignedInteger('users_id');
+            $table->text('text')->nullable();
+            $table->timestamps();
+        });
     }
 
     private function setEnvironmentValue(string $key, ?string $value): void

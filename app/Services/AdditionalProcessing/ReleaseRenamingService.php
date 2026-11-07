@@ -3,7 +3,6 @@
 namespace App\Services\AdditionalProcessing;
 
 use App\Models\Predb;
-use App\Models\ReleaseInform;
 use App\Services\AdditionalProcessing\Config\ProcessingConfiguration;
 use App\Services\AdditionalProcessing\State\ReleaseProcessingContext;
 use App\Services\NameFixing\Extractors\FileNameExtractor;
@@ -37,58 +36,6 @@ class ReleaseRenamingService
     public function fileNameChecks(array $fileData, ReleaseProcessingContext $context, array $dataSummary = []): bool
     {
         $rarFileName = Arr::pluck($fileData, 'name');
-
-        // Check ReleaseInform table for pre-matched names
-        // relOName matches case-insensitively; only an inform for this exact name applies.
-        $informName = ReleaseInform::query()
-            ->where(['relOName' => $context->release->searchname])
-            ->limit(25)
-            ->get()
-            ->first(static fn (ReleaseInform $inform): bool => $inform->relOName === (string) $context->release->searchname);
-
-        if ($informName !== null) {
-            if (preg_match(ReleaseUpdateService::PREDB_REGEX, $informName->relPName, $hit)) {
-                $preCheck = Predb::whereTitle($hit[0])->first();
-                $context->release->preid = $preCheck !== null ? $preCheck->id : 0;
-                $candidate = $preCheck->title ?? ucwords($hit[0], '.');
-                $candidate = $this->normalizeCandidateTitle($candidate);
-
-                if ($this->isPlausibleReleaseTitle($candidate)) {
-                    $this->updateService->updateRelease(
-                        $context->release,
-                        $candidate,
-                        'RarInfo FileName Match',
-                        true,
-                        'Filenames, ',
-                        true,
-                        true,
-                        $context->release->preid
-                    );
-                    Log::channel('filename_rename')->info(
-                        'RarInfo FileName Match: '.$context->release->searchname.' -> '.$candidate
-                    );
-
-                    return true;
-                } elseif ($this->config->debugMode) {
-                    Log::debug('RarInfo: Ignored low-quality candidate "'.$candidate.'" from ReleaseInform.');
-                }
-            } else {
-                $this->updateService->updateRelease(
-                    $context->release,
-                    $informName->relPName,
-                    'ReleaseInform FileName Match',
-                    true,
-                    'Filenames, ',
-                    true,
-                    true
-                );
-                Log::channel('filename_rename')->info(
-                    'ReleaseInform FileName Match: '.$context->release->searchname.' -> '.$informName->relPName
-                );
-
-                return true;
-            }
-        }
 
         // Don't rename parity/PAR2 releases — they are support file releases
         if ($this->isParityRelease($context->release->searchname)) {

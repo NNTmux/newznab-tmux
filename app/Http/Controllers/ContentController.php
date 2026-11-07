@@ -43,7 +43,7 @@ class ContentController extends BasePageController
 
         if ($contentId === 0 && $contentPage === 'content') {
             // Show all content except front page
-            $content = $this->getAllButFront()->all();
+            $content = $this->getAllButFront($role)->all();
             $isFront = false;
             $meta_title = 'Contents page';
             $meta_keywords = 'contents';
@@ -114,10 +114,12 @@ class ContentController extends BasePageController
      *
      * @return Collection<int, mixed>
      */
-    protected function getAllButFront(): Collection
+    protected function getAllButFront(int $role): Collection
     {
         return Content::query()
             ->where('id', '<>', 1)
+            ->active()
+            ->forRole($role)
             ->ordered()
             ->get();
     }
@@ -129,6 +131,7 @@ class ContentController extends BasePageController
     {
         return Content::query()
             ->where('id', $id)
+            ->active()
             ->forRole($role)
             ->first();
     }

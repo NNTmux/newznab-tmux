@@ -64,6 +64,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->secureSessionCookiesOnHttps();
         $this->blockHorizonWhenDisabled();
 
         Paginator::useTailwind();
@@ -139,6 +140,16 @@ class AppServiceProvider extends ServiceProvider
             (string) $app['config']->get('nntmux.log_viewer.index.table', 'app_logs_rt'),
             (bool) $app['config']->get('nntmux.log_viewer.index.enabled', true),
         ));
+    }
+
+    /**
+     * When SESSION_SECURE_COOKIE is not set, send the session cookie over HTTPS only if the site URL is HTTPS.
+     */
+    private function secureSessionCookiesOnHttps(): void
+    {
+        if (config('session.secure') === null && str_starts_with((string) config('app.url'), 'https://')) {
+            config(['session.secure' => true]);
+        }
     }
 
     /**

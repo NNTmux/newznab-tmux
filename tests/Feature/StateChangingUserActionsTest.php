@@ -87,7 +87,6 @@ class StateChangingUserActionsTest extends TestCase
     public static function mutationUrls(): array
     {
         return [
-            'invitation' => ['/ajax_profile'],
             'cart add' => ['/cart/add'],
             'cart delete' => ['/cart/delete/test-guid'],
             'shows' => ['/myshows?action=delete&id=7'],

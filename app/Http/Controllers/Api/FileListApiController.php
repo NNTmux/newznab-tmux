@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Release;
 use App\Services\Nzb\NzbParserService;
 use App\Services\Nzb\NzbService;
+use App\Services\ReleaseExtraService;
 use Illuminate\Http\JsonResponse;
 
 class FileListApiController extends Controller
@@ -44,6 +45,20 @@ class FileListApiController extends Controller
             ],
             'files' => $files,
             'total' => count($files),
+        ]);
+    }
+
+    /**
+     * Get video, audio and subtitle details for a release.
+     */
+    public function getMediaInfo(int $id, ReleaseExtraService $releaseExtra): JsonResponse
+    {
+        $subs = $releaseExtra->getSubs($id);
+
+        return response()->json([
+            'video' => $releaseExtra->getVideo($id) ?: null,
+            'audio' => $releaseExtra->getAudio($id) ?: null,
+            'subs' => $subs ? $subs->subs : null, // @phpstan-ignore property.notFound
         ]);
     }
 }

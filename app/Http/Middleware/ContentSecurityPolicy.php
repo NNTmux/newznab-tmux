@@ -25,21 +25,6 @@ class ContentSecurityPolicy
 
         $response = $next($request);
 
-        // Check if Turnstile is enabled
-        $turnstileEnabled = config('captcha.provider') === 'turnstile'
-            && config('captcha.turnstile.enabled') === true;
-
-        // If Turnstile is enabled, skip CSP to avoid sandbox iframe issues
-        // Turnstile creates sandboxed iframes that conflict with strict CSP
-        if ($turnstileEnabled) {
-            // Set minimal security headers only
-            $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
-            $response->headers->set('X-Content-Type-Options', 'nosniff');
-            $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
-
-            return $response;
-        }
-
         // Reuse the nonce generated above (shared with Blade via csp_nonce())
 
         $viteDevServerSources = $this->viteDevServerSources();
@@ -53,7 +38,7 @@ class ContentSecurityPolicy
         $grafanaOrigin = GrafanaEmbedService::frameOrigin(config('monitoring.grafana.url'), config('app.url'));
         $grafanaFrameSource = $grafanaOrigin === null ? '' : ' '.$grafanaOrigin;
 
-        // Build CSP directives for non-Turnstile pages
+        // Build CSP directives (Turnstile is allowed in script-src and frame-src)
         // 'strict-dynamic' propagates trust from nonce-validated scripts to
         // dynamically loaded scripts (e.g. TinyMCE loaded via createElement).
         // Host-based allowlists are kept as fallback for older browsers.

@@ -74,8 +74,9 @@ services:
             sh -c "while [ true ]; do php artisan schedule:run; sleep 60; done"
     mariadb:
         image: 'mariadb:latest'
+        # Data services only listen on the host's loopback; the app reaches them over the nntmux network.
         ports:
-            - '${FORWARD_DB_PORT:-3306}:3306'
+            - '127.0.0.1:${FORWARD_DB_PORT:-3306}:3306'
         environment:
             TZ: ${APP_TIMEZONE}
             MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
@@ -83,7 +84,6 @@ services:
             MYSQL_DATABASE: '${DB_DATABASE}'
             MYSQL_USER: '${DB_USERNAME}'
             MYSQL_PASSWORD: '${DB_PASSWORD}'
-            MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
         command:
             --max_allowed_packet=128M
             --group_concat_max_len=16384
@@ -102,7 +102,7 @@ services:
     redis:
         image: 'redis:latest'
         ports:
-            - '${FORWARD_REDIS_PORT:-6379}:6379'
+            - '127.0.0.1:${FORWARD_REDIS_PORT:-6379}:6379'
         environment:
             TZ: ${APP_TIMEZONE}
         volumes:
@@ -125,8 +125,8 @@ services:
             EXTRA: 1
         restart: always
         ports:
-            - 9306:9306
-            - 9308:9308
+            - '127.0.0.1:9306:9306'
+            - '127.0.0.1:9308:9308'
         ulimits:
             nproc: 65535
             nofile:
@@ -153,8 +153,8 @@ services:
     mailpit:
         image: 'axllent/mailpit:latest'
         ports:
-            - '${FORWARD_MAILPIT_PORT:-1025}:1025'
-            - '${FORWARD_MAILPIT_DASHBOARD_PORT:-8025}:8025'
+            - '127.0.0.1:${FORWARD_MAILPIT_PORT:-1025}:1025'
+            - '127.0.0.1:${FORWARD_MAILPIT_DASHBOARD_PORT:-8025}:8025'
         networks:
             - nntmux
     elasticsearch:
@@ -167,8 +167,8 @@ services:
             - xpack.security.enabled=false
             - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
         ports:
-            - 9200:9200
-            - 9300:9300
+            - '127.0.0.1:9200:9200'
+            - '127.0.0.1:9300:9300'
         volumes:
             - elasticsearch:/usr/share/elasticsearch/data
         networks:

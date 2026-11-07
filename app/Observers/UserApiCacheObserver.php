@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Observers;
 
 use App\Models\User;
+use App\Services\Api\ApiUserResolver;
 use Illuminate\Support\Facades\Cache;
 
 class UserApiCacheObserver
@@ -40,9 +41,9 @@ class UserApiCacheObserver
             return;
         }
 
-        $tokenHash = md5($apiToken);
-
-        Cache::forget('api_user:'.$tokenHash);
+        foreach (ApiUserResolver::cacheKeys($apiToken) as $cacheKey) {
+            Cache::forget($cacheKey);
+        }
         Cache::forget('api_user_stats:'.$user->id);
         Cache::forget(User::categoryExclusionCacheKey($user->id));
     }
