@@ -1,236 +1,83 @@
+@php
+    $rssFeedUrl = url("/rss/mymovies?dl=1&i={$userdata->id}&api_token={$userdata->api_token}");
+    $movieCount = count($movies ?? []);
+    $noCover = url('/covers/movies/no-cover.jpg');
+@endphp
+<x-page-header title="My movies" eyebrow="Your watchlist" description="Manage saved movies and receive automatic updates when releases become available." icon="fas fa-film">
+    <x-slot:stats>
+        <span class="workspace-hero__stat"><i class="fas fa-bookmark" aria-hidden="true"></i>{{ number_format($movieCount) }} saved</span>
+    </x-slot:stats>
+    <x-slot:actions>
+        <a href="{{ url('/Movies') }}" class="workspace-hero__action"><i class="fas fa-film" aria-hidden="true"></i>Browse movies</a>
+        <a href="{{ $rssFeedUrl }}" class="workspace-hero__action"><i class="fas fa-rss" aria-hidden="true"></i>RSS feed</a>
+    </x-slot:actions>
+</x-page-header>
 
-<div>
-    <x-page-header title="My movies" eyebrow="Your watchlist" description="Manage saved movies and receive automatic updates when releases become available." icon="fas fa-film">
-        <x-slot:stats>
-            <span class="workspace-hero__stat"><i class="fas fa-bookmark" aria-hidden="true"></i>{{ number_format(count($movies ?? [])) }} saved</span>
-        </x-slot:stats>
-        <x-slot:actions>
-            <a href="{{ url('/browse/Movies') }}" class="workspace-hero__action"><i class="fas fa-list" aria-hidden="true"></i>Browse all movies</a>
-        </x-slot:actions>
-    </x-page-header>
-
-    <!-- RSS Feed Info Card -->
-    <div class="info-card-gradient border-l-4 border-primary-500 rounded-lg p-5 mb-6 shadow">
-        <div class="flex items-start">
-            <div class="shrink-0">
-                <div class="flex items-center justify-center h-10 w-10 rounded-lg bg-primary-500 text-white">
-                    <i aria-hidden="true" class="fa-solid fa-rss text-lg"></i>
-                </div>
-            </div>
-            <div class="ml-4 flex-1">
-                <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Automatic Downloads via RSS</h3>
-                <p class="text-sm text-gray-700 dark:text-gray-300">
-                    Using 'My Movies' you can search for movies and add them to a wishlist. If the movie becomes available it will be added to your
-                    <a href="{{ url("/rss/mymovies?dl=1&i={$userdata->id}&api_token={$userdata->api_token}") }}"
-                       class="font-semibold text-link dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 underline inline-flex items-center">
-                        <i aria-hidden="true" class="fa-solid fa-rss mr-1"></i>personal RSS feed
-                    </a>
-                    for automatic downloading.
-                </p>
-            </div>
-        </div>
+<div class="surface-panel overflow-hidden rounded-xl shadow-sm">
+    <div class="flex flex-col gap-1 border-b border-line px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+        <h2 class="flex items-center gap-2 text-base font-semibold text-fg">
+            <i aria-hidden="true" class="fa-solid fa-bookmark text-link"></i>Your movies
+            <span class="text-sm font-medium text-fg-muted tabular-nums">{{ $movieCount }}</span>
+        </h2>
+        <p class="text-xs text-fg-muted">
+            <i aria-hidden="true" class="fa-solid fa-rss mr-1"></i>Movies are added to your
+            <a href="{{ $rssFeedUrl }}" class="font-medium text-link hover:underline">personal RSS feed</a> once released.
+        </p>
     </div>
 
-    <!-- Action Buttons -->
-    <div class="flex flex-wrap gap-3 mb-6">
-        <a class="px-6 py-3 bg-accent dark:bg-accent-hover text-white rounded-lg hover:bg-accent-hover dark:hover:bg-primary-800 shadow-md hover:shadow-lg transition-all duration-200 inline-flex items-center font-medium"
-           href="{{ url('/browse/Movies') }}"
-           title="Browse all available movies">
-            <i aria-hidden="true" class="fa-solid fa-list mr-2"></i>Browse All Movies
-        </a>
-        <a class="px-6 py-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500 shadow-md hover:shadow-lg transition-all duration-200 inline-flex items-center font-medium"
-           href="{{ url("/rss/mymovies?dl=1&i={$userdata->id}&api_token={$userdata->api_token}") }}"
-           title="All movies in your watchlist as an RSS feed">
-            <i aria-hidden="true" class="fa-solid fa-rss mr-2 text-orange-500"></i>RSS Feed
-        </a>
-    </div>
-
-    <!-- Movies Table/Cards -->
-    @if(count($movies ?? []) > 0)
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
-            <!-- Table Header -->
-            <div class="table-header-gradient px-6 py-4 border-b-2 border-gray-300 dark:border-gray-600">
-                <div class="flex items-center justify-between">
-                    <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center">
-                        <i aria-hidden="true" class="fa-solid fa-bookmark mr-2 text-link"></i>
-                        Your Movies <span class="ml-2 px-3 py-1 bg-accent dark:bg-accent-hover text-white text-sm rounded-full font-bold">{{ count($movies) }}</span>
-                    </h2>
-                </div>
-            </div>
-
-            <!-- Desktop Table View -->
-            <div class="hidden lg:block">
-                <div class="divide-y divide-gray-200 dark:divide-gray-700">
-                    @foreach($movies as $movie)
-                        <div class="p-6 hover:bg-primary-50 dark:hover:bg-gray-700 transition-colors duration-150">
-                            <div class="flex gap-6">
-                                <!-- Movie Poster -->
-                                <div class="shrink-0">
-                                    <img width="128" height="192" class="rounded-lg movie-poster-shadow w-32 h-48 object-cover"
-                                         src="{{ ($movie['cover'] ?? 0) == 1 ? getImageAssetUrl('movies', $movie['imdbid'] . '-cover', url('/covers/movies/no-cover.jpg')) : url('/covers/movies/no-cover.jpg') }}"
-                                         loading="lazy"
-                                         alt="{{ e($movie['title'] ?? '') }}"/>
-                                </div>
-
-                                <!-- Movie Info -->
-                                <div class="flex-1 min-w-0">
-                                    <div class="flex items-start justify-between mb-3">
-                                        <div class="flex-1">
-                                            <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-1">
-                                                <a href="{{ url("/Movies?imdb={$movie['imdbid']}") }}"
-                                                   class="hover:text-link dark:text-primary-400 transition-colors">
-                                                    {{ e($movie['title'] ?? '') }}
-                                                    @if(!empty($movie['year']))
-                                                        <span class="text-gray-500 font-normal">({{ $movie['year'] }})</span>
-                                                    @endif
-                                                </a>
-                                            </h3>
-                                            @if(!empty($movie['tagline']))
-                                                <p class="text-sm italic text-gray-600 dark:text-gray-400 mb-2">{{ e($movie['tagline']) }}</p>
-                                            @endif
-                                        </div>
-                                        <div class="flex gap-2 ml-4">
-                                            <a class="inline-flex items-center px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 shadow hover:shadow-md transition-all duration-200 text-sm font-medium"
-                                               href="{{ url("/mymovies?id=edit&imdb={$movie['imdbid']}") }}"
-                                               title="Edit Categories">
-                                                <i aria-hidden="true" class="fa-solid fa-edit mr-1.5"></i>Edit
-                                            </a>
-                                            <form method="POST" action="{{ url("/mymovies?id=delete&imdb={$movie['imdbid']}") }}" x-data="confirmForm" @submit.prevent="submit()" data-title="Remove Movie" data-message="Are you sure you want to remove this movie from your watchlist?" data-confirm-text="Remove" data-type="danger">
-                                                @csrf
-                                                <button type="submit" class="inline-flex items-center px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 dark:bg-red-700 shadow hover:shadow-md transition-all duration-200 text-sm font-medium" title="Remove from My Movies">
-                                                    <i aria-hidden="true" class="fa-solid fa-trash mr-1.5"></i>Delete
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-
-                                    @if(!empty($movie['plot']))
-                                        <p class="text-sm text-gray-700 dark:text-gray-300 mb-3 line-clamp-3">{{ e($movie['plot']) }}</p>
-                                    @endif
-
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-                                        @if(!empty($movie['genre']))
-                                            <div class="flex items-center text-sm">
-                                                <span class="font-semibold text-gray-700 dark:text-gray-300 mr-2"><i aria-hidden="true" class="fa-solid fa-tag mr-1 text-link dark:text-primary-400"></i>Genre:</span>
-                                                <span class="text-gray-600 dark:text-gray-400">{{ e($movie['genre']) }}</span>
-                                            </div>
-                                        @endif
-
-                                        @if(!empty($movie['director']))
-                                            <div class="flex items-center text-sm">
-                                                <span class="font-semibold text-gray-700 dark:text-gray-300 mr-2"><i aria-hidden="true" class="fa-solid fa-video-camera mr-1 text-link dark:text-primary-400"></i>Director:</span>
-                                                <span class="text-gray-600 dark:text-gray-400">{{ e($movie['director']) }}</span>
-                                            </div>
-                                        @endif
-                                    </div>
-
-                                    @if(!empty($movie['actors']))
-                                        <div class="flex items-start text-sm mb-3">
-                                            <span class="font-semibold text-gray-700 dark:text-gray-300 mr-2 shrink-0"><i aria-hidden="true" class="fa-solid fa-users mr-1 text-link dark:text-primary-400"></i>Starring:</span>
-                                            <span class="text-gray-600 dark:text-gray-400">{{ e($movie['actors']) }}</span>
-                                        </div>
-                                    @endif
-
-                                    <div class="flex items-center gap-4 pt-3 border-t border-gray-200 dark:border-gray-700">
-                                        <span class="inline-flex items-center px-3 py-1.5 category-badge text-primary-800 dark:text-primary-200 text-xs font-semibold rounded-full border border-primary-200">
-                                            <i aria-hidden="true" class="fa-solid fa-folder-open mr-1.5"></i>{{ !empty($movie['categoryNames']) ? e($movie['categoryNames']) : 'All Categories' }}
-                                        </span>
-                                        <span class="text-xs text-gray-500 dark:text-gray-400 flex items-center">
-                                            <i aria-hidden="true" class="fa-solid fa-calendar mr-1"></i>Added {{ isset($movie['created_at']) ? date('M d, Y', strtotime($movie['created_at'])) : '' }}
-                                        </span>
-                                        <a class="inline-flex items-center px-3 py-1.5 bg-warning-400 hover:bg-warning-500 text-gray-900 dark:text-gray-100 text-xs font-semibold rounded-full transition-colors"
-                                           target="_blank"
-                                           href="{{ $site->dereferrerLink }}http://www.imdb.com/title/tt{{ $movie['imdbid'] }}"
-                                           title="View on IMDB">
-                                            <i aria-hidden="true" class="fa-solid fa-external-link mr-1"></i>IMDB
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-
-            <!-- Mobile/Tablet Card View -->
-            <div class="lg:hidden">
-                @foreach($movies as $movie)
-                    <div class="p-6 border-b border-gray-200 dark:border-gray-700 hover:bg-primary-50 dark:hover:bg-gray-700 transition-colors duration-150">
-                        <div class="flex gap-4 mb-4">
-                            <div class="shrink-0">
-                                <img width="96" height="144" class="rounded-lg movie-poster-shadow w-24 h-36 object-cover"
-                                     src="{{ ($movie['cover'] ?? 0) == 1 ? getImageAssetUrl('movies', $movie['imdbid'] . '-cover', url('/covers/movies/no-cover.jpg')) : url('/covers/movies/no-cover.jpg') }}"
-                                     loading="lazy"
-                                     alt="{{ e($movie['title'] ?? '') }}"/>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1">
-                                    <a href="{{ url("/Movies?imdb={$movie['imdbid']}") }}"
-                                       class="hover:text-link">
-                                        {{ e($movie['title'] ?? '') }}
-                                        @if(!empty($movie['year']))
-                                            <span class="text-gray-500 text-sm">({{ $movie['year'] }})</span>
-                                        @endif
-                                    </a>
-                                </h3>
-                                @if(!empty($movie['tagline']))
-                                    <p class="text-xs italic text-gray-600 dark:text-gray-400 mb-2">{{ e($movie['tagline']) }}</p>
-                                @endif
-                                <span class="inline-flex items-center px-2 py-1 category-badge text-primary-800 dark:text-primary-200 text-xs font-semibold rounded-full border border-primary-200">
-                                    <i aria-hidden="true" class="fa-solid fa-folder-open mr-1"></i>{{ !empty($movie['categoryNames']) ? e($movie['categoryNames']) : 'All' }}
-                                </span>
-                            </div>
-                        </div>
-
-                        @if(!empty($movie['plot']))
-                            <p class="text-sm text-gray-700 dark:text-gray-300 mb-3 line-clamp-3">{{ e($movie['plot']) }}</p>
-                        @endif
-
-                        <div class="flex items-center justify-between pt-3 border-t border-gray-200 dark:border-gray-700">
-                            <div class="flex gap-2">
-                                <a class="inline-flex items-center px-3 py-1.5 bg-warning-400 hover:bg-warning-500 text-gray-900 dark:text-gray-100 text-xs font-semibold rounded-full transition-colors"
-                                   target="_blank"
-                                   href="{{ $site->dereferrerLink }}http://www.imdb.com/title/tt{{ $movie['imdbid'] }}">
-                                    <i aria-hidden="true" class="fa-solid fa-external-link mr-1"></i>IMDB
-                                </a>
-                                <span class="text-xs text-gray-500 dark:text-gray-400 flex items-center">
-                                    <i aria-hidden="true" class="fa-solid fa-calendar mr-1"></i>{{ isset($movie['created_at']) ? date('M d, Y', strtotime($movie['created_at'])) : '' }}
-                                </span>
-                            </div>
-                            <div class="flex gap-2">
-                                <a aria-label="Edit" class="px-3 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 text-sm font-medium shadow"
-                                   href="{{ url("/mymovies?id=edit&imdb={$movie['imdbid']}") }}"
-                                   title="Edit">
-                                    <i aria-hidden="true" class="fa-solid fa-edit"></i>
-                                </a>
-                                <form method="POST" action="{{ url("/mymovies?id=delete&imdb={$movie['imdbid']}") }}" x-data="confirmForm" @submit.prevent="submit()" data-title="Remove Movie" data-message="Are you sure you want to remove this movie from your watchlist?" data-confirm-text="Remove" data-type="danger">
-                                    @csrf
-                                    <button aria-label="Remove" type="submit" class="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 dark:bg-red-700 text-sm font-medium shadow" title="Remove">
-                                        <i aria-hidden="true" class="fa-solid fa-trash"></i>
-                                    </button>
-                                </form>
-                            </div>
+    @if($movieCount > 0)
+        <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+            @foreach($movies as $movie)
+                @php
+                    $movieTitle = (string) ($movie['title'] ?? '');
+                    $meta = array_filter([$movie['genre'] ?? null, ! empty($movie['director']) ? 'Directed by '.$movie['director'] : null]);
+                @endphp
+                <li class="flex flex-col gap-3 px-4 py-3 transition hover:bg-surface-hover sm:flex-row sm:items-center sm:gap-4 sm:px-6">
+                    <div class="flex min-w-0 flex-1 items-start gap-3">
+                        <img width="48" height="72" class="aspect-[2/3] w-12 shrink-0 rounded-md object-cover shadow-sm"
+                             src="{{ ($movie['cover'] ?? 0) == 1 ? getImageAssetUrl('movies', $movie['imdbid'].'-cover', $noCover) : $noCover }}"
+                             data-fallback-src="{{ $noCover }}" loading="lazy" decoding="async" alt="{{ $movieTitle }} cover"/>
+                        <div class="min-w-0">
+                            <a href="{{ url("/Movies?imdb={$movie['imdbid']}") }}" class="font-semibold text-link hover:underline">
+                                {{ $movieTitle }}@if(! empty($movie['year'])) <span class="font-normal text-fg-muted">({{ $movie['year'] }})</span>@endif
+                            </a>
+                            @if($meta !== [])
+                                <p class="truncate text-xs text-fg-muted" title="{{ implode(' · ', $meta) }}">{{ implode(' · ', $meta) }}</p>
+                            @endif
+                            @if(! empty($movie['plot']))
+                                <p class="mt-1 hidden text-sm text-fg-muted lg:line-clamp-2">{{ $movie['plot'] }}</p>
+                            @endif
                         </div>
                     </div>
-                @endforeach
-            </div>
-        </div>
+
+                    <div class="flex flex-wrap items-center gap-2 sm:w-64 sm:flex-col sm:items-start sm:gap-1">
+                        <x-badge :tone="! empty($movie['categoryNames']) ? 'primary' : 'neutral'" icon="fa-solid fa-folder-open">
+                            {{ ! empty($movie['categoryNames']) ? $movie['categoryNames'] : 'All categories' }}
+                        </x-badge>
+                        @if(isset($movie['created_at']))
+                            <span class="text-xs text-fg-muted"><i aria-hidden="true" class="fa-solid fa-clock mr-1"></i>Added {{ \Carbon\Carbon::parse($movie['created_at'])->format('M d, Y') }}</span>
+                        @endif
+                    </div>
+
+                    <div class="flex items-center gap-1 sm:justify-end">
+                        <a href="{{ $site->dereferrerLink }}https://www.imdb.com/title/tt{{ $movie['imdbid'] }}" target="_blank" rel="noopener noreferrer" title="View on IMDb"
+                           class="mr-1 inline-flex min-h-9 items-center gap-1.5 rounded-control border border-line px-3 text-xs font-medium text-fg-muted transition hover:bg-surface-hover hover:text-fg">
+                            IMDb<i aria-hidden="true" class="fa-solid fa-arrow-up-right-from-square text-[0.65rem]"></i>
+                        </a>
+                        <x-icon-button size="sm" icon="fa-solid fa-pen" label="Edit categories for {{ $movieTitle ?: 'this movie' }}"
+                                       :href="url('/mymovies?id=edit&imdb='.$movie['imdbid'])" />
+                        <form method="POST" action="{{ url("/mymovies?id=delete&imdb={$movie['imdbid']}") }}"
+                              x-data="confirmForm" @submit.prevent="submit()" data-title="Remove movie" data-message="Are you sure you want to remove this movie from your watchlist?" data-confirm-text="Remove" data-type="danger">
+                            @csrf
+                            <x-icon-button type="submit" size="sm" icon="fa-solid fa-trash" label="Remove {{ $movieTitle ?: 'this movie' }} from My movies" class="text-danger-600 dark:text-danger-400" />
+                        </form>
+                    </div>
+                </li>
+            @endforeach
+        </ul>
     @else
-        <!-- Empty State -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
-            <div class="text-center py-16 px-6">
-                <div class="mx-auto h-24 w-24 empty-state-bg rounded-full flex items-center justify-center mb-6 shadow-sm">
-                    <i aria-hidden="true" class="fa-solid fa-film text-5xl text-link"></i>
-                </div>
-                <h3 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">No Movies in Watchlist</h3>
-                <p class="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
-                    You haven't bookmarked any movies yet. Search for movies and add them to your watchlist.
-                </p>
-                <a href="{{ url('/browse/Movies') }}"
-                   class="inline-flex items-center px-6 py-3 bg-accent dark:bg-accent-hover text-white rounded-lg hover:bg-accent-hover dark:hover:bg-primary-800 shadow-md hover:shadow-lg transition-all duration-200 font-medium">
-                    <i aria-hidden="true" class="fa-solid fa-search mr-2"></i>Browse Movies
-                </a>
-            </div>
-        </div>
+        <x-empty-state icon="fas fa-film" title="No movies yet"
+                       message="You haven't saved any movies yet. Open a movie and add it to your watchlist to get its releases."
+                       :action-url="url('/Movies')" action-label="Browse movies" action-icon="fas fa-film" />
     @endif
 </div>

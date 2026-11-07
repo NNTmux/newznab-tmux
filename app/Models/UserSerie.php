@@ -78,8 +78,9 @@ class UserSerie extends Model
     {
         return self::query()
             ->where('user_series.users_id', $userId)
-            ->select(['user_series.*', 'v.title'])
+            ->select(['user_series.*', 'v.title', 'v.started', 'ti.summary', 'ti.publisher', 'ti.image'])
             ->join('videos as v', 'v.id', '=', 'user_series.videos_id')
+            ->leftJoin('tv_info as ti', 'ti.videos_id', '=', 'user_series.videos_id')
             ->orderBy('v.title')
             ->get();
     }

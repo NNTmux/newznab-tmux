@@ -66,7 +66,7 @@ class UserMovie extends Model
             ->where('users_id', $uid)
             ->leftJoin('movieinfo as mi', 'mi.imdbid', '=', 'user_movies.imdbid')
             ->orderBy('mi.title')
-            ->get(['user_movies.*', 'mi.year', 'mi.plot', 'mi.cover', 'mi.title'])
+            ->get(['user_movies.*', 'mi.year', 'mi.plot', 'mi.cover', 'mi.title', 'mi.genre', 'mi.director'])
             ->toArray();
     }
 

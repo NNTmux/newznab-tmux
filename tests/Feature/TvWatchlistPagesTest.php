@@ -69,18 +69,37 @@ class TvWatchlistPagesTest extends TestCase
     {
         $member = $this->member();
         DB::table('root_categories')->insert(['id' => Category::TV_ROOT, 'title' => 'TV']);
-        DB::table('videos')->insert(['id' => 7, 'title' => 'Severance']);
+        DB::table('videos')->insert(['id' => 7, 'title' => 'Severance', 'started' => '2022-02-18']);
+        DB::table('tv_info')->insert(['videos_id' => 7, 'summary' => 'Office workers have their memories surgically divided.', 'publisher' => 'Apple TV+', 'image' => 1]);
         DB::table('user_series')->insert(['users_id' => $member->getAuthIdentifier(), 'videos_id' => 7, 'categories' => '', 'created_at' => now()]);
 
         $html = $this->actingAs($member)->get(route('myshows'))
             ->assertOk()
             ->assertSee('Severance')
             ->assertSee('aria-label="Edit categories for Severance"', false)
+            ->assertSee('Apple TV+ · Since 2022')
+            ->assertSee('Office workers have their memories surgically divided.')
+            ->assertSee('alt="Severance cover"', false)
             ->assertSee('href="'.route('series').'"', false)
             ->getContent();
 
         $this->assertSame(1, substr_count((string) $html, 'href="'.route('myshows.browse').'"'), 'The releases link appears once, in the header.');
         $this->assertStringNotContainsString('max-w-7xl mx-auto', (string) $html);
+    }
+
+    #[Test]
+    public function adding_a_show_opens_my_shows(): void
+    {
+        $member = $this->member();
+        DB::table('root_categories')->insert(['id' => Category::TV_ROOT, 'title' => 'TV']);
+        DB::table('videos')->insert(['id' => 7, 'title' => 'Severance']);
+        DB::table('tv_info')->insert(['videos_id' => 7]);
+
+        $this->actingAs($member)
+            ->post('/myshows?action=doadd', ['id' => 7, 'from' => '/series/S'])
+            ->assertRedirect(route('myshows'));
+
+        $this->assertSame(1, DB::table('user_series')->where('users_id', $member->getAuthIdentifier())->where('videos_id', 7)->count());
     }
 
     #[Test]
@@ -217,6 +236,13 @@ class TvWatchlistPagesTest extends TestCase
         Schema::create('videos', function (Blueprint $table): void {
             $table->increments('id');
             $table->string('title');
+            $table->date('started')->nullable();
+        });
+        Schema::create('tv_info', function (Blueprint $table): void {
+            $table->unsignedInteger('videos_id')->primary();
+            $table->text('summary')->nullable();
+            $table->string('publisher')->nullable();
+            $table->boolean('image')->default(false);
         });
         Schema::create('user_series', function (Blueprint $table): void {
             $table->increments('id');

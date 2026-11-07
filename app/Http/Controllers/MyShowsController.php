@@ -58,7 +58,8 @@ class MyShowsController extends BasePageController
                     $category = $this->selectedCategoryIds($request, $this->showCategories(true));
                     UserSerie::addShow($this->userdata->id, $videoId, $category);
 
-                    return redirect()->to($from);
+                    // Like My movies: after adding, show the updated watchlist.
+                    return redirect()->route('myshows');
                 }
 
                 $categories = $this->showCategories(true);

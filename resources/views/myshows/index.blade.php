@@ -1,6 +1,7 @@
 @php
     $rssFeedUrl = url("/rss/myshows?dl=1&i={$userdata->id}&api_token={$userdata->api_token}");
     $showCount = count($shows ?? []);
+    $noCover = url('/covers/tvshows/no-cover.jpg');
 @endphp
 <x-page-header title="My TV shows" eyebrow="Your watchlist" description="Manage followed series and keep automatic updates flowing through your personal feed." icon="fas fa-tv">
     <x-slot:stats>
@@ -28,25 +29,36 @@
     @if($showCount > 0)
         <ul class="divide-y divide-gray-200 dark:divide-gray-700">
             @foreach($shows as $show)
-                <li class="flex flex-col gap-2 px-4 py-2.5 transition hover:bg-surface-hover sm:flex-row sm:items-center sm:gap-4 sm:px-6">
-                    <div class="flex min-w-0 flex-1 items-center gap-3">
-                        <span aria-hidden="true" class="show-avatar flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-sm font-bold text-white">
-                            {{ strtoupper(substr($show['title'] ?? 'T', 0, 1)) }}
-                        </span>
+                @php
+                    $showTitle = (string) ($show['title'] ?? '');
+                    $meta = array_filter([
+                        $show['publisher'] ?? null,
+                        ! empty($show['started']) ? 'Since '.\Carbon\Carbon::parse($show['started'])->format('Y') : null,
+                    ]);
+                    $coverUrl = ! empty($show['image']) ? getImageAssetUrl('tvshows', (string) $show['videos_id'], $noCover) : $noCover;
+                @endphp
+                <li class="flex flex-col gap-3 px-4 py-3 transition hover:bg-surface-hover sm:flex-row sm:items-center sm:gap-4 sm:px-6">
+                    <div class="flex min-w-0 flex-1 items-start gap-3">
+                        <img width="48" height="72" class="aspect-[2/3] w-12 shrink-0 rounded-md object-cover shadow-sm"
+                             src="{{ $coverUrl }}" data-fallback-src="{{ $noCover }}" loading="lazy" decoding="async" alt="{{ $showTitle }} cover"/>
                         <div class="min-w-0">
-                            <a class="block truncate font-semibold text-link hover:underline" title="View series details" href="{{ url("/series/{$show['videos_id']}") }}">{{ $show['title'] ?? '' }}</a>
-                            <p class="text-xs text-fg-muted">
-                                @if(isset($show['created_at']))
-                                    <i aria-hidden="true" class="fa-solid fa-clock mr-1"></i>Added {{ \Carbon\Carbon::parse($show['created_at'])->format('M d, Y') }}
-                                @endif
-                            </p>
+                            <a class="font-semibold text-link hover:underline" title="View series details" href="{{ url("/series/{$show['videos_id']}") }}">{{ $showTitle }}</a>
+                            @if($meta !== [])
+                                <p class="truncate text-xs text-fg-muted" title="{{ implode(' · ', $meta) }}">{{ implode(' · ', $meta) }}</p>
+                            @endif
+                            @if(! empty($show['summary']))
+                                <p class="mt-1 hidden text-sm text-fg-muted lg:line-clamp-2">{{ $show['summary'] }}</p>
+                            @endif
                         </div>
                     </div>
 
-                    <div class="sm:w-64">
+                    <div class="flex flex-wrap items-center gap-2 sm:w-64 sm:flex-col sm:items-start sm:gap-1">
                         <x-badge :tone="! empty($show['categoryNames']) ? 'primary' : 'neutral'" icon="fa-solid fa-folder-open">
                             {{ ! empty($show['categoryNames']) ? $show['categoryNames'] : 'All categories' }}
                         </x-badge>
+                        @if(isset($show['created_at']))
+                            <span class="text-xs text-fg-muted"><i aria-hidden="true" class="fa-solid fa-clock mr-1"></i>Added {{ \Carbon\Carbon::parse($show['created_at'])->format('M d, Y') }}</span>
+                        @endif
                     </div>
 
                     <div class="flex items-center gap-1 sm:justify-end">
