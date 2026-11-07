@@ -46,7 +46,7 @@
                                 @endphp
                                 @if($hasValidCover)
                                     <a href="{{ url('/details/' . $result->guid) }}" class="shrink-0 bg-gray-100 dark:bg-gray-700 rounded mr-3" x-show="showThumbs" @unless(request()->query('thumbs') === '1') x-cloak @endunless>
-                                        <img src="{{ request()->query('thumbs') === '1' ? $coverUrl : '' }}" x-bind:src="showThumbs ? '{{ $coverUrl }}' : ''" class="w-12 h-16 object-cover rounded shadow-sm hover:shadow-md transition" alt="Cover" loading="lazy">
+                                        <img width="48" height="64" src="{{ request()->query('thumbs') === '1' ? $coverUrl : '' }}" x-bind:src="showThumbs ? '{{ $coverUrl }}' : ''" class="w-12 h-16 object-cover rounded shadow-sm hover:shadow-md transition" alt="Cover" loading="lazy">
                                     </a>
                                 @endif
                             @endif
@@ -131,7 +131,7 @@
                         @endphp
                         @if($mHasCover)
                             <a href="{{ url('/details/' . $result->guid) }}" class="block mb-2 bg-gray-100 dark:bg-gray-700 rounded-lg" x-show="showThumbs" @unless(request()->query('thumbs') === '1') x-cloak @endunless>
-                                <img src="{{ request()->query('thumbs') === '1' ? $mCoverUrl : '' }}" x-bind:src="showThumbs ? '{{ $mCoverUrl }}' : ''" class="w-16 h-20 object-cover rounded-lg shadow-sm" alt="Cover" loading="lazy">
+                                <img width="64" height="80" src="{{ request()->query('thumbs') === '1' ? $mCoverUrl : '' }}" x-bind:src="showThumbs ? '{{ $mCoverUrl }}' : ''" class="w-16 h-20 object-cover rounded-lg shadow-sm" alt="Cover" loading="lazy">
                             </a>
                         @endif
                     @endif

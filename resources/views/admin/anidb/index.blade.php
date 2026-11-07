@@ -57,7 +57,7 @@
                                     $hasCover = $anime->anidbid > 0 && (file_exists(storage_path('covers/anime/' . $anime->anidbid . '-cover.webp')) || file_exists(storage_path('covers/anime/' . $anime->anidbid . '-cover.jpg')));
                                 @endphp
                                 @if($hasCover)
-                                    <img src="{{ getImageAssetUrl('anime', $anime->anidbid . '-cover', url('/covers/anime/no-cover.jpg'), [(string) $anime->anidbid]) }}"
+                                    <img width="48" height="64" src="{{ getImageAssetUrl('anime', $anime->anidbid . '-cover', url('/covers/anime/no-cover.jpg'), [(string) $anime->anidbid]) }}"
                                          alt="{{ $anime->title }}"
                                          class="h-16 w-12 object-cover rounded shadow"
                                          loading="lazy">

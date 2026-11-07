@@ -24,9 +24,9 @@
                             data-image-url="{{ $image['url'] }}"
                             data-image-title="{{ $image['label'] }} Image"
                             aria-label="Open {{ strtolower($image['label']) }} image">
-                        <img src="{{ $image['url'] }}"
+                        <img width="224" height="112" src="{{ $image['url'] }}"
                              alt="{{ $image['label'] }}"
-                             class="detail-gallery-image h-24 w-auto max-w-56 object-cover transition hover:opacity-90 sm:h-28"
+                             class="detail-gallery-image h-24 w-48 object-cover transition hover:opacity-90 sm:h-28 sm:w-56"
                              loading="lazy"
                              decoding="async">
                     </button>

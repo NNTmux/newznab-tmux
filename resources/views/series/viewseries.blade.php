@@ -88,7 +88,7 @@
                             <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
                                 @if(!empty($show['image']) && $show['image'] != 0)
                                     <div class="lg:col-span-1">
-                                        <img class="series-detail-poster w-full h-auto rounded-lg"
+                                        <img width="320" height="480" class="series-detail-poster w-full h-auto rounded-lg aspect-[2/3] object-cover"
                                              alt="{{ $seriestitles ?? '' }} Poster"
                                              loading="lazy"
                                              src="{{ getImageAssetUrl('tvshows', (string) $show['id'], url('/covers/tvshows/no-cover.jpg')) }}"/>

@@ -34,7 +34,7 @@
                             <div class="shrink-0 relative p-4">
                                 <a href="{{ route('movie.view', ['imdbid' => $movie->imdbid]) }}" class="block">
                                     @if($movie->cover)
-                                        <img src="{{ $movie->cover }}" alt="{{ $movie->title }}" class="w-full md:w-64 h-96 object-cover rounded-xl shadow-xl" loading="lazy">
+                                        <img width="256" height="384" src="{{ $movie->cover }}" alt="{{ $movie->title }}" class="w-full md:w-64 h-96 object-cover rounded-xl shadow-xl" loading="lazy">
                                     @else
                                         <div class="w-full md:w-64 h-96 bg-gray-200 dark:bg-gray-700 flex items-center justify-center rounded-xl shadow-xl">
                                             <i aria-hidden="true" class="fas fa-film text-gray-400 text-5xl"></i>

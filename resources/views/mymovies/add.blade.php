@@ -9,7 +9,7 @@
         <div class="p-6">
             <div class="mb-6">
                 <div class="flex items-center gap-4 mb-4">
-                    <img class="rounded-lg shadow-md w-24 h-auto"
+                    <img width="96" height="144" class="rounded-lg shadow-md w-24 h-auto aspect-[2/3] object-cover"
                          src="{{ getImageAssetUrl('movies', $imdbid . '-cover', url('/covers/movies/no-cover.jpg')) }}"
                          data-fallback-src="{{ url('/covers/movies/no-cover.jpg') }}"
                          loading="lazy"
@@ -119,7 +119,7 @@
                             @foreach($movies as $movie)
                                 <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
                                     <td class="px-4 py-3">
-                                        <img class="rounded-lg shadow-sm max-w-[120px]"
+                                        <img width="120" height="180" class="rounded-lg shadow-sm max-w-[120px]"
                                              src="{{ ($movie['cover'] ?? 0) == 1 ? getImageAssetUrl('movies', $movie['imdbid'] . '-cover', url('/covers/movies/no-cover.jpg')) : url('/covers/movies/no-cover.jpg') }}"
                                              loading="lazy"
                                              alt="{{ e($movie['title'] ?? '') }}"/>
@@ -189,7 +189,7 @@
                     @foreach($movies as $movie)
                         <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
                             <div class="flex gap-3">
-                                <img class="rounded-lg shadow-sm w-20 h-auto shrink-0"
+                                <img width="80" height="120" class="rounded-lg shadow-sm w-20 h-auto shrink-0 aspect-[2/3] object-cover"
                                      src="{{ ($movie['cover'] ?? 0) == 1 ? getImageAssetUrl('movies', $movie['imdbid'] . '-cover', url('/covers/movies/no-cover.jpg')) : url('/covers/movies/no-cover.jpg') }}"
                                      loading="lazy"
                                      alt="{{ e($movie['title'] ?? '') }}"/>

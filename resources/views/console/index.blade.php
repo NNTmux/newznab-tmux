@@ -53,7 +53,7 @@
                                 <div class="shrink-0">
                                     @if($guid)
                                         <a href="{{ url('/details/' . $guid) }}" class="block relative">
-                                            <img class="w-32 h-48 object-cover"
+                                            <img width="128" height="192" class="w-32 h-48 object-cover"
                                                  src="{{ getReleaseCover($result) }}"
                                                  alt="{{ $result->title }}"
                                                  loading="lazy"

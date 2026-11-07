@@ -66,7 +66,7 @@
                             <div class="flex gap-6">
                                 <!-- Movie Poster -->
                                 <div class="shrink-0">
-                                    <img class="rounded-lg movie-poster-shadow w-32 h-48 object-cover"
+                                    <img width="128" height="192" class="rounded-lg movie-poster-shadow w-32 h-48 object-cover"
                                          src="{{ ($movie['cover'] ?? 0) == 1 ? getImageAssetUrl('movies', $movie['imdbid'] . '-cover', url('/covers/movies/no-cover.jpg')) : url('/covers/movies/no-cover.jpg') }}"
                                          loading="lazy"
                                          alt="{{ e($movie['title'] ?? '') }}"/>
@@ -158,7 +158,7 @@
                     <div class="p-6 border-b border-gray-200 dark:border-gray-700 hover:bg-primary-50 dark:hover:bg-gray-700 transition-colors duration-150">
                         <div class="flex gap-4 mb-4">
                             <div class="shrink-0">
-                                <img class="rounded-lg movie-poster-shadow w-24 h-36 object-cover"
+                                <img width="96" height="144" class="rounded-lg movie-poster-shadow w-24 h-36 object-cover"
                                      src="{{ ($movie['cover'] ?? 0) == 1 ? getImageAssetUrl('movies', $movie['imdbid'] . '-cover', url('/covers/movies/no-cover.jpg')) : url('/covers/movies/no-cover.jpg') }}"
                                      loading="lazy"
                                      alt="{{ e($movie['title'] ?? '') }}"/>

@@ -107,7 +107,7 @@
                                 @if($guid)
                                     <a href="{{ url('/details/' . $guid) }}" class="block">
                                         @if(!empty($result->cover))
-                                            <img src="{{ url('/covers/games/' . $result->cover) }}"
+                                            <img width="128" height="192" src="{{ url('/covers/games/' . $result->cover) }}"
                                                  alt="{{ $result->title ?? $result->searchname }}"
                                                  class="w-32 h-48 object-cover"
                                                  loading="lazy"

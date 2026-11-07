@@ -25,7 +25,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 @if(isset($movie['cover']) && $movie['cover'])
                     <div class="lg:col-span-1">
-                        <img src="{{ $movie['cover'] }}" alt="{{ $movie['title'] }}" class="w-full rounded-lg shadow-lg" loading="lazy">
+                        <img width="320" height="480" src="{{ $movie['cover'] }}" alt="{{ $movie['title'] }}" class="w-full rounded-lg shadow-lg" loading="lazy">
                     </div>
                 @endif
 

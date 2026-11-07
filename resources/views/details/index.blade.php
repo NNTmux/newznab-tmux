@@ -2,6 +2,7 @@
 
 @push('modals')
     @include('partials.release-modals')
+    @include('details.partials.image-modal')
 @endpush
 
 @section('content')
@@ -47,8 +48,6 @@
     </div>
 </div>
 @endsection
-
-@include('details.partials.image-modal')
 
 {{-- NFO modal is included globally via layouts.main --}}
 

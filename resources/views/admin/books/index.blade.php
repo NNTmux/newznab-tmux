@@ -27,7 +27,7 @@
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @if($book->cover == 1)
-                                    <img src="{{ asset('storage/covers/book/' . $book->id . (file_exists(storage_path('covers/book/' . $book->id . '.webp')) ? '.webp' : '.jpg')) }}"
+                                    <img width="48" height="64" src="{{ asset('storage/covers/book/' . $book->id . (file_exists(storage_path('covers/book/' . $book->id . '.webp')) ? '.webp' : '.jpg')) }}"
                                          alt="{{ $book->title }}"
                                          class="h-16 w-12 object-cover rounded shadow"
                                          loading="lazy"

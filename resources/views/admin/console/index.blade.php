@@ -32,7 +32,7 @@
                                     $hasCover = file_exists($coverPath) || file_exists($legacyCoverPath);
                                 @endphp
                                 @if($hasCover)
-                                    <img src="{{ asset('covers/console/' . $console->id . (file_exists($coverPath) ? '.webp' : '.jpg')) }}"
+                                    <img width="48" height="64" src="{{ asset('covers/console/' . $console->id . (file_exists($coverPath) ? '.webp' : '.jpg')) }}"
                                          alt="{{ $console->title }}"
                                          class="h-16 w-12 object-cover rounded shadow"
                                          loading="lazy">

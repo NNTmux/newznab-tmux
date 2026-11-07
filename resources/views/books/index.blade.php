@@ -79,7 +79,7 @@
                     <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-200">
                         <a href="{{ $guid ? url('/details/' . $guid) : '#' }}" class="block relative">
                             @if(!empty($result->cover))
-                                <img src="{{ getImageAssetUrl('book', (string) $result->id, asset('assets/images/no-cover.png')) }}"
+                                <img width="320" height="480" src="{{ getImageAssetUrl('book', (string) $result->id, asset('assets/images/no-cover.png')) }}"
                                      alt="{{ $result->title }}"
                                      class="w-full h-64 object-cover"
                                      loading="lazy"

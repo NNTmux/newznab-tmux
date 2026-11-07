@@ -50,7 +50,7 @@
                 <div class="lg:col-span-1">
                     <!-- Avatar -->
                     <div class="flex justify-center mb-6">
-                        <img src="{{ !empty($user->email) && filter_var($user->email, FILTER_VALIDATE_EMAIL) ? 'https://www.gravatar.com/avatar/' . md5(strtolower(trim($user->email))) . '?s=120&d=mp' : 'https://www.gravatar.com/avatar/?d=mp&s=120' }}"
+                        <img width="120" height="120" src="{{ !empty($user->email) && filter_var($user->email, FILTER_VALIDATE_EMAIL) ? 'https://www.gravatar.com/avatar/' . md5(strtolower(trim($user->email))) . '?s=120&d=mp' : 'https://www.gravatar.com/avatar/?d=mp&s=120' }}"
                              alt="{{ $user->username }}"
                              loading="lazy"
                              class="w-30 h-30 rounded-full border-4 border-gray-200 dark:border-gray-700 shadow-lg">
