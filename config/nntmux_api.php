@@ -7,10 +7,12 @@ return [
     'isbndb_api_key' => env('ISBNDB_API_KEY', ''),
     'imdb_scraper_enabled' => env('IMDB_SCRAPER_ENABLED', true),
     'imdb_scraper_block_backoff_minutes' => env('IMDB_SCRAPER_BLOCK_BACKOFF_MINUTES', 60),
-    'imdbapi_dev_enabled' => env('IMDBAPI_DEV_ENABLED', true),
+    // api.imdbapi.dev stopped resolving in 2026; enable only when IMDBAPI_DEV_BASE_URL points at a working mirror.
+    'imdbapi_dev_enabled' => env('IMDBAPI_DEV_ENABLED', false),
     'imdbapi_dev_base_url' => env('IMDBAPI_DEV_BASE_URL', 'https://api.imdbapi.dev'),
     'imdbapi_dev_min_interval_seconds' => env('IMDBAPI_DEV_MIN_INTERVAL_SECONDS', 15),
     'imdbapi_dev_cooldown_seconds' => env('IMDBAPI_DEV_COOLDOWN_SECONDS', 300),
+    'imdbapi_dev_unreachable_cooldown_seconds' => env('IMDBAPI_DEV_UNREACHABLE_COOLDOWN_SECONDS', 21600),
     'omdb_api_key' => env('OMDB_APIKEY', ''),
     'trakttv_api_key' => env('TRAKTTV_APIKEY', ''),
     'trakttv_timeout' => env('TRAKTTV_TIMEOUT', 30),

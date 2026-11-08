@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Support\MetadataSources;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ConnectException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -29,6 +30,16 @@ class ImdbScraper
 
     protected const int WAF_PROBE_LOCK_SECONDS = 120;
 
+    /**
+     * Suggestion API title types ("qid") that are movies.
+     */
+    protected const array SUGGESTION_MOVIE_TYPES = ['movie', 'tvMovie', 'video'];
+
+    /**
+     * Title page failures worth retrying soon rather than caching for hours.
+     */
+    protected const array TRANSIENT_FAILURE_REASONS = ['html_exception', 'html_http_failure', 'html_empty_response'];
+
     protected Client $client;
 
     protected string $imdbApiDevBaseUrl;
@@ -42,6 +53,8 @@ class ImdbScraper
     protected ?string $lastFallbackFailureReason = null;
 
     protected bool $lastFetchWasSkipped = false;
+
+    protected bool $lastFailureWasTransient = false;
 
     public function __construct(?Client $client = null)
     {
@@ -127,6 +140,7 @@ class ImdbScraper
         $this->lastFailureReason = null;
         $this->lastFallbackFailureReason = null;
         $this->lastFetchWasSkipped = false;
+        $this->lastFailureWasTransient = false;
 
         $id = preg_replace('/[^0-9]/', '', $id) ?? '';
         if ($id === '' || strlen($id) < 5 || strlen($id) > 8) {
@@ -134,6 +148,9 @@ class ImdbScraper
 
             return false;
         }
+
+        // IMDb ids have at least 7 digits; "211915" is tt0211915.
+        $id = str_pad($id, 7, '0', STR_PAD_LEFT);
 
         $cacheKey = 'imdb_scrape_id_'.$id;
         if (Cache::has($cacheKey)) {
@@ -144,106 +161,110 @@ class ImdbScraper
             return $this->fetchWithoutScraping($id, $cacheKey);
         }
 
-        $url = 'https://www.imdb.com/title/tt'.$id.'/';
+        $data = $this->fetchTitlePage($id);
+        if (is_array($data)) {
+            $this->lastFetchSource = 'imdb_html';
+            Cache::put($cacheKey, $data, now()->addDays(7));
 
+            return $data;
+        }
+
+        $this->lastFailureReason = $data;
+        $this->lastRequestWasBlocked = $data === 'waf_block';
+        if ($data === 'not_found') {
+            Cache::put($cacheKey, false, now()->addHours(self::HARD_FAILURE_TTL_HOURS));
+
+            return false;
+        }
+
+        $fallbackData = $this->fetchFromImdbApiDev($id);
+        if ($fallbackData !== false) {
+            $this->lastFetchSource = 'imdbapi_dev';
+            $this->lastFailureReason = null;
+            $this->lastFallbackFailureReason = null;
+            Cache::put($cacheKey, $fallbackData, now()->addDays(7));
+
+            return $fallbackData;
+        }
+
+        $this->lastFailureWasTransient = $data === 'waf_block' || in_array($data, self::TRANSIENT_FAILURE_REASONS, true);
+        $ttl = $this->lastFailureWasTransient
+            ? now()->addMinutes(self::SOFT_FAILURE_TTL_MINUTES)
+            : now()->addHours(self::HARD_FAILURE_TTL_HOURS);
+        Cache::put($cacheKey, false, $ttl);
+
+        return false;
+    }
+
+    /**
+     * Whether the last fetchById() failure may succeed on a retry soon (block, timeout, server error).
+     */
+    public function wasTransientFailure(): bool
+    {
+        return $this->lastFailureWasTransient;
+    }
+
+    /**
+     * Load and parse the imdb.com title page.
+     *
+     * @return array<string, mixed>|string The title data, or why it failed (waf_block, not_found, html_*).
+     */
+    private function fetchTitlePage(string $id): array|string
+    {
         try {
-            $response = $this->client->get($url, [
+            $response = $this->client->get('https://www.imdb.com/title/tt'.$id.'/', [
                 'headers' => [
                     'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
                     'Referer' => 'https://www.imdb.com/',
                     'Upgrade-Insecure-Requests' => '1',
                 ],
             ]);
-
-            $statusCode = $response->getStatusCode();
-            $html = (string) $response->getBody();
-
-            if ($this->isWafResponse($statusCode, $html)) {
-                $this->lastRequestWasBlocked = true;
-                $this->lastFailureReason = 'waf_block';
-                $this->startWafBackoff();
-            } else {
-                $this->endWafBackoff();
-            }
-
-            if (! $this->lastRequestWasBlocked && $statusCode < 400 && trim($html) !== '') {
-                $data = $this->parseTitleHtml($html, $id);
-                if ($data !== false) {
-                    $this->lastFetchSource = 'imdb_html';
-                    $this->lastFailureReason = null;
-                    Cache::put($cacheKey, $data, now()->addDays(7));
-
-                    return $data;
-                }
-
-                $this->lastFailureReason = 'html_parse_failure';
-            } elseif (! $this->lastRequestWasBlocked) {
-                $this->lastFailureReason = trim($html) === '' ? 'html_empty_response' : 'html_http_failure';
-            }
-
-            $fallbackData = $this->fetchFromImdbApiDev($id);
-            if ($fallbackData !== false) {
-                $this->lastFetchSource = 'imdbapi_dev';
-                $this->lastFailureReason = null;
-                $this->lastFallbackFailureReason = null;
-                Cache::put($cacheKey, $fallbackData, now()->addDays(7));
-
-                return $fallbackData;
-            }
-
-            $ttl = $this->lastRequestWasBlocked
-                ? now()->addMinutes(self::SOFT_FAILURE_TTL_MINUTES)
-                : now()->addHours(self::HARD_FAILURE_TTL_HOURS);
-            Cache::put($cacheKey, false, $ttl);
-
-            return false;
         } catch (\Throwable $e) {
             Log::debug('IMDb fetch error tt'.$id.': '.$e->getMessage());
             Cache::forget(self::WAF_PROBE_CACHE_KEY);
-            if ($this->lastFailureReason === null) {
-                $this->lastFailureReason = 'html_exception';
-            }
 
-            $fallbackData = $this->fetchFromImdbApiDev($id);
-            if ($fallbackData !== false) {
-                $this->lastFetchSource = 'imdbapi_dev';
-                $this->lastFailureReason = null;
-                $this->lastFallbackFailureReason = null;
-                Cache::put($cacheKey, $fallbackData, now()->addDays(7));
-
-                return $fallbackData;
-            }
-
-            $ttl = $this->lastRequestWasBlocked
-                ? now()->addMinutes(self::SOFT_FAILURE_TTL_MINUTES)
-                : now()->addHours(self::HARD_FAILURE_TTL_HOURS);
-            Cache::put($cacheKey, false, $ttl);
-
-            return false;
+            return 'html_exception';
         }
+
+        $statusCode = $response->getStatusCode();
+        $html = (string) $response->getBody();
+
+        if ($this->isWafResponse($statusCode, $html)) {
+            $this->startWafBackoff();
+
+            return 'waf_block';
+        }
+
+        $this->endWafBackoff();
+
+        if ($statusCode === 404 || $statusCode === 410) {
+            return 'not_found';
+        }
+
+        if ($statusCode >= 400 || trim($html) === '') {
+            return trim($html) === '' ? 'html_empty_response' : 'html_http_failure';
+        }
+
+        return $this->parseTitleHtml($html, $id) ?: 'html_parse_failure';
     }
 
     /**
-     * Search IMDb suggestion API for a title.
+     * Search the IMDb suggestion API for movies matching a title.
      *
-     * @return array<string, mixed>
+     * Falls back to the imdb.com find page only when the suggestion request itself failed.
+     *
+     * @return list<array{imdbid: string, title: string, year: string, type: string, cover: string}>
      */
     public function search(string $query): array
     {
         $this->lastRequestWasBlocked = false;
 
         $query = trim($query);
-        if ($query === '') {
-            return [];
-        }
-
-        $norm = strtolower(preg_replace('/[^a-z0-9 ]/i', '', $query) ?? '');
-        $slug = preg_replace('/\s+/', '_', trim($norm)) ?? '';
+        $slug = $this->suggestionSlug($query);
         if ($slug === '') {
             return [];
         }
 
-        $prefix = substr($slug, 0, 1);
         $cacheKey = 'imdb_search_'.md5($slug);
         if (Cache::has($cacheKey)) {
             return Cache::get($cacheKey);
@@ -253,47 +274,56 @@ class ImdbScraper
             return [];
         }
 
-        $url = 'https://v2.sg.media-imdb.com/suggestion/'.urlencode($prefix).'/'.urlencode($slug).'.json';
+        $results = $this->fetchSuggestions($slug, $query) ?? $this->searchHtmlFallback($query);
+
+        if ($results === null) {
+            Cache::put($cacheKey, [], now()->addMinutes(self::SOFT_FAILURE_TTL_MINUTES));
+
+            return [];
+        }
+
+        $ttl = $results === [] ? now()->addHours(self::HARD_FAILURE_TTL_HOURS) : now()->addHours(12);
+        Cache::put($cacheKey, $results, $ttl);
+
+        return $results;
+    }
+
+    /**
+     * Suggestion API slug: ASCII, lowercase, words joined by underscores ("Spider-Man" => "spider_man").
+     */
+    private function suggestionSlug(string $query): string
+    {
+        $text = str_replace(["'", '’', '`'], '', Str::ascii($query));
+        $text = strtolower(trim(preg_replace('/[^a-z0-9]+/i', ' ', $text) ?? ''));
+
+        return preg_replace('/\s+/', '_', $text) ?? '';
+    }
+
+    /**
+     * @return list<array{imdbid: string, title: string, year: string, type: string, cover: string}>|null Null when the request failed.
+     */
+    private function fetchSuggestions(string $slug, string $query): ?array
+    {
+        $url = 'https://v2.sg.media-imdb.com/suggestion/'.urlencode($slug[0]).'/'.urlencode($slug).'.json';
 
         try {
-            $res = $this->client->get($url, [
+            $response = $this->client->get($url, [
                 'headers' => [
                     'Accept' => 'application/json,text/plain,*/*',
                     'Origin' => 'https://www.imdb.com',
                     'Referer' => 'https://www.imdb.com/find/?q='.rawurlencode($query).'&s=tt',
                 ],
             ]);
-            $body = (string) $res->getBody();
 
-            $results = [];
-            if ($res->getStatusCode() === 200 && ! $this->isWafResponse($res->getStatusCode(), $body)) {
-                $results = $this->parseSuggestionJson($body);
+            if ($response->getStatusCode() !== 200) {
+                return null;
             }
 
-            if ($results === [] && ! $this->isWafBackoffActive()) {
-                $htmlResults = $this->searchHtmlFallback($query);
-                if ($htmlResults !== []) {
-                    $results = $htmlResults;
-                }
-            }
-
-            if ($results === []) {
-                $ttl = $this->isWafBackoffActive()
-                    ? now()->addMinutes(self::SOFT_FAILURE_TTL_MINUTES)
-                    : now()->addHours(self::HARD_FAILURE_TTL_HOURS);
-                Cache::put($cacheKey, [], $ttl);
-
-                return [];
-            }
-
-            Cache::put($cacheKey, $results, now()->addHours(12));
-
-            return $results; // @phpstan-ignore return.type
+            return $this->parseSuggestionJson((string) $response->getBody());
         } catch (\Throwable $e) {
-            Log::debug('IMDb search error '.$query.': '.$e->getMessage());
-            Cache::put($cacheKey, [], now()->addHours(self::HARD_FAILURE_TTL_HOURS));
+            Log::debug('IMDb suggestion search failed for '.$query.': '.$e->getMessage());
 
-            return [];
+            return null;
         }
     }
 
@@ -302,12 +332,6 @@ class ImdbScraper
      */
     private function parseTitleHtml(string $html, string $id): array|false
     {
-        if ($this->isWafResponse(200, $html)) {
-            $this->lastRequestWasBlocked = true;
-
-            return false;
-        }
-
         $jsonLd = $this->extractPrimaryJsonLdEntity($html);
         $dom = HtmlDomParser::str_get_html($html);
 
@@ -348,6 +372,7 @@ class ImdbScraper
         return [
             'imdbid' => $id,
             'title' => $title,
+            'known_titles' => $this->normalizeStringList([$title, ...$this->normalizeStringList($jsonLd['alternateName'] ?? [])]),
             'year' => $year,
             'plot' => $plot,
             'rating' => $rating,
@@ -415,6 +440,14 @@ class ImdbScraper
             }
 
             return $mapped;
+        } catch (ConnectException $e) {
+            $this->lastFallbackFailureReason = 'fallback_unreachable';
+            // A DNS or connect failure won't clear in minutes; pause long and warn once per pause.
+            $cooldownSeconds = max(1, (int) config('nntmux_api.imdbapi_dev_unreachable_cooldown_seconds', 21600));
+            Cache::put(self::IMDBAPI_DEV_COOLDOWN_CACHE_KEY, true, now()->addSeconds($cooldownSeconds));
+            Log::warning('imdbapi.dev unreachable, pausing the IMDb fallback for '.$cooldownSeconds.' seconds: '.$e->getMessage());
+
+            return false;
         } catch (\Throwable $e) {
             Log::debug('imdbapi.dev fetch error tt'.$id.': '.$e->getMessage());
             $this->lastFallbackFailureReason = 'fallback_exception';
@@ -430,6 +463,7 @@ class ImdbScraper
     private function fetchWithoutScraping(string $id, string $cacheKey): array|false
     {
         $this->lastRequestWasBlocked = $this->isScrapingEnabled();
+        $this->lastFailureWasTransient = $this->lastRequestWasBlocked;
         $this->lastFailureReason = $this->lastRequestWasBlocked ? 'waf_backoff' : 'scraper_disabled';
 
         if (! $this->canUseImdbApiDev()) {
@@ -562,6 +596,7 @@ class ImdbScraper
         return [
             'imdbid' => $id,
             'title' => $title,
+            'known_titles' => $this->normalizeStringList([$title, (string) ($payload['originalTitle'] ?? '')]),
             'year' => $year,
             'plot' => $plot,
             'rating' => $rating,
@@ -574,13 +609,17 @@ class ImdbScraper
         ];
     }
 
+    /**
+     * Whether imdb.com refused the request: a WAF challenge (202), a block (403) or rate limiting (429).
+     * Challenge markers only count on pages without title data, since a real title page can mention them.
+     */
     private function isWafResponse(int $statusCode, string $body): bool
     {
-        if ($statusCode === 202) {
+        if (in_array($statusCode, [202, 403, 429], true)) {
             return true;
         }
 
-        if ($body === '') {
+        if ($body === '' || str_contains($body, 'application/ld+json')) {
             return false;
         }
 
@@ -603,10 +642,18 @@ class ImdbScraper
         }
 
         foreach ($matches[1] as $json) {
-            $decoded = json_decode(html_entity_decode(trim($json), ENT_QUOTES | ENT_HTML5, 'UTF-8'), true);
+            $decoded = json_decode(trim($json), true);
             if (! is_array($decoded)) {
                 continue;
             }
+
+            // IMDb escapes quotes inside values ("Schindler&apos;s List"); decoding them before
+            // json_decode would break the JSON, so decode the values instead.
+            array_walk_recursive($decoded, static function (mixed &$value): void {
+                if (is_string($value)) {
+                    $value = html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                }
+            });
 
             $entity = $this->findTitleEntity($decoded);
             if ($entity !== []) {
@@ -910,7 +957,7 @@ class ImdbScraper
         $type = strtolower((string) ($jsonLd['@type'] ?? 'movie'));
 
         return match ($type) {
-            'tvseries', 'tvminiseries', 'tvepisode', 'tvmovie' => 'tv',
+            'tvseries', 'tvminiseries', 'tvepisode' => 'tv',
             default => 'movie',
         };
     }
@@ -918,7 +965,7 @@ class ImdbScraper
     private function normalizeApiDevType(string $type): string
     {
         return match (strtolower(trim($type))) {
-            'tvseries', 'tv_series', 'tv mini series', 'tv_mini_series', 'tvminiseries', 'tvspecial', 'tv_special', 'tvmovie', 'tv_movie', 'tvepisode', 'tv_episode' => 'tv',
+            'tvseries', 'tv_series', 'tv mini series', 'tv_mini_series', 'tvminiseries', 'tvspecial', 'tv_special', 'tvepisode', 'tv_episode' => 'tv',
             default => 'movie',
         };
     }
@@ -980,18 +1027,25 @@ class ImdbScraper
     }
 
     /**
-     * @return array<int, array{imdbid: string, title: string, year: string}>
+     * Movie rows from a suggestion API answer. Series, episodes, shorts and games are skipped.
+     *
+     * @return list<array{imdbid: string, title: string, year: string, type: string, cover: string}>|null Null when the body is not suggestion JSON.
      */
-    private function parseSuggestionJson(string $body): array
+    private function parseSuggestionJson(string $body): ?array
     {
         $json = json_decode($body, true);
         if (! is_array($json)) {
-            return [];
+            return null;
         }
 
         $results = [];
         foreach (($json['d'] ?? []) as $row) {
             if (! is_array($row) || ! isset($row['id']) || ! is_string($row['id']) || ! str_starts_with($row['id'], 'tt')) {
+                continue;
+            }
+
+            $type = (string) ($row['qid'] ?? '');
+            if ($type !== '' && ! in_array($type, self::SUGGESTION_MOVIE_TYPES, true)) {
                 continue;
             }
 
@@ -1004,6 +1058,8 @@ class ImdbScraper
                 'imdbid' => substr($row['id'], 2),
                 'title' => $title,
                 'year' => trim((string) ($row['y'] ?? '')),
+                'type' => $type === '' ? '' : 'movie',
+                'cover' => $this->normalizeImageUrl($row['i']['imageUrl'] ?? ''),
             ];
 
             if (count($results) >= 25) {
@@ -1015,10 +1071,18 @@ class ImdbScraper
     }
 
     /**
-     * @return array<int, array{imdbid: string, title: string, year: string}>
+     * Search the imdb.com find page. Only used when the suggestion API failed; it shares the WAF back-off with title pages.
+     *
+     * @return list<array{imdbid: string, title: string, year: string, type: string, cover: string}>|null Null when the page could not be fetched.
      */
-    private function searchHtmlFallback(string $query): array
+    private function searchHtmlFallback(string $query): ?array
     {
+        if (! $this->acquireScrapeSlot()) {
+            $this->lastRequestWasBlocked = true;
+
+            return null;
+        }
+
         $url = 'https://www.imdb.com/find/?q='.rawurlencode($query).'&s=tt';
 
         try {
@@ -1036,47 +1100,45 @@ class ImdbScraper
                 $this->lastRequestWasBlocked = true;
                 $this->startWafBackoff();
 
-                return [];
+                return null;
             }
 
+            $this->endWafBackoff();
+
             if ($statusCode >= 400 || trim($html) === '') {
-                return [];
+                return null;
             }
 
             return $this->parseSearchHtml($html);
         } catch (\Throwable $e) {
             Log::debug('IMDb HTML search fallback failed for '.$query.': '.$e->getMessage());
+            Cache::forget(self::WAF_PROBE_CACHE_KEY);
 
-            return [];
+            return null;
         }
     }
 
     /**
-     * @return array<int, array{imdbid: string, title: string, year: string}>
+     * @return list<array{imdbid: string, title: string, year: string, type: string, cover: string}>
      */
     private function parseSearchHtml(string $html): array
     {
         $results = [];
 
-        if (preg_match_all('#<a[^>]+href=["\']/title/tt(?P<id>\d{5,8})/["\'][^>]*>(?P<title>.*?)</a>#is', $html, $matches, PREG_OFFSET_CAPTURE)) {
+        if (preg_match_all('#<a[^>]+href=["\']/title/tt(?P<id>\d{5,8})/(?:\?[^"\']*)?["\'][^>]*>(?P<title>.*?)</a>#is', $html, $matches, PREG_OFFSET_CAPTURE)) {
             foreach ($matches[0] as $index => $fullMatch) {
                 $title = trim(html_entity_decode(strip_tags($matches['title'][$index][0]), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
                 if ($title === '') {
                     continue;
                 }
 
+                // The year follows the link; stop at the next result so it can't borrow that one's year.
                 $offset = $fullMatch[1] + strlen($fullMatch[0]);
-                $context = substr($html, $offset, 200);
+                $nextLink = $matches[0][$index + 1][1] ?? null;
+                $length = min(500, $nextLink === null ? 500 : $nextLink - $offset);
+                $context = substr($html, $offset, max(0, $length));
 
-                $results[] = [
-                    'imdbid' => $matches['id'][$index][0],
-                    'title' => $title,
-                    'year' => $this->extractYearFromText(strip_tags($context)),
-                ];
-
-                if (count($results) >= 25) {
-                    break;
-                }
+                $results[] = $this->searchRow($matches['id'][$index][0], $title, $this->extractYearFromText(strip_tags($context)));
             }
         }
 
@@ -1094,25 +1156,25 @@ class ImdbScraper
                         continue;
                     }
 
-                    $context = trim(strip_tags((string) $html));
-                    $results[] = [
-                        'imdbid' => $matches['id'],
-                        'title' => $title,
-                        'year' => $this->extractYearFromText($context),
-                    ];
-
-                    if (count($results) >= 25) {
-                        break;
-                    }
+                    $row = $link->parentNode();
+                    $results[] = $this->searchRow($matches['id'], $title, $this->extractYearFromText((string) $row?->text()));
                 }
             }
         }
 
         $unique = [];
         foreach ($results as $result) {
-            $unique[$result['imdbid']] = $result;
+            $unique[$result['imdbid']] ??= $result;
         }
 
-        return array_values($unique);
+        return array_slice(array_values($unique), 0, 25);
+    }
+
+    /**
+     * @return array{imdbid: string, title: string, year: string, type: string, cover: string}
+     */
+    private function searchRow(string $imdbId, string $title, string $year): array
+    {
+        return ['imdbid' => $imdbId, 'title' => $title, 'year' => $year, 'type' => '', 'cover' => ''];
     }
 }

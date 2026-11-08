@@ -432,6 +432,58 @@ class MovieServiceTest extends ImdbScraperTestCase
     }
 
     #[Test]
+    public function it_accepts_imdb_metadata_that_matches_an_alternate_title(): void
+    {
+        config(['nntmux_api.imdb_scraper_enabled' => true, 'nntmux_api.imdbapi_dev_enabled' => false]);
+        $this->bindImdbScraper([
+            new Response(200, ['Content-Type' => 'text/html'], '<html><head><script type="application/ld+json">'
+                .'{"@type":"Movie","name":"Life Is Beautiful","alternateName":"La vita è bella","datePublished":"1997-12-20"}'
+                .'</script></head></html>'),
+        ]);
+        $service = new MovieService;
+        $service->echooutput = false;
+        $this->setMovieServiceProperty($service, 'currentTitle', 'La Vita E Bella');
+        $this->setMovieServiceProperty($service, 'currentYear', '');
+
+        $data = $service->fetchIMDBProperties('0118799');
+
+        $this->assertIsArray($data);
+        $this->assertSame('Life Is Beautiful', $data['title']);
+    }
+
+    #[Test]
+    public function it_tries_exact_year_imdb_search_candidates_first(): void
+    {
+        $scraper = Mockery::mock(ImdbScraper::class);
+        $scraper->shouldReceive('isScrapingEnabled')->andReturn(true);
+        $scraper->shouldReceive('search')->with('Crash')->andReturn([
+            ['imdbid' => '1000001', 'title' => 'Crash', 'year' => '2005', 'type' => 'movie', 'cover' => ''],
+            ['imdbid' => '1000002', 'title' => 'Crash', 'year' => '2004', 'type' => 'movie', 'cover' => ''],
+            ['imdbid' => '1000003', 'title' => 'Crush', 'year' => '1990', 'type' => 'movie', 'cover' => ''],
+        ]);
+        $this->app->instance(ImdbScraper::class, $scraper);
+
+        $service = new class extends MovieService
+        {
+            /** @var list<string> */
+            public array $attempts = [];
+
+            public function doMovieUpdate(string $buffer, string $service, int $id, int $processImdb = 1): string|false
+            {
+                $this->attempts[] = $buffer;
+
+                return false;
+            }
+        };
+        $service->echooutput = false;
+        $this->setMovieServiceProperty($service, 'currentTitle', 'Crash');
+        $this->setMovieServiceProperty($service, 'currentYear', '2004');
+
+        $this->assertFalse((new \ReflectionMethod($service, 'searchIMDb'))->invoke($service, 1));
+        $this->assertSame(['tt1000002', 'tt1000001'], $service->attempts);
+    }
+
+    #[Test]
     public function it_uses_an_embedded_imdb_id_before_searching_other_sources(): void
     {
         $service = new class extends MovieService

@@ -825,7 +825,7 @@ class MovieService
                 return false;
             }
 
-            return $this->matchesCurrentContext($cached['title'] ?? '', $cached['year'] ?? '') ? $cached : false;
+            return $this->matchesCurrentContext($cached['known_titles'] ?? $cached['title'] ?? '', $cached['year'] ?? '') ? $cached : false;
         }
         try {
             $scraper = app(ImdbScraper::class);
@@ -837,9 +837,9 @@ class MovieService
                 return false;
             }
             if ($scraped === false || empty($scraped['title'])) {
-                $ttl = $scraper->wasBlockedByWaf()
-                    ? now()->addMinutes(30)
-                    : now()->addHours(6);
+                // Blocks, timeouts and server errors are retried soon; only a real miss is cached for hours.
+                $transient = $scraper->wasBlockedByWaf() || $scraper->wasTransientFailure();
+                $ttl = $transient ? now()->addMinutes(30) : now()->addHours(6);
 
                 $failureReason = $scraper->getLastFailureReason() ?? 'unknown';
                 $fallbackFailureReason = $scraper->getLastFallbackFailureReason();
@@ -850,7 +850,7 @@ class MovieService
                         'reason' => $failureReason,
                         'fallback_reason' => $fallbackFailureReason,
                         'source' => $scraper->getLastFetchSource(),
-                        'negative_cache' => '6h',
+                        'negative_cache' => $transient ? '30m' : '6h',
                     ]);
                 }
 
@@ -872,7 +872,7 @@ class MovieService
             // check is per-release and must not poison the cache for other releases.
             Cache::put($cacheKey, $scraped, $expiresAt);
 
-            if (! $this->matchesCurrentContext($scraped['title'], $scraped['year'] ?? '')) {
+            if (! $this->matchesCurrentContext($scraped['known_titles'] ?? $scraped['title'], $scraped['year'] ?? '')) {
                 return false;
             }
             if ($this->echooutput) {
@@ -888,7 +888,7 @@ class MovieService
             return $scraped;
         } catch (\Throwable $e) {
             Log::warning('IMDb scrape error for '.$imdbId.': '.$e->getMessage());
-            Cache::put($cacheKey, false, now()->addHours(6));
+            Cache::put($cacheKey, false, now()->addMinutes(30));
 
             return false;
         }
@@ -1306,24 +1306,33 @@ class MovieService
                 return false;
             }
 
-            $attempts = 0;
-            foreach ($scraper->search($this->currentTitle) as $match) {
-                $title = (string) ($match['title'] ?? '');
-                if ($title === '' || empty($match['imdbid'])) {
+            $candidates = [];
+            foreach ($scraper->search($this->currentTitle) as $position => $match) {
+                $title = $match['title'];
+                if ($title === '' || $match['imdbid'] === '') {
                     continue;
                 }
 
-                if (! $this->isAcceptableSearchCandidate([$title], $match['year'] ?? '')) {
+                if (! $this->isAcceptableSearchCandidate([$title], $match['year'])) {
                     continue;
                 }
 
-                if ($this->doMovieUpdate('tt'.$match['imdbid'], 'IMDb(scrape)', $releaseId) !== false) {
+                $candidates[] = [
+                    'imdbid' => $match['imdbid'],
+                    'exactYear' => $this->yearDifference($match['year']) === 0,
+                    'similarity' => $this->bestTitleSimilarity([$title]),
+                    'position' => $position,
+                ];
+            }
+
+            // Exact-year matches first, then the closest title, then IMDb's own ranking.
+            usort($candidates, static fn (array $left, array $right): int => [$right['exactYear'], $right['similarity'], $left['position']]
+                <=> [$left['exactYear'], $left['similarity'], $right['position']]);
+
+            // Each attempt fetches full metadata, so stop after a few plausible candidates.
+            foreach (array_slice($candidates, 0, self::IMDB_SEARCH_CANDIDATE_LIMIT) as $candidate) {
+                if ($this->doMovieUpdate('tt'.$candidate['imdbid'], 'IMDb(scrape)', $releaseId) !== false) {
                     return true;
-                }
-
-                // Each attempt fetches full metadata, so stop after a few plausible candidates.
-                if (++$attempts >= self::IMDB_SEARCH_CANDIDATE_LIMIT) {
-                    break;
                 }
             }
         } catch (\Throwable $e) {
