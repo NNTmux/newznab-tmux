@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1408 512" role="img" aria-label="NNTmux">
+  <title>NNTmux</title>
+  <svg width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="nntmux-bg" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1e293b"/>
+      <stop offset="1" stop-color="#080d1a"/>
+    </linearGradient>
+    <radialGradient id="nntmux-glow" cx="256" cy="236" r="230" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3b82f6" stop-opacity=".35"/>
+      <stop offset="1" stop-color="#3b82f6" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="nntmux-glyph" x1="120" y1="92" x2="392" y2="380" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#67e8f9"/>
+      <stop offset=".5" stop-color="#60a5fa"/>
+      <stop offset="1" stop-color="#a78bfa"/>
+    </linearGradient>
+    <clipPath id="nntmux-tile"><rect width="512" height="512" rx="112"/></clipPath>
+  </defs>
+  <g clip-path="url(#nntmux-tile)">
+    <rect width="512" height="512" fill="url(#nntmux-bg)"/>
+    <rect width="512" height="512" fill="url(#nntmux-glow)"/>
+    <rect y="428" width="512" height="84" fill="#22c55e"/>
+    <rect x="64" y="452" width="72" height="36" rx="8" fill="#052e16"/>
+    <rect x="150" y="452" width="44" height="36" rx="8" fill="#052e16" fill-opacity=".45"/>
+    <rect x="208" y="452" width="44" height="36" rx="8" fill="#052e16" fill-opacity=".45"/>
+    <circle cx="430" cy="470" r="16" fill="#052e16"/>
+  </g>
+  <rect x="3" y="3" width="506" height="506" rx="109" fill="none" stroke="#ffffff" stroke-opacity=".1" stroke-width="6"/>
+  <g fill="url(#nntmux-glyph)">
+    <rect x="120" y="92" width="64" height="288" rx="6"/>
+    <rect x="328" y="92" width="64" height="288" rx="6"/>
+    <path d="M120 92h64l73.84 102.24h-64z"/>
+    <path d="M254.16 277.76h64L392 380h-64z"/>
+  </g>
+  <path fill="#4ade80" d="M204.24 208.64h64l39.52 54.72h-64z"/>
+  </svg>
+  <text x="600" y="346" fill="#f8fafc" font-family="Inter, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="264" font-weight="800" letter-spacing="-6" textLength="456" lengthAdjust="spacingAndGlyphs">NNT</text>
+  <text x="1080" y="346" fill="#4ade80" font-family="'JetBrains Mono', 'Fira Code', Menlo, Consolas, 'DejaVu Sans Mono', monospace" font-size="236" font-weight="700" textLength="312" lengthAdjust="spacingAndGlyphs">mux</text>
+</svg>

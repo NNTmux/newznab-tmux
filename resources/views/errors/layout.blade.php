@@ -35,6 +35,7 @@
     @include('partials.theme-init', ['static' => true])
 
     <title>@yield('title') · {{ config('app.name') }}</title>
+    @include('partials.favicons')
 
     @if($errorPageAssets)
         {{ $errorPageAssets }}

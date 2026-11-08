@@ -10,6 +10,7 @@
     @include('partials.theme-init', ['adminRail' => true])
 
     <title>{{ $meta_title ?? 'Admin' }} - {{ config('app.name') }}</title>
+    @include('partials.favicons')
 
     <meta name="description" content="{{ $meta_description ?? 'Admin panel' }}">
 
@@ -35,7 +36,7 @@
             <div class="layout-sidebar__brand flex items-center justify-between gap-3 p-4">
                 <a href="{{ route('admin.index') }}" class="flex min-w-0 items-center gap-3 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400">
                     <span class="layout-sidebar__logo flex h-11 w-11 shrink-0 items-center justify-center rounded-xl">
-                        <x-site-logo :url="$siteLogoUrl ?? null" fallback-icon="fas fa-sliders" />
+                        <x-site-logo :url="$siteLogoUrl ?? null" />
                     </span>
                     <span class="layout-sidebar__brand-name min-w-0">
                         <span class="block truncate text-lg font-semibold">Admin Panel</span>

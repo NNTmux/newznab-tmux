@@ -1,4 +1,11 @@
 <p align="center">
+    <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="public/assets/images/brand/nntmux-logo-light.svg">
+        <img src="public/assets/images/brand/nntmux-logo.svg" alt="NNTmux" width="360">
+    </picture>
+</p>
+
+<p align="center">
     <a href="https://packagist.org/packages/nntmux/newznab-tmux"><img src="https://poser.pugx.org/nntmux/newznab-tmux/v/stable.svg" alt="Latest Stable Version"></a>
     <a href="https://packagist.org/packages/nntmux/newznab-tmux"><img src="https://poser.pugx.org/nntmux/newznab-tmux/license.svg" alt="License"></a>
     <a href="https://www.patreon.com/bePatron?u=6160908"><img src="https://c5.patreon.com/external/logo/become_a_patron_button.png" alt="Become a Patron!" height="20"></a>

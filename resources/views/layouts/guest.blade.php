@@ -11,6 +11,7 @@
     @include('partials.theme-init')
 
     <title>{{ config('app.name') }}</title>
+    @include('partials.favicons')
 
     <!-- Styles -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])

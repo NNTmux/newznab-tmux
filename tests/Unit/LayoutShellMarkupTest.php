@@ -170,6 +170,38 @@ class LayoutShellMarkupTest extends TestCase
         $this->assertStringContainsString('name="remove_site_logo"', $settingsForm);
     }
 
+    public function test_site_logo_falls_back_to_the_nntmux_brand_mark(): void
+    {
+        $siteLogo = $this->view('components/site-logo.blade.php');
+
+        $this->assertStringContainsString('<x-application-logo', $siteLogo);
+        $this->assertStringNotContainsString('fallbackIcon', $siteLogo);
+        $this->assertStringNotContainsString('fallback-icon', $this->view('layouts/admin.blade.php'));
+        $this->assertStringContainsString('<svg', $this->view('components/application-logo.blade.php'));
+    }
+
+    public function test_layouts_link_default_brand_icons_that_exist(): void
+    {
+        foreach (['layouts/main', 'layouts/admin', 'layouts/guest', 'errors/layout'] as $layout) {
+            $this->assertStringContainsString("@include('partials.favicons')", $this->view("{$layout}.blade.php"), $layout);
+        }
+
+        $public = dirname(__DIR__, 2).'/public/';
+        preg_match_all("/asset\\('([^']+)'\\)/", $this->view('partials/favicons.blade.php'), $linked);
+        $this->assertNotEmpty($linked[1]);
+
+        foreach ($linked[1] as $file) {
+            $this->assertFileExists($public.$file);
+        }
+
+        $manifest = json_decode((string) file_get_contents($public.'site.webmanifest'), true, flags: JSON_THROW_ON_ERROR);
+        $this->assertContains('maskable', array_column($manifest['icons'], 'purpose'));
+
+        foreach ($manifest['icons'] as $icon) {
+            $this->assertFileExists($public.ltrim($icon['src'], '/'));
+        }
+    }
+
     public function test_desktop_header_search_uses_separated_fully_rounded_controls(): void
     {
         $markup = $this->view('partials/header-menu.blade.php');

@@ -16,6 +16,7 @@
 
     <meta name="keywords" content="{{ $meta_keywords ?? '' }}">
     <meta name="description" content="{{ $meta_description ?? '' }}">
+    @include('partials.favicons')
 
     @include('partials.theme-meta')
     <!-- CSP Nonce for dynamic script loading -->
