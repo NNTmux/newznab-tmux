@@ -104,6 +104,12 @@
                     <div class="mb-6">
                         <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3">External Links</h2>
                         <div class="flex flex-wrap gap-3">
+                            <!-- Trailer -->
+                            @if(!empty($movie['trailer_url'] ?? null))
+                                <a href="{{ $site->dereferrerLink }}{{ $movie['trailer_url'] }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent-hover transition">
+                                    <i aria-hidden="true" class="fas fa-circle-play mr-2"></i> Watch Trailer
+                                </a>
+                            @endif
                             @if(!empty($movie['imdbid'] ?? null))
                                 <a href="{{ $site->dereferrerLink }}https://www.imdb.com/title/tt{{ $movie['imdbid'] }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-warning-100 dark:bg-warning-900/40 text-warning-800 dark:text-warning-200 rounded-lg hover:bg-warning-200 transition">
                                     <i aria-hidden="true" class="fab fa-imdb mr-2 text-xl"></i> View on IMDb
@@ -127,15 +133,6 @@
                         </div>
                     </div>
 
-                    <!-- Trailer -->
-                    @if(is_string($movie['trailer'] ?? null) && str_starts_with($movie['trailer'], 'https://'))
-                        <div class="mb-6">
-                            <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">Trailer</h2>
-                            <div class="movie-detail-trailer aspect-video">
-                                <iframe src="{{ $movie['trailer'] }}" title="Trailer" class="w-full h-full" loading="lazy" allowfullscreen></iframe>
-                            </div>
-                        </div>
-                    @endif
                 </div>
             </div>
 

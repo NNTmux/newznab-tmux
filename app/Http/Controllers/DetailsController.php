@@ -22,6 +22,7 @@ use App\Services\MusicService;
 use App\Services\PopulateAniListService;
 use App\Services\ReleaseExtraService;
 use App\Services\Releases\ReleaseSearchService;
+use App\Support\TrailerUrl;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -116,9 +117,7 @@ class DetailsController extends BasePageController
                 }
                 if (app(ConfigurationProvider::class)->site()->trailersDisplay) {
                     $trailer = empty($mov['trailer']) ? $this->movieService->getTrailer($data['imdbid']) : $mov['trailer'];
-                    if ($trailer) {
-                        $mov['trailer'] = sprintf('<iframe width="%d" height="%d" src="%s"></iframe>', app(ConfigurationProvider::class)->site()->trailerWidth, app(ConfigurationProvider::class)->site()->trailerHeight, e($trailer));
-                    }
+                    $mov['trailer_url'] = TrailerUrl::watchUrl($trailer);
                 }
             }
         }

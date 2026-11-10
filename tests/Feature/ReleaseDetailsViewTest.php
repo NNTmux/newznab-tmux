@@ -151,16 +151,17 @@ class ReleaseDetailsViewTest extends TestCase
     }
 
     #[Test]
-    public function metadata_panels_share_a_two_column_grid_and_trailers_fold_away(): void
+    public function metadata_panels_share_a_two_column_grid_and_trailers_open_in_a_new_tab(): void
     {
         $page = (string) file_get_contents(resource_path('views/details/index.blade.php'));
         $this->assertStringContainsString('<div class="detail-info-grid">', $page);
         $this->assertStringNotContainsString("@include('details.partials.preview-images')", $page, 'Thumbnails live next to the cover');
         $this->assertStringContainsString("@include('details.partials.preview-images')", (string) file_get_contents(resource_path('views/details/partials/cover-actions.blade.php')));
 
-        $movie = (new MovieInfo)->forceFill(['title' => 'Pixels', 'year' => '2015', 'genre' => 'Action', 'trailer' => '<iframe src="https://example.invalid"></iframe>']);
-        $html = view('details.partials.movie-info', ['movie' => $movie])->render();
-        $this->assertStringContainsString('<summary class="cursor-pointer text-sm font-medium text-link dark:text-primary-400">Watch trailer</summary>', $html);
+        $movie = (new MovieInfo)->forceFill(['title' => 'Pixels', 'year' => '2015', 'genre' => 'Action', 'trailer_url' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ']);
+        $html = view('details.partials.movie-info', ['movie' => $movie, 'site' => (object) ['dereferrerLink' => '']])->render();
+        $this->assertMatchesRegularExpression('#<a href="https://www\.youtube\.com/watch\?v=dQw4w9WgXcQ" target="_blank" rel="noopener noreferrer"[^>]*>.*Watch trailer\s*</a>#s', $html);
+        $this->assertStringNotContainsString('<iframe', $html);
         $this->assertMatchesRegularExpression('/<dt[^>]*>Genre<\/dt>\s*<dd[^>]*>Action<\/dd>/', $html);
     }
 }

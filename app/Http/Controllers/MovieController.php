@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Services\MovieBrowseService;
 use App\Services\MovieService;
+use App\Support\TrailerUrl;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -145,6 +146,7 @@ class MovieController extends BasePageController
 
         // Add cover image URL using helper function
         $movieArray['cover'] = getReleaseCover($movieArray);
+        $movieArray['trailer_url'] = TrailerUrl::watchUrl($movieArray['trailer'] ?? null);
 
         // Get all releases for this movie directly (no limit)
         $releases = $this->movieBrowseService->getMovieReleases($imdbid, (array) $this->userdata->categoryexclusions);
@@ -173,6 +175,7 @@ class MovieController extends BasePageController
                 return response()->json(['message' => 'There is no trailer for this movie.'], 404);
             }
 
+            $mov['trailer_url'] = TrailerUrl::watchUrl($mov['trailer'] ?? null);
             $modal = $request->has('modal');
 
             $viewData = [

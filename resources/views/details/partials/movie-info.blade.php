@@ -12,7 +12,7 @@
                     $movieDirector = $movieData['director'] ?? ($movie->director ?? null);
                     $movieActors = $movieData['actors'] ?? ($movie->actors ?? null);
                     $movieLanguage = $movieData['language'] ?? ($movie->language ?? null);
-                    $movieTrailer = $movieData['trailer'] ?? ($movie->trailer ?? null);
+                    $movieTrailerUrl = $movieData['trailer_url'] ?? ($movie->trailer_url ?? null);
                     $movieRows = array_filter([
                         'Genre' => $movieGenre,
                         'Director' => $movieDirector,
@@ -63,13 +63,10 @@
                         </dl>
                     @endif
 
-                    @if(!empty($movieTrailer))
-                        <details class="mt-4">
-                            <summary class="cursor-pointer text-sm font-medium text-link dark:text-primary-400">Watch trailer</summary>
-                            <div class="mt-2 aspect-video">
-                                {!! $movieTrailer !!}
-                            </div>
-                        </details>
+                    @if(!empty($movieTrailerUrl))
+                        <a href="{{ $site->dereferrerLink ?? '' }}{{ $movieTrailerUrl }}" target="_blank" rel="noopener noreferrer" class="mt-4 inline-flex items-center rounded-lg bg-accent px-3 py-1.5 text-sm font-medium text-white transition hover:bg-accent-hover">
+                            <i aria-hidden="true" class="fas fa-circle-play mr-2"></i> Watch trailer
+                        </a>
                     @endif
                 </section>
             @endif

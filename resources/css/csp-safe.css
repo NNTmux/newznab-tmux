@@ -873,10 +873,6 @@ code.api-token::-webkit-scrollbar-thumb:hover {
     @apply rounded-xl shadow-xl;
 }
 
-.movie-detail-page .movie-detail-trailer {
-    @apply overflow-hidden rounded-xl shadow-lg;
-}
-
 .movie-detail-page .movie-release-card {
     @apply shadow-sm hover:shadow-md transition-shadow duration-300;
 }

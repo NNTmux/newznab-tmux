@@ -51,16 +51,19 @@ final class UserContentTemplateEscapingTest extends TestCase
     }
 
     #[Test]
-    public function movie_page_trailer_is_an_escaped_https_iframe(): void
+    public function movie_page_trailer_is_an_escaped_new_tab_link(): void
     {
         $block = $this->trailerBlock();
+        $site = (object) ['dereferrerLink' => ''];
 
-        $html = Blade::render($block, ['movie' => ['trailer' => 'https://www.youtube.com/embed/x"><script>alert(1)</script>']]);
-        $javascriptUrl = Blade::render($block, ['movie' => ['trailer' => 'javascript:alert(1)']]);
+        $html = Blade::render($block, ['site' => $site, 'movie' => ['trailer_url' => 'https://www.youtube.com/watch?v=x"><script>alert(1)</script>']]);
+        $withoutTrailer = Blade::render($block, ['site' => $site, 'movie' => ['trailer_url' => null]]);
 
         $this->assertStringNotContainsString('<script>', $html);
-        $this->assertStringContainsString('src="https://www.youtube.com/embed/x&quot;&gt;&lt;script&gt;', $html);
-        $this->assertStringNotContainsString('<iframe', $javascriptUrl);
+        $this->assertStringNotContainsString('<iframe', $html);
+        $this->assertStringContainsString('href="https://www.youtube.com/watch?v=x&quot;&gt;&lt;script&gt;', $html);
+        $this->assertStringContainsString('target="_blank" rel="noopener noreferrer"', $html);
+        $this->assertStringNotContainsString('Watch Trailer', $withoutTrailer);
     }
 
     private function trailerBlock(): string
