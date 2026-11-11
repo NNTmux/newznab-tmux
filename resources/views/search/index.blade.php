@@ -48,9 +48,7 @@
             @endphp
             <div>
                 <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Category</label>
-                <select id="category"
-                        name="t"
-                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                <x-select id="category" name="t">
                     <option value="">All Categories</option>
                     @if(isset($parentcatlist))
                         @foreach($parentcatlist as $parentcat)
@@ -79,7 +77,7 @@
                             </option>
                         @endforeach
                     @endif
-                </select>
+                </x-select>
             </div>
         </div>
 
@@ -92,44 +90,44 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div>
                         <label for="group" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Usenet Group</label>
-                        <input type="text" id="group" name="group" value="{{ request('group') }}"
-                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                               placeholder="e.g., alt.binaries.teevee">
+                        <x-input type="text" id="group" name="group" value="{{ request('group') }}"
+                               
+                               placeholder="e.g., alt.binaries.teevee" />
                     </div>
 
                     <div>
                         <label for="minage" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Min Age (days)</label>
-                        <input type="number" id="minage" name="minage" value="{{ request('minage') }}"
-                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                               min="0">
+                        <x-input type="number" id="minage" name="minage" value="{{ request('minage') }}"
+                               
+                               min="0" />
                     </div>
 
                     <div>
                         <label for="maxage" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Max Age (days)</label>
-                        <input type="number" id="maxage" name="maxage" value="{{ request('maxage') }}"
-                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                               min="0">
+                        <x-input type="number" id="maxage" name="maxage" value="{{ request('maxage') }}"
+                               
+                               min="0" />
                     </div>
 
                     <div>
                         <label for="minsize" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Min Size (MB)</label>
-                        <input type="number" id="minsize" name="minsize" value="{{ request('minsize') }}"
-                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                               min="0">
+                        <x-input type="number" id="minsize" name="minsize" value="{{ request('minsize') }}"
+                               
+                               min="0" />
                     </div>
 
                     <div>
                         <label for="maxsize" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Max Size (MB)</label>
-                        <input type="number" id="maxsize" name="maxsize" value="{{ request('maxsize') }}"
-                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                               min="0">
+                        <x-input type="number" id="maxsize" name="maxsize" value="{{ request('maxsize') }}"
+                               
+                               min="0" />
                     </div>
 
                     <div>
                         <label for="poster" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Poster</label>
-                        <input type="text" id="poster" name="searchadvposter" value="{{ request('searchadvposter') }}"
-                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                               placeholder="e.g., poster@example.com">
+                        <x-input type="text" id="poster" name="searchadvposter" value="{{ request('searchadvposter') }}"
+                               
+                               placeholder="e.g., poster@example.com" />
                     </div>
                 </div>
             </div>
@@ -138,7 +136,12 @@
         <!-- Action Buttons -->
         <div class="flex flex-col sm:flex-row flex-wrap gap-2">
             <x-button type="submit" size="lg" icon="fas fa-search">Search</x-button>
-            <x-button-link href="{{ url('/search?search_type=adv') }}" size="lg" icon="fas fa-sliders-h">Advanced Search</x-button-link>
+            {{-- Switching modes keeps the term and category that are already typed. --}}
+            @if(request('search_type') === 'adv')
+                <x-button-link :href="route('search', request()->only(['search', 't']))" size="lg" icon="fas fa-sliders-h">Basic Search</x-button-link>
+            @else
+                <x-button-link :href="route('search', array_merge(request()->only(['search', 't']), ['search_type' => 'adv']))" size="lg" icon="fas fa-sliders-h">Advanced Search</x-button-link>
+            @endif
             <a href="{{ route('search') }}" class="inline-flex justify-center rounded-lg bg-gray-300 px-6 py-3 text-base font-semibold text-gray-700 transition hover:bg-gray-400 dark:bg-gray-600 dark:text-gray-100 dark:hover:bg-gray-700">
                 Clear
             </a>

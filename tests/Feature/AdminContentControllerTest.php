@@ -565,6 +565,13 @@ class AdminContentControllerTest extends TestCase
             $table->timestamps();
         });
 
+        Schema::create('users_releases', function (Blueprint $table): void {
+            $table->increments('id');
+            $table->unsignedInteger('users_id');
+            $table->unsignedInteger('releases_id');
+            $table->timestamps();
+        });
+
         Schema::create('user_excluded_categories', function (Blueprint $table): void {
             $table->increments('id');
             $table->unsignedInteger('users_id');

@@ -120,7 +120,7 @@ class ReleaseResultsComponentTest extends TestCase
         $adultBrowse = (string) file_get_contents(__DIR__.'/../../resources/views/xxx/index.blade.php');
 
         $this->assertSame(2, substr_count($releaseResults, '<x-release-category-link'));
-        $this->assertStringContainsString('<x-release-category-link', $adultBrowse);
+        $this->assertStringContainsString('<x-release-results-panel', $adultBrowse, 'The adult list gets its category links from the shared results table');
         $this->assertStringContainsString("route('browse'", $categoryLink);
         $this->assertStringContainsString("preg_split('/\\s*>\\s*/u'", $categoryLink);
         $this->assertStringContainsString('Browse releases in {{ $categoryLabel }}', $categoryLink);

@@ -55,7 +55,7 @@
                         {!! \App\Support\CaptchaHelper::display() !!}
                     </div>
                     @error(\App\Support\CaptchaHelper::getResponseFieldName())
-                        <div class="text-red-500 dark:text-red-400 text-center text-sm mb-6">{{ $message }}</div>
+                        <div class="text-danger-500 dark:text-danger-400 text-center text-sm mb-6">{{ $message }}</div>
                     @enderror
                 @endif
 

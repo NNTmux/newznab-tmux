@@ -48,14 +48,14 @@
                     <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                         <thead class="bg-gray-50 dark:bg-gray-700">
                             <tr>
-                                <th class="px-4 py-3 text-left w-8">
+                                <th scope="col" class="px-4 py-3 text-left w-8">
                                     <label class="inline-flex items-center cursor-pointer">
                                         <input id="check-all" type="checkbox" aria-label="Select all releases" class="form-checkbox h-4 w-4 text-link bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded focus:ring-primary-500 dark:focus:ring-primary-600 focus:ring-2" x-model="allChecked" @change="toggleAll()">
                                     </label>
                                 </th>
-                                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">Name</th>
-                                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">Added</th>
-                                <th class="px-4 py-3 text-right text-sm font-semibold text-gray-700 dark:text-gray-300">Action</th>
+                                <th scope="col" class="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">Name</th>
+                                <th scope="col" class="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">Added</th>
+                                <th scope="col" class="px-4 py-3 text-right text-sm font-semibold text-gray-700 dark:text-gray-300">Action</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800">
@@ -79,12 +79,12 @@
                                     <td class="px-4 py-3">
                                         <div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
                                             <i aria-hidden="true" class="fa-regular fa-clock mr-2"></i>
-                                            <span title="{{ $result->created_at }}">{{ \Carbon\Carbon::parse($result->created_at)->diffForHumans() }}</span>
+                                            <span title="{{ $result->created_at }}">{{ userDateDiffForHumans($result->created_at) }}</span>
                                         </div>
                                     </td>
                                     <td class="px-4 py-3">
                                         <div class="flex justify-end gap-2">
-                                            <a aria-label="Download NZB" href="{{ url('/getnzb?id=' . $result->release->guid) }}"
+                                            <a aria-label="Download NZB" href="{{ route('getnzb.guid', $result->release->guid) }}"
                                                class="px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-300 dark:hover:bg-gray-600 text-sm"
                                                title="Download NZB">
                                                 <i aria-hidden="true" class="fa-solid fa-cloud-download"></i>
@@ -95,7 +95,7 @@
                                                 <i aria-hidden="true" class="fa-solid fa-info-circle"></i>
                                             </a>
                                             <button aria-label="Delete from cart" type="button"
-                                               class="cart-delete-link px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded hover:bg-red-200 dark:hover:bg-red-900/50 text-sm"
+                                               class="cart-delete-link px-2 py-1 bg-danger-100 dark:bg-danger-900/30 text-danger-700 dark:text-danger-400 rounded hover:bg-danger-200 dark:hover:bg-danger-900/50 text-sm"
                                                title="Delete from cart"
                                                data-delete-url="{{ url('/cart/delete/' . $result->release->guid) }}"
                                                data-release-name="{{ Str::limit($result->release->searchname, 50) }}">
@@ -127,16 +127,16 @@
                             </div>
                             <div class="flex items-center justify-between">
                                 <span class="text-xs text-gray-500 dark:text-gray-400">
-                                    <i aria-hidden="true" class="fa-regular fa-clock mr-1"></i>{{ \Carbon\Carbon::parse($result->created_at)->diffForHumans() }}
+                                    <i aria-hidden="true" class="fa-regular fa-clock mr-1"></i>{{ userDateDiffForHumans($result->created_at) }}
                                 </span>
                                 <div class="flex gap-2">
-                                    <a aria-label="Download NZB" href="{{ url('/getnzb?id=' . $result->release->guid) }}" class="px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded text-sm" title="Download NZB">
+                                    <a aria-label="Download NZB" href="{{ route('getnzb.guid', $result->release->guid) }}" class="px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded text-sm" title="Download NZB">
                                         <i aria-hidden="true" class="fa-solid fa-cloud-download"></i>
                                     </a>
                                     <a aria-label="View details" href="{{ url('/details/' . $result->release->guid) }}" class="px-2 py-1 bg-accent dark:bg-accent-hover text-white rounded text-sm" title="View details">
                                         <i aria-hidden="true" class="fa-solid fa-info-circle"></i>
                                     </a>
-                                    <button aria-label="Delete" type="button" class="cart-delete-link px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded text-sm" title="Delete"
+                                    <button aria-label="Delete" type="button" class="cart-delete-link px-2 py-1 bg-danger-100 dark:bg-danger-900/30 text-danger-700 dark:text-danger-400 rounded text-sm" title="Delete"
                                             data-delete-url="{{ url('/cart/delete/' . $result->release->guid) }}"
                                             data-release-name="{{ Str::limit($result->release->searchname, 50) }}">
                                         <i aria-hidden="true" class="fa-solid fa-trash"></i>
@@ -155,7 +155,7 @@
                             <button aria-label="Download NZBs" type="button" class="nzb_multi_operations_download_cart px-3 py-1 bg-success-600 dark:bg-success-700 text-white rounded hover:bg-success-700 dark:hover:bg-success-800 text-sm" title="Download NZBs">
                                 <i aria-hidden="true" class="fa-solid fa-cloud-download"></i>
                             </button>
-                            <button aria-label="Delete from cart" type="button" class="nzb_multi_operations_cartdelete px-3 py-1 bg-red-600 dark:bg-red-700 text-white rounded hover:bg-red-700 dark:hover:bg-red-800 text-sm" title="Delete from cart">
+                            <button aria-label="Delete from cart" type="button" class="nzb_multi_operations_cartdelete px-3 py-1 bg-danger-600 dark:bg-danger-700 text-white rounded hover:bg-danger-700 dark:hover:bg-danger-800 text-sm" title="Delete from cart">
                                 <i aria-hidden="true" class="fa-solid fa-trash"></i>
                             </button>
                         </div>
@@ -163,15 +163,14 @@
                 </div>
             </div>
         @else
-            <!-- Empty Cart -->
-            <div class="bg-warning-50 dark:bg-gray-700 border border-warning-200 dark:border-gray-600 rounded-lg p-8 text-center">
-                <i aria-hidden="true" class="fa-solid fa-shopping-basket text-warning-600 dark:text-warning-400 text-5xl mb-4"></i>
-                <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">Your basket is empty</h3>
-                <p class="text-gray-600 dark:text-gray-400 mb-4">Add some releases to your download basket to get started.</p>
-                <a href="{{ url('/browse/All') }}" class="inline-flex items-center px-4 py-2 bg-accent dark:bg-accent-hover text-white rounded-lg hover:bg-accent-hover dark:hover:bg-primary-800">
-                    <i aria-hidden="true" class="fa-solid fa-search mr-2"></i> Browse Releases
-                </a>
-            </div>
+            <x-empty-state
+                icon="fa-solid fa-shopping-basket"
+                title="Your basket is empty"
+                message="Add some releases to your download basket to get started."
+                :action-url="url('/browse/All')"
+                action-label="Browse Releases"
+                action-icon="fa-solid fa-search"
+            />
         @endif
     </div>
 </div>

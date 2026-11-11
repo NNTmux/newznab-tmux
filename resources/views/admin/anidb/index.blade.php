@@ -83,7 +83,7 @@
                                         {{ $anime->type }}
                                     </span>
                                 @else
-                                    <span class="text-gray-400">—</span>
+                                    <span class="text-gray-500 dark:text-gray-400">—</span>
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
@@ -99,7 +99,7 @@
                                         <span class="text-sm text-gray-900 dark:text-gray-200">{{ number_format($anime->rating / 100, 1) }}</span>
                                     </div>
                                 @else
-                                    <span class="text-gray-400">—</span>
+                                    <span class="text-gray-500 dark:text-gray-400">—</span>
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
@@ -108,11 +108,19 @@
                                    title="Edit">
                                     <i aria-hidden="true" class="fas fa-edit"></i>
                                 </a>
-                                <a aria-label="Remove from Releases" href="{{ url('admin/anidb-delete/' . $anime->anidbid) }}"
-                                   class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
-                                   title="Remove from Releases">
-                                    <i aria-hidden="true" class="fas fa-unlink"></i>
-                                </a>
+                                <form action="{{ route('admin.anidb-delete', $anime->anidbid) }}" method="post" class="inline"
+                                      x-data="confirmForm"
+                                      data-message="Remove this AniDB ID from all of its releases?"
+                                      data-title="Remove from Releases"
+                                      data-type="danger"
+                                      data-confirm-text="Remove"
+                                      @submit.prevent="submit()">
+                                    @csrf
+                                    <button type="submit" aria-label="Remove from Releases" title="Remove from Releases"
+                                            class="text-danger-600 dark:text-danger-400 hover:text-danger-900 dark:hover:text-danger-300">
+                                        <i aria-hidden="true" class="fas fa-unlink"></i>
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     @empty
@@ -147,5 +155,4 @@
     </x-admin.card>
 </div>
 
-{{-- Styles moved to resources/css/csp-safe.css --}}
 @endsection

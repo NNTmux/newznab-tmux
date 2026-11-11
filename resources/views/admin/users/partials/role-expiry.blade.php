@@ -14,26 +14,16 @@
                                 $hoursUntilExpiry = abs($totalHours % 24);
                             @endphp
                             @if($isExpired)
-                                <span class="px-3 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 animate-pulse">
-                                    <i aria-hidden="true" class="fas fa-exclamation-triangle mr-1"></i> Expired
-                                </span>
+                                <x-admin.badge tone="danger" icon="fas fa-exclamation-triangle" class="animate-pulse">Expired</x-admin.badge>
                             @elseif($daysUntilExpiry <= 7)
-                                <span class="px-3 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full bg-warning-100 dark:bg-warning-900 text-warning-800 dark:text-warning-200">
-                                    <i aria-hidden="true" class="fas fa-exclamation-circle mr-1"></i> Expiring Soon
-                                </span>
+                                <x-admin.badge tone="warning" icon="fas fa-exclamation-circle">Expiring Soon</x-admin.badge>
                             @elseif($daysUntilExpiry <= 30)
-                                <span class="px-3 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200">
-                                    <i aria-hidden="true" class="fas fa-check-circle mr-1"></i> Active
-                                </span>
+                                <x-admin.badge tone="primary" icon="fas fa-check-circle">Active</x-admin.badge>
                             @else
-                                <span class="px-3 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200">
-                                    <i aria-hidden="true" class="fas fa-check-circle mr-1"></i> Active
-                                </span>
+                                <x-admin.badge tone="success" icon="fas fa-check-circle">Active</x-admin.badge>
                             @endif
                         @else
-                            <span class="px-3 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300">
-                                <i aria-hidden="true" class="fas fa-infinity mr-1"></i> No Expiry
-                            </span>
+                            <x-admin.badge tone="neutral" icon="fas fa-infinity">No Expiry</x-admin.badge>
                         @endif
                     </div>
 
@@ -178,18 +168,18 @@
 
                     <!-- Status Information -->
                     @if(!empty($user->rolechangedate ?? ''))
-                        <div class="mt-3 p-3 rounded-lg {{ $isExpired ? 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800' : ($daysUntilExpiry <= 7 ? 'bg-warning-50 dark:bg-warning-900/20 border border-warning-200 dark:border-warning-800' : 'bg-info-50 dark:bg-info-900/20 border border-info-200 dark:border-info-800') }}">
+                        <div class="mt-3 p-3 rounded-lg {{ $isExpired ? 'bg-danger-50 dark:bg-danger-900/20 border border-danger-200 dark:border-danger-800' : ($daysUntilExpiry <= 7 ? 'bg-warning-50 dark:bg-warning-900/20 border border-warning-200 dark:border-warning-800' : 'bg-info-50 dark:bg-info-900/20 border border-info-200 dark:border-info-800') }}">
                             <div class="flex items-start">
-                                <i aria-hidden="true" class="fa {{ $isExpired ? 'fa-exclamation-triangle text-red-600 dark:text-red-400' : ($daysUntilExpiry <= 7 ? 'fa-clock text-warning-600 dark:text-warning-400' : 'fa-info-circle text-info-600 dark:text-info-400') }} mt-0.5 mr-2"></i>
+                                <i aria-hidden="true" class="fa {{ $isExpired ? 'fa-exclamation-triangle text-danger-600 dark:text-danger-400' : ($daysUntilExpiry <= 7 ? 'fa-clock text-warning-600 dark:text-warning-400' : 'fa-info-circle text-info-600 dark:text-info-400') }} mt-0.5 mr-2"></i>
                                 <div class="flex-1">
-                                    <p class="text-sm font-medium {{ $isExpired ? 'text-red-800 dark:text-red-200' : ($daysUntilExpiry <= 7 ? 'text-warning-800 dark:text-warning-200' : 'text-info-800 dark:text-info-200') }}">
+                                    <p class="text-sm font-medium {{ $isExpired ? 'text-danger-800 dark:text-danger-200' : ($daysUntilExpiry <= 7 ? 'text-warning-800 dark:text-warning-200' : 'text-info-800 dark:text-info-200') }}">
                                         @if($isExpired)
                                             Role expired {{ $expiryDate->diffForHumans() }}
                                         @else
                                             Role expires {{ $expiryDate->diffForHumans() }}
                                         @endif
                                     </p>
-                                    <p class="text-xs {{ $isExpired ? 'text-red-700 dark:text-red-300' : ($daysUntilExpiry <= 7 ? 'text-warning-700 dark:text-warning-300' : 'text-info-700 dark:text-info-300') }} mt-1">
+                                    <p class="text-xs {{ $isExpired ? 'text-danger-700 dark:text-danger-300' : ($daysUntilExpiry <= 7 ? 'text-warning-700 dark:text-warning-300' : 'text-info-700 dark:text-info-300') }} mt-1">
                                         <i aria-hidden="true" class="fas fa-calendar-alt mr-1"></i>{{ $expiryDate->format('F j, Y') }}
                                         <span class="mx-2">•</span>
                                         <i aria-hidden="true" class="fas fa-clock mr-1"></i>{{ $expiryDate->format('g:i A') }}

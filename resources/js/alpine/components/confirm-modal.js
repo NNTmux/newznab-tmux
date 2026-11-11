@@ -55,7 +55,7 @@ Alpine.data('confirmModal', () => ({
     },
 
     iconClass() {
-        if (this.type === 'danger') return 'fa-exclamation-triangle text-red-600 dark:text-red-400';
+        if (this.type === 'danger') return 'fa-exclamation-triangle text-danger-600 dark:text-danger-400';
         if (this.type === 'warning') return 'fa-exclamation-circle text-warning-600 dark:text-warning-400';
         if (this.type === 'success') return 'fa-check-circle text-success-600 dark:text-success-400';
         return 'fa-info-circle text-link dark:text-primary-400';
@@ -63,7 +63,7 @@ Alpine.data('confirmModal', () => ({
 
     confirmBtnClass() {
         const base = 'px-4 py-2 text-white rounded-lg transition font-medium ';
-        if (this.type === 'danger') return base + 'bg-red-600 dark:bg-red-700 hover:bg-red-700 dark:hover:bg-red-800';
+        if (this.type === 'danger') return base + 'bg-danger-600 dark:bg-danger-700 hover:bg-danger-700 dark:hover:bg-danger-800';
         if (this.type === 'warning') return base + 'bg-warning-600 dark:bg-warning-700 hover:bg-warning-700 dark:hover:bg-warning-800';
         if (this.type === 'success') return base + 'bg-success-600 dark:bg-success-700 hover:bg-success-700 dark:hover:bg-success-800';
         return base + 'bg-accent dark:bg-accent-hover hover:bg-accent-hover dark:hover:bg-primary-800';
@@ -97,7 +97,7 @@ Alpine.data('confirmModal', () => ({
                 e.preventDefault();
                 e.stopPropagation();
                 var isAnchor = deleteEl.tagName === 'A';
-                var form = isAnchor ? null : deleteEl.closest('form');
+                var form = isAnchor ? null : (deleteEl.form || deleteEl.closest('form'));
                 self.show({
                     message: 'Are you sure you want to delete this item?',
                     type: 'danger',
@@ -117,16 +117,19 @@ Alpine.data('confirmModal', () => ({
                 e.stopPropagation();
                 var message = confirmEl.getAttribute('data-confirm');
                 var isAnchor = confirmEl.tagName === 'A';
-                var form = isAnchor ? null : confirmEl.closest('form');
-                self.show({
+                var form = isAnchor ? null : (confirmEl.form || confirmEl.closest('form'));
+                var options = {};
+                if (confirmEl.hasAttribute('data-confirm-title')) options.title = confirmEl.getAttribute('data-confirm-title');
+                self.show(Object.assign(options, {
                     message: message,
-                    type: 'danger',
-                    confirmText: 'Confirm',
+                    // data-confirm-type lets non-destructive actions (restore, verify, resend) avoid the danger styling
+                    type: confirmEl.getAttribute('data-confirm-type') || 'danger',
+                    confirmText: confirmEl.getAttribute('data-confirm-text') || 'Confirm',
                     onConfirm: function() {
                         if (isAnchor && confirmEl.href) window.location.href = confirmEl.href;
                         else if (form) form.requestSubmit(confirmEl);
                     }
-                });
+                }));
                 return;
             }
         });

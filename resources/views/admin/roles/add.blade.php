@@ -15,7 +15,7 @@
                 <!-- Role Name -->
                 <div>
                     <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Role Name <span class="text-red-500">*</span>
+                        Role Name <span class="text-danger-500">*</span>
                     </label>
                     <input type="text"
                            id="name"

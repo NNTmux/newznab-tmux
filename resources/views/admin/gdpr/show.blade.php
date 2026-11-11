@@ -10,7 +10,7 @@
     <x-admin.card>
 
         @if($errors->any())
-            <div class="mx-6 mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-800 dark:text-red-200">
+            <div class="mx-6 mt-4 p-4 bg-danger-50 dark:bg-danger-900/20 border border-danger-200 dark:border-danger-800 rounded-lg text-danger-800 dark:text-danger-200">
                 <i aria-hidden="true" class="fas fa-exclamation-circle mr-2"></i>{{ $errors->first() }}
             </div>
         @endif
@@ -28,7 +28,7 @@
                             <dt class="text-gray-500 dark:text-gray-400">Subject User</dt>
                             <dd class="text-gray-900 dark:text-gray-100 font-medium">
                                 @if($subject)
-                                    {{ $subject->username }} (#{{ $subject->id }}) @if($subject->trashed()) <span class="text-xs text-red-500">deleted</span> @endif
+                                    {{ $subject->username }} (#{{ $subject->id }}) @if($subject->trashed()) <span class="text-xs text-danger-500">deleted</span> @endif
                                 @else
                                     Missing/deleted
                                 @endif
@@ -99,7 +99,7 @@
                     @if($gdprRequest->type === \App\Models\GdprRequest::TYPE_ERASURE && in_array($gdprRequest->status, [\App\Models\GdprRequest::STATUS_PENDING, \App\Models\GdprRequest::STATUS_PROCESSING], true))
                         <form method="post" action="{{ route('admin.gdpr-requests.complete-erasure', $gdprRequest) }}" class="mb-3">
                             @csrf
-                            <button type="submit" class="w-full px-4 py-2 bg-red-600 dark:bg-red-700 text-white rounded-md hover:bg-red-700" data-confirm="Complete GDPR erasure for this account? Retained payment and audit records will be anonymized or minimized where practical.">
+                            <button type="submit" class="w-full px-4 py-2 bg-danger-600 dark:bg-danger-700 text-white rounded-md hover:bg-danger-700" data-confirm="Complete GDPR erasure for this account? Retained payment and audit records will be anonymized or minimized where practical.">
                                 <i aria-hidden="true" class="fas fa-user-slash mr-2"></i>Complete Erasure
                             </button>
                         </form>

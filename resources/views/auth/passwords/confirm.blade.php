@@ -1,5 +1,7 @@
 @extends('layouts.guest')
 
+@section('title', __('Confirm your password'))
+
 @section('content')
 <div class="min-h-screen auth-page flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8">
@@ -36,12 +38,12 @@
                                 name="password"
                                 required
                                 autocomplete="current-password"
-                                class="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition @error('password') border-red-500 @enderror"
+                                class="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition @error('password') border-danger-500 @enderror"
                                 placeholder="Enter your password"
                             >
                         </div>
                         @error('password')
-                            <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                            <p class="mt-2 text-sm text-danger-600 dark:text-danger-400">{{ $message }}</p>
                         @enderror
                     </div>
 

@@ -13,12 +13,12 @@
 
             <div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
                 @auth
-                    <x-button-link href="{{ route('search') }}" icon="fas fa-search">Search Releases</x-button-link>
-                    <x-button-link href="{{ route('All') }}" variant="secondary" icon="fas fa-list-ul">Browse All</x-button-link>
+                    <x-button-link :href="route('search')" icon="fas fa-search">Search Releases</x-button-link>
+                    <x-button-link :href="route('All')" variant="secondary" icon="fas fa-list-ul">Browse All</x-button-link>
                 @else
-                    <x-button-link href="{{ route('login') }}" icon="fas fa-sign-in-alt">Sign In</x-button-link>
+                    <x-button-link :href="route('login')" icon="fas fa-sign-in-alt">Sign In</x-button-link>
                     @if(Route::has('register'))
-                        <x-button-link href="{{ route('register') }}" variant="secondary" icon="fas fa-user-plus">Create Account</x-button-link>
+                        <x-button-link :href="route('register')" variant="secondary" icon="fas fa-user-plus">Create Account</x-button-link>
                     @endif
                 @endauth
             </div>

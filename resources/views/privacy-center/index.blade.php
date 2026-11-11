@@ -5,20 +5,8 @@
     <x-page-header title="Privacy center" eyebrow="Your data and privacy" description="Export your account data and manage GDPR requests from one place." icon="fas fa-shield-alt" />
 
     <div class="surface-panel rounded-xl shadow-sm overflow-hidden">
-        @if(session('success'))
-            <div class="mx-6 mt-6 p-4 bg-success-50 dark:bg-success-900/20 border-l-4 border-success-500 text-success-800 dark:text-success-200 rounded">
-                <i aria-hidden="true" class="fas fa-check-circle mr-2"></i>{{ session('success') }}
-            </div>
-        @endif
-
-        @if(session('error'))
-            <div class="mx-6 mt-6 p-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 text-red-800 dark:text-red-200 rounded">
-                <i aria-hidden="true" class="fas fa-exclamation-circle mr-2"></i>{{ session('error') }}
-            </div>
-        @endif
-
         @if($errors->any())
-            <div class="mx-6 mt-6 p-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 text-red-800 dark:text-red-200 rounded">
+            <div class="mx-6 mt-6 p-4 bg-danger-50 dark:bg-danger-900/20 border-l-4 border-danger-500 text-danger-800 dark:text-danger-200 rounded">
                 <i aria-hidden="true" class="fas fa-exclamation-circle mr-2"></i>{{ $errors->first() }}
             </div>
         @endif
@@ -41,11 +29,11 @@
                 </form>
             </div>
 
-            <div class="border border-red-200 dark:border-red-800 rounded-lg p-5 bg-red-50 dark:bg-red-900/10">
-                <h2 class="text-lg font-semibold text-red-800 dark:text-red-200 mb-3">
+            <div class="border border-danger-200 dark:border-danger-800 rounded-lg p-5 bg-danger-50 dark:bg-danger-900/10">
+                <h2 class="text-lg font-semibold text-danger-800 dark:text-danger-200 mb-3">
                     <i aria-hidden="true" class="fas fa-user-slash mr-2"></i>Request Account Erasure
                 </h2>
-                <p class="text-sm text-red-700 dark:text-red-300 mb-4">
+                <p class="text-sm text-danger-700 dark:text-danger-300 mb-4">
                     Submit a GDPR erasure request for administrator review. Account/profile data and usage records will be removed or anonymized. Payment and audit records are retained only where required and direct account identifiers are anonymized or minimized where practical.
                 </p>
                 <form method="post" action="{{ route('privacy-center.erasure') }}">
@@ -53,8 +41,8 @@
                     <label for="erasure_notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Optional notes</label>
                     <textarea id="erasure_notes" name="notes" rows="3" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md" placeholder="Reason or additional details"></textarea>
                     <label for="confirmation" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mt-4 mb-1">Type ERASE to confirm</label>
-                    <input id="confirmation" name="confirmation" type="text" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md" autocomplete="off">
-                    <button type="submit" class="mt-4 px-4 py-2 bg-red-600 dark:bg-red-700 text-white rounded-md hover:bg-red-700">
+                    <x-input id="confirmation" name="confirmation" type="text" autocomplete="off" />
+                    <button type="submit" class="mt-4 px-4 py-2 bg-danger-600 dark:bg-danger-700 text-white rounded-md hover:bg-danger-700">
                         <i aria-hidden="true" class="fas fa-paper-plane mr-2"></i>Submit Erasure Request
                     </button>
                 </form>
@@ -70,10 +58,10 @@
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead class="bg-gray-50 dark:bg-gray-900">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Date</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Type</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Result</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Date</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Type</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Result</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">

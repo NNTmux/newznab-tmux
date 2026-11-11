@@ -6,7 +6,7 @@
         <x-slot:actions>
             <form method="POST" action="{{ url('admin/invitations/cleanup') }}" class="inline">
                 @csrf
-                <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                <button type="submit" class="px-4 py-2 bg-danger-600 text-white rounded-lg hover:bg-danger-700">
                     <i aria-hidden="true" class="fas fa-trash mr-2"></i>Cleanup Expired
                 </button>
             </form>
@@ -31,7 +31,7 @@
                 </div>
                 <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow border border-gray-200 dark:border-gray-700">
                     <div class="text-sm text-gray-500 dark:text-gray-400">Expired</div>
-                    <div class="text-2xl font-bold text-red-600 dark:text-red-400">{{ $stats['expired'] }}</div>
+                    <div class="text-2xl font-bold text-danger-600 dark:text-danger-400">{{ $stats['expired'] }}</div>
                 </div>
             </div>
 
@@ -106,12 +106,15 @@
 
         <!-- Invitations Table -->
         <div class="overflow-x-auto">
+            {{-- Standalone bulk form: row actions below are forms too, and forms cannot be nested. --}}
             <form method="POST" action="{{ url('admin/invitations/bulk') }}" id="bulkForm">
                 @csrf
+            </form>
+            <div x-data="adminInvitations">
                 <x-admin.data-table>
                     <x-slot:head>
                         <x-admin.th>
-                            <input aria-label="Select item" type="checkbox" id="select_all" class="rounded">
+                            <input aria-label="Select all invitations" type="checkbox" id="select_all" class="rounded" x-ref="selectAll" @change="toggleAll()">
                         </x-admin.th>
                         <x-admin.th>Email</x-admin.th>
                         <x-admin.th>Invited By</x-admin.th>
@@ -124,7 +127,7 @@
                         @forelse($invitations as $invitation)
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                                 <td class="px-6 py-4 whitespace-nowrap text-center">
-                                    <input aria-label="Select item" type="checkbox" name="invitation_ids[]" value="{{ $invitation->id }}" class="rounded invitation-checkbox">
+                                    <input aria-label="Select invitation for {{ $invitation->email }}" type="checkbox" name="invitation_ids[]" value="{{ $invitation->id }}" form="bulkForm" class="rounded invitation-checkbox" @change="onCheckboxChange()">
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
                                     {{ $invitation->email }}
@@ -134,21 +137,13 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @if($invitation->used_at)
-                                        <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-success-100 text-success-800 dark:bg-success-900 dark:text-success-200">
-                                            <i aria-hidden="true" class="fas fa-check-circle mr-1"></i>Used
-                                        </span>
+                                        <x-admin.badge tone="success" icon="fas fa-check-circle">Used</x-admin.badge>
                                     @elseif(!$invitation->is_active)
-                                        <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-warning-100 text-warning-800 dark:bg-warning-900 dark:text-warning-200">
-                                            <i aria-hidden="true" class="fas fa-ban mr-1"></i>Cancelled
-                                        </span>
+                                        <x-admin.badge tone="warning" icon="fas fa-ban">Cancelled</x-admin.badge>
                                     @elseif($invitation->expires_at && $invitation->expires_at->isPast())
-                                        <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
-                                            <i aria-hidden="true" class="fas fa-clock mr-1"></i>Expired
-                                        </span>
+                                        <x-admin.badge tone="danger" icon="fas fa-clock">Expired</x-admin.badge>
                                     @else
-                                        <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-200">
-                                            <i aria-hidden="true" class="fas fa-hourglass-half mr-1"></i>Pending
-                                        </span>
+                                        <x-admin.badge tone="primary" icon="fas fa-hourglass-half">Pending</x-admin.badge>
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
@@ -176,7 +171,7 @@
                                               data-confirm-text="Cancel Invitation"
                                               @submit.prevent="submit()">
                                             @csrf
-                                            <button aria-label="Cancel" type="submit" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300" title="Cancel">
+                                            <button aria-label="Cancel" type="submit" class="text-danger-600 dark:text-danger-400 hover:text-danger-900 dark:hover:text-danger-300" title="Cancel">
                                                 <i aria-hidden="true" class="fas fa-ban"></i>
                                             </button>
                                         </form>
@@ -196,13 +191,13 @@
                 <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-3">
-                            <select name="bulk_action" id="bulk_action" class="px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md">
+                            <select name="bulk_action" id="bulk_action" form="bulkForm" aria-label="Bulk action" class="px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md">
                                 <option value="">Bulk Actions</option>
                                 <option value="resend">Resend Selected</option>
                                 <option value="cancel">Cancel Selected</option>
                                 <option value="delete">Delete Selected</option>
                             </select>
-                            <button type="submit" class="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900" data-confirm="Are you sure you want to perform this bulk action?">
+                            <button type="submit" form="bulkForm" class="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900" data-confirm="Are you sure you want to perform this bulk action?" data-confirm-type="warning" data-confirm-text="Apply">
                                 Apply
                             </button>
                         </div>
@@ -211,7 +206,7 @@
                         </div>
                     </div>
                 </div>
-            </form>
+            </div>
         </div>
     </x-admin.card>
 
@@ -272,6 +267,5 @@
     @endif
 </div>
 
-{{-- Scripts moved to resources/js/csp-safe.js --}}
 @endsection
 

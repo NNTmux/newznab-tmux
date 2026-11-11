@@ -35,7 +35,7 @@
                         @method('DELETE')
                         <input type="hidden" name="id" value="{{ $user->id }}">
                         <button type="submit"
-                            class="px-4 py-2 bg-red-600 dark:bg-red-700 text-white text-sm rounded hover:bg-red-700 dark:hover:bg-red-800 transition"
+                            class="px-4 py-2 bg-danger-600 dark:bg-danger-700 text-white text-sm rounded hover:bg-danger-700 dark:hover:bg-danger-800 transition"
                             data-confirm="Are you sure you want to delete your account? This action cannot be undone.">
                             <i aria-hidden="true" class="fa-solid fa-trash mr-1"></i>Delete Account
                         </button>
@@ -85,30 +85,30 @@
                                 <h2 class="text-lg font-semibold">General Information</h2>
                             </div>
                             <div class="space-y-4">
-                                <div class="flex border-b border-gray-200 dark:border-gray-700 pb-3">
-                                    <div class="w-1/3 text-gray-600">Username</div>
-                                    <div class="w-2/3 font-medium">{{ $user->username }}</div>
+                                <div class="flex flex-col gap-1 border-b border-gray-200 pb-3 sm:flex-row sm:gap-0 dark:border-gray-700">
+                                    <div class="w-full text-gray-600 sm:w-1/3 dark:text-gray-400">Username</div>
+                                    <div class="w-full sm:w-2/3 font-medium">{{ $user->username }}</div>
                                 </div>
 
                                 @if(($isadmin ?? false) || !$publicview)
-                                    <div class="flex border-b border-gray-200 dark:border-gray-700 pb-3">
-                                        <div class="w-1/3 text-gray-600">Email</div>
-                                        <div class="w-2/3 font-medium">{{ $user->email }}</div>
+                                    <div class="flex flex-col gap-1 border-b border-gray-200 pb-3 sm:flex-row sm:gap-0 dark:border-gray-700">
+                                        <div class="w-full text-gray-600 sm:w-1/3 dark:text-gray-400">Email</div>
+                                        <div class="w-full sm:w-2/3 font-medium">{{ $user->email }}</div>
                                     </div>
                                 @endif
 
-                                <div class="flex border-b border-gray-200 dark:border-gray-700 pb-3">
-                                    <div class="w-1/3 text-gray-600">Registered</div>
-                                    <div class="w-2/3">
+                                <div class="flex flex-col gap-1 border-b border-gray-200 pb-3 sm:flex-row sm:gap-0 dark:border-gray-700">
+                                    <div class="w-full text-gray-600 sm:w-1/3 dark:text-gray-400">Registered</div>
+                                    <div class="w-full sm:w-2/3">
                                         <i aria-hidden="true" class="fa-solid fa-calendar text-gray-400 mr-2"></i>
-                                        {{ \Carbon\Carbon::parse($user->created_at)->format('M d, Y') }}
-                                        <span class="ml-2 px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs rounded">{{ \Carbon\Carbon::parse($user->created_at)->diffForHumans() }}</span>
+                                        {{ userDate($user->created_at, 'M d, Y') }}
+                                        <span class="ml-2 px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs rounded">{{ userDateDiffForHumans($user->created_at) }}</span>
                                     </div>
                                 </div>
 
-                                <div class="flex border-b border-gray-200 dark:border-gray-700 pb-3">
-                                    <div class="w-1/3 text-gray-600">Role</div>
-                                    <div class="w-2/3">
+                                <div class="flex flex-col gap-1 border-b border-gray-200 pb-3 sm:flex-row sm:gap-0 dark:border-gray-700">
+                                    <div class="w-full text-gray-600 sm:w-1/3 dark:text-gray-400">Role</div>
+                                    <div class="w-full sm:w-2/3">
                                         <span class="px-3 py-1 bg-primary-100 dark:bg-primary-900/50 text-primary-800 dark:text-primary-200 text-sm rounded-full">
                                             <i aria-hidden="true" class="fa-solid fa-id-badge mr-1"></i>{{ $user->roles->first()->name ?? 'User' }}
                                         </span>
@@ -116,9 +116,9 @@
                                 </div>
 
                                 @if($user->rolechangedate)
-                                    <div class="flex border-b border-gray-200 dark:border-gray-700 pb-3">
-                                        <div class="w-1/3 text-gray-600">Role Expiry</div>
-                                        <div class="w-2/3">
+                                    <div class="flex flex-col gap-1 border-b border-gray-200 pb-3 sm:flex-row sm:gap-0 dark:border-gray-700">
+                                        <div class="w-full text-gray-600 sm:w-1/3 dark:text-gray-400">Role Expiry</div>
+                                        <div class="w-full sm:w-2/3">
                                             @php
                                                 $roleExpiryDate = \Carbon\Carbon::parse($user->rolechangedate);
                                                 $now = \Carbon\Carbon::now();
@@ -130,7 +130,7 @@
                                                 <i aria-hidden="true" class="fa-solid fa-calendar-times text-gray-400 mr-2"></i>
                                                 <span class="font-medium">{{ $roleExpiryDate->format('M d, Y') }}</span>
                                                 @if($isExpired)
-                                                    <span class="ml-2 px-2 py-1 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 text-xs rounded">
+                                                    <span class="ml-2 px-2 py-1 bg-danger-100 dark:bg-danger-900 text-danger-800 dark:text-danger-200 text-xs rounded">
                                                         <i aria-hidden="true" class="fa-solid fa-exclamation-circle mr-1"></i>Expired {{ $expiryDiff }}
                                                     </span>
                                                 @elseif($daysUntilExpiry <= 7)
@@ -155,9 +155,9 @@
                                     $allPendingRoles = $user->getAllPendingStackedRoles();
                                 @endphp
                                 @if($allPendingRoles->count() > 0)
-                                    <div class="flex border-b border-gray-200 dark:border-gray-700 pb-3">
-                                        <div class="w-1/3 text-gray-600">Pending Role{{ $allPendingRoles->count() > 1 ? 's' : '' }}</div>
-                                        <div class="w-2/3">
+                                    <div class="flex flex-col gap-1 border-b border-gray-200 pb-3 sm:flex-row sm:gap-0 dark:border-gray-700">
+                                        <div class="w-full text-gray-600 sm:w-1/3 dark:text-gray-400">Pending Role{{ $allPendingRoles->count() > 1 ? 's' : '' }}</div>
+                                        <div class="w-full sm:w-2/3">
                                             <div class="space-y-3">
                                                 @foreach($allPendingRoles as $index => $pendingRoleInfo)
                                                     <div class="@if(!$loop->last) pb-3 border-b border-gray-100 dark:border-gray-700 @endif">
@@ -179,7 +179,7 @@
                                                             </div>
                                                             @if($pendingRoleInfo['end_date'])
                                                                 <div class="mt-1">
-                                                                    <i aria-hidden="true" class="fa-solid fa-stop-circle text-red-400 mr-1"></i>
+                                                                    <i aria-hidden="true" class="fa-solid fa-stop-circle text-danger-400 mr-1"></i>
                                                                     <span class="font-medium">Ends:</span> {{ $pendingRoleInfo['end_date']->format('M d, Y g:i A') }}
                                                                 </div>
                                                             @endif
@@ -195,9 +195,9 @@
                                     </div>
                                 @elseif($user->hasPendingRole())
                                     {{-- Fallback to old display if no history records but pending_roles_id is set --}}
-                                    <div class="flex border-b border-gray-200 dark:border-gray-700 pb-3">
-                                        <div class="w-1/3 text-gray-600">Pending Role</div>
-                                        <div class="w-2/3">
+                                    <div class="flex flex-col gap-1 border-b border-gray-200 pb-3 sm:flex-row sm:gap-0 dark:border-gray-700">
+                                        <div class="w-full text-gray-600 sm:w-1/3 dark:text-gray-400">Pending Role</div>
+                                        <div class="w-full sm:w-2/3">
                                             @php
                                                 $pendingRole = $user->getPendingRole();
                                                 $pendingStartDate = \Carbon\Carbon::parse($user->pending_role_start_date);
@@ -223,15 +223,15 @@
                                     </div>
                                 @endif
 
-                                <div class="flex border-b border-gray-200 dark:border-gray-700 pb-3">
-                                    <div class="w-1/3 text-gray-600">Last Login</div>
-                                    <div class="w-2/3">{{ \Carbon\Carbon::parse($user->lastlogin)->diffForHumans() }}</div>
+                                <div class="flex flex-col gap-1 border-b border-gray-200 pb-3 sm:flex-row sm:gap-0 dark:border-gray-700">
+                                    <div class="w-full text-gray-600 sm:w-1/3 dark:text-gray-400">Last Login</div>
+                                    <div class="w-full sm:w-2/3">{{ userDateDiffForHumans($user->lastlogin) }}</div>
                                 </div>
 
                                 @if($userinvitedby)
-                                    <div class="flex border-b border-gray-200 dark:border-gray-700 pb-3">
-                                        <div class="w-1/3 text-gray-600">Invited By</div>
-                                        <div class="w-2/3">
+                                    <div class="flex flex-col gap-1 border-b border-gray-200 pb-3 sm:flex-row sm:gap-0 dark:border-gray-700">
+                                        <div class="w-full text-gray-600 sm:w-1/3 dark:text-gray-400">Invited By</div>
+                                        <div class="w-full sm:w-2/3">
                                             <a href="{{ url('/profile?id=' . $userinvitedby->id) }}" class="text-link dark:text-primary-400 hover:text-primary-800">
                                                 {{ $userinvitedby->username }}
                                             </a>
@@ -239,14 +239,14 @@
                                     </div>
                                 @endif
 
-                                <div class="flex border-b border-gray-200 dark:border-gray-700 pb-3">
-                                    <div class="w-1/3 text-gray-600">Grabs</div>
-                                    <div class="w-2/3 font-semibold text-success-600">{{ number_format($user->grabs ?? 0) }}</div>
+                                <div class="flex flex-col gap-1 border-b border-gray-200 pb-3 sm:flex-row sm:gap-0 dark:border-gray-700">
+                                    <div class="w-full text-gray-600 sm:w-1/3 dark:text-gray-400">Grabs</div>
+                                    <div class="w-full sm:w-2/3 font-semibold text-success-600">{{ number_format($user->grabs ?? 0) }}</div>
                                 </div>
 
                                 <div class="flex pb-3">
-                                    <div class="w-1/3 text-gray-600">Timezone</div>
-                                    <div class="w-2/3">
+                                    <div class="w-full text-gray-600 sm:w-1/3 dark:text-gray-400">Timezone</div>
+                                    <div class="w-full sm:w-2/3">
                                         @php
                                             $userTimezone = $user->timezone ?? 'UTC';
                                             $timezoneDisplay = str_replace('_', ' ', $userTimezone);
@@ -350,15 +350,23 @@
                             </div>
 
                             <!-- Usage Limits -->
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6" x-data="profilePage">
                                 <!-- Downloads Usage -->
                                 <div class="surface-panel rounded-lg p-4 shadow">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                            <i aria-hidden="true" class="fa-solid fa-download text-success-600 mr-2"></i>Downloads (24h)
+                                        </h3>
+                                        <span class="text-sm font-bold {{ $downloadLimit > 0 && $grabstoday >= $downloadLimit ? 'text-danger-600' : 'text-success-600' }}">
+                                            {{ $grabstoday ?? 0 }} / {{ $downloadLimit }}
+                                        </span>
+                                    </div>
                                     <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
                                         @php
                                             $downloadPercentage = $downloadLimit > 0 ? min(($grabstoday / $downloadLimit) * 100, 100) : 0;
-                                            $downloadColor = $downloadPercentage >= 90 ? 'bg-red-600' : ($downloadPercentage >= 70 ? 'bg-warning-500' : 'bg-success-600');
+                                            $downloadColor = $downloadPercentage >= 90 ? 'bg-danger-600' : ($downloadPercentage >= 70 ? 'bg-warning-500' : 'bg-success-600');
                                         @endphp
-                                        <div class="{{ $downloadColor }} h-3 rounded-full progress-bar" data-width="{{ $downloadPercentage }}"></div>
+                                        <div class="{{ $downloadColor }} h-3 rounded-full progress-bar" data-width="{{ $downloadPercentage }}" role="progressbar" aria-label="Downloads used in the last 24 hours" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ (int) round($downloadPercentage) }}"></div>
                                     </div>
                                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                         {{ number_format($downloadLimit - $grabstoday) }} downloads remaining
@@ -371,16 +379,16 @@
                                         <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300">
                                             <i aria-hidden="true" class="fa-solid fa-server text-purple-600 mr-2"></i>API Requests (24h)
                                         </h3>
-                                        <span class="text-sm font-bold {{ $apirequests >= $apiLimit ? 'text-red-600' : 'text-success-600' }}">
+                                        <span class="text-sm font-bold {{ $apirequests >= $apiLimit ? 'text-danger-600' : 'text-success-600' }}">
                                             {{ $apirequests ?? 0 }} / {{ $apiLimit }}
                                         </span>
                                     </div>
                                     <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
                                         @php
                                             $apiPercentage = $apiLimit > 0 ? min(($apirequests / $apiLimit) * 100, 100) : 0;
-                                            $apiColor = $apiPercentage >= 90 ? 'bg-red-600' : ($apiPercentage >= 70 ? 'bg-warning-500' : 'bg-purple-600');
+                                            $apiColor = $apiPercentage >= 90 ? 'bg-danger-600' : ($apiPercentage >= 70 ? 'bg-warning-500' : 'bg-purple-600');
                                         @endphp
-                                        <div class="{{ $apiColor }} h-3 rounded-full progress-bar" data-width="{{ $apiPercentage }}"></div>
+                                        <div class="{{ $apiColor }} h-3 rounded-full progress-bar" data-width="{{ $apiPercentage }}" role="progressbar" aria-label="API requests used in the last 24 hours" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ (int) round($apiPercentage) }}"></div>
                                     </div>
                                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                         {{ number_format($apiLimit - $apirequests) }} requests remaining
@@ -389,7 +397,7 @@
                             </div>
 
                             <!-- Stats Cards -->
-                            <div class="grid grid-cols-3 gap-4 mb-6">
+                            <div class="grid grid-cols-1 gap-4 mb-6 sm:grid-cols-3">
                                 <div class="surface-panel rounded-lg p-4 text-center shadow">
                                     <div class="text-3xl font-bold text-link dark:text-primary-400">{{ $user->grabs ?? 0 }}</div>
                                     <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">Total Grabs</div>
@@ -406,12 +414,22 @@
 
 
                             @if(($isadmin ?? false) || !$publicview)
-                                <!-- API Keys -->
-                                <div class="space-y-4">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">API Token</label>
-                                        <code class="api-token block text-xs bg-gray-800 text-success-400 p-3 rounded break-all">{{ $user->api_token }}</code>
+                                <!-- API Token -->
+                                <div class="surface-panel rounded-lg p-4 shadow" x-data="copyToClipboard">
+                                    <h3 class="mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                        <label for="profile-api-token">
+                                            <i aria-hidden="true" class="fa-solid fa-key text-link dark:text-primary-400 mr-2"></i>API Token
+                                        </label>
+                                    </h3>
+                                    <div class="flex flex-col gap-2 sm:flex-row">
+                                        <input type="text" id="profile-api-token" readonly value="{{ $user->api_token }}"
+                                               class="min-h-11 w-full min-w-0 rounded-control border border-line bg-surface-sunken px-3.5 py-2.5 font-mono text-sm text-fg sm:flex-1">
+                                        <x-button type="button" variant="secondary" class="shrink-0" @click="copy('profile-api-token')" aria-label="Copy API token" title="Copy API token">
+                                            <i aria-hidden="true" class="fa-solid" :class="copied ? 'fa-check' : 'fa-copy'"></i>
+                                            <span x-text="copied ? 'Copied' : 'Copy'">Copy</span>
+                                        </x-button>
                                     </div>
+                                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Used for API and RSS requests. Keep it private.</p>
                                 </div>
                             @endif
                         </div>

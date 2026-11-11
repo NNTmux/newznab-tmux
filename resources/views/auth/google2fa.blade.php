@@ -1,5 +1,7 @@
 @extends('layouts.guest')
 
+@section('title', __('Two-factor verification'))
+
 @section('content')
 <div class="min-h-screen auth-page flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8">
@@ -33,14 +35,18 @@
                                 id="one_time_password"
                                 name="one_time_password"
                                 type="text"
+                                inputmode="numeric"
+                                maxlength="6"
+                                autocomplete="one-time-code"
+                                @error('one_time_password') aria-invalid="true" aria-describedby="one_time_password-error" @enderror
                                 required
                                 autofocus
-                                class="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition @error('one_time_password') border-red-500 @enderror"
+                                class="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition @error('one_time_password') border-danger-500 @enderror"
                                 placeholder="Enter 6-digit code"
                             >
                         </div>
                         @error('one_time_password')
-                            <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                            <p id="one_time_password-error" class="mt-2 text-sm text-danger-600 dark:text-danger-400">{{ $message }}</p>
                         @enderror
                     </div>
 

@@ -47,8 +47,8 @@
 
                 <!-- Error state -->
                 <div x-show="error && !loading" class="text-center py-8">
-                    <i aria-hidden="true" class="fas fa-exclamation-circle text-3xl text-red-600 dark:text-red-400"></i>
-                    <p class="text-red-600 dark:text-red-400 mt-2">Failed to load NFO file</p>
+                    <i aria-hidden="true" class="fas fa-exclamation-circle text-3xl text-danger-600 dark:text-danger-400"></i>
+                    <p class="text-danger-600 dark:text-danger-400 mt-2">Failed to load NFO file</p>
                 </div>
 
                 <!-- Content -->

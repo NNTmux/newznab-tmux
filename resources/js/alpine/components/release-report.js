@@ -68,7 +68,7 @@ Alpine.data('releaseReport', () => ({
                     triggerRef.disabled = true;
                     triggerRef.classList.add('opacity-50', 'cursor-not-allowed');
                     var icon = triggerRef.querySelector('i');
-                    if (icon) icon.classList.add('text-red-500');
+                    if (icon) icon.classList.add('text-danger-500');
                     var label = triggerRef.querySelector('.report-label');
                     if (label) label.textContent = 'Reported';
                 }
@@ -208,10 +208,20 @@ Alpine.data('adminReleaseReports', () => ({
     validateBulkAction(e) {
         const action = this.componentRoot()?.querySelector('select[name="action"]')?.value;
         const checkedCount = this.reportCheckboxes().filter(cb => cb.checked).length;
-        if (!action) { e.preventDefault(); alert('Please select an action.'); return; }
-        if (checkedCount === 0) { e.preventDefault(); alert('Please select at least one report.'); return; }
+        if (!action) { e.preventDefault(); showToast('Please select an action.', 'error'); return; }
+        if (checkedCount === 0) { e.preventDefault(); showToast('Please select at least one report.', 'error'); return; }
         if (action === 'delete') {
-            if (!confirm('Are you sure you want to DELETE ' + checkedCount + ' release(s)? This action cannot be undone.')) e.preventDefault();
+            // Ask in the shared confirmation dialog; form.submit() does not re-fire this handler.
+            e.preventDefault();
+            const form = e.target;
+            window.showConfirm({
+                title: 'Delete Releases',
+                message: 'Are you sure you want to delete ' + checkedCount + ' release(s)?',
+                details: 'This action cannot be undone.',
+                type: 'danger',
+                confirmText: 'Delete',
+                onConfirm: function() { form.submit(); }
+            });
         }
     }
 }));

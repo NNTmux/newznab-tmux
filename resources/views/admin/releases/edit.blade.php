@@ -229,7 +229,7 @@
                     @if(($release->passwordstatus ?? $release['passwordstatus'] ?? 0) == 0)
                         <span class="text-success-600 dark:text-success-400"><i aria-hidden="true" class="fas fa-check-circle"></i> None</span>
                     @elseif(($release->passwordstatus ?? $release['passwordstatus'] ?? 0) == 1)
-                        <span class="text-red-600 dark:text-red-400"><i aria-hidden="true" class="fas fa-lock"></i> Passworded</span>
+                        <span class="text-danger-600 dark:text-danger-400"><i aria-hidden="true" class="fas fa-lock"></i> Passworded</span>
                     @else
                         <span class="text-warning-600 dark:text-warning-400"><i aria-hidden="true" class="fas fa-question-circle"></i> Unknown</span>
                     @endif

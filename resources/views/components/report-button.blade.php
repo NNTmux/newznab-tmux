@@ -21,14 +21,14 @@
 @if($variant === 'icon')
     <button aria-label="{{ $reportTitle }}" type="button"
             data-report-release-id="{{ $releaseId }}"
-            class="report-trigger {{ $hasReports ? 'text-orange-500 dark:text-orange-400 hover:text-orange-600 dark:hover:text-orange-300' : 'text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300' }} transition text-sm"
+            class="report-trigger {{ $hasReports ? 'text-orange-500 dark:text-orange-400 hover:text-orange-600 dark:hover:text-orange-300' : 'text-danger-500 dark:text-danger-400 hover:text-danger-600 dark:hover:text-danger-300' }} transition text-sm"
             title="{{ $reportTitle }}">
         <i aria-hidden="true" class="fas fa-flag"></i>
     </button>
 @elseif($variant === 'button-lg')
     <button type="button"
             data-report-release-id="{{ $releaseId }}"
-            class="report-trigger release-action px-4 py-2 {{ $hasReports ? 'bg-orange-600 dark:bg-orange-700 hover:bg-orange-700 dark:hover:bg-orange-800' : 'bg-red-600 dark:bg-red-700 hover:bg-red-700 dark:hover:bg-red-800' }} text-white"
+            class="report-trigger release-action px-4 py-2 {{ $hasReports ? 'bg-orange-600 dark:bg-orange-700 hover:bg-orange-700 dark:hover:bg-orange-800' : 'bg-danger-600 dark:bg-danger-700 hover:bg-danger-700 dark:hover:bg-danger-800' }} text-white"
             title="{{ $reportTitle }}">
         <i aria-hidden="true" class="fas fa-flag mr-2"></i>
         <span class="report-label">{{ $hasReports ? 'Reported' : 'Report' }}</span>
@@ -36,7 +36,7 @@
 @elseif($variant === 'button')
     <button type="button"
             data-report-release-id="{{ $releaseId }}"
-            class="report-trigger release-action px-3 py-1.5 {{ $textSize }} {{ $hasReports ? 'bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 hover:bg-orange-200 dark:hover:bg-orange-800' : 'bg-red-50 dark:bg-red-400/10 text-red-700 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-400/20 hover:text-red-800 dark:hover:text-red-300' }}"
+            class="report-trigger release-action px-3 py-1.5 {{ $textSize }} {{ $hasReports ? 'bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 hover:bg-orange-200 dark:hover:bg-orange-800' : 'bg-danger-50 dark:bg-danger-400/10 text-danger-700 dark:text-danger-400 hover:bg-danger-100 dark:hover:bg-danger-400/20 hover:text-danger-800 dark:hover:text-danger-300' }}"
             title="{{ $reportTitle }}">
         <i aria-hidden="true" class="fas fa-flag mr-1.5"></i>
         <span class="report-label">{{ $hasReports ? 'Reported' : 'Report' }}</span>
@@ -44,7 +44,7 @@
 @else
     <button type="button"
             data-report-release-id="{{ $releaseId }}"
-            class="report-trigger {{ $hasReports ? 'text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300' : 'text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400' }} {{ $textSize }} transition"
+            class="report-trigger {{ $hasReports ? 'text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300' : 'text-gray-600 dark:text-gray-400 hover:text-danger-600 dark:hover:text-danger-400' }} {{ $textSize }} transition"
             title="{{ $reportTitle }}">
         <i aria-hidden="true" class="fas fa-flag mr-1"></i>
         <span class="report-label">{{ $hasReports ? 'Reported' : 'Report Issue' }}</span>

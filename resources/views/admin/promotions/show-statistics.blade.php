@@ -15,13 +15,9 @@
             <div>
                 <p class="text-sm text-gray-500 dark:text-gray-400">Status</p>
                 @if($promotion->is_active && $promotion->isCurrentlyActive())
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200">
-                        <i aria-hidden="true" class="fas fa-check-circle mr-2"></i>Active
-                    </span>
+                    <x-admin.badge tone="success" icon="fas fa-check-circle">Active</x-admin.badge>
                 @else
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-                        <i aria-hidden="true" class="fas fa-pause-circle mr-2"></i>Inactive
-                    </span>
+                    <x-admin.badge tone="neutral" icon="fas fa-pause-circle">Inactive</x-admin.badge>
                 @endif
             </div>
             <div>
@@ -136,17 +132,14 @@
                 <i aria-hidden="true" class="fas fa-user-tag mr-2"></i>Statistics by Role
             </h2>
         </div>
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead class="bg-gray-50 dark:bg-gray-900">
-                    <tr>
+        <x-admin.data-table>
+            <x-slot:head>
                         <x-admin.th>Role</x-admin.th>
                         <x-admin.th>Total Upgrades</x-admin.th>
                         <x-admin.th>Unique Users</x-admin.th>
                         <x-admin.th>Total Days Added</x-admin.th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            </x-slot:head>
+
                     @foreach($statsByRole as $roleStat)
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -165,9 +158,7 @@
                             </td>
                         </tr>
                     @endforeach
-                </tbody>
-            </table>
-        </div>
+        </x-admin.data-table>
     </x-admin.card>
     @endif
 
@@ -218,19 +209,16 @@
                 <i aria-hidden="true" class="fas fa-list mr-2"></i>Recent Applications
             </h2>
         </div>
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead class="bg-gray-50 dark:bg-gray-900">
-                    <tr>
+        <x-admin.data-table>
+            <x-slot:head>
                         <x-admin.th>User</x-admin.th>
                         <x-admin.th>Role</x-admin.th>
                         <x-admin.th>Days Added</x-admin.th>
                         <x-admin.th>Previous Expiry</x-admin.th>
                         <x-admin.th>New Expiry</x-admin.th>
                         <x-admin.th>Applied At</x-admin.th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            </x-slot:head>
+
                     @forelse($applications as $application)
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -270,14 +258,8 @@
                             </td>
                         </tr>
                     @endforelse
-                </tbody>
-            </table>
-        </div>
-        @if($applications->hasPages())
-            <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
-                {{ $applications->appends(request()->query())->links() }}
-            </div>
-        @endif
+        </x-admin.data-table>
+        <x-admin.pagination :paginator="$applications->appends(request()->query())" />
     </x-admin.card>
 </div>
 @endsection

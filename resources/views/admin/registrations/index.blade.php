@@ -4,13 +4,7 @@
 @php
     use Illuminate\Support\Str;
 
-    $statusBadgeClasses = static function (int $status): string {
-        return match ($status) {
-            \App\Enums\RegistrationStatus::Open->value => 'border border-emerald-500/30 bg-emerald-600 text-white shadow-sm dark:border-emerald-300/20 dark:bg-emerald-500 dark:text-slate-950',
-            \App\Enums\RegistrationStatus::Invite->value => 'border border-amber-500/30 bg-amber-500 text-slate-950 shadow-sm dark:border-amber-200/20 dark:bg-amber-400 dark:text-slate-950',
-            default => 'border border-rose-500/30 bg-rose-600 text-white shadow-sm dark:border-rose-200/20 dark:bg-rose-500 dark:text-white',
-        };
-    };
+    $statusBadgeClasses = static fn (int $status): string => (\App\Enums\RegistrationStatus::tryFrom($status) ?? \App\Enums\RegistrationStatus::Closed)->badgeClasses();
     $periodStatusClasses = static function (bool $isEnabled): string {
         return $isEnabled
             ? 'border border-emerald-500/30 bg-emerald-600 text-white shadow-sm dark:border-emerald-300/20 dark:bg-emerald-500 dark:text-slate-950'
@@ -26,7 +20,7 @@
 
 <div class="space-y-6">
     @if($errors->any())
-        <div class="rounded-lg border border-red-200 bg-red-50 p-4 text-red-800 dark:border-red-800 dark:bg-red-900/20 dark:text-red-200">
+        <div class="rounded-lg border border-danger-200 bg-danger-50 p-4 text-danger-800 dark:border-danger-800 dark:bg-danger-900/20 dark:text-danger-200">
             <p class="font-medium">Please fix the following issues:</p>
             <ul class="mt-2 list-disc space-y-1 pl-5 text-sm">
                 @foreach($errors->all() as $error)

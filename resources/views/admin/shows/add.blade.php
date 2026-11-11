@@ -21,8 +21,8 @@
 
         <!-- Flash Messages -->
         @if($errors->any())
-            <div class="mx-6 mt-4 p-4 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-lg">
-                <ul class="list-disc list-inside text-red-800 dark:text-red-200">
+            <div class="mx-6 mt-4 p-4 bg-danger-50 dark:bg-danger-900 border border-danger-200 dark:border-danger-700 rounded-lg">
+                <ul class="list-disc list-inside text-danger-800 dark:text-danger-200">
                     @foreach($errors->all() as $err)
                         <li>{{ $err }}</li>
                     @endforeach
@@ -53,7 +53,7 @@
             <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
                 <div class="md:col-span-3">
                     <label for="source" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Source <span class="text-red-500">*</span>
+                        Source <span class="text-danger-500">*</span>
                     </label>
                     <select id="source" name="source" x-model="source" required
                             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
@@ -65,7 +65,7 @@
 
                 <div class="md:col-span-5">
                     <label for="external_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        External ID <span class="text-red-500">*</span>
+                        External ID <span class="text-danger-500">*</span>
                     </label>
                     <input type="text" id="external_id" name="external_id" x-model="externalId" required
                            x-bind:placeholder="placeholder"
@@ -121,7 +121,7 @@
 
             <div x-show="hasError"
                  x-cloak
-                 class="mt-4 p-3 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-lg text-sm text-red-700 dark:text-red-200"
+                 class="mt-4 p-3 bg-danger-50 dark:bg-danger-900 border border-danger-200 dark:border-danger-700 rounded-lg text-sm text-danger-700 dark:text-danger-200"
                  x-text="previewError"></div>
 
             <div class="mt-6 flex gap-3">

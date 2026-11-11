@@ -5,7 +5,6 @@
     <x-admin.page-header :title="$title" icon="fas fa-edit" />
     <x-admin.card>
 
-        <!-- Success/Error/Warning Messages -->
 
 
 
@@ -36,7 +35,7 @@
                                      alt="Movie Cover"
                                      class="w-full h-auto rounded-lg mb-3">
                             @else
-                                <div class="flex flex-col items-center justify-center py-8 text-gray-400">
+                                <div class="flex flex-col items-center justify-center py-8 text-gray-500 dark:text-gray-400">
                                     <i aria-hidden="true" class="fas fa-image text-5xl mb-2"></i>
                                     <p class="text-sm">No cover image</p>
                                 </div>
@@ -65,7 +64,7 @@
                                      alt="Movie Backdrop"
                                      class="w-full h-auto rounded-lg mb-3">
                             @else
-                                <div class="flex flex-col items-center justify-center py-8 text-gray-400">
+                                <div class="flex flex-col items-center justify-center py-8 text-gray-500 dark:text-gray-400">
                                     <i aria-hidden="true" class="fas fa-image text-5xl mb-2"></i>
                                     <p class="text-sm">No backdrop image</p>
                                 </div>
@@ -93,7 +92,7 @@
                                    readonly
                                    class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-100 dark:bg-gray-700 dark:text-gray-300">
                             <a href="{{ $site->dereferrerLink }}https://www.imdb.com/title/tt{{ $movie['imdbid'] ?? $movie->imdbid ?? '' }}"
-                               target="_blank"
+                               target="_blank" rel="noopener noreferrer"
                                class="px-4 py-2 bg-warning-500 text-white rounded-md hover:bg-warning-600">
                                 <i aria-hidden="true" class="fas fa-external-link"></i> View on IMDB
                             </a>
@@ -103,12 +102,12 @@
                     <!-- Title -->
                     <div>
                         <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Title <span class="text-red-500">*</span>
+                            Title <span class="text-danger-500">*</span>
                         </label>
                         <input type="text"
                                id="title"
                                name="title"
-                               value="{{ $movie['title'] ?? $movie->title ?? '' }}"
+                               value="{{ old('title', $movie['title'] ?? $movie->title ?? '') }}"
                                required
                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>
@@ -121,7 +120,7 @@
                         <input type="text"
                                id="tagline"
                                name="tagline"
-                               value="{{ $movie['tagline'] ?? $movie->tagline ?? '' }}"
+                               value="{{ old('tagline', $movie['tagline'] ?? $movie->tagline ?? '') }}"
                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>
 
@@ -134,7 +133,7 @@
                             <input type="number"
                                    id="year"
                                    name="year"
-                                   value="{{ $movie['year'] ?? $movie->year ?? '' }}"
+                                   value="{{ old('year', $movie['year'] ?? $movie->year ?? '') }}"
                                    min="1800"
                                    max="2100"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
@@ -146,7 +145,7 @@
                             <input type="text"
                                    id="rating"
                                    name="rating"
-                                   value="{{ $movie['rating'] ?? $movie->rating ?? '' }}"
+                                   value="{{ old('rating', $movie['rating'] ?? $movie->rating ?? '') }}"
                                    placeholder="e.g., 8.5"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
                         </div>
@@ -160,7 +159,7 @@
                         <input type="text"
                                id="genre"
                                name="genre"
-                               value="{{ $movie['genre'] ?? $movie->genre ?? '' }}"
+                               value="{{ old('genre', $movie['genre'] ?? $movie->genre ?? '') }}"
                                placeholder="e.g., Action, Drama, Comedy"
                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>
@@ -173,7 +172,7 @@
                         <input type="text"
                                id="director"
                                name="director"
-                               value="{{ $movie['director'] ?? $movie->director ?? '' }}"
+                               value="{{ old('director', $movie['director'] ?? $movie->director ?? '') }}"
                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>
 
@@ -185,7 +184,7 @@
                         <input type="text"
                                id="actors"
                                name="actors"
-                               value="{{ $movie['actors'] ?? $movie->actors ?? '' }}"
+                               value="{{ old('actors', $movie['actors'] ?? $movie->actors ?? '') }}"
                                placeholder="Comma-separated list of actors"
                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>
@@ -198,7 +197,7 @@
                         <input type="text"
                                id="language"
                                name="language"
-                               value="{{ $movie['language'] ?? $movie->language ?? '' }}"
+                               value="{{ old('language', $movie['language'] ?? $movie->language ?? '') }}"
                                placeholder="e.g., English"
                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>
@@ -211,7 +210,7 @@
                         <textarea id="plot"
                                   name="plot"
                                   rows="6"
-                                  class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">{{ $movie['plot'] ?? $movie->plot ?? '' }}</textarea>
+                                  class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">{{ old('plot', $movie['plot'] ?? $movie->plot ?? '') }}</textarea>
                     </div>
 
                     <!-- Action Buttons -->
@@ -226,144 +225,13 @@
                            name="update"
                            value="1"
                            class="ml-auto px-6 py-2 bg-success-600 text-white rounded-lg hover:bg-success-700"
-                           data-confirm="This will fetch and update movie data from TMDB. Continue?">
+                           data-confirm="This will fetch and update movie data from TMDB. Continue?" data-confirm-type="info" data-confirm-text="Update">
                             <i aria-hidden="true" class="fas fa-refresh mr-2"></i>Update from TMDB
                         </button>
                     </div>
                 </div>
             </div>
         </form>
-    </x-admin.card>
-</div>
-@endsection
-@extends('layouts.admin')
-
-@section('content')
-<div class="space-y-6">
-    <x-admin.page-header :title="$title" icon="fas fa-film">
-        <x-slot:actions>
-            <x-admin.button :href="url('admin/movie-add')" icon="fas fa-plus">Add Movie</x-admin.button>
-        </x-slot:actions>
-    </x-admin.page-header>
-    <x-admin.card>
-
-        <!-- Search Form -->
-        <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
-            <form method="GET" action="{{ url('admin/movie-list') }}">
-                <div class="flex gap-2">
-                    <div class="relative flex-1">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i aria-hidden="true" class="fas fa-search text-gray-400"></i>
-                        </div>
-                        <input type="text"
-                               name="moviesearch"
-                               value="{{ $lastSearch ?? '' }}"
-                               placeholder="Search by IMDB ID or movie title..."
-                               class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
-                    </div>
-                    <button type="submit" class="px-4 py-2 bg-accent dark:bg-accent-hover text-white rounded-lg hover:bg-accent-hover">
-                        Search
-                    </button>
-                    @if(!empty($lastSearch))
-                        <a href="{{ url('admin/movie-list') }}" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
-                            Clear
-                        </a>
-                    @endif
-                </div>
-            </form>
-        </div>
-
-        <!-- Movie List Table -->
-        @if(!empty($movielist) && count($movielist) > 0)
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                    <thead class="bg-gray-50 dark:bg-gray-900">
-                        <tr>
-                            <x-admin.th>IMDB ID</x-admin.th>
-                            <x-admin.th>Title</x-admin.th>
-                            <x-admin.th>Year</x-admin.th>
-                            <x-admin.th>Rating</x-admin.th>
-                            <x-admin.th>Genre</x-admin.th>
-                            <x-admin.th>Cover</x-admin.th>
-                            <x-admin.th>Backdrop</x-admin.th>
-                            <x-admin.th>Actions</x-admin.th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                        @foreach($movielist as $movie)
-                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
-                                    <a href="{{ $site->dereferrerLink }}https://www.imdb.com/title/tt{{ $movie->imdbid }}" target="_blank" class="text-link dark:text-primary-400 hover:underline">
-                                        {{ $movie->imdbid }}
-                                    </a>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm font-medium text-gray-900 dark:text-gray-200">{{ $movie->title ?? 'N/A' }}</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                    {{ $movie->year ?? 'N/A' }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                    {{ $movie->rating ?? 'N/A' }}
-                                </td>
-                                <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
-                                    {{ \Illuminate\Support\Str::limit($movie->genre ?? 'N/A', 30) }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                    @if($movie->cover == 1)
-                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-success-100 dark:bg-success-900/40 text-success-800 dark:text-success-200">
-                                            <i aria-hidden="true" class="fas fa-check"></i> Yes
-                                        </span>
-                                    @else
-                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-200">
-                                            <i aria-hidden="true" class="fas fa-times"></i> No
-                                        </span>
-                                    @endif
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                    @if($movie->backdrop == 1)
-                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-success-100 dark:bg-success-900/40 text-success-800 dark:text-success-200">
-                                            <i aria-hidden="true" class="fas fa-check"></i> Yes
-                                        </span>
-                                    @else
-                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-200">
-                                            <i aria-hidden="true" class="fas fa-times"></i> No
-                                        </span>
-                                    @endif
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <a href="{{ url('admin/movie-edit?id=' . $movie->imdbid) }}" class="text-link dark:text-primary-400 hover:text-primary-900 mr-3">
-                                        <i aria-hidden="true" class="fas fa-edit"></i> Edit
-                                    </a>
-                                    <form method="POST" action="{{ route('admin.movie-edit') }}" class="inline">
-                                        @csrf
-                                        <input type="hidden" name="id" value="{{ $movie->imdbid }}">
-                                        <input type="hidden" name="update" value="1">
-                                        <button type="submit" class="text-success-600 dark:text-success-400 hover:text-success-900" title="Update from TMDB">
-                                            <i aria-hidden="true" class="fas fa-refresh"></i> Update
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        @else
-            <div class="px-6 py-12 text-center">
-                <i aria-hidden="true" class="fas fa-film text-gray-400 text-5xl mb-4"></i>
-                <p class="text-gray-500 dark:text-gray-400 text-lg">
-                    @if(!empty($lastSearch))
-                        No movies found matching "{{ $lastSearch }}".
-                    @else
-                        No movies found in the database.
-                    @endif
-                </p>
-                <a href="{{ url('admin/movie-add') }}" class="mt-4 inline-block px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent-hover">
-                    <i aria-hidden="true" class="fas fa-plus mr-2"></i>Add Your First Movie
-                </a>
-            </div>
-        @endif
     </x-admin.card>
 </div>
 @endsection

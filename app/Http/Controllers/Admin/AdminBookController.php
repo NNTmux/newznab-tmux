@@ -8,6 +8,7 @@ use App\Http\Controllers\BasePageController;
 use App\Models\BookInfo;
 use App\Services\BookService;
 use App\Services\ReleaseImageService;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -18,15 +19,25 @@ class AdminBookController extends BasePageController
     /**
      * Display a listing of books
      */
-    public function index(): View
+    public function index(Request $request): View
     {
         $this->setAdminPrefs();
 
         $meta_title = $title = 'Book List';
 
-        $bookList = BookInfo::query()->orderByDesc('created_at')->paginate(config('nntmux.items_per_page'));
+        $lastSearch = trim($this->scalarInput($request, 'search'));
+        $bookList = BookInfo::query()
+            ->when($lastSearch !== '', static function (Builder $query) use ($lastSearch): void {
+                $query->where(static function (Builder $query) use ($lastSearch): void {
+                    $query->whereLike('title', '%'.$lastSearch.'%')
+                        ->orWhereLike('author', '%'.$lastSearch.'%');
+                });
+            })
+            ->orderByDesc('created_at')
+            ->paginate(config('nntmux.items_per_page'))
+            ->withQueryString();
 
-        return view('admin.books.index', compact('bookList', 'title', 'meta_title'));
+        return view('admin.books.index', compact('bookList', 'title', 'meta_title', 'lastSearch'));
     }
 
     /**

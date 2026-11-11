@@ -98,6 +98,11 @@ class AdminReleaseNamingRegexesController extends BasePageController
                 break;
         }
 
+        if ($error !== '') {
+            // Keep what was typed so a rejected submission is not lost.
+            $regex = array_merge($regex, $request->only(array_keys($regex)));
+        }
+
         $this->viewData = array_merge($this->viewData, [
             'error' => $error,
             'regex' => (object) $regex,
@@ -139,5 +144,15 @@ class AdminReleaseNamingRegexesController extends BasePageController
         ]);
 
         return view('admin.regexes.release-naming-test', $this->viewData);
+    }
+
+    /**
+     * Delete a single regex and return to the list.
+     */
+    public function destroy(int $id): RedirectResponse
+    {
+        (new RegexService('release_naming_regexes'))->deleteRegex($id);
+
+        return redirect()->back()->with('success', 'Regex deleted successfully');
     }
 }

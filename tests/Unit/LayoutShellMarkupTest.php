@@ -223,6 +223,16 @@ class LayoutShellMarkupTest extends TestCase
         $this->assertStringNotContainsString('max-w-4xl', $profile);
     }
 
+    public function test_profile_api_tab_presents_usage_and_token_as_matching_cards(): void
+    {
+        $profile = $this->view('profile/index.blade.php');
+
+        $this->assertStringContainsString('</i>Downloads (24h)', $profile);
+        $this->assertStringContainsString('{{ $grabstoday ?? 0 }} / {{ $downloadLimit }}', $profile);
+        $this->assertStringContainsString('<div class="surface-panel rounded-lg p-4 shadow" x-data="copyToClipboard">', $profile);
+        $this->assertStringContainsString('class="min-h-11 w-full min-w-0 rounded-control border border-line bg-surface-sunken', $profile);
+    }
+
     public function test_first_party_layouts_apply_the_shared_view_treatment(): void
     {
         $this->assertStringContainsString('class="app-view-stack layout-page-container', $this->view('layouts/main.blade.php'));

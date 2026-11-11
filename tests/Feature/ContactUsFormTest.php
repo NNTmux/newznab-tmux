@@ -59,6 +59,21 @@ class ContactUsFormTest extends TestCase
     }
 
     #[Test]
+    public function the_site_header_shows_how_many_releases_are_in_the_signed_in_users_basket(): void
+    {
+        $member = $this->member();
+        DB::table('users_releases')->insert([
+            ['users_id' => $member->getAuthIdentifier(), 'releases_id' => 11],
+            ['users_id' => $member->getAuthIdentifier(), 'releases_id' => 12],
+            ['users_id' => 999, 'releases_id' => 13],
+        ]);
+
+        $this->actingAs($member)->get(route('contact-us'))
+            ->assertOk()
+            ->assertSeeInOrder(['Download basket items:', 'cart-count', '>2</span>'], false);
+    }
+
+    #[Test]
     public function guests_must_type_an_email(): void
     {
         $this->get(route('contact-us'))
@@ -192,6 +207,13 @@ class ContactUsFormTest extends TestCase
             $table->string('title')->default('');
             $table->integer('status')->default(1);
         });
+        Schema::create('users_releases', function (Blueprint $table): void {
+            $table->increments('id');
+            $table->unsignedInteger('users_id');
+            $table->unsignedInteger('releases_id');
+            $table->timestamps();
+        });
+
         Schema::create('user_excluded_categories', function (Blueprint $table): void {
             $table->increments('id');
             $table->unsignedInteger('users_id');

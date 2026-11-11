@@ -40,7 +40,7 @@
                     <div class="text-lg text-gray-900 dark:text-gray-100">
                         {{ \Carbon\Carbon::parse($user->rolechangedate)->format('Y-m-d H:i:s') }}
                         @if(\Carbon\Carbon::parse($user->rolechangedate)->isPast())
-                            <span class="ml-2 px-2 py-1 text-xs font-medium rounded bg-red-200 dark:bg-red-900 text-red-800 dark:text-red-200">
+                            <span class="ml-2 px-2 py-1 text-xs font-medium rounded bg-danger-200 dark:bg-danger-900 text-danger-800 dark:text-danger-200">
                                 Expired
                             </span>
                         @else
@@ -54,10 +54,8 @@
         </div>
 
         <!-- History Table -->
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead class="bg-gray-50 dark:bg-gray-900">
-                    <tr>
+        <x-admin.data-table>
+            <x-slot:head>
                         <x-admin.th>
                             Date
                         </x-admin.th>
@@ -85,9 +83,8 @@
                         <x-admin.th>
                             Changed By
                         </x-admin.th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            </x-slot:head>
+
                     @forelse($history as $record)
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
@@ -147,16 +144,10 @@
                             </td>
                         </tr>
                     @endforelse
-                </tbody>
-            </table>
-        </div>
+        </x-admin.data-table>
 
         <!-- Pagination -->
-        @if($history->hasPages())
-            <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
-                {{ $history->links() }}
-            </div>
-        @endif
+        <x-admin.pagination :paginator="$history" />
     </div>
 </div>
 @endsection

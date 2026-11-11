@@ -30,7 +30,6 @@ const lazyComponentMap = {
     'moviesPage':      () => import('./components/movies-page.js'),
     'qualityFilter':   () => import('./components/quality-filter.js'),
     'contentToggle':   () => import('./components/content-toggle.js'),
-    'contentDelete':   () => import('./components/content-toggle.js'),  // same file
     'releaseReport':   () => import('./components/release-report.js'),
     'adminReleaseReports': () => import('./components/release-report.js'),  // same file
     'adminReleaseList': () => import('./components/admin/release-list.js'),
@@ -41,7 +40,6 @@ const lazyComponentMap = {
     'cartPage':        () => import('./components/cart-page.js'),
     'releaseMultiOps': () => import('./components/cart-page.js'),  // same file
     'seriesSeasonLoader': () => import('./components/series-season-loader.js'),
-    'authPage':        () => import('./components/auth-page.js'),
     'otpInput':        () => import('./components/auth-page.js'),       // same file
     'loginMode':       () => import('./components/login-mode.js'),
     'passkeyLogin':    () => import('./components/passkey-login.js'),
@@ -51,18 +49,15 @@ const lazyComponentMap = {
     // --- Admin components (includes Chart.js — heavy) ---
     'adminDashboard':  () => import('./components/admin/dashboard.js'),
     'adminGroups':     () => import('./components/admin/groups.js'),
-    'adminFeatures':   () => import('./components/admin/features.js'),
     'adminUserEdit':   () => import('./components/admin/features.js'),  // same file
     'adminUserList':   () => import('./components/admin/user-list.js'),
     'adminDeletedUsers': () => import('./components/admin/features.js'), // same file
     'adminInvitations': () => import('./components/admin/features.js'), // same file
-    'adminRegexForm':  () => import('./components/admin/features.js'),  // same file
     'tinyMceEditor':   () => import('./components/admin/features.js'),  // same file
     'verifyUser':      () => import('./components/admin/verify-user.js'),
     'adminLogViewer':  () => import('./components/admin/log-viewer.js'),
     'adminMonitoring': () => import('./components/admin/monitoring.js'),
     'grafanaPanels':   () => import('./components/admin/monitoring.js'),   // same file
-    'tmuxEdit':        () => import('./components/admin/features.js'),  // same file
 };
 
 /**

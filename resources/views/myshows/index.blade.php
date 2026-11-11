@@ -57,17 +57,17 @@
                             {{ ! empty($show['categoryNames']) ? $show['categoryNames'] : 'All categories' }}
                         </x-badge>
                         @if(isset($show['created_at']))
-                            <span class="text-xs text-fg-muted"><i aria-hidden="true" class="fa-solid fa-clock mr-1"></i>Added {{ \Carbon\Carbon::parse($show['created_at'])->format('M d, Y') }}</span>
+                            <span class="text-xs text-fg-muted"><i aria-hidden="true" class="fa-solid fa-clock mr-1"></i>Added {{ userDate($show['created_at'], 'M d, Y') }}</span>
                         @endif
                     </div>
 
                     <div class="flex items-center gap-1 sm:justify-end">
-                        <x-icon-button size="sm" icon="fa-solid fa-pen" label="Edit categories for {{ $show['title'] ?? 'this show' }}"
+                        <x-icon-button size="sm" icon="fa-solid fa-pen" :label="'Edit categories for '.($show['title'] ?? 'this show')"
                                        :href="url('/myshows?action=edit&id='.$show['videos_id'])" />
                         <form method="POST" action="{{ url("/myshows?action=delete&id={$show['videos_id']}") }}"
                               x-data="confirmForm" @submit.prevent="submit()" data-title="Remove show" data-message="Are you sure you want to remove this show from your list?" data-confirm-text="Remove" data-type="danger">
                             @csrf
-                            <x-icon-button type="submit" size="sm" icon="fa-solid fa-trash" label="Remove {{ $show['title'] ?? 'this show' }} from My shows" class="text-danger-600 dark:text-danger-400" />
+                            <x-icon-button type="submit" size="sm" icon="fa-solid fa-trash" :label="'Remove '.($show['title'] ?? 'this show').' from My shows'" class="text-danger-600 dark:text-danger-400" />
                         </form>
                     </div>
                 </li>

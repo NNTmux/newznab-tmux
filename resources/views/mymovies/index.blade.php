@@ -55,7 +55,7 @@
                             {{ ! empty($movie['categoryNames']) ? $movie['categoryNames'] : 'All categories' }}
                         </x-badge>
                         @if(isset($movie['created_at']))
-                            <span class="text-xs text-fg-muted"><i aria-hidden="true" class="fa-solid fa-clock mr-1"></i>Added {{ \Carbon\Carbon::parse($movie['created_at'])->format('M d, Y') }}</span>
+                            <span class="text-xs text-fg-muted"><i aria-hidden="true" class="fa-solid fa-clock mr-1"></i>Added {{ userDate($movie['created_at'], 'M d, Y') }}</span>
                         @endif
                     </div>
 
@@ -64,12 +64,12 @@
                            class="mr-1 inline-flex min-h-9 items-center gap-1.5 rounded-control border border-line px-3 text-xs font-medium text-fg-muted transition hover:bg-surface-hover hover:text-fg">
                             IMDb<i aria-hidden="true" class="fa-solid fa-arrow-up-right-from-square text-[0.65rem]"></i>
                         </a>
-                        <x-icon-button size="sm" icon="fa-solid fa-pen" label="Edit categories for {{ $movieTitle ?: 'this movie' }}"
+                        <x-icon-button size="sm" icon="fa-solid fa-pen" :label="'Edit categories for '.($movieTitle ?: 'this movie')"
                                        :href="url('/mymovies?id=edit&imdb='.$movie['imdbid'])" />
                         <form method="POST" action="{{ url("/mymovies?id=delete&imdb={$movie['imdbid']}") }}"
                               x-data="confirmForm" @submit.prevent="submit()" data-title="Remove movie" data-message="Are you sure you want to remove this movie from your watchlist?" data-confirm-text="Remove" data-type="danger">
                             @csrf
-                            <x-icon-button type="submit" size="sm" icon="fa-solid fa-trash" label="Remove {{ $movieTitle ?: 'this movie' }} from My movies" class="text-danger-600 dark:text-danger-400" />
+                            <x-icon-button type="submit" size="sm" icon="fa-solid fa-trash" :label="'Remove '.($movieTitle ?: 'this movie').' from My movies'" class="text-danger-600 dark:text-danger-400" />
                         </form>
                     </div>
                 </li>

@@ -24,9 +24,7 @@
                                 <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">{{ $group['label'] }}</h2>
                                     <p class="text-sm text-gray-500 dark:text-gray-400">Drag to reorder only items in this group.</p>
                             </div>
-                            <span class="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600 dark:bg-gray-700 dark:text-gray-300">
-                                {{ count($group['items']) }} items
-                            </span>
+                            <x-admin.badge tone="neutral">{{ count($group['items']) }} items</x-admin.badge>
                         </div>
 
                         <x-admin.data-table class="select-none">
@@ -65,7 +63,7 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                         @if(!empty($item->url))
-                                            <a href="{{ $item->url }}" target="_blank" class="text-link dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300">
+                                            <a href="{{ $item->url }}" target="_blank" rel="noopener noreferrer" class="text-link dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300">
                                                 {{ Str::limit($item->url, 30) }}
                                             </a>
                                         @else
@@ -74,17 +72,11 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                         @if($item->contenttype == 1)
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200">
-                                                Useful Link
-                                            </span>
+                                            <x-admin.badge tone="primary">Useful Link</x-admin.badge>
                                         @elseif($item->contenttype == 2)
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200">
-                                                Article
-                                            </span>
+                                            <x-admin.badge tone="success">Article</x-admin.badge>
                                         @elseif($item->contenttype == 3)
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200">
-                                                Homepage
-                                            </span>
+                                            <x-admin.badge tone="info">Homepage</x-admin.badge>
                                         @else
                                             <span class="text-gray-400 dark:text-gray-500">N/A</span>
                                         @endif
@@ -102,13 +94,9 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap" data-status-cell>
                                         @if($item->status == 1)
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200">
-                                                <i aria-hidden="true" class="fas fa-check mr-1"></i>Enabled
-                                            </span>
+                                            <x-admin.badge tone="success" icon="fas fa-check">Enabled</x-admin.badge>
                                         @else
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">
-                                                <i aria-hidden="true" class="fas fa-times mr-1"></i>Disabled
-                                            </span>
+                                            <x-admin.badge tone="danger" icon="fas fa-times">Disabled</x-admin.badge>
                                         @endif
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400" data-ordinal-cell>{{ $item->ordinal ?? 0 }}</td>
@@ -128,7 +116,7 @@
                                                 <i aria-hidden="true" class="fas fa-toggle-{{ $item->status == 1 ? 'on' : 'off' }}"></i>
                                             </button>
                                             <button aria-label="{{ filled($item->title) ? $item->title : 'Untitled' }}" type="button"
-                                                    class="content-delete text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
+                                                    class="content-delete text-danger-600 dark:text-danger-400 hover:text-danger-900 dark:hover:text-danger-300"
                                                     data-content-id="{{ $item->id }}"
                                                     data-content-title="{{ filled($item->title) ? $item->title : 'Untitled' }}"
                                                     x-on:click.prevent="deleteContent({{ $item->id }}, @js(filled($item->title) ? $item->title : 'Untitled'), $el)"

@@ -23,12 +23,12 @@
                         <!-- Title -->
                         <div>
                             <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Title <span class="text-red-500">*</span>
+                                Title <span class="text-danger-500">*</span>
                             </label>
                             <input type="text"
                                    id="title"
                                    name="title"
-                                   value="{{ $show['title'] ?? '' }}"
+                                   value="{{ old('title', $show['title'] ?? '') }}"
                                    readonly
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md bg-gray-100 dark:bg-gray-900">
                             <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Title is read-only</p>
@@ -58,7 +58,7 @@
                             <input type="text"
                                    id="started"
                                    name="started"
-                                   value="{{ $show['started'] ?? '' }}"
+                                   value="{{ old('started', $show['started'] ?? '') }}"
                                    readonly
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md bg-gray-100 dark:bg-gray-900">
                         </div>
@@ -71,7 +71,7 @@
                             <input type="text"
                                    id="countries_id"
                                    name="countries_id"
-                                   value="{{ $show['countries_id'] ?? '' }}"
+                                   value="{{ old('countries_id', $show['countries_id'] ?? '') }}"
                                    readonly
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md bg-gray-100 dark:bg-gray-900">
                         </div>
@@ -168,7 +168,7 @@
                             <input type="text"
                                    id="publisher"
                                    name="publisher"
-                                   value="{{ $show['publisher'] ?? '' }}"
+                                   value="{{ old('publisher', $show['publisher'] ?? '') }}"
                                    readonly
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md bg-gray-100 dark:bg-gray-900">
                         </div>

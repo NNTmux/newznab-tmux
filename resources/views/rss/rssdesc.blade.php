@@ -16,21 +16,21 @@
 
         @auth
             <div class="surface-panel-alt rounded-lg p-6 mb-6 border">
-                <h4 class="text-lg font-semibold mb-3 text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
+                <h2 class="text-lg font-semibold mb-3 text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
                     <i aria-hidden="true" class="fa-solid fa-key mr-2 text-gray-600 dark:text-gray-400"></i>Your API Token
-                </h4>
-                <div class="flex rounded-md shadow-sm">
+                </h2>
+                <div class="flex rounded-md shadow-sm" x-data="copyToClipboard">
                     <input type="text" class="flex-1 rounded-l-md border-gray-300 dark:border-gray-600 font-mono text-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white" value="api_token={{ auth()->user()->api_token }}" readonly id="apiTokenInput">
-                    <button aria-label="Copy to clipboard" class="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500" type="button" id="copyApiToken" title="Copy to clipboard">
-                        <i aria-hidden="true" class="fa-solid fa-copy"></i>
+                    <button aria-label="Copy to clipboard" class="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500" type="button" @click="copy('apiTokenInput')" :class="copied ? 'text-success-600' : ''" title="Copy to clipboard">
+                        <i aria-hidden="true" class="fa-solid" :class="copied ? 'fa-check' : 'fa-copy'"></i>
                     </button>
                 </div>
             </div>
         @endauth
 
-        <h4 class="text-lg font-semibold mb-3 text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
+        <h2 class="text-lg font-semibold mb-3 text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
             <i aria-hidden="true" class="fa-solid fa-cog mr-2 text-gray-600 dark:text-gray-400"></i>RSS Configuration Options
-        </h4>
+        </h2>
         <div class="overflow-x-auto mb-6">
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead class="bg-gray-50 dark:bg-gray-900 dark:bg-gray-700">
@@ -83,16 +83,16 @@
             <a href="{{ url('/apihelp') }}" class="underline hover:text-link dark:hover:text-primary-300 text-link dark:text-primary-400">API</a>, which returns its data in an RSS-compatible format.
         </div>
 
-        <h4 class="text-lg font-semibold mt-6 mb-3 text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
+        <h2 class="text-lg font-semibold mt-6 mb-3 text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
             <i aria-hidden="true" class="fa-solid fa-list mr-2 text-gray-600 dark:text-gray-400"></i>Available Feeds
-        </h4>
+        </h2>
 
         <!-- General Feeds -->
         <div class="surface-panel rounded-lg border shadow-sm mb-6">
             <div class="surface-panel-alt px-6 py-4 border-b">
-                <h5 class="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center">
                     <i aria-hidden="true" class="fa-solid fa-globe mr-2 text-link dark:text-primary-400"></i>General Feeds
-                </h5>
+                </h3>
             </div>
             <div class="divide-y divide-gray-200 dark:divide-gray-700">
                 <div class="p-4">
@@ -100,14 +100,14 @@
                         <strong class="text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
                             <i aria-hidden="true" class="fa-solid fa-rss mr-2 text-primary-500 dark:text-primary-400"></i>Full Site Feed
                         </strong>
-                        <a href="{{ url('/rss/full-feed?dl=1&api_token=' . (auth()->user()->api_token ?? '')) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-link bg-white dark:bg-gray-800 hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600" target="_blank">
+                        <a href="{{ url('/rss/full-feed?dl=1&api_token=' . (auth()->user()->api_token ?? '')) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-link bg-white dark:bg-gray-800 hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600" target="_blank" rel="noopener noreferrer">
                             <i aria-hidden="true" class="fa-solid fa-external-link mr-1"></i>Open Feed
                         </a>
                     </div>
-                    <div class="flex rounded-md shadow-sm">
+                    <div class="flex rounded-md shadow-sm" x-data="copyToClipboard">
                         <input type="text" class="flex-1 rounded-l-md border-gray-300 dark:border-gray-600 font-mono text-xs focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="{{ url('/rss/full-feed?dl=1&api_token=' . (auth()->user()->api_token ?? '')) }}" readonly id="fullFeedUrl">
-                        <button aria-label="Copy to clipboard" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500 copy-btn" type="button" data-copy-target="fullFeedUrl">
-                            <i aria-hidden="true" class="fa-solid fa-copy"></i>
+                        <button aria-label="Copy to clipboard" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500" type="button" @click="copy('fullFeedUrl')" :class="copied ? 'text-success-600' : ''">
+                            <i aria-hidden="true" class="fa-solid" :class="copied ? 'fa-check' : 'fa-copy'"></i>
                         </button>
                     </div>
                     <small class="text-gray-500 text-xs mt-2 block dark:text-gray-400">You can define limit and num parameters, which will decide how many items to show and what offset to use (default values: limit 100 and offset 0).</small>
@@ -118,14 +118,14 @@
                         <strong class="text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
                             <i aria-hidden="true" class="fa-solid fa-shopping-basket mr-2 text-primary-500 dark:text-primary-400"></i>My Cart Feed
                         </strong>
-                        <a href="{{ url('/rss/cart?dl=1&api_token=' . (auth()->user()->api_token ?? '') . '&del=1') }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-link bg-white dark:bg-gray-800 hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600" target="_blank">
+                        <a href="{{ url('/rss/cart?dl=1&api_token=' . (auth()->user()->api_token ?? '') . '&del=1') }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-link bg-white dark:bg-gray-800 hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600" target="_blank" rel="noopener noreferrer">
                             <i aria-hidden="true" class="fa-solid fa-external-link mr-1"></i>Open Feed
                         </a>
                     </div>
-                    <div class="flex rounded-md shadow-sm">
+                    <div class="flex rounded-md shadow-sm" x-data="copyToClipboard">
                         <input type="text" class="flex-1 rounded-l-md border-gray-300 dark:border-gray-600 font-mono text-xs focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="{{ url('/rss/cart?dl=1&api_token=' . (auth()->user()->api_token ?? '') . '&del=1') }}" readonly id="cartFeedUrl">
-                        <button aria-label="Copy to clipboard" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500 copy-btn" type="button" data-copy-target="cartFeedUrl">
-                            <i aria-hidden="true" class="fa-solid fa-copy"></i>
+                        <button aria-label="Copy to clipboard" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500" type="button" @click="copy('cartFeedUrl')" :class="copied ? 'text-success-600' : ''">
+                            <i aria-hidden="true" class="fa-solid" :class="copied ? 'fa-check' : 'fa-copy'"></i>
                         </button>
                     </div>
                 </div>
@@ -135,14 +135,14 @@
                         <strong class="text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
                             <i aria-hidden="true" class="fa-solid fa-tv mr-2 text-success-600 dark:text-success-400"></i>My Shows Feed
                         </strong>
-                        <a href="{{ url('/rss/myshows?dl=1&api_token=' . (auth()->user()->api_token ?? '') . '&del=1') }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-link bg-white dark:bg-gray-800 hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600" target="_blank">
+                        <a href="{{ url('/rss/myshows?dl=1&api_token=' . (auth()->user()->api_token ?? '') . '&del=1') }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-link bg-white dark:bg-gray-800 hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600" target="_blank" rel="noopener noreferrer">
                             <i aria-hidden="true" class="fa-solid fa-external-link mr-1"></i>Open Feed
                         </a>
                     </div>
-                    <div class="flex rounded-md shadow-sm">
+                    <div class="flex rounded-md shadow-sm" x-data="copyToClipboard">
                         <input type="text" class="flex-1 rounded-l-md border-gray-300 dark:border-gray-600 font-mono text-xs focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="{{ url('/rss/myshows?dl=1&api_token=' . (auth()->user()->api_token ?? '') . '&del=1') }}" readonly id="myShowsFeedUrl">
-                        <button aria-label="Copy to clipboard" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500 copy-btn" type="button" data-copy-target="myShowsFeedUrl">
-                            <i aria-hidden="true" class="fa-solid fa-copy"></i>
+                        <button aria-label="Copy to clipboard" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500" type="button" @click="copy('myShowsFeedUrl')" :class="copied ? 'text-success-600' : ''">
+                            <i aria-hidden="true" class="fa-solid" :class="copied ? 'fa-check' : 'fa-copy'"></i>
                         </button>
                     </div>
                 </div>
@@ -152,14 +152,14 @@
                         <strong class="text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
                             <i aria-hidden="true" class="fa-solid fa-film mr-2 text-red-600 dark:text-red-400"></i>My Movies Feed
                         </strong>
-                        <a href="{{ url('/rss/mymovies?dl=1&api_token=' . (auth()->user()->api_token ?? '') . '&del=1') }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-link bg-white dark:bg-gray-800 hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600" target="_blank">
+                        <a href="{{ url('/rss/mymovies?dl=1&api_token=' . (auth()->user()->api_token ?? '') . '&del=1') }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-link bg-white dark:bg-gray-800 hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600" target="_blank" rel="noopener noreferrer">
                             <i aria-hidden="true" class="fa-solid fa-external-link mr-1"></i>Open Feed
                         </a>
                     </div>
-                    <div class="flex rounded-md shadow-sm">
+                    <div class="flex rounded-md shadow-sm" x-data="copyToClipboard">
                         <input type="text" class="flex-1 rounded-l-md border-gray-300 dark:border-gray-600 font-mono text-xs focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="{{ url('/rss/mymovies?dl=1&api_token=' . (auth()->user()->api_token ?? '') . '&del=1') }}" readonly id="myMoviesFeedUrl">
-                        <button aria-label="Copy to clipboard" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500 copy-btn" type="button" data-copy-target="myMoviesFeedUrl">
-                            <i aria-hidden="true" class="fa-solid fa-copy"></i>
+                        <button aria-label="Copy to clipboard" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500" type="button" @click="copy('myMoviesFeedUrl')" :class="copied ? 'text-success-600' : ''">
+                            <i aria-hidden="true" class="fa-solid" :class="copied ? 'fa-check' : 'fa-copy'"></i>
                         </button>
                     </div>
                 </div>
@@ -169,9 +169,9 @@
         <!-- Trending Feeds -->
         <div class="surface-panel rounded-lg border shadow-sm mb-6">
             <div class="surface-panel-alt px-6 py-4 border-b">
-                <h5 class="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center">
                     <i aria-hidden="true" class="fa-solid fa-fire mr-2 text-link dark:text-primary-400"></i>Trending Feeds
-                </h5>
+                </h3>
                 <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Most downloaded content in the last 48 hours (updated hourly)</p>
             </div>
             <div class="divide-y divide-gray-200 dark:divide-gray-700">
@@ -180,14 +180,14 @@
                         <strong class="text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
                             <i aria-hidden="true" class="fa-solid fa-film mr-2 text-link dark:text-primary-400"></i>Trending Movies
                         </strong>
-                        <a href="{{ url('/rss/trending-movies?dl=1&api_token=' . (auth()->user()->api_token ?? '')) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-link bg-white dark:bg-gray-800 hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600" target="_blank">
+                        <a href="{{ url('/rss/trending-movies?dl=1&api_token=' . (auth()->user()->api_token ?? '')) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-link bg-white dark:bg-gray-800 hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600" target="_blank" rel="noopener noreferrer">
                             <i aria-hidden="true" class="fa-solid fa-external-link mr-1"></i>Open Feed
                         </a>
                     </div>
-                    <div class="flex rounded-md shadow-sm">
+                    <div class="flex rounded-md shadow-sm" x-data="copyToClipboard">
                         <input type="text" class="flex-1 rounded-l-md border-gray-300 dark:border-gray-600 font-mono text-xs focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="{{ url('/rss/trending-movies?dl=1&api_token=' . (auth()->user()->api_token ?? '')) }}" readonly id="trendingMoviesFeedUrl">
-                        <button aria-label="Copy to clipboard" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500 copy-btn" type="button" data-copy-target="trendingMoviesFeedUrl">
-                            <i aria-hidden="true" class="fa-solid fa-copy"></i>
+                        <button aria-label="Copy to clipboard" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500" type="button" @click="copy('trendingMoviesFeedUrl')" :class="copied ? 'text-success-600' : ''">
+                            <i aria-hidden="true" class="fa-solid" :class="copied ? 'fa-check' : 'fa-copy'"></i>
                         </button>
                     </div>
                 </div>
@@ -196,14 +196,14 @@
                         <strong class="text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
                             <i aria-hidden="true" class="fa-solid fa-tv mr-2 text-purple-600 dark:text-purple-400"></i>Trending TV Shows
                         </strong>
-                        <a href="{{ url('/rss/trending-shows?dl=1&api_token=' . (auth()->user()->api_token ?? '')) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-link bg-white dark:bg-gray-800 hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600" target="_blank">
+                        <a href="{{ url('/rss/trending-shows?dl=1&api_token=' . (auth()->user()->api_token ?? '')) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-link bg-white dark:bg-gray-800 hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600" target="_blank" rel="noopener noreferrer">
                             <i aria-hidden="true" class="fa-solid fa-external-link mr-1"></i>Open Feed
                         </a>
                     </div>
-                    <div class="flex rounded-md shadow-sm">
+                    <div class="flex rounded-md shadow-sm" x-data="copyToClipboard">
                         <input type="text" class="flex-1 rounded-l-md border-gray-300 dark:border-gray-600 font-mono text-xs focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="{{ url('/rss/trending-shows?dl=1&api_token=' . (auth()->user()->api_token ?? '')) }}" readonly id="trendingShowsFeedUrl">
-                        <button aria-label="Copy to clipboard" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500 copy-btn" type="button" data-copy-target="trendingShowsFeedUrl">
-                            <i aria-hidden="true" class="fa-solid fa-copy"></i>
+                        <button aria-label="Copy to clipboard" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500" type="button" @click="copy('trendingShowsFeedUrl')" :class="copied ? 'text-success-600' : ''">
+                            <i aria-hidden="true" class="fa-solid" :class="copied ? 'fa-check' : 'fa-copy'"></i>
                         </button>
                     </div>
                 </div>
@@ -214,9 +214,9 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div class="surface-panel rounded-lg border shadow-sm">
                 <div class="surface-panel-alt px-6 py-4 border-b">
-                    <h5 class="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center">
                         <i aria-hidden="true" class="fa-solid fa-folder mr-2 text-link dark:text-primary-400"></i>Parent Categories
-                    </h5>
+                    </h3>
                 </div>
                 <div class="divide-y divide-gray-200 dark:divide-gray-700">
                     @forelse($parentcategorylist ?? [] as $category)
@@ -225,14 +225,14 @@
                                 <strong class="text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
                                     <i aria-hidden="true" class="fa-solid fa-folder-open mr-2 text-warning-600 dark:text-warning-400"></i>{{ $category['title'] }}
                                 </strong>
-                                <a href="{{ url('/rss/category?id=' . $category['id'] . '&dl=1&api_token=' . (auth()->user()->api_token ?? '')) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-link bg-white dark:bg-gray-800 hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600" target="_blank">
+                                <a href="{{ url('/rss/category?id=' . $category['id'] . '&dl=1&api_token=' . (auth()->user()->api_token ?? '')) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-link bg-white dark:bg-gray-800 hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600" target="_blank" rel="noopener noreferrer">
                                     <i aria-hidden="true" class="fa-solid fa-external-link mr-1"></i>Open Feed
                                 </a>
                             </div>
-                            <div class="flex rounded-md shadow-sm">
+                            <div class="flex rounded-md shadow-sm" x-data="copyToClipboard">
                                 <input type="text" class="flex-1 rounded-l-md border-gray-300 dark:border-gray-600 font-mono text-xs focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="{{ url('/rss/category?id=' . $category['id'] . '&dl=1&api_token=' . (auth()->user()->api_token ?? '')) }}" readonly id="parentCat{{ $category['id'] }}Url">
-                                <button aria-label="Copy to clipboard" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500 copy-btn" type="button" data-copy-target="parentCat{{ $category['id'] }}Url">
-                                    <i aria-hidden="true" class="fa-solid fa-copy"></i>
+                                <button aria-label="Copy to clipboard" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500" type="button" @click="copy('parentCat{{ $category['id'] }}Url')" :class="copied ? 'text-success-600' : ''">
+                                    <i aria-hidden="true" class="fa-solid" :class="copied ? 'fa-check' : 'fa-copy'"></i>
                                 </button>
                             </div>
                         </div>
@@ -247,9 +247,9 @@
 
             <div class="surface-panel rounded-lg border shadow-sm">
                 <div class="surface-panel-alt px-6 py-4 border-b">
-                    <h5 class="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center">
                         <i aria-hidden="true" class="fa-solid fa-folder-open mr-2 text-link dark:text-primary-400"></i>Sub Categories
-                    </h5>
+                    </h3>
                 </div>
                 <div class="divide-y divide-gray-200 dark:divide-gray-700 max-h-[500px] overflow-y-auto">
                     @forelse($categorylist ?? [] as $category)
@@ -259,14 +259,14 @@
                                     <strong class="text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
                                         <i aria-hidden="true" class="fa-solid fa-tag mr-2 text-primary-500 dark:text-primary-400"></i>{{ $category['title'] }}
                                     </strong>
-                                    <a href="{{ url('/rss/category?id=' . $category['id'] . '&dl=1&api_token=' . (auth()->user()->api_token ?? '')) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-link bg-white dark:bg-gray-800 hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600" target="_blank">
+                                    <a href="{{ url('/rss/category?id=' . $category['id'] . '&dl=1&api_token=' . (auth()->user()->api_token ?? '')) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-link bg-white dark:bg-gray-800 hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600" target="_blank" rel="noopener noreferrer">
                                         <i aria-hidden="true" class="fa-solid fa-external-link mr-1"></i>Open Feed
                                     </a>
                                 </div>
-                                <div class="flex rounded-md shadow-sm">
+                                <div class="flex rounded-md shadow-sm" x-data="copyToClipboard">
                                     <input type="text" class="flex-1 rounded-l-md border-gray-300 dark:border-gray-600 font-mono text-xs focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="{{ url('/rss/category?id=' . $category['id'] . '&dl=1&api_token=' . (auth()->user()->api_token ?? '')) }}" readonly id="subCat{{ $category['id'] }}Url">
-                                    <button aria-label="Copy to clipboard" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500 copy-btn" type="button" data-copy-target="subCat{{ $category['id'] }}Url">
-                                        <i aria-hidden="true" class="fa-solid fa-copy"></i>
+                                    <button aria-label="Copy to clipboard" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500" type="button" @click="copy('subCat{{ $category['id'] }}Url')" :class="copied ? 'text-success-600' : ''">
+                                        <i aria-hidden="true" class="fa-solid" :class="copied ? 'fa-check' : 'fa-copy'"></i>
                                     </button>
                                 </div>
                             </div>
@@ -283,5 +283,4 @@
     </div>
 </div>
 
-{{-- Copy to clipboard functionality moved to csp-safe.js --}}
 @endsection

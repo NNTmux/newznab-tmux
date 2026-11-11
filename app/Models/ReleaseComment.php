@@ -6,6 +6,7 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\DB;
@@ -144,11 +145,17 @@ class ReleaseComment extends Model
     /**
      * Get release_comments rows by limit.
      */
-    public static function getCommentsRange(): LengthAwarePaginator // @phpstan-ignore missingType.generics
+    public static function getCommentsRange(string $search = ''): LengthAwarePaginator // @phpstan-ignore missingType.generics
     {
         $range = self::query()
             ->select(['release_comments.*', 'releases.guid'])
             ->leftJoin('releases', 'releases.id', '=', 'release_comments.releases_id')
+            ->when($search !== '', static function (Builder $query) use ($search): void {
+                $query->where(static function (Builder $query) use ($search): void {
+                    $query->whereLike('release_comments.text', '%'.$search.'%')
+                        ->orWhereLike('release_comments.username', '%'.$search.'%');
+                });
+            })
             ->orderByDesc('release_comments.created_at');
 
         return $range->paginate(config('nntmux.items_per_page'));

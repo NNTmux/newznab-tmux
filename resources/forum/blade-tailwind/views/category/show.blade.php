@@ -180,7 +180,7 @@
     @endcan
 
     @push('forum-page-scripts')
-    <script type="module">
+    <script type="module" nonce="{{ csp_nonce() }}">
     Vue.createApp({
         setup() {
             const selectableThreadIds = @json($selectableThreadIds);

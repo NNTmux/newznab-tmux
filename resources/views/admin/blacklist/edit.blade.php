@@ -17,10 +17,10 @@
 
             <!-- Error Message -->
             @if($error)
-                <div class="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                <div class="mb-6 p-4 bg-danger-50 dark:bg-danger-900/20 border border-danger-200 dark:border-danger-800 rounded-lg">
                     <div class="flex">
-                        <i aria-hidden="true" class="fas fa-exclamation-triangle text-red-500 dark:text-red-400 mr-3"></i>
-                        <p class="text-red-800 dark:text-red-300">{{ $error }}</p>
+                        <i aria-hidden="true" class="fas fa-exclamation-triangle text-danger-500 dark:text-danger-400 mr-3"></i>
+                        <p class="text-danger-800 dark:text-danger-300">{{ $error }}</p>
                     </div>
                 </div>
             @endif
@@ -28,7 +28,7 @@
             <!-- Group Name -->
             <div class="mb-6">
                 <label for="groupname" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Group Name: <span class="text-red-500">*</span>
+                    Group Name: <span class="text-danger-500">*</span>
                 </label>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -49,7 +49,7 @@
             <!-- Regex -->
             <div class="mb-6">
                 <label for="regex" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Regex: <span class="text-red-500">*</span>
+                    Regex: <span class="text-danger-500">*</span>
                 </label>
                 <div class="relative">
                     <div class="absolute top-3 left-3 pointer-events-none">
@@ -175,5 +175,4 @@
     </x-admin.card>
 </div>
 
-{{-- Scripts moved to resources/js/csp-safe.js --}}
 @endsection

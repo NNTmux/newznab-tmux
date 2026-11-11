@@ -86,13 +86,21 @@ class AdminFormsAndTablesTest extends TestCase
         foreach (['users/index', 'groups/index', 'release-reports/index'] as $view) {
             $source = (string) file_get_contents(__DIR__."/../../resources/views/admin/{$view}.blade.php");
 
+            $handRolledModals = substr_count($source, 'role="dialog" aria-modal="true"');
+            $sharedModals = substr_count($source, '<x-modal ');
+
             $this->assertSame(
                 substr_count($source, 'role="dialog"'),
                 substr_count($source, 'aria-labelledby="'),
                 "{$view}: every dialog needs an accessible name",
             );
-            $this->assertGreaterThan(0, substr_count($source, 'role="dialog" aria-modal="true"'), $view);
+            $this->assertSame($sharedModals, substr_count($source, ' labelledby="'), "{$view}: every shared modal needs an accessible name");
+            $this->assertGreaterThan(0, $handRolledModals + $sharedModals, $view);
         }
+
+        $sharedModal = (string) file_get_contents(__DIR__.'/../../resources/views/components/modal.blade.php');
+        $this->assertStringContainsString('<dialog', $sharedModal, 'The shared modal is a native dialog, so the browser traps focus');
+        $this->assertStringContainsString('aria-labelledby="{{ $labelledby }}"', $sharedModal);
     }
 
     /**

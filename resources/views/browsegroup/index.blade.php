@@ -46,7 +46,7 @@
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
         <!-- Header -->
         <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 flex flex-col md:flex-row md:justify-between md:items-center gap-3">
-            <h5 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Browse Groups</h5>
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Browse Groups</h2>
             <div class="flex items-center">
                 {{ $results->onEachSide(3)->links() }}
             </div>
@@ -57,13 +57,13 @@
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead class="bg-gray-50 dark:bg-gray-700">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             Name
                         </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             Description
                         </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             Last Updated
                         </th>
                     </tr>
@@ -86,7 +86,7 @@
                             <td class="px-6 py-4 whitespace-nowrap text-gray-600 dark:text-gray-400">
                                 <i aria-hidden="true" class="fa-regular fa-clock text-gray-400 mr-2"></i>
                                 <span title="{{ $result->last_updated ?? '' }}">
-                                    {{ isset($result->last_updated) ? \Carbon\Carbon::parse($result->last_updated)->diffForHumans() : 'N/A' }}
+                                    {{ isset($result->last_updated) ? userDateDiffForHumans($result->last_updated) : 'N/A' }}
                                 </span>
                             </td>
                         </tr>

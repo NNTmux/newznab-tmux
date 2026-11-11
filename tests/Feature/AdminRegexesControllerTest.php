@@ -159,6 +159,106 @@ class AdminRegexesControllerTest extends TestCase
             ->assertNotFound();
     }
 
+    public function test_admin_regex_list_pages_post_deletes_to_routes_that_remove_the_regex(): void
+    {
+        $admin = $this->createUserWithRole('Admin');
+
+        foreach ([
+            'release_naming_regexes' => ['admin.release_naming_regexes-list', 'admin.release_naming_regexes-delete'],
+            'collection_regexes' => ['admin.collection_regexes-list', 'admin.collection_regexes-delete'],
+            'category_regexes' => ['admin.category_regexes-list', 'admin.category_regexes-delete'],
+        ] as $table => [$listRoute, $deleteRoute]) {
+            $regexId = $this->insertRegexFixture($table, '/delete-me/i', 'Regex to delete');
+            $keptRegexId = $this->insertRegexFixture($table, '/keep-me/i', 'Regex to keep');
+
+            $this->actingAs($admin)
+                ->get(route($listRoute))
+                ->assertOk()
+                ->assertSee('action="'.route($deleteRoute, $regexId).'" method="post"', false);
+
+            $this->actingAs($admin)
+                ->from(route($listRoute))
+                ->post(route($deleteRoute, $regexId))
+                ->assertRedirect(route($listRoute));
+
+            $this->assertDatabaseMissing($table, ['id' => $regexId]);
+            $this->assertDatabaseHas($table, ['id' => $keptRegexId]);
+        }
+    }
+
+    public function test_regex_list_pages_show_only_the_controls_their_type_supports(): void
+    {
+        $admin = $this->createUserWithRole('Admin');
+        foreach (['release_naming_regexes', 'collection_regexes', 'category_regexes'] as $table) {
+            $this->insertRegexFixture($table, '/fixture/i', 'Fixture regex');
+        }
+
+        $this->actingAs($admin)
+            ->get(route('admin.collection_regexes-list'))
+            ->assertOk()
+            ->assertSee('href="'.route('admin.collection-regexes-test').'"', false)
+            ->assertDontSee('update_releases 6 true');
+
+        $this->actingAs($admin)
+            ->get(route('admin.release_naming_regexes-list'))
+            ->assertOk()
+            ->assertSee('href="'.route('admin.release-naming-regexes-test').'"', false);
+
+        $this->actingAs($admin)
+            ->get(route('admin.category_regexes-list'))
+            ->assertOk()
+            ->assertSee('update_releases 6 true')
+            ->assertSee('href="'.url('/admin/category_regexes-edit').'"', false)
+            ->assertDontSee('category_regexes-test', false);
+    }
+
+    public function test_rejected_regex_submission_keeps_the_typed_values(): void
+    {
+        $admin = $this->createUserWithRole('Admin');
+
+        $this->actingAs($admin)
+            ->post(route('admin.collection_regexes-edit'), [
+                'action' => 'submit',
+                'group_regex' => 'alt.binaries.keepme',
+                'regex' => '',
+                'description' => 'Typed description',
+                'ordinal' => '5',
+            ])
+            ->assertOk()
+            ->assertSee('Regex cannot be empty')
+            ->assertSee('alt.binaries.keepme')
+            ->assertSee('Typed description');
+
+        $this->assertDatabaseCount('collection_regexes', 0);
+    }
+
+    public function test_admin_regex_delete_routes_reject_get_requests(): void
+    {
+        $admin = $this->createUserWithRole('Admin');
+        $regexId = $this->insertRegexFixture('collection_regexes', '/keep-me/i', 'Regex to keep');
+
+        $this->actingAs($admin)
+            ->get(route('admin.collection_regexes-delete', $regexId))
+            ->assertStatus(405);
+
+        $this->assertDatabaseHas('collection_regexes', ['id' => $regexId]);
+    }
+
+    public function test_admin_regex_test_pages_open_from_their_list_page_links(): void
+    {
+        $admin = $this->createUserWithRole('Admin');
+
+        $this->actingAs($admin)
+            ->get(route('admin.collection-regexes-test'))
+            ->assertOk()
+            ->assertSee('Collections Regex Test');
+
+        $this->actingAs($admin)
+            ->get(route('admin.release-naming-regexes-test'))
+            ->assertOk()
+            ->assertSee('Release Naming Regex Test');
+    }
+
     public function test_admin_regex_list_pages_decode_entity_encoded_regexes_without_double_escaping(): void
     {
         $admin = $this->createUserWithRole('Admin');

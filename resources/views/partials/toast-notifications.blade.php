@@ -1,6 +1,8 @@
 {{-- Toast notifications (flash messages and showToast()). Store: resources/js/alpine/stores/toast.js --}}
 <div x-data="toastContainer"
      class="pointer-events-none fixed right-4 top-4 z-9999 flex w-[min(24rem,calc(100vw-2rem))] flex-col gap-2">
+    {{-- Always in the DOM so screen readers register it before the first toast appears. --}}
+    <p class="sr-only" role="status" aria-live="polite" aria-atomic="true" x-text="announcement()"></p>
     <template x-for="toast in items()" :key="toast.id">
         <div class="toast-item pointer-events-auto flex w-full items-start gap-3 overflow-hidden rounded-card border border-line bg-surface p-4 shadow-overlay transition-all duration-300"
              :class="[toneFor(toast.type), toast.removing ? 'translate-x-full opacity-0' : 'translate-x-0 opacity-100']"

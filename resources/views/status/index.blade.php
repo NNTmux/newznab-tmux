@@ -11,38 +11,25 @@
         ServiceStatusEnum::Degraded => 'border-warning-500/50 bg-warning-500 text-warning-950 dark:bg-warning-900 dark:text-warning-200',
         ServiceStatusEnum::Maintenance => 'border-primary-500/50 bg-accent text-white dark:bg-primary-900 dark:text-primary-200',
         ServiceStatusEnum::PartialOutage => 'border-orange-500/50 bg-orange-600 text-white dark:bg-orange-900 dark:text-orange-200',
-        ServiceStatusEnum::MajorOutage => 'border-red-500/50 bg-red-600 text-white dark:bg-red-900 dark:text-red-200',
+        ServiceStatusEnum::MajorOutage => 'border-danger-500/50 bg-danger-600 text-white dark:bg-danger-900 dark:text-danger-200',
     };
 
     $serviceBadge = static function (ServiceStatusEnum $s): string {
         $base = 'px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full';
-        return $base.' '.match ($s) {
-            ServiceStatusEnum::Operational => 'bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200',
-            ServiceStatusEnum::Degraded => 'bg-warning-100 dark:bg-warning-900 text-warning-800 dark:text-warning-200',
-            ServiceStatusEnum::Maintenance => 'bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200',
-            ServiceStatusEnum::PartialOutage => 'bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200',
-            ServiceStatusEnum::MajorOutage => 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200',
-        };
+
+        return $base.' '.$s->badgeClasses();
     };
 
     $impactBadge = static function (IncidentImpactEnum $i): string {
         $base = 'px-2 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full';
-        return $base.' '.match ($i) {
-            IncidentImpactEnum::None => 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200',
-            IncidentImpactEnum::Minor => 'bg-warning-100 dark:bg-warning-900 text-warning-800 dark:text-warning-200',
-            IncidentImpactEnum::Major => 'bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200',
-            IncidentImpactEnum::Critical => 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200',
-        };
+
+        return $base.' '.$i->badgeClasses();
     };
 
     $incidentStatusBadge = static function (IncidentStatusEnum $st): string {
         $base = 'px-2 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full';
-        return $base.' '.match ($st) {
-            IncidentStatusEnum::Investigating => 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200',
-            IncidentStatusEnum::Identified => 'bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200',
-            IncidentStatusEnum::Monitoring => 'bg-cyan-100 dark:bg-cyan-900 text-cyan-800 dark:text-cyan-200',
-            IncidentStatusEnum::Resolved => 'bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200',
-        };
+
+        return $base.' '.$st->badgeClasses();
     };
 @endphp
 

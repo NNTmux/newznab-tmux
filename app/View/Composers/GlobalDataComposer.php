@@ -9,6 +9,7 @@ use App\Enums\ThemePreference;
 use App\Models\Category;
 use App\Models\Content;
 use App\Models\User;
+use App\Models\UsersRelease;
 use App\Services\Configuration\ConfigurationProvider;
 use App\Services\SiteLogoService;
 use Illuminate\Database\Eloquent\Builder;
@@ -92,6 +93,7 @@ class GlobalDataComposer
                 'ismod' => $userdata->hasRole('Moderator'),
                 'parentcatlist' => $parentcatlist,
                 'header_menu_cat' => request()->input('t', ''),
+                'cartCount' => UsersRelease::query()->where('users_id', $userId)->count(),
                 'userTheme' => ThemePreference::fromPreference($userdata->theme_preference)->value,
                 'userColorScheme' => ColorScheme::fromPreference($userdata->color_scheme)->value,
             ]);

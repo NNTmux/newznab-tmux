@@ -10,12 +10,6 @@
 
     <div class="surface-panel rounded-xl shadow-sm">
         <!-- Messages -->
-        @if(session('success'))
-            <div class="mx-6 mt-6 p-4 bg-success-50 dark:bg-success-950/40 border-l-4 border-success-500 text-success-800 dark:text-success-200 rounded">
-                <i aria-hidden="true" class="fas fa-check-circle mr-2"></i>{{ session('success') }}
-            </div>
-        @endif
-
         @if($success_2fa)
             <div class="mx-6 mt-6 p-4 bg-success-50 dark:bg-success-950/40 border-l-4 border-success-500 text-success-800 dark:text-success-200 rounded">
                 <i aria-hidden="true" class="fas fa-check-circle mr-2"></i>{{ $success_2fa }}
@@ -23,10 +17,21 @@
         @endif
 
         @if($error || $error_2fa)
-            <div class="mx-6 mt-6 p-4 bg-red-50 dark:bg-red-950/40 border-l-4 border-red-500 text-red-800 dark:text-red-200 rounded">
+            <div class="mx-6 mt-6 p-4 bg-danger-50 dark:bg-danger-950/40 border-l-4 border-danger-500 text-danger-800 dark:text-danger-200 rounded">
                 <i aria-hidden="true" class="fas fa-exclamation-circle mr-2"></i>{{ $error ?: $error_2fa }}
             </div>
         @endif
+
+        <nav aria-label="Settings sections" class="flex flex-wrap gap-2 border-b border-line px-6 py-3 text-sm">
+            <a href="#profile-update-form" class="rounded-full bg-surface-sunken px-3 py-1 font-medium text-fg transition hover:bg-surface-hover">Account</a>
+            <a href="#settings-theme" class="rounded-full bg-surface-sunken px-3 py-1 font-medium text-fg transition hover:bg-surface-hover">Theme</a>
+            <a href="#settings-color-scheme" class="rounded-full bg-surface-sunken px-3 py-1 font-medium text-fg transition hover:bg-surface-hover">Color scheme</a>
+            <a href="#settings-timezone" class="rounded-full bg-surface-sunken px-3 py-1 font-medium text-fg transition hover:bg-surface-hover">Time zone</a>
+            <a href="#settings-cover-views" class="rounded-full bg-surface-sunken px-3 py-1 font-medium text-fg transition hover:bg-surface-hover">Cover views</a>
+            <a href="#settings-permissions" class="rounded-full bg-surface-sunken px-3 py-1 font-medium text-fg transition hover:bg-surface-hover">Permissions</a>
+            <a href="#settings-exclusions" class="rounded-full bg-surface-sunken px-3 py-1 font-medium text-fg transition hover:bg-surface-hover">Exclusions</a>
+            <a href="#settings-security" class="rounded-full bg-surface-sunken px-3 py-1 font-medium text-fg transition hover:bg-surface-hover">Two-factor</a>
+        </nav>
 
         <!-- Form -->
         <form id="profile-update-form" method="POST" action="{{ route('profileedit') }}" class="p-6 space-y-6">
@@ -37,60 +42,61 @@
             <div>
                 <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email Address</label>
                 <input type="email" name="email" id="email" value="{{ old('email', $user->email) }}"
-                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 @error('email') border-red-500 dark:border-red-600 @enderror">
+                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 @error('email') border-danger-500 dark:border-danger-600 @enderror">
                 @error('email')
-                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                    <p class="mt-2 text-sm text-danger-600">{{ $message }}</p>
                 @enderror
             </div>
 
             <!-- Current Password -->
             <div>
                 <label for="current_password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Current Password (required to change your email or password)</label>
-                <div class="relative">
-                    <input type="password" name="current_password" id="current_password" autocomplete="current-password"
-                        class="w-full px-4 py-2 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 @error('current_password') border-red-500 dark:border-red-600 @enderror">
-                    <button aria-label="Show password" type="button" class="password-toggle-btn absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" data-field-id="current_password">
-                        <i aria-hidden="true" class="fas fa-eye" id="current_password-eye"></i>
+                <div class="relative" x-data="passwordToggle">
+                    <input type="password" x-ref="field" name="current_password" id="current_password" autocomplete="current-password"
+                        class="w-full px-4 py-2 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 @error('current_password') border-danger-500 dark:border-danger-600 @enderror">
+                    <button aria-label="Show password" :aria-label="label()" type="button" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" @click="toggle()">
+                        <i aria-hidden="true" class="fas" :class="iconClass()"></i>
                     </button>
                 </div>
                 @error('current_password')
-                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                    <p class="mt-2 text-sm text-danger-600">{{ $message }}</p>
                 @enderror
             </div>
 
             <!-- Password -->
             <div>
                 <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">New Password (leave blank to keep current)</label>
-                <div class="relative">
-                    <input type="password" name="password" id="password"
-                        class="w-full px-4 py-2 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 @error('password') border-red-500 dark:border-red-600 @enderror">
-                    <button aria-label="Show password" type="button" class="password-toggle-btn absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" data-field-id="password">
-                        <i aria-hidden="true" class="fas fa-eye" id="password-eye"></i>
+                <div class="relative" x-data="passwordToggle">
+                    <input type="password" x-ref="field" name="password" id="password" autocomplete="new-password"
+                        class="w-full px-4 py-2 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 @error('password') border-danger-500 dark:border-danger-600 @enderror">
+                    <button aria-label="Show password" :aria-label="label()" type="button" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" @click="toggle()">
+                        <i aria-hidden="true" class="fas" :class="iconClass()"></i>
                     </button>
                 </div>
                 <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Must contain at least 8 characters, including uppercase, lowercase, numbers and special characters</p>
                 @error('password')
-                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                    <p class="mt-2 text-sm text-danger-600">{{ $message }}</p>
                 @enderror
             </div>
 
             <!-- Confirm Password -->
             <div>
                 <label for="password_confirmation" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Confirm Password</label>
-                <div class="relative">
-                    <input type="password" name="password_confirmation" id="password_confirmation"
+                <div class="relative" x-data="passwordToggle">
+                    <input type="password" x-ref="field" name="password_confirmation" id="password_confirmation" autocomplete="new-password"
                         class="w-full px-4 py-2 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500">
-                    <button aria-label="Show password" type="button" class="password-toggle-btn absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" data-field-id="password_confirmation">
-                        <i aria-hidden="true" class="fas fa-eye" id="password_confirmation-eye"></i>
+                    <button aria-label="Show password" :aria-label="label()" type="button" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" @click="toggle()">
+                        <i aria-hidden="true" class="fas" :class="iconClass()"></i>
                     </button>
                 </div>
             </div>
 
             <!-- Theme Preference -->
-            <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
+            <div id="settings-theme" class="scroll-mt-4 border-t border-gray-200 dark:border-gray-700 pt-6">
+                <fieldset>
+                    <legend class="w-full"><h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
                     <i aria-hidden="true" class="fas fa-palette mr-2 text-link dark:text-primary-400"></i>Theme Preference
-                </h3>
+                </h3></legend>
                 <div class="space-y-3">
                     <label class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition {{ ($user->theme_preference ?? 'light') === 'light' ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20' : 'border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700' }}">
                         <input type="radio" name="theme_preference" value="light" {{ ($user->theme_preference ?? 'light') === 'light' ? 'checked' : '' }}
@@ -135,13 +141,15 @@
                 <p class="mt-3 text-xs text-gray-500 dark:text-gray-400">
                     <i aria-hidden="true" class="fas fa-info-circle mr-1"></i>Your theme preference will be applied across all devices and browsers when you're logged in.
                 </p>
+                </fieldset>
             </div>
 
             <!-- Color Scheme -->
-            <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
+            <div id="settings-color-scheme" class="scroll-mt-4 border-t border-gray-200 dark:border-gray-700 pt-6">
+                <fieldset>
+                    <legend class="w-full"><h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
                     <i aria-hidden="true" class="fas fa-swatchbook mr-2 text-link"></i>Color Scheme
-                </h3>
+                </h3></legend>
                 <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">Choose the main color scheme for the site (sidebar, header, buttons, and accents).</p>
                 @php
                     $currentScheme = \App\Enums\ColorScheme::fromPreference($user->color_scheme);
@@ -163,10 +171,11 @@
                 <p class="mt-3 text-xs text-gray-500 dark:text-gray-400">
                     <i aria-hidden="true" class="fas fa-info-circle mr-1"></i>Save your profile to apply the color scheme. You can also change it from the user menu in the header.
                 </p>
+                </fieldset>
             </div>
 
             <!-- Timezone Preference -->
-            <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
+            <div id="settings-timezone" class="scroll-mt-4 border-t border-gray-200 dark:border-gray-700 pt-6">
                 <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
                     <i aria-hidden="true" class="fas fa-clock mr-2 text-link dark:text-primary-400"></i>Timezone Preference
                 </h3>
@@ -174,8 +183,7 @@
                     <label for="timezone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Select Your Timezone
                     </label>
-                    <select name="timezone" id="timezone"
-                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                    <x-select name="timezone" id="timezone">
                         @php
                             $timezones = getAvailableTimezones();
                             $currentTimezone = old('timezone', $user->timezone ?? 'UTC');
@@ -190,7 +198,7 @@
                                 @endforeach
                             </optgroup>
                         @endforeach
-                    </select>
+                    </x-select>
                     <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
                         <i aria-hidden="true" class="fas fa-info-circle mr-1"></i>All dates and times will be displayed in your selected timezone. Current server time: {{ now()->format('Y-m-d H:i:s T') }}
                     </p>
@@ -198,8 +206,9 @@
             </div>
 
             <!-- View Preferences -->
-            <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Cover View Preferences</h3>
+            <div id="settings-cover-views" class="scroll-mt-4 border-t border-gray-200 dark:border-gray-700 pt-6">
+                <fieldset>
+                    <legend class="w-full"><h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Cover View Preferences</h3></legend>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <label class="flex items-center">
                         <input type="checkbox" name="movieview" value="1" {{ $user->movieview ? 'checked' : '' }}
@@ -227,11 +236,13 @@
                         <span class="text-sm text-gray-700 dark:text-gray-300">Book Covers</span>
                     </label>
                 </div>
+                </fieldset>
             </div>
 
             <!-- Category Permissions -->
-            <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Category Permissions</h3>
+            <div id="settings-permissions" class="scroll-mt-4 border-t border-gray-200 dark:border-gray-700 pt-6">
+                <fieldset>
+                    <legend class="w-full"><h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Category Permissions</h3></legend>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <label class="flex items-center">
                         <input type="checkbox" name="viewmovies" value="1" {{ $user->hasDirectPermission('view movies') ? 'checked' : '' }}
@@ -274,11 +285,13 @@
                         <span class="text-sm text-gray-700 dark:text-gray-300">Other</span>
                     </label>
                 </div>
+                </fieldset>
             </div>
 
             <!-- Excluded Subcategories -->
-            <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">Exclude Subcategories</h3>
+            <div id="settings-exclusions" class="scroll-mt-4 border-t border-gray-200 dark:border-gray-700 pt-6">
+                <fieldset>
+                    <legend class="w-full"><h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">Exclude Subcategories</h3></legend>
                 <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
                     Select specific subcategories you don't want to see in browse, search, API, and RSS results.
                     These will be hidden even if you have access to the parent category.
@@ -296,7 +309,7 @@
                                                name="excluded_categories[]"
                                                value="{{ $subcategory->id }}"
                                                {{ in_array($subcategory->id, $userExcludedCategories ?? []) ? 'checked' : '' }}
-                                               class="rounded border-gray-300 dark:border-gray-600 text-red-600 dark:text-red-400 focus:ring-red-500 mr-2">
+                                               class="rounded border-gray-300 dark:border-gray-600 text-danger-600 dark:text-danger-400 focus:ring-danger-500 mr-2">
                                         <span class="text-gray-600 dark:text-gray-400">{{ $subcategory->title }}</span>
                                     </label>
                                 @endforeach
@@ -304,12 +317,13 @@
                         </div>
                     @endforeach
                 </div>
+                </fieldset>
             </div>
 
         </form>
 
             <!-- Actions -->
-            <div class="mx-6 mb-6 mt-6 border-t border-gray-200 pt-6 flex items-center justify-between dark:border-gray-700">
+            <div class="sticky bottom-0 z-10 mt-6 flex items-center justify-between border-t border-gray-200 bg-surface px-6 py-4 dark:border-gray-700">
                 <a href="{{ route('profile') }}" class="px-6 py-2 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 transition">
                     Cancel
                 </a>
@@ -330,7 +344,7 @@
             </div>
 
         <!-- 2FA Section (Outside main form) -->
-        <div class="p-6 border-t border-gray-200">
+        <div id="settings-security" class="scroll-mt-4 p-6 border-t border-gray-200 dark:border-gray-700">
             <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
                 <i aria-hidden="true" class="fas fa-shield-alt mr-2 text-link"></i>Two-Factor Authentication (2FA)
             </h3>
@@ -349,13 +363,13 @@
                                 <button x-show="!show2faForm"
                                         @click="toggle2fa()"
                                         type="button"
-                                        class="px-4 py-2 bg-red-600 dark:bg-red-700 text-white text-sm rounded-lg hover:bg-red-700 dark:hover:bg-red-800 transition">
+                                        class="px-4 py-2 bg-danger-600 dark:bg-danger-700 text-white text-sm rounded-lg hover:bg-danger-700 dark:hover:bg-danger-800 transition">
                                     <i aria-hidden="true" class="fas fa-times-circle mr-2"></i>Disable 2FA
                                 </button>
 
                                 <div x-show="show2faForm"
                                      x-cloak
-                                     class="bg-white dark:bg-gray-800 border border-red-200 dark:border-red-700 rounded-lg p-4 mt-3">
+                                     class="bg-white dark:bg-gray-800 border border-danger-200 dark:border-danger-700 rounded-lg p-4 mt-3">
                                     <div class="mb-4 p-3 bg-warning-50 dark:bg-warning-900/20 border border-warning-200 dark:border-warning-700 rounded-lg">
                                         <div class="flex items-start">
                                             <i aria-hidden="true" class="fas fa-exclamation-triangle text-warning-600 dark:text-warning-400 mr-2 mt-0.5"></i>
@@ -371,15 +385,15 @@
                                             <label for="disable_2fa_password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                                 Current Password
                                             </label>
-                                            <div class="relative">
-                                                <input type="password"
+                                            <div class="relative" x-data="passwordToggle">
+                                                <input type="password" x-ref="field"
                                                        id="disable_2fa_password"
                                                        name="current-password"
                                                        required
-                                                       class="w-full px-4 py-2 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+                                                       class="w-full px-4 py-2 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-danger-500 focus:border-danger-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                                                        placeholder="Enter your password">
-                                                <button aria-label="Show password" type="button" class="password-toggle-btn absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" data-field-id="disable_2fa_password">
-                                                    <i aria-hidden="true" class="fas fa-eye" id="disable_2fa_password-eye"></i>
+                                                <button aria-label="Show password" :aria-label="label()" type="button" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" @click="toggle()">
+                        <i aria-hidden="true" class="fas" :class="iconClass()"></i>
                                                 </button>
                                             </div>
                                         </div>
@@ -387,7 +401,7 @@
                                             <label for="disable_2fa_code" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                                 Authentication Code
                                             </label>
-                                            <input type="text"
+                                            <x-input type="text"
                                                    id="disable_2fa_code"
                                                    name="one_time_password"
                                                    required
@@ -395,12 +409,12 @@
                                                    pattern="[0-9]{6}"
                                                    maxlength="6"
                                                    autocomplete="one-time-code"
-                                                   class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
-                                                   placeholder="6-digit code from your authenticator app">
+                                                   
+                                                   placeholder="6-digit code from your authenticator app" />
                                         </div>
                                         <div class="flex gap-2">
                                             <button type="submit"
-                                                    class="px-4 py-2 bg-red-600 dark:bg-red-700 text-white text-sm rounded-lg hover:bg-red-700 dark:hover:bg-red-800 transition">
+                                                    class="px-4 py-2 bg-danger-600 dark:bg-danger-700 text-white text-sm rounded-lg hover:bg-danger-700 dark:hover:bg-danger-800 transition">
                                                 <i aria-hidden="true" class="fas fa-check mr-2"></i>Confirm Disable
                                             </button>
                                             <button @click="cancel2fa()"
@@ -450,6 +464,8 @@
                                            id="verify-code"
                                            name="verify-code"
                                            placeholder="Enter 6-digit code"
+                                           inputmode="numeric"
+                                           autocomplete="one-time-code"
                                            maxlength="6"
                                            required
                                            class="w-full md:w-64 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-center text-lg tracking-widest bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500">

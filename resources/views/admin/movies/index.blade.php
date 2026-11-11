@@ -12,7 +12,7 @@
     <x-admin.card>
 
         <!-- Search Form -->
-        <x-admin.search-bar>
+        <x-admin.filter-panel>
             <form method="GET" action="{{ url('admin/movie-list') }}">
                 <div class="flex gap-2">
                     <div class="relative flex-1">
@@ -35,7 +35,7 @@
                     @endif
                 </div>
             </form>
-        </x-admin.search-bar>
+        </x-admin.filter-panel>
 
         @if(!empty($movielist) && count($movielist) > 0)
             <x-admin.data-table>
@@ -53,7 +53,7 @@
                 @foreach($movielist as $movie)
                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                            <a href="{{ $site->dereferrerLink }}https://www.imdb.com/title/tt{{ $movie->imdbid }}" target="_blank" class="text-link dark:text-primary-400 hover:underline">
+                            <a href="{{ $site->dereferrerLink }}https://www.imdb.com/title/tt{{ $movie->imdbid }}" target="_blank" rel="noopener noreferrer" class="text-link dark:text-primary-400 hover:underline">
                                 {{ $movie->imdbid }}
                             </a>
                         </td>
@@ -71,24 +71,16 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm">
                             @if($movie->cover == 1)
-                                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200">
-                                    <i aria-hidden="true" class="fas fa-check"></i> Yes
-                                </span>
+                                <x-admin.badge tone="success" icon="fas fa-check">Yes</x-admin.badge>
                             @else
-                                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">
-                                    <i aria-hidden="true" class="fas fa-times"></i> No
-                                </span>
+                                <x-admin.badge tone="danger" icon="fas fa-times">No</x-admin.badge>
                             @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm">
                             @if($movie->backdrop == 1)
-                                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200">
-                                    <i aria-hidden="true" class="fas fa-check"></i> Yes
-                                </span>
+                                <x-admin.badge tone="success" icon="fas fa-check">Yes</x-admin.badge>
                             @else
-                                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">
-                                    <i aria-hidden="true" class="fas fa-times"></i> No
-                                </span>
+                                <x-admin.badge tone="danger" icon="fas fa-times">No</x-admin.badge>
                             @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -107,6 +99,7 @@
                     </tr>
                 @endforeach
             </x-admin.data-table>
+            <x-admin.pagination :paginator="$movielist->withQueryString()" />
         @else
             <x-empty-state
                 icon="fas fa-film"

@@ -21,8 +21,8 @@ const LEVEL_BADGES = {
     info: 'bg-primary-100 text-primary-800 dark:bg-primary-900/60 dark:text-primary-200',
     notice: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/60 dark:text-cyan-200',
     warning: 'bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-200',
-    error: 'bg-red-100 text-red-800 dark:bg-red-900/60 dark:text-red-200',
-    critical: 'bg-red-600 text-white',
+    error: 'bg-danger-100 text-danger-800 dark:bg-danger-900/60 dark:text-danger-200',
+    critical: 'bg-danger-600 text-white',
     alert: 'bg-fuchsia-600 text-white',
     emergency: 'bg-black text-white dark:bg-white dark:text-black',
 };
@@ -32,8 +32,8 @@ const LEVEL_BORDERS = {
     info: 'border-l-primary-400',
     notice: 'border-l-cyan-400',
     warning: 'border-l-amber-400',
-    error: 'border-l-red-500',
-    critical: 'border-l-red-700',
+    error: 'border-l-danger-500',
+    critical: 'border-l-danger-700',
     alert: 'border-l-fuchsia-600',
     emergency: 'border-l-black dark:border-l-white',
 };

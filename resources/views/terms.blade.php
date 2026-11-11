@@ -1,5 +1,7 @@
 @extends('layouts.guest')
 
+@section('title', __('Terms and Conditions'))
+
 @section('content')
     <div class="container mx-auto px-4 py-6">
         <div class="max-w-4xl mx-auto">
@@ -47,14 +49,14 @@
                                 <li>All activities that occur under your account, password, or API key;</li>
                                 <li>Ensuring that all information you provide is accurate and up to date.</li>
                             </ul>
-                            <div class="p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-lg mb-4">
-                                <p class="text-red-800 dark:text-red-200 font-semibold mb-2"><i aria-hidden="true" class="fas fa-exclamation-triangle mr-2"></i>Strictly Prohibited:</p>
-                                <ul class="list-disc pl-10 ml-4 text-red-700 dark:text-red-300">
+                            <div class="p-4 bg-danger-50 dark:bg-danger-900/30 border border-danger-200 dark:border-danger-700 rounded-lg mb-4">
+                                <p class="text-danger-800 dark:text-danger-200 font-semibold mb-2"><i aria-hidden="true" class="fas fa-exclamation-triangle mr-2"></i>Strictly Prohibited:</p>
+                                <ul class="list-disc pl-10 ml-4 text-danger-700 dark:text-danger-300">
                                     <li><strong>API Key Sharing:</strong> Sharing your API key with others is strictly prohibited.</li>
                                     <li><strong>Account Sharing:</strong> Sharing your account credentials with others is strictly prohibited.</li>
                                     <li><strong>Multiple IP Addresses:</strong> Using your account from multiple IP addresses simultaneously or from an excessive number of different IP addresses is not allowed.</li>
                                 </ul>
-                                <p class="text-red-800 dark:text-red-200 font-semibold mt-3"><i aria-hidden="true" class="fas fa-ban mr-2"></i>Violation of these rules will result in immediate and permanent account ban.</p>
+                                <p class="text-danger-800 dark:text-danger-200 font-semibold mt-3"><i aria-hidden="true" class="fas fa-ban mr-2"></i>Violation of these rules will result in immediate and permanent account ban.</p>
                             </div>
 
                             <h2 class="text-xl font-semibold mb-4 mt-6">4. Acceptable Use</h2>
@@ -67,7 +69,7 @@
                                 <li>Use third-party services, applications, or tools that abuse, exploit, or place excessive load on our service;</li>
                                 <li>Use VPNs, proxies, or other services in a manner that circumvents our usage monitoring or restrictions.</li>
                             </ul>
-                            <p class="mb-4 text-red-700 dark:text-red-300"><strong>Note:</strong> Using services or applications that are known to abuse {{ config('app.name') }} will result in account termination. This includes any third-party tools that make excessive API requests, scrape data, or otherwise violate our terms of service.</p>
+                            <p class="mb-4 text-danger-700 dark:text-danger-300"><strong>Note:</strong> Using services or applications that are known to abuse {{ config('app.name') }} will result in account termination. This includes any third-party tools that make excessive API requests, scrape data, or otherwise violate our terms of service.</p>
 
                             <h2 class="text-xl font-semibold mb-4 mt-6">5. Content and Copyright</h2>
                             <p class="mb-4">Users are solely responsible for the content they access through this service. {{ config('app.name') }} does not host, store, or control usenet content and disclaims all liability for such content.</p>

@@ -16,15 +16,20 @@ class AdminCategoryController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index(): mixed
+    public function index(Request $request): mixed
     {
         $this->setAdminPrefs();
         $meta_title = $title = 'Category List';
 
-        $categorylist = Category::getFlat();
+        $sort = in_array($request->query('sort'), ['id', 'title'], true) ? $request->query('sort') : 'id';
+        $direction = $request->query('order') === 'desc' ? 'desc' : 'asc';
+
+        $categorylist = Category::query()->orderBy($sort, $direction)->get();
 
         $this->viewData = array_merge($this->viewData, [
             'categorylist' => $categorylist,
+            'sort' => $sort,
+            'order' => $direction,
             'title' => $title,
             'meta_title' => $meta_title,
         ]);

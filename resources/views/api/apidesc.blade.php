@@ -16,9 +16,9 @@
         </p>
         @auth
             <div class="surface-panel-alt rounded-lg p-6 mb-6 border">
-                <h4 class="text-lg font-semibold mb-3 text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
+                <h2 class="text-lg font-semibold mb-3 text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
                     <i aria-hidden="true" class="fa-solid fa-key mr-2 text-gray-600 dark:text-gray-400"></i>Your API Credentials
-                </h4>
+                </h2>
                 <div class="flex rounded-md shadow-sm" x-data="copyToClipboard()">
                     <input type="text" class="flex-1 rounded-l-md border-gray-300 dark:border-gray-600 font-mono text-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white" value="apikey={{ auth()->user()->api_token }}" readonly id="apikeyInput">
                     <button aria-label="Copy to clipboard" class="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500" type="button" @click="copy('apikeyInput')" title="Copy to clipboard" :class="copied ? 'text-success-600' : ''">
@@ -27,9 +27,9 @@
                 </div>
             </div>
         @endauth
-        <h4 class="text-lg font-semibold mb-3 text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
+        <h2 class="text-lg font-semibold mb-3 text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
             <i aria-hidden="true" class="fa-solid fa-plug mr-2 text-gray-600 dark:text-gray-400"></i>Available Functions
-        </h4>
+        </h2>
         <p class="text-gray-700 dark:text-gray-300 mb-4 dark:text-gray-300">Use the parameter <code class="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-sm text-red-600 dark:bg-gray-700 dark:text-red-400">?t=</code> to specify the function being called. In addition to search, TV, and movies, this site supports <strong class="text-gray-900 dark:text-gray-100">music</strong> (<code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">t=music</code> or <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">t=audio</code>), <strong class="text-gray-900 dark:text-gray-100">books</strong> (<code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">t=book</code> or <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">t=b</code>), and <strong class="text-gray-900 dark:text-gray-100">anime</strong> (<code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">t=anime</code>). See <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">?t=caps</code> for capability flags.</p>
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -291,16 +291,16 @@
                 </tbody>
             </table>
         </div>
-        <h4 class="text-lg font-semibold mt-6 mb-3 text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
+        <h2 class="text-lg font-semibold mt-6 mb-3 text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
             <i aria-hidden="true" class="fa-solid fa-sort-amount-down mr-2 text-gray-600 dark:text-gray-400"></i>Sorting Results (v1)
-        </h4>
+        </h2>
         <p class="text-gray-700 dark:text-gray-300 mb-4 dark:text-gray-300">
             Search-style endpoints support <code class="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-xs text-red-600 dark:bg-gray-700 dark:text-red-400">sort=field_direction</code>.
             Allowed fields: <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">cat</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">name</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">size</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">files</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">stats</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">posted</code>. Direction is <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">asc</code> or <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">desc</code>.
         </p>
         <div class="surface-panel-alt rounded-lg border shadow-sm mb-4">
             <div class="p-6">
-                <h5 class="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100 dark:text-white">Sort request examples</h5>
+                <h3 class="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100 dark:text-white">Sort request examples</h3>
                 <div class="flex flex-col gap-2">
                     @auth
                         <a href="{{ url('/api/v1/api?t=search&q=ubuntu&sort=posted_desc&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-link bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
@@ -325,7 +325,7 @@
         </div>
         <div class="surface-panel-alt rounded-lg border shadow-sm mb-4">
             <div class="p-6">
-                <h5 class="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100 dark:text-white">XML sort response snippet (<code class="text-xs">sort=size_desc</code>)</h5>
+                <h3 class="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100 dark:text-white">XML sort response snippet (<code class="text-xs">sort=size_desc</code>)</h3>
                 <pre class="bg-gray-100 dark:bg-gray-800 p-3 rounded text-xs text-gray-800 dark:text-gray-200 overflow-x-auto"><code>&lt;item&gt;
   &lt;title&gt;Ubuntu ISO x64&lt;/title&gt;
   &lt;newznab:attr name="size" value="734003200"/&gt;
@@ -337,9 +337,9 @@
                 <p class="text-sm text-gray-600 dark:text-gray-400 mt-2 mb-0">Larger release appears first because <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">size_desc</code> sorts descending.</p>
             </div>
         </div>
-        <h4 class="text-lg font-semibold mt-6 mb-3 text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
+        <h2 class="text-lg font-semibold mt-6 mb-3 text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
             <i aria-hidden="true" class="fa-solid fa-filter mr-2 text-gray-600 dark:text-gray-400"></i>HTTP QUERY Method
-        </h4>
+        </h2>
         <p class="text-gray-700 dark:text-gray-300 mb-4">
             The API also accepts the HTTP <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">QUERY</code> method (RFC 10008), which sends the same parameters as a JSON body instead of the URL.
             Only read-only functions are available over QUERY: <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">search</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">tvsearch</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">movie</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">music</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">book</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">anime</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">details</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">caps</code> and <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">nfo</code> (and their short aliases).
@@ -347,7 +347,7 @@
         </p>
         <div class="surface-panel-alt rounded-lg border shadow-sm mb-4">
             <div class="p-6">
-                <h5 class="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">QUERY request example</h5>
+                <h3 class="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">QUERY request example</h3>
                 <pre class="bg-gray-100 dark:bg-gray-800 p-3 rounded text-xs text-gray-800 dark:text-gray-200 overflow-x-auto"><code>curl -X QUERY {{ url('/api/v1/api') }} \
   -H 'Content-Type: application/json' \
   -d '{"t":"search","apikey":"&lt;your api key&gt;","q":"linux","cat":[2000,5030]}'</code></pre>
@@ -358,25 +358,25 @@
             </div>
         </div>
 
-        <h4 class="text-lg font-semibold mt-6 mb-3 text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
+        <h2 class="text-lg font-semibold mt-6 mb-3 text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
             <i aria-hidden="true" class="fa-solid fa-file-code mr-2 text-gray-600 dark:text-gray-400"></i>Output Format
-        </h4>
+        </h2>
         <p class="text-gray-700 dark:text-gray-300 mb-4 dark:text-gray-300">Select your preferred output format (not applicable to functions which return an NZB/NFO file).</p>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="surface-panel-alt rounded-lg border shadow-sm h-full">
                 <div class="p-6">
-                    <h5 class="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
+                    <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
                         <i aria-hidden="true" class="fa-solid fa-code mr-2 text-link dark:text-primary-400"></i>XML (default)
-                    </h5>
+                    </h3>
                     <p class="text-gray-700 dark:text-gray-300 mb-3 dark:text-gray-300">Returns the data in an XML document.</p>
                     <code class="block bg-gray-100 dark:bg-gray-800 p-2 rounded text-sm text-red-600 dark:bg-gray-700 dark:text-red-400">?t=search&amp;q=linux&amp;o=xml</code>
                 </div>
             </div>
             <div class="surface-panel-alt rounded-lg border shadow-sm h-full">
                 <div class="p-6">
-                    <h5 class="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
+                    <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
                         <i aria-hidden="true" class="fa-solid fa-code mr-2 text-link dark:text-primary-400"></i>JSON
-                    </h5>
+                    </h3>
                     <p class="text-gray-700 dark:text-gray-300 mb-3 dark:text-gray-300">Returns the data in a JSON object.</p>
                     <code class="block bg-gray-100 dark:bg-gray-800 p-2 rounded text-sm text-red-600 dark:bg-gray-700 dark:text-red-400">?t=search&amp;q=linux&amp;o=json</code>
                 </div>

@@ -101,12 +101,12 @@
             {{-- Payment placeholders (see the btcpay route); replace the URL once payments are configured. --}}
             @if($userRole !== 'Admin')
                 @if($userRole === 'User')
-                    <a href="https://example.com" target="_blank" class="nav-link">
+                    <a href="https://example.com" target="_blank" rel="noopener noreferrer" class="nav-link">
                         <i aria-hidden="true" class="fa-solid fa-arrow-up fa-fw shrink-0"></i>
                         <span>Upgrade Your Account</span>
                     </a>
                 @else
-                    <a href="https://example.com" target="_blank" class="nav-link">
+                    <a href="https://example.com" target="_blank" rel="noopener noreferrer" class="nav-link">
                         <i aria-hidden="true" class="fa-solid fa-clock fa-fw shrink-0"></i>
                         <span>Extend Your Account</span>
                     </a>

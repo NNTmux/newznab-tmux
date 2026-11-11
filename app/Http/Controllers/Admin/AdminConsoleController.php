@@ -8,9 +8,11 @@ use App\Http\Controllers\BasePageController;
 use App\Services\ConsoleService;
 use App\Services\GenreService;
 use App\Services\ReleaseImageService;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class AdminConsoleController extends BasePageController
@@ -29,15 +31,25 @@ class AdminConsoleController extends BasePageController
     /**
      * Display a listing of console games
      */
-    public function index(): View
+    public function index(Request $request): View
     {
         $this->setAdminPrefs();
 
         $meta_title = $title = 'Console List';
 
-        $consoleList = getRange('consoleinfo');
+        $lastSearch = trim($this->scalarInput($request, 'search'));
+        $consoleList = DB::table('consoleinfo')
+            ->when($lastSearch !== '', static function (Builder $query) use ($lastSearch): void {
+                $query->where(static function (Builder $query) use ($lastSearch): void {
+                    $query->whereLike('title', '%'.$lastSearch.'%')
+                        ->orWhereLike('platform', '%'.$lastSearch.'%');
+                });
+            })
+            ->orderByDesc('created_at')
+            ->paginate(config('nntmux.items_per_page'))
+            ->withQueryString();
 
-        return view('admin.console.index', compact('consoleList', 'title', 'meta_title'));
+        return view('admin.console.index', compact('consoleList', 'title', 'meta_title', 'lastSearch'));
     }
 
     /**

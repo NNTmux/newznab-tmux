@@ -14,7 +14,7 @@
     </p>
 
     @if($message = session('authenticatePasskey::message'))
-        <div class="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-700 dark:bg-red-900/20 dark:text-red-300" role="alert">
+        <div class="mt-4 rounded-lg border border-danger-200 bg-danger-50 p-3 text-sm text-danger-700 dark:border-danger-700 dark:bg-danger-900/20 dark:text-danger-300" role="alert">
             {{ $message }}
         </div>
     @endif
@@ -64,7 +64,7 @@
         <span x-text="busy ? 'Waiting for passkey...' : 'Sign in with passkey'"></span>
     </button>
 
-    <p x-show="error" x-text="error" class="mt-2 text-sm text-red-600 dark:text-red-400"></p>
+    <p x-show="error" x-text="error" class="mt-2 text-sm text-danger-600 dark:text-danger-400"></p>
 
     <div
         x-show="showCreateHint"

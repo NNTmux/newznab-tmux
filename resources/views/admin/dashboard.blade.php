@@ -2,21 +2,24 @@
 
 @section('content')
 @php
-    $dashboardStatusBadgeClasses = static function (int $status): string {
-        return match ($status) {
-            \App\Enums\RegistrationStatus::Open->value => 'border border-emerald-500/30 bg-emerald-600 text-white shadow-sm dark:border-emerald-300/20 dark:bg-emerald-500 dark:text-slate-950',
-            \App\Enums\RegistrationStatus::Invite->value => 'border border-amber-500/30 bg-amber-500 text-slate-950 shadow-sm dark:border-amber-200/20 dark:bg-amber-400 dark:text-slate-950',
-            default => 'border border-rose-500/30 bg-rose-600 text-white shadow-sm dark:border-rose-200/20 dark:bg-rose-500 dark:text-white',
-        };
-    };
+    $dashboardStatusBadgeClasses = static fn (int $status): string => (\App\Enums\RegistrationStatus::tryFrom($status) ?? \App\Enums\RegistrationStatus::Closed)->badgeClasses();
 @endphp
 
 <div x-data="adminDashboard"
      id="adminDashboard"
      class="admin-dashboard-page"
      data-data-url="{{ route('admin.api.dashboard-data') }}"
-     data-refresh-interval="{{ 15 * 60 * 1000 }}">
+     data-refresh-interval="{{ 15 * 60 * 1000 }}"
+     data-badge-classes="{{ json_encode([
+         'service' => \App\Enums\ServiceStatusEnum::badgeClassMap(),
+         'impact' => \App\Enums\IncidentImpactEnum::badgeClassMap(),
+         'registration' => \App\Enums\RegistrationStatus::badgeClassMap(),
+     ]) }}">
     <div class="admin-dashboard-page__content space-y-6" data-dashboard-content>
+    <div x-show="loadError" x-cloak role="alert" class="flex flex-wrap items-center justify-between gap-3 rounded-card border border-danger-200 bg-danger-50 px-4 py-3 text-sm text-danger-900 dark:border-danger-800 dark:bg-danger-950/50 dark:text-danger-100">
+        <span><i aria-hidden="true" class="fa-solid fa-circle-exclamation mr-2"></i>The dashboard data could not be loaded. The figures below may be missing or out of date.</span>
+        <x-button type="button" variant="secondary" size="sm" icon="fa-solid fa-rotate-right" @click="retry()">Try again</x-button>
+    </div>
     <x-admin.page-header title="Admin Dashboard" icon="fas fa-gauge-high" subtitle="Monitor index health, users, releases, and site activity from one workspace." class="admin-dashboard-page__hero">
         <x-slot:actions>
             <div class="rounded-xl border border-gray-200 bg-white/70 px-4 py-2 text-sm text-gray-600 dark:border-gray-600 dark:bg-gray-800/70 dark:text-gray-300 lg:text-right">
@@ -92,7 +95,7 @@
                     <span class="text-sm text-warning-600 dark:text-warning-400 block">
                         <i aria-hidden="true" class="fas fa-trash"></i> <span data-stat="soft-deleted-users">{{ number_format($stats['soft_deleted_users'] ?? 0) }}</span> soft deleted
                     </span>
-                    <span class="text-sm text-red-600 dark:text-red-400 block">
+                    <span class="text-sm text-danger-600 dark:text-danger-400 block">
                         <i aria-hidden="true" class="fas fa-trash-alt"></i> <span data-stat="permanently-deleted-users">{{ number_format($stats['permanently_deleted_users'] ?? 0) }}</span> permanently deleted
                     </span>
                 </div>
@@ -270,28 +273,28 @@
                         <i aria-hidden="true" class="fas fa-chart-bar mr-2 text-success-600 dark:text-success-400"></i>
                         Downloads (Last 7 Days - Hourly)
                     </h4>
-                    <div class="chart-container"><canvas id="downloadsChart"></canvas></div>
+                    <div class="chart-container"><canvas id="downloadsChart" role="img" aria-label="Line chart of downloads per hour over the last 7 days"></canvas></div>
                 </div>
                 <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
                     <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
                         <i aria-hidden="true" class="fas fa-chart-area mr-2 text-purple-600 dark:text-purple-400"></i>
                         API/RSS Hits (Last 7 Days - Hourly)
                     </h4>
-                    <div class="chart-container"><canvas id="apiHitsChart"></canvas></div>
+                    <div class="chart-container"><canvas id="apiHitsChart" role="img" aria-label="Line chart of API and RSS hits per hour over the last 7 days"></canvas></div>
                 </div>
                 <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
                     <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
                         <i aria-hidden="true" class="fas fa-chart-line mr-2 text-success-600 dark:text-success-400"></i>
                         Downloads (Last 60 Minutes)
                     </h4>
-                    <div class="chart-container"><canvas id="downloadsMinuteChart"></canvas></div>
+                    <div class="chart-container"><canvas id="downloadsMinuteChart" role="img" aria-label="Line chart of downloads per minute over the last 60 minutes"></canvas></div>
                 </div>
                 <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
                     <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
                         <i aria-hidden="true" class="fas fa-chart-line mr-2 text-purple-600 dark:text-purple-400"></i>
                         API/RSS Hits (Last 60 Minutes)
                     </h4>
-                    <div class="chart-container"><canvas id="apiHitsMinuteChart"></canvas></div>
+                    <div class="chart-container"><canvas id="apiHitsMinuteChart" role="img" aria-label="Line chart of API and RSS hits per minute over the last 60 minutes"></canvas></div>
                 </div>
             </div>
         </div>
@@ -367,11 +370,11 @@
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
                             <h5 class="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-3"><i aria-hidden="true" class="fas fa-microchip mr-2 text-orange-600 dark:text-orange-400"></i>CPU Usage</h5>
-                            <div class="chart-container"><canvas id="cpuHistory24hChart" data-chart-label="CPU Usage %"></canvas></div>
+                            <div class="chart-container"><canvas id="cpuHistory24hChart" role="img" aria-label="Line chart of CPU usage per hour over the last 24 hours" data-chart-label="CPU Usage %"></canvas></div>
                         </div>
                         <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
                             <h5 class="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-3"><i aria-hidden="true" class="fas fa-memory mr-2 text-cyan-600 dark:text-cyan-400"></i>RAM Usage</h5>
-                            <div class="chart-container"><canvas id="ramHistory24hChart" data-chart-label="RAM Usage %"></canvas></div>
+                            <div class="chart-container"><canvas id="ramHistory24hChart" role="img" aria-label="Line chart of RAM usage per hour over the last 24 hours" data-chart-label="RAM Usage %"></canvas></div>
                         </div>
                     </div>
                 </div>
@@ -383,11 +386,11 @@
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
                             <h5 class="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-3"><i aria-hidden="true" class="fas fa-microchip mr-2 text-orange-600 dark:text-orange-400"></i>CPU Usage</h5>
-                            <div class="chart-container"><canvas id="cpuHistory30dChart" data-chart-label="CPU Usage %"></canvas></div>
+                            <div class="chart-container"><canvas id="cpuHistory30dChart" role="img" aria-label="Line chart of CPU usage per day over the last 30 days" data-chart-label="CPU Usage %"></canvas></div>
                         </div>
                         <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
                             <h5 class="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-3"><i aria-hidden="true" class="fas fa-memory mr-2 text-cyan-600 dark:text-cyan-400"></i>RAM Usage</h5>
-                            <div class="chart-container"><canvas id="ramHistory30dChart" data-chart-label="RAM Usage %"></canvas></div>
+                            <div class="chart-container"><canvas id="ramHistory30dChart" role="img" aria-label="Line chart of RAM usage per day over the last 30 days" data-chart-label="RAM Usage %"></canvas></div>
                         </div>
                     </div>
                 </div>
@@ -465,29 +468,6 @@
         </div>
     </div>
     @endif
-
-    <!-- Quick Links -->
-    <x-admin.card class="p-6">
-        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Quick Links</h3>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <a href="{{ url('/admin/user-list') }}" class="flex flex-col items-center p-4 bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition">
-                <i aria-hidden="true" class="fas fa-users text-3xl text-link dark:text-primary-400 mb-2"></i>
-                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Manage Users</span>
-            </a>
-            <a href="{{ url('/admin/release-list') }}" class="flex flex-col items-center p-4 bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition">
-                <i aria-hidden="true" class="fas fa-download text-3xl text-success-600 mb-2"></i>
-                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Manage Releases</span>
-            </a>
-            <a href="{{ url('/admin/category-list') }}" class="flex flex-col items-center p-4 bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition">
-                <i aria-hidden="true" class="fas fa-folder text-3xl text-purple-600 mb-2"></i>
-                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Categories</span>
-            </a>
-            <a href="{{ route('admin.settings.show', ['domain' => 'site']) }}" class="flex flex-col items-center p-4 bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition">
-                <i aria-hidden="true" class="fas fa-cog text-3xl text-orange-600 mb-2"></i>
-                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Settings</span>
-            </a>
-        </div>
-    </x-admin.card>
 </div>
 </div>
 @endsection

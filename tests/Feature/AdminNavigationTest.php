@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Enums\ConfigurationDomain;
 use App\Support\Navigation\AdminNavigation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -24,6 +25,33 @@ class AdminNavigationTest extends TestCase
         $this->assertSame(['Filtering', 'Category Regexes'], AdminNavigation::trailFor(Request::create('/admin/category_regexes-edit?id=3')));
         $this->assertSame(['Releases', 'Categories'], AdminNavigation::trailFor(Request::create('/admin/category-edit?id=3')));
         $this->assertSame([], AdminNavigation::trailFor(Request::create('/admin/unknown-page')));
+    }
+
+    #[Test]
+    public function pagination_and_filter_parameters_do_not_move_the_highlight_to_another_page(): void
+    {
+        $this->assertSame(['PreDB'], AdminNavigation::trailFor(Request::create('/admin/predb?page=2')));
+        $this->assertSame(['Releases', 'Release Reports'], AdminNavigation::trailFor(Request::create('/admin/release-reports?status=pending')));
+        $this->assertSame(['Groups', 'Active Groups'], AdminNavigation::trailFor(Request::create('/admin/group-list-active?page=2')));
+    }
+
+    #[Test]
+    public function pages_nested_below_a_menu_page_highlight_that_page(): void
+    {
+        $this->assertSame(['Users', 'Role History'], AdminNavigation::trailFor(Request::create('/admin/user-role-history/7')));
+        $this->assertSame(['Users', 'Promotions'], AdminNavigation::trailFor(Request::create('/admin/promotions/5/edit')));
+        $this->assertSame(['Invitations'], AdminNavigation::trailFor(Request::create('/admin/invitations/12')));
+    }
+
+    #[Test]
+    public function every_settings_domain_is_reachable_from_the_menu(): void
+    {
+        foreach (ConfigurationDomain::cases() as $domain) {
+            $trail = AdminNavigation::trailFor(Request::create('/admin/settings/'.$domain->value));
+
+            $this->assertSame('System', $trail[0] ?? null, $domain->value);
+            $this->assertCount(2, $trail, $domain->value);
+        }
     }
 
     #[Test]

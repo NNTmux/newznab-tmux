@@ -111,17 +111,17 @@
                                 </a>
                             @endif
                             @if(!empty($movie['imdbid'] ?? null))
-                                <a href="{{ $site->dereferrerLink }}https://www.imdb.com/title/tt{{ $movie['imdbid'] }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-warning-100 dark:bg-warning-900/40 text-warning-800 dark:text-warning-200 rounded-lg hover:bg-warning-200 transition">
+                                <a href="{{ $site->dereferrerLink }}https://www.imdb.com/title/tt{{ $movie['imdbid'] }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-4 py-2 bg-warning-100 dark:bg-warning-900/40 text-warning-800 dark:text-warning-200 rounded-lg hover:bg-warning-200 transition">
                                     <i aria-hidden="true" class="fab fa-imdb mr-2 text-xl"></i> View on IMDb
                                 </a>
                             @endif
                             @if(!empty($movie['tmdbid'] ?? null))
-                                <a href="{{ $site->dereferrerLink }}https://www.themoviedb.org/movie/{{ $movie['tmdbid'] }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-primary-100 dark:bg-primary-900/40 text-primary-800 dark:text-primary-200 rounded-lg hover:bg-primary-200 transition">
+                                <a href="{{ $site->dereferrerLink }}https://www.themoviedb.org/movie/{{ $movie['tmdbid'] }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-4 py-2 bg-primary-100 dark:bg-primary-900/40 text-primary-800 dark:text-primary-200 rounded-lg hover:bg-primary-200 transition">
                                     <i aria-hidden="true" class="fas fa-film mr-2"></i> View on TMDb
                                 </a>
                             @endif
                             @if(!empty($movie['traktid'] ?? null))
-                                <a href="{{ $site->dereferrerLink }}https://trakt.tv/movies/{{ $movie['traktid'] }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-200 rounded-lg hover:bg-red-200 transition">
+                                <a href="{{ $site->dereferrerLink }}https://trakt.tv/movies/{{ $movie['traktid'] }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-4 py-2 bg-danger-100 dark:bg-danger-900/40 text-danger-800 dark:text-danger-200 rounded-lg hover:bg-danger-200 transition">
                                     <i aria-hidden="true" class="fas fa-heart mr-2"></i> View on Trakt
                                 </a>
                             @endif
@@ -150,19 +150,19 @@
                             <!-- Resolution Filters -->
                             <div class="flex flex-wrap gap-2 items-center">
                                 <span class="text-sm font-medium text-gray-700 dark:text-gray-300 mr-2">Resolution:</span>
-                                <button data-resolution="all"
+                                <button type="button" data-resolution="all"
                                         class="px-4 py-2 rounded-lg text-sm font-medium transition bg-accent text-white hover:bg-accent-hover">
                                     <i aria-hidden="true" class="fas fa-list mr-1"></i> All
                                 </button>
-                                <button data-resolution="720p"
+                                <button type="button" data-resolution="720p"
                                         class="px-4 py-2 rounded-lg text-sm font-medium transition bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600">
                                     <i aria-hidden="true" class="fas fa-tv mr-1"></i> 720p
                                 </button>
-                                <button data-resolution="1080p"
+                                <button type="button" data-resolution="1080p"
                                         class="px-4 py-2 rounded-lg text-sm font-medium transition bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600">
                                     <i aria-hidden="true" class="fas fa-desktop mr-1"></i> 1080p
                                 </button>
-                                <button data-resolution="2160p"
+                                <button type="button" data-resolution="2160p"
                                         class="px-4 py-2 rounded-lg text-sm font-medium transition bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600">
                                     <i aria-hidden="true" class="fas fa-film mr-1"></i> 2160p / 4K
                                 </button>
@@ -171,19 +171,19 @@
                             <!-- Source Filters -->
                             <div class="flex flex-wrap gap-2 items-center">
                                 <span class="text-sm font-medium text-gray-700 dark:text-gray-300 mr-2">Source:</span>
-                                <button data-source="all"
+                                <button type="button" data-source="all"
                                         class="px-4 py-2 rounded-lg text-sm font-medium transition bg-purple-600 text-white hover:bg-purple-700">
                                     <i aria-hidden="true" class="fas fa-list mr-1"></i> All
                                 </button>
-                                <button data-source="bluray"
+                                <button type="button" data-source="bluray"
                                         class="px-4 py-2 rounded-lg text-sm font-medium transition bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600">
                                     <i aria-hidden="true" class="fas fa-compact-disc mr-1"></i> Bluray
                                 </button>
-                                <button data-source="web-dl"
+                                <button type="button" data-source="web-dl"
                                         class="px-4 py-2 rounded-lg text-sm font-medium transition bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600">
                                     <i aria-hidden="true" class="fas fa-cloud-download-alt mr-1"></i> WEB-DL
                                 </button>
-                                <button data-source="webrip"
+                                <button type="button" data-source="webrip"
                                         class="px-4 py-2 rounded-lg text-sm font-medium transition bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600">
                                     <i aria-hidden="true" class="fas fa-globe mr-1"></i> WEBRip
                                 </button>
@@ -210,11 +210,6 @@
                                             @endif
                                         </div>
                                         <div class="flex flex-wrap gap-2 mt-2 text-xs">
-                                            @if($release->postdate)
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200">
-                                                    <i aria-hidden="true" class="fas fa-calendar-alt mr-1"></i>Posted: {{ \Carbon\Carbon::parse($release->postdate)->format('M d, Y H:i') }}
-                                                </span>
-                                            @endif
                                             @if($release->adddate)
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200">
                                                     <i aria-hidden="true" class="fas fa-plus-circle mr-1"></i>Added: {{ userDateDiffForHumans($release->adddate) }}
@@ -222,16 +217,8 @@
                                             @endif
                                         </div>
                                     </div>
-                                    <div class="flex gap-2 shrink-0">
-                                        <a href="{{ url('/getnzb/' . $release->guid) }}" class="inline-flex items-center px-4 py-2 bg-success-600 dark:bg-success-700 text-white text-sm font-medium rounded-lg hover:bg-success-700 dark:hover:bg-success-800 transition">
-                                            <i aria-hidden="true" class="fas fa-download mr-2"></i> Download
-                                        </a>
-                                        <button class="add-to-cart inline-flex items-center px-4 py-2 bg-accent dark:bg-accent-hover text-white text-sm font-medium rounded-lg hover:bg-accent-hover dark:hover:bg-primary-800 transition" data-guid="{{ $release->guid }}">
-                                            <i aria-hidden="true" class="fas fa-shopping-cart mr-2"></i> Add to Cart
-                                        </button>
-                                        <a href="{{ url('/details/' . $release->guid) }}" class="inline-flex items-center px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-lg hover:bg-gray-700 transition">
-                                            <i aria-hidden="true" class="fas fa-info-circle mr-2"></i> Details
-                                        </a>
+                                    <div class="shrink-0">
+                                        <x-release-row-actions :result="$release" />
                                     </div>
                                 </div>
                             </div>
@@ -239,11 +226,8 @@
                     </div>
                 </div>
             @else
-                <div class="mt-8 pt-8 border-t border-gray-200">
-                    <div class="text-center py-8">
-                        <i aria-hidden="true" class="fas fa-inbox text-gray-400 text-5xl mb-4"></i>
-                        <p class="text-gray-600 dark:text-gray-400 text-lg">No releases available for this movie.</p>
-                    </div>
+                <div class="mt-8 border-t border-line pt-8">
+                    <x-empty-state icon="fas fa-inbox" title="No releases available" message="Nothing has been posted for this movie yet." />
                 </div>
             @endif
         </div>

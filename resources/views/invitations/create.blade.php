@@ -15,9 +15,9 @@
 @unless($invite_mode)
 <div class="max-w-4xl mx-auto px-4 py-3">
     <div class="bg-warning-50 border border-warning-200 text-warning-800 rounded-lg p-6 shadow-sm dark:bg-warning-900 dark:border-warning-700 dark:text-warning-300">
-        <h5 class="text-lg font-semibold mb-2 flex items-center">
+        <h2 class="text-lg font-semibold mb-2 flex items-center">
             <i aria-hidden="true" class="fa-solid fa-ban mr-2"></i>Invitations Disabled
-        </h5>
+        </h2>
         <p class="mb-3">User invitations are currently disabled on this site. You cannot send new invitations at this time.</p>
         <a href="{{ url('/profile') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600">
             <i aria-hidden="true" class="fa-solid fa-arrow-left mr-1"></i> Back to Profile
@@ -28,11 +28,11 @@
 <div class="max-w-4xl mx-auto px-4 py-3">
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm dark:bg-gray-800">
         <div class="bg-gray-50 dark:bg-gray-900 px-6 py-4 border-b border-gray-200 dark:border-gray-700 rounded-t-lg flex justify-between items-center dark:bg-gray-700 dark:border-gray-600">
-            <h5 class="text-lg font-semibold text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
                 <i aria-hidden="true" class="fa-solid fa-paper-plane mr-2"></i>Send New Invitation
-            </h5>
+            </h2>
             <div class="flex items-center gap-3">
-                <div class="px-3 py-1 rounded text-sm font-medium text-white {{ $user_invites_left > 0 ? 'bg-success-600' : 'bg-red-600' }}">
+                <div class="px-3 py-1 rounded text-sm font-medium text-white {{ $user_invites_left > 0 ? 'bg-success-600' : 'bg-danger-600' }}">
                     <i aria-hidden="true" class="fa-solid fa-envelope mr-1"></i>
                     {{ $user_invites_left }} invites left
                 </div>
@@ -42,17 +42,8 @@
             </div>
         </div>
         <div class="p-6">
-            @if(session('error'))
-                <div class="mb-4 bg-red-50 border border-red-200 text-red-800 rounded-lg p-4 dark:bg-red-900 dark:border-red-700 dark:text-red-200" role="alert">
-                    <div class="flex items-center">
-                        <i aria-hidden="true" class="fa-solid fa-exclamation-triangle mr-2"></i>
-                        <span>{{ session('error') }}</span>
-                    </div>
-                </div>
-            @endif
-
             @if($errors->any())
-                <div class="mb-4 bg-red-50 border border-red-200 text-red-800 rounded-lg p-4 dark:bg-red-900 dark:border-red-700 dark:text-red-200">
+                <div class="mb-4 bg-danger-50 border border-danger-200 text-danger-800 rounded-lg p-4 dark:bg-danger-900 dark:border-danger-700 dark:text-danger-200">
                     <ul class="list-disc list-inside mb-0">
                         @foreach($errors->all() as $error)
                             <li>{{ $error }}</li>
@@ -64,7 +55,7 @@
             @unless($can_send_invites)
                 <div class="bg-warning-50 border border-warning-200 text-warning-800 rounded-lg p-6 text-center dark:bg-warning-900 dark:border-warning-700 dark:text-warning-300">
                     <i aria-hidden="true" class="fa-solid fa-exclamation-triangle text-5xl mb-3"></i>
-                    <h5 class="text-lg font-semibold mb-2">No Invitations Available</h5>
+                    <h2 class="text-lg font-semibold mb-2">No Invitations Available</h2>
                     <p class="mb-4">You have used all of your available invitations. You cannot send new invitations at this time.</p>
                     <div class="flex gap-2 justify-center">
                         <a href="{{ url('/invitations') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-accent dark:bg-accent-hover hover:bg-accent-hover dark:hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
@@ -93,17 +84,17 @@
 
                             <div class="mb-6">
                                 <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    <i aria-hidden="true" class="fa-solid fa-envelope mr-1"></i>Email Address <span class="text-red-600">*</span>
+                                    <i aria-hidden="true" class="fa-solid fa-envelope mr-1"></i>Email Address <span class="text-danger-600">*</span>
                                 </label>
                                 <input type="email"
-                                       class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white @error('email') border-red-500 @enderror"
+                                       class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white @error('email') border-danger-500 @enderror"
                                        id="email"
                                        name="email"
                                        value="{{ old('email') }}"
                                        required
                                        placeholder="Enter recipient's email address">
                                 @error('email')
-                                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                    <p class="mt-1 text-sm text-danger-600 dark:text-danger-400">{{ $message }}</p>
                                 @enderror
                                 <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
                                     <i aria-hidden="true" class="fa-solid fa-info-circle mr-1"></i>The person will receive an invitation email at this address.
@@ -114,17 +105,15 @@
                                 <label for="expiry_days" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                     <i aria-hidden="true" class="fa-regular fa-clock mr-1"></i>Expiry Period
                                 </label>
-                                <select class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white @error('expiry_days') border-red-500 @enderror"
-                                        id="expiry_days"
-                                        name="expiry_days">
+                                <x-select id="expiry_days" name="expiry_days">
                                     <option value="1" @selected(old('expiry_days') == '1')>1 Day</option>
                                     <option value="3" @selected(old('expiry_days') == '3')>3 Days</option>
                                     <option value="7" @selected(old('expiry_days') == '7' || !old('expiry_days'))>1 Week (Default)</option>
                                     <option value="14" @selected(old('expiry_days') == '14')>2 Weeks</option>
                                     <option value="30" @selected(old('expiry_days') == '30')>1 Month</option>
-                                </select>
+                                </x-select>
                                 @error('expiry_days')
-                                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                    <p class="mt-1 text-sm text-danger-600 dark:text-danger-400">{{ $message }}</p>
                                 @enderror
                                 <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
                                     <i aria-hidden="true" class="fa-solid fa-info-circle mr-1"></i>How long the invitation will remain valid.
@@ -136,18 +125,16 @@
                                     <label for="role" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                         <i aria-hidden="true" class="fa-solid fa-user-tag mr-1"></i>Default Role <small class="text-gray-500 dark:text-gray-400">(Optional)</small>
                                     </label>
-                                    <select class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white @error('role') border-red-500 @enderror"
-                                            id="role"
-                                            name="role">
+                                    <x-select id="role" name="role">
                                         <option value="">Use System Default</option>
                                         @foreach($user_roles as $roleId => $roleName)
                                             <option value="{{ $roleId }}" @selected(old('role') == $roleId)>
                                                 {{ $roleName }}
                                             </option>
                                         @endforeach
-                                    </select>
+                                    </x-select>
                                     @error('role')
-                                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                        <p class="mt-1 text-sm text-danger-600 dark:text-danger-400">{{ $message }}</p>
                                     @enderror
                                     <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
                                         <i aria-hidden="true" class="fa-solid fa-info-circle mr-1"></i>The role to assign to the user when they accept the invitation.
@@ -180,8 +167,6 @@
                             </div>
                         </form>
                     @endunless
-                </div>
-            </div>
         </div>
     </div>
 </div>

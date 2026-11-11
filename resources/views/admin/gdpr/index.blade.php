@@ -56,7 +56,7 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ ucfirst($gdprRequest->type) }}</td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">{{ ucfirst($gdprRequest->status) }}</span>
+                                <x-admin.badge tone="neutral">{{ ucfirst($gdprRequest->status) }}</x-admin.badge>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ formatDateTime($gdprRequest->completed_at) ?: '—' }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
@@ -72,9 +72,7 @@
                     @endforelse
         </x-admin.data-table>
 
-        <div class="px-6 py-4">
-            {{ $requests->links() }}
-        </div>
+        <x-admin.pagination :paginator="$requests" />
     </x-admin.card>
 
     <x-admin.card class="p-6">

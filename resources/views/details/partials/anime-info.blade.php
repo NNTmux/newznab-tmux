@@ -229,12 +229,12 @@
                             <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">External Links</h4>
                             <div class="flex flex-wrap gap-3">
                                 @if(!empty($anilistId))
-                                    <a href="{{ $site->dereferrerLink ?? '' }}https://anilist.co/anime/{{ $anilistId }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-primary-100 text-primary-800 rounded-lg hover:bg-primary-200 transition dark:bg-primary-900/30 dark:text-primary-200 dark:hover:bg-primary-800/30">
+                                    <a href="{{ $site->dereferrerLink ?? '' }}https://anilist.co/anime/{{ $anilistId }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-4 py-2 bg-primary-100 text-primary-800 rounded-lg hover:bg-primary-200 transition dark:bg-primary-900/30 dark:text-primary-200 dark:hover:bg-primary-800/30">
                                         <i aria-hidden="true" class="fas fa-external-link-alt mr-2"></i> View on AniList
                                     </a>
                                 @endif
                                 @if(!empty($malId))
-                                    <a href="{{ $site->dereferrerLink ?? '' }}https://myanimelist.net/anime/{{ $malId }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-warning-100 dark:bg-warning-900/40 text-warning-800 dark:text-warning-200 rounded-lg hover:bg-warning-200 transition">
+                                    <a href="{{ $site->dereferrerLink ?? '' }}https://myanimelist.net/anime/{{ $malId }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-4 py-2 bg-warning-100 dark:bg-warning-900/40 text-warning-800 dark:text-warning-200 rounded-lg hover:bg-warning-200 transition">
                                         <i aria-hidden="true" class="fas fa-external-link-alt mr-2"></i> View on MyAnimeList
                                     </a>
                                 @endif

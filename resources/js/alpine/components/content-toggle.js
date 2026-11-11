@@ -234,7 +234,7 @@ Alpine.data('contentToggle', () => ({
                     el.className = 'content-toggle-status text-success-600 dark:text-success-400 hover:text-success-900 dark:hover:text-success-300';
                     el.innerHTML = '<i aria-hidden="true" class="fa-solid fa-toggle-on"></i>';
                 } else {
-                    statusCell.innerHTML = '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100"><i aria-hidden="true" class="fa-solid fa-times mr-1"></i>Disabled</span>';
+                    statusCell.innerHTML = '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-danger-100 dark:bg-danger-900 text-danger-800 dark:text-danger-100"><i aria-hidden="true" class="fa-solid fa-times mr-1"></i>Disabled</span>';
                     el.className = 'content-toggle-status text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300';
                     el.innerHTML = '<i aria-hidden="true" class="fa-solid fa-toggle-off"></i>';
                 }

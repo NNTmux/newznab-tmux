@@ -1,5 +1,7 @@
 @extends('layouts.guest')
 
+@section('title', __('Choose a new password'))
+
 @section('content')
 <div class="min-h-screen auth-page flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8">
@@ -23,12 +25,12 @@
             <div class="px-8 py-6">
                 <!-- Error Messages -->
                 @if($errors->any())
-                    <div class="mb-4 p-4 rounded-lg bg-red-50 border border-red-200 dark:bg-red-900/30 dark:border-red-700">
+                    <div class="mb-4 p-4 rounded-lg bg-danger-50 border border-danger-200 dark:bg-danger-900/30 dark:border-danger-700">
                         <div class="flex items-start">
-                            <i aria-hidden="true" class="fas fa-exclamation-circle text-red-600 dark:text-red-400 mr-3 mt-0.5"></i>
+                            <i aria-hidden="true" class="fas fa-exclamation-circle text-danger-600 dark:text-danger-400 mr-3 mt-0.5"></i>
                             <div class="flex-1">
-                                <p class="text-sm font-medium text-red-800 dark:text-red-200">There were some errors:</p>
-                                <ul class="mt-2 text-sm text-red-700 dark:text-red-300 list-disc list-inside">
+                                <p class="text-sm font-medium text-danger-800 dark:text-danger-200">There were some errors:</p>
+                                <ul class="mt-2 text-sm text-danger-700 dark:text-danger-300 list-disc list-inside">
                                     @foreach($errors->all() as $error)
                                         <li>{{ $error }}</li>
                                     @endforeach
@@ -70,21 +72,27 @@
                         <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             New Password
                         </label>
-                        <div class="relative">
+                        <div class="relative" x-data="passwordToggle">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <i aria-hidden="true" class="fas fa-lock text-gray-400"></i>
                             </div>
                             <input
                                 id="password"
                                 type="password"
+                                x-ref="field"
+                                autocomplete="new-password"
+                                @error('password') aria-invalid="true" aria-describedby="password-error" @enderror
                                 name="password"
                                 required
-                                class="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition @error('password') border-red-500 @enderror"
+                                class="block w-full pl-10 pr-10 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition @error('password') border-danger-500 @enderror"
                                 placeholder="Enter your new password"
                             >
+                            <button type="button" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200" @click="toggle()" aria-label="Show password" :aria-label="label()">
+                                <i class="fas" :class="iconClass()" aria-hidden="true"></i>
+                            </button>
                         </div>
                         @error('password')
-                            <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                            <p id="password-error" class="mt-2 text-sm text-danger-600 dark:text-danger-400">{{ $message }}</p>
                         @enderror
                         <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Must be at least 8 characters</p>
                     </div>
@@ -94,18 +102,23 @@
                         <label for="password_confirmation" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             Confirm New Password
                         </label>
-                        <div class="relative">
+                        <div class="relative" x-data="passwordToggle">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <i aria-hidden="true" class="fas fa-lock text-gray-400"></i>
                             </div>
                             <input
                                 id="password_confirmation"
                                 type="password"
+                                x-ref="field"
+                                autocomplete="new-password"
                                 name="password_confirmation"
                                 required
-                                class="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition"
+                                class="block w-full pl-10 pr-10 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition"
                                 placeholder="Confirm your new password"
                             >
+                            <button type="button" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200" @click="toggle()" aria-label="Show password" :aria-label="label()">
+                                <i class="fas" :class="iconClass()" aria-hidden="true"></i>
+                            </button>
                         </div>
                     </div>
 

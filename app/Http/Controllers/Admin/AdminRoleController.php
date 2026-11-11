@@ -131,6 +131,6 @@ class AdminRoleController extends BasePageController
             Role::query()->where('id', $request->input('id'))->delete();
         }
 
-        return redirect()->to($request->server('HTTP_REFERER'));
+        return redirect()->back()->with('success', 'Role deleted successfully');
     }
 }

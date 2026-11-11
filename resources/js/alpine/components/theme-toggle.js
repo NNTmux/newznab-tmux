@@ -4,32 +4,6 @@
  */
 import Alpine from '@alpinejs/csp';
 
-Alpine.data('themeToggle', () => ({
-    cycle() {
-        Alpine.store('theme').cycle();
-    }
-}));
-
-Alpine.data('themeRadio', () => ({
-    _updating: false,
-
-    init() {
-        // Watch for external theme changes and sync radio buttons
-        this.$watch('$store.theme.current', () => {
-            if (this._updating) return;
-            this._updating = true;
-            this.$nextTick(() => { this._updating = false; });
-        });
-    },
-
-    select(value) {
-        if (this._updating) return;
-        this._updating = true;
-        Alpine.store('theme').set(value);
-        this.$nextTick(() => { this._updating = false; });
-    }
-}));
-
 // Document-level delegation for #theme-toggle button without x-data
 (function() {
     var themeToggle = document.getElementById('theme-toggle');

@@ -27,7 +27,7 @@
                                     </div>
                                 @endif
                                 @if(!empty($failed) && $failed > 0)
-                                    <div class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-200 border border-red-200 dark:border-red-800">
+                                    <div class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-danger-100 dark:bg-danger-900/40 text-danger-800 dark:text-danger-200 border border-danger-200 dark:border-danger-800">
                                         <i aria-hidden="true" class="fas fa-exclamation-triangle mr-2"></i>
                                         <span>{{ $failed }} user{{ $failed > 1 ? 's' : '' }} reported download failure</span>
                                     </div>

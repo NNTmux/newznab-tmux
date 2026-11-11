@@ -75,7 +75,6 @@ class AppServiceProvider extends ServiceProvider
         view()->composer([
             'layouts.main',
             'layouts.guest',
-            'layouts.app',
             'search.*',
         ], GlobalDataComposer::class);
 

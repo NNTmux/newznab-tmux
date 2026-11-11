@@ -6,12 +6,11 @@
     $hasPoster = !empty($show['image']) && $show['image'] != 0;
     $network = $show['publisher'] ?? null;
     $externalLinks = array_filter([
-        'TheTVDB' => !empty($show['tvdb']) && $show['tvdb'] > 0 ? 'http://thetvdb.com/?tab=series&id='.$show['tvdb'] : null,
-        'TVMaze' => !empty($show['tvmaze']) && $show['tvmaze'] > 0 ? 'http://tvmaze.com/shows/'.$show['tvmaze'] : null,
-        'Trakt' => !empty($show['trakt']) && $show['trakt'] > 0 ? 'http://www.trakt.tv/shows/'.$show['trakt'] : null,
+        'TheTVDB' => !empty($show['tvdb']) && $show['tvdb'] > 0 ? 'https://thetvdb.com/?tab=series&id='.$show['tvdb'] : null,
+        'TVMaze' => !empty($show['tvmaze']) && $show['tvmaze'] > 0 ? 'https://www.tvmaze.com/shows/'.$show['tvmaze'] : null,
+        'Trakt' => !empty($show['trakt']) && $show['trakt'] > 0 ? 'https://trakt.tv/shows/'.$show['trakt'] : null,
         'IMDb' => !empty($show['imdb']) && $show['imdb'] > 0 ? 'https://www.imdb.com/title/tt'.$show['imdb'] : null,
         'TMDb' => !empty($show['tmdb']) && $show['tmdb'] > 0 ? 'https://www.themoviedb.org/tv/'.$show['tmdb'] : null,
-        'TV Rage' => !empty($show['tvrage']) && $show['tvrage'] > 0 ? 'http://www.tvrage.com/shows/id-'.$show['tvrage'] : null,
     ]);
     $facts = array_filter([
         'Network' => $network ?: null,
@@ -111,10 +110,10 @@
                 <div class="series-episodes-card bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm">
                     <div class="px-4 py-3 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
                         <div class="flex flex-wrap items-center justify-between gap-3">
-                            <h5 class="text-lg font-semibold text-gray-800 dark:text-white">
+                            <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
                                 <i aria-hidden="true" class="fa-solid fa-list mr-2 text-link dark:text-primary-400"></i>
                                 Episodes & Releases
-                            </h5>
+                            </h3>
                             <x-release-bulk-actions />
                         </div>
                     </div>
@@ -157,5 +156,4 @@
 @endsection
 
 @push('scripts')
-@include('partials.cart-script')
 @endpush

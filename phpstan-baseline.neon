@@ -1010,12 +1010,6 @@ parameters:
 			path: app/Support/UpdatePerformanceHelper.php
 
 		-
-			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/View/Components/AppLayout.php
-
-		-
 			message: '#^Unable to resolve the template type TCacheValue in call to static method Illuminate\\Cache\\Repository\:\:remember\(\)$#'
 			identifier: argument.templateType
 			count: 1

@@ -97,7 +97,7 @@
                                     <div class="max-w-md">
                                         @if($report->release)
                                             <a href="{{ url('/details/' . $report->release->guid) }}"
-                                               target="_blank"
+                                               target="_blank" rel="noopener noreferrer"
                                                class="text-link dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300 font-medium text-sm break-all">
                                                 {{ Str::limit($report->release->searchname, 80) }}
                                             </a>
@@ -105,7 +105,7 @@
                                                 ID: {{ $report->releases_id }} | Size: {{ number_format($report->release->size / 1073741824, 2) }} GB
                                             </div>
                                         @else
-                                            <span class="text-red-500 dark:text-red-400 text-sm">
+                                            <span class="text-danger-500 dark:text-danger-400 text-sm">
                                                 <i aria-hidden="true" class="fas fa-exclamation-triangle mr-1"></i> Release Deleted
                                             </span>
                                             <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -124,9 +124,7 @@
                                     </div>
                                 </td>
                                 <td class="px-4 py-4">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200">
-                                        {{ $report->reason_label }}
-                                    </span>
+                                    <x-admin.badge tone="warning">{{ $report->reason_label }}</x-admin.badge>
                                     @if($report->description)
                                         <button aria-label="View description" type="button"
                                                 class="report-description-btn ml-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
@@ -199,7 +197,7 @@
                                                   @submit.prevent="submit()">
                                                 @csrf
                                                 <button type="submit"
-                                                        class="px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm inline-flex items-center"
+                                                        class="px-3 py-1.5 bg-danger-600 text-white rounded-lg hover:bg-danger-700 transition text-sm inline-flex items-center"
                                                         title="Delete Release">
                                                     <i aria-hidden="true" class="fas fa-trash mr-1"></i> Delete
                                                 </button>
@@ -284,7 +282,7 @@
 
                                         @if($report->release)
                                             <a aria-label="View Release" href="{{ url('/details/' . $report->release->guid) }}"
-                                               target="_blank"
+                                               target="_blank" rel="noopener noreferrer"
                                                class="px-3 py-1.5 bg-accent text-white rounded-lg hover:bg-accent-hover transition text-sm inline-flex items-center"
                                                title="View Release">
                                                 <i aria-hidden="true" class="fas fa-external-link-alt"></i>
@@ -297,9 +295,7 @@
             </x-admin.data-table>
 
             <!-- Pagination -->
-            <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
-                {{ $reportsList->appends(['status' => $status])->links() }}
-            </div>
+            <x-admin.pagination :paginator="$reportsList->appends(['status' => $status])" />
         @else
             <div class="px-6 py-12 text-center">
                 <i aria-hidden="true" class="fas fa-flag text-gray-300 dark:text-gray-600 text-6xl mb-4"></i>

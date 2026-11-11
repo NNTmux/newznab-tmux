@@ -8,8 +8,10 @@ use App\Http\Controllers\BasePageController;
 use App\Services\GenreService;
 use App\Services\MusicService;
 use App\Services\ReleaseImageService;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class AdminMusicController extends BasePageController
 {
@@ -20,16 +22,17 @@ class AdminMusicController extends BasePageController
     {
         $meta_title = $title = 'Music List';
 
-        // Get search parameter
-        $search = $this->scalarInput($request, 'musicsearch');
+        $lastSearch = trim($this->scalarInput($request, 'musicsearch'));
 
-        if (! empty($search)) {
-            $musicList = getRange('musicinfo');
-            $lastSearch = $search;
-        } else {
-            $musicList = getRange('musicinfo');
-            $lastSearch = '';
-        }
+        $musicList = DB::table('musicinfo')
+            ->when($lastSearch !== '', static function (Builder $query) use ($lastSearch): void {
+                $query->where(static function (Builder $query) use ($lastSearch): void {
+                    $query->whereLike('title', '%'.$lastSearch.'%')
+                        ->orWhereLike('artist', '%'.$lastSearch.'%');
+                });
+            })
+            ->orderByDesc('created_at')
+            ->paginate(config('nntmux.items_per_page'));
 
         return view('admin.music.index', compact('title', 'meta_title', 'musicList', 'lastSearch'));
     }

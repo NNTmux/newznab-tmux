@@ -95,6 +95,11 @@ class AdminCollectionRegexesController extends BasePageController
                 break;
         }
 
+        if ($error !== '') {
+            // Keep what was typed so a rejected submission is not lost.
+            $regex = array_merge($regex, $request->only(array_keys($regex)));
+        }
+
         $this->viewData = array_merge($this->viewData, [
             'regex' => (object) $regex,
             'error' => $error,
@@ -134,5 +139,15 @@ class AdminCollectionRegexesController extends BasePageController
         ]);
 
         return view('admin.regexes.collection-test', $this->viewData);
+    }
+
+    /**
+     * Delete a single regex and return to the list.
+     */
+    public function destroy(int $id): RedirectResponse
+    {
+        (new RegexService('collection_regexes'))->deleteRegex($id);
+
+        return redirect()->back()->with('success', 'Regex deleted successfully');
     }
 }

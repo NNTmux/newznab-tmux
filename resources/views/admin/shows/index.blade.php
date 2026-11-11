@@ -82,13 +82,9 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @if($show->type == 0)
-                                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-200">
-                                        <i aria-hidden="true" class="fas fa-tv mr-1"></i>TV
-                                    </span>
+                                    <x-admin.badge tone="primary" icon="fas fa-tv">TV</x-admin.badge>
                                 @elseif($show->type == 1)
-                                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
-                                        <i aria-hidden="true" class="fas fa-film mr-1"></i>Film
-                                    </span>
+                                    <x-admin.badge tone="info" icon="fas fa-film">Film</x-admin.badge>
                                 @elseif($show->type == 2)
                                     <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200">
                                         <i aria-hidden="true" class="fas fa-dragon mr-1"></i>Anime
@@ -144,7 +140,7 @@
                                 <form method="POST" action="{{ route('admin.show-remove', $show->id) }}" class="inline">
                                     @csrf
                                     <button aria-label="Remove from Releases" type="submit"
-                                        class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
+                                        class="text-danger-600 dark:text-danger-400 hover:text-danger-900 dark:hover:text-danger-300"
                                         title="Remove from Releases"
                                         data-confirm="Remove this TV show ID from all linked releases?">
                                         <i aria-hidden="true" class="fas fa-unlink"></i>
@@ -184,5 +180,4 @@
     </x-admin.card>
 </div>
 
-{{-- Styles moved to resources/css/csp-safe.css --}}
 @endsection

@@ -71,6 +71,10 @@ final class AdminNavigation
             ]],
             ['label' => __('System'), 'icon' => 'fa-gear', 'children' => [
                 ['label' => __('Site Settings'), 'icon' => 'fa-sliders', 'url' => route('admin.settings.show', ['domain' => 'site'])],
+                ['label' => __('Registration Settings'), 'icon' => 'fa-id-card', 'url' => route('admin.settings.show', ['domain' => 'registration'])],
+                ['label' => __('Ingestion Settings'), 'icon' => 'fa-download', 'url' => route('admin.settings.show', ['domain' => 'ingestion'])],
+                ['label' => __('Post Processing Settings'), 'icon' => 'fa-gears', 'url' => route('admin.settings.show', ['domain' => 'post-processing'])],
+                ['label' => __('Metadata Settings'), 'icon' => 'fa-tags', 'url' => route('admin.settings.show', ['domain' => 'metadata'])],
                 ['label' => __('Registrations'), 'icon' => 'fa-user-plus', 'url' => route('admin.registrations.index')],
                 ['label' => __('Tmux'), 'icon' => 'fa-terminal', 'url' => route('admin.settings.show', ['domain' => 'tmux'])],
                 ['label' => __('Statistics'), 'icon' => 'fa-chart-column', 'url' => url('/admin/site-stats')],
@@ -133,7 +137,9 @@ final class AdminNavigation
     }
 
     /**
-     * Exact path match first; otherwise an edit/add page whose prefix matches a "-list" page.
+     * Same path first (pagination, filter and sort parameters are ignored, but a link's own
+     * query parameters must be present); then the closest parent link for pages nested below a
+     * menu page; otherwise an edit/add page whose prefix matches a "-list" page.
      *
      * @param  list<array{label: string, icon: string, url?: string, children?: list<array{label: string, icon: string, url: string}>}>  $definition
      */
@@ -151,13 +157,42 @@ final class AdminNavigation
             }
         }
 
+        $currentPath = Str::before($current, '?');
+        parse_str((string) parse_url($request->getRequestUri(), PHP_URL_QUERY), $currentQuery);
+
+        $bestMatch = null;
+        $bestMatchScore = -1;
         foreach ($links as $url) {
-            if (self::normalise($url) === $current) {
-                return $url;
+            if (Str::before(self::normalise($url), '?') !== $currentPath) {
+                continue;
+            }
+
+            parse_str((string) parse_url($url, PHP_URL_QUERY), $linkQuery);
+            if (self::queryContains($currentQuery, $linkQuery) && count($linkQuery) > $bestMatchScore) {
+                $bestMatch = $url;
+                $bestMatchScore = count($linkQuery);
             }
         }
 
-        $currentPath = Str::before($current, '?');
+        if ($bestMatch !== null) {
+            return $bestMatch;
+        }
+
+        // A page below a menu page (a detail, create or edit screen) belongs to the closest parent link.
+        $parentMatch = null;
+        $parentMatchLength = 0;
+        foreach ($links as $url) {
+            $path = Str::before(self::normalise($url), '?');
+            if (str_starts_with($currentPath, $path.'/') && strlen($path) > $parentMatchLength) {
+                $parentMatch = $url;
+                $parentMatchLength = strlen($path);
+            }
+        }
+
+        if ($parentMatch !== null) {
+            return $parentMatch;
+        }
+
         foreach ($links as $url) {
             $path = Str::before(self::normalise($url), '?');
             if (str_ends_with($path, '-list') && Str::is(Str::beforeLast($path, '-list').'-*', $currentPath)) {
@@ -166,6 +201,23 @@ final class AdminNavigation
         }
 
         return null;
+    }
+
+    /**
+     * Whether every parameter of the link is present, with the same value, in the current request.
+     *
+     * @param  array<array-key, mixed>  $currentQuery
+     * @param  array<array-key, mixed>  $linkQuery
+     */
+    private static function queryContains(array $currentQuery, array $linkQuery): bool
+    {
+        foreach ($linkQuery as $key => $value) {
+            if (! array_key_exists($key, $currentQuery) || $currentQuery[$key] !== $value) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private static function normalise(string $url): string

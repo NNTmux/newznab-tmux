@@ -1,8 +1,8 @@
             <!-- Password Information -->
             @if(isset($release->passwordstatus) && $release->passwordstatus > 0)
-                <div class="detail-password-card bg-linear-to-r from-red-50 to-orange-50 dark:from-red-900 dark:to-orange-900 rounded-lg p-6 border border-red-100 dark:border-red-800">
+                <div class="detail-password-card bg-linear-to-r from-danger-50 to-orange-50 dark:from-danger-900 dark:to-orange-900 rounded-lg p-6 border border-danger-100 dark:border-danger-800">
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
-                        <i aria-hidden="true" class="fas fa-lock mr-2 text-red-600 dark:text-red-400"></i> Password Protected Release
+                        <i aria-hidden="true" class="fas fa-lock mr-2 text-danger-600 dark:text-danger-400"></i> Password Protected Release
                     </h3>
                     <div class="space-y-3">
                         <div>

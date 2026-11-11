@@ -351,7 +351,7 @@
     @endif
 
     @push('forum-page-scripts')
-    <script type="module">
+    <script type="module" nonce="{{ csp_nonce() }}">
     Vue.createApp({
         setup() {
             let posts = @json($posts);

@@ -92,8 +92,8 @@
 
         <x-admin.card class="p-6">
             <div class="flex items-center">
-                <div class="shrink-0 bg-red-100 dark:bg-red-900 rounded-full p-3">
-                    <i aria-hidden="true" class="fas fa-calendar-plus text-2xl text-red-600 dark:text-red-400"></i>
+                <div class="shrink-0 bg-danger-100 dark:bg-danger-900 rounded-full p-3">
+                    <i aria-hidden="true" class="fas fa-calendar-plus text-2xl text-danger-600 dark:text-danger-400"></i>
                 </div>
                 <div class="ml-4">
                     <p class="text-sm text-gray-500 dark:text-gray-400">Total Days Added</p>
@@ -181,18 +181,15 @@
                 <i aria-hidden="true" class="fas fa-list mr-2"></i>All Promotions Statistics
             </h2>
         </div>
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead class="bg-gray-50 dark:bg-gray-900">
-                    <tr>
+        <x-admin.data-table>
+            <x-slot:head>
                         <x-admin.th>Promotion</x-admin.th>
                         <x-admin.th>Applications</x-admin.th>
                         <x-admin.th>Days/Application</x-admin.th>
                         <x-admin.th>Status</x-admin.th>
                         <x-admin.th>Actions</x-admin.th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            </x-slot:head>
+
                     @forelse($promotions as $promotion)
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                             <td class="px-6 py-4">
@@ -211,13 +208,9 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @if($promotion->is_active && $promotion->isCurrentlyActive())
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200">
-                                        <i aria-hidden="true" class="fas fa-check mr-1"></i>Active
-                                    </span>
+                                    <x-admin.badge tone="success" icon="fas fa-check">Active</x-admin.badge>
                                 @else
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-                                        Inactive
-                                    </span>
+                                    <x-admin.badge tone="neutral">Inactive</x-admin.badge>
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -233,9 +226,7 @@
                             </td>
                         </tr>
                     @endforelse
-                </tbody>
-            </table>
-        </div>
+        </x-admin.data-table>
     </x-admin.card>
 
     <!-- Recent Activity -->
@@ -245,18 +236,15 @@
                 <i aria-hidden="true" class="fas fa-clock mr-2"></i>Recent Promotion Activity
             </h2>
         </div>
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead class="bg-gray-50 dark:bg-gray-900">
-                    <tr>
+        <x-admin.data-table>
+            <x-slot:head>
                         <x-admin.th>User</x-admin.th>
                         <x-admin.th>Promotion</x-admin.th>
                         <x-admin.th>Role</x-admin.th>
                         <x-admin.th>Days Added</x-admin.th>
                         <x-admin.th>Applied At</x-admin.th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            </x-slot:head>
+
                     @forelse($recentActivity as $activity)
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
@@ -284,9 +272,7 @@
                             </td>
                         </tr>
                     @endforelse
-                </tbody>
-            </table>
-        </div>
+        </x-admin.data-table>
     </x-admin.card>
 </div>
 @endsection

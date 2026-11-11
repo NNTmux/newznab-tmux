@@ -3,82 +3,6 @@
  */
 import Alpine from '@alpinejs/csp';
 
-Alpine.data('searchAutocomplete', (inputId, dropdownId, formId, itemClass, maxItems) => ({
-    query: '',
-    suggestions: [],
-    currentIndex: -1,
-    open: false,
-    _debounceTimer: null,
-
-    init() {
-        // If IDs passed as data attributes, use those
-        this._inputId = inputId || this.$el.dataset.inputId;
-        this._dropdownId = dropdownId || this.$el.dataset.dropdownId;
-        this._formId = formId || this.$el.dataset.formId;
-        this._itemClass = itemClass || this.$el.dataset.itemClass || 'autocomplete-item';
-        this._maxItems = maxItems || parseInt(this.$el.dataset.maxItems) || 10;
-    },
-
-    onInput() {
-        clearTimeout(this._debounceTimer);
-        const q = this.query.trim();
-        if (q.length < 2) { this.hide(); return; }
-
-        this._debounceTimer = setTimeout(() => {
-            fetch('/api/search/autocomplete?q=' + encodeURIComponent(q))
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success && data.suggestions && data.suggestions.length > 0) {
-                        this.suggestions = data.suggestions.slice(0, this._maxItems);
-                        this.currentIndex = -1;
-                        this.open = true;
-                    } else {
-                        this.hide();
-                    }
-                })
-                .catch(() => this.hide());
-        }, 200);
-    },
-
-    onKeydown(e) {
-        if (!this.open) return;
-        if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            this.currentIndex = Math.min(this.currentIndex + 1, this.suggestions.length - 1);
-        } else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            this.currentIndex = Math.max(this.currentIndex - 1, 0);
-        } else if (e.key === 'Enter' && this.currentIndex >= 0) {
-            e.preventDefault();
-            this.select(this.currentIndex);
-        } else if (e.key === 'Escape') {
-            this.hide();
-        }
-    },
-
-    select(index) {
-        this.query = this.suggestions[index];
-        this.hide();
-        // Submit form
-        const form = this.$refs.form || document.getElementById(this._formId);
-        if (form) form.submit();
-    },
-
-    hover(index) {
-        this.currentIndex = index;
-    },
-
-    hide() {
-        this.open = false;
-        this.suggestions = [];
-        this.currentIndex = -1;
-    },
-
-    isSelected(index) {
-        return this.currentIndex === index;
-    }
-}));
-
 // Sort dropdown
 Alpine.data('sortDropdown', () => ({
     open: false,
@@ -101,6 +25,14 @@ Alpine.data('sortDropdown', () => ({
         if (input.closest('[x-data]')) return;
 
         var debounceTimer, currentIndex = -1, suggestions = [];
+
+        // Combobox semantics so screen readers announce the suggestion list and the highlighted option.
+        input.setAttribute('role', 'combobox');
+        input.setAttribute('aria-autocomplete', 'list');
+        input.setAttribute('aria-expanded', 'false');
+        input.setAttribute('aria-controls', dropdownId);
+        dropdown.setAttribute('role', 'listbox');
+        if (!dropdown.hasAttribute('aria-label')) dropdown.setAttribute('aria-label', 'Search suggestions');
 
         input.addEventListener('input', function() {
             clearTimeout(debounceTimer);
@@ -145,6 +77,9 @@ Alpine.data('sortDropdown', () => ({
                 var row = document.createElement('div');
                 row.className = itemClass + ' ' + sizeClass + ' cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100';
                 row.dataset.index = String(i);
+                row.id = dropdownId + '-option-' + i;
+                row.setAttribute('role', 'option');
+                row.setAttribute('aria-selected', 'false');
                 var icon = document.createElement('i');
                 icon.setAttribute('aria-hidden', 'true');
                 icon.className = ('fas fa-search text-gray-400 mr-2 ' + iconSize).trim();
@@ -167,10 +102,25 @@ Alpine.data('sortDropdown', () => ({
                 el.addEventListener('mouseenter', function() { currentIndex = i; updateSelection(dropdown.querySelectorAll('.' + itemClass)); });
             });
             dropdown.classList.remove('hidden');
+            input.setAttribute('aria-expanded', 'true');
+            input.removeAttribute('aria-activedescendant');
         }
 
-        function hideDropdown() { dropdown.classList.add('hidden'); dropdown.innerHTML = ''; suggestions = []; currentIndex = -1; }
-        function updateSelection(items) { items.forEach(function(el, i) { if (i === currentIndex) el.classList.add('bg-primary-100', 'dark:bg-primary-900'); else el.classList.remove('bg-primary-100', 'dark:bg-primary-900'); }); }
+        function hideDropdown() {
+            dropdown.classList.add('hidden'); dropdown.innerHTML = ''; suggestions = []; currentIndex = -1;
+            input.setAttribute('aria-expanded', 'false');
+            input.removeAttribute('aria-activedescendant');
+        }
+        function updateSelection(items) {
+            items.forEach(function(el, i) {
+                var selected = i === currentIndex;
+                el.classList.toggle('bg-primary-100', selected);
+                el.classList.toggle('dark:bg-primary-900', selected);
+                el.setAttribute('aria-selected', selected ? 'true' : 'false');
+            });
+            if (currentIndex >= 0 && items[currentIndex]) input.setAttribute('aria-activedescendant', items[currentIndex].id);
+            else input.removeAttribute('aria-activedescendant');
+        }
     }
 
     initAutocomplete('header-search-input', 'header-autocomplete-dropdown', 'header-search-form', 'header-autocomplete-item', 8);

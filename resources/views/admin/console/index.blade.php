@@ -10,6 +10,7 @@
         </x-slot:actions>
     </x-admin.page-header>
     <x-admin.card>
+        <x-admin.list-search :action="route('admin.console-list')" :value="$lastSearch ?? ''" placeholder="Search by title or platform" label="Search console games" />
 
         <!-- Console Table -->
         <x-admin.data-table>
@@ -54,11 +55,9 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @if($console->platform)
-                                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
-                                        {{ $console->platform }}
-                                    </span>
+                                    <x-admin.badge tone="info">{{ $console->platform }}</x-admin.badge>
                                 @else
-                                    <span class="text-gray-400">—</span>
+                                    <span class="text-gray-500 dark:text-gray-400">—</span>
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
@@ -78,13 +77,13 @@
                                         @elseif($console->esrb == 'E10+') bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-200
                                         @elseif($console->esrb == 'T') bg-warning-100 text-warning-800 dark:bg-warning-900 dark:text-warning-200
                                         @elseif($console->esrb == 'M') bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200
-                                        @elseif($console->esrb == 'AO') bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200
+                                        @elseif($console->esrb == 'AO') bg-danger-100 text-danger-800 dark:bg-danger-900 dark:text-danger-200
                                         @else bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200
                                         @endif">
                                         {{ $console->esrb }}
                                     </span>
                                 @else
-                                    <span class="text-gray-400">—</span>
+                                    <span class="text-gray-500 dark:text-gray-400">—</span>
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
@@ -95,7 +94,7 @@
                                 </a>
                                 @if($console->url)
                                     <a aria-label="View Source" href="{{ $console->url }}"
-                                       target="_blank"
+                                       target="_blank" rel="noopener noreferrer"
                                        class="text-success-600 dark:text-success-400 hover:text-success-900 dark:hover:text-success-300"
                                        title="View Source">
                                         <i aria-hidden="true" class="fas fa-external-link-alt"></i>
@@ -116,9 +115,7 @@
         </x-admin.data-table>
 
         <!-- Pagination -->
-        <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
-            {{ $consoleList->links() }}
-        </div>
+        <x-admin.pagination :paginator="$consoleList" />
     </x-admin.card>
 </div>
 @endsection

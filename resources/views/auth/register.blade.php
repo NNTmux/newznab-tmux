@@ -1,5 +1,7 @@
 @extends('layouts.guest')
 
+@section('title', __('Create an account'))
+
 @section('content')
 <div class="min-h-dvh auth-page flex items-start justify-center px-4 py-6 sm:px-6 sm:py-10 lg:px-8">
     <div class="w-full max-w-md space-y-6 sm:space-y-8">
@@ -51,12 +53,12 @@
 
                 <!-- Validation Error Messages -->
                 @if($errors->any())
-                    <div role="alert" class="mb-4 p-4 rounded-lg bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700">
+                    <div role="alert" class="mb-4 p-4 rounded-lg bg-danger-50 dark:bg-danger-900/30 border border-danger-200 dark:border-danger-700">
                         <div class="flex items-start">
-                            <i aria-hidden="true" class="fas fa-exclamation-circle text-red-600 dark:text-red-400 mr-3 mt-0.5"></i>
+                            <i aria-hidden="true" class="fas fa-exclamation-circle text-danger-600 dark:text-danger-400 mr-3 mt-0.5"></i>
                             <div class="flex-1">
-                                <p class="text-sm font-medium text-red-800 dark:text-red-200">There were some errors with your submission:</p>
-                                <ul class="mt-2 text-sm text-red-700 dark:text-red-300 list-disc list-inside">
+                                <p class="text-sm font-medium text-danger-800 dark:text-danger-200">There were some errors with your submission:</p>
+                                <ul class="mt-2 text-sm text-danger-700 dark:text-danger-300 list-disc list-inside">
                                     @foreach($errors->all() as $error)
                                         <li>{{ $error }}</li>
                                     @endforeach
@@ -90,12 +92,12 @@
                                 value="{{ old('username') }}"
                                 required
                                 autofocus
-                                class="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition @error('username') border-red-500 @enderror"
+                                class="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition @error('username') border-danger-500 @enderror"
                                 placeholder="Choose a username"
                             >
                         </div>
                         @error('username')
-                            <p id="username-error" class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            <p id="username-error" class="mt-2 text-sm text-danger-600">{{ $message }}</p>
                         @enderror
                     </div>
 
@@ -116,12 +118,12 @@
                                 autocomplete="email"
                                 value="{{ old('email', $email ?? '') }}"
                                 required
-                                class="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition @error('email') border-red-500 @enderror"
+                                class="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition @error('email') border-danger-500 @enderror"
                                 placeholder="your@email.com"
                             >
                         </div>
                         @error('email')
-                            <p id="email-error" class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            <p id="email-error" class="mt-2 text-sm text-danger-600">{{ $message }}</p>
                         @enderror
                     </div>
 
@@ -142,7 +144,7 @@
                                 @error('password') aria-invalid="true" aria-describedby="password-error" @enderror
                                 autocomplete="new-password"
                                 required
-                                class="block w-full pl-10 pr-10 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition @error('password') border-red-500 @enderror"
+                                class="block w-full pl-10 pr-10 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition @error('password') border-danger-500 @enderror"
                                 placeholder="Create a strong password"
                             >
                             <button type="button" class="password-toggle-btn absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" @click="toggle()" aria-label="Show password" :aria-label="label()" aria-controls="password" :aria-pressed="visible">
@@ -150,7 +152,7 @@
                             </button>
                         </div>
                         @error('password')
-                            <p id="password-error" class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                            <p id="password-error" class="mt-2 text-sm text-danger-600 dark:text-danger-400">{{ $message }}</p>
                         @enderror
                         <div class="mt-2 text-xs text-gray-500 dark:text-gray-400 space-y-1">
                             <p class="font-medium">Password requirements:</p>
@@ -194,7 +196,7 @@
                             {!! \App\Support\CaptchaHelper::display() !!}
                         </div>
                         @error(\App\Support\CaptchaHelper::getResponseFieldName())
-                            <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                            <p class="mt-2 text-sm text-danger-600 dark:text-danger-400">{{ $message }}</p>
                         @enderror
                     @endif
 
@@ -209,9 +211,9 @@
                         >
                         <label for="terms" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
                             I agree to the
-                            <a href="{{ url('/terms-and-conditions') }}" target="_blank" class="text-link dark:text-primary-400 hover:text-primary-500">Terms and Conditions</a>
+                            <a href="{{ url('/terms-and-conditions') }}" target="_blank" rel="noopener noreferrer" class="text-link dark:text-primary-400 hover:text-primary-500">Terms and Conditions</a>
                             and
-                            <a href="{{ url('/privacy-policy') }}" target="_blank" class="text-link dark:text-primary-400 hover:text-primary-500">Privacy Policy</a>
+                            <a href="{{ url('/privacy-policy') }}" target="_blank" rel="noopener noreferrer" class="text-link dark:text-primary-400 hover:text-primary-500">Privacy Policy</a>
                         </label>
                     </div>
 

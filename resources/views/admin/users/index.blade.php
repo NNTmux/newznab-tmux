@@ -89,8 +89,8 @@
 
         <!-- Validation Messages -->
         @if($errors->any())
-            <div class="mx-6 mt-4 p-4 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-lg">
-                <p class="text-red-800 dark:text-red-200">
+            <div class="mx-6 mt-4 p-4 bg-danger-50 dark:bg-danger-900 border border-danger-200 dark:border-danger-700 rounded-lg">
+                <p class="text-danger-800 dark:text-danger-200">
                     <i aria-hidden="true" class="fas fa-exclamation-circle mr-2"></i>{{ $errors->first() }}
                 </p>
             </div>
@@ -138,67 +138,23 @@
                             <x-admin.th>
                                 <input aria-label="Select all active users on this page" type="checkbox" id="selectAllUserList" class="h-4 w-4 text-link dark:text-primary-400 focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded" title="Select all active users on this page">
                             </x-admin.th>
-                            <x-admin.th>ID</x-admin.th>
-                            <x-admin.th :sort="request('ob') === 'username_asc' ? 'asc' : (request('ob') === 'username_desc' ? 'desc' : null)">
-                                <a href="{{ url('admin/user-list?' . http_build_query(array_merge(request()->except('ob'), ['ob' => request('ob') === 'username_asc' ? 'username_desc' : 'username_asc']))) }}" class="group inline-flex items-center hover:text-gray-700 dark:hover:text-gray-200">
-                                    Username
-                                    @if(request('ob') === 'username_asc')
-                                        <i aria-hidden="true" class="fas fa-sort-up ml-1"></i>
-                                    @elseif(request('ob') === 'username_desc')
-                                        <i aria-hidden="true" class="fas fa-sort-down ml-1"></i>
-                                    @else
-                                        <i aria-hidden="true" class="fas fa-sort ml-1 opacity-50 group-hover:opacity-100"></i>
-                                    @endif
-                                </a>
-                            </x-admin.th>
+                            <x-admin.th class="hidden xl:table-cell">ID</x-admin.th>
+                            <x-admin.th :sort="request('ob') === 'username_asc' ? 'asc' : (request('ob') === 'username_desc' ? 'desc' : null)" :href="url('admin/user-list?' . http_build_query(array_merge(request()->except('ob'), ['ob' => request('ob') === 'username_asc' ? 'username_desc' : 'username_asc'])))">Username</x-admin.th>
                             <x-admin.th>Email</x-admin.th>
-                            <x-admin.th :sort="request('ob') === 'apiaccess_asc' ? 'asc' : (request('ob') === 'apiaccess_desc' ? 'desc' : null)">
-                                <a href="{{ url('admin/user-list?' . http_build_query(array_merge(request()->except('ob'), ['ob' => request('ob') === 'apiaccess_asc' ? 'apiaccess_desc' : 'apiaccess_asc']))) }}" class="group inline-flex items-center hover:text-gray-700 dark:hover:text-gray-200">
-                                    Status
-                                    @if(request('ob') === 'apiaccess_asc')
-                                        <i aria-hidden="true" class="fas fa-sort-up ml-1"></i>
-                                    @elseif(request('ob') === 'apiaccess_desc')
-                                        <i aria-hidden="true" class="fas fa-sort-down ml-1"></i>
-                                    @else
-                                        <i aria-hidden="true" class="fas fa-sort ml-1 opacity-50 group-hover:opacity-100"></i>
-                                    @endif
-                                </a>
-                            </x-admin.th>
+                            <x-admin.th :sort="request('ob') === 'apiaccess_asc' ? 'asc' : (request('ob') === 'apiaccess_desc' ? 'desc' : null)" :href="url('admin/user-list?' . http_build_query(array_merge(request()->except('ob'), ['ob' => request('ob') === 'apiaccess_asc' ? 'apiaccess_desc' : 'apiaccess_asc'])))">Status</x-admin.th>
                             <x-admin.th>Role</x-admin.th>
-                            <x-admin.th>
+                            <x-admin.th class="hidden xl:table-cell">
                                 <i aria-hidden="true" class="fas fa-layer-group mr-1"></i>Pending Role
                             </x-admin.th>
-                            <x-admin.th :sort="request('ob') === 'rolechangedate_asc' ? 'asc' : (request('ob') === 'rolechangedate_desc' ? 'desc' : null)">
-                                <a href="{{ url('admin/user-list?' . http_build_query(array_merge(request()->except('ob'), ['ob' => request('ob') === 'rolechangedate_asc' ? 'rolechangedate_desc' : 'rolechangedate_asc']))) }}" class="group inline-flex items-center hover:text-gray-700 dark:hover:text-gray-200">
-                                    Role Expiry
-                                    @if(request('ob') === 'rolechangedate_asc')
-                                        <i aria-hidden="true" class="fas fa-sort-up ml-1"></i>
-                                    @elseif(request('ob') === 'rolechangedate_desc')
-                                        <i aria-hidden="true" class="fas fa-sort-down ml-1"></i>
-                                    @else
-                                        <i aria-hidden="true" class="fas fa-sort ml-1 opacity-50 group-hover:opacity-100"></i>
-                                    @endif
-                                </a>
-                            </x-admin.th>
-                            <x-admin.th>Host</x-admin.th>
-                            <x-admin.th>Country</x-admin.th>
+                            <x-admin.th class="hidden lg:table-cell" :sort="request('ob') === 'rolechangedate_asc' ? 'asc' : (request('ob') === 'rolechangedate_desc' ? 'desc' : null)" :href="url('admin/user-list?' . http_build_query(array_merge(request()->except('ob'), ['ob' => request('ob') === 'rolechangedate_asc' ? 'rolechangedate_desc' : 'rolechangedate_asc'])))">Role Expiry</x-admin.th>
+                            <x-admin.th class="hidden xl:table-cell">Host</x-admin.th>
+                            <x-admin.th class="hidden xl:table-cell">Country</x-admin.th>
                             <x-admin.th>Verified</x-admin.th>
-                            <x-admin.th :sort="request('ob') === 'createdat_asc' ? 'asc' : (request('ob') === 'createdat_desc' ? 'desc' : null)">
-                                <a href="{{ url('admin/user-list?' . http_build_query(array_merge(request()->except('ob'), ['ob' => request('ob') === 'createdat_asc' ? 'createdat_desc' : 'createdat_asc']))) }}" class="group inline-flex items-center hover:text-gray-700 dark:hover:text-gray-200">
-                                    Created
-                                    @if(request('ob') === 'createdat_asc')
-                                        <i aria-hidden="true" class="fas fa-sort-up ml-1"></i>
-                                    @elseif(request('ob') === 'createdat_desc')
-                                        <i aria-hidden="true" class="fas fa-sort-down ml-1"></i>
-                                    @else
-                                        <i aria-hidden="true" class="fas fa-sort ml-1 opacity-50 group-hover:opacity-100"></i>
-                                    @endif
-                                </a>
-                            </x-admin.th>
-                            <x-admin.th title="Daily API requests in last 24 hours">
+                            <x-admin.th class="hidden lg:table-cell" :sort="request('ob') === 'createdat_asc' ? 'asc' : (request('ob') === 'createdat_desc' ? 'desc' : null)" :href="url('admin/user-list?' . http_build_query(array_merge(request()->except('ob'), ['ob' => request('ob') === 'createdat_asc' ? 'createdat_desc' : 'createdat_asc'])))">Created</x-admin.th>
+                            <x-admin.th class="hidden xl:table-cell" title="Daily API requests in last 24 hours">
                                 <i aria-hidden="true" class="fas fa-code mr-1"></i>Daily API
                             </x-admin.th>
-                            <x-admin.th title="Daily downloads in last 24 hours">
+                            <x-admin.th class="hidden xl:table-cell" title="Daily downloads in last 24 hours">
                                 <i aria-hidden="true" class="fas fa-download mr-1"></i>Daily DLs
                             </x-admin.th>
                             <x-admin.th>Actions</x-admin.th>
@@ -222,14 +178,14 @@
                                         <input aria-label="Deleted users cannot be selected here" type="checkbox" disabled class="h-4 w-4 text-gray-300 dark:text-gray-600 border-gray-300 dark:border-gray-600 rounded cursor-not-allowed" title="Deleted users cannot be selected here">
                                     @endif
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ $user->id }}</td>
+                                <td class="hidden xl:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ $user->id }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ $user->username }}</div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ $user->email }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @if($user->deleted_at)
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200" title="Soft Deleted on {{ \Carbon\Carbon::parse($user->deleted_at)->format('M j, Y g:i A') }}">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-danger-100 dark:bg-danger-900 text-danger-800 dark:text-danger-200" title="Soft Deleted on {{ \Carbon\Carbon::parse($user->deleted_at)->format('M j, Y g:i A') }}">
                                             <i aria-hidden="true" class="fas fa-trash mr-1"></i>Deleted
                                         </span>
                                     @elseif($user->roles_id === \App\Enums\UserRole::DISABLED->value)
@@ -237,25 +193,19 @@
                                             <i aria-hidden="true" class="fas fa-ban mr-1"></i>Disabled
                                         </span>
                                     @else
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200">
-                                            <i aria-hidden="true" class="fas fa-check-circle mr-1"></i>Active
-                                        </span>
+                                        <x-admin.badge tone="success" icon="fas fa-check-circle">Active</x-admin.badge>
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200">
-                                        {{ $user->rolename ?? 'N/A' }}
-                                    </span>
+                                    <x-admin.badge tone="primary">{{ $user->rolename ?? 'N/A' }}</x-admin.badge>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
+                                <td class="hidden xl:table-cell px-6 py-4 whitespace-nowrap">
                                     @if(!empty($user->pending_roles_id) && !empty($user->pending_role_start_date))
                                         @php
                                             $pendingStartDate = \Carbon\Carbon::parse($user->pending_role_start_date);
                                         @endphp
                                         <div class="flex flex-col gap-1">
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 w-fit">
-                                                <i aria-hidden="true" class="fas fa-layer-group mr-1"></i>{{ $role_names[$user->pending_roles_id] ?? 'Unknown' }}
-                                            </span>
+                                            <x-admin.badge tone="info" icon="fas fa-layer-group" class="w-fit">{{ $role_names[$user->pending_roles_id] ?? 'Unknown' }}</x-admin.badge>
                                             <span class="text-xs text-gray-500 dark:text-gray-400">
                                                 <i aria-hidden="true" class="fas fa-clock mr-1"></i>{{ $pendingStartDate->diffForHumans() }}
                                             </span>
@@ -264,7 +214,7 @@
                                         <span class="text-gray-400 dark:text-gray-500 text-xs">—</span>
                                     @endif
                                 </td>
-                                <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                                <td class="hidden lg:table-cell px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
                                     @if($user->rolechangedate)
                                         @php
                                             $expiryDate = \Carbon\Carbon::parse($user->rolechangedate);
@@ -273,7 +223,7 @@
                                         @endphp
                                         <div class="flex flex-col gap-1">
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full w-fit
-                                                @if($isExpired) bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200
+                                                @if($isExpired) bg-danger-100 dark:bg-danger-900 text-danger-800 dark:text-danger-200
                                                 @elseif($isExpiringSoon) bg-warning-100 dark:bg-warning-900 text-warning-800 dark:text-warning-200
                                                 @else bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300
                                                 @endif">
@@ -291,8 +241,8 @@
                                         </span>
                                     @endif
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ $user->host ?? 'N/A' }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                <td class="hidden xl:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ $user->host ?? 'N/A' }}</td>
+                                <td class="hidden xl:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                     @if(!empty($user->country_code))
                                         <span title="{{ $user->country_name }}">{{ $user->country_code }}</span>
                                     @else
@@ -301,25 +251,21 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @if($isVerified)
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200">
-                                            <i aria-hidden="true" class="fas fa-check mr-1"></i>Yes
-                                        </span>
+                                        <x-admin.badge tone="success" icon="fas fa-check">Yes</x-admin.badge>
                                     @else
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">
-                                            <i aria-hidden="true" class="fas fa-times mr-1"></i>No
-                                        </span>
+                                        <x-admin.badge tone="danger" icon="fas fa-times">No</x-admin.badge>
                                     @endif
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                <td class="hidden lg:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                     {{ $user->created_at ? formatDate($user->created_at) : 'N/A' }}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100" title="API requests in last 24 hours">
+                                <td class="hidden xl:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100" title="API requests in last 24 hours">
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                         {{ ($user->daily_api_count ?? 0) > 0 ? 'bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300' }}">
                                         <i aria-hidden="true" class="fas fa-code mr-1"></i>{{ $user->daily_api_count ?? 0 }}
                                     </span>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100" title="Downloads in last 24 hours">
+                                <td class="hidden xl:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100" title="Downloads in last 24 hours">
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                         {{ ($user->daily_download_count ?? 0) > 0 ? 'bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300' }}">
                                         <i aria-hidden="true" class="fas fa-download mr-1"></i>{{ $user->daily_download_count ?? 0 }}
@@ -334,7 +280,7 @@
                                                 <button aria-label="Restore User" type="submit"
                                                         class="text-success-600 dark:text-success-400 hover:text-success-900 dark:hover:text-success-300 bg-transparent border-0 p-0 cursor-pointer"
                                                         title="Restore User"
-                                                        data-confirm="Are you sure you want to restore user '{{ $user->username }}'?">
+                                                        data-confirm="Are you sure you want to restore user '{{ $user->username }}'?" data-confirm-type="info" data-confirm-text="Restore">
                                                     <i aria-hidden="true" class="fas fa-undo"></i>
                                                 </button>
                                             </form>
@@ -368,7 +314,7 @@
                                                     <button aria-label="Resend Verification" type="submit"
                                                             class="text-warning-600 dark:text-warning-400 hover:text-warning-900 dark:hover:text-warning-300 border-0 bg-transparent cursor-pointer p-0"
                                                             title="Resend Verification"
-                                                            data-confirm="Resend account verification email to '{{ $user->username }}'?">
+                                                            data-confirm="Resend account verification email to '{{ $user->username }}'?" data-confirm-type="info" data-confirm-text="Resend">
                                                         <i aria-hidden="true" class="fas fa-envelope"></i>
                                                     </button>
                                                 </form>
@@ -377,7 +323,7 @@
                                                 @csrf
                                                 <input type="hidden" name="id" value="{{ $user->id }}">
                                                 <button aria-label="Delete" type="submit"
-                                                        class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 bg-transparent border-0 p-0 cursor-pointer"
+                                                        class="text-danger-600 dark:text-danger-400 hover:text-danger-900 dark:hover:text-danger-300 bg-transparent border-0 p-0 cursor-pointer"
                                                         title="Delete"
                                                         data-confirm="Are you sure you want to delete user '{{ $user->username }}'?">
                                                     <i aria-hidden="true" class="fas fa-trash"></i>
@@ -393,9 +339,7 @@
             </div>
 
             <!-- Pagination -->
-            <div class="px-6 py-4 border-t border-gray-200">
-                {{ $userlist->links() }}
-            </div>
+            <x-admin.pagination :paginator="$userlist" />
         @else
             <x-admin.empty-state icon="fas fa-users" title="No users found" message="Try adjusting your search filters or add a new user." />
         @endif
@@ -403,18 +347,7 @@
 </div>
 
 <!-- Verify User Confirmation Modal (x-data mounts verifyUser so showVerifyModal/submitVerifyForm exist) -->
-<div id="verifyUserModal"
-     x-data="verifyUser"
-     x-show="open"
-     x-cloak
-     x-transition:enter="transition ease-out duration-200"
-     x-transition:enter-start="opacity-0"
-     x-transition:enter-end="opacity-100"
-     x-transition:leave="transition ease-in duration-150"
-     x-transition:leave-start="opacity-100"
-     x-transition:leave-end="opacity-0"
-     class="fixed inset-0 bg-gray-900/50 dark:bg-black/70 flex items-center justify-center z-50">
-    <div role="dialog" aria-modal="true" aria-labelledby="verify-user-modal-title-0" class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 transform transition-all">
+<x-modal open="open" close="hide()" labelledby="verify-user-modal-title-0" id="verifyUserModal" x-data="verifyUser" panel-class="">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div class="flex items-center justify-between">
                 <h3 id="verify-user-modal-title-0" class="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center">
@@ -443,7 +376,6 @@
                 <i aria-hidden="true" class="fas fa-check mr-2"></i>Verify
             </button>
         </div>
-    </div>
-</div>
+</x-modal>
 
 @endsection

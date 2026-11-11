@@ -21,8 +21,13 @@ Alpine.data('toastContainer', () => ({
         Alpine.store('toast').resume(id);
     },
 
+    /** Errors interrupt as alerts; everything else is announced through the polite live region. */
     roleFor(type) {
-        return type === 'error' ? 'alert' : 'status';
+        return type === 'error' ? 'alert' : null;
+    },
+
+    announcement() {
+        return Alpine.store('toast').announcement;
     },
 
     toneFor(type) {

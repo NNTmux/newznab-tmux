@@ -3,14 +3,6 @@
  */
 import Alpine from '@alpinejs/csp';
 
-Alpine.data('sidebarToggle', () => ({
-    open: false,
-
-    toggle() {
-        this.open = !this.open;
-    }
-}));
-
 // Document-level delegation for .sidebar-toggle elements without x-data
 document.querySelectorAll('.sidebar-toggle').forEach(function(toggle) {
     if (toggle.closest('[x-data]')) return;

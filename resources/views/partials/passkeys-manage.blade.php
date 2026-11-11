@@ -69,7 +69,7 @@
                 </button>
             </form>
 
-            <p x-show="error" x-text="error" class="text-sm text-red-600 dark:text-red-400"></p>
+            <p x-show="error" x-text="error" class="text-sm text-danger-600 dark:text-danger-400"></p>
             <p x-show="success" x-text="success" class="text-sm text-success-600 dark:text-success-400"></p>
 
             <template x-if="passkeys.length === 0">
@@ -83,10 +83,10 @@
                     <table class="min-w-full divide-y divide-gray-200 text-sm dark:divide-gray-700">
                         <thead class="bg-gray-50 dark:bg-gray-800">
                             <tr>
-                                <th class="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300">Name</th>
-                                <th class="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300">Created</th>
-                                <th class="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300">Last used</th>
-                                <th class="px-4 py-3 text-right font-semibold text-gray-700 dark:text-gray-300">Actions</th>
+                                <th scope="col" class="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300">Name</th>
+                                <th scope="col" class="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300">Created</th>
+                                <th scope="col" class="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300">Last used</th>
+                                <th scope="col" class="px-4 py-3 text-right font-semibold text-gray-700 dark:text-gray-300">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-900">
@@ -99,7 +99,7 @@
                                         <button
                                             type="button"
                                             @click="deletePasskey(passkey.id)"
-                                            class="rounded-lg border border-red-300 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-50 dark:border-red-700 dark:text-red-300 dark:hover:bg-red-900/30"
+                                            class="rounded-lg border border-danger-300 px-3 py-1.5 text-xs font-medium text-danger-700 hover:bg-danger-50 dark:border-danger-700 dark:text-danger-300 dark:hover:bg-danger-900/30"
                                         >
                                             Delete
                                         </button>

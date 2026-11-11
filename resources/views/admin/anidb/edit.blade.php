@@ -23,7 +23,7 @@
                         <!-- Title -->
                         <div>
                             <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Title <span class="text-red-500">*</span>
+                                Title <span class="text-danger-500">*</span>
                             </label>
                             <input type="text"
                                    id="title"
@@ -148,12 +148,12 @@
                                 </label>
                                 <div class="flex flex-wrap gap-2">
                                     @if(!empty($anilistId))
-                                        <a href="{{ $site->dereferrerLink ?? '' }}https://anilist.co/anime/{{ $anilistId }}" target="_blank" class="inline-flex items-center px-3 py-2 bg-primary-100 dark:bg-primary-900/40 text-primary-800 dark:text-primary-200 rounded-lg hover:bg-primary-200 transition text-sm">
+                                        <a href="{{ $site->dereferrerLink ?? '' }}https://anilist.co/anime/{{ $anilistId }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-3 py-2 bg-primary-100 dark:bg-primary-900/40 text-primary-800 dark:text-primary-200 rounded-lg hover:bg-primary-200 transition text-sm">
                                             <i aria-hidden="true" class="fas fa-external-link-alt mr-2"></i> AniList
                                         </a>
                                     @endif
                                     @if(!empty($malId))
-                                        <a href="{{ $site->dereferrerLink ?? '' }}https://myanimelist.net/anime/{{ $malId }}" target="_blank" class="inline-flex items-center px-3 py-2 bg-warning-100 dark:bg-warning-900/40 text-warning-800 dark:text-warning-200 rounded-lg hover:bg-warning-200 transition text-sm">
+                                        <a href="{{ $site->dereferrerLink ?? '' }}https://myanimelist.net/anime/{{ $malId }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-3 py-2 bg-warning-100 dark:bg-warning-900/40 text-warning-800 dark:text-warning-200 rounded-lg hover:bg-warning-200 transition text-sm">
                                             <i aria-hidden="true" class="fas fa-external-link-alt mr-2"></i> MyAnimeList
                                         </a>
                                     @endif

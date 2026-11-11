@@ -77,17 +77,17 @@
                                         <!-- External Links -->
                                         <div class="flex items-center gap-2 mb-4 text-xs flex-wrap">
                                             @if($movie->imdbid)
-                                                <a href="{{ $site->dereferrerLink }}https://www.imdb.com/title/tt{{ $movie->imdbid }}" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-warning-100 dark:bg-warning-900/40 text-warning-800 dark:text-warning-200 rounded-lg hover:bg-warning-200 transition">
+                                                <a href="{{ $site->dereferrerLink }}https://www.imdb.com/title/tt{{ $movie->imdbid }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-3 py-1.5 bg-warning-100 dark:bg-warning-900/40 text-warning-800 dark:text-warning-200 rounded-lg hover:bg-warning-200 transition">
                                                     <i aria-hidden="true" class="fab fa-imdb mr-1"></i> IMDb
                                                 </a>
                                             @endif
                                             @if($movie->tmdbid)
-                                                <a href="{{ $site->dereferrerLink }}https://www.themoviedb.org/movie/{{ $movie->tmdbid }}" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-primary-100 text-primary-800 rounded-lg hover:bg-primary-200 transition dark:bg-primary-900/30 dark:text-primary-200 dark:hover:bg-primary-800/30">
+                                                <a href="{{ $site->dereferrerLink }}https://www.themoviedb.org/movie/{{ $movie->tmdbid }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-3 py-1.5 bg-primary-100 text-primary-800 rounded-lg hover:bg-primary-200 transition dark:bg-primary-900/30 dark:text-primary-200 dark:hover:bg-primary-800/30">
                                                     <i aria-hidden="true" class="fas fa-film mr-1"></i> TMDb
                                                 </a>
                                             @endif
                                             @if($movie->traktid)
-                                                <a href="{{ $site->dereferrerLink }}https://trakt.tv/movies/{{ $movie->traktid }}" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-200 rounded-lg hover:bg-red-200 transition">
+                                                <a href="{{ $site->dereferrerLink }}https://trakt.tv/movies/{{ $movie->traktid }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-3 py-1.5 bg-danger-100 dark:bg-danger-900/40 text-danger-800 dark:text-danger-200 rounded-lg hover:bg-danger-200 transition">
                                                     <i aria-hidden="true" class="fas fa-heart mr-1"></i> Trakt
                                                 </a>
                                             @endif
@@ -129,7 +129,7 @@
             icon="fas fa-chart-line"
             title="No trending movies found"
             message="Check back soon for the most popular downloads!"
-            action-url="{{ route('Movies') }}"
+            :action-url="route('Movies')"
             action-label="Browse All Movies"
             action-icon="fas fa-film"
         />

@@ -107,30 +107,6 @@
     width: 0; /* Start at 0 for animation */
 }
 
-/* Profile Charts - API Token Scrollbar */
-code.api-token {
-    overflow-x: auto;
-    word-break: break-all;
-}
-
-code.api-token::-webkit-scrollbar {
-    height: 6px;
-}
-
-code.api-token::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 3px;
-}
-
-code.api-token::-webkit-scrollbar-thumb {
-    background: rgba(0, 255, 0, 0.3);
-    border-radius: 3px;
-}
-
-code.api-token::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 255, 0, 0.5);
-}
-
 /* Profile Page Styles */
 
 /* Tab content visibility */
@@ -354,33 +330,6 @@ code.api-token::-webkit-scrollbar-thumb:hover {
     border-color: rgb(107, 114, 128);
 }
 
-/* Reset selected modal list styling */
-#reset-selected-list {
-    max-height: 150px;
-    overflow-y: auto;
-}
-
-#reset-selected-list::-webkit-scrollbar {
-    width: 6px;
-}
-
-#reset-selected-list::-webkit-scrollbar-track {
-    background: rgb(243, 244, 246); /* gray-100 */
-    border-radius: 3px;
-}
-
-.dark #reset-selected-list::-webkit-scrollbar-track {
-    background: rgb(55, 65, 81); /* gray-700 */
-}
-
-#reset-selected-list::-webkit-scrollbar-thumb {
-    background: rgb(156, 163, 175); /* gray-400 */
-    border-radius: 3px;
-}
-
-.dark #reset-selected-list::-webkit-scrollbar-thumb {
-    background: rgb(107, 114, 128); /* gray-500 */
-}
 .movie-filter-control {
     width: 100%;
     min-height: 2.75rem;

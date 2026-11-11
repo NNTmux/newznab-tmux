@@ -112,10 +112,8 @@
                     </div>
                 </div>
 
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                        <thead class="bg-gray-50 dark:bg-gray-900">
-                            <tr>
+                <x-admin.data-table>
+                    <x-slot:head>
                                 <x-admin.th>
                                     <input aria-label="Select all" type="checkbox" id="selectAll" class="h-4 w-4 text-link dark:text-primary-400 focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded">
                                 </x-admin.th>
@@ -157,9 +155,8 @@
                                 <x-admin.th>Deleted By</x-admin.th>
                                 <x-admin.th>GDPR Erasure</x-admin.th>
                                 <x-admin.th>Actions</x-admin.th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    </x-slot:head>
+
                             @foreach($deletedusers as $user)
                                 <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                                     <td class="px-6 py-4 whitespace-nowrap">
@@ -170,20 +167,14 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ $user->email }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-                                            {{ $user->rolename ?? 'N/A' }}
-                                        </span>
+                                        <x-admin.badge tone="neutral">{{ $user->rolename ?? 'N/A' }}</x-admin.badge>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ $user->host ?? 'N/A' }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         @if($user->verified)
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200">
-                                                <i aria-hidden="true" class="fas fa-check mr-1"></i>Yes
-                                            </span>
+                                            <x-admin.badge tone="success" icon="fas fa-check">Yes</x-admin.badge>
                                         @else
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">
-                                                <i aria-hidden="true" class="fas fa-times mr-1"></i>No
-                                            </span>
+                                            <x-admin.badge tone="danger" icon="fas fa-times">No</x-admin.badge>
                                         @endif
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
@@ -194,13 +185,9 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         @if($user->deleted_by === 'Self')
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200">
-                                                <i aria-hidden="true" class="fas fa-user mr-1"></i>Self
-                                            </span>
+                                            <x-admin.badge tone="primary" icon="fas fa-user">Self</x-admin.badge>
                                         @elseif($user->deleted_by === 'System')
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-                                                <i aria-hidden="true" class="fas fa-robot mr-1"></i>System
-                                            </span>
+                                            <x-admin.badge tone="neutral" icon="fas fa-robot">System</x-admin.badge>
                                         @elseif($user->deleted_by)
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-warning-100 dark:bg-warning-900 text-warning-800 dark:text-warning-200" title="Deleted by admin: {{ $user->deleted_by }}">
                                                 <i aria-hidden="true" class="fas fa-user-shield mr-1"></i>{{ $user->deleted_by }}
@@ -215,9 +202,7 @@
                                                 <i aria-hidden="true" class="fas fa-shield-alt mr-1"></i>GDPR
                                             </a>
                                         @else
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
-                                                <i aria-hidden="true" class="fas fa-minus mr-1"></i>No
-                                            </span>
+                                            <x-admin.badge tone="neutral" icon="fas fa-minus">No</x-admin.badge>
                                         @endif
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -230,7 +215,7 @@
                                                 <i aria-hidden="true" class="fas fa-undo"></i>
                                             </button>
                                             <button aria-label="Permanently Delete" type="button"
-                                                    class="delete-user-btn text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 bg-transparent border-0 p-0 cursor-pointer"
+                                                    class="delete-user-btn text-danger-600 dark:text-danger-400 hover:text-danger-900 dark:hover:text-danger-300 bg-transparent border-0 p-0 cursor-pointer"
                                                     title="Permanently Delete"
                                                     data-user-id="{{ $user->id }}"
                                                     data-username="{{ $user->username }}">
@@ -240,15 +225,11 @@
                                     </td>
                                 </tr>
                             @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                </x-admin.data-table>
             </form>
 
             <!-- Pagination -->
-            <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
-                {{ $deletedusers->links() }}
-            </div>
+            <x-admin.pagination :paginator="$deletedusers" />
         @else
             <x-admin.empty-state icon="fas fa-trash-restore" title="No deleted users found" message="There are no soft-deleted users matching your filters." />
         @endif

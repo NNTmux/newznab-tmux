@@ -4,10 +4,12 @@
 @source "../js";
 /* PHP files that hold literal Tailwind class strings */
 @source "../../app/Enums/ColorScheme.php";
+@source "../../app/Enums/RegistrationStatus.php";
+@source "../../app/Enums/ServiceStatusEnum.php";
+@source "../../app/Enums/IncidentImpactEnum.php";
+@source "../../app/Enums/IncidentStatusEnum.php";
 @source "../../app/Models/UserActivity.php";
-/* Forum (own build / CDN) and Pulse (own CSS) never load app.css */
-@source not "../views/forum";
-@source not "../views/components/forum";
+/* Pulse ships its own CSS and never loads app.css */
 @source not "../views/vendor/pulse";
 
 /* Tailwind v4 plugins */
@@ -920,11 +922,11 @@ dialog.app-modal::backdrop {
 }
 
 .release-bulk-actions__delete {
-    @apply text-red-700 hover:bg-red-50;
+    @apply text-danger-700 hover:bg-danger-50;
 }
 
 .dark .release-bulk-actions__delete {
-    @apply text-red-400 hover:bg-red-400/10;
+    @apply text-danger-400 hover:bg-danger-400/10;
 }
 
 .release-bulk-actions__button:focus-visible {

@@ -66,7 +66,7 @@
     </script>
 
     @push('forum-page-scripts')
-    <script type="module">
+    <script type="module" nonce="{{ csp_nonce() }}">
     const app = Vue.createApp({
         setup() {
             const state = Vue.reactive({

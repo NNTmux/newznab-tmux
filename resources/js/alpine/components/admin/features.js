@@ -39,7 +39,7 @@ Alpine.data('tinyMceEditor', () => ({
             document.querySelectorAll('#body, .tinymce-editor').forEach(ta => {
                 if (ta.parentElement) {
                     const err = document.createElement('div');
-                    err.className = 'mt-2 p-3 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 text-red-800 dark:text-red-200 rounded';
+                    err.className = 'mt-2 p-3 bg-danger-50 dark:bg-danger-900 border border-danger-200 dark:border-danger-700 text-danger-800 dark:text-danger-200 rounded';
                     err.innerHTML = '<i aria-hidden="true" class="fas fa-exclamation-triangle mr-2"></i>TinyMCE editor failed to load.';
                     ta.parentElement.insertBefore(err, ta.nextSibling);
                 }
@@ -192,8 +192,8 @@ Alpine.data('adminUserEdit', () => ({
         display.textContent = d.toLocaleDateString('en-US', { weekday:'short', year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' });
         preview.classList.remove('hidden');
         const diff = d - new Date();
-        display.classList.remove('text-red-600','dark:text-red-400','text-warning-600','dark:text-warning-400','text-link','dark:text-primary-400');
-        if (diff < 0) display.classList.add('text-red-600','dark:text-red-400');
+        display.classList.remove('text-danger-600','dark:text-danger-400','text-warning-600','dark:text-warning-400','text-link','dark:text-primary-400');
+        if (diff < 0) display.classList.add('text-danger-600','dark:text-danger-400');
         else if (diff < 7*24*60*60*1000) display.classList.add('text-warning-600','dark:text-warning-400');
         else display.classList.add('text-link','dark:text-primary-400');
     }
@@ -254,149 +254,17 @@ Alpine.data('adminDeletedUsers', () => ({
 
 // Invitations select all
 Alpine.data('adminInvitations', () => ({
-    allChecked: false,
-    toggleAll() { this.$el.querySelectorAll('.invitation-checkbox').forEach(cb => { cb.checked = this.allChecked; }); },
+    toggleAll() {
+        const selectAll = this.$refs.selectAll;
+        this.$root.querySelectorAll('.invitation-checkbox').forEach(cb => { cb.checked = selectAll.checked; });
+        selectAll.indeterminate = false;
+    },
     onCheckboxChange() {
-        const all = this.$el.querySelectorAll('.invitation-checkbox');
-        const checked = this.$el.querySelectorAll('.invitation-checkbox:checked');
-        this.allChecked = all.length > 0 && checked.length === all.length;
-    }
-}));
-
-// Regex form validation
-Alpine.data('adminRegexForm', () => ({
-    validate(e) {
-        const inputs = this.$el.querySelectorAll('input[name*="regex"], textarea[name*="regex"]');
-        let valid = true;
-        inputs.forEach(input => {
-            const val = input.value.trim();
-            if (val && input.hasAttribute('required')) {
-                const delims = ['/','/','#','~','%','@','!'];
-                if (delims.includes(val[0])) {
-                    let found = false;
-                    for (let i = 1; i < val.length; i++) { if (val[i] === val[0]) { found = true; break; } }
-                    if (!found) { valid = false; input.classList.add('border-red-500'); }
-                    else input.classList.remove('border-red-500');
-                }
-            }
-        });
-        if (!valid) { e.preventDefault(); showToast('Please fix regex validation errors', 'error'); }
-    }
-}));
-
-// Tmux crap types toggle
-Alpine.data('tmuxEdit', () => ({
-    customCrap: false,
-    init() {
-        const checked = document.querySelector('input[name="fix_crap_opt"]:checked');
-        if (checked) this.customCrap = checked.value === 'Custom';
-    },
-    setCrapOpt(value) { this.customCrap = value === 'Custom'; }
-}));
-
-// Image fallbacks (global)
-Alpine.data('imageFallback', () => ({
-    onError(e) {
-        const fallback = e.target.getAttribute('data-fallback-src');
-        if (fallback && e.target.src !== fallback) e.target.src = fallback;
-    }
-}));
-
-// Select redirect
-Alpine.data('selectRedirect', () => ({
-    onChange(e) {
-        const url = e.target.value;
-        if (url && url !== '#') window.location.href = url;
-    }
-}));
-
-// Confirm delete (link or form)
-Alpine.data('confirmAction', () => ({
-    confirmDelete(e, message) {
-        e.preventDefault();
-        e.stopPropagation();
-        const el = e.currentTarget;
-        const form = el.closest('form');
-        showConfirm({
-            message: message || 'Are you sure you want to delete this item?',
-            type: 'danger',
-            confirmText: 'Delete',
-            onConfirm: function() { if (form) form.submit(); else if (el.href) window.location.href = el.href; }
-        });
-    }
-}));
-
-// Download NZB toast
-Alpine.data('downloadNzb', () => ({
-    onClick() { showToast('Downloading NZB...', 'success'); }
-}));
-
-// Logout
-Alpine.data('logout', () => ({
-    submit(e) {
-        e.preventDefault();
-        const form = document.getElementById('logout-form') || document.getElementById('sidebar-logout-form');
-        if (form) form.submit();
-    }
-}));
-
-// Promotion toggle/delete
-Alpine.data('promotionAction', () => ({
-    togglePromotion(e, name, isActive, href) {
-        e.preventDefault();
-        const action = isActive ? 'deactivate' : 'activate';
-        showConfirm({
-            title: action.charAt(0).toUpperCase() + action.slice(1) + ' Promotion',
-            message: 'Are you sure you want to ' + action + ' the promotion "' + name + '"?',
-            type: isActive ? 'warning' : 'success',
-            confirmText: action.charAt(0).toUpperCase() + action.slice(1),
-            onConfirm: function() { window.location.href = href; }
-        });
-    },
-    deletePromotion(e, name) {
-        e.preventDefault();
-        const form = e.currentTarget.closest('form');
-        showConfirm({
-            title: 'Delete Promotion',
-            message: 'Are you sure you want to delete the promotion "' + name + '"?',
-            details: 'This action cannot be undone.',
-            type: 'danger',
-            confirmText: 'Delete',
-            onConfirm: function() { if (form) form.submit(); }
-        });
-    }
-}));
-
-// Binary blacklist
-Alpine.data('binaryBlacklist', () => ({
-    deleteBlacklist(e, id) {
-        e.preventDefault();
-        if (confirm('Are you sure? This will delete the blacklist from this list.')) {
-            if (typeof ajax_binaryblacklist_delete === 'function') ajax_binaryblacklist_delete(id);
-        }
-    }
-}));
-
-// Regex delete
-Alpine.data('regexDelete', () => ({
-    deleteRegex(e, id, deleteUrl) {
-        e.preventDefault();
-        if (confirm('Are you sure you want to delete this regex? This action cannot be undone.')) {
-            const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
-            fetch(deleteUrl + '?id=' + id, { method: 'GET', headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': csrf } })
-            .then(r => r.json())
-            .then(d => {
-                if (d.success) { const row = document.getElementById('row-' + id); if (row) { row.style.transition = 'opacity 0.3s'; row.style.opacity = '0'; setTimeout(() => row.remove(), 300); } showToast('Regex deleted successfully', 'success'); }
-                else showToast('Error deleting regex', 'error');
-            }).catch(() => showToast('Error deleting regex', 'error'));
-        }
-    }
-}));
-
-// My Movies confirm
-Alpine.data('myMovies', () => ({
-    confirmRemove(e) {
-        if (!confirm('Are you sure you want to remove this movie from your watchlist?')) e.preventDefault();
+        const all = this.$root.querySelectorAll('.invitation-checkbox');
+        const checked = this.$root.querySelectorAll('.invitation-checkbox:checked');
+        const selectAll = this.$refs.selectAll;
+        selectAll.checked = all.length > 0 && checked.length === all.length;
+        selectAll.indeterminate = checked.length > 0 && checked.length < all.length;
     }
 }));
 
@@ -494,15 +362,6 @@ Alpine.data('myMovies', () => ({
             return;
         }
 
-        var promoDelete = e.target.closest('.promotion-delete-btn');
-        if (promoDelete) {
-            e.preventDefault();
-            var name = promoDelete.getAttribute('data-promotion-name');
-            var form = promoDelete.closest('form');
-            showConfirm({ title: 'Delete Promotion', message: 'Are you sure you want to delete the promotion "' + name + '"?', details: 'This action cannot be undone.', type: 'danger', confirmText: 'Delete', onConfirm: function() { if (form) form.submit(); } });
-            return;
-        }
-
         // Content toggle/delete
         var contentToggle = e.target.closest('.content-toggle-status');
         if (contentToggle) {
@@ -518,7 +377,7 @@ Alpine.data('myMovies', () => ({
                 if (data.success) {
                     var row = contentToggle.closest('tr'), sc = row.cells[5], ns = data.status;
                     if (ns === 1) { sc.innerHTML = '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-100"><i aria-hidden="true" class="fa-solid fa-check mr-1"></i>Enabled</span>'; contentToggle.className = 'content-toggle-status text-success-600 dark:text-success-400 hover:text-success-900 dark:hover:text-success-300'; contentToggle.innerHTML = '<i aria-hidden="true" class="fa-solid fa-toggle-on"></i>'; }
-                    else { sc.innerHTML = '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100"><i aria-hidden="true" class="fa-solid fa-times mr-1"></i>Disabled</span>'; contentToggle.className = 'content-toggle-status text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300'; contentToggle.innerHTML = '<i aria-hidden="true" class="fa-solid fa-toggle-off"></i>'; }
+                    else { sc.innerHTML = '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-danger-100 dark:bg-danger-900 text-danger-800 dark:text-danger-100"><i aria-hidden="true" class="fa-solid fa-times mr-1"></i>Disabled</span>'; contentToggle.className = 'content-toggle-status text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300'; contentToggle.innerHTML = '<i aria-hidden="true" class="fa-solid fa-toggle-off"></i>'; }
                     contentToggle.setAttribute('data-current-status', ns); contentToggle.title = ns === 1 ? 'Disable' : 'Enable';
                     showToast(data.message, 'success');
                 } else showToast(data.message || 'Failed', 'error');
@@ -544,34 +403,6 @@ Alpine.data('myMovies', () => ({
                     }).catch(function() { showToast('Error', 'error'); contentDelete.disabled = false; contentDelete.style.opacity = '1'; });
                 }
             });
-            return;
-        }
-
-        // Regex delete
-        var regexDel = e.target.closest('[data-delete-regex]');
-        if (regexDel) {
-            e.preventDefault();
-            var id = regexDel.getAttribute('data-delete-regex');
-            var url = regexDel.getAttribute('data-delete-url');
-            if (confirm('Are you sure you want to delete this regex?')) {
-                var csrf = document.querySelector('meta[name="csrf-token"]')?.content;
-                fetch(url + '?id=' + id, { method: 'GET', headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': csrf } })
-                .then(function(r) { return r.json(); }).then(function(d) {
-                    if (d.success) { var row = document.getElementById('row-' + id); if (row) { row.style.transition = 'opacity 0.3s'; row.style.opacity = '0'; setTimeout(function() { row.remove(); }, 300); } showToast('Regex deleted', 'success'); }
-                    else showToast('Error', 'error');
-                }).catch(function() { showToast('Error', 'error'); });
-            }
-            return;
-        }
-
-        // Binary blacklist delete
-        var blDel = e.target.closest('[data-delete-blacklist]');
-        if (blDel) {
-            e.preventDefault();
-            var id = blDel.getAttribute('data-delete-blacklist');
-            if (confirm('Are you sure? This will delete the blacklist.')) {
-                if (typeof ajax_binaryblacklist_delete === 'function') ajax_binaryblacklist_delete(id);
-            }
             return;
         }
 
@@ -603,28 +434,7 @@ Alpine.data('myMovies', () => ({
         }
     });
 
-    // --- Image fallbacks ---
-    document.querySelectorAll('img[data-fallback-src], img[data-hide-on-error]').forEach(function(img) {
-        img.addEventListener('error', function() {
-            var fb = this.getAttribute('data-fallback-src');
-            if (fb && this.src !== fb) { this.src = fb; return; }
-            if (this.hasAttribute('data-hide-on-error')) this.style.display = 'none';
-        });
-    });
-
     // --- Admin select-alls and bulk forms ---
-    // Invitations select-all
-    var selectAllInv = document.getElementById('select_all');
-    if (selectAllInv) {
-        var invBoxes = document.querySelectorAll('.invitation-checkbox');
-        selectAllInv.addEventListener('change', function() { invBoxes.forEach(function(cb) { cb.checked = selectAllInv.checked; }); });
-        invBoxes.forEach(function(cb) { cb.addEventListener('change', function() {
-            var all = Array.from(invBoxes).every(function(c) { return c.checked; });
-            var some = Array.from(invBoxes).some(function(c) { return c.checked; });
-            selectAllInv.checked = all; selectAllInv.indeterminate = some && !all;
-        }); });
-    }
-
     // Deleted users select-all
     var selectAllUsers = document.getElementById('selectAll');
     if (selectAllUsers) {

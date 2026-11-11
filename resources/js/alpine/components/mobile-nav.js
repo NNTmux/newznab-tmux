@@ -3,50 +3,6 @@
  */
 import Alpine from '@alpinejs/csp';
 
-Alpine.data('mobileNav', () => ({
-    navOpen: false,
-    searchOpen: false,
-
-    toggleNav() {
-        this.navOpen = !this.navOpen;
-        if (this.navOpen) this.searchOpen = false;
-    },
-
-    toggleSearch() {
-        this.searchOpen = !this.searchOpen;
-        if (this.searchOpen) this.navOpen = false;
-    },
-
-    closeAll() {
-        this.navOpen = false;
-        this.searchOpen = false;
-    },
-
-    init() {
-        // Close when the corresponding desktop control becomes available.
-        window.addEventListener('resize', () => {
-            if (window.innerWidth >= 1536) this.navOpen = false;
-            if (window.innerWidth >= 1536) this.searchOpen = false;
-        });
-    }
-}));
-
-Alpine.data('mobileNavSection', () => ({
-    open: false,
-
-    toggle() {
-        this.open = !this.open;
-    }
-}));
-
-Alpine.data('mobileSidebar', () => ({
-    open: false,
-
-    toggle() {
-        this.open = !this.open;
-    }
-}));
-
 /**
  * Document-level delegation for mobile menu elements without x-data.
  */

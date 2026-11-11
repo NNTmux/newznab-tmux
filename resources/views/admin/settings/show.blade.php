@@ -53,7 +53,12 @@
                             $errorId = $field->column.'_error';
                         @endphp
                         <div @class(['md:col-span-2' => in_array($field->control, ['textarea', 'rich-text', 'multiselect'], true)]) @if ($field->control === 'rich-text') x-data="tinyMceEditor" @endif>
-                            <label for="{{ $field->column }}" class="mb-1.5 block text-sm font-semibold text-fg">{{ $field->label }}</label>
+                            @if ($field->control === 'multiselect')
+                                {{-- A checkbox group has no single control to point at: the group is labelled instead. --}}
+                                <span id="{{ $field->column }}_label" class="mb-1.5 block text-sm font-semibold text-fg">{{ $field->label }}</span>
+                            @else
+                                <label for="{{ $field->column }}" class="mb-1.5 block text-sm font-semibold text-fg">{{ $field->label }}</label>
+                            @endif
 
                             @if ($field->control === 'boolean')
                                 <div class="flex min-h-11 items-center">
@@ -89,7 +94,7 @@
                                     @endif
                                 </div>
                             @elseif ($field->control === 'multiselect')
-                                <div class="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4" aria-describedby="{{ $helpId }}">
+                                <div class="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4" role="group" aria-labelledby="{{ $field->column }}_label" aria-describedby="{{ $helpId }}">
                                     @foreach ($field->options as $optionValue => $optionLabel)
                                         <label class="inline-flex min-h-11 items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"><input type="checkbox" name="{{ $field->column }}[]" value="{{ $optionValue }}" class="{{ $checkboxClasses }}" @checked(in_array($optionValue, old($field->column, $selectedCleanupRules), true))> {{ $optionLabel }}</label>
                                     @endforeach

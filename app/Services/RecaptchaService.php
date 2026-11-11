@@ -70,6 +70,8 @@ class RecaptchaService
      */
     public static function renderJs(): string
     {
-        return '<script src="https://www.google.com/recaptcha/api.js" async defer></script>';
+        $nonce = function_exists('csp_nonce') ? ' nonce="'.e(csp_nonce()).'"' : '';
+
+        return '<script src="https://www.google.com/recaptcha/api.js"'.$nonce.' async defer></script>';
     }
 }

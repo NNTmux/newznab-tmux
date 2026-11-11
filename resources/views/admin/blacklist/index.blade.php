@@ -17,8 +17,7 @@
             <strong>Click Edit or on the blacklist to enable/disable.</strong>
         </x-admin.info-alert>
 
-        <!-- Messages -->
-        <div id="message" class="px-6"></div>
+        <x-admin.list-search :action="route('admin.binaryblacklist-list')" :value="$lastSearch ?? ''" placeholder="Search by group, regex or description" label="Search the blacklist" />
 
         @if(count($binlist) > 0)
             <x-admin.data-table>
@@ -49,25 +48,25 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-center">
                             @if($bin->optype == 1)
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300">Black</span>
+                                <x-admin.badge tone="danger">Black</x-admin.badge>
                             @else
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-success-100 dark:bg-success-900/30 text-success-800 dark:text-success-300">White</span>
+                                <x-admin.badge tone="success">White</x-admin.badge>
                             @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-center">
                             @if($bin->msgcol == 1)
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300">Subject</span>
+                                <x-admin.badge tone="primary">Subject</x-admin.badge>
                             @elseif($bin->msgcol == 2)
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-warning-100 dark:bg-warning-900/30 text-warning-800 dark:text-warning-300">Poster</span>
+                                <x-admin.badge tone="warning">Poster</x-admin.badge>
                             @else
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300">MessageID</span>
+                                <x-admin.badge tone="neutral">MessageID</x-admin.badge>
                             @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-center">
                             @if($bin->status == 1)
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200">Active</span>
+                                <x-admin.badge tone="success">Active</x-admin.badge>
                             @else
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">Disabled</span>
+                                <x-admin.badge tone="danger">Disabled</x-admin.badge>
                             @endif
                         </td>
                         <td class="px-6 py-4 text-sm">
@@ -93,12 +92,19 @@
                                    title="Edit this blacklist">
                                     <i aria-hidden="true" class="fas fa-edit"></i>
                                 </a>
-                                <button aria-label="Delete this blacklist" type="button"
-                                        class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
-                                        data-delete-blacklist="{{ $bin->id }}"
-                                        title="Delete this blacklist">
-                                    <i aria-hidden="true" class="fas fa-trash"></i>
-                                </button>
+                                <form action="{{ route('admin.binaryblacklist-delete', $bin->id) }}" method="post" class="inline"
+                                      x-data="confirmForm"
+                                      data-message="Are you sure you want to delete this blacklist?"
+                                      data-title="Delete Blacklist"
+                                      data-type="danger"
+                                      data-confirm-text="Delete"
+                                      @submit.prevent="submit()">
+                                    @csrf
+                                    <button aria-label="Delete this blacklist" type="submit" title="Delete this blacklist"
+                                            class="text-danger-600 dark:text-danger-400 hover:text-danger-900 dark:hover:text-danger-300">
+                                        <i aria-hidden="true" class="fas fa-trash"></i>
+                                    </button>
+                                </form>
                             </div>
                         </td>
                     </tr>

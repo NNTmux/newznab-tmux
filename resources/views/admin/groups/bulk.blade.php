@@ -22,15 +22,12 @@
                 </div>
 
                 <!-- Results Table -->
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                        <thead class="bg-gray-50 dark:bg-gray-900">
-                            <tr>
+                <x-admin.data-table>
+                    <x-slot:head>
                                 <x-admin.th>Group</x-admin.th>
                                 <x-admin.th>Status</x-admin.th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    </x-slot:head>
+
                             @foreach($groupmsglist as $group)
                                 <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                                     <td class="px-6 py-4 whitespace-nowrap">
@@ -41,24 +38,16 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         @if(strpos($group['msg'], 'Error') !== false)
-                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300">
-                                                <i aria-hidden="true" class="fas fa-exclamation-circle mr-1"></i>{{ $group['msg'] }}
-                                            </span>
+                                            <x-admin.badge tone="danger" icon="fas fa-exclamation-circle">{{ $group['msg'] }}</x-admin.badge>
                                         @elseif(strpos($group['msg'], 'exists') !== false)
-                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-warning-100 dark:bg-warning-900/30 text-warning-800 dark:text-warning-300">
-                                                <i aria-hidden="true" class="fas fa-exclamation-triangle mr-1"></i>{{ $group['msg'] }}
-                                            </span>
+                                            <x-admin.badge tone="warning" icon="fas fa-exclamation-triangle">{{ $group['msg'] }}</x-admin.badge>
                                         @else
-                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-success-100 dark:bg-success-900/30 text-success-800 dark:text-success-300">
-                                                <i aria-hidden="true" class="fas fa-check-circle mr-1"></i>{{ $group['msg'] }}
-                                            </span>
+                                            <x-admin.badge tone="success" icon="fas fa-check-circle">{{ $group['msg'] }}</x-admin.badge>
                                         @endif
                                     </td>
                                 </tr>
                             @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                </x-admin.data-table>
             @else
                 <!-- Info Alert -->
                 <div class="mb-6 p-4 bg-info-50 dark:bg-info-900/30 border border-info-200 dark:border-info-800 rounded-lg">
@@ -78,7 +67,7 @@
                     <!-- Group Pattern -->
                     <div class="mb-6">
                         <label for="groupfilter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Group Pattern: <span class="text-red-500">*</span>
+                            Group Pattern: <span class="text-danger-500">*</span>
                         </label>
                         <div class="relative">
                             <div class="absolute top-3 left-3 pointer-events-none">

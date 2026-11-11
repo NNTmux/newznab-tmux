@@ -193,7 +193,7 @@
                             <button type="button" x-show="hasTimeRange()" x-cloak class="text-xs font-semibold text-link hover:underline dark:text-primary-400" @click="clearRange()">Clear time range</button>
                         </div>
 
-                        <p x-show="searchError" x-cloak class="text-sm text-red-600 dark:text-red-400" x-text="searchError"></p>
+                        <p x-show="searchError" x-cloak class="text-sm text-danger-600 dark:text-danger-400" x-text="searchError"></p>
                     </div>
 
                     {{-- Selected file header (browse mode) --}}
@@ -212,7 +212,7 @@
                             <button type="button" class="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-amber-700 hover:bg-amber-50 dark:text-amber-300 dark:hover:bg-amber-900/30" @click="truncateFile()" title="Empty this log file">
                                 <i class="fas fa-eraser" aria-hidden="true"></i><span>Truncate</span>
                             </button>
-                            <button type="button" class="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-red-700 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-40 dark:text-red-300 dark:hover:bg-red-900/30" :disabled="canDelete() === false" :title="deleteTitle()" @click="deleteFile()">
+                            <button type="button" class="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-danger-700 hover:bg-danger-50 disabled:cursor-not-allowed disabled:opacity-40 dark:text-danger-300 dark:hover:bg-danger-900/30" :disabled="canDelete() === false" :title="deleteTitle()" @click="deleteFile()">
                                 <i class="fas fa-trash" aria-hidden="true"></i><span>Delete</span>
                             </button>
                         </div>
@@ -249,7 +249,7 @@
                             <div class="h-4 w-5/6 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
                         </div>
 
-                        <div x-show="error" x-cloak class="m-6 flex items-center justify-between gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-900/30 dark:text-red-200">
+                        <div x-show="error" x-cloak class="m-6 flex items-center justify-between gap-3 rounded-lg border border-danger-200 bg-danger-50 px-4 py-3 text-sm text-danger-800 dark:border-danger-900 dark:bg-danger-900/30 dark:text-danger-200">
                             <span x-text="error"></span>
                             <button type="button" class="font-semibold hover:underline" @click="loadEntries()">Retry</button>
                         </div>
@@ -292,13 +292,13 @@
                                     <span class="min-w-0 flex-1 truncate font-mono text-sm font-semibold text-gray-900 dark:text-gray-100" x-text="group.path"></span>
                                     <span x-show="hasEngine(group)" class="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide" :class="engineBadgeClass(group)" :title="engineTitle(group)" x-text="engineLabel(group)"></span>
                                     <span x-show="group.timedOut" class="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800 dark:bg-amber-900/50 dark:text-amber-200" title="The search timed out; results may be incomplete">timed out</span>
-                                    <span x-show="group.error" class="rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-800 dark:bg-red-900/50 dark:text-red-200" :title="group.error">error</span>
+                                    <span x-show="group.error" class="rounded-full bg-danger-100 px-2 py-0.5 text-xs font-semibold text-danger-800 dark:bg-danger-900/50 dark:text-danger-200" :title="group.error">error</span>
                                     <span class="shrink-0 text-xs text-gray-600 dark:text-gray-400" x-text="groupCountLabel(group)"></span>
                                 </button>
 
                                 <template x-if="group.open">
                                     <div>
-                                        <p x-show="group.error" class="px-6 py-2 text-sm text-red-700 dark:text-red-300" x-text="group.error"></p>
+                                        <p x-show="group.error" class="px-6 py-2 text-sm text-danger-700 dark:text-danger-300" x-text="group.error"></p>
                                         <ol class="divide-y divide-gray-100 dark:divide-gray-800">
                                             <template x-for="entry in group.entries" :key="entry._key">
                                                 @include('admin.logs.partials.entry', ['showOpenInFile' => true])

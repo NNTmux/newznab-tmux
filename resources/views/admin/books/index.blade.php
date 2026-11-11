@@ -10,6 +10,7 @@
         </x-slot:actions>
     </x-admin.page-header>
     <x-admin.card>
+        <x-admin.list-search :action="route('admin.book-list')" :value="$lastSearch ?? ''" placeholder="Search by title or author" label="Search books" />
 
         <!-- Books Table -->
         <x-admin.data-table>
@@ -72,7 +73,7 @@
                                 </a>
                                 @if($book->url)
                                     <a aria-label="View Source" href="{{ $book->url }}"
-                                       target="_blank"
+                                       target="_blank" rel="noopener noreferrer"
                                        class="ml-3 text-success-600 dark:text-success-400 hover:text-success-900 dark:hover:text-success-300"
                                        title="View Source">
                                         <i aria-hidden="true" class="fas fa-external-link-alt"></i>
@@ -90,9 +91,7 @@
         </x-admin.data-table>
 
         <!-- Pagination -->
-        <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
-            {{ $bookList->links() }}
-        </div>
+        <x-admin.pagination :paginator="$bookList" />
     </x-admin.card>
 </div>
 @endsection

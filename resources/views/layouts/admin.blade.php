@@ -107,7 +107,7 @@
                         </a>
                         <a href="{{ route('logout') }}"
                            data-logout
-                           class="touch-target inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-red-300 transition hover:bg-red-400/10 hover:text-red-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300" title="Log out" aria-label="Log out">
+                           class="touch-target inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-danger-300 transition hover:bg-danger-400/10 hover:text-danger-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger-300" title="Log out" aria-label="Log out">
                             <i class="fas fa-sign-out-alt" aria-hidden="true"></i><span class="hidden xl:inline">Log out</span>
                         </a>
                         <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">

@@ -5,7 +5,6 @@
     <x-admin.page-header :title="$title" icon="fas fa-music" />
     <x-admin.card>
 
-        <!-- Success/Error/Warning Messages -->
 
 
 
@@ -22,7 +21,7 @@
                     <!-- Title -->
                     <div>
                         <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Album Title <span class="text-red-500">*</span>
+                            Album Title <span class="text-danger-500">*</span>
                         </label>
                         <input type="text"
                                id="title"
@@ -183,13 +182,9 @@
                             Current Cover Status
                         </label>
                         @if(!empty($mus['cover']) && $mus['cover'] == 1)
-                            <span class="inline-flex items-center px-3 py-1 text-sm font-semibold rounded-full bg-success-100 dark:bg-success-900/40 text-success-800 dark:text-success-200">
-                                <i aria-hidden="true" class="fas fa-check mr-2"></i> Cover Available
-                            </span>
+                            <x-admin.badge tone="success" icon="fas fa-check">Cover Available</x-admin.badge>
                         @else
-                            <span class="inline-flex items-center px-3 py-1 text-sm font-semibold rounded-full bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-200">
-                                <i aria-hidden="true" class="fas fa-times mr-2"></i> No Cover
-                            </span>
+                            <x-admin.badge tone="danger" icon="fas fa-times">No Cover</x-admin.badge>
                         @endif
                     </div>
                 </div>

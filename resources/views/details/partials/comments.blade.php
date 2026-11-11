@@ -59,7 +59,7 @@
                                             <p class="font-semibold text-gray-800 dark:text-gray-200">{{ $comment['username'] ?? 'Anonymous' }}</p>
                                             <p class="text-xs text-gray-500 dark:text-gray-400">
                                                 <i aria-hidden="true" class="far fa-clock mr-1"></i>
-                                                {{ \Carbon\Carbon::parse($comment['created_at'])->diffForHumans() }}
+                                                {{ userDateDiffForHumans($comment['created_at']) }}
                                             </p>
                                         </div>
                                     </div>

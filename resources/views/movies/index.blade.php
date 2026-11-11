@@ -80,7 +80,7 @@
                 <div>
                     <label for="title" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Title</label>
                     <div class="relative">
-                        <span class="pointer-events-none absolute inset-y-0 left-0 flex w-10 items-center justify-center text-gray-400" aria-hidden="true">
+                        <span class="pointer-events-none absolute inset-y-0 left-0 flex w-10 items-center justify-center text-gray-500 dark:text-gray-400" aria-hidden="true">
                             <i aria-hidden="true" class="fas fa-magnifying-glass text-sm"></i>
                         </span>
                         <input type="search"
@@ -177,8 +177,8 @@
                 icon="fas fa-film"
                 title="No movies found"
                 message="Try broadening your filters or clear them to return to the full catalog."
-                action-url="{{ $activeMovieFilters->isNotEmpty() ? route('Movies') : null }}"
-                action-label="{{ $activeMovieFilters->isNotEmpty() ? 'Clear filters' : null }}"
+                :action-url="$activeMovieFilters->isNotEmpty() ? route('Movies') : null"
+                :action-label="$activeMovieFilters->isNotEmpty() ? 'Clear filters' : null"
                 action-icon="fas fa-rotate-left"
             />
         </section>

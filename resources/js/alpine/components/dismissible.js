@@ -4,15 +4,6 @@
  */
 import Alpine from '@alpinejs/csp';
 
-// Simple dismissible alert (flash messages, banners)
-Alpine.data('dismissible', () => ({
-    show: true,
-
-    dismiss() {
-        this.show = false;
-    }
-}));
-
 // Period filter with custom date range toggle
 Alpine.data('periodFilter', (initialShowCustom) => ({
     showCustom: initialShowCustom || false,

@@ -42,7 +42,7 @@ Alpine.data('mediainfoModal', () => ({
                 this.loading = false;
             })
             .catch(err => {
-                this._setContent('<div class="text-center py-8"><i aria-hidden="true" class="fas fa-exclamation-circle text-3xl text-red-600"></i><p class="text-red-600 mt-2">' + escapeHtml(err.message) + '</p></div>');
+                this._setContent('<div class="text-center py-8"><i aria-hidden="true" class="fas fa-exclamation-circle text-3xl text-danger-600"></i><p class="text-danger-600 mt-2">' + escapeHtml(err.message) + '</p></div>');
                 this.loading = false;
             });
     },

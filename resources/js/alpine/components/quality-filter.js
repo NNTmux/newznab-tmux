@@ -50,6 +50,7 @@ Alpine.data('qualityFilter', () => ({
         this.$el.querySelectorAll('[data-resolution]').forEach(btn => {
             const filter = btn.getAttribute('data-resolution');
             const isActive = filter === this.activeResolution;
+            btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
 
             // Remove all state classes first
             btn.classList.remove('bg-accent', 'text-white', 'hover:bg-accent-hover');
@@ -66,6 +67,7 @@ Alpine.data('qualityFilter', () => ({
         this.$el.querySelectorAll('[data-source]').forEach(btn => {
             const filter = btn.getAttribute('data-source');
             const isActive = filter === this.activeSource;
+            btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
 
             // Remove all state classes first
             btn.classList.remove('bg-purple-600', 'text-white', 'hover:bg-purple-700');

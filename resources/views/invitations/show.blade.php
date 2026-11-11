@@ -6,9 +6,9 @@
 
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm dark:bg-gray-800">
         <div class="bg-gray-50 dark:bg-gray-900 px-6 py-4 border-b border-gray-200 dark:border-gray-700 rounded-t-lg dark:bg-gray-700 dark:border-gray-600">
-            <h5 class="text-lg font-semibold text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
                 <i aria-hidden="true" class="fa-solid fa-envelope-open mr-2"></i>Invitation to Join {{ $site->title }}
-            </h5>
+            </h2>
         </div>
         <div class="p-6">
             @if($preview)
@@ -16,7 +16,7 @@
                     <div class="flex">
                         <i aria-hidden="true" class="fa-solid fa-user-plus text-4xl mr-4 mt-1"></i>
                         <div>
-                            <h6 class="font-semibold mb-2">You've been invited!</h6>
+                            <h3 class="font-semibold mb-2">You've been invited!</h3>
                             <p class="mb-0">
                                 <strong>{{ $preview['inviter_name'] ?? 'Someone' }}</strong> has invited you to join <strong>{{ $site->title }}</strong>.
                             </p>
@@ -27,9 +27,9 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                     <div class="bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 dark:bg-gray-700 dark:border-gray-600">
                         <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 dark:border-gray-600">
-                            <h6 class="font-semibold text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
+                            <h3 class="font-semibold text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
                                 <i aria-hidden="true" class="fa-solid fa-info-circle mr-2"></i>Invitation Details
-                            </h6>
+                            </h3>
                         </div>
                         <div class="p-4">
                             <div class="grid grid-cols-5 gap-3 mb-3">
@@ -56,7 +56,7 @@
                                     @isset($preview['expires_at'])
                                         <span class="text-gray-900 dark:text-gray-100">{{ date('M j, Y H:i', $preview['expires_at']) }}</span>
                                         @if($preview['expires_at'] < time())
-                                            <br><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 mt-1 dark:bg-red-900 dark:text-red-200">
+                                            <br><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-danger-100 text-danger-800 mt-1 dark:bg-danger-900 dark:text-danger-200">
                                                 <i aria-hidden="true" class="fa-solid fa-times mr-1"></i>Expired
                                             </span>
                                         @elseif($preview['is_used'])
@@ -89,9 +89,9 @@
                     </div>
                     <div class="bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 dark:bg-gray-700 dark:border-gray-600">
                         <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 dark:border-gray-600">
-                            <h6 class="font-semibold text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
+                            <h3 class="font-semibold text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
                                 <i aria-hidden="true" class="fa-solid fa-list-ol mr-2"></i>What's Next?
-                            </h6>
+                            </h3>
                         </div>
                         <div class="p-4">
                             <p class="mb-3 text-gray-700 dark:text-gray-300">To accept this invitation and create your account:</p>
@@ -109,16 +109,16 @@
                     @if($preview['is_used'])
                         <div class="bg-success-50 border border-success-200 text-success-800 rounded-lg p-6 mb-4 dark:bg-success-900 dark:border-success-700 dark:text-success-300">
                             <i aria-hidden="true" class="fas fa-check-circle text-4xl mb-2"></i>
-                            <h6 class="font-semibold mb-2">This invitation has already been used</h6>
+                            <h3 class="font-semibold mb-2">This invitation has already been used</h3>
                             <p class="mb-0">The account has been successfully created using this invitation.</p>
                         </div>
                         <a href="{{ url('/login') }}" class="inline-flex items-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-accent dark:bg-accent-hover hover:bg-accent-hover dark:hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                             <i aria-hidden="true" class="fas fa-sign-in-alt mr-2"></i> Login to Your Account
                         </a>
                     @elseif($preview['expires_at'] < time())
-                        <div class="bg-red-50 border border-red-200 text-red-800 rounded-lg p-6 mb-4 dark:bg-red-900 dark:border-red-700 dark:text-red-300">
+                        <div class="bg-danger-50 border border-danger-200 text-danger-800 rounded-lg p-6 mb-4 dark:bg-danger-900 dark:border-danger-700 dark:text-danger-300">
                             <i aria-hidden="true" class="fas fa-exclamation-triangle text-4xl mb-2"></i>
-                            <h6 class="font-semibold mb-2">This invitation has expired</h6>
+                            <h3 class="font-semibold mb-2">This invitation has expired</h3>
                             <p class="mb-0">Please contact the person who invited you for a new invitation.</p>
                         </div>
                         <a href="{{ url('/contact') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600">
@@ -127,7 +127,7 @@
                     @elseif($registrationStatus['is_closed'])
                         <div class="bg-warning-50 border border-warning-200 text-warning-800 rounded-lg p-6 mb-4 dark:bg-warning-900 dark:border-warning-700 dark:text-warning-300">
                             <i aria-hidden="true" class="fas fa-door-closed text-4xl mb-2"></i>
-                            <h6 class="font-semibold mb-2">Registrations are currently closed</h6>
+                            <h3 class="font-semibold mb-2">Registrations are currently closed</h3>
                             <p class="mb-0">{{ $registrationStatus['message'] }}</p>
                         </div>
                     @else
@@ -142,9 +142,9 @@
                     @endif
                 </div>
             @else
-                <div class="bg-red-50 border border-red-200 text-red-800 rounded-lg p-6 text-center dark:bg-red-900 dark:border-red-700 dark:text-red-300">
-                    <i aria-hidden="true" class="fas fa-exclamation-triangle text-5xl mb-3 text-red-600 dark:text-red-400"></i>
-                    <h5 class="text-xl font-semibold text-red-600 mb-3 dark:text-red-400">Invalid Invitation</h5>
+                <div class="bg-danger-50 border border-danger-200 text-danger-800 rounded-lg p-6 text-center dark:bg-danger-900 dark:border-danger-700 dark:text-danger-300">
+                    <i aria-hidden="true" class="fas fa-exclamation-triangle text-5xl mb-3 text-danger-600 dark:text-danger-400"></i>
+                    <h2 class="text-xl font-semibold text-danger-600 mb-3 dark:text-danger-400">Invalid Invitation</h2>
                     <p class="mb-4">This invitation link is not valid, has expired, or has been removed.</p>
                     <div class="flex flex-col sm:flex-row gap-2 justify-center">
                         <a href="{{ url('/contact') }}" class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600">

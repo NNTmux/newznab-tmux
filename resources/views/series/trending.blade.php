@@ -77,22 +77,22 @@
                                         <!-- External Links -->
                                         <div class="flex items-center gap-2 mb-4 text-xs flex-wrap">
                                             @if($show->tvdb)
-                                                <a href="{{ $site->dereferrerLink }}https://thetvdb.com/?tab=series&id={{ $show->tvdb }}" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-success-100 dark:bg-success-900/40 text-success-800 dark:text-success-200 rounded-lg hover:bg-success-200 transition">
+                                                <a href="{{ $site->dereferrerLink }}https://thetvdb.com/?tab=series&id={{ $show->tvdb }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-3 py-1.5 bg-success-100 dark:bg-success-900/40 text-success-800 dark:text-success-200 rounded-lg hover:bg-success-200 transition">
                                                     <i aria-hidden="true" class="fas fa-tv mr-1"></i> TVDB
                                                 </a>
                                             @endif
                                             @if($show->tvmaze)
-                                                <a href="{{ $site->dereferrerLink }}https://www.tvmaze.com/shows/{{ $show->tvmaze }}" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-purple-100 dark:bg-purple-900/40 text-purple-800 dark:text-purple-200 rounded-lg hover:bg-purple-200 transition">
+                                                <a href="{{ $site->dereferrerLink }}https://www.tvmaze.com/shows/{{ $show->tvmaze }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-3 py-1.5 bg-purple-100 dark:bg-purple-900/40 text-purple-800 dark:text-purple-200 rounded-lg hover:bg-purple-200 transition">
                                                     <i aria-hidden="true" class="fas fa-tv mr-1"></i> TVMaze
                                                 </a>
                                             @endif
                                             @if($show->trakt)
-                                                <a href="{{ $site->dereferrerLink }}https://trakt.tv/shows/{{ $show->trakt }}" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-200 rounded-lg hover:bg-red-200 transition">
+                                                <a href="{{ $site->dereferrerLink }}https://trakt.tv/shows/{{ $show->trakt }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-3 py-1.5 bg-danger-100 dark:bg-danger-900/40 text-danger-800 dark:text-danger-200 rounded-lg hover:bg-danger-200 transition">
                                                     <i aria-hidden="true" class="fas fa-heart mr-1"></i> Trakt
                                                 </a>
                                             @endif
                                             @if($show->tmdb)
-                                                <a href="{{ $site->dereferrerLink }}https://www.themoviedb.org/tv/{{ $show->tmdb }}" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-primary-100 text-primary-800 rounded-lg hover:bg-primary-200 transition dark:bg-primary-900/30 dark:text-primary-200 dark:hover:bg-primary-800/30">
+                                                <a href="{{ $site->dereferrerLink }}https://www.themoviedb.org/tv/{{ $show->tmdb }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-3 py-1.5 bg-primary-100 text-primary-800 rounded-lg hover:bg-primary-200 transition dark:bg-primary-900/30 dark:text-primary-200 dark:hover:bg-primary-800/30">
                                                     <i aria-hidden="true" class="fas fa-film mr-1"></i> TMDb
                                                 </a>
                                             @endif
@@ -127,7 +127,7 @@
             icon="fas fa-chart-line"
             title="No trending TV shows found"
             message="Check back soon for the most popular downloads!"
-            action-url="{{ route('series') }}"
+            :action-url="route('series')"
             action-label="Browse All TV Shows"
             action-icon="fas fa-tv"
         />

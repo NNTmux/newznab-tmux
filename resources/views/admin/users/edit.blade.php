@@ -13,8 +13,8 @@
 
         <!-- Error Messages -->
         @if(!empty($error))
-            <div class="mx-6 mt-4 p-4 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-lg">
-                <p class="text-red-800 dark:text-red-200">
+            <div class="mx-6 mt-4 p-4 bg-danger-50 dark:bg-danger-900 border border-danger-200 dark:border-danger-700 rounded-lg">
+                <p class="text-danger-800 dark:text-danger-200">
                     <i aria-hidden="true" class="fas fa-exclamation-circle mr-2"></i>{{ $error }}
                 </p>
             </div>
@@ -34,12 +34,12 @@
                 <!-- Username -->
                 <div>
                     <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Username <span class="text-red-500">*</span>
+                        Username <span class="text-danger-500">*</span>
                     </label>
                     <input type="text"
                            id="username"
                            name="username"
-                           value="{{ is_array($user) ? ($user['username'] ?? '') : ($user->username ?? '') }}"
+                           value="{{ old('username', is_array($user) ? ($user['username'] ?? '') : ($user->username ?? '')) }}"
                            required
                            class="w-full px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500">
                 </div>
@@ -47,12 +47,12 @@
                 <!-- Email -->
                 <div>
                     <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Email <span class="text-red-500">*</span>
+                        Email <span class="text-danger-500">*</span>
                     </label>
                     <input type="email"
                            id="email"
                            name="email"
-                           value="{{ is_array($user) ? ($user['email'] ?? '') : ($user->email ?? '') }}"
+                           value="{{ old('email', is_array($user) ? ($user['email'] ?? '') : ($user->email ?? '')) }}"
                            required
                            class="w-full px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500">
                 </div>
@@ -60,7 +60,7 @@
                 <!-- Password -->
                 <div>
                     <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Password @if(empty($user['id']))<span class="text-red-500">*</span>@endif
+                        Password @if(empty($user['id']))<span class="text-danger-500">*</span>@endif
                     </label>
                     <div class="relative">
                         <input type="password"
@@ -81,7 +81,7 @@
                 <!-- Role -->
                 <div>
                     <label for="role" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Role <span class="text-red-500">*</span>
+                        Role <span class="text-danger-500">*</span>
                     </label>
                     @if(!is_array($user) && !empty($user->pending_roles_id))
                         @php
@@ -138,7 +138,7 @@
                     <input type="number"
                            id="invites"
                            name="invites"
-                           value="{{ is_array($user) ? ($user['invites'] ?? 0) : ($user->invites ?? 0) }}"
+                           value="{{ old('invites', is_array($user) ? ($user['invites'] ?? 0) : ($user->invites ?? 0)) }}"
                            class="w-full px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500">
                 </div>
 
@@ -150,7 +150,7 @@
                     <textarea id="notes"
                               name="notes"
                               rows="4"
-                              class="w-full px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500">{{ is_array($user) ? ($user['notes'] ?? '') : ($user->notes ?? '') }}</textarea>
+                              class="w-full px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500">{{ old('notes', is_array($user) ? ($user['notes'] ?? '') : ($user->notes ?? '')) }}</textarea>
                 </div>
 
                 @include('admin.users.partials.view-preferences')

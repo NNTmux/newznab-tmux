@@ -11,9 +11,7 @@
                                     Pending Stacked Role{{ $allPendingRoles->count() > 1 ? 's' : '' }}
                                     <span class="ml-2 px-2 py-0.5 bg-accent text-white text-xs rounded-full">{{ $allPendingRoles->count() }}</span>
                                 </label>
-                                <span class="px-3 py-1 inline-flex items-center text-xs leading-5 font-bold rounded-full bg-primary-200 dark:bg-primary-800 text-primary-800 dark:text-primary-100 animate-pulse">
-                                    <i aria-hidden="true" class="fas fa-clock mr-1"></i> SCHEDULED
-                                </span>
+                                <x-admin.badge tone="primary" icon="fas fa-clock" class="animate-pulse">SCHEDULED</x-admin.badge>
                             </div>
 
                             <div class="space-y-3">
@@ -35,7 +33,7 @@
                                             @if($pendingRoleInfo['end_date'])
                                                 <div class="flex items-center justify-between">
                                                     <span class="text-xs font-medium text-gray-600 dark:text-gray-300">
-                                                        <i aria-hidden="true" class="fas fa-stop-circle text-red-400 mr-1"></i>Ends:
+                                                        <i aria-hidden="true" class="fas fa-stop-circle text-danger-400 mr-1"></i>Ends:
                                                     </span>
                                                     <span class="font-semibold text-gray-900 dark:text-gray-100">{{ $pendingRoleInfo['end_date']->format('M j, Y g:i A') }}</span>
                                                 </div>
@@ -55,10 +53,10 @@
                                     These roles will automatically activate in sequence as each previous role expires
                                 </p>
                                 @if(!empty($user->pending_roles_id))
-                                    <label class="inline-flex items-center px-3 py-2 rounded-md bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 hover:bg-red-100 dark:hover:bg-red-900/50 cursor-pointer transition-all">
+                                    <label class="inline-flex items-center px-3 py-2 rounded-md bg-danger-50 dark:bg-danger-900/30 border border-danger-200 dark:border-danger-700 hover:bg-danger-100 dark:hover:bg-danger-900/50 cursor-pointer transition-all">
                                         <input type="checkbox" name="cancel_pending_role" value="1"
-                                               class="rounded border-red-300 dark:border-red-600 bg-white dark:bg-gray-700 text-red-600 dark:text-red-500 shadow-sm focus:ring-2 focus:ring-red-500 dark:focus:ring-red-400 focus:border-red-500 dark:focus:border-red-400 cursor-pointer">
-                                        <span class="ml-2 text-xs text-red-700 dark:text-red-300 font-semibold">Cancel all pending roles</span>
+                                               class="rounded border-danger-300 dark:border-danger-600 bg-white dark:bg-gray-700 text-danger-600 dark:text-danger-500 shadow-sm focus:ring-2 focus:ring-danger-500 dark:focus:ring-danger-400 focus:border-danger-500 dark:focus:border-danger-400 cursor-pointer">
+                                        <span class="ml-2 text-xs text-danger-700 dark:text-danger-300 font-semibold">Cancel all pending roles</span>
                                     </label>
                                 @endif
                             </div>
@@ -71,9 +69,7 @@
                                     <i aria-hidden="true" class="fas fa-layer-group mr-2 text-lg"></i>
                                     Pending Stacked Role
                                 </label>
-                                <span class="px-3 py-1 inline-flex items-center text-xs leading-5 font-bold rounded-full bg-primary-200 dark:bg-primary-800 text-primary-800 dark:text-primary-100 animate-pulse">
-                                    <i aria-hidden="true" class="fas fa-clock mr-1"></i> SCHEDULED
-                                </span>
+                                <x-admin.badge tone="primary" icon="fas fa-clock" class="animate-pulse">SCHEDULED</x-admin.badge>
                             </div>
 
                             @php
@@ -102,10 +98,10 @@
                                     <i aria-hidden="true" class="fas fa-info-circle mr-1"></i>
                                     This role will automatically activate when the current role expires
                                 </p>
-                                <label class="inline-flex items-center px-3 py-2 rounded-md bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 hover:bg-red-100 dark:hover:bg-red-900/50 cursor-pointer transition-all">
+                                <label class="inline-flex items-center px-3 py-2 rounded-md bg-danger-50 dark:bg-danger-900/30 border border-danger-200 dark:border-danger-700 hover:bg-danger-100 dark:hover:bg-danger-900/50 cursor-pointer transition-all">
                                     <input type="checkbox" name="cancel_pending_role" value="1"
-                                           class="rounded border-red-300 dark:border-red-600 bg-white dark:bg-gray-700 text-red-600 dark:text-red-500 shadow-sm focus:ring-2 focus:ring-red-500 dark:focus:ring-red-400 focus:border-red-500 dark:focus:border-red-400 cursor-pointer">
-                                    <span class="ml-2 text-xs text-red-700 dark:text-red-300 font-semibold">Cancel pending role</span>
+                                           class="rounded border-danger-300 dark:border-danger-600 bg-white dark:bg-gray-700 text-danger-600 dark:text-danger-500 shadow-sm focus:ring-2 focus:ring-danger-500 dark:focus:ring-danger-400 focus:border-danger-500 dark:focus:border-danger-400 cursor-pointer">
+                                    <span class="ml-2 text-xs text-danger-700 dark:text-danger-300 font-semibold">Cancel pending role</span>
                                 </label>
                             </div>
                         </div>

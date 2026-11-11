@@ -6,8 +6,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\BasePageController;
 use App\Models\UsenetGroup;
-use App\Services\BlacklistService;
-use App\Services\RegexService;
 use Illuminate\Http\Request;
 
 class AdminAjaxController extends BasePageController
@@ -23,30 +21,6 @@ class AdminAjaxController extends BasePageController
 
         try {
             switch ($request->input('action')) {
-                case 'binary_blacklist_delete':
-                    $id = (int) $request->input('row_id');
-                    (new BlacklistService)->deleteBlacklist($id);
-                    echo "Blacklist $id deleted.";
-                    break;
-
-                case 'category_regex_delete':
-                    $id = (int) $request->input('row_id');
-                    (new RegexService('category_regexes'))->deleteRegex($id);
-                    echo "Regex $id deleted.";
-                    break;
-
-                case 'collection_regex_delete':
-                    $id = (int) $request->input('row_id');
-                    (new RegexService('collection_regexes'))->deleteRegex($id);
-                    echo "Regex $id deleted.";
-                    break;
-
-                case 'release_naming_regex_delete':
-                    $id = (int) $request->input('row_id');
-                    (new RegexService('release_naming_regexes'))->deleteRegex($id);
-                    echo "Regex $id deleted.";
-                    break;
-
                 case 'group_edit_purge_all':
                 case 'purge_all_groups':
                     UsenetGroup::purge();
@@ -129,7 +103,5 @@ class AdminAjaxController extends BasePageController
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
-
-        return null;
     }
 }

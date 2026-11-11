@@ -19,7 +19,7 @@
         </span>
     @endif
     @if(!empty($result->failed_count) && $result->failed_count > 0)
-        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
+        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-danger-100 dark:bg-danger-900 text-danger-800 dark:text-danger-200"
               title="{{ $result->failed_count }} user(s) reported download failure">
             <i aria-hidden="true" class="fas fa-exclamation-triangle mr-1"></i> Failed ({{ $result->failed_count }})
         </span>

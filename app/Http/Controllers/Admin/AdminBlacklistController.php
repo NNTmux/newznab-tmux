@@ -17,7 +17,7 @@ class AdminBlacklistController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index(): mixed
+    public function index(Request $request): mixed
     {
         $this->setAdminPrefs();
         $svc = new BlacklistService;
@@ -26,7 +26,15 @@ class AdminBlacklistController extends BasePageController
 
         $binlist = $svc->getBlacklist(false);
 
+        $lastSearch = trim($this->scalarInput($request, 'search'));
+        if ($lastSearch !== '') {
+            $binlist = array_values(array_filter($binlist, static function (object $entry) use ($lastSearch): bool {
+                return str_contains(mb_strtolower(implode(' ', [$entry->groupname ?? '', $entry->regex ?? '', $entry->description ?? ''])), mb_strtolower($lastSearch));
+            }));
+        }
+
         $this->viewData = array_merge($this->viewData, [
+            'lastSearch' => $lastSearch,
             'binlist' => $binlist,
             'title' => $title,
             'meta_title' => $meta_title,
@@ -95,6 +103,11 @@ class AdminBlacklistController extends BasePageController
                 break;
         }
 
+        if ($error !== '') {
+            // Keep what was typed so a rejected submission is not lost.
+            $regex = array_merge($regex, $request->only(array_keys($regex)));
+        }
+
         $this->viewData = array_merge($this->viewData, [
             'error' => $error,
             'regex' => (object) $regex,
@@ -113,5 +126,15 @@ class AdminBlacklistController extends BasePageController
         ]);
 
         return view('admin.blacklist.edit', $this->viewData);
+    }
+
+    /**
+     * Delete a single blacklist entry and return to the list.
+     */
+    public function destroy(int $id): RedirectResponse
+    {
+        (new BlacklistService)->deleteBlacklist($id);
+
+        return redirect()->back()->with('success', 'Blacklist deleted successfully');
     }
 }

@@ -5,7 +5,6 @@
     <x-admin.page-header :title="$title" icon="fas fa-film" />
     <x-admin.card>
 
-        <!-- Success/Error/Warning Messages -->
 
 
 
@@ -31,7 +30,7 @@
             <div class="max-w-2xl">
                 <div class="mb-6">
                     <label for="id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        IMDB ID <span class="text-red-500">*</span>
+                        IMDB ID <span class="text-danger-500">*</span>
                     </label>
                     <div class="flex gap-2">
                         <div class="relative flex-1">
@@ -45,7 +44,7 @@
                                    pattern="[0-9]+"
                                    placeholder="0111161"
                                    class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
-                                   value="">
+                                   value="{{ old('id') }}">
                         </div>
                         <button type="submit" class="px-6 py-2 bg-accent dark:bg-accent-hover text-white rounded-lg hover:bg-accent-hover whitespace-nowrap">
                             <i aria-hidden="true" class="fas fa-plus mr-2"></i>Add Movie

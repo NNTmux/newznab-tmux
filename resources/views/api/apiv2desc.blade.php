@@ -16,9 +16,9 @@
 
         @auth
             <div class="surface-panel-alt rounded-lg p-6 mb-6 border">
-                <h4 class="text-lg font-semibold mb-3 text-gray-900 dark:text-gray-100 flex items-center">
+                <h2 class="text-lg font-semibold mb-3 text-gray-900 dark:text-gray-100 flex items-center">
                     <i aria-hidden="true" class="fa-solid fa-key mr-2 text-gray-600 dark:text-gray-400"></i>Your API Credentials
-                </h4>
+                </h2>
                 <div class="flex rounded-md shadow-sm" x-data="copyToClipboard()">
                     <input type="text" class="flex-1 rounded-l-md border-gray-300 dark:border-gray-600 font-mono text-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white" value="api_token={{ auth()->user()->api_token }}" readonly id="apikeyInput">
                     <button aria-label="Copy to clipboard" class="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500" type="button" @click="copy('apikeyInput')" title="Copy to clipboard" :class="copied ? 'text-success-600' : ''">
@@ -28,9 +28,9 @@
             </div>
         @endauth
 
-        <h4 class="text-lg font-semibold mb-3 text-gray-900 dark:text-gray-100 flex items-center">
+        <h2 class="text-lg font-semibold mb-3 text-gray-900 dark:text-gray-100 flex items-center">
             <i aria-hidden="true" class="fa-solid fa-plug mr-2 text-gray-600 dark:text-gray-400"></i>Available Functions
-        </h4>
+        </h2>
         <p class="text-gray-700 dark:text-gray-300 mb-4 dark:text-gray-300">
             Beyond <code class="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-xs text-red-600 dark:text-gray-700 dark:text-red-400">search</code>, <code class="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-xs text-red-600 dark:text-gray-700 dark:text-red-400">tv</code>, and <code class="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-xs text-red-600 dark:text-gray-700 dark:text-red-400">movies</code>, JSON endpoints include <code class="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-xs text-red-600 dark:text-gray-700 dark:text-red-400">audio</code> (music), <code class="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-xs text-red-600 dark:text-gray-700 dark:text-red-400">books</code>, and <code class="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-xs text-red-600 dark:text-gray-700 dark:text-red-400">anime</code>. The <code class="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-xs text-red-600 dark:text-gray-700 dark:text-red-400">capabilities</code> response lists <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">audio-search</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">book-search</code>, and <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">anime-search</code>.
         </p>
@@ -277,16 +277,16 @@
             </table>
         </div>
 
-        <h4 class="text-lg font-semibold mt-6 mb-3 text-gray-900 dark:text-gray-100 flex items-center">
+        <h2 class="text-lg font-semibold mt-6 mb-3 text-gray-900 dark:text-gray-100 flex items-center">
             <i aria-hidden="true" class="fa-solid fa-sort-amount-down mr-2 text-gray-600 dark:text-gray-400"></i>Sorting Results (v2)
-        </h4>
+        </h2>
         <p class="text-gray-700 dark:text-gray-300 mb-4 dark:text-gray-300">
             Search endpoints support <code class="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-xs text-red-600 dark:bg-gray-700 dark:text-red-400">sort=field_direction</code>.
             Allowed fields: <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">cat</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">name</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">size</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">files</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">stats</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">posted</code>. Direction is <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">asc</code> or <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">desc</code>.
         </p>
         <div class="surface-panel-alt rounded-lg border shadow-sm mb-4">
             <div class="p-6">
-                <h5 class="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">Sort request examples</h5>
+                <h3 class="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">Sort request examples</h3>
                 <div class="flex flex-col gap-2">
                     @auth
                         <a href="{{ url('/api/v2/search?id=ubuntu&sort=posted_desc&api_token=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-link bg-white dark:bg-gray-800 hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
@@ -311,7 +311,7 @@
         </div>
         <div class="surface-panel-alt rounded-lg border shadow-sm mb-4">
             <div class="p-6">
-                <h5 class="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">JSON sort response snippet (<code class="text-xs">sort=size_desc</code>)</h5>
+                <h3 class="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">JSON sort response snippet (<code class="text-xs">sort=size_desc</code>)</h3>
                 <pre class="bg-gray-100 dark:bg-gray-800 p-3 rounded text-xs text-gray-800 dark:text-gray-200 overflow-x-auto"><code>{
   "Total": 2,
   "Results": [
@@ -323,9 +323,9 @@
             </div>
         </div>
 
-        <h4 class="text-lg font-semibold mt-6 mb-3 text-gray-900 dark:text-gray-100 flex items-center">
+        <h2 class="text-lg font-semibold mt-6 mb-3 text-gray-900 dark:text-gray-100 flex items-center">
             <i aria-hidden="true" class="fa-solid fa-filter mr-2 text-gray-600 dark:text-gray-400"></i>HTTP QUERY Method
-        </h4>
+        </h2>
         <p class="text-gray-700 dark:text-gray-300 mb-4">
             <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">search</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">tv</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">movies</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">audio</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">books</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">anime</code> and <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">details</code>
             also accept the HTTP <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">QUERY</code> method (RFC 10008), which sends the same parameters as a JSON body instead of the URL.
@@ -333,7 +333,7 @@
         </p>
         <div class="surface-panel-alt rounded-lg border shadow-sm mb-4">
             <div class="p-6">
-                <h5 class="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">QUERY request example</h5>
+                <h3 class="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">QUERY request example</h3>
                 <pre class="bg-gray-100 dark:bg-gray-800 p-3 rounded text-xs text-gray-800 dark:text-gray-200 overflow-x-auto"><code>curl -X QUERY {{ url('/api/v2/search') }} \
   -H 'Content-Type: application/json' \
   -d '{"api_token":"&lt;your api_token&gt;","id":"ubuntu","cat":[2000,5030],"limit":50}'</code></pre>
@@ -347,15 +347,15 @@
             </div>
         </div>
 
-        <h4 class="text-lg font-semibold mt-6 mb-3 text-gray-900 dark:text-gray-100 flex items-center">
+        <h2 class="text-lg font-semibold mt-6 mb-3 text-gray-900 dark:text-gray-100 flex items-center">
             <i aria-hidden="true" class="fa-solid fa-file-code mr-2 text-gray-600 dark:text-gray-400"></i>Output Format
-        </h4>
+        </h2>
         <div class="surface-panel-alt rounded-lg border shadow-sm mb-4">
             <div class="p-6">
                 <div class="flex items-center">
                     <i aria-hidden="true" class="fa-solid fa-code mr-3 text-link dark:text-primary-400 text-3xl"></i>
                     <div>
-                        <h5 class="text-lg font-semibold mb-1 text-gray-900 dark:text-gray-100">JSON Format</h5>
+                        <h3 class="text-lg font-semibold mb-1 text-gray-900 dark:text-gray-100">JSON Format</h3>
                         <p class="mb-0 text-gray-700 dark:text-gray-300">All information is returned in JSON format.</p>
                     </div>
                 </div>

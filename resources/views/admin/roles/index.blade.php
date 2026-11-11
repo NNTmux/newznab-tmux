@@ -36,13 +36,9 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ $role->rate_limit ?? 60 }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             @if($role->isdefault)
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200">
-                                    <i aria-hidden="true" class="fas fa-check mr-1"></i>Yes
-                                </span>
+                                <x-admin.badge tone="success" icon="fas fa-check">Yes</x-admin.badge>
                             @else
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-                                    No
-                                </span>
+                                <x-admin.badge tone="neutral">No</x-admin.badge>
                             @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -52,15 +48,20 @@
                                    title="Edit">
                                     <i aria-hidden="true" class="fas fa-edit"></i>
                                 </a>
-                                <a aria-label="Delete" href="{{ url('admin/role-delete?id=' . $role->id) }}"
-                                   class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
-                                   title="Delete"
-                                   x-data="confirmLink"
-                                   data-url="{{ url('admin/role-delete?id=' . $role->id) }}"
-                                   data-message="Are you sure you want to delete role '{{ $role->name }}'?"
-                                   @click.prevent="navigate()">
-                                    <i aria-hidden="true" class="fas fa-trash"></i>
-                                </a>
+                                <form action="{{ route('admin.role-delete') }}" method="post" class="inline"
+                                      x-data="confirmForm"
+                                      data-message="Are you sure you want to delete role '{{ $role->name }}'?"
+                                      data-title="Delete Role"
+                                      data-type="danger"
+                                      data-confirm-text="Delete"
+                                      @submit.prevent="submit()">
+                                    @csrf
+                                    <input type="hidden" name="id" value="{{ $role->id }}">
+                                    <button type="submit" aria-label="Delete" title="Delete"
+                                            class="text-danger-600 dark:text-danger-400 hover:text-danger-900 dark:hover:text-danger-300">
+                                        <i aria-hidden="true" class="fas fa-trash"></i>
+                                    </button>
+                                </form>
                             </div>
                         </td>
                     </tr>

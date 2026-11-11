@@ -48,16 +48,16 @@
                     </ul>
                 </div>
             @else
-                <div class="bg-red-50 dark:bg-red-900 border-l-4 border-red-500 dark:border-red-600 p-4 rounded mb-6">
+                <div class="bg-danger-50 dark:bg-danger-900 border-l-4 border-danger-500 dark:border-danger-600 p-4 rounded mb-6">
                     <div class="flex">
                         <div class="shrink-0">
-                            <i aria-hidden="true" class="fas fa-exclamation-circle text-red-600 dark:text-red-400 text-xl"></i>
+                            <i aria-hidden="true" class="fas fa-exclamation-circle text-danger-600 dark:text-danger-400 text-xl"></i>
                         </div>
                         <div class="ml-3">
-                            <h3 class="text-sm font-medium text-red-800 dark:text-red-200">
+                            <h3 class="text-sm font-medium text-danger-800 dark:text-danger-200">
                                 Operation Failed
                             </h3>
-                            <div class="mt-2 text-sm text-red-700 dark:text-red-300">
+                            <div class="mt-2 text-sm text-danger-700 dark:text-danger-300">
                                 <p>Failed to remove AniDB ID from releases. This could be due to:</p>
                                 <ul class="list-disc list-inside mt-2 space-y-1">
                                     <li>Invalid AniDB ID provided</li>

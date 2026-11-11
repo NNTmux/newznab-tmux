@@ -1,5 +1,7 @@
 @extends('layouts.guest')
 
+@section('title', __('Two-factor verification'))
+
 @section('content')
 <div class="min-h-screen auth-page flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8">
@@ -22,12 +24,12 @@
         <div class="auth-card rounded-xl shadow-xl overflow-hidden">
             <div class="px-8 py-6">
                 @if($errors->any())
-                    <div class="mb-4 p-4 rounded-lg bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700">
+                    <div class="mb-4 p-4 rounded-lg bg-danger-50 dark:bg-danger-900/30 border border-danger-200 dark:border-danger-700">
                         <div class="flex items-start">
-                            <i aria-hidden="true" class="fas fa-exclamation-circle text-red-600 dark:text-red-400 mr-3 mt-0.5"></i>
+                            <i aria-hidden="true" class="fas fa-exclamation-circle text-danger-600 dark:text-danger-400 mr-3 mt-0.5"></i>
                             <div class="flex-1">
-                                <p class="text-sm font-medium text-red-800 dark:text-red-200">There were some errors:</p>
-                                <ul class="mt-2 text-sm text-red-700 dark:text-red-300 list-disc list-inside">
+                                <p class="text-sm font-medium text-danger-800 dark:text-danger-200">There were some errors:</p>
+                                <ul class="mt-2 text-sm text-danger-700 dark:text-danger-300 list-disc list-inside">
                                     @foreach($errors->all() as $error)
                                         <li>{{ $error }}</li>
                                     @endforeach

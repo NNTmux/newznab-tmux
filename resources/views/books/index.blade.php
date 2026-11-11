@@ -18,23 +18,21 @@
                     <!-- Author Filter -->
                     <div>
                         <label for="author" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Author</label>
-                        <input type="text"
+                        <x-input type="text"
                                id="author"
                                name="author"
                                value="{{ $author ?? '' }}"
-                               placeholder="Search by author"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500">
+                               placeholder="Search by author" />
                     </div>
 
                     <!-- Title Filter -->
                     <div>
                         <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Title</label>
-                        <input type="text"
+                        <x-input type="text"
                                id="title"
                                name="title"
                                value="{{ $title ?? '' }}"
-                               placeholder="Search by title"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500">
+                               placeholder="Search by title" />
                     </div>
 
                     {{-- Category is chosen with the Category dropdown in the results toolbar. --}}
@@ -91,7 +89,7 @@
                             @endif
                             @if($totalFailed > 0)
                                 <div class="absolute top-2 right-2">
-                                    <span class="px-2 py-1 bg-red-600 dark:bg-red-700 text-white text-xs rounded-full shadow-lg" title="{{ $totalFailed }} user(s) reported download failure">
+                                    <span class="px-2 py-1 bg-danger-600 dark:bg-danger-700 text-white text-xs rounded-full shadow-lg" title="{{ $totalFailed }} user(s) reported download failure">
                                         <i aria-hidden="true" class="fa-solid fa-exclamation-triangle mr-1"></i>Failed
                                     </span>
                                 </div>
@@ -112,7 +110,7 @@
                         </a>
                         @if($guid)
                             <div class="px-3 pb-3 flex gap-1">
-                                <a aria-label="Download NZB" href="{{ url('/getnzb?id=' . $guid) }}"
+                                <a aria-label="Download NZB" href="{{ route('getnzb.guid', $guid) }}"
                                    class="flex-1 px-2 py-1 bg-success-600 dark:bg-success-700 text-white text-xs rounded hover:bg-success-700 dark:hover:bg-success-800 text-center"
                                    title="Download NZB">
                                     <i aria-hidden="true" class="fa-solid fa-download"></i>
@@ -122,6 +120,13 @@
                                    title="View Details">
                                     <i aria-hidden="true" class="fa-solid fa-info-circle"></i>
                                 </a>
+                                <button type="button" aria-label="Add to basket" title="Add to basket" data-guid="{{ $guid }}"
+                                        class="add-to-cart flex-1 px-2 py-1 border border-line bg-surface text-fg text-xs rounded hover:bg-surface-hover text-center">
+                                    <i aria-hidden="true" class="icon_cart fa-solid fa-shopping-basket"></i>
+                                </button>
+                                @if(!empty($firstRelease->id))
+                                    <x-report-button :release-id="$firstRelease->id" :reported-count="(int) ($firstRelease->total_report_count ?? $firstRelease->report_count ?? 0)" />
+                                @endif
                             </div>
                         @endif
                     </div>

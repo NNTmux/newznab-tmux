@@ -169,11 +169,7 @@
         </x-admin.data-table>
 
         <!-- Pagination -->
-        @if($history->hasPages())
-            <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
-                {{ $history->links() }}
-            </div>
-        @endif
+        <x-admin.pagination :paginator="$history" />
     </div>
 </div>
 @endsection

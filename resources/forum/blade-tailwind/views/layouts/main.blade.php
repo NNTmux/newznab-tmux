@@ -48,10 +48,7 @@
                             <a href="{{ url('/register') }}" class="inline-flex items-center rounded-full bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-500">Register</a>
                         @else
                             <span class="inline-flex items-center rounded-full bg-gray-100 px-4 py-2 font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-200">{{ $username }}</span>
-                            <a href="{{ url('/logout') }}" class="inline-flex items-center rounded-full border border-gray-300 px-4 py-2 font-medium text-gray-700 transition hover:border-red-300 hover:text-red-600 dark:border-gray-600 dark:text-gray-300 dark:hover:border-red-500 dark:hover:text-red-400" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Log out</a>
-                            <form id="logout-form" action="{{ url('/logout') }}" method="POST" class="hidden">
-                                @csrf
-                            </form>
+                            <a href="{{ url('/logout') }}" class="inline-flex items-center rounded-full border border-gray-300 px-4 py-2 font-medium text-gray-700 transition hover:border-red-300 hover:text-red-600 dark:border-gray-600 dark:text-gray-300 dark:hover:border-red-500 dark:hover:text-red-400" data-logout>Log out</a>
                         @endguest
                     </div>
                 </div>

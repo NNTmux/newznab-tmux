@@ -61,21 +61,13 @@
                                         $isExpired = $promotion->end_date && \Carbon\Carbon::now()->gt($promotion->end_date);
                                     @endphp
                                     @if($isExpired)
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">
-                                            <i aria-hidden="true" class="fas fa-times-circle mr-1"></i>Expired
-                                        </span>
+                                        <x-admin.badge tone="danger" icon="fas fa-times-circle">Expired</x-admin.badge>
                                     @elseif($promotion->is_active && $promotion->isCurrentlyActive())
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200">
-                                            <i aria-hidden="true" class="fas fa-check mr-1"></i>Active
-                                        </span>
+                                        <x-admin.badge tone="success" icon="fas fa-check">Active</x-admin.badge>
                                     @elseif($promotion->is_active)
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-warning-100 dark:bg-warning-900 text-warning-800 dark:text-warning-200">
-                                            <i aria-hidden="true" class="fas fa-clock mr-1"></i>Scheduled
-                                        </span>
+                                        <x-admin.badge tone="warning" icon="fas fa-clock">Scheduled</x-admin.badge>
                                     @else
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-                                            <i aria-hidden="true" class="fas fa-pause mr-1"></i>Inactive
-                                        </span>
+                                        <x-admin.badge tone="neutral" icon="fas fa-pause">Inactive</x-admin.badge>
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -91,7 +83,7 @@
                                             <button aria-label="{{ $promotion->is_active ? 'Deactivate' : 'Activate' }}" type="submit"
                                                 class="{{ $promotion->is_active ? 'text-orange-600 dark:text-orange-400 hover:text-orange-900 dark:hover:text-orange-300' : 'text-success-600 dark:text-success-400 hover:text-success-900 dark:hover:text-success-300' }}"
                                                 title="{{ $promotion->is_active ? 'Deactivate' : 'Activate' }}"
-                                                data-confirm="Are you sure you want to {{ $promotion->is_active ? 'deactivate' : 'activate' }} the promotion &quot;{{ $promotion->name }}&quot;?">
+                                                data-confirm="Are you sure you want to {{ $promotion->is_active ? 'deactivate' : 'activate' }} the promotion &quot;{{ $promotion->name }}&quot;?" data-confirm-type="warning">
                                                 <i aria-hidden="true" class="fas fa-{{ $promotion->is_active ? 'pause' : 'play' }}"></i>
                                             </button>
                                         </form>
@@ -100,14 +92,18 @@
                                            title="Edit">
                                             <i aria-hidden="true" class="fas fa-edit"></i>
                                         </a>
-                                        <form action="{{ route('admin.promotions.destroy', $promotion->id) }}" method="POST" class="inline promotion-delete-form">
+                                        <form action="{{ route('admin.promotions.destroy', $promotion->id) }}" method="POST" class="inline"
+                                              x-data="confirmForm"
+                                              data-message="Are you sure you want to delete the promotion &quot;{{ $promotion->name }}&quot;? This action cannot be undone."
+                                              data-title="Delete Promotion"
+                                              data-type="danger"
+                                              data-confirm-text="Delete"
+                                              @submit.prevent="submit()">
                                             @csrf
                                             @method('DELETE')
-                                            <button aria-label="Delete" type="button"
-                                                    class="promotion-delete-btn text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
-                                                    title="Delete"
-                                                    data-promotion-id="{{ $promotion->id }}"
-                                                    data-promotion-name="{{ $promotion->name }}">
+                                            <button aria-label="Delete" type="submit"
+                                                    class="text-danger-600 dark:text-danger-400 hover:text-danger-900 dark:hover:text-danger-300"
+                                                    title="Delete">
                                                 <i aria-hidden="true" class="fas fa-trash"></i>
                                             </button>
                                         </form>
@@ -117,11 +113,7 @@
                         @endforeach
             </x-admin.data-table>
         @else
-            <div class="px-6 py-12 text-center">
-                <i aria-hidden="true" class="fas fa-gift text-gray-400 text-5xl mb-4"></i>
-                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No promotions found</h3>
-                <p class="text-gray-500 dark:text-gray-400">Create your first promotion to get started.</p>
-            </div>
+            <x-admin.empty-state icon="fas fa-gift" title="No promotions found" message="Create your first promotion to get started." />
         @endif
     </x-admin.card>
 </div>

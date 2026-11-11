@@ -31,6 +31,7 @@ import './components/cart-button.js';
 import './components/inline-search.js';
 import './components/search-autocomplete.js';
 import './components/dismissible.js';
+import './components/image-fallback.js';
 
 // --- Shared utility (backward compat) ---
 window.escapeHtml = function(text) {

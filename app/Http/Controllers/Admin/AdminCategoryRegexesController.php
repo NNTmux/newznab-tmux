@@ -119,6 +119,11 @@ class AdminCategoryRegexesController extends BasePageController
             $category_names[] = $category_db->parent_title.' '.$category_db->title.': '.$category_db->id;
         }
 
+        if ($error !== '') {
+            // Keep what was typed so a rejected submission is not lost.
+            $regex = array_merge($regex, $request->only(array_keys($regex)));
+        }
+
         $this->viewData = array_merge($this->viewData, [
             'error' => $error,
             'regex' => (object) $regex,
@@ -131,5 +136,15 @@ class AdminCategoryRegexesController extends BasePageController
         ]);
 
         return view('admin.regexes.category-edit', $this->viewData);
+    }
+
+    /**
+     * Delete a single regex and return to the list.
+     */
+    public function destroy(int $id): RedirectResponse
+    {
+        (new RegexService('category_regexes'))->deleteRegex($id);
+
+        return redirect()->back()->with('success', 'Regex deleted successfully');
     }
 }

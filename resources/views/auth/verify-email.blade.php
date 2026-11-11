@@ -1,5 +1,7 @@
 @extends('layouts.guest')
 
+@section('title', __('Verify your email address'))
+
 @section('content')
     <div class="min-h-screen auth-page flex items-center justify-center px-4">
         <div class="w-full max-w-md auth-card shadow-md rounded-xl p-8 space-y-6">

@@ -1,5 +1,7 @@
 @extends('layouts.guest')
 
+@section('title', __('Two-factor authentication'))
+
 @section('content')
 <div class="min-h-screen auth-page flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-lg w-full space-y-8">
@@ -68,11 +70,11 @@
                                             <i aria-hidden="true" class="fas fa-key text-gray-400"></i>
                                         </div>
                                         <input id="verify-code" type="password" name="verify-code" required
-                                               class="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition @error('verify-code') border-red-500 @enderror"
+                                               class="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition @error('verify-code') border-danger-500 @enderror"
                                                placeholder="Enter 6-digit code">
                                     </div>
                                     @error('verify-code')
-                                        <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                        <p class="mt-2 text-sm text-danger-600 dark:text-danger-400">{{ $message }}</p>
                                     @enderror
                                 </div>
                                 <button type="submit" class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-success-600 dark:bg-success-700 hover:bg-success-700 dark:hover:bg-success-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-success-500 transition">
@@ -106,11 +108,11 @@
                                         <i aria-hidden="true" class="fas fa-lock text-gray-400"></i>
                                     </div>
                                     <input id="current-password" type="password" name="current-password" required
-                                           class="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition @error('current-password') border-red-500 @enderror"
+                                           class="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition @error('current-password') border-danger-500 @enderror"
                                            placeholder="Enter your current password">
                                 </div>
                                 @error('current-password')
-                                    <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                    <p class="mt-2 text-sm text-danger-600 dark:text-danger-400">{{ $message }}</p>
                                 @enderror
                             </div>
                             <div>
@@ -122,7 +124,7 @@
                                        class="block w-full px-3 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition"
                                        placeholder="6-digit code from your authenticator app">
                             </div>
-                            <button type="submit" class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-red-600 dark:bg-red-700 hover:bg-red-700 dark:hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition">
+                            <button type="submit" class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-danger-600 dark:bg-danger-700 hover:bg-danger-700 dark:hover:bg-danger-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-danger-500 transition">
                                 <i aria-hidden="true" class="fas fa-times mr-2"></i>
                                 Disable 2FA
                             </button>

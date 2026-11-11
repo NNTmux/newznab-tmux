@@ -6,6 +6,8 @@ import Alpine from '@alpinejs/csp';
 
 Alpine.store('toast', {
     items: [],
+    /** Text of the latest non-error toast, mirrored into a persistent live region for screen readers. */
+    announcement: '',
     _nextId: 0,
     _timers: {},
 
@@ -26,6 +28,11 @@ Alpine.store('toast', {
         const duration = this.durationFor(type);
         this.items.push({ id, message, type, removing: false, remaining: duration });
         this._schedule(id);
+        if (type !== 'error') {
+            // Errors carry role="alert" themselves. A live region only speaks when its text changes, so
+            // alternate a trailing no-break space to make a repeated message count as new text.
+            this.announcement = String(message) + (id % 2 === 0 ? '\u00A0' : '');
+        }
     },
 
     /** Pause auto-dismiss while the pointer or keyboard focus is on a toast. */

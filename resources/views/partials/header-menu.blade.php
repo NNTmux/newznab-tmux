@@ -19,6 +19,14 @@
 
             <!-- Right side: Search and User Menu -->
             <div class="flex items-center space-x-2 lg:space-x-4 ml-auto">
+                @auth
+                    <!-- Download basket with live item count (updated by the Alpine cart store) -->
+                    <a href="{{ url('/cart/index') }}" class="touch-target relative rounded-xl p-2 text-gray-300 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400">
+                        <i class="fa-solid fa-shopping-basket text-lg" aria-hidden="true"></i>
+                        <span class="sr-only">Download basket items:</span>
+                        <span class="cart-count absolute -right-1 -top-1 min-w-5 rounded-full bg-accent px-1 text-center text-xs font-semibold leading-5 text-white {{ ($cartCount ?? 0) > 0 ? '' : 'hidden' }}">{{ $cartCount ?? 0 }}</span>
+                    </a>
+                @endauth
                 <!-- Search toggle (visible below 2xl) -->
                 <button type="button" class="touch-target rounded-xl p-2 text-gray-300 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 2xl:hidden" id="mobile-search-toggle" aria-label="Toggle release search" aria-expanded="false" aria-controls="mobile-search-form">
                     <i class="fa-solid fa-search text-lg" aria-hidden="true"></i>
@@ -115,10 +123,10 @@
                     <!-- Guest Links -->
                     <div class="flex items-center space-x-2">
                         <a href="{{ route('login') }}" class="px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition">
-                            <i aria-hidden="true" class="fa-solid fa-sign-in mr-1"></i><span class="hidden sm:inline">Login</span>
+                            <i aria-hidden="true" class="fa-solid fa-sign-in sm:mr-1"></i><span class="sr-only sm:not-sr-only">Login</span>
                         </a>
                         <a href="{{ route('register') }}" class="px-3 py-2 text-sm bg-accent dark:bg-accent-hover hover:bg-accent-hover dark:hover:bg-primary-800 text-white rounded-lg transition">
-                            <i aria-hidden="true" class="fa-solid fa-user-plus mr-1"></i><span class="hidden sm:inline">Register</span>
+                            <i aria-hidden="true" class="fa-solid fa-user-plus sm:mr-1"></i><span class="sr-only sm:not-sr-only">Register</span>
                         </a>
                     </div>
                 @endauth

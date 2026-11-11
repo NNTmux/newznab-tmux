@@ -17,10 +17,10 @@
 
             <!-- Error Message -->
             @if($error)
-                <div class="mb-6 p-4 bg-red-50 dark:bg-red-950/40 border border-red-200 rounded-lg">
+                <div class="mb-6 p-4 bg-danger-50 dark:bg-danger-950/40 border border-danger-200 rounded-lg">
                     <div class="flex">
-                        <i aria-hidden="true" class="fas fa-exclamation-triangle text-red-500 mr-3"></i>
-                        <p class="text-red-800 dark:text-red-200">{{ $error }}</p>
+                        <i aria-hidden="true" class="fas fa-exclamation-triangle text-danger-500 mr-3"></i>
+                        <p class="text-danger-800 dark:text-danger-200">{{ $error }}</p>
                     </div>
                 </div>
             @endif
@@ -28,7 +28,7 @@
             <!-- Group -->
             <div class="mb-6">
                 <label for="group_regex" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Group: <span class="text-red-500">*</span>
+                    Group: <span class="text-danger-500">*</span>
                 </label>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -51,7 +51,7 @@
             <!-- Regex -->
             <div class="mb-6">
                 <label for="regex" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Regex: <span class="text-red-500">*</span>
+                    Regex: <span class="text-danger-500">*</span>
                 </label>
                 <div class="relative">
                     <div class="absolute top-3 left-3 pointer-events-none">
@@ -65,7 +65,7 @@
                 </div>
                 <p class="mt-2 text-sm text-gray-500">
                     Regex to use when categorizing releases.<br>
-                    The regex delimiters are not added, you MUST add them. See <a href="http://php.net/manual/en/regexp.reference.delimiters" target="_blank" class="text-link dark:text-primary-400 hover:text-primary-800">this</a> page.<br>
+                    The regex delimiters are not added, you MUST add them. See <a href="https://www.php.net/manual/en/regexp.reference.delimiters" target="_blank" rel="noopener noreferrer" class="text-link dark:text-primary-400 hover:text-primary-800">this</a> page.<br>
                     To make the regex case insensitive, add <code class="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">i</code> after the last delimiter.
                 </p>
             </div>
@@ -92,7 +92,7 @@
             <!-- Ordinal -->
             <div class="mb-6">
                 <label for="ordinal" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Ordinal: <span class="text-red-500">*</span>
+                    Ordinal: <span class="text-danger-500">*</span>
                 </label>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -140,7 +140,7 @@
             <!-- Category -->
             <div class="mb-6">
                 <label for="categories_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Category: <span class="text-red-500">*</span>
+                    Category: <span class="text-danger-500">*</span>
                 </label>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -177,6 +177,5 @@
     </x-admin.card>
 </div>
 
-{{-- Scripts moved to resources/js/csp-safe.js --}}
 @endsection
 

@@ -85,21 +85,13 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @if($pre->nuked == 0)
-                                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-success-100 text-success-800 dark:bg-success-900 dark:text-success-200">
-                                        <i aria-hidden="true" class="fas fa-check-circle mr-1"></i>Not Nuked
-                                    </span>
+                                    <x-admin.badge tone="success" icon="fas fa-check-circle">Not Nuked</x-admin.badge>
                                 @elseif($pre->nuked == 1)
-                                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-200">
-                                        <i aria-hidden="true" class="fas fa-undo mr-1"></i>Un-Nuked
-                                    </span>
+                                    <x-admin.badge tone="primary" icon="fas fa-undo">Un-Nuked</x-admin.badge>
                                 @elseif($pre->nuked == 2)
-                                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
-                                        <i aria-hidden="true" class="fas fa-radiation mr-1"></i>Nuked
-                                    </span>
+                                    <x-admin.badge tone="danger" icon="fas fa-radiation">Nuked</x-admin.badge>
                                 @elseif($pre->nuked == 3)
-                                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-warning-100 text-warning-800 dark:bg-warning-900 dark:text-warning-200">
-                                        <i aria-hidden="true" class="fas fa-exclamation-triangle mr-1"></i>Mod Nuked
-                                    </span>
+                                    <x-admin.badge tone="warning" icon="fas fa-exclamation-triangle">Mod Nuked</x-admin.badge>
                                 @endif
                                 @if($pre->nuked > 0 && $pre->nukereason)
                                     <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -110,7 +102,7 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
                                 @if(isset($pre->guid))
                                     <a href="{{ url('details/' . $pre->guid) }}"
-                                       target="_blank"
+                                       target="_blank" rel="noopener noreferrer"
                                        class="text-link dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300">
                                         <i aria-hidden="true" class="fas fa-external-link-alt mr-1"></i>View
                                     </a>

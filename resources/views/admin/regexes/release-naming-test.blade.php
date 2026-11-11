@@ -25,7 +25,7 @@
                 <!-- Group Field -->
                 <div class="md:col-span-1">
                     <label for="group" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Group: <span class="text-red-500">*</span>
+                        Group: <span class="text-danger-500">*</span>
                     </label>
                     <input type="text"
                            id="group"
@@ -77,7 +77,7 @@
             <!-- Regex Field -->
             <div class="mb-6">
                 <label for="regex" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Regex: <span class="text-red-500">*</span>
+                    Regex: <span class="text-danger-500">*</span>
                 </label>
                 <textarea id="regex"
                           name="regex"
@@ -131,18 +131,14 @@
                                                     {{ $row['newName'] }}
                                                 </div>
                                             @else
-                                                <span class="text-gray-400">—</span>
+                                                <span class="text-gray-500 dark:text-gray-400">—</span>
                                             @endif
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-center">
                                             @if(isset($row['match']) && $row['match'])
-                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-success-100 dark:bg-success-900/40 text-success-800 dark:text-success-200">
-                                                    <i aria-hidden="true" class="fas fa-check mr-1"></i>Match
-                                                </span>
+                                                <x-admin.badge tone="success" icon="fas fa-check">Match</x-admin.badge>
                                             @else
-                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-200">
-                                                    <i aria-hidden="true" class="fas fa-times mr-1"></i>No Match
-                                                </span>
+                                                <x-admin.badge tone="danger" icon="fas fa-times">No Match</x-admin.badge>
                                             @endif
                                         </td>
                                     </tr>

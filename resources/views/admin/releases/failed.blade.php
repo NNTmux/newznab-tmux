@@ -9,7 +9,6 @@
     </x-admin.page-header>
     <x-admin.card>
 
-        <!-- Success/Error/Warning Messages -->
 
 
 
@@ -41,10 +40,8 @@
 
         <!-- Failed Releases List Table -->
         @if($releaselist && $releaselist->count() > 0)
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                    <thead class="bg-gray-50 dark:bg-gray-900">
-                        <tr>
+            <x-admin.data-table>
+                <x-slot:head>
                             <x-admin.th>Name</x-admin.th>
                             <x-admin.th>Category</x-admin.th>
                             <x-admin.th align="right">Size</x-admin.th>
@@ -53,9 +50,8 @@
                             <x-admin.th>Post Date</x-admin.th>
                             <x-admin.th align="center">Grabs</x-admin.th>
                             <x-admin.th align="right">Actions</x-admin.th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                </x-slot:head>
+
                         @foreach($releaselist as $release)
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                                 <td class="px-6 py-4">
@@ -66,20 +62,13 @@
                                     </a>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200">
-                                        {{ $release->category_name ?? 'Unknown' }}
-                                    </span>
+                                    <x-admin.badge tone="info">{{ $release->category_name ?? 'Unknown' }}</x-admin.badge>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right">
-                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200">
-                                        {{ human_filesize($release->size) }}
-                                    </span>
+                                    <x-admin.badge tone="primary">{{ human_filesize($release->size) }}</x-admin.badge>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-center">
-                                    <a href="{{ url('/admin/release-files?id=' . $release->guid) }}"
-                                       class="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 hover:bg-indigo-200 dark:hover:bg-indigo-800">
-                                        <i aria-hidden="true" class="fas fa-file mr-1"></i>{{ $release->totalpart ?? 0 }}
-                                    </a>
+                                    <x-admin.badge tone="info" icon="fas fa-file">{{ $release->totalpart ?? 0 }}</x-admin.badge>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                     <div class="flex items-center">
@@ -98,9 +87,7 @@
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-center">
-                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200">
-                                        <i aria-hidden="true" class="fas fa-download mr-1"></i>{{ $release->grabs ?? 0 }}
-                                    </span>
+                                    <x-admin.badge tone="success" icon="fas fa-download">{{ $release->grabs ?? 0 }}</x-admin.badge>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <div class="flex justify-end gap-2">
@@ -117,7 +104,7 @@
                                             </a>
                                         @endif
                                         <button aria-label="Delete release" type="button"
-                                               class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
+                                               class="text-danger-600 dark:text-danger-400 hover:text-danger-900 dark:hover:text-danger-300"
                                                 @click="deleteRelease($event)"
                                                data-delete-release="{{ $release->guid }}"
                                                data-delete-url="{{ url('/admin/release-delete/' . $release->guid) }}"
@@ -128,9 +115,7 @@
                                 </td>
                             </tr>
                         @endforeach
-                    </tbody>
-                </table>
-            </div>
+            </x-admin.data-table>
 
             <!-- Pagination -->
             <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700">

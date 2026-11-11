@@ -23,7 +23,7 @@
                         <!-- Title -->
                         <div>
                             <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Title <span class="text-red-500">*</span>
+                                Title <span class="text-danger-500">*</span>
                             </label>
                             <input type="text"
                                    id="title"
@@ -92,7 +92,7 @@
                                    value="{{ $con['url'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">
                             @if(!empty($con['url']))
-                                <a href="{{ $con['url'] }}" target="_blank" class="text-sm text-link dark:text-primary-400 hover:underline mt-1 inline-block">
+                                <a href="{{ $con['url'] }}" target="_blank" rel="noopener noreferrer" class="text-sm text-link dark:text-primary-400 hover:underline mt-1 inline-block">
                                     <i aria-hidden="true" class="fas fa-external-link-alt mr-1"></i>View Source
                                 </a>
                             @endif
@@ -234,5 +234,4 @@
     </x-admin.card>
 </div>
 
-{{-- Scripts moved to resources/js/csp-safe.js --}}
 @endsection

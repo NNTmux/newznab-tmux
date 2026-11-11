@@ -7,6 +7,8 @@ namespace Tests\Feature;
 use App\Models\Category;
 use App\Models\User;
 use App\Support\Navigation\CategoryMenu;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\URL;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
@@ -52,6 +54,41 @@ class HeaderCategoryMenuTest extends TestCase
         $this->assertSame(url('/Movies/HD'), $menu[1]['children'][0]['url']);
         $this->assertSame(url('/Games'), $menu[2]['children'][0]['url']);
         $this->assertSame(url('/browse/PC/ISO'), $menu[2]['children'][1]['url']);
+    }
+
+    #[Test]
+    public function the_dropdown_of_the_section_being_browsed_is_highlighted(): void
+    {
+        $menu = CategoryMenu::build($this->parents(), null);
+
+        $tvOnTvPage = $this->renderDropdown($menu[0], '/browse/TV/HD');
+        $moviesOnTvPage = $this->renderDropdown($menu[1], '/browse/TV/HD');
+        $tvOnSeriesPage = $this->renderDropdown($menu[0], '/series/42');
+
+        $this->assertStringContainsString('data-current-section="true"', $tvOnTvPage);
+        $this->assertStringNotContainsString('data-current-section', $moviesOnTvPage);
+        $this->assertStringContainsString('data-current-section="true"', $tvOnSeriesPage, 'Pages below a menu link belong to its section');
+    }
+
+    #[Test]
+    public function the_menu_link_for_the_current_page_is_marked_for_assistive_technology(): void
+    {
+        $menu = CategoryMenu::build($this->parents(), null);
+
+        $this->assertSame(1, substr_count($this->renderDropdown($menu[0], '/series'), 'aria-current="page"'));
+        $this->assertStringNotContainsString('aria-current="page"', $this->renderDropdown($menu[0], '/series/42'));
+    }
+
+    /**
+     * @param  array<string, mixed>  $entry
+     */
+    private function renderDropdown(array $entry, string $currentPath): string
+    {
+        $request = Request::create(url($currentPath));
+        $this->app->instance('request', $request);
+        URL::setRequest($request);
+
+        return (string) $this->view('partials.header-menu.category-dropdown', ['entry' => $entry]);
     }
 
     #[Test]

@@ -256,6 +256,7 @@ Route::middleware(['role:Admin', '2fa'])->prefix('admin')->group(function () {
     Route::get('binaryblacklist-list', [AdminBlacklistController::class, 'index'])->name('admin.binaryblacklist-list');
     Route::get('binaryblacklist-edit', [AdminBlacklistController::class, 'edit'])->name('admin.binaryblacklist-edit');
     Route::post('binaryblacklist-edit', [AdminBlacklistController::class, 'edit']);
+    Route::post('binaryblacklist-delete/{id}', [AdminBlacklistController::class, 'destroy'])->whereNumber('id')->name('admin.binaryblacklist-delete');
     Route::get('book-list', [AdminBookController::class, 'index'])->name('admin.book-list');
     Route::get('book-edit', [AdminBookController::class, 'edit'])->name('admin.book-edit');
     Route::post('book-edit', [AdminBookController::class, 'edit']);
@@ -330,16 +331,20 @@ Route::middleware(['role:Admin', '2fa'])->prefix('admin')->group(function () {
     Route::delete('promotions/{id}', [AdminPromotionController::class, 'destroy'])->name('admin.promotions.destroy');
     Route::patch('promotions/{id}/toggle', [AdminPromotionController::class, 'toggle'])->name('admin.promotions.toggle');
 
-    Route::post('release_naming_regexes-test', [AdminReleaseNamingRegexesController::class, 'testRegex'])->name('admin.release-naming-regexes-test');
+    Route::match(['GET', 'POST'], 'release_naming_regexes-test', [AdminReleaseNamingRegexesController::class, 'testRegex'])->name('admin.release-naming-regexes-test');
     Route::get('release_naming_regexes-list', [AdminReleaseNamingRegexesController::class, 'index'])->name('admin.release_naming_regexes-list');
     Route::get('release_naming_regexes-edit', [AdminReleaseNamingRegexesController::class, 'edit'])->name('admin.release_naming_regexes-edit');
     Route::post('release_naming_regexes-edit', [AdminReleaseNamingRegexesController::class, 'edit']);
+    Route::post('release_naming_regexes-delete/{id}', [AdminReleaseNamingRegexesController::class, 'destroy'])->whereNumber('id')->name('admin.release_naming_regexes-delete');
     Route::get('category_regexes-list', [AdminCategoryRegexesController::class, 'index'])->name('admin.category_regexes-list');
     Route::get('category_regexes-edit', [AdminCategoryRegexesController::class, 'edit'])->name('admin.category_regexes-edit');
     Route::post('category_regexes-edit', [AdminCategoryRegexesController::class, 'edit']);
+    Route::post('category_regexes-delete/{id}', [AdminCategoryRegexesController::class, 'destroy'])->whereNumber('id')->name('admin.category_regexes-delete');
     Route::get('collection_regexes-list', [AdminCollectionRegexesController::class, 'index'])->name('admin.collection_regexes-list');
     Route::get('collection_regexes-edit', [AdminCollectionRegexesController::class, 'edit'])->name('admin.collection_regexes-edit');
     Route::post('collection_regexes-edit', [AdminCollectionRegexesController::class, 'edit']);
+    Route::post('collection_regexes-delete/{id}', [AdminCollectionRegexesController::class, 'destroy'])->whereNumber('id')->name('admin.collection_regexes-delete');
+    Route::match(['GET', 'POST'], 'collection_regexes-test', [AdminCollectionRegexesController::class, 'testRegex'])->name('admin.collection-regexes-test');
     Route::post('ajax', [AdminAjaxController::class, 'ajaxAction'])->name('admin.ajax');
     Route::get('tmux-edit', [AdminSettingsController::class, 'legacyTmux'])->name('admin.tmux-edit');
     Route::get('release-list', [AdminReleasesController::class, 'index'])->name('admin.release-list');

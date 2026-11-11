@@ -40,21 +40,13 @@
                             <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Status</dt>
                             <dd class="mt-1">
                                 @if($invitation->used_at)
-                                    <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-success-100 text-success-800 dark:bg-success-900 dark:text-success-200">
-                                        <i aria-hidden="true" class="fas fa-check-circle mr-1"></i>Used
-                                    </span>
+                                    <x-admin.badge tone="success" icon="fas fa-check-circle">Used</x-admin.badge>
                                 @elseif(!$invitation->is_active)
-                                    <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-warning-100 text-warning-800 dark:bg-warning-900 dark:text-warning-200">
-                                        <i aria-hidden="true" class="fas fa-ban mr-1"></i>Cancelled
-                                    </span>
+                                    <x-admin.badge tone="warning" icon="fas fa-ban">Cancelled</x-admin.badge>
                                 @elseif($invitation->expires_at && $invitation->expires_at->isPast())
-                                    <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
-                                        <i aria-hidden="true" class="fas fa-clock mr-1"></i>Expired
-                                    </span>
+                                    <x-admin.badge tone="danger" icon="fas fa-clock">Expired</x-admin.badge>
                                 @else
-                                    <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-200">
-                                        <i aria-hidden="true" class="fas fa-hourglass-half mr-1"></i>Pending
-                                    </span>
+                                    <x-admin.badge tone="primary" icon="fas fa-hourglass-half">Pending</x-admin.badge>
                                 @endif
                             </dd>
                         </div>
@@ -70,7 +62,7 @@
                                 @if($invitation->is_active)
                                     <span class="text-success-600 dark:text-success-400"><i aria-hidden="true" class="fas fa-check-circle"></i> Yes</span>
                                 @else
-                                    <span class="text-red-600 dark:text-red-400"><i aria-hidden="true" class="fas fa-times-circle"></i> No</span>
+                                    <span class="text-danger-600 dark:text-danger-400"><i aria-hidden="true" class="fas fa-times-circle"></i> No</span>
                                 @endif
                             </dd>
                         </div>
@@ -139,7 +131,7 @@
                                     {{ formatDateTimeSeconds($invitation->expires_at) }}
                                     <span class="text-gray-500 dark:text-gray-400">({{ $invitation->expires_at->diffForHumans() }})</span>
                                     @if($invitation->expires_at->isPast())
-                                        <span class="ml-2 text-red-600 dark:text-red-400"><i aria-hidden="true" class="fas fa-exclamation-triangle"></i> Expired</span>
+                                        <span class="ml-2 text-danger-600 dark:text-danger-400"><i aria-hidden="true" class="fas fa-exclamation-triangle"></i> Expired</span>
                                     @endif
                                 @else
                                     <span class="text-gray-500 dark:text-gray-400">Never</span>
@@ -193,5 +185,4 @@
     </x-admin.card>
 </div>
 
-{{-- Scripts moved to resources/js/csp-safe.js --}}
 @endsection

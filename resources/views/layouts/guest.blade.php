@@ -10,7 +10,7 @@
     {{-- Apply dark mode BEFORE any CSS loads to prevent white flash --}}
     @include('partials.theme-init')
 
-    <title>{{ config('app.name') }}</title>
+    <title>@hasSection('title')@yield('title') - {{ config('app.name') }}@elseif(! empty($meta_title)){{ $meta_title }} - {{ config('app.name') }}@else{{ config('app.name') }}@endif</title>
     @include('partials.favicons')
 
     <!-- Styles -->
@@ -35,6 +35,7 @@
     @endif
 </head>
 <body class="guest-view-stack font-sans antialiased pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)]">
+    <a href="#main-content" class="skip-link">Skip to content</a>
     @php
         $legacyMessage = session('message');
         $legacyType = session('message_type');

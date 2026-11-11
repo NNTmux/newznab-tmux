@@ -11,26 +11,12 @@
 import Alpine from '@alpinejs/csp';
 import Chart from 'chart.js/auto';
 import { applyChartDefaults, observeTheme, seriesColors } from '../../lib/chart-theme.js';
-const STATUS_BADGE_CLASSES = {
-    operational: 'bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200',
-    degraded: 'bg-warning-100 dark:bg-warning-900 text-warning-800 dark:text-warning-200',
-    maintenance: 'bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200',
-    partial_outage: 'bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200',
-    major_outage: 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200',
-};
-const IMPACT_BADGE_CLASSES = {
-    critical: 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200',
-    major: 'bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200',
-    minor: 'bg-warning-100 dark:bg-warning-900 text-warning-800 dark:text-warning-200',
-};
+// Badge colour classes per status come from the PHP enums (data-badge-classes on the dashboard root),
+// so Blade and this script cannot drift apart.
+const BADGE_CLASSES = { service: {}, impact: {}, registration: {} };
+const NEUTRAL_BADGE_CLASSES = 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200';
 const SYSTEM_SERVICE_SLUGS = ['database', 'redis', 'queue', 'disk'];
-// Mirror of \App\Enums\RegistrationStatus values.
 const REGISTRATION_BADGE_BASE = 'inline-flex items-center justify-center rounded-full px-3 py-1.5 text-sm font-semibold ';
-const REGISTRATION_BADGE_CLASSES = {
-    0: 'border border-emerald-500/30 bg-emerald-600 text-white shadow-sm dark:border-emerald-300/20 dark:bg-emerald-500 dark:text-slate-950',
-    1: 'border border-amber-500/30 bg-amber-500 text-slate-950 shadow-sm dark:border-amber-200/20 dark:bg-amber-400 dark:text-slate-950',
-    2: 'border border-rose-500/30 bg-rose-600 text-white shadow-sm dark:border-rose-200/20 dark:bg-rose-500 dark:text-white',
-};
 const formatNumber = (value) => Number(value || 0).toLocaleString();
 /** Full literal class strings so Tailwind can see them (never build class names at runtime). */
 const SUMMARY_TONES = {
@@ -48,16 +34,22 @@ const escapeHtml = (str) => String(str ?? '')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
 const badgeClass = (status) => 'px-2 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full '
-    + (STATUS_BADGE_CLASSES[status] ?? 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200');
+    + (BADGE_CLASSES.service[status] ?? NEUTRAL_BADGE_CLASSES);
 const registrationBadgeClass = (status) => REGISTRATION_BADGE_BASE
-    + (REGISTRATION_BADGE_CLASSES[status] ?? REGISTRATION_BADGE_CLASSES[2]);
+    + (BADGE_CLASSES.registration[status] ?? NEUTRAL_BADGE_CLASSES);
 Alpine.data('adminDashboard', () => ({
     _charts: [],
     _refreshInterval: null,
     _visibilityHandler: null,
     _lastRefreshAt: Date.now(),
     _isRefreshing: false,
+    loadError: false,
     init() {
+        try {
+            Object.assign(BADGE_CLASSES, JSON.parse(this.$el.dataset.badgeClasses || '{}'));
+        } catch (_error) {
+            // Fall back to neutral pills when the attribute is missing or malformed.
+        }
         this._loadDashboardData();
         this._scheduleRefresh();
     },
@@ -97,11 +89,18 @@ Alpine.data('adminDashboard', () => ({
                 this._renderSiteStatus(payload.serviceStatuses, payload.activeIncidents);
                 this._renderSystemServices(payload.serviceStatuses);
                 this._lastRefreshAt = Date.now();
+                this.loadError = false;
             })
-            .catch(() => {})
+            .catch(() => {
+                // Tell the admin instead of leaving the loading skeletons up forever.
+                this.loadError = true;
+            })
             .finally(() => {
                 this._isRefreshing = false;
             });
+    },
+    retry() {
+        this._loadDashboardData();
     },
     _swapWidget(name) {
         const widget = this.$el.querySelector(`[data-widget="${name}"]`);
@@ -336,7 +335,7 @@ Alpine.data('adminDashboard', () => ({
         const overflow = incidents.length - visible.length;
         const items = visible.map(inc => {
             const impactClass = 'px-2 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full shrink-0 '
-                + (IMPACT_BADGE_CLASSES[inc.impact] ?? 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200');
+                + (BADGE_CLASSES.impact[inc.impact] ?? NEUTRAL_BADGE_CLASSES);
             const autoBadge = inc.is_auto
                 ? '<span class="ml-1 px-1 py-0.5 text-[10px] leading-3 font-semibold rounded bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200">Auto</span>'
                 : '';
@@ -352,7 +351,7 @@ Alpine.data('adminDashboard', () => ({
                 </div>`;
         }).join('');
         region.innerHTML = `
-            <h4 class="text-sm font-semibold text-red-600 dark:text-red-400 mb-2">
+            <h4 class="text-sm font-semibold text-danger-600 dark:text-danger-400 mb-2">
                 <i aria-hidden="true" class="fas fa-exclamation-triangle mr-1"></i>${incidents.length} Active Incident${incidents.length === 1 ? '' : 's'}
             </h4>
             <div class="space-y-2">${items}${overflow > 0 ? `<p class="text-xs text-gray-500 dark:text-gray-400 pt-1">+ ${overflow} more</p>` : ''}</div>

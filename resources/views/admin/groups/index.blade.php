@@ -172,32 +172,24 @@
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 text-center">
-                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-                                        {{ $group->num_releases ?? 0 }}
-                                    </span>
+                                    <x-admin.badge tone="neutral">{{ $group->num_releases ?? 0 }}</x-admin.badge>
                                 </td>
                                 <td class="px-6 py-4 text-center">
                                     @if(empty($group->minfilestoformrelease))
                                         <span class="text-gray-400 dark:text-gray-500">n/a</span>
                                     @else
-                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-                                            {{ $group->minfilestoformrelease }}
-                                        </span>
+                                        <x-admin.badge tone="neutral">{{ $group->minfilestoformrelease }}</x-admin.badge>
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 text-center">
                                     @if(empty($group->minsizetoformrelease))
                                         <span class="text-gray-400 dark:text-gray-500">n/a</span>
                                     @else
-                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-                                            {{ human_filesize($group->minsizetoformrelease) }}
-                                        </span>
+                                        <x-admin.badge tone="neutral">{{ human_filesize($group->minsizetoformrelease) }}</x-admin.badge>
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 text-center">
-                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-                                        {{ $group->backfill_target }}
-                                    </span>
+                                    <x-admin.badge tone="neutral">{{ $group->backfill_target }}</x-admin.badge>
                                 </td>
                                 <td class="px-6 py-4 text-center" id="groupdel-{{ $group->id }}">
                                     <div class="flex gap-1 justify-center">
@@ -214,13 +206,13 @@
                                         </button>
                                         <button aria-label="Delete this group" type="button"
                                                 @click="handleAction('delete-group', '{{ $group->id }}')"
-                                                class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
+                                                class="text-danger-600 dark:text-danger-400 hover:text-danger-900 dark:hover:text-danger-300"
                                                 title="Delete this group">
                                             <i aria-hidden="true" class="fas fa-trash"></i>
                                         </button>
                                         <button aria-label="Purge this group" type="button"
                                                 @click="handleAction('purge-group', '{{ $group->id }}')"
-                                                class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
+                                                class="text-danger-600 dark:text-danger-400 hover:text-danger-900 dark:hover:text-danger-300"
                                                 title="Purge this group">
                                             <i aria-hidden="true" class="fas fa-eraser"></i>
                                         </button>
@@ -249,20 +241,10 @@
     </x-admin.card>
 
     <!-- Reset All Modal -->
-    <div x-show="resetAllOpen"
-     x-cloak
-     x-transition:enter="transition ease-out duration-200"
-     x-transition:enter-start="opacity-0"
-     x-transition:enter-end="opacity-100"
-     x-transition:leave="transition ease-in duration-150"
-     x-transition:leave-start="opacity-100"
-     x-transition:leave-end="opacity-0"
-     class="fixed inset-0 bg-gray-600/50 overflow-y-auto h-full w-full z-50">
-    <div role="dialog" aria-modal="true" aria-labelledby="groups-modal-title-0" class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800"
-         @click.outside="handleAction('hide-reset-modal')">
+    <x-modal open="resetAllOpen" close="handleAction('hide-reset-modal')" labelledby="groups-modal-title-0">
         <div class="mt-3">
             <h3 id="groups-modal-title-0" class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Confirm Reset All Groups</h3>
-            <p class="text-sm text-red-600 dark:text-red-400 mb-2">
+            <p class="text-sm text-danger-600 dark:text-danger-400 mb-2">
                 <i aria-hidden="true" class="fas fa-exclamation-triangle mr-2"></i>Are you sure you want to reset all groups?
             </p>
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
@@ -281,24 +263,13 @@
                 </button>
             </div>
         </div>
-    </div>
-</div>
+    </x-modal>
 
 <!-- Purge All Modal -->
-<div x-show="purgeAllOpen"
-     x-cloak
-     x-transition:enter="transition ease-out duration-200"
-     x-transition:enter-start="opacity-0"
-     x-transition:enter-end="opacity-100"
-     x-transition:leave="transition ease-in duration-150"
-     x-transition:leave-start="opacity-100"
-     x-transition:leave-end="opacity-0"
-     class="fixed inset-0 bg-gray-600/50 overflow-y-auto h-full w-full z-50">
-    <div role="dialog" aria-modal="true" aria-labelledby="groups-modal-title-1" class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800"
-         @click.outside="handleAction('hide-purge-modal')">
+<x-modal open="purgeAllOpen" close="handleAction('hide-purge-modal')" labelledby="groups-modal-title-1">
         <div class="mt-3">
             <h3 id="groups-modal-title-1" class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Confirm Purge All Groups</h3>
-            <p class="text-sm text-red-600 dark:text-red-400 mb-2">
+            <p class="text-sm text-danger-600 dark:text-danger-400 mb-2">
                 <i aria-hidden="true" class="fas fa-exclamation-triangle mr-2"></i>Are you sure you want to purge all groups?
             </p>
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
@@ -312,26 +283,15 @@
                 </button>
                 <button type="button"
                         @click="handleAction('purge-all')"
-                        class="px-4 py-2 bg-red-600 dark:bg-red-700 text-white rounded-lg hover:bg-red-700">
+                        class="px-4 py-2 bg-danger-600 dark:bg-danger-700 text-white rounded-lg hover:bg-danger-700">
                     Purge All
                 </button>
             </div>
         </div>
-    </div>
-</div>
+</x-modal>
 
 <!-- Reset Selected Modal -->
-<div x-show="resetSelectedOpen"
-     x-cloak
-     x-transition:enter="transition ease-out duration-200"
-     x-transition:enter-start="opacity-0"
-     x-transition:enter-end="opacity-100"
-     x-transition:leave="transition ease-in duration-150"
-     x-transition:leave-start="opacity-100"
-     x-transition:leave-end="opacity-0"
-     class="fixed inset-0 bg-gray-600/50 overflow-y-auto h-full w-full z-50">
-    <div role="dialog" aria-modal="true" aria-labelledby="groups-modal-title-2" class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800"
-         @click.outside="handleAction('hide-reset-selected-modal')">
+<x-modal open="resetSelectedOpen" close="handleAction('hide-reset-selected-modal')" labelledby="groups-modal-title-2">
         <div class="mt-3">
             <h3 id="groups-modal-title-2" class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Confirm Reset Selected Groups</h3>
             <p class="text-sm text-orange-600 dark:text-orange-400 mb-2">
@@ -358,8 +318,7 @@
                 </button>
             </div>
         </div>
-    </div>
-</div>
+</x-modal>
 </div>
 
 @endsection

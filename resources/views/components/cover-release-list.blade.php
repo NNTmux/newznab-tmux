@@ -51,7 +51,7 @@
                                 @endif
                                 @if(isset($release->postdate))
                                     <span class="release-chip">
-                                        <i class="fas fa-calendar-days mr-1" aria-hidden="true"></i>{{ date('M d, Y H:i', strtotime($release->postdate)) }}
+                                        <i class="fas fa-calendar-days mr-1" aria-hidden="true"></i>{{ userDate($release->postdate, 'M d, Y H:i') }}
                                     </span>
                                 @endif
                                 @if($shouldShowAddDate && isset($release->adddate))
@@ -81,8 +81,8 @@
                                         <span class="ml-1 px-1 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-xs rounded">{{ $release->grabs }}</span>
                                     @endif
                                 </a>
-                                <button type="button" class="add-to-cart release-action-sm release-action-primary px-2 py-0.5" data-guid="{{ $release->guid }}">
-                                    <i aria-hidden="true" class="fas fa-shopping-cart mr-1"></i> Cart
+                                <button type="button" class="add-to-cart release-action-sm release-action-primary px-2 py-0.5" data-guid="{{ $release->guid }}" title="Add to basket">
+                                    <i aria-hidden="true" class="icon_cart fa-solid fa-shopping-basket mr-1"></i> Add to basket
                                 </button>
                                 <a href="{{ url('/details/' . $release->guid) }}" class="release-action-sm release-action-muted px-2 py-0.5">
                                     <i aria-hidden="true" class="fas fa-info-circle mr-1"></i> Details

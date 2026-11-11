@@ -42,7 +42,7 @@
                     <!-- Title (editable for new categories) -->
                     <div class="mb-6">
                         <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Title: <span class="text-red-500">*</span>
+                            Title: <span class="text-danger-500">*</span>
                         </label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">

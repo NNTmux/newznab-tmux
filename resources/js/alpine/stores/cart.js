@@ -13,5 +13,10 @@ Alpine.store('cart', {
 
     setCount(n) {
         this.count = n;
+        const el = document.querySelector('.cart-count');
+        if (el) {
+            el.textContent = n;
+            el.classList.toggle('hidden', !(n > 0));
+        }
     }
 });

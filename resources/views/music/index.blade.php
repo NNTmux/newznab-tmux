@@ -22,53 +22,47 @@
                     <!-- Artist Filter -->
                     <div>
                         <label for="artist" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Artist</label>
-                        <input type="text"
+                        <x-input type="text"
                                id="artist"
                                name="artist"
                                value="{{ $artist ?? '' }}"
-                               placeholder="Search by artist"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500">
+                               placeholder="Search by artist" />
                     </div>
 
                     <!-- Title Filter -->
                     <div>
                         <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Title</label>
-                        <input type="text"
+                        <x-input type="text"
                                id="title"
                                name="title"
                                value="{{ $title ?? '' }}"
-                               placeholder="Search by title"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500">
+                               placeholder="Search by title" />
                     </div>
 
                     <!-- Genre Filter -->
                     <div>
                         <label for="genre" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Genre</label>
-                        <select id="genre"
-                                name="genre"
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                        <x-select id="genre" name="genre">
                             <option value="">All Genres</option>
                             @foreach($genres ?? [] as $g)
                                 <option value="{{ $g->id }}" {{ ($genre ?? '') == $g->id ? 'selected' : '' }}>
                                     {{ $g->title }}
                                 </option>
                             @endforeach
-                        </select>
+                        </x-select>
                     </div>
 
                     <!-- Year Filter -->
                     <div>
                         <label for="year" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Year</label>
-                        <select id="year"
-                                name="year"
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                        <x-select id="year" name="year">
                             <option value="">All Years</option>
                             @foreach($years ?? [] as $y)
                                 <option value="{{ $y }}" {{ ($year ?? '') == $y ? 'selected' : '' }}>
                                     {{ $y }}
                                 </option>
                             @endforeach
-                        </select>
+                        </x-select>
                     </div>
                 </div>
 
@@ -142,7 +136,7 @@
                                         <p class="text-sm text-gray-600 dark:text-gray-400">{{ $result->artist ?? 'Unknown Artist' }}</p>
 
                                         @if($totalFailed > 0)
-                                            <div class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-200 border border-red-200 mt-1">
+                                            <div class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-danger-100 dark:bg-danger-900/40 text-danger-800 dark:text-danger-200 border border-danger-200 mt-1">
                                                 <i aria-hidden="true" class="fas fa-exclamation-triangle mr-1"></i>
                                                 <span>{{ $totalFailed }} failed report{{ $totalFailed > 1 ? 's' : '' }}</span>
                                             </div>

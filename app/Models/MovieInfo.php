@@ -7,6 +7,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Cache;
 
 /**
@@ -86,7 +87,8 @@ class MovieInfo extends Model
     public static function getAll(string $search = ''): mixed
     {
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
-        $movie = Cache::get(md5($search));
+        $cacheKey = 'movieinfo:all:'.md5($search).':'.Paginator::resolveCurrentPage();
+        $movie = Cache::get($cacheKey);
         if ($movie !== null) {
             return $movie;
         }
@@ -100,7 +102,7 @@ class MovieInfo extends Model
         }
 
         $movie = $sql->paginate(config('nntmux.items_per_page'));
-        Cache::put(md5($search), $movie, $expiresAt);
+        Cache::put($cacheKey, $movie, $expiresAt);
 
         return $movie;
     }

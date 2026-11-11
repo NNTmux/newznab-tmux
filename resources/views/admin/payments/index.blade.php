@@ -121,112 +121,16 @@
         @if($payments->count() > 0)
             <x-admin.data-table>
                 <x-slot:head>
-                    <x-admin.th align="center" width="16">
-                        <div class="flex items-center justify-center gap-2">
-                            <span>ID</span>
-                            <div class="flex flex-col gap-0.5">
-                                <a aria-label="Sort Ascending" href="{{ request()->fullUrlWithQuery(['sort' => 'id', 'order' => 'asc', 'page' => null]) }}" class="text-gray-400 hover:text-link dark:hover:text-primary-400 {{ ($sort === 'id' && $order === 'asc') ? 'text-link dark:text-primary-400' : '' }}" title="Sort Ascending">
-                                    <i aria-hidden="true" class="fas fa-sort-numeric-down text-xs"></i>
-                                </a>
-                                <a aria-label="Sort Descending" href="{{ request()->fullUrlWithQuery(['sort' => 'id', 'order' => 'desc', 'page' => null]) }}" class="text-gray-400 hover:text-link dark:hover:text-primary-400 {{ ($sort === 'id' && $order === 'desc') ? 'text-link dark:text-primary-400' : '' }}" title="Sort Descending">
-                                    <i aria-hidden="true" class="fas fa-sort-numeric-down-alt text-xs"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </x-admin.th>
-                    <x-admin.th>
-                        <div class="flex items-center gap-2">
-                            <span>Date</span>
-                            <div class="flex flex-col gap-0.5">
-                                <a aria-label="Sort Ascending" href="{{ request()->fullUrlWithQuery(['sort' => 'created_at', 'order' => 'asc', 'page' => null]) }}" class="text-gray-400 hover:text-link dark:hover:text-primary-400 {{ ($sort === 'created_at' && $order === 'asc') ? 'text-link dark:text-primary-400' : '' }}" title="Sort Ascending">
-                                    <i aria-hidden="true" class="fas fa-sort-numeric-down text-xs"></i>
-                                </a>
-                                <a aria-label="Sort Descending" href="{{ request()->fullUrlWithQuery(['sort' => 'created_at', 'order' => 'desc', 'page' => null]) }}" class="text-gray-400 hover:text-link dark:hover:text-primary-400 {{ ($sort === 'created_at' && $order === 'desc') ? 'text-link dark:text-primary-400' : '' }}" title="Sort Descending">
-                                    <i aria-hidden="true" class="fas fa-sort-numeric-down-alt text-xs"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </x-admin.th>
-                    <x-admin.th>
-                        <div class="flex items-center gap-2">
-                            <span>Username</span>
-                            <div class="flex flex-col gap-0.5">
-                                <a aria-label="Sort Ascending" href="{{ request()->fullUrlWithQuery(['sort' => 'username', 'order' => 'asc', 'page' => null]) }}" class="text-gray-400 hover:text-link dark:hover:text-primary-400 {{ ($sort === 'username' && $order === 'asc') ? 'text-link dark:text-primary-400' : '' }}" title="Sort Ascending">
-                                    <i aria-hidden="true" class="fas fa-sort-alpha-down text-xs"></i>
-                                </a>
-                                <a aria-label="Sort Descending" href="{{ request()->fullUrlWithQuery(['sort' => 'username', 'order' => 'desc', 'page' => null]) }}" class="text-gray-400 hover:text-link dark:hover:text-primary-400 {{ ($sort === 'username' && $order === 'desc') ? 'text-link dark:text-primary-400' : '' }}" title="Sort Descending">
-                                    <i aria-hidden="true" class="fas fa-sort-alpha-down-alt text-xs"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </x-admin.th>
-                    <x-admin.th>
-                        <div class="flex items-center gap-2">
-                            <span>Email</span>
-                            <div class="flex flex-col gap-0.5">
-                                <a aria-label="Sort Ascending" href="{{ request()->fullUrlWithQuery(['sort' => 'email', 'order' => 'asc', 'page' => null]) }}" class="text-gray-400 hover:text-link dark:hover:text-primary-400 {{ ($sort === 'email' && $order === 'asc') ? 'text-link dark:text-primary-400' : '' }}" title="Sort Ascending">
-                                    <i aria-hidden="true" class="fas fa-sort-alpha-down text-xs"></i>
-                                </a>
-                                <a aria-label="Sort Descending" href="{{ request()->fullUrlWithQuery(['sort' => 'email', 'order' => 'desc', 'page' => null]) }}" class="text-gray-400 hover:text-link dark:hover:text-primary-400 {{ ($sort === 'email' && $order === 'desc') ? 'text-link dark:text-primary-400' : '' }}" title="Sort Descending">
-                                    <i aria-hidden="true" class="fas fa-sort-alpha-down-alt text-xs"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </x-admin.th>
+                    <x-admin.th align="center" width="16" :sort="$sort === 'id' ? $order : null" :href="request()->fullUrlWithQuery(['sort' => 'id', 'order' => $sort === 'id' && $order === 'asc' ? 'desc' : 'asc', 'page' => null])">ID</x-admin.th>
+                    <x-admin.th :sort="$sort === 'created_at' ? $order : null" :href="request()->fullUrlWithQuery(['sort' => 'created_at', 'order' => $sort === 'created_at' && $order === 'asc' ? 'desc' : 'asc', 'page' => null])">Date</x-admin.th>
+                    <x-admin.th :sort="$sort === 'username' ? $order : null" :href="request()->fullUrlWithQuery(['sort' => 'username', 'order' => $sort === 'username' && $order === 'asc' ? 'desc' : 'asc', 'page' => null])">Username</x-admin.th>
+                    <x-admin.th :sort="$sort === 'email' ? $order : null" :href="request()->fullUrlWithQuery(['sort' => 'email', 'order' => $sort === 'email' && $order === 'asc' ? 'desc' : 'asc', 'page' => null])">Email</x-admin.th>
                     <x-admin.th>Item</x-admin.th>
-                    <x-admin.th>
-                        <div class="flex items-center gap-2">
-                            <span>Order ID</span>
-                            <div class="flex flex-col gap-0.5">
-                                <a aria-label="Sort Ascending" href="{{ request()->fullUrlWithQuery(['sort' => 'order_id', 'order' => 'asc', 'page' => null]) }}" class="text-gray-400 hover:text-link dark:hover:text-primary-400 {{ ($sort === 'order_id' && $order === 'asc') ? 'text-link dark:text-primary-400' : '' }}" title="Sort Ascending">
-                                    <i aria-hidden="true" class="fas fa-sort-alpha-down text-xs"></i>
-                                </a>
-                                <a aria-label="Sort Descending" href="{{ request()->fullUrlWithQuery(['sort' => 'order_id', 'order' => 'desc', 'page' => null]) }}" class="text-gray-400 hover:text-link dark:hover:text-primary-400 {{ ($sort === 'order_id' && $order === 'desc') ? 'text-link dark:text-primary-400' : '' }}" title="Sort Descending">
-                                    <i aria-hidden="true" class="fas fa-sort-alpha-down-alt text-xs"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </x-admin.th>
-                    <x-admin.th>
-                        <div class="flex items-center gap-2">
-                            <span>Amount</span>
-                            <div class="flex flex-col gap-0.5">
-                                <a aria-label="Sort Ascending" href="{{ request()->fullUrlWithQuery(['sort' => 'invoice_amount', 'order' => 'asc', 'page' => null]) }}" class="text-gray-400 hover:text-link dark:hover:text-primary-400 {{ ($sort === 'invoice_amount' && $order === 'asc') ? 'text-link dark:text-primary-400' : '' }}" title="Sort Ascending">
-                                    <i aria-hidden="true" class="fas fa-sort-numeric-down text-xs"></i>
-                                </a>
-                                <a aria-label="Sort Descending" href="{{ request()->fullUrlWithQuery(['sort' => 'invoice_amount', 'order' => 'desc', 'page' => null]) }}" class="text-gray-400 hover:text-link dark:hover:text-primary-400 {{ ($sort === 'invoice_amount' && $order === 'desc') ? 'text-link dark:text-primary-400' : '' }}" title="Sort Descending">
-                                    <i aria-hidden="true" class="fas fa-sort-numeric-down-alt text-xs"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </x-admin.th>
+                    <x-admin.th :sort="$sort === 'order_id' ? $order : null" :href="request()->fullUrlWithQuery(['sort' => 'order_id', 'order' => $sort === 'order_id' && $order === 'asc' ? 'desc' : 'asc', 'page' => null])">Order ID</x-admin.th>
+                    <x-admin.th :sort="$sort === 'invoice_amount' ? $order : null" :href="request()->fullUrlWithQuery(['sort' => 'invoice_amount', 'order' => $sort === 'invoice_amount' && $order === 'asc' ? 'desc' : 'asc', 'page' => null])">Amount</x-admin.th>
                     <x-admin.th>Method</x-admin.th>
-                    <x-admin.th>
-                        <div class="flex items-center gap-2">
-                            <span>Pay. status</span>
-                            <div class="flex flex-col gap-0.5">
-                                <a aria-label="Sort Ascending" href="{{ request()->fullUrlWithQuery(['sort' => 'payment_status', 'order' => 'asc', 'page' => null]) }}" class="text-gray-400 hover:text-link dark:hover:text-primary-400 {{ ($sort === 'payment_status' && $order === 'asc') ? 'text-link dark:text-primary-400' : '' }}" title="Sort Ascending">
-                                    <i aria-hidden="true" class="fas fa-sort-alpha-down text-xs"></i>
-                                </a>
-                                <a aria-label="Sort Descending" href="{{ request()->fullUrlWithQuery(['sort' => 'payment_status', 'order' => 'desc', 'page' => null]) }}" class="text-gray-400 hover:text-link dark:hover:text-primary-400 {{ ($sort === 'payment_status' && $order === 'desc') ? 'text-link dark:text-primary-400' : '' }}" title="Sort Descending">
-                                    <i aria-hidden="true" class="fas fa-sort-alpha-down-alt text-xs"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </x-admin.th>
-                    <x-admin.th>
-                        <div class="flex items-center gap-2">
-                            <span>Inv. status</span>
-                            <div class="flex flex-col gap-0.5">
-                                <a aria-label="Sort Ascending" href="{{ request()->fullUrlWithQuery(['sort' => 'invoice_status', 'order' => 'asc', 'page' => null]) }}" class="text-gray-400 hover:text-link dark:hover:text-primary-400 {{ ($sort === 'invoice_status' && $order === 'asc') ? 'text-link dark:text-primary-400' : '' }}" title="Sort Ascending">
-                                    <i aria-hidden="true" class="fas fa-sort-alpha-down text-xs"></i>
-                                </a>
-                                <a aria-label="Sort Descending" href="{{ request()->fullUrlWithQuery(['sort' => 'invoice_status', 'order' => 'desc', 'page' => null]) }}" class="text-gray-400 hover:text-link dark:hover:text-primary-400 {{ ($sort === 'invoice_status' && $order === 'desc') ? 'text-link dark:text-primary-400' : '' }}" title="Sort Descending">
-                                    <i aria-hidden="true" class="fas fa-sort-alpha-down-alt text-xs"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </x-admin.th>
+                    <x-admin.th :sort="$sort === 'payment_status' ? $order : null" :href="request()->fullUrlWithQuery(['sort' => 'payment_status', 'order' => $sort === 'payment_status' && $order === 'asc' ? 'desc' : 'asc', 'page' => null])">Pay. status</x-admin.th>
+                    <x-admin.th :sort="$sort === 'invoice_status' ? $order : null" :href="request()->fullUrlWithQuery(['sort' => 'invoice_status', 'order' => $sort === 'invoice_status' && $order === 'asc' ? 'desc' : 'asc', 'page' => null])">Inv. status</x-admin.th>
                 </x-slot:head>
 
                 @foreach($payments as $payment)
@@ -243,13 +147,9 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">{{ Str::limit($payment->payment_method, 20) }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             @if(strcasecmp((string) $payment->payment_status, \App\Models\Payment::PAYMENT_STATUS_SETTLED) === 0)
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200">
-                                    {{ $payment->payment_status }}
-                                </span>
+                                <x-admin.badge tone="success">{{ $payment->payment_status }}</x-admin.badge>
                             @else
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200">
-                                    {{ $payment->payment_status }}
-                                </span>
+                                <x-admin.badge tone="warning">{{ $payment->payment_status }}</x-admin.badge>
                             @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
@@ -257,22 +157,16 @@
                                 $inv = $payment->invoice_status ?? \App\Models\Payment::INVOICE_STATUS_PENDING;
                             @endphp
                             @if(strcasecmp((string) $inv, \App\Models\Payment::INVOICE_STATUS_SETTLED) === 0)
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200">
-                                    {{ $inv }}
-                                </span>
+                                <x-admin.badge tone="success">{{ $inv }}</x-admin.badge>
                             @else
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-warning-100 dark:bg-warning-900 text-warning-800 dark:text-warning-200">
-                                    {{ $inv }}
-                                </span>
+                                <x-admin.badge tone="warning">{{ $inv }}</x-admin.badge>
                             @endif
                         </td>
                     </tr>
                 @endforeach
             </x-admin.data-table>
 
-            <div class="mt-4 px-6">
-                {{ $payments->withQueryString()->links() }}
-            </div>
+            <x-admin.pagination :paginator="$payments->withQueryString()" />
 
             <div class="border-t border-gray-200 bg-gray-50 px-6 py-4 dark:border-gray-700 dark:bg-gray-900">
                 <div class="flex flex-wrap items-center justify-between gap-2 text-sm text-gray-600 dark:text-gray-400">

@@ -16,6 +16,23 @@
 </x-page-header>
 
 <div class="surface-panel rounded-xl shadow-sm">
+    @php
+        $consoleFilterUrl = route('Console', array_filter(['id' => $categorytitle ?? null]));
+    @endphp
+    <form method="get" action="{{ $consoleFilterUrl }}" class="border-b border-line px-4 py-4 sm:px-6" role="search" aria-label="Filter console titles">
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-[1fr_1fr_auto] md:items-end">
+            <x-field label="Title" for="console-title" name="title">
+                <x-input id="console-title" name="title" :value="$title ?? ''" placeholder="Search by title" />
+            </x-field>
+            <x-field label="Platform" for="console-platform" name="platform">
+                <x-input id="console-platform" name="platform" :value="$platform ?? ''" placeholder="Search by platform" />
+            </x-field>
+            <div class="flex gap-2">
+                <x-button type="submit" icon="fa-solid fa-search">Search</x-button>
+                <x-button :href="$consoleFilterUrl" variant="secondary" icon="fa-solid fa-xmark">Clear</x-button>
+            </div>
+        </div>
+    </form>
 
     @if($results->count() > 0)
         <form id="nzb_multi_operations_form" method="get" x-data="releaseMultiOps">
@@ -60,7 +77,7 @@
                                                  data-fallback-src="{{ url('/images/no-cover.png') }}">
                                             @if($totalFailed > 0)
                                                 <div class="absolute top-2 right-2">
-                                                    <span class="px-2 py-1 bg-red-600 dark:bg-red-700 text-white text-xs rounded-full">
+                                                    <span class="px-2 py-1 bg-danger-600 dark:bg-danger-700 text-white text-xs rounded-full">
                                                         <i aria-hidden="true" class="fa-solid fa-exclamation-circle mr-1"></i>{{ $totalFailed }} Failed
                                                     </span>
                                                 </div>
@@ -108,7 +125,7 @@
                                             <!-- External Links -->
                                             @if(!empty($result->url))
                                                 <div class="mt-2">
-                                                    <a target="_blank" href="{{ $site->dereferrerLink }}{{ $result->url }}"
+                                                    <a target="_blank" rel="noopener noreferrer" href="{{ $site->dereferrerLink }}{{ $result->url }}"
                                                        title="View Game page" class="inline-flex items-center px-2 py-1 bg-gray-600 text-white text-xs rounded hover:bg-gray-700">
                                                        <i aria-hidden="true" class="fa-solid fa-shopping-cart mr-1"></i>Source
                                                     </a>
@@ -150,5 +167,4 @@
 @endsection
 
 @push('scripts')
-@include('partials.cart-script')
 @endpush

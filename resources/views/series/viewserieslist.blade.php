@@ -55,9 +55,9 @@
                     @php
                         $sData = is_object($s) ? get_object_vars($s) : $s;
                         $externalLinks = array_filter([
-                            'TVDB' => ! empty($sData['tvdb']) && $sData['tvdb'] > 0 ? 'http://thetvdb.com/?tab=series&id='.$sData['tvdb'] : null,
-                            'TVMaze' => ! empty($sData['tvmaze']) && $sData['tvmaze'] > 0 ? 'http://tvmaze.com/shows/'.$sData['tvmaze'] : null,
-                            'Trakt' => ! empty($sData['trakt']) && $sData['trakt'] > 0 ? 'http://www.trakt.tv/shows/'.$sData['trakt'] : null,
+                            'TVDB' => ! empty($sData['tvdb']) && $sData['tvdb'] > 0 ? 'https://thetvdb.com/?tab=series&id='.$sData['tvdb'] : null,
+                            'TVMaze' => ! empty($sData['tvmaze']) && $sData['tvmaze'] > 0 ? 'https://www.tvmaze.com/shows/'.$sData['tvmaze'] : null,
+                            'Trakt' => ! empty($sData['trakt']) && $sData['trakt'] > 0 ? 'https://trakt.tv/shows/'.$sData['trakt'] : null,
                         ]);
                     @endphp
                     <li class="flex flex-col gap-2 px-4 py-2.5 transition hover:bg-surface-hover sm:flex-row sm:items-center sm:gap-4 sm:px-6">
@@ -88,12 +88,12 @@
                         <div class="flex items-center gap-1 sm:w-40 sm:justify-end">
                             @if(! empty($sData['userseriesid']))
                                 <x-badge tone="success" icon="fa-solid fa-check">Following</x-badge>
-                                <x-icon-button size="sm" icon="fa-solid fa-pen" label="Edit categories for {{ $sData['title'] ?? 'this show' }}"
+                                <x-icon-button size="sm" icon="fa-solid fa-pen" :label="'Edit categories for '.($sData['title'] ?? 'this show')"
                                                :href="url('/myshows?action=edit&id='.$sData['id'].'&from='.$returnTo)" />
                                 <form method="POST" action="{{ url('/myshows?action=delete&id='.$sData['id'].'&from='.$returnTo) }}"
                                       x-data="confirmForm" @submit.prevent="submit()" data-title="Remove show" data-message="Stop following this show?" data-confirm-text="Remove" data-type="danger">
                                     @csrf
-                                    <x-icon-button type="submit" size="sm" icon="fa-solid fa-trash" label="Remove {{ $sData['title'] ?? 'this show' }} from My shows" class="text-danger-600 dark:text-danger-400" />
+                                    <x-icon-button type="submit" size="sm" icon="fa-solid fa-trash" :label="'Remove '.($sData['title'] ?? 'this show').' from My shows'" class="text-danger-600 dark:text-danger-400" />
                                 </form>
                             @else
                                 <x-button size="sm" variant="soft" icon="fa-solid fa-plus" title="Add to My shows"

@@ -1,5 +1,7 @@
 @extends('layouts.guest')
 
+@section('title', __('Reset your password'))
+
 @section('content')
 <div class="min-h-screen auth-page flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8">
@@ -23,11 +25,11 @@
             <div class="px-8 py-6">
                 <!-- Error Messages -->
                 @if(isset($errors) && $errors->any())
-                    <div class="mb-4 p-4 rounded-lg bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700">
+                    <div class="mb-4 p-4 rounded-lg bg-danger-50 dark:bg-danger-900/30 border border-danger-200 dark:border-danger-700">
                         <div class="flex items-start">
-                            <i aria-hidden="true" class="fas fa-exclamation-circle text-red-600 dark:text-red-400 mr-3 mt-0.5"></i>
+                            <i aria-hidden="true" class="fas fa-exclamation-circle text-danger-600 dark:text-danger-400 mr-3 mt-0.5"></i>
                             <div class="flex-1">
-                                <ul class="text-sm text-red-700 dark:text-red-300 list-disc list-inside">
+                                <ul class="text-sm text-danger-700 dark:text-danger-300 list-disc list-inside">
                                     @foreach($errors->all() as $error)
                                         <li>{{ $error }}</li>
                                     @endforeach
@@ -57,12 +59,12 @@
                                 value="{{ old('email') }}"
                                 required
                                 autofocus
-                                class="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition {{ isset($errors) && $errors->has('email') ? 'border-red-500' : '' }}"
+                                class="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition {{ isset($errors) && $errors->has('email') ? 'border-danger-500' : '' }}"
                                 placeholder="your@email.com"
                             >
                         </div>
                         @if(isset($errors) && $errors->has('email'))
-                            <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $errors->first('email') }}</p>
+                            <p class="mt-2 text-sm text-danger-600 dark:text-danger-400">{{ $errors->first('email') }}</p>
                         @endif
                     </div>
 
@@ -72,7 +74,7 @@
                             {!! \App\Support\CaptchaHelper::display() !!}
                         </div>
                         @error(\App\Support\CaptchaHelper::getResponseFieldName())
-                            <p class="mt-2 text-sm text-red-600 dark:text-red-400 text-center">{{ $message }}</p>
+                            <p class="mt-2 text-sm text-danger-600 dark:text-danger-400 text-center">{{ $message }}</p>
                         @enderror
                     @endif
 

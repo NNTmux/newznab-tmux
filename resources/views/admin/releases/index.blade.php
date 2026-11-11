@@ -114,9 +114,7 @@
                             @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-primary-100 dark:bg-primary-900/20 text-primary-800 dark:text-primary-300">
-                                {{ $release->category_name ?? 'N/A' }}
-                            </span>
+                            <x-admin.badge tone="primary">{{ $release->category_name ?? 'N/A' }}</x-admin.badge>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                             {{ number_format($release->size / 1073741824, 2) }} GB
@@ -138,7 +136,7 @@
                                 <a aria-label="View Details" href="{{ url('/details/' . $release->guid) }}"
                                    class="text-link dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300"
                                    title="View Details"
-                                   target="_blank">
+                                   target="_blank" rel="noopener noreferrer">
                                     <i aria-hidden="true" class="fas fa-eye"></i>
                                 </a>
                                 <a aria-label="Edit" href="{{ url('admin/release-edit?id=' . $release->guid . '&action=view') }}"
@@ -147,7 +145,7 @@
                                     <i aria-hidden="true" class="fas fa-edit"></i>
                                 </a>
                                 <button aria-label="Delete" type="button"
-                                       class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
+                                       class="text-danger-600 dark:text-danger-400 hover:text-danger-900 dark:hover:text-danger-300"
                                         @click="deleteRelease($event)"
                                        data-delete-release="{{ $release->guid }}"
                                        data-delete-url="{{ url('admin/release-delete/' . $release->guid) }}"
@@ -165,7 +163,7 @@
             <x-admin.empty-state
                 icon="fas fa-list"
                 title="No releases found"
-                message="{{ request('search') || (request()->filled('category_id') && (int) request('category_id') !== -1) ? 'No releases match your filters.' : 'No releases are currently available in the system.' }}"
+                :message="request('search') || (request()->filled('category_id') && (int) request('category_id') !== -1) ? 'No releases match your filters.' : 'No releases are currently available in the system.'"
             />
         @endif
     </x-admin.card>

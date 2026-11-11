@@ -12,7 +12,7 @@
         </a>
     </div>
 
-    <p x-show="error" x-cloak x-text="error" class="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-800 dark:bg-red-900/30 dark:text-red-200"></p>
+    <p x-show="error" x-cloak x-text="error" class="mb-4 rounded-lg bg-danger-50 px-4 py-3 text-sm text-danger-800 dark:bg-danger-900/30 dark:text-danger-200"></p>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         @foreach($grafanaPanels as $panel)

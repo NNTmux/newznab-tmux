@@ -107,7 +107,7 @@
 
     @stack('scripts')
 
-    <!-- Theme Management Data (moved to csp-safe.js) -->
+    <!-- Theme data read by the Alpine theme store -->
     @php $colorScheme = $userColorScheme; @endphp
     <div id="current-theme-data"
          data-theme="{{ $themePreference }}"
@@ -117,7 +117,7 @@
          class="hidden">
     </div>
 
-    <!-- Flash Messages Data (moved to csp-safe.js) -->
+    <!-- Flash messages read by the Alpine toast store -->
     <div id="flash-messages-data"
          data-messages="{{ json_encode([
              'success' => session('success'),

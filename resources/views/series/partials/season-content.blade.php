@@ -3,14 +3,14 @@
         <div class="season-content" data-season="{{ $seasonNumber }}">
             @foreach($episodes as $episodeNumber => $releases)
                 <div class="mb-4 pb-4 border-b border-gray-200 dark:border-gray-700 last:border-b-0">
-                    <h6 class="font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    <h4 class="font-semibold text-gray-700 dark:text-gray-300 mb-2">
                         Episode {{ $episodeNumber }}
-                    </h6>
+                    </h4>
                     <div class="space-y-2">
                         @foreach($releases as $release)
                             <div class="series-episode-card flex items-center gap-3 bg-gray-50 dark:bg-gray-900 rounded-lg p-3 hover:bg-gray-100 dark:hover:bg-gray-800">
                                 <div class="shrink-0">
-                                    <input aria-label="Select item" type="checkbox" class="chkRelease rounded border-gray-300 dark:border-gray-600 text-link dark:text-primary-500 focus:ring-primary-500 dark:focus:ring-primary-400 dark:bg-gray-700" name="release[]" value="{{ $release->guid }}" @change="onCheckboxChange()">
+                                    <input aria-label="Select {{ $release->searchname }}" type="checkbox" class="chkRelease rounded border-gray-300 dark:border-gray-600 text-link dark:text-primary-500 focus:ring-primary-500 dark:focus:ring-primary-400 dark:bg-gray-700" name="release[]" value="{{ $release->guid }}" @change="onCheckboxChange()">
                                 </div>
                                 <div class="flex-1">
                                     <div class="flex items-center gap-2 flex-wrap">
@@ -19,7 +19,7 @@
                                             {{ $release->searchname }}
                                         </a>
                                         @if(($release->failed_count ?? 0) > 0)
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-200"
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-danger-100 dark:bg-danger-900/40 text-danger-800 dark:text-danger-200"
                                                   title="{{ $release->failed_count }} user(s) reported download failure">
                                                 <i aria-hidden="true" class="fas fa-exclamation-triangle mr-1"></i> Failed ({{ $release->failed_count }})
                                             </span>
@@ -44,23 +44,7 @@
                                         @endif
                                     </div>
                                 </div>
-                                <div class="flex gap-2">
-                                    <a aria-label="Download NZB" href="{{ url('/getnzb?id=' . $release->guid) }}"
-                                       class="download-nzb px-3 py-1 bg-success-600 dark:bg-success-700 text-white rounded hover:bg-success-700 dark:hover:bg-success-800 text-sm"
-                                       title="Download NZB">
-                                        <i aria-hidden="true" class="fa-solid fa-download"></i>
-                                    </a>
-                                    <a aria-label="View Details" href="{{ url('/details/' . $release->guid) }}"
-                                       class="px-3 py-1 bg-accent dark:bg-accent-hover text-white rounded hover:bg-accent-hover dark:hover:bg-primary-800 text-sm"
-                                       title="View Details">
-                                        <i aria-hidden="true" class="fa-solid fa-info-circle"></i>
-                                    </a>
-                                    <a aria-label="Add to cart" href="#" class="add-to-cart px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-300 text-sm"
-                                       data-guid="{{ $release->guid }}"
-                                       title="Add to cart">
-                                        <i aria-hidden="true" class="icon_cart fa-solid fa-shopping-basket"></i>
-                                    </a>
-                                </div>
+                                <x-release-row-actions :result="$release" :compact="true" />
                             </div>
                         @endforeach
                     </div>
@@ -68,9 +52,6 @@
             @endforeach
         </div>
     @empty
-        <div class="bg-primary-50 dark:bg-primary-950/40 border border-primary-200 rounded-lg p-4 text-primary-800 dark:text-primary-200">
-            <i aria-hidden="true" class="fa-solid fa-info-circle mr-2"></i>
-            No releases found on this page for the selected season.
-        </div>
+        <x-empty-state icon="fas fa-tv" title="No releases for this season" message="Nothing has been posted on this page for the selected season." />
     @endforelse
 </div>

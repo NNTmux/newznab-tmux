@@ -21,32 +21,8 @@
         @if(count($categorylist) > 0)
             <x-admin.data-table>
                 <x-slot:head>
-                    <x-admin.th align="center" width="20">
-                        <div class="flex items-center justify-center gap-2">
-                            <span>ID</span>
-                            <div class="flex flex-col gap-0.5">
-                                <a aria-label="Sort Ascending" href="?sort=id&order=asc" class="text-gray-400 hover:text-link dark:hover:text-primary-400 {{ (request('sort') == 'id' && request('order') == 'asc') ? 'text-link dark:text-primary-400' : '' }}" title="Sort Ascending">
-                                    <i aria-hidden="true" class="fas fa-sort-numeric-down text-xs"></i>
-                                </a>
-                                <a aria-label="Sort Descending" href="?sort=id&order=desc" class="text-gray-400 hover:text-link dark:hover:text-primary-400 {{ (request('sort') == 'id' && request('order') == 'desc') ? 'text-link dark:text-primary-400' : '' }}" title="Sort Descending">
-                                    <i aria-hidden="true" class="fas fa-sort-numeric-down-alt text-xs"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </x-admin.th>
-                    <x-admin.th>
-                        <div class="flex items-center gap-2">
-                            <span>Title</span>
-                            <div class="flex flex-col gap-0.5">
-                                <a aria-label="Sort Ascending" href="?sort=title&order=asc" class="text-gray-400 hover:text-link dark:hover:text-primary-400 {{ (request('sort') == 'title' && request('order') == 'asc') ? 'text-link dark:text-primary-400' : '' }}" title="Sort Ascending">
-                                    <i aria-hidden="true" class="fas fa-sort-alpha-down text-xs"></i>
-                                </a>
-                                <a aria-label="Sort Descending" href="?sort=title&order=desc" class="text-gray-400 hover:text-link dark:hover:text-primary-400 {{ (request('sort') == 'title' && request('order') == 'desc') ? 'text-link dark:text-primary-400' : '' }}" title="Sort Descending">
-                                    <i aria-hidden="true" class="fas fa-sort-alpha-down-alt text-xs"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </x-admin.th>
+                    <x-admin.th align="center" width="20" :sort="$sort === 'id' ? $order : null" :href="request()->fullUrlWithQuery(['sort' => 'id', 'order' => $sort === 'id' && $order === 'asc' ? 'desc' : 'asc', 'page' => null])">ID</x-admin.th>
+                    <x-admin.th :sort="$sort === 'title' ? $order : null" :href="request()->fullUrlWithQuery(['sort' => 'title', 'order' => $sort === 'title' && $order === 'asc' ? 'desc' : 'asc', 'page' => null])">Title</x-admin.th>
                     <x-admin.th>Parent</x-admin.th>
                     <x-admin.th align="center" width="24">Status</x-admin.th>
                     <x-admin.th align="center" width="24">Preview</x-admin.th>
@@ -63,33 +39,23 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                             @if($category->parent)
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-                                    {{ $category->parent->title }}
-                                </span>
+                                <x-admin.badge tone="neutral">{{ $category->parent->title }}</x-admin.badge>
                             @else
                                 <span class="text-gray-400 dark:text-gray-500">N/A</span>
                             @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-center">
                             @if($category->status == 1)
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200">
-                                    <i aria-hidden="true" class="fas fa-check-circle mr-1"></i>Active
-                                </span>
+                                <x-admin.badge tone="success" icon="fas fa-check-circle">Active</x-admin.badge>
                             @else
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">
-                                    <i aria-hidden="true" class="fas fa-times-circle mr-1"></i>Inactive
-                                </span>
+                                <x-admin.badge tone="danger" icon="fas fa-times-circle">Inactive</x-admin.badge>
                             @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-center">
                             @if($category->disablepreview == 1)
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-warning-100 dark:bg-warning-900 text-warning-800 dark:text-warning-200">
-                                    <i aria-hidden="true" class="fas fa-times-circle mr-1"></i>Disabled
-                                </span>
+                                <x-admin.badge tone="warning" icon="fas fa-times-circle">Disabled</x-admin.badge>
                             @else
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200">
-                                    <i aria-hidden="true" class="fas fa-check-circle mr-1"></i>Enabled
-                                </span>
+                                <x-admin.badge tone="success" icon="fas fa-check-circle">Enabled</x-admin.badge>
                             @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
@@ -105,7 +71,7 @@
                                     <input type="hidden" name="id" value="{{ $category->id }}">
                                     <button aria-label="Delete Category" type="submit"
                                         data-confirm-delete
-                                        class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
+                                        class="text-danger-600 dark:text-danger-400 hover:text-danger-900 dark:hover:text-danger-300"
                                         title="Delete Category">
                                         <i aria-hidden="true" class="fas fa-trash"></i>
                                     </button>

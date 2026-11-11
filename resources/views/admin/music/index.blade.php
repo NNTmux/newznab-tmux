@@ -5,7 +5,6 @@
     <x-admin.page-header :title="$title" icon="fas fa-music" />
     <x-admin.card>
 
-        <!-- Success/Error/Warning Messages -->
 
 
 
@@ -77,13 +76,9 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm">
                                     @if(!empty($music->cover) && $music->cover == 1)
-                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-success-100 dark:bg-success-900/40 text-success-800 dark:text-success-200">
-                                            <i aria-hidden="true" class="fas fa-check"></i> Yes
-                                        </span>
+                                        <x-admin.badge tone="success" icon="fas fa-check">Yes</x-admin.badge>
                                     @else
-                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-200">
-                                            <i aria-hidden="true" class="fas fa-times"></i> No
-                                        </span>
+                                        <x-admin.badge tone="danger" icon="fas fa-times">No</x-admin.badge>
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -94,6 +89,7 @@
                             </tr>
                         @endforeach
             </x-admin.data-table>
+            <x-admin.pagination :paginator="$musicList->withQueryString()" />
         @else
             <div class="px-6 py-12 text-center">
                 <i aria-hidden="true" class="fas fa-music text-gray-400 text-5xl mb-4"></i>

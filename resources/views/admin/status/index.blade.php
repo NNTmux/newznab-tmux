@@ -8,33 +8,20 @@
 
     $serviceBadge = static function (ServiceStatusEnum $s): string {
         $base = 'px-2 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full';
-        return $base.' '.match ($s) {
-            ServiceStatusEnum::Operational => 'bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200',
-            ServiceStatusEnum::Degraded => 'bg-warning-100 dark:bg-warning-900 text-warning-800 dark:text-warning-200',
-            ServiceStatusEnum::Maintenance => 'bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200',
-            ServiceStatusEnum::PartialOutage => 'bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200',
-            ServiceStatusEnum::MajorOutage => 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200',
-        };
+
+        return $base.' '.$s->badgeClasses();
     };
 
     $impactBadge = static function (IncidentImpactEnum $i): string {
         $base = 'px-2 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full';
-        return $base.' '.match ($i) {
-            IncidentImpactEnum::None => 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200',
-            IncidentImpactEnum::Minor => 'bg-warning-100 dark:bg-warning-900 text-warning-800 dark:text-warning-200',
-            IncidentImpactEnum::Major => 'bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200',
-            IncidentImpactEnum::Critical => 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200',
-        };
+
+        return $base.' '.$i->badgeClasses();
     };
 
     $incidentStatusBadge = static function (IncidentStatusEnum $st): string {
         $base = 'px-2 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full';
-        return $base.' '.match ($st) {
-            IncidentStatusEnum::Investigating => 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200',
-            IncidentStatusEnum::Identified => 'bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200',
-            IncidentStatusEnum::Monitoring => 'bg-cyan-100 dark:bg-cyan-900 text-cyan-800 dark:text-cyan-200',
-            IncidentStatusEnum::Resolved => 'bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200',
-        };
+
+        return $base.' '.$st->badgeClasses();
     };
 @endphp
 
@@ -130,7 +117,7 @@
                                   @submit.prevent="submit()">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="text-red-600 dark:text-red-400 hover:underline">Delete</button>
+                                <button type="submit" class="text-danger-600 dark:text-danger-400 hover:underline">Delete</button>
                             </form>
                         </td>
                     </tr>
@@ -141,11 +128,7 @@
                 @endforelse
             </x-admin.data-table>
         </div>
-        @if($incidents->hasPages())
-            <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
-                {{ $incidents->links() }}
-            </div>
-        @endif
+        <x-admin.pagination :paginator="$incidents" />
     </x-admin.card>
 </div>
 @endsection
