@@ -269,11 +269,11 @@ class Release extends Model
     /**
      * @throws \Exception
      */
-    public static function updateGrab(string $guid): void
+    public static function updateGrab(string $guid, ?int $releaseId = null): void
     {
         $updateGrabs = ((int) app(ConfigurationProvider::class)->ingestion()->grabStatus !== 0);
         if ($updateGrabs) {
-            $id = self::whereGuid($guid)->value('id');
+            $id = $releaseId ?? self::whereGuid($guid)->value('id');
             self::whereGuid($guid)->increment('grabs');
             if ($id !== null) {
                 self::syncSearchIndexAfterCommit((int) $id);
@@ -573,6 +573,35 @@ class Release extends Model
         });
 
         return is_array($guid) ? $releases : $releases->first();
+    }
+
+    /**
+     * The release fields an NZB download needs (file name and X-DNZB headers), in one query.
+     */
+    public static function getForNzbDownload(string $guid): ?self
+    {
+        $release = self::query()
+            ->select([
+                'releases.id',
+                'releases.guid',
+                'releases.searchname',
+                'releases.imdbid',
+                'releases.nfostatus',
+                'v.tvdb',
+                'cp.title as parent_category',
+                'c.title as sub_category',
+            ])
+            ->leftJoin('categories as c', 'c.id', '=', 'releases.categories_id')
+            ->leftJoin('root_categories as cp', 'cp.id', '=', 'c.root_categories_id')
+            ->leftJoin('videos as v', 'v.id', '=', 'releases.videos_id')
+            ->where('releases.guid', $guid)
+            ->first();
+
+        if ($release !== null) {
+            $release->category_name = $release->parent_category.' > '.$release->sub_category;
+        }
+
+        return $release;
     }
 
     /**

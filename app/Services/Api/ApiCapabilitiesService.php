@@ -47,9 +47,16 @@ final readonly class ApiCapabilitiesService
         $data = ['server' => $data['server'], 'limits' => $this->limits()] + $data;
         $status = $this->registrationStatus();
         $data['registration'] = $this->registration($status);
-        $data['categories'] = $includeCatalogs ? Category::getForMenu() : null;
-        $data['groups'] = $includeCatalogs ? $this->groups() : null;
-        $data['genres'] = $includeCatalogs ? $this->genres() : null;
+        $catalogs = $includeCatalogs
+            ? Cache::remember('api_v1_caps_catalogs', 600, fn (): array => [
+                'categories' => Category::getForMenu(),
+                'groups' => $this->groups(),
+                'genres' => $this->genres(),
+            ])
+            : ['categories' => null, 'groups' => null, 'genres' => null];
+        $data['categories'] = $catalogs['categories'];
+        $data['groups'] = $catalogs['groups'];
+        $data['genres'] = $catalogs['genres'];
 
         return $data;
     }

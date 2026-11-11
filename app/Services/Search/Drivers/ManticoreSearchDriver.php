@@ -42,6 +42,11 @@ class ManticoreSearchDriver implements SearchDriverInterface
 {
     private const AVAILABILITY_CHECK_CACHE_TTL = 30;
 
+    /** A confirmed "available" is shared through the cache, so web requests skip the status call. */
+    private const SHARED_AVAILABILITY_CACHE_KEY = 'search:manticore:available';
+
+    private const SHARED_AVAILABILITY_CACHE_TTL = 15;
+
     /** @var list<string> */
     private const RELEASE_FIELD_SEARCH_FIELDS = [
         'searchname',
@@ -134,21 +139,55 @@ class ManticoreSearchDriver implements SearchDriverInterface
             return self::$availabilityCache;
         }
 
+        if ($this->isSharedAvailabilityConfirmed()) {
+            self::$availabilityCache = true;
+            self::$availabilityCacheTime = $now;
+
+            return true;
+        }
+
         try {
             $status = $this->manticoreSearch->nodes()->status();
 
             self::$availabilityCache = ! empty($status);
             self::$availabilityCacheTime = $now;
+            $this->shareAvailability(self::$availabilityCache);
 
             return self::$availabilityCache;
         } catch (\Throwable $e) {
             self::$availabilityCache = false;
             self::$availabilityCacheTime = $now;
+            $this->shareAvailability(false);
             if (config('app.debug')) {
                 Log::debug('ManticoreSearch not available: '.$e->getMessage());
             }
 
             return false;
+        }
+    }
+
+    private function isSharedAvailabilityConfirmed(): bool
+    {
+        try {
+            return Cache::get(self::SHARED_AVAILABILITY_CACHE_KEY) === true;
+        } catch (\Throwable) {
+            return false;
+        }
+    }
+
+    /**
+     * Only "available" is shared; an outage is never cached, so every request re-checks it.
+     */
+    private function shareAvailability(bool $available): void
+    {
+        try {
+            if ($available) {
+                Cache::put(self::SHARED_AVAILABILITY_CACHE_KEY, true, self::SHARED_AVAILABILITY_CACHE_TTL);
+            } else {
+                Cache::forget(self::SHARED_AVAILABILITY_CACHE_KEY);
+            }
+        } catch (\Throwable) {
+            // The shared flag is an optimisation; the status call remains the source of truth.
         }
     }
 

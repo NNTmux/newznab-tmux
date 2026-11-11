@@ -36,8 +36,14 @@ class TvLookupOutcomeWriter
         $this->batching = false;
         if ($this->cacheBumpPending) {
             $this->cacheBumpPending = false;
-            ReleaseBrowseService::bumpCacheVersion();
+            $this->bumpBrowseCache();
         }
+    }
+
+    /** TV links arrive continuously, so their cache bumps are rate limited. */
+    private function bumpBrowseCache(): void
+    {
+        ReleaseBrowseService::bumpCacheVersion(max(0, (int) config('nntmux.api.release_cache_tv_bump_interval', 60)));
     }
 
     public function record(TvReleaseContext $context, TvProcessingResult $result): void
@@ -72,7 +78,7 @@ class TvLookupOutcomeWriter
             if ($this->batching) {
                 $this->cacheBumpPending = true;
             } else {
-                ReleaseBrowseService::bumpCacheVersion();
+                $this->bumpBrowseCache();
             }
         }
     }

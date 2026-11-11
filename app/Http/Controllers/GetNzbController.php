@@ -8,6 +8,7 @@ use App\Models\Release;
 use App\Models\User;
 use App\Models\UserDownload;
 use App\Models\UsersRelease;
+use App\Services\Api\ApiUserResolver;
 use App\Services\Nzb\NzbService;
 use App\Support\FilenameSanitizer;
 use Exception;
@@ -166,7 +167,8 @@ class GetNzbController extends BasePageController
             return $this->apiError(200);
         }
 
-        $user = User::findVerifiedByApiToken((string) $request->input('r'));
+        // Same cached lookup as API v1, so a download does not reload the user, role and roles.
+        $user = app(ApiUserResolver::class)->v1((string) $request->input('r'));
         if (! $user) {
             return $this->apiError(100);
         }
@@ -294,7 +296,7 @@ class GetNzbController extends BasePageController
         string $releaseId
     ): JsonResponse|Response|StreamedResponse {
         // Get release data first so the NZB path is only built for a stored release
-        $releaseData = Release::getByGuid($releaseId);
+        $releaseData = Release::getForNzbDownload($releaseId);
         if ($releaseData === null) {
             return $this->apiError(300, 'Release not found!');
         }
@@ -338,7 +340,7 @@ class GetNzbController extends BasePageController
      */
     private function updateDownloadStatistics(Request $request, int $uid, string $releaseId, int $releaseDbId): void
     {
-        Release::updateGrab($releaseId);
+        Release::updateGrab($releaseId, $releaseDbId);
         UserDownload::addDownloadRequest($uid, $releaseDbId);
         User::incrementGrabs($uid);
 

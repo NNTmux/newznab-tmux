@@ -112,6 +112,8 @@ return [
         'release_cache_jitter' => (int) env('API_RELEASE_CACHE_JITTER', 60),
         'release_cache_stale_ttl' => (int) env('API_RELEASE_CACHE_STALE_TTL', 900),
         'release_cache_lock_ttl' => (int) env('API_RELEASE_CACHE_LOCK_TTL', 15),
+        // TV post-processing invalidates cached release results at most once per this many seconds (0 = on every linked batch).
+        'release_cache_tv_bump_interval' => (int) env('API_RELEASE_CACHE_TV_BUMP_INTERVAL', 60),
         'async_audit' => (bool) env('API_ASYNC_AUDIT', true),
         'audit_queue' => env('API_AUDIT_QUEUE', 'api-audit'),
         'access_update_interval' => (int) env('API_ACCESS_UPDATE_INTERVAL', 60),

@@ -488,9 +488,13 @@ class ReleaseSearchService
         $releases = Release::fromQuery($sql);
 
         if ($releases->isNotEmpty()) {
-            $countSql = sprintf('SELECT COUNT(*) as count FROM releases r %s', $whereSql);
-            $countResult = Release::fromQuery($countSql);
-            $releases[0]->_totalrows = $countResult[0]->count ?? 0;
+            $total = $this->totalFromShortPage($releases->count(), $offset, $limit);
+            if ($total === null) {
+                $countSql = sprintf('SELECT COUNT(*) as count FROM releases r %s', $whereSql);
+                $countResult = Release::fromQuery($countSql);
+                $total = $countResult[0]->count ?? 0;
+            }
+            $releases[0]->_totalrows = $total;
         }
 
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
@@ -645,9 +649,13 @@ class ReleaseSearchService
         $releases = Release::fromQuery($sql);
 
         if ($releases->isNotEmpty()) {
-            $countSql = sprintf('SELECT COUNT(*) as count FROM releases r %s', $whereSql);
-            $countResult = Release::fromQuery($countSql);
-            $releases[0]->_totalrows = $countResult[0]->count ?? 0;
+            $total = $this->totalFromShortPage($releases->count(), $offset, $limit);
+            if ($total === null) {
+                $countSql = sprintf('SELECT COUNT(*) as count FROM releases r %s', $whereSql);
+                $countResult = Release::fromQuery($countSql);
+                $total = $countResult[0]->count ?? 0;
+            }
+            $releases[0]->_totalrows = $total;
         }
 
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
@@ -959,14 +967,18 @@ class ReleaseSearchService
         }
 
         if ($releases->isNotEmpty()) {
-            $countSql = sprintf(
-                'SELECT COUNT(*) as count FROM releases r %s %s %s',
-                (! empty($videoJoinCondition) ? 'LEFT JOIN videos v ON r.videos_id = v.id AND v.type = 0' : ''),
-                ($needsEpisodeJoin ? sprintf('INNER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id %s', $episodeJoinCondition) : ''),
-                $whereSql
-            );
-            $countResult = Release::fromQuery($countSql);
-            $releases[0]->_totalrows = $countResult[0]->count ?? 0;
+            $total = $this->totalFromShortPage($releases->count(), $offset, $limit);
+            if ($total === null) {
+                $countSql = sprintf(
+                    'SELECT COUNT(*) as count FROM releases r %s %s %s',
+                    (! empty($videoJoinCondition) ? 'LEFT JOIN videos v ON r.videos_id = v.id AND v.type = 0' : ''),
+                    ($needsEpisodeJoin ? sprintf('INNER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id %s', $episodeJoinCondition) : ''),
+                    $whereSql
+                );
+                $countResult = Release::fromQuery($countSql);
+                $total = $countResult[0]->count ?? 0;
+            }
+            $releases[0]->_totalrows = $total;
         }
 
         if ($shouldCache && $cacheKey !== null) {
@@ -1177,9 +1189,10 @@ class ReleaseSearchService
             ]);
         }
         if ($releases->isNotEmpty()) {
-            $releases[0]->_totalrows = $this->getPagerCount(
-                preg_replace('#LEFT(\s+OUTER)?\s+JOIN\s+(?!tv_episodes)\s+.*ON.*=.*\n#i', ' ', $baseSql)
-            );
+            $releases[0]->_totalrows = $this->totalFromShortPage($releases->count(), $offset, $limit)
+                ?? $this->getPagerCount(
+                    preg_replace('#LEFT(\s+OUTER)?\s+JOIN\s+(?!tv_episodes)\s+.*ON.*=.*\n#i', ' ', $baseSql)
+                );
         }
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
         Cache::put($cacheKey, $releases, $expiresAt);
@@ -1273,7 +1286,8 @@ class ReleaseSearchService
         }
         $releases = Release::fromQuery($sql);
         if ($releases->isNotEmpty()) {
-            $releases[0]->_totalrows = $this->getPagerCount($baseSql);
+            $releases[0]->_totalrows = $this->totalFromShortPage($releases->count(), $offset, $limit)
+                ?? $this->getPagerCount($baseSql);
         }
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
         Cache::put($cacheKey, $releases, $expiresAt);
@@ -1437,14 +1451,18 @@ class ReleaseSearchService
         }
 
         if ($releases->isNotEmpty()) {
-            // Optimize: Execute count query using same WHERE clause
-            $countSql = sprintf(
-                'SELECT COUNT(*) as count FROM releases r %s %s',
-                $needsMovieJoin ? $joinSql : '',
-                $whereSql
-            );
-            $countResult = DB::selectOne($countSql);
-            $releases[0]->_totalrows = $countResult->count ?? 0;
+            $total = $this->totalFromShortPage($releases->count(), $offset, $limit);
+            if ($total === null) {
+                // Optimize: Execute count query using same WHERE clause
+                $countSql = sprintf(
+                    'SELECT COUNT(*) as count FROM releases r %s %s',
+                    $needsMovieJoin ? $joinSql : '',
+                    $whereSql
+                );
+                $countResult = DB::selectOne($countSql);
+                $total = $countResult->count ?? 0;
+            }
+            $releases[0]->_totalrows = $total;
         }
 
         Cache::put($cacheKey, $releases, now()->addMinutes(config('nntmux.cache_expiry_medium')));
@@ -2113,6 +2131,15 @@ class ReleaseSearchService
     private function getCacheVersion(): string
     {
         return ReleaseNameQuery::VERSION.':'.(int) Cache::get(self::CACHE_VERSION_KEY, 1).':';
+    }
+
+    /**
+     * A non-empty page shorter than its limit is the last page, so the total is
+     * known exactly and the COUNT query can be skipped.
+     */
+    private function totalFromShortPage(int $rowCount, int $offset, int $limit): ?int
+    {
+        return $rowCount > 0 && $limit > 0 && $rowCount < $limit ? $offset + $rowCount : null;
     }
 
     /**

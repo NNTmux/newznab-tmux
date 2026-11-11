@@ -14,7 +14,8 @@ final class ApiUserResolver
         // v1 only accepts verified users, so it must never share a cache entry with v2.
         return Cache::remember(self::v1CacheKey($token), 300, static function () use ($token): ?User {
             $user = User::findVerifiedByApiToken($token);
-            $user?->load('role');
+            // `roles` is cached too so hasRole() checks need no query per request.
+            $user?->load(['role', 'roles']);
 
             return $user;
         });
@@ -24,7 +25,7 @@ final class ApiUserResolver
     {
         return Cache::remember(self::v2CacheKey($token), 300, static fn (): ?User => User::query()
             ->whereApiToken($token)
-            ->with('role')
+            ->with(['role', 'roles'])
             ->first());
     }
 

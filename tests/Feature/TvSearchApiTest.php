@@ -291,6 +291,46 @@ final class TvSearchApiTest extends TestCase
         $this->assertNotContains('Titanic.The.Digital.The.Simpsons.2025.Special', $results->pluck('searchname')->all());
     }
 
+    #[Test]
+    public function tv_search_takes_the_total_from_a_short_page_without_a_count_query(): void
+    {
+        $this->bindSearchIndexMockReturningBothReleases();
+        DB::flushQueryLog();
+        DB::enableQueryLog();
+
+        $results = (new ReleaseSearchService)->tvSearch(['tvdb' => 71663], '', '', '', 0, 100, '', [5030]);
+
+        $this->assertCount(2, $results);
+        $this->assertSame(2, (int) $results[0]->_totalrows);
+        $this->assertSame([], $this->loggedCountQueries());
+    }
+
+    #[Test]
+    public function tv_search_still_counts_when_the_page_is_full(): void
+    {
+        $this->bindSearchIndexMockReturningBothReleases();
+        DB::flushQueryLog();
+        DB::enableQueryLog();
+
+        $results = (new ReleaseSearchService)->tvSearch(['tvdb' => 71663], '', '', '', 0, 1, '', [5030]);
+
+        $this->assertCount(1, $results);
+        $this->assertSame(2, (int) $results[0]->_totalrows);
+        $this->assertCount(1, $this->loggedCountQueries());
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function loggedCountQueries(): array
+    {
+        return collect(DB::getQueryLog())
+            ->pluck('query')
+            ->filter(static fn (string $query): bool => str_contains(strtolower($query), 'count(*)'))
+            ->values()
+            ->all();
+    }
+
     private function bindSearchIndexMockReturningBothReleases(): void
     {
         $mock = Mockery::mock(SearchService::class, [$this->app]);

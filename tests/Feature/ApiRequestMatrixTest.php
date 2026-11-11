@@ -715,6 +715,18 @@ class ApiRequestMatrixTest extends TestCase
         $this->assertSame('Test Genre', $menu['genres'][0]['name']);
     }
 
+    public function test_v1_caps_catalogs_are_served_from_cache_between_requests(): void
+    {
+        $firstResponse = $this->get('/api/v1/api?t=caps')->assertOk()->getContent();
+        DB::table('usenet_groups')->insert(['name' => 'alt.binaries.added-later', 'active' => true]);
+
+        $secondResponse = $this->get('/api/v1/api?t=caps')->assertOk()->getContent();
+
+        $this->assertStringContainsString('alt.binaries.test', $firstResponse);
+        $this->assertStringContainsString('alt.binaries.test', $secondResponse);
+        $this->assertStringNotContainsString('alt.binaries.added-later', $secondResponse);
+    }
+
     public function test_v2_capabilities_includes_groups_and_genres(): void
     {
         $this->getJson('/api/v2/capabilities')
@@ -1238,6 +1250,52 @@ class ApiRequestMatrixTest extends TestCase
         $this->assertSame(1, (int) $stats->grab_count);
     }
 
+    public function test_token_download_reads_the_release_once_and_sends_its_metadata_headers(): void
+    {
+        DB::table('releases')->where('id', 1)->update(['imdbid' => '0133093', 'nfostatus' => 1]);
+        $nzbFolder = $this->writeReleaseNzb();
+        DB::flushQueryLog();
+        DB::enableQueryLog();
+
+        try {
+            $response = $this->get('/getnzb?id=release-guid.nzb&r='.$this->apiToken());
+            $response->assertOk();
+            $response->streamedContent();
+        } finally {
+            (new Filesystem)->deleteDirectory($nzbFolder);
+        }
+
+        $releaseSelects = collect(DB::getQueryLog())
+            ->pluck('query')
+            ->filter(static fn (string $query): bool => preg_match('/^select .* from "?releases"?/i', $query) === 1);
+        $response->assertHeader('X-DNZB-Category', 'TV &gt; SD');
+        $response->assertHeader('X-DNZB-MoreInfo', 'http://www.imdb.com/title/tt0133093');
+        $response->assertHeader('X-DNZB-NFO', url('/nfo/release-guid'));
+        $this->assertCount(1, $releaseSelects);
+        $this->assertSame(3, (int) DB::table('releases')->where('id', 1)->value('grabs'));
+    }
+
+    public function test_token_download_reuses_the_cached_api_user(): void
+    {
+        $token = $this->apiToken();
+        $nzbFolder = $this->writeReleaseNzb();
+
+        try {
+            $this->get('/getnzb?id=release-guid.nzb&r='.$token)->assertOk();
+            DB::flushQueryLog();
+            DB::enableQueryLog();
+            $this->get('/getnzb?id=release-guid.nzb&r='.$token)->assertOk();
+        } finally {
+            (new Filesystem)->deleteDirectory($nzbFolder);
+        }
+
+        $userLookups = collect(DB::getQueryLog())
+            ->pluck('query')
+            ->filter(static fn (string $query): bool => preg_match('/^select .* from "?(users|roles|model_has_roles)"?/i', $query) === 1);
+        $this->assertSame([], $userLookups->values()->all());
+        $this->assertSame(2, DB::table('user_downloads')->count());
+    }
+
     public function test_v2_getnzb_streams_the_nzb_and_records_one_grab(): void
     {
         $userId = (int) DB::table('users')->value('id');
@@ -1683,6 +1741,7 @@ class ApiRequestMatrixTest extends TestCase
             $table->unsignedInteger('tv_episodes_id')->default(0);
             $table->integer('haspreview')->default(0);
             $table->integer('nfostatus')->default(0);
+            $table->string('imdbid')->nullable();
             $table->unsignedInteger('movieinfo_id')->default(0);
             $table->unsignedInteger('musicinfo_id')->default(0);
             $table->unsignedInteger('consoleinfo_id')->default(0);

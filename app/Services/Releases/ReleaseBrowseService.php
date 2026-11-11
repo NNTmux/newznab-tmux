@@ -683,8 +683,17 @@ class ReleaseBrowseService
         return $sql;
     }
 
-    public static function bumpCacheVersion(): void
+    /**
+     * Invalidate every cached release result. With $minIntervalSeconds, bumps inside that
+     * window after the last accepted one are dropped, so frequent callers cannot keep the
+     * caches cold; a dropped change shows once the cached entries expire.
+     */
+    public static function bumpCacheVersion(int $minIntervalSeconds = 0): void
     {
+        if ($minIntervalSeconds > 0 && ! Cache::add(self::CACHE_VERSION_KEY.':bump_guard', true, $minIntervalSeconds)) {
+            return;
+        }
+
         $current = (int) Cache::get(self::CACHE_VERSION_KEY, 1);
         Cache::forever(self::CACHE_VERSION_KEY, $current + 1);
     }

@@ -154,6 +154,48 @@ class TvProviderStorageTest extends TestCase
         $this->assertSame(TvLookupStatus::ShowNotFound->value, (int) DB::table('releases')->where('id', $missed)->value('tv_episodes_id'));
     }
 
+    public function test_writer_invalidates_release_caches_at_most_once_per_interval(): void
+    {
+        config(['nntmux.api.release_cache_tv_bump_interval' => 60]);
+        $writer = new TvLookupOutcomeWriter;
+        $versionBefore = $this->releaseCacheVersion();
+
+        $this->recordMatchedRelease($writer, 'The.Expanse.S01E01', 1);
+        $this->recordMatchedRelease($writer, 'The.Expanse.S01E02', 2);
+        $versionInsideInterval = $this->releaseCacheVersion();
+        $this->travel(61)->seconds();
+        $this->recordMatchedRelease($writer, 'The.Expanse.S01E03', 3);
+
+        $this->assertSame($versionBefore + 1, $versionInsideInterval);
+        $this->assertSame($versionBefore + 2, $this->releaseCacheVersion());
+    }
+
+    public function test_writer_invalidates_release_caches_on_every_link_when_the_interval_is_zero(): void
+    {
+        config(['nntmux.api.release_cache_tv_bump_interval' => 0]);
+        $writer = new TvLookupOutcomeWriter;
+        $versionBefore = $this->releaseCacheVersion();
+
+        $this->recordMatchedRelease($writer, 'The.Expanse.S01E01', 1);
+        $this->recordMatchedRelease($writer, 'The.Expanse.S01E02', 2);
+
+        $this->assertSame($versionBefore + 2, $this->releaseCacheVersion());
+    }
+
+    private function recordMatchedRelease(TvLookupOutcomeWriter $writer, string $searchname, int $episode): void
+    {
+        $videoId = (int) (DB::table('videos')->where('title', 'The Expanse')->value('id') ?? $this->insertVideo('The Expanse'));
+        $episodeId = $this->insertEpisode($videoId, 1, $episode);
+        $releaseId = $this->insertTvRelease($searchname);
+
+        $writer->record(new TvReleaseContext($releaseId, $searchname, 1, 5040), TvProcessingResult::matched($videoId, $episodeId, 'TVDB'));
+    }
+
+    private function releaseCacheVersion(): int
+    {
+        return (int) Cache::get('releases:cache_version', 1);
+    }
+
     /**
      * @return array<string, mixed>
      */

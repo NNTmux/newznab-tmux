@@ -67,6 +67,14 @@ class BlockAbusiveServices
      */
     protected int $cacheTtl = 86400;
 
+    /**
+     * Cache TTL for failed ASN lookups (in seconds), so an unreachable or
+     * rate-limiting lookup service is not called again on every request.
+     */
+    protected int $failedLookupCacheTtl = 300;
+
+    private const string FAILED_ASN_LOOKUP = 'lookup_failed';
+
     public function __construct(private readonly IndexerProxyDetector $detector) {}
 
     /**
@@ -342,9 +350,22 @@ class BlockAbusiveServices
 
         $cacheKey = 'asn_lookup_'.md5($ip);
 
-        return Cache::remember($cacheKey, $this->cacheTtl, function () use ($ip) {
-            return $this->fetchAsnFromApi($ip);
-        });
+        $cached = Cache::get($cacheKey);
+        if ($cached === self::FAILED_ASN_LOOKUP) {
+            return null;
+        }
+        if (is_array($cached)) {
+            return $cached;
+        }
+
+        $asnInfo = $this->fetchAsnFromApi($ip);
+        Cache::put(
+            $cacheKey,
+            $asnInfo ?? self::FAILED_ASN_LOOKUP,
+            $asnInfo === null ? $this->failedLookupCacheTtl : $this->cacheTtl
+        );
+
+        return $asnInfo;
     }
 
     /**

@@ -7,8 +7,10 @@ namespace Tests\Feature;
 use App\Enums\ConfigurationDomain;
 use App\Services\Configuration\ConfigurationProvider;
 use App\Services\Configuration\DomainConfigurationRepository;
+use App\Support\Configuration\SiteConfigurationData;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use PDO;
 use RuntimeException;
@@ -63,6 +65,18 @@ final class SettingsMissingTableTest extends TestCase
 
         $this->assertSame('NNTmux', $site->title);
         $this->assertSame('/', $site->homeLink);
+    }
+
+    public function test_cached_configuration_is_served_without_querying_the_database(): void
+    {
+        $cached = new SiteConfigurationData('Cached title', '/', null, '', '', '', '', '', '', '', true, 480, 345);
+        Cache::put('configuration:'.ConfigurationDomain::Site->value, $cached, 300);
+        DB::enableQueryLog();
+
+        $site = app(ConfigurationProvider::class)->site();
+
+        $this->assertSame('Cached title', $site->title);
+        $this->assertSame([], DB::getQueryLog());
     }
 
     public function test_mutation_fails_clearly_when_domain_table_is_missing(): void

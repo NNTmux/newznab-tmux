@@ -277,6 +277,26 @@ final class BlockAbusiveServicesTest extends TestCase
     }
 
     /**
+     * A failed lookup is remembered, so the lookup service is not called on every request.
+     */
+    public function test_failed_asn_lookups_are_not_repeated_on_the_next_request(): void
+    {
+        Http::fake([
+            'ip-api.com/*' => Http::response(['status' => 'fail', 'message' => 'reserved range'], 200),
+        ]);
+        $request = Request::create('/api/test', 'GET');
+        $request->headers->set('User-Agent', 'Mozilla/5.0');
+        $request->server->set('REMOTE_ADDR', '8.8.8.8');
+
+        $first = $this->middleware->handle($request, fn ($req) => new Response('OK', 200));
+        $second = $this->middleware->handle($request, fn ($req) => new Response('OK', 200));
+
+        $this->assertSame(200, $first->getStatusCode());
+        $this->assertSame(200, $second->getStatusCode());
+        Http::assertSentCount(1);
+    }
+
+    /**
      * Test that ASN lookups are cached.
      */
     public function test_caches_asn_lookups(): void
