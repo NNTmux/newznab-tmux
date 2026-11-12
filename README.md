@@ -15,7 +15,7 @@
 
 NNTmux is a modern Usenet indexer built on Laravel, designed for high performance and scalability. It automatically scans Usenet, collects headers, and organizes them into searchable releases. The project is actively maintained and features multi-threaded processing, advanced search, and a web-based front-end with API access.
 
-This project is a fork of [newznab plus](https://github.com/anth0/nnplus) and [nZEDb](https://github.com/nZEDb/nZEDb), with significant improvements:
+This project is a fork of newznab plus and [nZEDb](https://github.com/nZEDb/nZEDb), with significant improvements:
 
 - Multi-threaded processing (header retrieval, release creation, post-processing)
 - Advanced search (name, subject, category, post-date)
