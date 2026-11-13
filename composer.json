@@ -77,8 +77,6 @@
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.7",
-        "captainhook/captainhook": "^5.4",
-        "captainhook/plugin-composer": "^5.2",
         "driftingly/rector-laravel": "^2.0",
         "ergebnis/composer-normalize": "^2.30",
         "fakerphp/faker": "^1.23",
@@ -126,7 +124,6 @@
     "config": {
         "allow-plugins": {
             "composer/package-versions-deprecated": true,
-            "captainhook/plugin-composer": true,
             "treeware/plant": true,
             "ergebnis/composer-normalize": true,
             "pestphp/pest-plugin": true,
