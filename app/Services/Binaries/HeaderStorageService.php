@@ -177,7 +177,16 @@ final class HeaderStorageService
             }
 
             // Flush binary aggregate updates
-            if (! $transaction->hasErrors()) {
+            if (! $transaction->hasErrors() && DeferredAggregateQueue::enabled()) {
+                // Workers on neighbouring article ranges recount the same binaries and
+                // deadlock; one aggregator (binaries:flush-aggregates) recounts them instead.
+                if (! $this->collectionHandler->touchLastSeen(
+                    $this->collectionHandler->getAllIds(),
+                    $this->config->sqlChunkSize
+                )) {
+                    $transaction->markError();
+                }
+            } elseif (! $transaction->hasErrors()) {
                 $touchedBinaryIds = $this->partHandler->getTouchedBinaryIds();
                 if (! $this->binaryHandler->refreshAggregates(
                     $touchedBinaryIds,
@@ -223,12 +232,21 @@ final class HeaderStorageService
         }
 
         $this->collectionHandler->markCommitted();
+        if (DeferredAggregateQueue::enabled()) {
+            // Queued only after commit, so the aggregator never sees rows rolled back.
+            $this->deferredAggregates()->push($this->partHandler->getTouchedBinaryIds());
+        }
         $this->failedInserts = array_merge(
             $this->failedInserts,
             $this->partHandler->getFailedNumbers()
         );
 
         return true;
+    }
+
+    private function deferredAggregates(): DeferredAggregateQueue
+    {
+        return app(DeferredAggregateQueue::class);
     }
 
     private function isTransientLockError(?\Throwable $exception): bool

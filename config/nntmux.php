@@ -24,6 +24,9 @@ return [
     'crc_token' => env('CRC_TOKEN', null),
     'multiprocessing_max_child_time' => env('NN_MULTIPROCESSING_MAX_CHILD_TIME', 1800),
     'concurrency_timeout' => env('NN_CONCURRENCY_TIMEOUT'),
+    // Header workers queue touched binaries in Redis and one scheduled aggregator
+    // recounts them, instead of every worker recounting shared rows (deadlocks).
+    'defer_header_aggregates' => (bool) env('NN_DEFER_HEADER_AGGREGATES', false),
     // Files of an obfuscated multi-file release whose first segment is checked for an archive.
     'archive_probe_files' => (int) env('NN_ARCHIVE_PROBE_FILES', 3),
     // Season packs packed one archive set per episode: sets (first volume of each) listed per release; 1 = only the first set.
