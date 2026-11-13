@@ -69,7 +69,7 @@
         "spatie/laravel-data": "^4",
         "spatie/laravel-directory-cleanup": "^1.10",
         "spatie/laravel-passkeys": "^1.7",
-        "spatie/laravel-permission": "^7.0.0",
+        "spatie/laravel-permission": "^8.5.0",
         "spatie/laravel-typescript-transformer": "^2",
         "stechstudio/laravel-zipstream": "^5.4",
         "symfony/process": "^7.0",
