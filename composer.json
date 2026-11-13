@@ -49,7 +49,7 @@
         "dariusiii/net_nntp": "^4.0",
         "dariusiii/rarinfo": "^3.0",
         "dariusiii/tv-maze-php-api": "^2.0.0",
-        "elasticsearch/elasticsearch": "^8.19",
+        "elasticsearch/elasticsearch": "^9.5",
         "guzzlehttp/guzzle": "^7.9",
         "intervention/image": "^4.0",
         "laravel/framework": "^13.0",
