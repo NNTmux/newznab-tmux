@@ -6,6 +6,7 @@ use App\Services\Binaries\BinariesConfig;
 use App\Services\Binaries\BinariesService;
 use App\Services\Binaries\BinaryHandler;
 use App\Services\Binaries\CollectionHandler;
+use App\Services\Binaries\DeferredAggregateQueue;
 use App\Services\Binaries\HeaderParser;
 use App\Services\Binaries\HeaderStorageService;
 use App\Services\Binaries\HeaderStorageTransaction;
@@ -183,6 +184,75 @@ class BinariesStorageInternalsTest extends TestCase
         $this->assertSame(2, DB::table('parts')->count());
         $this->assertSame(2, (int) $binary->currentparts);
         $this->assertSame(325, (int) $binary->partsize);
+    }
+
+    public function test_deferred_header_storage_queues_binaries_instead_of_recounting(): void
+    {
+        $this->createHeaderStorageTables();
+        $queue = $this->fakeAggregateQueue();
+        config(['nntmux.defer_header_aggregates' => true]);
+
+        $service = new HeaderStorageService($this->deterministicCollectionHandler(), config: new BinariesConfig(sqlChunkSize: 10));
+        $failed = $service->store([
+            $this->parsedHeader(501, 1, 'Deferred.Release', 150),
+            $this->parsedHeader(502, 2, 'Deferred.Release', 175),
+        ], ['id' => 1, 'name' => 'alt.test'], true);
+
+        $binary = DB::table('binaries')->first();
+        $this->assertSame([], $failed);
+        $this->assertSame(2, DB::table('parts')->count());
+        $this->assertSame(0, (int) $binary->currentparts);
+        $this->assertSame([(int) $binary->id], $queue->ids);
+    }
+
+    public function test_flush_aggregates_recounts_queued_binaries_from_parts(): void
+    {
+        $this->createHeaderStorageTables();
+        $queue = $this->fakeAggregateQueue();
+        config(['nntmux.defer_header_aggregates' => true]);
+
+        $service = new HeaderStorageService($this->deterministicCollectionHandler(), config: new BinariesConfig(sqlChunkSize: 10));
+        $service->store([
+            $this->parsedHeader(511, 1, 'Flushed.Release', 150),
+            $this->parsedHeader(512, 2, 'Flushed.Release', 175),
+        ], ['id' => 1, 'name' => 'alt.test'], true);
+
+        $this->artisan('binaries:flush-aggregates')->assertSuccessful();
+
+        $binary = DB::table('binaries')->first();
+        $this->assertSame(2, (int) $binary->currentparts);
+        $this->assertSame(325, (int) $binary->partsize);
+        $this->assertSame([], $queue->ids);
+    }
+
+    private function fakeAggregateQueue(): DeferredAggregateQueue
+    {
+        $queue = new class extends DeferredAggregateQueue
+        {
+            /** @var list<int> */
+            public array $ids = [];
+
+            public function push(array $binaryIds): void
+            {
+                $this->ids = array_values(array_unique([...$this->ids, ...$binaryIds]));
+            }
+
+            public function pop(int $count): array
+            {
+                $taken = \array_slice($this->ids, 0, $count);
+                $this->ids = \array_slice($this->ids, $count);
+
+                return $taken;
+            }
+
+            public function size(): int
+            {
+                return \count($this->ids);
+            }
+        };
+        $this->app->instance(DeferredAggregateQueue::class, $queue);
+
+        return $queue;
     }
 
     public function test_header_storage_batch_updates_binary_that_exists_before_chunk(): void

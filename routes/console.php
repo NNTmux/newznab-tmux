@@ -36,6 +36,7 @@ Schedule::command('cloudflare:reload')->daily()->withoutOverlapping();
 Schedule::command('cache:prune-stale-tags')->hourly();
 Schedule::command('gdpr:purge-expired-exports')->dailyAt('03:30')->withoutOverlapping();
 Schedule::command('nntmux:collect-stats')->everyFifteenMinutes()->withoutOverlapping();
+Schedule::command('binaries:flush-aggregates')->everyMinute()->withoutOverlapping()->when(static fn (): bool => (bool) config('nntmux.defer_header_aggregates'));
 Schedule::command('nntmux:populate-steam-apps')->monthly();
 // Collect system metrics every 5 minutes
 Schedule::command('metrics:collect')->everyFiveMinutes()->withoutOverlapping();
