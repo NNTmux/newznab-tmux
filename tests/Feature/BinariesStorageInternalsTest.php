@@ -6,6 +6,7 @@ use App\Services\Binaries\BinariesConfig;
 use App\Services\Binaries\BinariesService;
 use App\Services\Binaries\BinaryHandler;
 use App\Services\Binaries\CollectionHandler;
+use App\Services\Binaries\CrossPostOwnership;
 use App\Services\Binaries\HeaderParser;
 use App\Services\Binaries\HeaderStorageService;
 use App\Services\Binaries\HeaderStorageTransaction;
@@ -394,6 +395,81 @@ class BinariesStorageInternalsTest extends TestCase
         $this->assertSame([1301, 1302], DB::table('missed_parts')->orderBy('numberid')->pluck('numberid')->all());
     }
 
+    public function test_chunk_locks_its_collections_in_id_order_before_writing_children(): void
+    {
+        $this->createHeaderStorageTables();
+        $statements = [];
+        $lockAttempts = 0;
+        DB::listen(static function (QueryExecuted $query) use (&$statements, &$lockAttempts): void {
+            if (preg_match('/^select "id" from "collections" where "id" in .* order by "id" asc$/', $query->sql)) {
+                $statements[] = ['lock', $query->bindings];
+                // The first lock attempt hits contention; the chunk must be retried, not dropped.
+                if (++$lockAttempts === 1) {
+                    throw new QueryException('sqlite', $query->sql, $query->bindings, new \PDOException('database is locked'));
+                }
+            } elseif (str_starts_with($query->sql, 'insert or ignore into "collection_groups"')) {
+                $statements[] = ['collection_groups', []];
+            } elseif (str_starts_with($query->sql, 'insert or ignore into "binaries"')) {
+                $statements[] = ['binaries', []];
+            }
+        });
+        $service = new HeaderStorageService($this->deterministicCollectionHandler(), config: new BinariesConfig(sqlChunkSize: 10));
+
+        $failed = $service->store([
+            $this->parsedHeader(1601, 1, 'Zulu.Release'),
+            $this->parsedHeader(1602, 1, 'Alpha.Release'),
+            $this->parsedHeader(1603, 1, 'Mike.Release'),
+        ], ['id' => 1, 'name' => 'alt.test'], false);
+
+        $this->assertSame([], $failed);
+        $this->assertSame(2, $lockAttempts);
+        $collectionIds = DB::table('collections')->orderBy('id')->pluck('id')->map('intval')->all();
+        // Locked before anything references the collections, and again on the retry.
+        $this->assertSame(
+            [['lock', $collectionIds], ['lock', $collectionIds], ['collection_groups', []], ['binaries', []]],
+            $statements
+        );
+        $this->assertSame(3, DB::table('parts')->count());
+    }
+
+    public function test_update_skips_cross_posts_owned_by_another_group_without_queueing_them_as_missing(): void
+    {
+        $this->createHeaderStorageTables();
+        $this->createMissedPartsTable();
+        $owned = $this->rawHeader(1401, 'Owned.Release (1/1)');
+        $owned['Xref'] = 'news.example.com alt.binaries.test:1401 alt.binaries.other:9001';
+        $elsewhere = $this->rawHeader(1402, 'Elsewhere.Release (1/1)');
+        $elsewhere['Xref'] = 'news.example.com alt.binaries.other:9002 alt.binaries.test:1402';
+        $notCrossPosted = $this->rawHeader(1403, 'Local.Release (1/1)');
+        $nntp = Mockery::mock(NNTPService::class);
+        $nntp->shouldReceive('getXOVER')->once()->andReturn([$owned, $elsewhere, $notCrossPosted]);
+
+        $this->ownershipScanService($nntp)->scan(['id' => 1, 'name' => 'alt.binaries.test'], 1401, 1403);
+
+        $subjects = DB::table('collections')->orderBy('subject')->pluck('subject')->implode('|');
+        $this->assertStringContainsString('Local.Release', $subjects);
+        $this->assertStringContainsString('Owned.Release', $subjects);
+        $this->assertStringNotContainsString('Elsewhere.Release', $subjects);
+        $this->assertSame(2, DB::table('parts')->count());
+        $this->assertSame(0, DB::table('missed_parts')->count(), 'skipped articles were received, not missing');
+    }
+
+    public function test_part_repair_is_not_filtered_by_cross_post_ownership(): void
+    {
+        $this->createHeaderStorageTables();
+        $this->createMissedPartsTable();
+        DB::table('missed_parts')->insert(['numberid' => 1501, 'groups_id' => 1]);
+        $elsewhere = $this->rawHeader(1501, 'Elsewhere.Release (1/1)');
+        $elsewhere['Xref'] = 'news.example.com alt.binaries.other:9501 alt.binaries.test:1501';
+        $nntp = Mockery::mock(NNTPService::class);
+        $nntp->shouldReceive('getOverview')->once()->andReturn([$elsewhere]);
+
+        $this->ownershipScanService($nntp)->scan(['id' => 1, 'name' => 'alt.binaries.test'], 1501, 1501, 'partrepair', [1501]);
+
+        $this->assertSame(1, DB::table('parts')->count());
+        $this->assertSame(0, DB::table('missed_parts')->count());
+    }
+
     /** @return iterable<string, array{int}> */
     public static function lockFailures(): iterable
     {
@@ -493,6 +569,28 @@ class BinariesStorageInternalsTest extends TestCase
             $parser,
             new HeaderStorageService($this->deterministicCollectionHandler(), config: $config),
             nntp: $nntp,
+        );
+    }
+
+    /**
+     * Ownership where alt.binaries.test and alt.binaries.other are active and cover every article.
+     */
+    private function ownershipScanService(NNTPService $nntp): BinariesService
+    {
+        $config = new BinariesConfig(headerChunkSize: 10, sqlChunkSize: 10);
+
+        return new BinariesService(
+            $config,
+            new HeaderParser(new class extends BlacklistService
+            {
+                public function isBlackListed(array $msg, string $groupName): bool
+                {
+                    return false;
+                }
+            }),
+            new HeaderStorageService($this->deterministicCollectionHandler(), config: $config),
+            nntp: $nntp,
+            crossPostOwnership: new CrossPostOwnership(['alt.binaries.test' => 1, 'alt.binaries.other' => 1]),
         );
     }
 

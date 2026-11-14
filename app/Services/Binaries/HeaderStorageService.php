@@ -259,6 +259,7 @@ final class HeaderStorageService
             $transaction->getBatchNoise()
         );
 
+        // getOrCreateCollections() also locks the chunk's collections, in id order.
         if ($this->collectionHandler->getLastException() !== null) {
             // A SQL error may have rolled the transaction back server-side
             // (e.g. deadlock), so the whole chunk must fail and be retried.

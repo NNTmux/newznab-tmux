@@ -46,6 +46,28 @@ class XrefService
         return array_values(array_diff($incoming, $existing));
     }
 
+    /**
+     * Group name => article number in that group, in Xref order. Tokens without
+     * an article number are left out; a repeated group keeps its first number.
+     *
+     * @return array<string, int>
+     */
+    public function extractGroupArticleNumbers(?string $xref): array
+    {
+        if (empty($xref)) {
+            return [];
+        }
+
+        $numbers = [];
+        foreach (explode(' ', $xref) as $token) {
+            if (preg_match(self::XREF_PATTERN_WITH_NUM, $token, $m) && ! isset($numbers[$m[1]])) {
+                $numbers[$m[1]] = (int) substr($m[4], 1);
+            }
+        }
+
+        return $numbers;
+    }
+
     /** @return list<string> */
     public function extractGroupNames(?string $xref): array
     {

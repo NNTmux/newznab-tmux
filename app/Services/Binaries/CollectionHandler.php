@@ -146,7 +146,7 @@ final class CollectionHandler
                 $batchNoise
             );
 
-            if ($collectionId > 0) {
+            if ($collectionId > 0 && $this->lockForWrite([$collectionId])) {
                 $this->collectionIds[$collectionKey] = $collectionId;
                 $this->insertCollectionGroups([
                     $collectionKey => array_fill_keys(
@@ -237,32 +237,44 @@ final class CollectionHandler
             ];
         }
 
-        if ($pending === []) {
-            $this->insertCollectionGroups($groupNamesByCollectionKey);
+        if ($pending !== []) {
+            $this->prefetchExistingCollections($hashesToPrefetch);
 
+            try {
+                $idsByHash = $this->bulkInsertAndResolve($pending);
+                foreach ($pending as $collectionKey => $row) {
+                    $collectionId = $idsByHash[$row['collectionhash']] ?? 0;
+                    if ($collectionId <= 0) {
+                        continue;
+                    }
+
+                    $this->collectionIds[$collectionKey] = $collectionId;
+                    foreach ($indexByCollectionKey[$collectionKey] ?? [] as $index) {
+                        $resolved[$index] = $collectionId;
+                    }
+                }
+            } catch (\Throwable $e) {
+                $this->lastException = $e;
+                if (config('app.debug') === true) {
+                    SqlError::logFailure('Bulk collection insert failed', $e);
+                }
+
+                return $resolved;
+            }
+        }
+
+        // Lock before collection_groups: its foreign key check takes a shared lock on
+        // each parent in row order, which crossed with other chunks' ordered locks.
+        if (! $this->lockForWrite(array_values($resolved))) {
             return $resolved;
         }
 
-        $this->prefetchExistingCollections($hashesToPrefetch);
-
         try {
-            $idsByHash = $this->bulkInsertAndResolve($pending);
-            foreach ($pending as $collectionKey => $row) {
-                $collectionId = $idsByHash[$row['collectionhash']] ?? 0;
-                if ($collectionId <= 0) {
-                    continue;
-                }
-
-                $this->collectionIds[$collectionKey] = $collectionId;
-                foreach ($indexByCollectionKey[$collectionKey] ?? [] as $index) {
-                    $resolved[$index] = $collectionId;
-                }
-            }
             $this->insertCollectionGroups($groupNamesByCollectionKey);
         } catch (\Throwable $e) {
             $this->lastException = $e;
             if (config('app.debug') === true) {
-                SqlError::logFailure('Bulk collection insert failed', $e);
+                SqlError::logFailure('Collection group insert failed', $e);
             }
         }
 
@@ -629,6 +641,39 @@ final class CollectionHandler
         }
 
         return (int) (Collection::whereCollectionhash($collectionHash)->value('id') ?? 0);
+    }
+
+    /**
+     * Lock the chunk's collections, in ascending id order, before anything references them
+     * (collection_groups, binaries, parts). Concurrent chunks touching the same upload
+     * (parallel range workers, update vs. backfill or part repair, cleanup deletes) then
+     * wait for each other's commit instead of deadlocking: child inserts take shared locks
+     * on their parents in row order, and the aggregate refreshes read each other's rows.
+     *
+     * @param  list<int>  $collectionIds
+     */
+    public function lockForWrite(array $collectionIds): bool
+    {
+        $collectionIds = array_values(array_unique(array_map('intval', $collectionIds)));
+        if ($collectionIds === []) {
+            return true;
+        }
+        sort($collectionIds);
+
+        try {
+            foreach (array_chunk($collectionIds, $this->sqlChunkSize) as $chunk) {
+                DB::table('collections')->whereIn('id', $chunk)->orderBy('id')->lockForUpdate()->pluck('id');
+            }
+
+            return true;
+        } catch (\Throwable $e) {
+            $this->lastException = $e;
+            if (config('app.debug') === true) {
+                SqlError::logFailure('Collection lock failed', $e);
+            }
+
+            return false;
+        }
     }
 
     /**

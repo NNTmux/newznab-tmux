@@ -64,6 +64,9 @@ class BinariesService
 
     private int $headersBlackListed = 0;
 
+    /** Cross-posted headers skipped because another group's worker stores them. */
+    private int $headersCrossPosted = 0;
+
     /** @var array<int, true> */
     private array $headersReceived = [];
 
@@ -77,6 +80,7 @@ class BinariesService
         ?MissedPartHandler $missedPartHandler = null,
         ?NNTPService $nntp = null,
         ?ProcessingRuntimeStateRepository $runtimeState = null,
+        private readonly ?CrossPostOwnership $crossPostOwnership = null,
     ) {
         $this->config = $config ?? BinariesConfig::fromSettings();
         $this->headerParser = $headerParser ?? new HeaderParser;
@@ -274,11 +278,14 @@ class BinariesService
         $this->groupMySQL = $groupMySQL;
         $this->last = $last;
         $this->first = $first;
-        $this->notYEnc = $this->headersBlackListed = 0;
+        $this->notYEnc = $this->headersBlackListed = $this->headersCrossPosted = 0;
         $this->headersReceived = [];
 
         $returnArray = [];
         $partRepair = ($type === 'partrepair');
+        // Fresh per scan, so first_record changes from backfill are picked up.
+        // Part repair fetches this group's own missing articles and is never filtered.
+        $ownership = $partRepair ? null : ($this->crossPostOwnership ?? new CrossPostOwnership);
         $addToPartRepair = ($type === 'update' && $this->config->partRepair);
 
         // Download headers from NNTP
@@ -328,6 +335,15 @@ class BinariesService
             $this->notYEnc += (int) $parseResult['notYEnc'];
             $this->headersBlackListed += (int) $parseResult['blacklisted'];
             $this->headerParser->flushBlacklistUpdates();
+
+            if ($ownership !== null) {
+                $owned = array_values(array_filter(
+                    $parseResult['headers'],
+                    static fn (array $header): bool => $ownership->isOwnedBy($header, (string) $groupMySQL['name'])
+                ));
+                $this->headersCrossPosted += \count($parseResult['headers']) - \count($owned);
+                $parseResult['headers'] = $owned;
+            }
 
             if ($parseResult['headers'] !== []) {
                 try {
@@ -1006,7 +1022,8 @@ class BinariesService
         cli()->primary(
             'Received '.\count($this->headersReceived).
             ' articles of '.number_format($this->last - $this->first + 1).' requested, '.
-            $this->headersBlackListed.' blacklisted, '.$this->notYEnc.' not yEnc.'
+            $this->headersBlackListed.' blacklisted, '.$this->notYEnc.' not yEnc, '.
+            $this->headersCrossPosted.' owned by another group.'
         );
     }
 
