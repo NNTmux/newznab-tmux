@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Foundation\Vite as ViteManager;
 use Illuminate\Support\HtmlString;
@@ -46,12 +47,17 @@ abstract class TestCase extends BaseTestCase
 
     /**
      * Restore the database environment so a test's temporary SQLite file never leaks into later tests.
+     *
+     * Eloquent also caches each model's table columns statically for mass-assignment checks; a test
+     * that builds a smaller table would otherwise make later tests silently drop real attributes.
      */
     protected function tearDown(): void
     {
         try {
             parent::tearDown();
         } finally {
+            self::forgetGuardableColumns();
+
             foreach (self::$baselineEnvironment ?? [] as $key => $value) {
                 if ($value['getenv'] === false) {
                     putenv($key);
@@ -79,6 +85,16 @@ abstract class TestCase extends BaseTestCase
         }
 
         return $environment;
+    }
+
+    /**
+     * Clear Eloquent's static per-model column cache used by GuardsAttributes::isGuardableColumn().
+     */
+    private static function forgetGuardableColumns(): void
+    {
+        \Closure::bind(static function (): void {
+            static::$guardableColumns = [];
+        }, null, Model::class)();
     }
 
     /**
