@@ -73,8 +73,15 @@ class ArchiveExtractionCommandTest extends TestCase
 
     public function test_nfo_fallback_passes_the_archive_filename_without_a_shell(): void
     {
+        // UnrarRunner only runs a binary that exists on disk, so use a stand-in rather than the host's unrar.
+        $binDir = sys_get_temp_dir().'/nntmux-nfo-command-bin-'.uniqid('', true);
+        mkdir($binDir, 0777, true);
+        $unrarPath = $binDir.'/unrar';
+        file_put_contents($unrarPath, "#!/bin/sh\nexit 0\n");
+        chmod($unrarPath, 0755);
+
         Process::fake([
-            "'/usr/bin/unrar'" => Process::result('UNRAR 7.0 freeware', '', 0),
+            "'{$unrarPath}'" => Process::result('UNRAR 7.0 freeware', '', 0),
             '*' => Process::result(),
         ]);
 
@@ -87,23 +94,28 @@ class ArchiveExtractionCommandTest extends TestCase
         $service = $reflection->newInstanceWithoutConstructor();
         foreach ([
             'tmpPath' => $tmpPath,
-            'unrarPath' => '/usr/bin/unrar',
+            'unrarPath' => $unrarPath,
             'timeoutSeconds' => 60,
         ] as $property => $value) {
             $reflection->getProperty($property)->setValue($service, $value);
         }
 
-        $reflection->getMethod('extractNfoViaUnrar')->invoke($service, "Rar!\x1a\x07\x00", [$filename], 'test-guid');
+        try {
+            $reflection->getMethod('extractNfoViaUnrar')->invoke($service, "Rar!\x1a\x07\x00", [$filename], 'test-guid');
 
-        Process::assertRan(function (PendingProcess $process) use ($filename): bool {
-            return is_array($process->command)
-                && array_slice($process->command, 0, 2) === ['/usr/bin/unrar', 'e']
-                && in_array('--', $process->command, true)
-                && in_array($filename, $process->command, true);
-        });
+            Process::assertRan(function (PendingProcess $process) use ($filename, $unrarPath): bool {
+                return is_array($process->command)
+                    && array_slice($process->command, 0, 2) === [$unrarPath, 'e']
+                    && in_array('--', $process->command, true)
+                    && in_array($filename, $process->command, true);
+            });
 
-        $this->assertSame([], glob($tmpPath.'*') ?: []);
-        rmdir($tmpPath);
+            $this->assertSame([], glob($tmpPath.'*') ?: []);
+        } finally {
+            @rmdir($tmpPath);
+            @unlink($unrarPath);
+            @rmdir($binDir);
+        }
     }
 
     public function test_7z_extraction_never_invokes_external_tools_even_with_unreadable_headers(): void
