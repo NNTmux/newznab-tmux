@@ -8,6 +8,7 @@ use App\Enums\RegistrationStatus;
 use App\Http\Controllers\Admin\AdminPageController;
 use App\Models\Release;
 use App\Models\User;
+use App\Services\Admin\PaymentStatsReport;
 use App\Services\AdminDashboardSnapshotService;
 use App\Services\Monitoring\GrafanaEmbedService;
 use App\Services\RegistrationStatusService;
@@ -65,7 +66,7 @@ class AdminDashboardUserCountTest extends TestCase
         $this->app->instance(SystemMetricsService::class, $systemMetrics);
         $this->app->instance(RegistrationStatusService::class, $registration);
         $this->app->instance(SiteStatusService::class, $siteStatus);
-        $this->snapshot = new AdminDashboardSnapshotService($userStats, $systemMetrics, $registration, $siteStatus);
+        $this->snapshot = new AdminDashboardSnapshotService($userStats, $systemMetrics, $registration, $siteStatus, new PaymentStatsReport);
         $this->app->instance(AdminDashboardSnapshotService::class, $this->snapshot);
     }
 
@@ -127,6 +128,27 @@ class AdminDashboardUserCountTest extends TestCase
 
         $this->assertSame(2, $stats['releases_today']);
         $this->assertSame(1, $stats['users_today']);
+    }
+
+    public function test_dashboard_reports_payment_revenue_and_the_state_of_recent_payments(): void
+    {
+        $this->travelTo('2026-11-16 12:00:00');
+        $payment = ['username' => 'alice', 'email' => 'alice@example.test', 'item_description' => 'Supporter 1 year', 'payment_status' => 'Settled', 'order_id' => 'order'];
+        DB::table('payments')->insert([
+            $payment + ['created_at' => now()->startOfYear()->toDateTimeString(), 'invoice_amount' => '19', 'payment_method' => 'LTC', 'invoice_status' => 'Settled'],
+            $payment + ['created_at' => now()->subDays(2)->toDateTimeString(), 'invoice_amount' => '15', 'payment_method' => 'BTC-CHAIN', 'invoice_status' => 'Settled'],
+            $payment + ['created_at' => now()->subDay()->toDateTimeString(), 'invoice_amount' => '50', 'payment_method' => 'XMR-CHAIN', 'invoice_status' => 'Pending'],
+        ]);
+
+        $snapshot = $this->snapshot->get();
+
+        $this->assertSame(
+            ['revenue_30d' => 15.0, 'count_30d' => 2, 'revenue_year' => 34.0, 'count_year' => 3],
+            $snapshot['payment_stats'],
+            'The unsettled invoice is counted as a payment but not as revenue',
+        );
+        $this->assertSame(['XMR', 'unsettled'], [$snapshot['recent_payments'][0]['coin'], $snapshot['recent_payments'][0]['invoice_state']]);
+        $this->assertSame(['BTC', 'settled'], [$snapshot['recent_payments'][1]['coin'], $snapshot['recent_payments'][1]['invoice_state']]);
     }
 
     public function test_dashboard_returns_zero_counts_for_empty_tables(): void

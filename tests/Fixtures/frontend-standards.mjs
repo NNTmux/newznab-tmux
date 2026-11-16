@@ -216,6 +216,12 @@ assert.equal(toastTimers.length, 2, 'Leaving the toast restarts the timer');
     observerCallback();
     assert.equal(updated, 1, 'Theme changes re-render registered charts');
     assert.equal(chart.data.datasets[0].borderColor, 'rgba(16, 185, 129, 1)', 'Charts pick up the new scheme color');
+
+    const mixedChart = { $themeTones: [{ name: 'success', fillAlpha: 0.7 }, { name: 'primary', fillAlpha: 0.2 }], data: { datasets: [{}, {}] }, update: () => {} };
+    observeTheme(Chart, () => [mixedChart]);
+    observerCallback();
+    assert.equal(mixedChart.data.datasets[0].backgroundColor, 'rgba(16, 185, 129, 0.7)', 'Each dataset of a mixed chart keeps its own tone');
+    assert.equal(mixedChart.data.datasets[1].borderColor, 'rgba(16, 185, 129, 1)', 'The second dataset is re-themed too');
 }
 
 {

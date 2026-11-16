@@ -59,6 +59,7 @@ class AdminPageController extends BasePageController
             'registrationStatus' => $payload['registrationStatus'],
             'nextRegistrationPeriod' => $payload['nextRegistrationPeriod'],
             'hasRecentPayments' => ! empty($payload['recent_payments']),
+            'paymentStats' => $payload['payment_stats'] ?? null,
             // Grafana panels replace the Chart.js CPU/RAM history when monitoring is set up.
             'grafanaPanels' => $grafana->dashboardPanels(),
             'grafanaTokenUrl' => $grafana->tokenUrl(),
@@ -139,6 +140,7 @@ class AdminPageController extends BasePageController
             'systemMetrics' => $payload['systemMetrics'],
             'recent_activity' => $recentActivity,
             'recent_payments' => $payload['recent_payments'] ?? [],
+            'payment_stats' => $payload['payment_stats'] ?? null,
             'serviceStatuses' => $serviceStatuses,
             'activeIncidents' => $activeIncidents,
         ]);

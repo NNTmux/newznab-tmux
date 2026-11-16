@@ -385,6 +385,7 @@ Route::middleware(['role:Admin', '2fa'])->prefix('admin')->group(function () {
     Route::get('music-edit', [AdminMusicController::class, 'edit'])->name('admin.music-edit');
     Route::post('music-edit', [AdminMusicController::class, 'edit']);
     Route::get('payment-list', [AdminPaymentController::class, 'index'])->name('admin.payment-list');
+    Route::get('payment-list/export', [AdminPaymentController::class, 'export'])->name('admin.payment-list.export');
     Route::get('predb', [AdminPredbController::class, 'index'])->name('admin.predb');
     Route::get('group-list', [AdminGroupController::class, 'index'])->name('admin.group-list');
     Route::get('group-edit', [AdminGroupController::class, 'edit'])->name('admin.group-edit');

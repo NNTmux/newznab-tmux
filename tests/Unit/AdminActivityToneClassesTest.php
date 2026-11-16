@@ -50,7 +50,7 @@ class AdminActivityToneClassesTest extends TestCase
 
         $this->assertStringContainsString("from '../../lib/chart-theme.js'", $script);
         $this->assertStringNotContainsString('rgba(', $script, 'Chart colors come from the theme tokens');
-        $this->assertSame(6, substr_count($view, '<x-admin.stat-card'));
+        $this->assertSame(8, substr_count($view, '<x-admin.stat-card'), 'Six headline tiles and two payment revenue cards');
         $this->assertStringContainsString('role="tablist"', $monitoring);
         $this->assertStringContainsString('role="tabpanel"', $monitoring);
         $this->assertStringNotContainsString(':aria-pressed', $monitoring);

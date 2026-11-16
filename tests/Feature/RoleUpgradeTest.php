@@ -3,8 +3,10 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Services\AdminDashboardSnapshotService;
 use Carbon\Carbon;
 use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
@@ -671,12 +673,14 @@ final class RoleUpgradeTest extends TestCase
     public function test_btcpay_webhook_applies_a_purchasable_role(): void
     {
         $this->createSettledPayment('Supporter 1');
+        Cache::put(AdminDashboardSnapshotService::CACHE_KEY, ['stale' => true], 60);
 
         $response = $this->postSignedBtcPayWebhook();
 
         $response->assertOk();
         $this->assertSame($this->supporterRole->id, $this->user->fresh()?->roles_id);
         $this->assertSame('Settled', DB::table('payments')->value('invoice_status'));
+        $this->assertFalse(Cache::has(AdminDashboardSnapshotService::CACHE_KEY), 'The dashboard must not keep showing the invoice as unsettled');
     }
 
     public function test_btcpay_webhook_rejects_a_bad_signature(): void

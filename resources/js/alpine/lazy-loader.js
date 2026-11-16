@@ -48,6 +48,7 @@ const lazyComponentMap = {
 
     // --- Admin components (includes Chart.js — heavy) ---
     'adminDashboard':  () => import('./components/admin/dashboard.js'),
+    'adminPayments':   () => import('./components/admin/payments.js'),
     'adminGroups':     () => import('./components/admin/groups.js'),
     'adminUserEdit':   () => import('./components/admin/features.js'),  // same file
     'adminUserList':   () => import('./components/admin/user-list.js'),

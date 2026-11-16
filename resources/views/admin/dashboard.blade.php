@@ -434,8 +434,27 @@
         </div>
     </div>
 
-    <!-- Recent Payments Widget (deferred) -->
+    <!-- Payment revenue and Recent Payments Widget (deferred) -->
     @if(! empty($hasRecentPayments))
+    @php
+        $revenue = static fn (float|int|null $value): string => rtrim(rtrim(number_format((float) $value, 2), '0'), '.');
+    @endphp
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <x-admin.stat-card label="Revenue, last 30 days" :value="$revenue($paymentStats['revenue_30d'] ?? 0)" stat-key="revenue-30d" icon="fas fa-coins" color="success">
+            <x-slot:footerSlot>
+                <div class="mt-4">
+                    <span class="text-sm text-fg-muted"><span data-stat="revenue-30d-count">{{ number_format($paymentStats['count_30d'] ?? 0) }}</span> payments</span>
+                </div>
+            </x-slot:footerSlot>
+        </x-admin.stat-card>
+        <x-admin.stat-card label="Revenue, this year" :value="$revenue($paymentStats['revenue_year'] ?? 0)" stat-key="revenue-year" icon="fas fa-sack-dollar" color="primary">
+            <x-slot:footerSlot>
+                <div class="mt-4">
+                    <span class="text-sm text-fg-muted"><span data-stat="revenue-year-count">{{ number_format($paymentStats['count_year'] ?? 0) }}</span> payments</span>
+                </div>
+            </x-slot:footerSlot>
+        </x-admin.stat-card>
+    </div>
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700"
          data-widget="recent-payments">
         <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center justify-between">
@@ -459,7 +478,8 @@
                             <x-admin.th>User</x-admin.th>
                             <x-admin.th>Item</x-admin.th>
                             <x-admin.th align="right">Amount</x-admin.th>
-                            <x-admin.th align="center">Status</x-admin.th>
+                            <x-admin.th>Coin</x-admin.th>
+                            <x-admin.th align="center">State</x-admin.th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200 dark:divide-gray-700" data-payments-tbody></tbody>

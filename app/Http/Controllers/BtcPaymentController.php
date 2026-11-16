@@ -98,6 +98,7 @@ class BtcPaymentController extends BasePageController
 
                     User::updateUserRole($user->id, $roleName, addYears: $addYears);
                     $checkOrder->update(['invoice_status' => Payment::INVOICE_STATUS_SETTLED]);
+                    Cache::forget(AdminDashboardSnapshotService::CACHE_KEY);
                     Log::channel('btc_payment')->info('User: '.$user->username.' upgraded to '.$roleName.' (+'.$addYears.' years) for BTCPay webhook: '.$checkOrder->webhook_id);
 
                     return response('OK', 200);
@@ -138,34 +139,5 @@ class BtcPaymentController extends BasePageController
         }
 
         return true;
-    }
-
-    /**
-     * Payment.status values from BTCPay Greenfield API (payload.payment.status). Used for admin filters.
-     *
-     * @return list<string>
-     */
-    public static function paymentStatusesForAdminFilter(): array
-    {
-        return [
-            'Pending',
-            'Processing',
-            Payment::PAYMENT_STATUS_SETTLED,
-            'Invalid',
-            'Manual',
-        ];
-    }
-
-    /**
-     * invoice_status values used in our DB (migration default Pending; webhook sets Settled after role upgrade).
-     *
-     * @return list<string>
-     */
-    public static function invoiceStatusesForAdminFilter(): array
-    {
-        return [
-            Payment::INVOICE_STATUS_PENDING,
-            Payment::INVOICE_STATUS_SETTLED,
-        ];
     }
 }

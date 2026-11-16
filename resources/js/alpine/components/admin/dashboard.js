@@ -86,6 +86,7 @@ Alpine.data('adminDashboard', () => ({
                 this._renderSystemMetrics(payload.systemMetrics);
                 this._renderRecentActivity(payload.recent_activity);
                 this._renderRecentPayments(payload.recent_payments);
+                this._renderPaymentStats(payload.payment_stats);
                 this._renderSiteStatus(payload.serviceStatuses, payload.activeIncidents);
                 this._renderSystemServices(payload.serviceStatuses);
                 this._lastRefreshAt = Date.now();
@@ -274,6 +275,14 @@ Alpine.data('adminDashboard', () => ({
                 </div>`;
         }).join('');
     },
+    _renderPaymentStats(stats) {
+        if (!stats) return;
+        const amount = (value) => Number(value || 0).toLocaleString(undefined, { maximumFractionDigits: 2 });
+        this._setStatText('revenue-30d', amount(stats.revenue_30d));
+        this._setStatText('revenue-30d-count', formatNumber(stats.count_30d));
+        this._setStatText('revenue-year', amount(stats.revenue_year));
+        this._setStatText('revenue-year-count', formatNumber(stats.count_year));
+    },
     _renderRecentPayments(payments) {
         const hasPayments = Array.isArray(payments) && payments.length > 0;
         const existing = this.$el.querySelector('[data-widget="recent-payments"]');
@@ -286,15 +295,14 @@ Alpine.data('adminDashboard', () => ({
         if (!widget) return;
         const tbody = widget.querySelector('[data-payments-tbody]');
         if (!tbody) return;
-        const settledClasses = 'bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200';
-        const pendingClasses = 'bg-warning-100 dark:bg-warning-900 text-warning-800 dark:text-warning-200';
-        const otherClasses = 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200';
+        // Invoice state says whether the role upgrade was applied; payment_status is always "Settled".
+        const states = {
+            settled: { label: 'Settled', classes: 'bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200' },
+            unsettled: { label: 'Unsettled', classes: 'bg-warning-100 dark:bg-warning-900 text-warning-800 dark:text-warning-200' },
+            legacy: { label: 'Legacy', classes: 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200' },
+        };
         tbody.innerHTML = payments.map(p => {
-            const status = String(p.payment_status ?? '');
-            const isSettled = status.toLowerCase() === 'settled';
-            const isPending = status === '' || status.toLowerCase() === 'pending';
-            const badge = isSettled ? settledClasses : (isPending ? pendingClasses : otherClasses);
-            const statusLabel = status || 'Pending';
+            const state = states[p.invoice_state] ?? states.unsettled;
             const dateText = p.created_at_formatted ?? p.created_at_human ?? '';
             const item = p.item_description ?? '';
             const itemTrunc = item.length > 40 ? item.slice(0, 40) + '…' : item;
@@ -304,8 +312,9 @@ Alpine.data('adminDashboard', () => ({
                     <td class="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">${escapeHtml(p.username ?? '')}</td>
                     <td class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300" title="${escapeHtml(item)}">${escapeHtml(itemTrunc)}</td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-right font-semibold text-gray-900 dark:text-gray-100">${escapeHtml(p.invoice_amount ?? '')}</td>
+                    <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">${escapeHtml(p.coin ?? '')}</td>
                     <td class="px-4 py-2 whitespace-nowrap text-center">
-                        <span class="px-2 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full ${badge}">${escapeHtml(statusLabel)}</span>
+                        <span class="px-2 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full ${state.classes}">${state.label}</span>
                     </td>
                 </tr>`;
         }).join('');

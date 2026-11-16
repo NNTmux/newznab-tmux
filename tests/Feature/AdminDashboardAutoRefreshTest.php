@@ -60,6 +60,7 @@ class AdminDashboardAutoRefreshTest extends TestCase
         $this->assertStringContainsString('_renderRegistrationStatus(payload.registrationStatus)', $content);
         $this->assertStringContainsString('_renderLastRefresh(payload.generated_at_time)', $content);
         $this->assertStringContainsString("_setStatText('last-refresh', timeText ?? '')", $content);
+        $this->assertStringContainsString('_renderPaymentStats(payload.payment_stats)', $content);
     }
 
     public function test_dashboard_warmer_runs_every_fifteen_minutes_without_overlapping(): void
@@ -92,6 +93,10 @@ class AdminDashboardAutoRefreshTest extends TestCase
             'permanently-deleted-users',
             'deleted-users-total',
             'last-refresh',
+            'revenue-30d',
+            'revenue-30d-count',
+            'revenue-year',
+            'revenue-year-count',
         ] as $hook) {
             // Headline tiles pass the hook as stat-key; x-admin.stat-card renders it as data-stat.
             $this->assertTrue(

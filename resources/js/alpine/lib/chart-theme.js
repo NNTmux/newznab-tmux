@@ -62,15 +62,20 @@ export function applyChartDefaults(Chart) {
     Chart.defaults.font.family = readToken('--font-sans', 'system-ui, sans-serif');
 }
 
-/** Re-theme registered charts whenever the theme or color scheme changes. Returns a disconnect function. */
+/**
+ * Re-theme registered charts whenever the theme or color scheme changes. Returns a disconnect function.
+ * A chart names its tones as `$themeTone` (first dataset) or `$themeTones` (one per dataset).
+ */
 export function observeTheme(Chart, getCharts) {
     const observer = new MutationObserver(() => {
         applyChartDefaults(Chart);
         getCharts().forEach((chart) => {
-            const tone = chart.$themeTone;
-            if (tone) {
-                Object.assign(chart.data.datasets[0], seriesColors(tone.name, tone.fillAlpha));
-            }
+            const tones = chart.$themeTones ?? (chart.$themeTone ? [chart.$themeTone] : []);
+            tones.forEach((tone, index) => {
+                if (tone && chart.data.datasets[index]) {
+                    Object.assign(chart.data.datasets[index], seriesColors(tone.name, tone.fillAlpha));
+                }
+            });
             chart.update('none');
         });
     });

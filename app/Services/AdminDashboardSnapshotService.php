@@ -11,6 +11,7 @@ use App\Models\ReleaseReport;
 use App\Models\UsenetGroup;
 use App\Models\User;
 use App\Models\UserActivity;
+use App\Services\Admin\PaymentStatsReport;
 use Illuminate\Support\Facades\Cache;
 
 /**
@@ -23,7 +24,7 @@ use Illuminate\Support\Facades\Cache;
  */
 class AdminDashboardSnapshotService
 {
-    public const CACHE_KEY = 'admin:dashboard:snapshot:v2';
+    public const CACHE_KEY = 'admin:dashboard:snapshot:v3';
 
     /**
      * @var array{0: int, 1: int}
@@ -35,6 +36,7 @@ class AdminDashboardSnapshotService
         private readonly SystemMetricsService $systemMetricsService,
         private readonly RegistrationStatusService $registrationStatusService,
         private readonly SiteStatusService $siteStatusService,
+        private readonly PaymentStatsReport $paymentStatsReport,
     ) {}
 
     /**
@@ -85,6 +87,7 @@ class AdminDashboardSnapshotService
             'systemMetrics' => $this->buildSystemMetrics(),
             'recent_activity' => $this->buildRecentActivity(),
             'recent_payments' => $this->buildRecentPayments(),
+            'payment_stats' => $this->paymentStatsReport->dashboardStats($now->toImmutable()),
             'serviceStatuses' => $this->siteStatusService->getEnabledServices(),
             'activeIncidents' => $this->siteStatusService->getActiveIncidents(),
             'registrationStatus' => $registrationStatus,
@@ -242,7 +245,9 @@ class AdminDashboardSnapshotService
                     'item_description' => (string) $payment->item_description,
                     'invoice_amount' => (string) $payment->invoice_amount,
                     'payment_method' => (string) $payment->payment_method,
+                    'coin' => Payment::coinFor($payment->payment_method),
                     'payment_status' => (string) $payment->payment_status,
+                    'invoice_state' => $payment->invoiceState(),
                     'invoice_status' => (string) ($payment->invoice_status ?? Payment::INVOICE_STATUS_PENDING),
                     'order_id' => (string) $payment->order_id,
                     'created_at' => $createdAt?->toIso8601String(),
