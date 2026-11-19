@@ -11,6 +11,10 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
+/**
+ * @deprecated Nothing dispatches this job; failed index updates are retried by
+ *             nntmux:search-repair. Kept so payloads already on the queue still run.
+ */
 class ReindexReleaseJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;

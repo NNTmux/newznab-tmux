@@ -810,7 +810,7 @@ class ReleaseFileManager
         string $hash = '',
         string $crc = ''
     ): bool {
-        if ($name === '') {
+        if (! ReleaseFile::isStorableName($name)) {
             return false;
         }
 

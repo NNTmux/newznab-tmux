@@ -69,7 +69,7 @@ Schedule::call(function () {
 // Check tmux health and auto-restart if monitor pane is dead
 Schedule::command('tmux:health-check --auto-restart')->everyThirtyMinutes()->withoutOverlapping();
 Schedule::command('nntmux:check-service-health')->everyMinute()->withoutOverlapping();
-Schedule::command('nntmux:search-repair --limit=100')->everyMinute()->withoutOverlapping();
+Schedule::command('nntmux:search-repair --limit=500')->everyMinute()->withoutOverlapping();
 // TV: retry episode lookups for shows whose episode wasn't available yet, and normalize
 // any release still carrying a legacy TV processor status.
 Schedule::command('tv:reprocess-missing-episodes --limit=2000')->everyThirtyMinutes()->withoutOverlapping()->runInBackground();

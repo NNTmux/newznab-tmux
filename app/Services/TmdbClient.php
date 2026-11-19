@@ -420,6 +420,7 @@ class TmdbClient
     /**
      * Get TV episode with fallback using multiple external IDs.
      * Tries TMDB ID first, then looks up by TVDB or IMDB if needed.
+     * A show the external IDs resolve to is only asked for the episode once.
      *
      * @param  array<string, mixed>  $ids  Array of IDs: ['tmdb' => X, 'tvdb' => Y, 'imdb' => Z]
      * @param  int  $seasonNumber  The season number
@@ -428,9 +429,13 @@ class TmdbClient
      */
     public function getTvEpisodeWithFallback(array $ids, int $seasonNumber, int $episodeNumber): ?array
     {
+        /** @var array<int, true> $triedShowIds */
+        $triedShowIds = [];
+
         // First try with TMDB ID if available
         $tmdbId = (int) ($ids['tmdb'] ?? 0);
         if ($tmdbId > 0) {
+            $triedShowIds[$tmdbId] = true;
             $result = $this->getTvEpisode($tmdbId, $seasonNumber, $episodeNumber);
             if ($result !== null) {
                 return $result;
@@ -440,9 +445,10 @@ class TmdbClient
         // Try to find the show by TVDB ID
         $tvdbId = (int) ($ids['tvdb'] ?? 0);
         if ($tvdbId > 0) {
-            $show = $this->findTvByExternalId((string) $tvdbId, 'tvdb_id');
-            if ($show !== null && isset($show['id'])) {
-                $result = $this->getTvEpisode((int) $show['id'], $seasonNumber, $episodeNumber);
+            $showId = (int) ($this->findTvByExternalId((string) $tvdbId, 'tvdb_id')['id'] ?? 0);
+            if ($showId > 0 && ! isset($triedShowIds[$showId])) {
+                $triedShowIds[$showId] = true;
+                $result = $this->getTvEpisode($showId, $seasonNumber, $episodeNumber);
                 if ($result !== null) {
                     return $result;
                 }
@@ -456,9 +462,9 @@ class TmdbClient
                 ? (string) $imdbId
                 : 'tt'.(string) $imdbId;
 
-            $show = $this->findTvByExternalId($imdbFormatted, 'imdb_id');
-            if ($show !== null && isset($show['id'])) {
-                $result = $this->getTvEpisode((int) $show['id'], $seasonNumber, $episodeNumber);
+            $showId = (int) ($this->findTvByExternalId($imdbFormatted, 'imdb_id')['id'] ?? 0);
+            if ($showId > 0 && ! isset($triedShowIds[$showId])) {
+                $result = $this->getTvEpisode($showId, $seasonNumber, $episodeNumber);
                 if ($result !== null) {
                     return $result;
                 }

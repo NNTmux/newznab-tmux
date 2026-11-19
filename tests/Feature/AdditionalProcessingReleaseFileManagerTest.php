@@ -873,6 +873,41 @@ class AdditionalProcessingReleaseFileManagerTest extends TestCase
         ];
     }
 
+    public function test_a_listing_of_binary_noise_stores_no_files_and_leaves_the_password_status_unknown(): void
+    {
+        DB::table('releases')->insert($this->releaseRow());
+        Search::shouldReceive('updateRelease')->once()->with(1);
+        $nameFixing = new CountingNameFixingService;
+        $manager = $this->makeManager($nameFixing);
+        $context = new ReleaseProcessingContext(Release::query()->findOrFail(1));
+        $context->nzbHasCompressedFile = true;
+
+        $queued = $manager->addFileInfo([
+            'name' => "Om\x1C?3?jn??\x07p|\tQ?I\x17\x13?\x15.?\xED\xA5\x9EUm?|M?\x1A\x1A{?",
+            'size' => 1024,
+        ], $context, '\\.(?:par2|sfv|nzb)');
+        $manager->finalizeRelease($context, true);
+
+        $this->assertFalse($queued);
+        $this->assertSame(1, $context->totalFileInfo);
+        $this->assertSame(0, $context->addedFileInfo);
+        $this->assertSame(0, $nameFixing->matchPreDbFilesCalls);
+        $this->assertSame(0, DB::table('release_files')->count());
+        $this->assertSame(-1, (int) DB::table('releases')->where('id', 1)->value('passwordstatus'));
+    }
+
+    public function test_a_file_name_in_a_legacy_encoding_is_still_queued(): void
+    {
+        DB::table('releases')->insert($this->releaseRow());
+        $manager = $this->makeManager();
+        $context = new ReleaseProcessingContext(Release::query()->findOrFail(1));
+
+        $queued = $manager->addFileInfo(['name' => "Fran\xE7ais.mkv", 'size' => 1024], $context, '\\.(?:par2|sfv|nzb)');
+
+        $this->assertTrue($queued);
+        $this->assertArrayHasKey("Fran\xE7ais.mkv", $context->pendingReleaseFiles);
+    }
+
     public function test_invalid_release_file_sizes_are_rejected(): void
     {
         DB::table('releases')->insert($this->releaseRow());

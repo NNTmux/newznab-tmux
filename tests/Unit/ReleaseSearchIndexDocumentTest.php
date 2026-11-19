@@ -61,6 +61,39 @@ final class ReleaseSearchIndexDocumentTest extends TestCase
     }
 
     #[Test]
+    public function normalize_makes_unreadable_bytes_json_encodable(): void
+    {
+        $document = ReleaseSearchIndexDocument::normalize([
+            'id' => 42,
+            'name' => "Truncated.Name.\xE4\xB9",
+            'searchname' => 'Example',
+            'filename' => "Example.mkv Om\x1C\x07p|\tQ\xED\xA5\x9EUm\x1A\x1A{",
+        ]);
+
+        $json = json_encode($document);
+
+        self::assertIsString($json);
+        self::assertSame('Example.mkv Om p| Q???Um {', $document['filename']);
+        self::assertSame('Truncated.Name.?', $document['name']);
+    }
+
+    #[Test]
+    public function normalize_leaves_valid_multibyte_text_untouched_and_is_repeatable(): void
+    {
+        $document = ReleaseSearchIndexDocument::normalize([
+            'id' => 42,
+            'searchname' => 'Åland.久',
+            'filename' => 'Åland 久.mkv',
+            'postdate' => '2026-01-02 03:04:05',
+            'adddate' => '2026-01-03 04:05:06',
+        ]);
+
+        self::assertSame('Åland 久.mkv', $document['filename']);
+        self::assertSame('Åland 久', $document['plainsearchname']);
+        self::assertSame($document, ReleaseSearchIndexDocument::normalizeForBulk($document));
+    }
+
+    #[Test]
     public function indexed_documents_can_be_hydrated_for_legacy_release_consumers(): void
     {
         $row = ReleaseSearchIndexDocument::toReleaseRow([

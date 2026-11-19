@@ -6,6 +6,11 @@ namespace Tests\Unit\Services\Search;
 
 use App\Services\Search\Drivers\ManticoreSearchDriver;
 use App\Support\ReleaseSearchIndexDocument;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Manticoresearch\Client;
 use Manticoresearch\Exceptions\ResponseException;
 use Manticoresearch\Request;
@@ -165,5 +170,90 @@ final class ManticoreInsertRetryTest extends TestCase
         $method = new ReflectionMethod(ManticoreSearchDriver::class, 'replaceReleaseDocumentWithRetry');
 
         $this->assertTrue($method->invoke($driver, $document));
+    }
+
+    public function test_a_failed_insert_is_recorded_for_the_repair_command_and_queues_nothing(): void
+    {
+        $this->createFailureTable();
+        Bus::fake();
+        Log::spy();
+        $driver = $this->driverWhoseInsertFails();
+
+        $driver->insertRelease($this->releaseRow(42));
+
+        $failure = DB::table('search_index_failures')->where('release_id', 42)->first();
+        $this->assertSame(1, (int) $failure->attempts);
+        $this->assertSame('upsert', $failure->operation);
+        $this->assertNull($failure->resolved_at);
+        Bus::assertNothingDispatched();
+    }
+
+    public function test_repeated_failures_back_off_to_one_hour(): void
+    {
+        $this->createFailureTable();
+        $this->freezeSecond();
+        Log::spy();
+        DB::table('search_index_failures')->insert(['release_id' => 42, 'operation' => 'upsert', 'attempts' => 11]);
+        $driver = $this->driverWhoseInsertFails();
+
+        $driver->insertRelease($this->releaseRow(42));
+
+        $failure = DB::table('search_index_failures')->where('release_id', 42)->first();
+        $this->assertSame(12, (int) $failure->attempts);
+        $this->assertSame(now()->addHour()->toDateTimeString(), (string) $failure->next_attempt_at);
+    }
+
+    public function test_a_successful_insert_resolves_the_failure_and_resets_its_attempts(): void
+    {
+        $this->createFailureTable();
+        DB::table('search_index_failures')->insert(['release_id' => 42, 'operation' => 'upsert', 'attempts' => 5]);
+        $driver = $this->driverWithTable($this->createStub(Table::class));
+
+        $driver->insertRelease($this->releaseRow(42));
+
+        $failure = DB::table('search_index_failures')->where('release_id', 42)->first();
+        $this->assertSame(0, (int) $failure->attempts);
+        $this->assertNotNull($failure->resolved_at);
+        $this->assertNull($failure->next_attempt_at);
+    }
+
+    private function driverWhoseInsertFails(): ManticoreSearchDriver
+    {
+        $table = $this->createStub(Table::class);
+        $table->method('replaceDocument')->willThrowException($this->makeResponseException('unable to parse'));
+
+        return $this->driverWithTable($table);
+    }
+
+    private function driverWithTable(Table $table): ManticoreSearchDriver
+    {
+        $client = $this->createStub(Client::class);
+        $client->method('table')->willReturn($table);
+
+        $driver = new ManticoreSearchDriver([
+            'host' => '127.0.0.1',
+            'port' => 9308,
+            'retry_attempts' => 1,
+            'retry_delay_ms' => 0,
+            'indexes' => ['releases' => 'releases_rt', 'predb' => 'predb_rt'],
+        ]);
+        (new \ReflectionProperty(ManticoreSearchDriver::class, 'manticoreSearch'))->setValue($driver, $client);
+
+        return $driver;
+    }
+
+    private function createFailureTable(): void
+    {
+        Schema::dropIfExists('search_index_failures');
+        Schema::create('search_index_failures', function (Blueprint $table): void {
+            $table->id();
+            $table->unsignedBigInteger('release_id')->unique();
+            $table->string('operation', 32)->default('upsert');
+            $table->unsignedInteger('attempts')->default(0);
+            $table->text('last_error')->nullable();
+            $table->timestamp('next_attempt_at')->nullable();
+            $table->timestamp('resolved_at')->nullable();
+            $table->timestamps();
+        });
     }
 }

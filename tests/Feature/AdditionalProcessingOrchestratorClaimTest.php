@@ -18,7 +18,6 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
-use Mockery;
 use PDO;
 use Tests\TestCase;
 use Tests\Unit\AdditionalProcessing\CreatesProcessingConfiguration;
@@ -126,31 +125,7 @@ class AdditionalProcessingOrchestratorClaimTest extends TestCase
         $this->assertSame(0, (int) Release::query()->where('id', 1)->value('haspreview'));
         $this->assertSame(-1, (int) Release::query()->where('id', 1)->value('passwordstatus'));
 
-        Log::shouldHaveReceived('info')
-            ->once()
-            ->with(
-                'Additional postprocessing run finished',
-                Mockery::on(static fn (array $context): bool => $context['picked'] === 1
-                    && $context['processed'] === 0
-                    && $context['failed'] === 1
-                    && $context['outcomes'] === ['failed' => 1]
-                    && array_key_exists('artifacts_created', $context)
-                    && array_key_exists('artifact_yield_percent', $context)
-                    && array_key_exists('release_files_added', $context)
-                    && array_key_exists('download_requests', $context)
-                    && array_key_exists('nntp_requests', $context)
-                    && array_key_exists('download_cache_hits', $context)
-                    && array_key_exists('database_statements', $context)
-                    && array_key_exists('database_milliseconds', $context)
-                    && array_key_exists('search_sync_requests', $context)
-                    && array_key_exists('search_sync_executions', $context)
-                    && array_key_exists('duplicate_message_ids', $context)
-                    && array_key_exists('unsupported_reasons', $context)
-                    && array_key_exists('releases_per_second', $context)
-                    && array_key_exists('average_release_seconds', $context)
-                    && array_key_exists('stage_seconds', $context)
-                    && array_key_exists('peak_memory_bytes', $context)),
-            );
+        Log::shouldNotHaveReceived('info');
     }
 
     public function test_exception_after_finalization_keeps_the_finalized_status(): void

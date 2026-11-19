@@ -4,6 +4,8 @@ namespace Tests\Unit;
 
 use App\Services\TmdbClient;
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
@@ -614,6 +616,53 @@ class TmdbClientTest extends TestCase
         $this->assertNull($this->client->getTvEpisode(1396, 1, -1));
 
         Http::assertNothingSent();
+    }
+
+    public function test_episode_fallback_asks_a_show_only_once_when_every_id_resolves_to_it(): void
+    {
+        Http::fake([
+            'api.themoviedb.org/3/tv/100/season/1/episode/5*' => Http::response([], 404),
+            'api.themoviedb.org/3/find/*' => Http::response(['tv_results' => [['id' => 100]]]),
+        ]);
+
+        $result = $this->client->getTvEpisodeWithFallback(['tmdb' => 100, 'tvdb' => 555, 'imdb' => '0123456'], 1, 5);
+
+        $this->assertNull($result);
+        $this->assertCount(1, $this->episodeRequests());
+    }
+
+    public function test_episode_fallback_still_tries_a_different_show_found_by_external_id(): void
+    {
+        Http::fake([
+            'api.themoviedb.org/3/tv/100/season/1/episode/5*' => Http::response([], 404),
+            'api.themoviedb.org/3/find/*' => Http::response(['tv_results' => [['id' => 200]]]),
+            'api.themoviedb.org/3/tv/200/season/1/episode/5*' => Http::response(['id' => 9001, 'episode_number' => 5]),
+        ]);
+
+        $result = $this->client->getTvEpisodeWithFallback(['tmdb' => 100, 'tvdb' => 555], 1, 5);
+
+        $this->assertSame(9001, $result['id'] ?? null);
+    }
+
+    public function test_episode_fallback_without_a_tmdb_id_asks_the_found_show_only_once(): void
+    {
+        Http::fake([
+            'api.themoviedb.org/3/tv/100/season/1/episode/5*' => Http::response([], 404),
+            'api.themoviedb.org/3/find/*' => Http::response(['tv_results' => [['id' => 100]]]),
+        ]);
+
+        $result = $this->client->getTvEpisodeWithFallback(['tmdb' => 0, 'tvdb' => 555, 'imdb' => 'tt0123456'], 1, 5);
+
+        $this->assertNull($result);
+        $this->assertCount(1, $this->episodeRequests());
+    }
+
+    /**
+     * @return Collection<int, mixed>
+     */
+    private function episodeRequests(): Collection
+    {
+        return Http::recorded(static fn (Request $request): bool => str_contains($request->url(), '/episode/'));
     }
 
     public function test_get_tv_season_allows_season_zero_for_specials(): void

@@ -286,37 +286,6 @@ class AdditionalProcessingOrchestrator
             elapsedSeconds: $this->elapsedSecondsSince($startedAt),
             peakMemoryBytes: memory_get_peak_usage(true),
         );
-        $downloadMetrics = $batchResult->downloadMetrics();
-        $persistenceMetrics = $batchResult->persistenceMetrics();
-
-        Log::info('Additional postprocessing run finished', [
-            'pipeline' => 'v2',
-            'guid_char' => $guidChar,
-            'picked' => count($claimedIds),
-            'processed' => $batchResult->successfulCount(),
-            'failed' => $batchResult->unsuccessfulCount(),
-            'outcomes' => $batchResult->outcomeCounts(),
-            'artifacts_created' => $batchResult->artifactsCreatedCount(),
-            'artifact_yield_percent' => round($batchResult->artifactYieldPercent(), 2),
-            'release_files_added' => $batchResult->releaseFilesAdded(),
-            'download_requests' => $downloadMetrics->logicalRequests,
-            'nntp_requests' => $downloadMetrics->networkRequests,
-            'download_cache_hits' => $downloadMetrics->cacheHits,
-            'nntp_bytes' => $downloadMetrics->bytesDownloaded,
-            'reused_bytes' => $downloadMetrics->bytesReused,
-            'preview_bytes' => $downloadMetrics->mediaBytesDownloaded,
-            'database_statements' => $persistenceMetrics->databaseStatements,
-            'database_milliseconds' => round($persistenceMetrics->databaseMilliseconds, 3),
-            'search_sync_requests' => $persistenceMetrics->searchSyncRequests,
-            'search_sync_executions' => $persistenceMetrics->searchSyncExecutions,
-            'duplicate_message_ids' => $batchResult->duplicateMessageIdCount(),
-            'unsupported_reasons' => $batchResult->unsupportedReasonCounts(),
-            'elapsed_seconds' => round($batchResult->elapsedSeconds, 6),
-            'releases_per_second' => round($batchResult->releasesPerSecond(), 4),
-            'average_release_seconds' => round($batchResult->averageReleaseSeconds(), 6),
-            'stage_seconds' => $this->roundedStageDurations($batchResult->stageDurationTotals()),
-            'peak_memory_bytes' => $batchResult->peakMemoryBytes,
-        ]);
 
         $this->output->endOutput();
 
@@ -326,18 +295,6 @@ class AdditionalProcessingOrchestrator
     private function elapsedSecondsSince(int $startedAtNanoseconds): float
     {
         return (hrtime(true) - $startedAtNanoseconds) / 1_000_000_000;
-    }
-
-    /**
-     * @param  array<string, float>  $durations
-     * @return array<string, float>
-     */
-    private function roundedStageDurations(array $durations): array
-    {
-        return array_map(
-            static fn (float $duration): float => round($duration, 6),
-            $durations,
-        );
     }
 
     public function finish(): void

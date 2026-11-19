@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Services\Search\Drivers;
 
 use App\Enums\SecondarySearchIndex;
-use App\Jobs\ReindexReleaseJob;
 use App\Models\BookInfo;
 use App\Models\ConsoleInfo;
 use App\Models\GamesInfo;
@@ -478,15 +477,8 @@ class ManticoreSearchDriver implements SearchDriverInterface
 
         $releaseId = (int) $parameters['id'];
         if (! $this->replaceReleaseDocumentWithRetry($parameters)) {
+            // Retried by nntmux:search-repair once the recorded backoff is due.
             $this->recordReleaseIndexFailure($releaseId, 'insertRelease', 'upsert');
-            try {
-                ReindexReleaseJob::dispatch($releaseId)->delay(now()->addSeconds(2));
-            } catch (\Throwable $e) {
-                Log::error('ManticoreSearch: failed to queue ReindexReleaseJob', [
-                    'release_id' => $releaseId,
-                    'error' => $e->getMessage(),
-                ]);
-            }
         }
     }
 
@@ -570,7 +562,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
                     'operation' => $operation,
                     'attempts' => $attempts,
                     'last_error' => $phase,
-                    'next_attempt_at' => now()->addSeconds(min(3600, 2 ** min($attempts, 10))),
+                    'next_attempt_at' => now()->addSeconds(min(3600, 2 ** min($attempts, 12))),
                     'resolved_at' => null,
                     'updated_at' => now(),
                     'created_at' => now(),
@@ -602,6 +594,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
             DB::table('search_index_failures')
                 ->where('release_id', $releaseId)
                 ->update([
+                    'attempts' => 0,
                     'resolved_at' => now(),
                     'next_attempt_at' => null,
                     'updated_at' => now(),

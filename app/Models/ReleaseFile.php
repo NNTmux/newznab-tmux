@@ -117,6 +117,15 @@ class ReleaseFile extends Model
     }
 
     /**
+     * Whether a listed file name may be stored. Names holding control characters
+     * come from unreadable archive headers and are binary noise, not file names.
+     */
+    public static function isStorableName(string $name): bool
+    {
+        return $name !== '' && preg_match('/[\x00-\x1F\x7F]/', $name) !== 1;
+    }
+
+    /**
      * Add new files for a release ID.
      *
      *
@@ -125,6 +134,10 @@ class ReleaseFile extends Model
      */
     public static function addReleaseFiles(mixed $id, mixed $name, mixed $size, mixed $createdTime, mixed $hasPassword, string $hash = '', string $crc = ''): int
     {
+        if (! is_string($name) || ! self::isStorableName($name)) {
+            return 0;
+        }
+
         // Check if we already have this data in table
         $duplicateCheck = self::query()->where('releases_id', $id)->where('name', $name)->first();
 

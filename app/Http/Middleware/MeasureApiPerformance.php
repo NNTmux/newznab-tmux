@@ -7,7 +7,6 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
 final class MeasureApiPerformance
@@ -23,7 +22,6 @@ final class MeasureApiPerformance
         $connection->flushQueryLog();
         $connection->enableQueryLog();
         $startedAt = hrtime(true);
-        $memoryAtStart = memory_get_usage(true);
 
         try {
             $response = $next($request);
@@ -34,19 +32,14 @@ final class MeasureApiPerformance
 
         $durationMs = (hrtime(true) - $startedAt) / 1_000_000;
         $queryMs = array_sum(array_map(static fn (array $query): float => (float) ($query['time'] ?? 0), $queries));
-        $metrics = [
-            'route' => $request->route()?->getActionName(),
-            'status' => $response->getStatusCode(),
-            'duration_ms' => round($durationMs, 2),
-            'query_count' => count($queries),
-            'query_ms' => round($queryMs, 2),
-            'memory_delta_bytes' => max(0, memory_get_usage(true) - $memoryAtStart),
-            'response_bytes' => strlen((string) $response->getContent()),
-            'release_cache' => $request->attributes->get('nntmux.api_release_cache', 'unused'),
-        ];
 
-        Log::channel(config('logging.default'))->info('API performance', $metrics);
-        $response->headers->set('Server-Timing', sprintf('app;dur=%.2f, db;dur=%.2f;desc="%d queries"', $durationMs, $queryMs, count($queries)));
+        $response->headers->set('Server-Timing', sprintf(
+            'app;dur=%.2f, db;dur=%.2f;desc="%d queries", cache;desc="%s"',
+            $durationMs,
+            $queryMs,
+            count($queries),
+            (string) $request->attributes->get('nntmux.api_release_cache', 'unused'),
+        ));
 
         return $response;
     }
