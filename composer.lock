@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5c3df0d6067eaad529989009de5744cc",
+    "content-hash": "6d9de69f628aeaade5f01958e0104889",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -1026,36 +1026,36 @@
         },
         {
             "name": "elastic/transport",
-            "version": "v8.11.1",
+            "version": "v9.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/elastic/elastic-transport-php.git",
-                "reference": "b037aa80e5f44de034706cd7b8f3695b08b2cec6"
+                "reference": "3488b9d070e220f2a1ebdb500e6c588069f1897f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/elastic/elastic-transport-php/zipball/b037aa80e5f44de034706cd7b8f3695b08b2cec6",
-                "reference": "b037aa80e5f44de034706cd7b8f3695b08b2cec6",
+                "url": "https://api.github.com/repos/elastic/elastic-transport-php/zipball/3488b9d070e220f2a1ebdb500e6c588069f1897f",
+                "reference": "3488b9d070e220f2a1ebdb500e6c588069f1897f",
                 "shasum": ""
             },
             "require": {
                 "composer-runtime-api": "^2.0",
+                "nyholm/psr7": "^1.8",
                 "open-telemetry/api": "^1.0",
-                "php": "^7.4 || ^8.0",
+                "php": "^8.1",
                 "php-http/discovery": "^1.14",
-                "php-http/httplug": "^2.3",
+                "php-http/httplug": "^2.4",
                 "psr/http-client": "^1.0",
                 "psr/http-factory": "^1.0",
-                "psr/http-message": "^1.0 || ^2.0",
-                "psr/log": "^1 || ^2 || ^3"
+                "psr/http-message": "^2.0",
+                "psr/log": "^2.0 || ^3.0"
             },
             "require-dev": {
-                "nyholm/psr7": "^1.5",
                 "open-telemetry/sdk": "^1.0",
                 "php-http/mock-client": "^1.5",
                 "phpstan/phpstan": "^2.1",
-                "phpunit/phpunit": "^9.5",
-                "symfony/http-client": "^5.4"
+                "phpunit/phpunit": "^10",
+                "symfony/http-client": "^6.0"
             },
             "type": "library",
             "autoload": {
@@ -1078,43 +1078,44 @@
             ],
             "support": {
                 "issues": "https://github.com/elastic/elastic-transport-php/issues",
-                "source": "https://github.com/elastic/elastic-transport-php/tree/v8.11.1"
+                "source": "https://github.com/elastic/elastic-transport-php/tree/v9.0.1"
             },
-            "time": "2026-10-22T14:57:01+00:00"
+            "time": "2025-05-08T12:31:50+00:00"
         },
         {
             "name": "elasticsearch/elasticsearch",
-            "version": "v8.19.0",
+            "version": "v9.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/elastic/elasticsearch-php.git",
-                "reference": "1771284cb43a7b653634d418b6f5f0ec84ff8a6d"
+                "reference": "6fe5f99ea3a8b697f8c098399cc84d2339a9508d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/elastic/elasticsearch-php/zipball/1771284cb43a7b653634d418b6f5f0ec84ff8a6d",
-                "reference": "1771284cb43a7b653634d418b6f5f0ec84ff8a6d",
+                "url": "https://api.github.com/repos/elastic/elasticsearch-php/zipball/6fe5f99ea3a8b697f8c098399cc84d2339a9508d",
+                "reference": "6fe5f99ea3a8b697f8c098399cc84d2339a9508d",
                 "shasum": ""
             },
             "require": {
-                "elastic/transport": "^8.11",
-                "guzzlehttp/guzzle": "^7.0",
-                "php": "^7.4 || ^8.0",
+                "elastic/transport": "^9.0",
+                "php": "^8.1",
                 "psr/http-client": "^1.0",
-                "psr/http-message": "^1.1 || ^2.0",
-                "psr/log": "^1|^2|^3"
+                "psr/http-message": "^2.0",
+                "psr/log": "^2.0|^3.0"
             },
             "require-dev": {
                 "ext-yaml": "*",
                 "ext-zip": "*",
-                "mockery/mockery": "^1.5",
-                "nyholm/psr7": "^1.5",
-                "php-http/mock-client": "^1.5",
+                "guzzlehttp/guzzle": "^7.0",
+                "mockery/mockery": "^1.6",
+                "nette/php-generator": "^4.0",
+                "nyholm/psr7": "^1.8",
+                "php-http/mock-client": "^1.6",
                 "phpstan/phpstan": "^2.1",
-                "phpunit/phpunit": "^9.5",
+                "phpunit/phpunit": "^10.0",
                 "psr/http-factory": "^1.0",
-                "symfony/finder": "~4.0",
-                "symfony/http-client": "^5.0|^6.0|^7.0"
+                "symfony/finder": "^6.0",
+                "symfony/http-client": "^6.0|^7.0"
             },
             "type": "library",
             "autoload": {
@@ -1135,9 +1136,9 @@
             ],
             "support": {
                 "issues": "https://github.com/elastic/elasticsearch-php/issues",
-                "source": "https://github.com/elastic/elasticsearch-php/tree/v8.19.0"
+                "source": "https://github.com/elastic/elasticsearch-php/tree/v9.5.0"
             },
-            "time": "2025-08-06T16:58:06+00:00"
+            "time": "2026-08-04T14:31:01+00:00"
         },
         {
             "name": "evenement/evenement",
@@ -4122,16 +4123,16 @@
         },
         {
             "name": "open-telemetry/api",
-            "version": "1.11.0",
+            "version": "1.12.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/opentelemetry-php/api.git",
-                "reference": "bc169d9ecd11858e941657770dc708c6a15fc5f4"
+                "reference": "b0884741f3f9d5dc60477784c8671bd2acef4ceb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/opentelemetry-php/api/zipball/bc169d9ecd11858e941657770dc708c6a15fc5f4",
-                "reference": "bc169d9ecd11858e941657770dc708c6a15fc5f4",
+                "url": "https://api.github.com/repos/opentelemetry-php/api/zipball/b0884741f3f9d5dc60477784c8671bd2acef4ceb",
+                "reference": "b0884741f3f9d5dc60477784c8671bd2acef4ceb",
                 "shasum": ""
             },
             "require": {
@@ -4158,7 +4159,7 @@
                     ]
                 },
                 "branch-alias": {
-                    "dev-main": "1.11.x-dev"
+                    "dev-main": "1.12.x-dev"
                 }
             },
             "autoload": {
@@ -4195,7 +4196,7 @@
                 "issues": "https://github.com/open-telemetry/opentelemetry-php/issues",
                 "source": "https://github.com/open-telemetry/opentelemetry-php"
             },
-            "time": "2026-11-05T11:54:49+00:00"
+            "time": "2026-11-19T08:10:15+00:00"
         },
         {
             "name": "open-telemetry/context",
@@ -4257,16 +4258,16 @@
         },
         {
             "name": "paragonie/constant_time_encoding",
-            "version": "v3.1.4",
+            "version": "v3.1.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/paragonie/constant_time_encoding.git",
-                "reference": "5efef6e6cb43e088ccab7d0c1e2f2ab25b9e8b54"
+                "reference": "ceed38ba49d98b85808edfc4f04750ff61eb9739"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/paragonie/constant_time_encoding/zipball/5efef6e6cb43e088ccab7d0c1e2f2ab25b9e8b54",
-                "reference": "5efef6e6cb43e088ccab7d0c1e2f2ab25b9e8b54",
+                "url": "https://api.github.com/repos/paragonie/constant_time_encoding/zipball/ceed38ba49d98b85808edfc4f04750ff61eb9739",
+                "reference": "ceed38ba49d98b85808edfc4f04750ff61eb9739",
                 "shasum": ""
             },
             "require": {
@@ -4322,7 +4323,7 @@
                 "issues": "https://github.com/paragonie/constant_time_encoding/issues",
                 "source": "https://github.com/paragonie/constant_time_encoding"
             },
-            "time": "2026-11-06T20:31:19+00:00"
+            "time": "2026-11-18T13:55:22+00:00"
         },
         {
             "name": "php-ffmpeg/php-ffmpeg",
@@ -5975,16 +5976,16 @@
         },
         {
             "name": "sentry/sentry",
-            "version": "4.37.1",
+            "version": "4.38.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/getsentry/sentry-php.git",
-                "reference": "e91d17a16a2f007c01a68b0a6140a46bb3c1f90d"
+                "reference": "9e5f09ccb8f741dde2717f48b1c6df820f95b7c5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/getsentry/sentry-php/zipball/e91d17a16a2f007c01a68b0a6140a46bb3c1f90d",
-                "reference": "e91d17a16a2f007c01a68b0a6140a46bb3c1f90d",
+                "url": "https://api.github.com/repos/getsentry/sentry-php/zipball/9e5f09ccb8f741dde2717f48b1c6df820f95b7c5",
+                "reference": "9e5f09ccb8f741dde2717f48b1c6df820f95b7c5",
                 "shasum": ""
             },
             "require": {
@@ -6001,7 +6002,7 @@
                 "raven/raven": "*"
             },
             "require-dev": {
-                "carthage-software/mago": "1.30.0",
+                "carthage-software/mago": "1.60.2",
                 "friendsofphp/php-cs-fixer": "^3.4",
                 "guzzlehttp/guzzle": "^7.0|^8.0",
                 "guzzlehttp/promises": "^2.0.3|^3.0.0",
@@ -6056,7 +6057,7 @@
             ],
             "support": {
                 "issues": "https://github.com/getsentry/sentry-php/issues",
-                "source": "https://github.com/getsentry/sentry-php/tree/4.37.1"
+                "source": "https://github.com/getsentry/sentry-php/tree/4.38.0"
             },
             "funding": [
                 {
@@ -6068,27 +6069,27 @@
                     "type": "custom"
                 }
             ],
-            "time": "2026-11-17T17:03:08+00:00"
+            "time": "2026-11-19T10:49:48+00:00"
         },
         {
             "name": "sentry/sentry-laravel",
-            "version": "4.30.0",
+            "version": "4.31.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/getsentry/sentry-laravel.git",
-                "reference": "001f8c7eeeb0d512491c4a22c5a4880c833bd036"
+                "reference": "f40666aad6261a7cbc94bca061b3514ba09eeaa1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/getsentry/sentry-laravel/zipball/001f8c7eeeb0d512491c4a22c5a4880c833bd036",
-                "reference": "001f8c7eeeb0d512491c4a22c5a4880c833bd036",
+                "url": "https://api.github.com/repos/getsentry/sentry-laravel/zipball/f40666aad6261a7cbc94bca061b3514ba09eeaa1",
+                "reference": "f40666aad6261a7cbc94bca061b3514ba09eeaa1",
                 "shasum": ""
             },
             "require": {
                 "illuminate/support": "^6.0 | ^7.0 | ^8.0 | ^9.0 | ^10.0 | ^11.0 | ^12.0 | ^13.0",
                 "nyholm/psr7": "^1.0",
                 "php": "^7.2 | ^8.0",
-                "sentry/sentry": "^4.34.0",
+                "sentry/sentry": "^4.38.0",
                 "symfony/psr-http-message-bridge": "^1.0 | ^2.0 | ^6.0 | ^7.0 | ^8.0"
             },
             "require-dev": {
@@ -6148,7 +6149,7 @@
             ],
             "support": {
                 "issues": "https://github.com/getsentry/sentry-laravel/issues",
-                "source": "https://github.com/getsentry/sentry-laravel/tree/4.30.0"
+                "source": "https://github.com/getsentry/sentry-laravel/tree/4.31.0"
             },
             "funding": [
                 {
@@ -6160,7 +6161,7 @@
                     "type": "custom"
                 }
             ],
-            "time": "2026-11-11T19:17:46+00:00"
+            "time": "2026-11-19T14:23:20+00:00"
         },
         {
             "name": "spatie/laravel-data",
@@ -11125,16 +11126,16 @@
         },
         {
             "name": "web-auth/webauthn-lib",
-            "version": "5.3.13",
+            "version": "5.3.15",
             "source": {
                 "type": "git",
                 "url": "https://github.com/web-auth/webauthn-lib.git",
-                "reference": "19eb8e4107467052e5b24c023832ef8164062e89"
+                "reference": "768fb8cf7bebaad8a08b3015e206dda95e3320fa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/web-auth/webauthn-lib/zipball/19eb8e4107467052e5b24c023832ef8164062e89",
-                "reference": "19eb8e4107467052e5b24c023832ef8164062e89",
+                "url": "https://api.github.com/repos/web-auth/webauthn-lib/zipball/768fb8cf7bebaad8a08b3015e206dda95e3320fa",
+                "reference": "768fb8cf7bebaad8a08b3015e206dda95e3320fa",
                 "shasum": ""
             },
             "require": {
@@ -11195,7 +11196,7 @@
                 "webauthn"
             ],
             "support": {
-                "source": "https://github.com/web-auth/webauthn-lib/tree/5.3.13"
+                "source": "https://github.com/web-auth/webauthn-lib/tree/5.3.15"
             },
             "funding": [
                 {
@@ -11207,7 +11208,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2026-11-17T19:20:46+00:00"
+            "time": "2026-11-18T16:46:55+00:00"
         },
         {
             "name": "webmozart/assert",
@@ -11717,16 +11718,16 @@
         },
         {
             "name": "ergebnis/composer-normalize",
-            "version": "2.57.0",
+            "version": "2.58.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ergebnis/composer-normalize.git",
-                "reference": "fe0f69429cf61be9099155d5a63a2816016d5446"
+                "reference": "74ed2dad07f772e686a7f3498f2a507190640ee5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ergebnis/composer-normalize/zipball/fe0f69429cf61be9099155d5a63a2816016d5446",
-                "reference": "fe0f69429cf61be9099155d5a63a2816016d5446",
+                "url": "https://api.github.com/repos/ergebnis/composer-normalize/zipball/74ed2dad07f772e686a7f3498f2a507190640ee5",
+                "reference": "74ed2dad07f772e686a7f3498f2a507190640ee5",
                 "shasum": ""
             },
             "require": {
@@ -11743,15 +11744,15 @@
             "require-dev": {
                 "composer/composer": "^2.11.0",
                 "ergebnis/license": "^2.9.0",
-                "ergebnis/php-cs-fixer-config": "^6.64.1",
-                "ergebnis/phpstan-rules": "^2.17.0",
+                "ergebnis/php-cs-fixer-config": "^6.64.3",
+                "ergebnis/phpstan-rules": "^2.17.1",
                 "ergebnis/phpunit-slow-test-detector": "^2.27.0",
                 "ergebnis/rector-rules": "^1.19.0",
                 "fakerphp/faker": "^1.24.1",
                 "phpstan/extension-installer": "^1.4.3",
                 "phpstan/phpstan": "^2.1.55",
                 "phpstan/phpstan-deprecation-rules": "^2.0.5",
-                "phpstan/phpstan-phpunit": "^2.1.1",
+                "phpstan/phpstan-phpunit": "^2.1.2",
                 "phpstan/phpstan-strict-rules": "^2.1.1",
                 "phpunit/phpunit": "^9.6.33",
                 "rector/rector": "^2.7.0",
@@ -11761,7 +11762,7 @@
             "extra": {
                 "class": "Ergebnis\\Composer\\Normalize\\NormalizePlugin",
                 "branch-alias": {
-                    "dev-main": "2.57-dev"
+                    "dev-main": "2.58-dev"
                 },
                 "plugin-optional": true,
                 "composer-normalize": {
@@ -11798,7 +11799,7 @@
                 "security": "https://github.com/ergebnis/composer-normalize/blob/main/.github/SECURITY.md",
                 "source": "https://github.com/ergebnis/composer-normalize"
             },
-            "time": "2026-11-12T21:04:16+00:00"
+            "time": "2026-11-19T13:10:46+00:00"
         },
         {
             "name": "ergebnis/differ",
@@ -11878,16 +11879,16 @@
         },
         {
             "name": "ergebnis/json",
-            "version": "1.7.0",
+            "version": "1.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ergebnis/json.git",
-                "reference": "829ce8b25c5e452249492c824f1d227777709403"
+                "reference": "36bcd6b05dc05176064c0f7813d955fd3313cb47"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ergebnis/json/zipball/829ce8b25c5e452249492c824f1d227777709403",
-                "reference": "829ce8b25c5e452249492c824f1d227777709403",
+                "url": "https://api.github.com/repos/ergebnis/json/zipball/36bcd6b05dc05176064c0f7813d955fd3313cb47",
+                "reference": "36bcd6b05dc05176064c0f7813d955fd3313cb47",
                 "shasum": ""
             },
             "require": {
@@ -11895,26 +11896,26 @@
                 "php": "~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 || ~8.6.0"
             },
             "require-dev": {
-                "ergebnis/data-provider": "^3.6.0",
-                "ergebnis/license": "^2.7.0",
-                "ergebnis/php-cs-fixer-config": "^6.63.3",
-                "ergebnis/phpstan-rules": "^2.13.1",
-                "ergebnis/phpunit-slow-test-detector": "^2.25.0",
-                "ergebnis/rector-rules": "^1.18.4",
+                "ergebnis/data-provider": "^3.7.1",
+                "ergebnis/license": "^2.9.0",
+                "ergebnis/php-cs-fixer-config": "^6.64.3",
+                "ergebnis/phpstan-rules": "^2.17.1",
+                "ergebnis/phpunit-slow-test-detector": "^2.27.0",
+                "ergebnis/rector-rules": "^1.19.0",
                 "fakerphp/faker": "^1.24.1",
                 "infection/infection": "~0.26.6",
                 "phpstan/extension-installer": "^1.4.3",
                 "phpstan/phpstan": "^2.2.14",
                 "phpstan/phpstan-deprecation-rules": "^2.0.5",
-                "phpstan/phpstan-phpunit": "^2.0.18",
-                "phpstan/phpstan-strict-rules": "^2.0.12",
+                "phpstan/phpstan-phpunit": "^2.1.2",
+                "phpstan/phpstan-strict-rules": "^2.1.1",
                 "phpunit/phpunit": "^9.6.24",
-                "rector/rector": "^2.6.7"
+                "rector/rector": "^2.7.0"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "1.7-dev"
+                    "dev-main": "1.8-dev"
                 },
                 "composer-normalize": {
                     "indent-size": 2,
@@ -11947,20 +11948,20 @@
                 "security": "https://github.com/ergebnis/json/blob/main/.github/SECURITY.md",
                 "source": "https://github.com/ergebnis/json"
             },
-            "time": "2026-09-24T19:42:16+00:00"
+            "time": "2026-11-19T13:14:02+00:00"
         },
         {
             "name": "ergebnis/json-normalizer",
-            "version": "4.12.0",
+            "version": "4.13.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ergebnis/json-normalizer.git",
-                "reference": "b1a23409760cbac5b4deef9284c4e5e4a9c9165b"
+                "reference": "edf69bb6451940f80756a29218600ccce5a42d80"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ergebnis/json-normalizer/zipball/b1a23409760cbac5b4deef9284c4e5e4a9c9165b",
-                "reference": "b1a23409760cbac5b4deef9284c4e5e4a9c9165b",
+                "url": "https://api.github.com/repos/ergebnis/json-normalizer/zipball/edf69bb6451940f80756a29218600ccce5a42d80",
+                "reference": "edf69bb6451940f80756a29218600ccce5a42d80",
                 "shasum": ""
             },
             "require": {
@@ -11973,19 +11974,19 @@
                 "php": "~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 || ~8.6.0"
             },
             "require-dev": {
-                "composer/semver": "^3.4.4",
+                "composer/semver": "^3.6.0",
                 "ergebnis/data-provider": "^3.7.1",
-                "ergebnis/license": "^2.8.0",
-                "ergebnis/php-cs-fixer-config": "^6.64.1",
+                "ergebnis/license": "^2.9.0",
+                "ergebnis/php-cs-fixer-config": "^6.64.3",
                 "ergebnis/phpunit-slow-test-detector": "^2.27.0",
-                "ergebnis/rector-rules": "^1.18.5",
+                "ergebnis/rector-rules": "^1.19.0",
                 "fakerphp/faker": "^1.24.1",
                 "infection/infection": "~0.26.6",
                 "phpstan/extension-installer": "^1.4.3",
-                "phpstan/phpstan": "^2.2.15",
+                "phpstan/phpstan": "^2.3.2",
                 "phpstan/phpstan-deprecation-rules": "^2.0.5",
-                "phpstan/phpstan-phpunit": "^2.1.1",
-                "phpstan/phpstan-strict-rules": "^2.1.0",
+                "phpstan/phpstan-phpunit": "^2.1.2",
+                "phpstan/phpstan-strict-rules": "^2.1.1",
                 "phpunit/phpunit": "^9.6.19",
                 "rector/rector": "^2.7.0"
             },
@@ -11995,7 +11996,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "4.12-dev"
+                    "dev-main": "4.13-dev"
                 },
                 "composer-normalize": {
                     "indent-size": 2,
@@ -12029,20 +12030,20 @@
                 "security": "https://github.com/ergebnis/json-normalizer/blob/main/.github/SECURITY.md",
                 "source": "https://github.com/ergebnis/json-normalizer"
             },
-            "time": "2026-10-29T15:38:49+00:00"
+            "time": "2026-11-19T13:14:26+00:00"
         },
         {
             "name": "ergebnis/json-pointer",
-            "version": "3.10.0",
+            "version": "3.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ergebnis/json-pointer.git",
-                "reference": "58b61ce2d66e928b8d9feafb9eeff89d0523e748"
+                "reference": "b660a1c3b12eb18a718e64b388d7a42b39f67abf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ergebnis/json-pointer/zipball/58b61ce2d66e928b8d9feafb9eeff89d0523e748",
-                "reference": "58b61ce2d66e928b8d9feafb9eeff89d0523e748",
+                "url": "https://api.github.com/repos/ergebnis/json-pointer/zipball/b660a1c3b12eb18a718e64b388d7a42b39f67abf",
+                "reference": "b660a1c3b12eb18a718e64b388d7a42b39f67abf",
                 "shasum": ""
             },
             "require": {
@@ -12051,8 +12052,8 @@
             "require-dev": {
                 "ergebnis/data-provider": "^3.7.1",
                 "ergebnis/license": "^2.9.0",
-                "ergebnis/php-cs-fixer-config": "^6.64.1",
-                "ergebnis/phpstan-rules": "^2.17.0",
+                "ergebnis/php-cs-fixer-config": "^6.64.3",
+                "ergebnis/phpstan-rules": "^2.17.1",
                 "ergebnis/phpunit-slow-test-detector": "^2.27.0",
                 "ergebnis/rector-rules": "^1.19.0",
                 "fakerphp/faker": "^1.24.1",
@@ -12060,7 +12061,7 @@
                 "phpstan/extension-installer": "^1.4.3",
                 "phpstan/phpstan": "^2.2.14",
                 "phpstan/phpstan-deprecation-rules": "^2.0.5",
-                "phpstan/phpstan-phpunit": "^2.1.1",
+                "phpstan/phpstan-phpunit": "^2.1.2",
                 "phpstan/phpstan-strict-rules": "^2.1.1",
                 "phpunit/phpunit": "^9.6.34",
                 "rector/rector": "^2.7.0"
@@ -12068,7 +12069,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "3.10-dev"
+                    "dev-main": "3.11-dev"
                 },
                 "composer-normalize": {
                     "indent-size": 2,
@@ -12103,20 +12104,20 @@
                 "security": "https://github.com/ergebnis/json-pointer/blob/main/.github/SECURITY.md",
                 "source": "https://github.com/ergebnis/json-pointer"
             },
-            "time": "2026-11-11T12:52:52+00:00"
+            "time": "2026-11-19T13:14:51+00:00"
         },
         {
             "name": "ergebnis/json-printer",
-            "version": "3.9.1",
+            "version": "3.10.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ergebnis/json-printer.git",
-                "reference": "a9bbf3816ca39382d6fb4b4ad58018e5ea4f3cb4"
+                "reference": "f1d191df7d6f3fd7a7a92b4bb83e9f1aab33637b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ergebnis/json-printer/zipball/a9bbf3816ca39382d6fb4b4ad58018e5ea4f3cb4",
-                "reference": "a9bbf3816ca39382d6fb4b4ad58018e5ea4f3cb4",
+                "url": "https://api.github.com/repos/ergebnis/json-printer/zipball/f1d191df7d6f3fd7a7a92b4bb83e9f1aab33637b",
+                "reference": "f1d191df7d6f3fd7a7a92b4bb83e9f1aab33637b",
                 "shasum": ""
             },
             "require": {
@@ -12124,26 +12125,26 @@
                 "php": "~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 || ~8.6.0"
             },
             "require-dev": {
-                "ergebnis/data-provider": "^3.7.0",
-                "ergebnis/license": "^2.8.0",
-                "ergebnis/php-cs-fixer-config": "^6.64.1",
-                "ergebnis/phpunit-slow-test-detector": "^2.26.0",
-                "ergebnis/rector-rules": "^1.18.5",
+                "ergebnis/data-provider": "^3.7.1",
+                "ergebnis/license": "^2.9.0",
+                "ergebnis/php-cs-fixer-config": "^6.64.3",
+                "ergebnis/phpunit-slow-test-detector": "^2.27.0",
+                "ergebnis/rector-rules": "^1.19.0",
                 "fakerphp/faker": "^1.24.0",
                 "infection/infection": "~0.26.6",
                 "phpbench/phpbench": "^1.2.14",
                 "phpstan/extension-installer": "^1.4.3",
-                "phpstan/phpstan": "^2.2.16",
+                "phpstan/phpstan": "^2.3.4",
                 "phpstan/phpstan-deprecation-rules": "^2.0.5",
-                "phpstan/phpstan-phpunit": "^2.1.1",
-                "phpstan/phpstan-strict-rules": "^2.1.0",
+                "phpstan/phpstan-phpunit": "^2.1.2",
+                "phpstan/phpstan-strict-rules": "^2.1.1",
                 "phpunit/phpunit": "^9.6.21",
                 "rector/rector": "^2.7.0"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "3.9-dev"
+                    "dev-main": "3.10-dev"
                 },
                 "composer-normalize": {
                     "indent-size": 2,
@@ -12178,20 +12179,20 @@
                 "security": "https://github.com/ergebnis/json-printer/blob/main/.github/SECURITY.md",
                 "source": "https://github.com/ergebnis/json-printer"
             },
-            "time": "2026-10-21T19:02:11+00:00"
+            "time": "2026-11-19T13:15:15+00:00"
         },
         {
             "name": "ergebnis/json-schema-validator",
-            "version": "4.6.0",
+            "version": "4.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ergebnis/json-schema-validator.git",
-                "reference": "228bf86d963c06c863a3143c9d8531bb3ef72fbe"
+                "reference": "5beb71cd57c24865dfea8695936b85c5ef83da1e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ergebnis/json-schema-validator/zipball/228bf86d963c06c863a3143c9d8531bb3ef72fbe",
-                "reference": "228bf86d963c06c863a3143c9d8531bb3ef72fbe",
+                "url": "https://api.github.com/repos/ergebnis/json-schema-validator/zipball/5beb71cd57c24865dfea8695936b85c5ef83da1e",
+                "reference": "5beb71cd57c24865dfea8695936b85c5ef83da1e",
                 "shasum": ""
             },
             "require": {
@@ -12202,25 +12203,25 @@
                 "php": "~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 || ~8.6.0"
             },
             "require-dev": {
-                "ergebnis/data-provider": "^3.6.0",
-                "ergebnis/license": "^2.7.0",
-                "ergebnis/php-cs-fixer-config": "^6.63.3",
-                "ergebnis/phpunit-slow-test-detector": "^2.25.0",
-                "ergebnis/rector-rules": "^1.18.4",
+                "ergebnis/data-provider": "^3.7.1",
+                "ergebnis/license": "^2.9.0",
+                "ergebnis/php-cs-fixer-config": "^6.64.3",
+                "ergebnis/phpunit-slow-test-detector": "^2.27.0",
+                "ergebnis/rector-rules": "^1.19.0",
                 "fakerphp/faker": "^1.24.0",
                 "infection/infection": "~0.26.6",
                 "phpstan/extension-installer": "^1.4.3",
-                "phpstan/phpstan": "^2.2.15",
+                "phpstan/phpstan": "^2.3.6",
                 "phpstan/phpstan-deprecation-rules": "^2.0.5",
-                "phpstan/phpstan-phpunit": "^2.0.18",
-                "phpstan/phpstan-strict-rules": "^2.0.12",
+                "phpstan/phpstan-phpunit": "^2.1.2",
+                "phpstan/phpstan-strict-rules": "^2.1.1",
                 "phpunit/phpunit": "^9.6.20",
-                "rector/rector": "^2.6.7"
+                "rector/rector": "^2.8.4"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "4.6-dev"
+                    "dev-main": "4.7-dev"
                 },
                 "composer-normalize": {
                     "indent-size": 2,
@@ -12255,7 +12256,7 @@
                 "security": "https://github.com/ergebnis/json-schema-validator/blob/main/.github/SECURITY.md",
                 "source": "https://github.com/ergebnis/json-schema-validator"
             },
-            "time": "2026-09-24T19:42:52+00:00"
+            "time": "2026-11-19T13:15:40+00:00"
         },
         {
             "name": "fakerphp/faker",
@@ -12847,20 +12848,20 @@
         },
         {
             "name": "laravel/pao",
-            "version": "v1.1.5",
+            "version": "v1.1.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/pao.git",
-                "reference": "620424f1ce744d96937fb6be60a94793e79b67ad"
+                "reference": "1266f9ccd0f97105983e9d88ffcedb844b8d4898"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/pao/zipball/620424f1ce744d96937fb6be60a94793e79b67ad",
-                "reference": "620424f1ce744d96937fb6be60a94793e79b67ad",
+                "url": "https://api.github.com/repos/laravel/pao/zipball/1266f9ccd0f97105983e9d88ffcedb844b8d4898",
+                "reference": "1266f9ccd0f97105983e9d88ffcedb844b8d4898",
                 "shasum": ""
             },
             "require": {
-                "laravel/agent-detector": "^2.0.2",
+                "laravel/agent-detector": "^2.0.5",
                 "php": "^8.3"
             },
             "conflict": {
@@ -12871,14 +12872,14 @@
             },
             "require-dev": {
                 "brianium/paratest": "^7.20.0",
-                "laravel/pint": "^1.30.5",
-                "orchestra/testbench": "^10.11.0 || ^11.2.0",
-                "pestphp/pest": "^4.7.8 || ^5.1.4",
-                "pestphp/pest-plugin-type-coverage": "^4.0.4 || ^5.0.2",
-                "phpstan/phpstan": "^2.2.13",
-                "rector/rector": "^2.6.6",
-                "symfony/process": "^7.4.13 || ^8.1.6",
-                "symfony/var-dumper": "^7.4.15 || ^8.1.6"
+                "laravel/pint": "^1.32.3",
+                "orchestra/testbench": "^10.11.0 || ^11.3.0",
+                "pestphp/pest": "^4.7.8 || ^5.2.1",
+                "pestphp/pest-plugin-type-coverage": "^4.0.6 || ^5.0.2",
+                "phpstan/phpstan": "^2.3.7",
+                "rector/rector": "^2.8.5",
+                "symfony/process": "^7.4.13 || ^8.1.10",
+                "symfony/var-dumper": "^7.4.15 || ^8.1.10"
             },
             "type": "library",
             "extra": {
@@ -12928,7 +12929,7 @@
                 "issues": "https://github.com/laravel/pao/issues",
                 "source": "https://github.com/laravel/pao"
             },
-            "time": "2026-09-07T14:48:06+00:00"
+            "time": "2026-11-19T13:50:51+00:00"
         },
         {
             "name": "laravel/pint",
@@ -13556,11 +13557,11 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "2.3.6",
+            "version": "2.3.7",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/00cedebb76cc82c1592414fa4f616cefdccda16f",
-                "reference": "00cedebb76cc82c1592414fa4f616cefdccda16f",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/90c91c2498849ab8cc4e873864bbf1cb2bf6ea12",
+                "reference": "90c91c2498849ab8cc4e873864bbf1cb2bf6ea12",
                 "shasum": ""
             },
             "require": {
@@ -13616,7 +13617,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-11-15T19:58:26+00:00"
+            "time": "2026-11-19T10:31:11+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -13977,16 +13978,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "12.5.44",
+            "version": "12.5.45",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "47d052b58672b016b512974c1139346306c8ca24"
+                "reference": "ca97be2931de6a0adf824da12889cbf935a016e9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/47d052b58672b016b512974c1139346306c8ca24",
-                "reference": "47d052b58672b016b512974c1139346306c8ca24",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/ca97be2931de6a0adf824da12889cbf935a016e9",
+                "reference": "ca97be2931de6a0adf824da12889cbf935a016e9",
                 "shasum": ""
             },
             "require": {
@@ -14055,7 +14056,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/12.5.44"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/12.5.45"
             },
             "funding": [
                 {
@@ -14063,7 +14064,7 @@
                     "type": "other"
                 }
             ],
-            "time": "2026-11-13T11:09:06+00:00"
+            "time": "2026-11-19T12:16:09+00:00"
         },
         {
             "name": "rector/rector",
