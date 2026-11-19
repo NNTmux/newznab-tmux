@@ -76,6 +76,18 @@ class CbpOrphanPrunerTest extends TestCase
         $this->assertSame([10, 11], $this->ids('parts', 'binaries_id'));
     }
 
+    public function test_count_stale_collection_groups_ignores_live_rows_and_stops_at_limit(): void
+    {
+        $pruner = new CbpOrphanPruner;
+
+        $this->assertSame(2, $pruner->countStaleCollectionGroups(10));
+        $this->assertSame(1, $pruner->countStaleCollectionGroups(1));
+
+        $pruner->sweep('collection_groups');
+
+        $this->assertSame(0, $pruner->countStaleCollectionGroups(10));
+    }
+
     public function test_command_prunes_selected_tables(): void
     {
         $this->artisan('cbp:prune-orphans', ['--table' => ['binaries', 'parts'], '--batch' => 2])

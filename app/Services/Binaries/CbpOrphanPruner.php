@@ -150,13 +150,28 @@ final class CbpOrphanPruner
             );
         }
 
-        // Refresh statistics so information_schema row estimates (checked by
-        // the id-widening migration) reflect the rebuilt table immediately.
+        // Refresh statistics so the optimizer sees the rebuilt table's size.
         DB::statement('ANALYZE TABLE collection_groups');
 
         $kept = (int) DB::table('collection_groups')->count();
 
         return ['kept' => $kept, 'removed' => max(0, $before - $kept)];
+    }
+
+    /**
+     * Count collection_groups rows whose collection is gone, stopping at $limit
+     * so a heavily polluted table is not scanned to the end.
+     */
+    public function countStaleCollectionGroups(int $limit): int
+    {
+        return (int) DB::scalar(
+            'SELECT COUNT(*) FROM (
+                SELECT 1 FROM collection_groups cg
+                WHERE NOT EXISTS (SELECT 1 FROM collections c WHERE c.id = cg.collections_id)
+                LIMIT ?
+            ) stale',
+            [max(0, $limit)]
+        );
     }
 
     /**

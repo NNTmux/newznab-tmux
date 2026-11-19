@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Services\Binaries\CbpOrphanPruner;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -12,7 +13,7 @@ use Illuminate\Support\Facades\Schema;
  * Production burned roughly 2.85M collection ids per hour against an INT
  * UNSIGNED ceiling of 4.29B. Ingest no longer wastes ids, but the headroom
  * removes the overflow risk for good. collections and binaries are small
- * transient tables; collection_groups must be pruned first
+ * transient tables; collection_groups must be free of stale rows first
  * (`php artisan cbp:prune-orphans --rebuild-collection-groups`) so the copy
  * ALTER stays short.
  *
@@ -21,7 +22,7 @@ use Illuminate\Support\Facades\Schema;
  */
 return new class extends Migration
 {
-    private const int MAX_COLLECTION_GROUPS_ROWS = 2_000_000;
+    private const int MAX_STALE_COLLECTION_GROUPS_ROWS = 500_000;
 
     /**
      * Table => [column, extra definition]. Only tables that exist are altered.
@@ -51,14 +52,13 @@ return new class extends Migration
             return;
         }
 
-        if (isset($pending['collection_groups'])) {
-            $estimatedRows = (int) DB::scalar(
-                'SELECT TABLE_ROWS FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?',
-                ['collection_groups']
-            );
-            if ($estimatedRows > self::MAX_COLLECTION_GROUPS_ROWS) {
+        // Live rows are bounded by collections, so only stale rows can make
+        // the copy ALTER slow; the total row count says nothing about that.
+        if (isset($pending['collection_groups']) && Schema::hasTable('collections')) {
+            $staleRows = app(CbpOrphanPruner::class)->countStaleCollectionGroups(self::MAX_STALE_COLLECTION_GROUPS_ROWS + 1);
+            if ($staleRows > self::MAX_STALE_COLLECTION_GROUPS_ROWS) {
                 throw new RuntimeException(
-                    "collection_groups holds about {$estimatedRows} rows, most of them stale. Widening it would rewrite the whole table.\n".
+                    'collection_groups holds more than '.number_format(self::MAX_STALE_COLLECTION_GROUPS_ROWS).' rows whose collection no longer exists. Widening it would copy them all.'."\n".
                     'Run `php artisan tmux:stop`, then `php artisan cbp:prune-orphans --rebuild-collection-groups`, then rerun `php artisan migrate`.'
                 );
             }
