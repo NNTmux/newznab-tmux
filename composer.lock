@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "963c63192e5e1c7610c86f455534148f",
+    "content-hash": "5c3df0d6067eaad529989009de5744cc",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -6544,6 +6544,90 @@
                 }
             ],
             "time": "2026-05-30T19:21:26+00:00"
+        },
+        {
+            "name": "spatie/laravel-suspicious-login",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/spatie/laravel-suspicious-login.git",
+                "reference": "83441fcc4972596dcae5c4c59ff8cce51171c604"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/spatie/laravel-suspicious-login/zipball/83441fcc4972596dcae5c4c59ff8cce51171c604",
+                "reference": "83441fcc4972596dcae5c4c59ff8cce51171c604",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/contracts": "^11.0||^12.0||^13.0",
+                "php": "^8.4",
+                "spatie/laravel-package-tools": "^1.16"
+            },
+            "require-dev": {
+                "geoip2/geoip2": "^3.0",
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.14",
+                "nunomaduro/collision": "^8.8",
+                "orchestra/testbench": "^11.0.0||^10.0.0||^9.0.0",
+                "pestphp/pest": "^4.0||^5.0",
+                "pestphp/pest-plugin-arch": "^4.0||^5.0",
+                "pestphp/pest-plugin-laravel": "^4.0||^5.0",
+                "phpstan/extension-installer": "^1.4",
+                "phpstan/phpstan-deprecation-rules": "^2.0",
+                "phpstan/phpstan-phpunit": "^2.0"
+            },
+            "suggest": {
+                "geoip2/geoip2": "Required to use the maxmind geolocation driver (^3.0)."
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "SuspiciousLogin": "Spatie\\SuspiciousLogin\\Facades\\SuspiciousLogin"
+                    },
+                    "providers": [
+                        "Spatie\\SuspiciousLogin\\SuspiciousLoginServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Spatie\\SuspiciousLogin\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Freek Van der Herten",
+                    "email": "freek@spatie.be",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Detect suspicious logins in your Laravel app and decide how to respond",
+            "homepage": "https://github.com/spatie/laravel-suspicious-login",
+            "keywords": [
+                "Authentication",
+                "laravel",
+                "laravel-suspicious-login",
+                "login",
+                "security",
+                "spatie"
+            ],
+            "support": {
+                "issues": "https://github.com/spatie/laravel-suspicious-login/issues",
+                "source": "https://github.com/spatie/laravel-suspicious-login/tree/1.0.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/Spatie",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-11-19T15:14:24+00:00"
         },
         {
             "name": "spatie/laravel-typescript-transformer",

@@ -16,6 +16,9 @@ server {
     index index.php;
     charset utf-8;
     client_max_body_size 100m;
+    # Login response headers (CSP plus several encrypted cookies) outgrow the default 4k buffer.
+    fastcgi_buffer_size 16k;
+    fastcgi_buffers 8 16k;
     location / { try_files $uri $uri/ /index.php?$query_string; }
     location ^~ /storage/ { alias /srv/nntmux/shared/storage/app/public/; }
     location ^~ /covers/ { alias /srv/nntmux/shared/storage/covers/; }

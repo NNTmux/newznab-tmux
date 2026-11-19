@@ -125,6 +125,22 @@ class ViteDockerConfigurationTest extends TestCase
         $this->assertStringContainsString('alias /var/www/html/storage/app/public/;', $nginxConfig);
     }
 
+    /**
+     * nginx answers 502 when the login response headers do not fit its FastCGI header buffer (4k by default).
+     */
+    public function test_nginx_fastcgi_header_buffer_fits_login_response_headers(): void
+    {
+        foreach (['docker/8.5/nginx.conf', 'infra/ansible/roles/tls/templates/nginx.conf.j2'] as $path) {
+            $nginxConfig = $this->projectFile($path);
+
+            $this->assertSame(1, preg_match('/^\s*fastcgi_buffer_size (\d+)k;$/m', $nginxConfig, $headerBuffer), "{$path} keeps the default 4k FastCGI header buffer");
+            $this->assertSame(1, preg_match('/^\s*fastcgi_buffers \d+ (\d+)k;$/m', $nginxConfig, $bodyBuffers), "{$path} does not size fastcgi_buffers");
+            $this->assertGreaterThanOrEqual(16, (int) $headerBuffer[1], "{$path} FastCGI header buffer is too small");
+            // nginx refuses to start when the default busy-buffer size (two body buffers) is below the header buffer.
+            $this->assertGreaterThanOrEqual((int) $headerBuffer[1], 2 * (int) $bodyBuffers[1], "{$path} fastcgi_buffers are too small for the header buffer");
+        }
+    }
+
     public function test_cursor_registers_nntmux_mcp_through_sail_alongside_boost(): void
     {
         $configuration = json_decode(
