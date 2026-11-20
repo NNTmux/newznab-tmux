@@ -292,7 +292,7 @@ class UpdateNNTmux extends Command
 
         $typeTransformProcess = Process::timeout(600)
             ->path(base_path())
-            ->run('php artisan typescript:transform --force');
+            ->run('php artisan typescript:transform');
 
         if (! $typeTransformProcess->successful()) {
             throw new \Exception($this->formatProcessFailure($typeTransformProcess, 'TypeScript transform'));

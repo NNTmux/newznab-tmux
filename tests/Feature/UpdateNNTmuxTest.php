@@ -260,7 +260,7 @@ class UpdateNNTmuxTest extends TestCase
         $this->assertStringContainsString('npm ci failed, falling back to npm install', $output);
         $this->assertStringContainsString('stderr=lockfile mismatch', $output);
         $this->assertStringContainsString('stdout=dependency conflict', $output);
-        foreach (['npm install --silent', 'php artisan typescript:transform --force', 'npm exec vite build'] as $buildCommand) {
+        foreach (['npm install --silent', 'php artisan typescript:transform', 'npm exec vite build'] as $buildCommand) {
             Process::assertRanTimes(fn (PendingProcess $process): bool => $process->command === $buildCommand && $process->path === $this->directory && $process->timeout === 600, 1);
         }
         Process::assertNotRan('npm run build');
@@ -295,8 +295,8 @@ class UpdateNNTmuxTest extends TestCase
     /** @return iterable<string, array{string, string, string, string, list<string>}> */
     public static function buildFailures(): iterable
     {
-        yield 'install fallback fails' => ['npm install --silent', '', 'dependency resolution failed', 'npm install failed', ['php artisan typescript:transform --force', 'npm exec vite build']];
-        yield 'type transform fails' => ['php artisan typescript:transform --force', 'transform error', '', 'stdout=transform error', ['npm exec vite build']];
+        yield 'install fallback fails' => ['npm install --silent', '', 'dependency resolution failed', 'npm install failed', ['php artisan typescript:transform', 'npm exec vite build']];
+        yield 'type transform fails' => ['php artisan typescript:transform', 'transform error', '', 'stdout=transform error', ['npm exec vite build']];
         yield 'vite fails silently' => ['npm exec vite build', '', '', 'no stdout/stderr captured', []];
     }
 

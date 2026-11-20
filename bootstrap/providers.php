@@ -8,6 +8,7 @@ use App\Providers\HorizonServiceProvider;
 use App\Providers\ProcessingServiceProvider;
 use App\Providers\SearchServiceProvider;
 use App\Providers\TvProcessingServiceProvider;
+use App\Providers\TypeScriptTransformerServiceProvider;
 use App\Providers\UserServiceProvider;
 
 return [
@@ -19,5 +20,6 @@ return [
     ProcessingServiceProvider::class,
     SearchServiceProvider::class,
     TvProcessingServiceProvider::class,
+    TypeScriptTransformerServiceProvider::class,
     UserServiceProvider::class,
 ];
