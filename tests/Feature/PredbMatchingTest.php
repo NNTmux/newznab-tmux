@@ -131,6 +131,15 @@ final class PredbMatchingTest extends TestCase
         self::assertFalse(Predb::matchPre($name));
     }
 
+    public function test_admin_listing_filters_by_the_ids_of_search_hits(): void
+    {
+        DB::statement('ALTER TABLE predb ADD COLUMN predate TEXT');
+        DB::table('predb')->insert(['id' => 8, 'title' => 'Other.Scene-GROUP', 'filename' => '', 'source' => 'srrdb']);
+        Search::shouldReceive('searchPredb')->once()->with('canonical')->andReturn([$this->hit()]);
+
+        self::assertSame([7], Predb::getAll('canonical')->pluck('id')->all());
+    }
+
     public function test_empty_input_and_outage_do_not_query_predb(): void
     {
         Search::shouldReceive('matchPredbExact')->once()->with('Canonical.Scene-GROUP')->andThrow(new RuntimeException('offline'));

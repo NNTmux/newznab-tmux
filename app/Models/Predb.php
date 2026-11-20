@@ -212,8 +212,7 @@ class Predb extends Model
             ->select('predb.*', 'releases.guid')
             ->orderByDesc('predb.predate');
         if (! empty($search)) {
-            $ids = Search::searchPredb($search);
-            $sql->whereIn('predb.id', $ids);
+            $sql->whereIn('predb.id', array_column(Search::searchPredb($search), 'id'));
         }
 
         $predb = $sql->paginate(config('nntmux.items_per_page'));
