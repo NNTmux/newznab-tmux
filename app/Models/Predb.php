@@ -11,6 +11,7 @@ use App\Services\NameFixing\ReleaseUpdateService;
 use App\Support\PredbSearchDocument;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
@@ -203,7 +204,8 @@ class Predb extends Model
     public static function getAll(string $search = '')
     {
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
-        $predb = Cache::get(md5($search));
+        $cacheKey = md5($search.':page:'.Paginator::resolveCurrentPage());
+        $predb = Cache::get($cacheKey);
         if ($predb !== null) {
             return $predb;
         }
@@ -217,7 +219,7 @@ class Predb extends Model
 
         $predb = $sql->paginate(config('nntmux.items_per_page'));
         $predb->withPath(url('admin/predb'));
-        Cache::put(md5($search), $predb, $expiresAt);
+        Cache::put($cacheKey, $predb, $expiresAt);
 
         return $predb;
     }

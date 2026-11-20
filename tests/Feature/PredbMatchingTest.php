@@ -25,6 +25,7 @@ use Elastic\Elasticsearch\ClientBuilder;
 use GuzzleHttp\Psr7\Response as HttpResponse;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
@@ -138,6 +139,18 @@ final class PredbMatchingTest extends TestCase
         Search::shouldReceive('searchPredb')->once()->with('canonical')->andReturn([$this->hit()]);
 
         self::assertSame([7], Predb::getAll('canonical')->pluck('id')->all());
+    }
+
+    public function test_admin_listing_caches_each_page_separately(): void
+    {
+        DB::statement('ALTER TABLE predb ADD COLUMN predate TEXT');
+        DB::table('predb')->where('id', 7)->update(['predate' => '2026-01-02 00:00:00']);
+        DB::table('predb')->insert(['id' => 8, 'title' => 'Other.Scene-GROUP', 'filename' => '', 'source' => 'srrdb', 'predate' => '2026-01-01 00:00:00']);
+        config(['nntmux.items_per_page' => 1]);
+
+        self::assertSame([7], Predb::getAll()->pluck('id')->all());
+        Paginator::currentPageResolver(static fn (): int => 2);
+        self::assertSame([8], Predb::getAll()->pluck('id')->all());
     }
 
     public function test_empty_input_and_outage_do_not_query_predb(): void
