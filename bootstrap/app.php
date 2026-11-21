@@ -5,6 +5,7 @@ use App\Http\Middleware\ClearanceMiddleware;
 use App\Http\Middleware\ContentSecurityPolicy;
 use App\Http\Middleware\DecorateHttpQueryResponses;
 use App\Http\Middleware\DegradeWhenRedisUnreachable;
+use App\Http\Middleware\DenyBlockedIps;
 use App\Http\Middleware\EnforceSessionToken;
 use App\Http\Middleware\ForceJsonOnAPI;
 use App\Http\Middleware\Google2FAMiddleware;
@@ -69,6 +70,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append([
             PreventRequestsDuringMaintenance::class,
             ForceJsonOnAPI::class,
+            DenyBlockedIps::class, // Refuse addresses on the IP block list before anything else runs
             BlockAbusiveServices::class, // Block AIOStreams, Oracle Cloud, UsenetStreamer, Cloudflare WARP
             MeasureApiPerformance::class,
         ]);

@@ -2,6 +2,7 @@
 
 use App\Jobs\PurgeDeletedAccounts;
 use App\Jobs\RemoveInactiveAccounts;
+use App\Models\BlockedIp;
 use App\Models\LoginAttempt;
 use App\Models\UserActivityStat;
 use App\Models\UserDownload;
@@ -52,8 +53,8 @@ Schedule::call(function () {
 Schedule::call(function () {
     UserActivityStat::cleanupOldHourlyStats(30);
 })->dailyAt('04:30');
-// Delete login attempts older than suspicious-login.prune_after_days
-Schedule::command('model:prune', ['--model' => [LoginAttempt::class]])->dailyAt('03:45')->withoutOverlapping();
+// Delete login attempts older than suspicious-login.prune_after_days, and IP blocks that ended long ago
+Schedule::command('model:prune', ['--model' => [LoginAttempt::class, BlockedIp::class]])->dailyAt('03:45')->withoutOverlapping();
 if (config('nntmux.purge_inactive_users') === true) {
     Schedule::job(new RemoveInactiveAccounts)->daily();
     Schedule::job(new PurgeDeletedAccounts)->daily();

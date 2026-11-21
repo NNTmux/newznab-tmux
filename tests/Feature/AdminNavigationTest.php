@@ -34,6 +34,7 @@ class AdminNavigationTest extends TestCase
         $this->assertSame(['Releases', 'Release Reports'], AdminNavigation::trailFor(Request::create('/admin/release-reports?status=pending')));
         $this->assertSame(['Groups', 'Active Groups'], AdminNavigation::trailFor(Request::create('/admin/group-list-active?page=2')));
         $this->assertSame(['Users', 'Login Attempts'], AdminNavigation::trailFor(Request::create('/admin/login-attempts?status=failed')));
+        $this->assertSame(['Users', 'Blocked IPs'], AdminNavigation::trailFor(Request::create('/admin/blocked-ips?page=2')));
     }
 
     #[Test]

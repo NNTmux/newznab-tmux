@@ -143,7 +143,26 @@
                         </td>
                         <td class="whitespace-nowrap">
                             @if(filled($attempt->ip_address))
-                                <a href="{{ route('admin.login-attempts.index', ['ip' => $attempt->ip_address]) }}" class="font-mono {{ $link }}" title="Show attempts from this address">{{ $attempt->ip_address }}</a>
+                                <div class="flex items-center gap-2">
+                                    <a href="{{ route('admin.login-attempts.index', ['ip' => $attempt->ip_address]) }}" class="font-mono {{ $link }}" title="Show attempts from this address">{{ $attempt->ip_address }}</a>
+                                    @if(in_array($attempt->ip_address, $blockedIps, true))
+                                        <a href="{{ route('admin.blocked-ips.index') }}" title="This address is blocked site-wide"><x-admin.badge tone="danger" icon="fas fa-ban">IP blocked</x-admin.badge></a>
+                                    @else
+                                        <form method="post" action="{{ route('admin.blocked-ips.store') }}" class="inline"
+                                              x-data="confirmForm"
+                                              data-message="Block {{ $attempt->ip_address }} from the whole site for 24 hours?"
+                                              data-title="Block address"
+                                              data-type="danger"
+                                              data-confirm-text="Block"
+                                              @submit.prevent="submit()">
+                                            @csrf
+                                            <input type="hidden" name="ip" value="{{ $attempt->ip_address }}">
+                                            <input type="hidden" name="hours" value="24">
+                                            <input type="hidden" name="reason" value="Blocked from the login attempts list">
+                                            <button type="submit" class="text-fg-muted hover:text-danger-600 dark:hover:text-danger-400" aria-label="Block {{ $attempt->ip_address }}" title="Block this address"><i aria-hidden="true" class="fas fa-ban"></i></button>
+                                        </form>
+                                    @endif
+                                </div>
                             @else
                                 <span class="text-fg-muted">&mdash;</span>
                             @endif

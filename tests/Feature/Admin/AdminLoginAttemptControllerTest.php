@@ -7,6 +7,7 @@ namespace Tests\Feature\Admin;
 use App\Http\Middleware\Google2FAMiddleware;
 use App\Models\LoginAttempt;
 use App\Models\User;
+use App\Services\Security\IpBlockService;
 use App\View\Composers\GlobalDataComposer;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Cache;
@@ -153,6 +154,21 @@ class AdminLoginAttemptControllerTest extends TestCase
     }
 
     #[Test]
+    public function a_blocked_address_is_marked_and_other_addresses_offer_a_block_button(): void
+    {
+        $this->recordAttempt(['successful' => false, 'identifier' => 'ghost', 'ip_address' => '203.0.113.50']);
+        $this->recordAttempt(['successful' => false, 'identifier' => 'typo', 'ip_address' => '203.0.113.60']);
+        app(IpBlockService::class)->blockManually('203.0.113.50');
+
+        $this->actingAs($this->userWithRole('Admin'))->get(route('admin.login-attempts.index'))
+            ->assertOk()
+            ->assertViewHas('blockedIps', ['203.0.113.50'])
+            ->assertSee('IP blocked')
+            ->assertSee('aria-label="Block 203.0.113.60"', false)
+            ->assertDontSee('aria-label="Block 203.0.113.50"', false);
+    }
+
+    #[Test]
     public function pagination_keeps_the_filters(): void
     {
         config(['nntmux.items_per_page' => 2]);
@@ -277,6 +293,7 @@ class AdminLoginAttemptControllerTest extends TestCase
     {
         (require database_path('migrations/2026_11_19_171205_create_login_attempts_table.php'))->up();
         (require database_path('migrations/2026_11_21_110719_add_created_at_index_to_login_attempts_table.php'))->up();
+        (require database_path('migrations/2026_11_21_165723_create_blocked_ips_table.php'))->up();
 
         Schema::create('roles', function (Blueprint $table): void {
             $table->increments('id');

@@ -25,6 +25,7 @@ final class AdminNavigation
                 ['label' => __('Roles'), 'icon' => 'fa-user-tag', 'url' => url('/admin/role-list')],
                 ['label' => __('Role History'), 'icon' => 'fa-clock-rotate-left', 'url' => url('/admin/user-role-history')],
                 ['label' => __('Login Attempts'), 'icon' => 'fa-right-to-bracket', 'url' => route('admin.login-attempts.index')],
+                ['label' => __('Blocked IPs'), 'icon' => 'fa-ban', 'url' => route('admin.blocked-ips.index')],
                 ['label' => __('Promotions'), 'icon' => 'fa-arrow-up', 'url' => url('/admin/promotions')],
                 ['label' => __('Deleted Users'), 'icon' => 'fa-user-slash', 'url' => url('/admin/deleted-users')],
                 ['label' => __('GDPR Requests'), 'icon' => 'fa-shield-halved', 'url' => route('admin.gdpr-requests.index')],

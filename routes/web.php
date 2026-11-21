@@ -14,6 +14,7 @@
 use App\Http\Controllers\Admin\AdminAjaxController;
 use App\Http\Controllers\Admin\AdminAnidbController;
 use App\Http\Controllers\Admin\AdminBlacklistController;
+use App\Http\Controllers\Admin\AdminBlockedIpController;
 use App\Http\Controllers\Admin\AdminBookController;
 use App\Http\Controllers\Admin\AdminCategoryController;
 use App\Http\Controllers\Admin\AdminCategoryRegexesController;
@@ -279,6 +280,9 @@ Route::middleware(['role:Admin', '2fa'])->prefix('admin')->group(function () {
     Route::get('user-role-history', [AdminUserRoleHistoryController::class, 'index'])->name('admin.user-role-history');
     Route::get('user-role-history/{userId}', [AdminUserRoleHistoryController::class, 'show'])->name('admin.user-role-history.show');
     Route::get('login-attempts', [AdminLoginAttemptController::class, 'index'])->name('admin.login-attempts.index');
+    Route::get('blocked-ips', [AdminBlockedIpController::class, 'index'])->name('admin.blocked-ips.index');
+    Route::post('blocked-ips', [AdminBlockedIpController::class, 'store'])->name('admin.blocked-ips.store');
+    Route::delete('blocked-ips/{blockedIp}', [AdminBlockedIpController::class, 'destroy'])->whereNumber('blockedIp')->name('admin.blocked-ips.destroy');
     Route::get('registrations', [AdminRegistrationController::class, 'index'])->name('admin.registrations.index');
     Route::post('registrations/status', [AdminRegistrationController::class, 'updateStatus'])->name('admin.registrations.update-status');
     Route::post('registrations/periods', [AdminRegistrationController::class, 'storePeriod'])->name('admin.registrations.periods.store');

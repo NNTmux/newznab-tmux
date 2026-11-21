@@ -6,13 +6,21 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\BasePageController;
 use App\Http\Requests\Admin\AdminLoginAttemptListRequest;
+use App\Models\BlockedIp;
 use App\Models\LoginAttempt;
+use App\Services\Security\IpBlockService;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\View\View;
 use Spatie\SuspiciousLogin\Enums\RiskLevel;
 
 class AdminLoginAttemptController extends BasePageController
 {
+    public function __construct(private readonly IpBlockService $blocks)
+    {
+        parent::__construct();
+    }
+
     public function index(AdminLoginAttemptListRequest $request): View
     {
         $this->setAdminPrefs();
@@ -29,6 +37,7 @@ class AdminLoginAttemptController extends BasePageController
 
         $this->viewData = array_merge($this->viewData, [
             'attempts' => $attempts,
+            'blockedIps' => $this->blockedIpsAmong($attempts),
             'summary' => $this->lastDaySummary(),
             'filters' => $filters,
             'statuses' => LoginAttempt::STATUSES,
@@ -40,6 +49,29 @@ class AdminLoginAttemptController extends BasePageController
         ]);
 
         return view('admin.login-attempts.index', $this->viewData);
+    }
+
+    /**
+     * The addresses on this page that are blocked site-wide right now, as recorded on the attempts.
+     *
+     * @param  LengthAwarePaginator<int, LoginAttempt>  $attempts
+     * @return list<string>
+     */
+    private function blockedIpsAmong(LengthAwarePaginator $attempts): array
+    {
+        $normalized = [];
+        foreach ($attempts->pluck('ip_address')->filter()->unique() as $ip) {
+            $normalized[(string) $ip] = $this->blocks->normalize((string) $ip);
+        }
+
+        $addresses = array_values(array_unique(array_filter($normalized)));
+        if ($addresses === []) {
+            return [];
+        }
+
+        $blocked = BlockedIp::query()->active()->whereIn('ip_address', $addresses)->pluck('ip_address')->all();
+
+        return array_keys(array_filter($normalized, static fn (?string $address): bool => in_array($address, $blocked, true)));
     }
 
     /**

@@ -145,6 +145,34 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | IP block list
+    |--------------------------------------------------------------------------
+    |
+    | Addresses in the blocked_ips table are refused site-wide by the DenyBlockedIps
+    | middleware. An address is blocked automatically once it (or the browser cookie
+    | it shares with other addresses) has tried to sign in to `unknown_account_threshold`
+    | different accounts that do not exist within `window_hours`. The first block lasts
+    | `block_hours` and each repeat doubles, up to `max_block_hours`. Automatic blocking
+    | reads login_attempts, so it needs SUSPICIOUS_LOGIN_ENABLED=true.
+    |
+    */
+    'ip_blocking' => [
+        'enabled' => (bool) env('IP_BLOCKING_ENABLED', true),
+        'auto_block' => (bool) env('LOGIN_ABUSE_AUTO_BLOCK', true),
+        'unknown_account_threshold' => (int) env('LOGIN_ABUSE_UNKNOWN_ACCOUNT_THRESHOLD', 3),
+        'window_hours' => (int) env('LOGIN_ABUSE_WINDOW_HOURS', 24),
+        'block_hours' => (int) env('LOGIN_ABUSE_BLOCK_HOURS', 24),
+        'max_block_hours' => (int) env('LOGIN_ABUSE_MAX_BLOCK_HOURS', 720),
+        // IPs or CIDR ranges that are never blocked (comma-separated). Private addresses and
+        // trusted proxies are always exempt.
+        'allowlist' => array_values(array_filter(array_map(
+            static fn (string $entry): string => trim($entry),
+            explode(',', (string) env('IP_BLOCKING_ALLOWLIST', ''))
+        ))),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Release dedupe (import-time)
     |--------------------------------------------------------------------------
     |
