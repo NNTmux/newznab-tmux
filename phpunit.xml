@@ -22,6 +22,7 @@
     <env name="API_ASYNC_AUDIT" value="false"/>
     <env name="MAIL_MAILER" value="array"/>
     <env name="LOG_VIEWER_INDEX_ENABLED" value="false"/>
+    <env name="SUSPICIOUS_LOGIN_ENABLED" value="false"/>
   </php>
   <logging/>
   <source>

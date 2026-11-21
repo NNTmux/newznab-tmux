@@ -30,7 +30,7 @@ final class TmuxMonitorProcessCountCacheTest extends TestCase
         $query = 'SELECT COUNT(*) AS processtv FROM releases';
         $databaseResult = (object) ['processtv' => 42];
 
-        DB::shouldReceive('selectOne')
+        DB::partialMock()->shouldReceive('selectOne')
             ->once()
             ->with($query)
             ->andReturn($databaseResult);
@@ -51,11 +51,11 @@ final class TmuxMonitorProcessCountCacheTest extends TestCase
         $firstDatabaseResult = (object) ['processtv' => 42];
         $secondDatabaseResult = (object) ['processtv' => 21];
 
-        DB::shouldReceive('selectOne')
+        DB::partialMock()->shouldReceive('selectOne')
             ->once()
             ->with($firstQuery)
             ->andReturn($firstDatabaseResult);
-        DB::shouldReceive('selectOne')
+        DB::partialMock()->shouldReceive('selectOne')
             ->once()
             ->with($secondQuery)
             ->andReturn($secondDatabaseResult);
@@ -70,7 +70,7 @@ final class TmuxMonitorProcessCountCacheTest extends TestCase
         config(['tmux.monitor.proc1_cache_ttl' => 300]);
         $query = 'SELECT COUNT(*) AS processnfo FROM releases';
 
-        DB::shouldReceive('selectOne')
+        DB::partialMock()->shouldReceive('selectOne')
             ->twice()
             ->with($query)
             ->andReturn((object) ['processnfo' => 1], (object) ['processnfo' => 2]);

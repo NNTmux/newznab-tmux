@@ -93,8 +93,8 @@ class MovieCoverReleaseToolsTest extends TestCase
     public function test_movie_cover_range_keeps_top_two_releases_and_loads_their_available_tools(): void
     {
         $connection = DB::connection();
-        DB::shouldReceive('connection')->andReturn($connection);
-        DB::shouldReceive('select')->andReturnUsing(function (string $query, array $bindings = []) use ($connection): array {
+        DB::partialMock()->shouldReceive('connection')->andReturn($connection);
+        DB::partialMock()->shouldReceive('select')->andReturnUsing(function (string $query, array $bindings = []) use ($connection): array {
             if (str_starts_with($query, '(SELECT')) {
                 // SQLite requires a SELECT wrapper around each per-movie LIMIT branch.
                 $query = 'SELECT * FROM '.str_replace(' UNION ALL (SELECT', ' UNION ALL SELECT * FROM (SELECT', $query);
