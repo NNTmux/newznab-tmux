@@ -1,8 +1,8 @@
 <?php
 
+use App\Models\LoginAttempt;
 use Spatie\SuspiciousLogin\Fingerprinters\CookieFingerprinter;
 use Spatie\SuspiciousLogin\Mail\SuspiciousLoginMail;
-use Spatie\SuspiciousLogin\Models\LoginAttempt;
 use Spatie\SuspiciousLogin\Presets\DefaultPreset;
 
 return [
@@ -84,8 +84,8 @@ return [
     ],
 
     /*
-     * The model used to store login attempts. You can use your own model,
-     * as long as it extends Spatie\SuspiciousLogin\Models\LoginAttempt.
+     * The model used to store login attempts. App\Models\LoginAttempt extends
+     * Spatie\SuspiciousLogin\Models\LoginAttempt with the admin list filters.
      */
     'model' => LoginAttempt::class,
 
@@ -104,8 +104,8 @@ return [
     'mailable' => SuspiciousLoginMail::class,
 
     /*
-     * Login attempts older than this many days are deleted when you run
-     * `php artisan model:prune --model="Spatie\SuspiciousLogin\Models\LoginAttempt"`.
+     * Login attempts older than this many days are deleted by the daily
+     * `model:prune --model="App\Models\LoginAttempt"` scheduled in routes/console.php.
      */
     'prune_after_days' => 365,
 ];

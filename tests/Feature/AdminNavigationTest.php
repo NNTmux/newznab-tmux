@@ -33,6 +33,7 @@ class AdminNavigationTest extends TestCase
         $this->assertSame(['PreDB'], AdminNavigation::trailFor(Request::create('/admin/predb?page=2')));
         $this->assertSame(['Releases', 'Release Reports'], AdminNavigation::trailFor(Request::create('/admin/release-reports?status=pending')));
         $this->assertSame(['Groups', 'Active Groups'], AdminNavigation::trailFor(Request::create('/admin/group-list-active?page=2')));
+        $this->assertSame(['Users', 'Login Attempts'], AdminNavigation::trailFor(Request::create('/admin/login-attempts?status=failed')));
     }
 
     #[Test]
