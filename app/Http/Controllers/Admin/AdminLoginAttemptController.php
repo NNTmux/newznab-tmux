@@ -9,6 +9,7 @@ use App\Http\Requests\Admin\AdminLoginAttemptListRequest;
 use App\Models\BlockedIp;
 use App\Models\LoginAttempt;
 use App\Services\Security\IpBlockService;
+use App\Services\Security\LoginAbuseDetector;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\View\View;
@@ -16,8 +17,10 @@ use Spatie\SuspiciousLogin\Enums\RiskLevel;
 
 class AdminLoginAttemptController extends BasePageController
 {
-    public function __construct(private readonly IpBlockService $blocks)
-    {
+    public function __construct(
+        private readonly IpBlockService $blocks,
+        private readonly LoginAbuseDetector $detector,
+    ) {
         parent::__construct();
     }
 
@@ -38,6 +41,7 @@ class AdminLoginAttemptController extends BasePageController
         $this->viewData = array_merge($this->viewData, [
             'attempts' => $attempts,
             'blockedIps' => $this->blockedIpsAmong($attempts),
+            'deletedAccountLogins' => $this->deletedAccountLoginsAmong($attempts),
             'summary' => $this->lastDaySummary(),
             'filters' => $filters,
             'statuses' => LoginAttempt::STATUSES,
@@ -60,7 +64,7 @@ class AdminLoginAttemptController extends BasePageController
     private function blockedIpsAmong(LengthAwarePaginator $attempts): array
     {
         $normalized = [];
-        foreach ($attempts->pluck('ip_address')->filter()->unique() as $ip) {
+        foreach (collect($attempts->items())->pluck('ip_address')->filter()->unique() as $ip) {
             $normalized[(string) $ip] = $this->blocks->normalize((string) $ip);
         }
 
@@ -72,6 +76,25 @@ class AdminLoginAttemptController extends BasePageController
         $blocked = BlockedIp::query()->active()->whereIn('ip_address', $addresses)->pluck('ip_address')->all();
 
         return array_keys(array_filter($normalized, static fn (?string $address): bool => in_array($address, $blocked, true)));
+    }
+
+    /**
+     * The submitted logins on this page that found no account because the account was deleted,
+     * lower-cased. Their owners are former members, not people guessing names.
+     *
+     * @param  LengthAwarePaginator<int, LoginAttempt>  $attempts
+     * @return list<string>
+     */
+    private function deletedAccountLoginsAmong(LengthAwarePaginator $attempts): array
+    {
+        $identifiers = [];
+        foreach ($attempts->items() as $attempt) {
+            if ($attempt->authenticatable_id === null && is_string($attempt->identifier)) {
+                $identifiers[] = $attempt->identifier;
+            }
+        }
+
+        return $this->detector->deletedAccountLogins($identifiers);
     }
 
     /**

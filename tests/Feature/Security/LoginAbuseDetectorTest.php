@@ -38,7 +38,8 @@ class LoginAbuseDetectorTest extends TestCase
             'suspicious-login.enabled' => true,
             'nntmux.ip_blocking.enabled' => true,
             'nntmux.ip_blocking.auto_block' => true,
-            'nntmux.ip_blocking.unknown_account_threshold' => 3,
+            'nntmux.ip_blocking.unknown_account_threshold' => 2,
+            'nntmux.ip_blocking.signed_in_unknown_account_threshold' => 3,
             'nntmux.ip_blocking.window_hours' => 24,
             'nntmux.ip_blocking.block_hours' => 24,
             'nntmux.ip_blocking.max_block_hours' => 720,
@@ -56,31 +57,63 @@ class LoginAbuseDetectorTest extends TestCase
     }
 
     #[Test]
-    public function an_address_that_tries_three_different_non_existent_accounts_is_blocked_for_a_day(): void
+    public function an_address_that_tries_two_different_non_existent_accounts_is_blocked_for_a_day(): void
     {
-        $this->unknownAccountAttempts(self::IP, ['ghost-one', 'ghost-two', 'ghost@example.test']);
+        $this->unknownAccountAttempts(self::IP, ['ghost-one', 'ghost@example.test']);
 
         $created = app(LoginAbuseDetector::class)->evaluate(self::IP);
 
         $this->assertCount(1, $created);
         $this->assertSame(self::IP, $created[0]->ip_address);
         $this->assertSame('2026-11-22 12:00:00', $created[0]->expires_at?->toDateTimeString());
-        $this->assertSame('Tried 3 accounts that do not exist within 24 hours', $created[0]->reason);
+        $this->assertSame('Tried 2 accounts that do not exist within 24 hours', $created[0]->reason);
         $this->assertTrue(app(IpBlockService::class)->isBlocked(self::IP));
     }
 
     #[Test]
-    public function two_different_non_existent_accounts_are_not_enough(): void
+    public function two_mistyped_names_from_an_address_that_signed_in_successfully_are_not_enough(): void
     {
+        $this->successfulSignIn(['ip_address' => self::IP]);
         $this->unknownAccountAttempts(self::IP, ['ghost-one', 'ghost-two']);
 
         $this->assertNotBlocked(self::IP);
     }
 
     #[Test]
+    public function a_third_non_existent_account_blocks_an_address_that_signed_in_successfully(): void
+    {
+        $this->successfulSignIn(['ip_address' => self::IP]);
+        $this->unknownAccountAttempts(self::IP, ['ghost-one', 'ghost-two', 'ghost-three']);
+
+        $created = app(LoginAbuseDetector::class)->evaluate(self::IP);
+
+        $this->assertCount(1, $created);
+        $this->assertSame('Tried 3 accounts that do not exist within 24 hours', $created[0]->reason);
+    }
+
+    #[Test]
+    public function a_successful_sign_in_on_the_same_device_from_another_address_also_raises_the_limit(): void
+    {
+        $this->successfulSignIn(['ip_address' => self::SECOND_IP, 'device_fingerprint' => self::DEVICE]);
+        $this->unknownAccountAttempts(self::IP, ['ghost-one', 'ghost-two'], ['device_fingerprint' => self::DEVICE]);
+
+        $this->assertSame([], app(LoginAbuseDetector::class)->evaluate(self::IP, self::DEVICE));
+        $this->assertFalse(app(IpBlockService::class)->isBlocked(self::IP));
+    }
+
+    #[Test]
+    public function a_successful_sign_in_older_than_the_window_does_not_raise_the_limit(): void
+    {
+        $this->successfulSignIn(['ip_address' => self::IP, 'created_at' => now()->subHours(25)]);
+        $this->unknownAccountAttempts(self::IP, ['ghost-one', 'ghost-two']);
+
+        $this->assertCount(1, app(LoginAbuseDetector::class)->evaluate(self::IP));
+    }
+
+    #[Test]
     public function retrying_the_same_wrong_name_does_not_add_up(): void
     {
-        $this->unknownAccountAttempts(self::IP, ['ghost-one', 'ghost-two', 'ghost-two', 'GHOST-TWO', ' ghost-two ']);
+        $this->unknownAccountAttempts(self::IP, ['ghost-one', 'ghost-one', 'GHOST-ONE', ' ghost-one ']);
 
         $this->assertNotBlocked(self::IP);
     }
@@ -88,7 +121,7 @@ class LoginAbuseDetectorTest extends TestCase
     #[Test]
     public function wrong_passwords_on_existing_accounts_do_not_count(): void
     {
-        $this->unknownAccountAttempts(self::IP, ['ghost-one', 'ghost-two']);
+        $this->unknownAccountAttempts(self::IP, ['ghost-one']);
         foreach (['alice', 'bob', 'carol'] as $username) {
             $this->recordAttempt([
                 'identifier' => $username,
@@ -103,8 +136,8 @@ class LoginAbuseDetectorTest extends TestCase
     #[Test]
     public function attempts_older_than_the_window_do_not_count(): void
     {
-        $this->unknownAccountAttempts(self::IP, ['ghost-one', 'ghost-two'], ['created_at' => now()->subHours(25)]);
-        $this->unknownAccountAttempts(self::IP, ['ghost-three']);
+        $this->unknownAccountAttempts(self::IP, ['ghost-one'], ['created_at' => now()->subHours(25)]);
+        $this->unknownAccountAttempts(self::IP, ['ghost-two']);
 
         $this->assertNotBlocked(self::IP);
     }
@@ -112,9 +145,9 @@ class LoginAbuseDetectorTest extends TestCase
     #[Test]
     public function a_device_that_switches_address_between_guesses_gets_every_address_it_used_blocked(): void
     {
-        $this->unknownAccountAttempts(self::IP, ['ghost-one', 'ghost-two'], ['device_fingerprint' => self::DEVICE]);
-        $this->unknownAccountAttempts(self::SECOND_IP, ['ghost-one', 'ghost-two'], ['device_fingerprint' => self::DEVICE]);
-        $this->unknownAccountAttempts(self::THIRD_IP, ['ghost-three'], ['device_fingerprint' => self::DEVICE]);
+        $this->unknownAccountAttempts(self::IP, ['ghost-one'], ['device_fingerprint' => self::DEVICE]);
+        $this->unknownAccountAttempts(self::SECOND_IP, ['ghost-one'], ['device_fingerprint' => self::DEVICE]);
+        $this->unknownAccountAttempts(self::THIRD_IP, ['ghost-two'], ['device_fingerprint' => self::DEVICE]);
 
         $created = app(LoginAbuseDetector::class)->evaluate(self::THIRD_IP, self::DEVICE);
 
@@ -185,12 +218,11 @@ class LoginAbuseDetectorTest extends TestCase
     }
 
     #[Test]
-    public function three_failed_sign_ins_to_unknown_accounts_block_the_address_as_they_are_recorded(): void
+    public function two_failed_sign_ins_to_unknown_accounts_block_the_address_as_they_are_recorded(): void
     {
         $this->app['request']->server->set('REMOTE_ADDR', self::IP);
 
         event(new Failed('web', null, ['username' => 'ghost-one', 'password' => 'wrong']));
-        event(new Failed('web', null, ['username' => 'ghost-two', 'password' => 'wrong']));
         $this->assertFalse(app(IpBlockService::class)->isBlocked(self::IP));
 
         event(new Failed('web', null, ['email' => 'ghost@example.test', 'password' => 'wrong']));
@@ -259,6 +291,18 @@ class LoginAbuseDetectorTest extends TestCase
         foreach ($identifiers as $identifier) {
             $this->recordAttempt(['ip_address' => $ip, 'identifier' => $identifier] + $attributes);
         }
+    }
+
+    /**
+     * @param  array<string, mixed>  $attributes
+     */
+    private function successfulSignIn(array $attributes): void
+    {
+        $this->recordAttempt($attributes + [
+            'successful' => true,
+            'authenticatable_type' => 'App\\Models\\User',
+            'authenticatable_id' => self::EXISTING_ACCOUNT_ID,
+        ]);
     }
 
     /**

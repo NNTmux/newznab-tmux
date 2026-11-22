@@ -3,6 +3,7 @@
 @section('title', $title ?? 'Login Attempts')
 
 @use('App\Models\User')
+@use('Illuminate\Support\Str')
 
 @section('content')
 @php
@@ -127,7 +128,11 @@
                                 <div class="text-xs text-fg-muted">Account no longer exists</div>
                             @elseif(filled($attempt->identifier))
                                 <span class="break-all font-medium text-gray-900 dark:text-gray-100">{{ $attempt->identifier }}</span>
-                                <div class="text-xs text-fg-muted">No matching account</div>
+                                @if(in_array(Str::lower(trim($attempt->identifier)), $deletedAccountLogins, true))
+                                    <div class="mt-1"><x-admin.badge tone="neutral">Deleted account</x-admin.badge></div>
+                                @else
+                                    <div class="text-xs text-fg-muted">No matching account</div>
+                                @endif
                             @else
                                 <span class="text-fg-muted">&mdash;</span>
                             @endif

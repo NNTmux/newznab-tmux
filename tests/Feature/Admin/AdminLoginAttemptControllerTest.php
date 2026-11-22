@@ -154,6 +154,21 @@ class AdminLoginAttemptControllerTest extends TestCase
     }
 
     #[Test]
+    public function a_failed_sign_in_to_a_deleted_account_is_marked_as_such_instead_of_as_an_unknown_account(): void
+    {
+        $this->seedAccount(self::ALICE_ID, 'alice', 'alice@example.test');
+        DB::table('users')->where('id', self::ALICE_ID)->update(['deleted_at' => now()]);
+        $this->recordAttempt(['successful' => false, 'identifier' => 'Alice']);
+        $this->recordAttempt(['successful' => false, 'identifier' => 'alice@example.test']);
+
+        $this->actingAs($this->userWithRole('Admin'))->get(route('admin.login-attempts.index'))
+            ->assertOk()
+            ->assertViewHas('deletedAccountLogins', ['alice@example.test', 'alice'])
+            ->assertSee('Deleted account')
+            ->assertDontSee('No matching account');
+    }
+
+    #[Test]
     public function a_blocked_address_is_marked_and_other_addresses_offer_a_block_button(): void
     {
         $this->recordAttempt(['successful' => false, 'identifier' => 'ghost', 'ip_address' => '203.0.113.50']);

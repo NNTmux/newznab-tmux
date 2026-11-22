@@ -19,6 +19,10 @@ use Illuminate\Support\Str;
  * A failed attempt has no account when authenticatable_id is null. Attempts are counted per
  * address and per device cookie together, so a visitor who switches address between guesses
  * is still counted as one.
+ *
+ * The limit is ip_blocking.unknown_account_threshold different names. An address or device
+ * that also signed in successfully within the window is a member mistyping a name, and gets
+ * the higher ip_blocking.signed_in_unknown_account_threshold instead.
  */
 class LoginAbuseDetector
 {
@@ -75,7 +79,7 @@ class LoginAbuseDetector
     public function inspect(string $ip, ?string $deviceFingerprint = null): ?array
     {
         $deviceFingerprint = $deviceFingerprint === '' ? null : $deviceFingerprint;
-        $threshold = max(1, (int) config('nntmux.ip_blocking.unknown_account_threshold', 3));
+        $threshold = $this->threshold();
 
         $attempts = LoginAttempt::query()
             ->where('successful', false)
@@ -107,6 +111,10 @@ class LoginAbuseDetector
             return null;
         }
 
+        if (count($identifiers) < $this->signedInThreshold() && $this->signedInSuccessfully($ip, $deviceFingerprint)) {
+            return null;
+        }
+
         $ips = $attempts->pluck('ip_address')
             ->prepend($ip)
             ->filter(static fn (mixed $address): bool => is_string($address) && $address !== '')
@@ -120,6 +128,77 @@ class LoginAbuseDetector
     public function windowHours(): int
     {
         return max(1, (int) config('nntmux.ip_blocking.window_hours', 24));
+    }
+
+    /**
+     * Which of the submitted logins are the username or email of a soft-deleted account,
+     * lower-cased.
+     *
+     * @param  list<string>  $identifiers
+     * @return list<string>
+     */
+    public function deletedAccountLogins(array $identifiers): array
+    {
+        $identifiers = array_values(array_unique(array_filter(
+            array_map(static fn (string $identifier): string => trim($identifier), $identifiers),
+            static fn (string $identifier): bool => $identifier !== '',
+        )));
+        if ($identifiers === []) {
+            return [];
+        }
+
+        // Both spellings are sent so the match also works on a case-sensitive database.
+        $candidates = array_values(array_unique([...$identifiers, ...array_map(Str::lower(...), $identifiers)]));
+
+        $deleted = [];
+        $accounts = User::onlyTrashed()
+            ->where(static function (Builder $query) use ($candidates): void {
+                $query->whereIn('username', $candidates)->orWhereIn('email', $candidates);
+            })
+            ->toBase()
+            ->get(['username', 'email']);
+
+        foreach ($accounts as $account) {
+            $deleted[Str::lower((string) $account->username)] = true;
+            $deleted[Str::lower((string) $account->email)] = true;
+        }
+
+        return array_values(array_unique(array_filter(
+            array_map(Str::lower(...), $identifiers),
+            static fn (string $identifier): bool => isset($deleted[$identifier]),
+        )));
+    }
+
+    private function threshold(): int
+    {
+        return max(1, (int) config('nntmux.ip_blocking.unknown_account_threshold', 2));
+    }
+
+    /**
+     * The limit for an address or device that signed in successfully; never below the normal one.
+     */
+    private function signedInThreshold(): int
+    {
+        return max($this->threshold(), (int) config('nntmux.ip_blocking.signed_in_unknown_account_threshold', 3));
+    }
+
+    /**
+     * Whether the address or device completed a sign-in within the window. This looks at the
+     * whole window, also before a block that has since ended.
+     */
+    private function signedInSuccessfully(string $ip, ?string $deviceFingerprint): bool
+    {
+        return LoginAttempt::query()
+            ->where('successful', true)
+            ->where('blocked', false)
+            ->where('created_at', '>', now()->subHours($this->windowHours()))
+            ->where(static function (Builder $query) use ($ip, $deviceFingerprint): void {
+                $query->where('ip_address', $ip);
+                if ($deviceFingerprint !== null) {
+                    $query->orWhere('device_fingerprint', $deviceFingerprint);
+                }
+            })
+            ->exists();
     }
 
     /**
@@ -160,25 +239,11 @@ class LoginAbuseDetector
      */
     private function withoutDeletedAccounts(array $identifiers): array
     {
-        // Both spellings are sent so the match also works on a case-sensitive database.
-        $candidates = array_values(array_unique([...$identifiers, ...array_map(Str::lower(...), $identifiers)]));
-
-        $deleted = [];
-        $accounts = User::onlyTrashed()
-            ->where(static function (Builder $query) use ($candidates): void {
-                $query->whereIn('username', $candidates)->orWhereIn('email', $candidates);
-            })
-            ->toBase()
-            ->get(['username', 'email']);
-
-        foreach ($accounts as $account) {
-            $deleted[Str::lower((string) $account->username)] = true;
-            $deleted[Str::lower((string) $account->email)] = true;
-        }
+        $deleted = $this->deletedAccountLogins($identifiers);
 
         return array_values(array_filter(
             $identifiers,
-            static fn (string $identifier): bool => ! isset($deleted[Str::lower($identifier)]),
+            static fn (string $identifier): bool => ! in_array(Str::lower($identifier), $deleted, true),
         ));
     }
 }
