@@ -259,7 +259,7 @@ class CbpReleaseEligibilityTest extends TestCase
     {
         if (DB::getDriverName() === 'sqlite') {
             // The par2-only filter uses REGEXP; SQLite evaluates `X REGEXP Y` as regexp(Y, X).
-            DB::connection()->getPdo()->sqliteCreateFunction(
+            DB::connection()->getPdo()->createFunction(
                 'REGEXP',
                 static fn (?string $pattern, ?string $subject): int => $pattern !== null && $subject !== null
                     && preg_match('/'.str_replace('/', '\/', $pattern).'/i', $subject) === 1 ? 1 : 0,

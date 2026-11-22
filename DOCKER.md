@@ -196,7 +196,7 @@ make test filter=ReleaseSearchTest      # run a single test
 
 > **Note:** `make pull` / `update` / `rebuild` use `docker compose pull --ignore-buildable`,
 > which only pulls images for services in the active `COMPOSE_PROFILES` and skips images
-> that are built locally (e.g. `sail-8.5/app`). Requires Docker Compose v2.22+.
+> that are built locally (e.g. `sail-8.6/app`). Requires Docker Compose v2.22+.
 
 You can also use `./sail` directly for anything not covered above —
 unknown commands are passed through to `docker compose`.
@@ -297,7 +297,7 @@ The app container's nginx is installed from the Ubuntu archive. This keeps the
 Docker build independent of third-party nginx module repositories and avoids ABI
 mismatches between `nginx` and dynamic module packages.
 
-Gzip compression is enabled in `docker/8.5/nginx.conf`. Brotli is intentionally
+Gzip compression is enabled in `docker/8.6/nginx.conf`. Brotli is intentionally
 not enabled because Ubuntu's stock nginx package does not include Brotli
 directives by default. A `nginx -t` is run during `docker build` to fail fast on
 any config drift.

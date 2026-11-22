@@ -15,7 +15,6 @@ class BookServiceTest extends TestCase
         /** @var BookService $service */
         $service = (new \ReflectionClass(BookService::class))->newInstanceWithoutConstructor();
         $property = new \ReflectionProperty(BookService::class, 'obfuscatedSubjectExtractor');
-        $property->setAccessible(true);
         $property->setValue($service, new ObfuscatedSubjectExtractor);
 
         return $service;

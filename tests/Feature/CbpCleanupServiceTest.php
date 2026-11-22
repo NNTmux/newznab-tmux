@@ -24,8 +24,8 @@ class CbpCleanupServiceTest extends TestCase
         config(['database.default' => 'sqlite', 'database.connections.sqlite.database' => ':memory:']);
         DB::purge();
         DB::reconnect();
-        DB::connection()->getPdo()->sqliteCreateFunction('UNIX_TIMESTAMP', static fn (?string $value): int => strtotime((string) $value));
-        DB::connection()->getPdo()->sqliteCreateFunction(
+        DB::connection()->getPdo()->createFunction('UNIX_TIMESTAMP', static fn (?string $value): int => strtotime((string) $value));
+        DB::connection()->getPdo()->createFunction(
             'REGEXP',
             static function (?string $subject, ?string $pattern): int {
                 if ($subject === null || $pattern === null || $pattern === '') {

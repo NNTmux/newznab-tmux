@@ -23,7 +23,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Mockery;
-use PDO;
+use Pdo\Sqlite;
 use Tests\Support\ConfigurationTestBuilder;
 use Tests\TestCase;
 
@@ -251,9 +251,9 @@ class BookProcessingRetryTest extends TestCase
         DB::table('releases')->insert([
             'id' => 5, 'name' => 'N:/NZB', 'bookinfo_id' => -2,
         ]);
-        /** @var PDO $pdo */
+        /** @var Sqlite $pdo */
         $pdo = DB::connection()->getPdo();
-        $pdo->sqliteCreateFunction('IF', static fn (int $condition, int $yes, int $no): int => $condition ? $yes : $no, 3);
+        $pdo->createFunction('IF', static fn (int $condition, int $yes, int $no): int => $condition ? $yes : $no, 3);
         $tmux = app(Tmux::class);
         $sql = $tmux->proc_query(1, '', '');
         $lines = array_filter(explode("\n", $sql), static fn (string $line): bool => str_contains($line, 'AS processbooks'));

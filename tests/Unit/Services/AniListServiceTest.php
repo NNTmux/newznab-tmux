@@ -130,7 +130,6 @@ class AniListServiceTest extends TestCase
         ]);
 
         $property = new ReflectionProperty($service, 'client');
-        $property->setAccessible(true);
         $property->setValue($service, $client);
 
         return $service;
@@ -154,7 +153,6 @@ class AniListServiceTest extends TestCase
     private function resetRateLimitPause(): void
     {
         $property = new ReflectionProperty(PopulateAniListService::class, 'rateLimitPause');
-        $property->setAccessible(true);
         $property->setValue(null, null);
     }
 }

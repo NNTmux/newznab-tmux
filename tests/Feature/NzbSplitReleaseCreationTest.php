@@ -117,7 +117,7 @@ final class NzbSplitReleaseCreationTest extends TestCase
     public function test_random_quoted_filename_is_not_treated_as_a_proper_name(): void
     {
         DB::statement('CREATE TABLE release_naming_regexes (id INTEGER PRIMARY KEY, group_regex TEXT, regex TEXT, status INTEGER, ordinal INTEGER)');
-        DB::connection()->getPdo()->sqliteCreateFunction('REGEXP', static fn (): int => 0, 2);
+        DB::connection()->getPdo()->createFunction('REGEXP', static fn (): int => 0, 2);
         $this->insertCollection('[43/84] "2CeHrOvvNeiGTXAfDTZqCZ.part42.rar" yEnc', totalFiles: 84);
         Search::shouldReceive('matchPredbExact')->andReturn(null);
         Search::shouldReceive('updateRelease')->once()->with(1);

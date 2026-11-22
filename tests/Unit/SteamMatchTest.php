@@ -12,7 +12,6 @@ class SteamMatchTest extends TestCase
     {
         $ref = new ReflectionClass($obj);
         $m = $ref->getMethod($method);
-        $m->setAccessible(true);
 
         return $m->invokeArgs($obj, $args);
     }

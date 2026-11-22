@@ -491,7 +491,6 @@ class SeriesControllerTest extends TestCase
     {
         $reflection = new ReflectionClass(GlobalDataComposer::class);
         $property = $reflection->getProperty('resolvedData');
-        $property->setAccessible(true);
         $property->setValue(null, null);
     }
 

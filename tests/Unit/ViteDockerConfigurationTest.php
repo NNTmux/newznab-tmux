@@ -90,7 +90,7 @@ class ViteDockerConfigurationTest extends TestCase
 
     public function test_container_startup_clears_stale_vite_hot_state(): void
     {
-        $startContainer = $this->projectFile('docker/8.5/start-container');
+        $startContainer = $this->projectFile('docker/8.6/start-container');
 
         $unlinkPosition = strpos($startContainer, 'unlink /var/www/html/public/hot');
         $supervisorPosition = strpos($startContainer, 'exec /usr/bin/supervisord');
@@ -102,7 +102,7 @@ class ViteDockerConfigurationTest extends TestCase
 
     public function test_container_startup_aligns_runtime_directory_ownership_with_the_host_user(): void
     {
-        $startContainer = $this->projectFile('docker/8.5/start-container');
+        $startContainer = $this->projectFile('docker/8.6/start-container');
 
         $this->assertStringContainsString('usermod -u "$WWWUSER" -o sail', $startContainer);
         $this->assertStringContainsString('storage/framework storage/logs bootstrap/cache', $startContainer);
@@ -119,7 +119,7 @@ class ViteDockerConfigurationTest extends TestCase
 
     public function test_nginx_serves_laravel_public_storage_without_a_host_symlink(): void
     {
-        $nginxConfig = $this->projectFile('docker/8.5/nginx.conf');
+        $nginxConfig = $this->projectFile('docker/8.6/nginx.conf');
 
         $this->assertStringContainsString('location ^~ /storage/', $nginxConfig);
         $this->assertStringContainsString('alias /var/www/html/storage/app/public/;', $nginxConfig);
@@ -130,7 +130,7 @@ class ViteDockerConfigurationTest extends TestCase
      */
     public function test_nginx_fastcgi_header_buffer_fits_login_response_headers(): void
     {
-        foreach (['docker/8.5/nginx.conf', 'infra/ansible/roles/tls/templates/nginx.conf.j2'] as $path) {
+        foreach (['docker/8.6/nginx.conf', 'infra/ansible/roles/tls/templates/nginx.conf.j2'] as $path) {
             $nginxConfig = $this->projectFile($path);
 
             $this->assertSame(1, preg_match('/^\s*fastcgi_buffer_size (\d+)k;$/m', $nginxConfig, $headerBuffer), "{$path} keeps the default 4k FastCGI header buffer");

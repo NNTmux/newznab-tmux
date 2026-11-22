@@ -31,6 +31,7 @@ use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
 use Mockery;
 use PDO;
+use Pdo\Sqlite;
 use PHPUnit\Framework\Attributes\DataProvider;
 use ReflectionClass;
 use Tests\TestCase;
@@ -706,7 +707,6 @@ class ApiRequestMatrixTest extends TestCase
         $apiController = app(ApiController::class);
         $reflection = new ReflectionClass($apiController);
         $typeProperty = $reflection->getProperty('type');
-        $typeProperty->setAccessible(true);
         $typeProperty->setValue($apiController, 'caps');
 
         $menu = $apiController->getForMenu();
@@ -1506,8 +1506,8 @@ class ApiRequestMatrixTest extends TestCase
             'guid' => 'alpha-guid',
         ]));
         $pdo = DB::connection()->getPdo();
-        if ($pdo instanceof PDO && method_exists($pdo, 'sqliteCreateFunction')) {
-            $pdo->sqliteCreateFunction('CONCAT', static fn (...$parts): string => implode('', $parts));
+        if ($pdo instanceof Sqlite) {
+            $pdo->createFunction('CONCAT', static fn (...$parts): string => implode('', $parts));
         }
         Search::shouldReceive('isAvailable')->andReturn(true);
         Search::shouldReceive('searchReleasePage')

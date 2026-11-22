@@ -995,7 +995,6 @@ if (! function_exists('fileInfo')) {
             if (empty($output)) {
                 $output = '';
             }
-            finfo_close($fileInfo);
         }
 
         return $output;

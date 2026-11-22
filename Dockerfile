@@ -32,7 +32,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 RUN install-php-extensions bcmath exif gd intl mbstring pdo_mysql pdo_sqlite sockets pcntl redis imagick zip
 COPY --from=build --chown=www-data:www-data /app /app
-COPY docker/8.5/php.ini /usr/local/etc/php/conf.d/99-nntmux.ini
+COPY docker/8.6/php.ini /usr/local/etc/php/conf.d/99-nntmux.ini
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
     && mkdir -p /app/_install /app/storage/covers /app/storage/app/public \
     && ln -s ../storage/covers /app/public/covers \

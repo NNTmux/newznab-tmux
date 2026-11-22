@@ -23,7 +23,7 @@ usermod -a -G supervisor sail > /dev/null 2>&1
 # The FPM unix socket stays owned by www-data so nginx (running as www-data)
 # can connect to it.
 SAIL_GROUP="$(id -gn sail)"
-cat > /etc/php/8.5/fpm/pool.d/zz-sail.conf <<EOF
+cat > /etc/php/8.6/fpm/pool.d/zz-sail.conf <<EOF
 [www]
 user = sail
 group = ${SAIL_GROUP}

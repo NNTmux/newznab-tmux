@@ -387,7 +387,6 @@ class RegisterControllerTest extends TestCase
         $mock->shouldAllowMockingProtectedMethods();
 
         $reflection = new \ReflectionProperty(RegisterController::class, 'registrationStatusService');
-        $reflection->setAccessible(true);
         $reflection->setValue($mock, app(RegistrationStatusService::class));
 
         $expectation = $mock->shouldReceive('create')->once();

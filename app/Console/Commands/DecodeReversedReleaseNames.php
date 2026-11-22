@@ -107,7 +107,6 @@ class DecodeReversedReleaseNames extends Command
     {
         $reflection = new \ReflectionClass($detector);
         $method = $reflection->getMethod('scoreValidName');
-        $method->setAccessible(true);
 
         return $method->invoke($detector, $name);
     }

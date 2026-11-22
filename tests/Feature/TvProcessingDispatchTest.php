@@ -11,7 +11,7 @@ use App\Services\TvProcessing\TvProcessingPipeline;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Mockery\MockInterface;
-use PDO;
+use Pdo\Sqlite;
 use Tests\Support\ConfigurationTestBuilder;
 use Tests\Support\TvProcessingSchema;
 use Tests\TestCase;
@@ -66,9 +66,9 @@ class TvProcessingDispatchTest extends TestCase
         $this->insertTvRelease('Deferred.S01E01', ['tv_lookup_retry_at' => now()->addHour()]);
         $this->insertTvRelease('Missing.Episode.S01E01', ['videos_id' => 3, 'tv_episodes_id' => -11]);
 
-        /** @var PDO $pdo */
+        /** @var Sqlite $pdo */
         $pdo = DB::connection()->getPdo();
-        $pdo->sqliteCreateFunction('IF', static fn (int $condition, int $yes, int $no): int => $condition ? $yes : $no, 3);
+        $pdo->createFunction('IF', static fn (int $condition, int $yes, int $no): int => $condition ? $yes : $no, 3);
         $sql = (string) app(Tmux::class)->proc_query(1, '', '');
         $line = array_values(array_filter(explode("\n", $sql), static fn (string $line): bool => str_contains($line, 'AS processtv')))[0];
 

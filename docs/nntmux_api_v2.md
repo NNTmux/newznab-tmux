@@ -170,7 +170,7 @@ different filters, a different sort or on another endpoint returns `400`.
 Laravel decodes the JSON body before any middleware runs, so the app limit is a
 contract limit. The resource limit belongs in the web server. It must cover both
 `/api/v1/api` and the v2 search paths without lowering the 100m limit that `POST`
-NZB uploads need. The bundled `docker/8.5/nginx.conf` does this:
+NZB uploads need. The bundled `docker/8.6/nginx.conf` does this:
 
 ```nginx
 map "$request_method:$http_content_length" $nntmux_query_body_status {

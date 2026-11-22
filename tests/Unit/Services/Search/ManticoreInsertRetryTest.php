@@ -94,11 +94,9 @@ final class ManticoreInsertRetryTest extends TestCase
 
         $driver = new ManticoreSearchDriver($config);
         $prop = new \ReflectionProperty(ManticoreSearchDriver::class, 'manticoreSearch');
-        $prop->setAccessible(true);
         $prop->setValue($driver, $client);
 
         $refP = new ReflectionMethod(ManticoreSearchDriver::class, 'replaceReleaseDocumentWithRetry');
-        $refP->setAccessible(true);
 
         $ok = $refP->invoke($driver, $this->releaseRow(42));
         $this->assertTrue($ok);
@@ -127,11 +125,9 @@ final class ManticoreInsertRetryTest extends TestCase
 
         $driver = new ManticoreSearchDriver($config);
         $prop = new \ReflectionProperty(ManticoreSearchDriver::class, 'manticoreSearch');
-        $prop->setAccessible(true);
         $prop->setValue($driver, $client);
 
         $refP = new ReflectionMethod(ManticoreSearchDriver::class, 'replaceReleaseDocumentWithRetry');
-        $refP->setAccessible(true);
 
         $ok = $refP->invoke($driver, $this->releaseRow(7));
         $this->assertFalse($ok);

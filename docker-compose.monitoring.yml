@@ -3,7 +3,7 @@
 #   php artisan monitoring:install --sail   # keys + .env
 #   make up                                  # includes this overlay while MONITORING_ENABLED=true
 #
-# Grafana is reached through the app's nginx at /grafana/ (docker/8.5/nginx.conf),
+# Grafana is reached through the app's nginx at /grafana/ (docker/8.6/nginx.conf),
 # which checks the Laravel session and passes Grafana a JWT signed by the app. Ubuntu hosts use scripts/install-monitoring.sh.
 services:
   prometheus:

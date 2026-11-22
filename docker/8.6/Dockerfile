@@ -28,21 +28,27 @@ RUN apt-get update \
     && echo "deb [signed-by=/etc/apt/keyrings/pgdg.gpg] http://apt.postgresql.org/pub/repos/apt noble-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
     && apt-get update
 
-# Install core PHP packages
-RUN apt-get install -y php8.5 php8.5-cli php8.5-common php8.5-dev php8.5-fpm \
-    php8.5-bcmath php8.5-bz2 php8.5-curl php8.5-gd php8.5-gmp \
-    php8.5-intl php8.5-mbstring php8.5-mysql \
-    php8.5-readline php8.5-soap php8.5-sqlite3 php8.5-xml php8.5-xsl \
-    php8.5-zip php8.5-pgsql
+# Install core PHP packages. The package index is refreshed here because the
+# cached layer above may list builds the repository has already replaced.
+RUN apt-get update \
+    && apt-get install -y php8.6 php8.6-cli php8.6-common php8.6-dev php8.6-fpm \
+    php8.6-bcmath php8.6-bz2 php8.6-curl php8.6-gd php8.6-gmp \
+    php8.6-intl php8.6-mbstring php8.6-mysql \
+    php8.6-readline php8.6-soap php8.6-sqlite3 php8.6-xml php8.6-xsl \
+    php8.6-zip php8.6-pgsql
 
-# Install optional PHP extensions (skip if not available)
-RUN apt-get install -y --no-install-recommends \
-    php8.5-sockets php8.5-imap php8.5-ldap \
-    php8.5-amqp php8.5-gnupg php8.5-http php8.5-igbinary php8.5-imagick \
-    php8.5-msgpack php8.5-oauth php8.5-raphf php8.5-redis php8.5-swoole \
-    php8.5-tidy php8.5-uploadprogress php8.5-uuid php8.5-xmlrpc \
-    php8.5-yaml php8.5-zstd php8.5-memcached php8.5-pcov php8.5-xdebug \
-    || true
+# Install optional PHP extensions one at a time, so an extension that is not
+# published for this PHP version is skipped without dropping the others.
+RUN apt-get update \
+    && for extension in sockets imap ldap amqp gnupg raphf http igbinary imagick \
+        msgpack oauth redis tidy uploadprogress uuid xmlrpc yaml zstd memcached \
+        pcov xdebug; do \
+        apt-get install -y --no-install-recommends "php8.6-${extension}" \
+            || echo "php8.6-${extension} is not available, skipping"; \
+    done
+
+# Fail the build when an extension the application depends on is missing.
+RUN php -r 'foreach (["bcmath", "ctype", "curl", "exif", "fileinfo", "filter", "gd", "hash", "iconv", "intl", "json", "libxml", "mbstring", "mysqlnd", "openssl", "pcntl", "pcre", "pdo", "pdo_mysql", "pdo_sqlite", "session", "simplexml", "sockets", "sodium", "spl", "xmlwriter", "zip", "zlib", "redis", "imagick"] as $extension) { if (! extension_loaded($extension)) { fwrite(STDERR, "Missing PHP extension: {$extension}\n"); exit(1); } }'
 
 # Install other packages
 RUN apt-get install -y \
@@ -93,7 +99,7 @@ RUN chmod 0644 /etc/cron.d/scheduler \
 COPY start-container /usr/local/bin/start-container
 COPY nginx.conf /etc/nginx/sites-available/default
 COPY supervisord.conf /etc/supervisor/supervisord.conf
-COPY php.ini /etc/php/8.5/cli/conf.d/99-sail.ini
+COPY php.ini /etc/php/8.6/cli/conf.d/99-sail.ini
 
 RUN chmod +x /usr/local/bin/start-container \
     && nginx -t

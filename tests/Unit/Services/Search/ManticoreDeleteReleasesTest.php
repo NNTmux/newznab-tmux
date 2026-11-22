@@ -38,7 +38,6 @@ final class ManticoreDeleteReleasesTest extends TestCase
 
         $driver = new ManticoreSearchDriver($config);
         $prop = new \ReflectionProperty(ManticoreSearchDriver::class, 'manticoreSearch');
-        $prop->setAccessible(true);
         $prop->setValue($driver, $client);
 
         $driver->deleteReleases([149331415, 42, 0, 149331415]);
@@ -62,7 +61,6 @@ final class ManticoreDeleteReleasesTest extends TestCase
 
         $driver = new ManticoreSearchDriver($config);
         $prop = new \ReflectionProperty(ManticoreSearchDriver::class, 'manticoreSearch');
-        $prop->setAccessible(true);
         $prop->setValue($driver, $client);
 
         $driver->deleteReleases([0, -1]);

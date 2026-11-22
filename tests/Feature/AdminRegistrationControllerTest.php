@@ -182,7 +182,6 @@ class AdminRegistrationControllerTest extends TestCase
         $apiController = app(ApiController::class);
         $reflection = new ReflectionClass($apiController);
         $typeProperty = $reflection->getProperty('type');
-        $typeProperty->setAccessible(true);
         $typeProperty->setValue($apiController, 'caps');
 
         $menu = $apiController->getForMenu();
@@ -491,7 +490,6 @@ class AdminRegistrationControllerTest extends TestCase
     {
         $reflection = new ReflectionClass(GlobalDataComposer::class);
         $property = $reflection->getProperty('resolvedData');
-        $property->setAccessible(true);
         $property->setValue(null, null);
     }
 

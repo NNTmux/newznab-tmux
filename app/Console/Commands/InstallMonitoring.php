@@ -110,14 +110,14 @@ class InstallMonitoring extends Command
         $this->setEnvironmentValues([
             'MONITORING_ENABLED' => 'true',
             'GRAFANA_URL' => '/grafana',
-            // docker/8.5/nginx.conf authenticates /grafana/ with auth_request.
+            // docker/8.6/nginx.conf authenticates /grafana/ with auth_request.
             'GRAFANA_AUTH' => 'proxy',
             'GRAFANA_JWT_PRIVATE_KEY_PATH' => $this->projectRelativePath($privateKey),
             'MONITORING_PUSHGATEWAY_URL' => 'http://pushgateway:9091',
         ]);
 
         $this->components->info('Next steps:');
-        $this->line('  make build          # picks up the /grafana/ proxy in docker/8.5/nginx.conf');
+        $this->line('  make build          # picks up the /grafana/ proxy in docker/8.6/nginx.conf');
         $this->line('  make up             # now also starts Prometheus, Grafana, the Pushgateway and exporters');
         $this->line('  ./sail artisan config:clear');
 

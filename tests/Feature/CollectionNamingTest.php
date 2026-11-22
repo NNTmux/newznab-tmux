@@ -30,7 +30,7 @@ class CollectionNamingTest extends TestCase
         DB::purge();
         DB::reconnect();
         // SQLite evaluates `X REGEXP Y` as regexp(Y, X).
-        DB::connection()->getPdo()->sqliteCreateFunction(
+        DB::connection()->getPdo()->createFunction(
             'REGEXP',
             static fn (?string $pattern, ?string $subject): int => $subject !== null && $pattern !== null
                 && @preg_match('/'.str_replace('/', '\/', $pattern).'/i', $subject) === 1 ? 1 : 0,

@@ -66,7 +66,7 @@ class NzbCreationReliabilityTest extends TestCase
         config(['nntmux_settings.path_to_nzbs' => $this->tempNzbPath]);
         DB::purge();
         DB::reconnect();
-        DB::connection()->getPdo()->sqliteCreateFunction('UNIX_TIMESTAMP', static fn (?string $value): int => strtotime((string) $value));
+        DB::connection()->getPdo()->createFunction('UNIX_TIMESTAMP', static fn (?string $value): int => strtotime((string) $value));
 
         $this->createSchema();
         NzbCreationCandidateQuery::flushCapabilityCache();
