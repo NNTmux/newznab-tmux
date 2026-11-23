@@ -11,6 +11,7 @@ Path-scoped and standing agent rules for NNTmux. Hand-written entries live here;
 | `app/Services/TvProcessing/**` | [tv-processing.md](./tv-processing.md) | Provider errors never become ShowNotFound; local relink before API retries; title-normalized show matching |
 | `app/Services/{TmdbClient,TraktService,TvMazeClient,TvdbClient}.php` | [tv-processing.md](./tv-processing.md) | Only 404/empty is a miss; throw `TvProviderException` otherwise |
 | `app/Services/{MovieService,MoviesProcessor}.php` | [movie-processing.md](./movie-processing.md) | Cache raw provider data and validate per release; normalized title comparison; TMDB translations for German titles |
+| `app/Services/{TraktService,TvdbClient}.php` | [movie-processing.md](./movie-processing.md) | Movie lookups: Trakt title search with aliases, TVDB as last search and gap-filler |
 | `app/Services/{OmdbClient,MdbListClient}.php` | [movie-processing.md](./movie-processing.md) | Rotten Tomatoes score from MDBList then OMDb; never blank a stored score; failures are not misses |
 | `app/Console/Commands/{RelinkLocalTvEpisodes,RepairTvReleaseLinks,ReprocessUnmatchedTvReleases,ReprocessMissingEpisodes}.php` | [tv-processing.md](./tv-processing.md) | Local relink first, API requeue last |
 

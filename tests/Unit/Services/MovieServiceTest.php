@@ -4,22 +4,26 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Services;
 
+use App\Exceptions\TvProviderException;
 use App\Facades\Search;
 use App\Models\MovieInfo;
 use App\Models\Release;
 use App\Services\ImdbScraper;
 use App\Services\MovieService;
 use App\Services\MoviesProcessor;
+use App\Services\ReleaseImageService;
 use App\Services\Runners\PostProcessRunner;
 use App\Services\TmdbClient;
 use App\Services\TraktService;
 use App\Services\TvProcessing\Providers\TraktProvider;
+use App\Support\Data\ImageProcessingResult;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -35,6 +39,9 @@ class MovieServiceTest extends ImdbScraperTestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        // TVDB is asked last and for gaps; tests that want it configure a key themselves.
+        config(['tvdb.api_key' => '', 'tvdb.retry_times' => 1]);
 
         Schema::dropIfExists('movieinfo');
         Schema::create('movieinfo', function (Blueprint $table): void {
@@ -821,6 +828,182 @@ class MovieServiceTest extends ImdbScraperTestCase
     }
 
     #[Test]
+    public function it_finds_a_german_release_through_a_trakt_title_search_and_its_aliases(): void
+    {
+        Cache::flush();
+        $this->disableOtherMovieProviders();
+        $this->app->instance(TmdbClient::class, Mockery::mock(TmdbClient::class, ['isConfigured' => false]));
+        Search::shouldReceive('updateRelease')->with(1);
+        Search::shouldReceive('insertMovie');
+        Release::query()->insert([
+            'id' => 1,
+            'searchname' => 'Der.Pate.1972.German.DL.1080p.BluRay.x264-GRP',
+            'categories_id' => 2040,
+            'imdbid' => null,
+        ]);
+        $trakt = $this->traktClientAnswering(
+            summaries: [$this->traktGodfather()],
+            search: [
+                ['movie' => ['title' => 'The Godfather Part II', 'year' => 1974, 'ids' => ['imdb' => 'tt0071562']]],
+                ['movie' => $this->traktGodfather()],
+            ],
+            aliases: [['title' => 'Der Pate', 'country' => 'de']],
+        );
+        $service = $this->makeServiceWithoutCovers();
+        $this->useTraktClient($service, $trakt);
+
+        $service->processMovieReleases();
+
+        $this->assertSame('0068646', Release::query()->whereKey(1)->value('imdbid'));
+        $this->assertSame('Trakt', $service->service);
+        $this->assertSame('The Godfather', MovieInfo::query()->where('imdbid', '0068646')->value('title'));
+        $this->assertSame(['tt0068646'], $trakt->aliasRequests);
+    }
+
+    #[Test]
+    public function it_accepts_trakt_metadata_by_a_country_alias_when_the_release_year_is_one_off(): void
+    {
+        Cache::flush();
+        $trakt = $this->traktClientAnswering(
+            summaries: [$this->traktGodfather()],
+            aliases: [['title' => 'Der Pate', 'country' => 'de']],
+        );
+        $service = new MovieService;
+        $service->echooutput = false;
+        $this->useTraktClient($service, $trakt);
+        $this->invokeParse($service, 'Der.Pate.1973.German.DL.1080p.BluRay.x264-GRP');
+
+        $movie = $service->fetchTraktTVProperties('0068646');
+
+        $this->assertIsArray($movie);
+        $this->assertSame('The Godfather', $movie['title']);
+    }
+
+    #[Test]
+    public function it_does_not_cache_a_trakt_outage_as_a_miss(): void
+    {
+        Cache::flush();
+        Log::spy();
+        $trakt = $this->traktClientAnswering(summaries: [
+            new TvProviderException('trakt', 'Trakt returned 503 for movies/tt0068646', 503),
+            $this->traktGodfather(),
+        ]);
+        $service = new MovieService;
+        $service->echooutput = false;
+        $this->useTraktClient($service, $trakt);
+
+        $duringOutage = $service->fetchTraktTVProperties('0068646');
+        $afterOutage = $service->fetchTraktTVProperties('0068646');
+
+        $this->assertFalse($duringOutage);
+        $this->assertIsArray($afterOutage);
+        $this->assertSame('The Godfather', $afterOutage['title']);
+        Log::shouldHaveReceived('warning')->once();
+    }
+
+    #[Test]
+    public function it_finds_a_german_release_through_a_tvdb_title_search(): void
+    {
+        Cache::flush();
+        $this->disableOtherMovieProviders();
+        $this->app->instance(TmdbClient::class, Mockery::mock(TmdbClient::class, ['isConfigured' => false]));
+        $this->fakeTvdb([
+            'api4.thetvdb.com/v4/search/remoteid/tt0068646' => Http::response(['data' => [['movie' => ['id' => 275, 'name' => 'The Godfather']]]]),
+            'api4.thetvdb.com/v4/search?*' => Http::response(['data' => [$this->tvdbSearchRow()]]),
+            'api4.thetvdb.com/v4/movies/275/extended*' => Http::response(['data' => $this->tvdbMovieRecord()]),
+        ]);
+        Search::shouldReceive('updateRelease')->with(1);
+        Search::shouldReceive('insertMovie');
+        Release::query()->insert([
+            'id' => 1,
+            'searchname' => 'Der.Pate.1972.German.DL.1080p.BluRay.x264-GRP',
+            'categories_id' => 2040,
+            'imdbid' => null,
+        ]);
+        $service = $this->makeServiceWithoutCovers();
+
+        $service->processMovieReleases();
+
+        $this->assertSame('0068646', Release::query()->whereKey(1)->value('imdbid'));
+        $this->assertSame('TVDB', $service->service);
+        $movie = MovieInfo::query()->where('imdbid', '0068646')->firstOrFail();
+        $this->assertSame('The Godfather', $movie->title);
+        $this->assertSame('1972', $movie->year);
+        $this->assertSame('Crime, Drama', $movie->genre);
+        $this->assertSame('An offer you can\'t refuse.', $movie->tagline);
+        $this->assertStringStartsWith('Don Corleone, the ageing patriarch', $movie->plot);
+        $this->assertSame('https://www.youtube.com/embed/1x0GpEZnwa8', $movie->trailer);
+        Http::assertSent(static fn (Request $request): bool => str_contains($request->url(), '/v4/search?')
+            && $request['query'] === 'Der Pate' && $request['type'] === 'movie' && (int) $request['year'] === 1972);
+    }
+
+    #[Test]
+    public function it_rejects_a_tvdb_search_result_from_another_year(): void
+    {
+        Cache::flush();
+        $this->disableOtherMovieProviders();
+        $this->app->instance(TmdbClient::class, Mockery::mock(TmdbClient::class, ['isConfigured' => false]));
+        $this->fakeTvdb(['api4.thetvdb.com/v4/search?*' => Http::response(['data' => [$this->tvdbSearchRow()]])]);
+        Search::shouldReceive('updateRelease')->with(1);
+        Release::query()->insert([
+            'id' => 1,
+            'searchname' => 'Der.Pate.1990.German.DL.1080p.BluRay.x264-GRP',
+            'categories_id' => 2040,
+            'imdbid' => null,
+        ]);
+
+        $this->makeServiceWithoutCovers()->processMovieReleases();
+
+        $this->assertSame('', Release::query()->whereKey(1)->value('imdbid'));
+        $this->assertSame(0, MovieInfo::query()->count());
+    }
+
+    #[Test]
+    public function it_only_asks_tvdb_when_another_provider_left_a_gap(): void
+    {
+        Cache::flush();
+        Search::shouldReceive('insertMovie');
+        Http::preventStrayRequests();
+        $this->fakeTvdb([
+            'api4.thetvdb.com/v4/search/remoteid/*' => Http::response(['data' => [['movie' => ['id' => 275, 'name' => 'The Godfather']]]]),
+            'api4.thetvdb.com/v4/movies/275/extended*' => Http::response(['data' => $this->tvdbMovieRecord()]),
+        ]);
+        $complete = $this->movieServiceWithTmdbAndTrakt(trailer: 'https://youtube.com/watch?v=Ew9ngL1GZvs');
+        $withoutTrailer = $this->movieServiceWithTmdbAndTrakt(trailer: '');
+
+        $complete->updateMovieInfo('0068646');
+        $requestsForCompleteMovie = Http::recorded()->count();
+        $withoutTrailer->updateMovieInfo('0071562');
+
+        $this->assertSame(0, $requestsForCompleteMovie);
+        $this->assertSame('https://youtube.com/embed/Ew9ngL1GZvs', MovieInfo::query()->where('imdbid', '0068646')->value('trailer'));
+        $this->assertSame('https://www.youtube.com/embed/1x0GpEZnwa8', MovieInfo::query()->where('imdbid', '0071562')->value('trailer'));
+    }
+
+    #[Test]
+    public function it_does_not_cache_a_tvdb_outage_as_a_miss(): void
+    {
+        Cache::flush();
+        Log::spy();
+        $this->fakeTvdb([
+            'api4.thetvdb.com/v4/search/remoteid/tt0068646' => Http::sequence()
+                ->push(['message' => 'Service Unavailable'], 503)
+                ->push(['data' => [['movie' => ['id' => 275, 'name' => 'The Godfather']]]]),
+            'api4.thetvdb.com/v4/movies/275/extended*' => Http::response(['data' => $this->tvdbMovieRecord()]),
+        ]);
+        $service = new MovieService;
+        $service->echooutput = false;
+
+        $duringOutage = $service->fetchTvdbProperties('0068646');
+        $afterOutage = $service->fetchTvdbProperties('0068646');
+
+        $this->assertFalse($duringOutage);
+        $this->assertIsArray($afterOutage);
+        $this->assertContains('Der Pate', $afterOutage['known_titles']);
+        Log::shouldHaveReceived('warning')->once();
+    }
+
+    #[Test]
     public function it_does_not_cache_an_omdb_failure_as_a_miss(): void
     {
         Cache::flush();
@@ -1058,6 +1241,197 @@ class MovieServiceTest extends ImdbScraperTestCase
         $service->omdbScore = $omdbScore;
 
         return $service;
+    }
+
+    /**
+     * A Trakt client that answers from canned data and records which movies it was asked aliases for.
+     *
+     * @param  list<array<string, mixed>|TvProviderException>  $summaries  One per summary request, in order
+     * @param  list<array<string, mixed>>  $search
+     * @param  list<array<string, mixed>>  $aliases
+     */
+    private function traktClientAnswering(array $summaries = [], array $search = [], array $aliases = []): TraktService
+    {
+        return new class($summaries, $search, $aliases) extends TraktService
+        {
+            /** @var list<string> */
+            public array $aliasRequests = [];
+
+            /**
+             * @param  list<array<string, mixed>|TvProviderException>  $summaries
+             * @param  list<array<string, mixed>>  $search
+             * @param  list<array<string, mixed>>  $aliases
+             */
+            public function __construct(private array $summaries, private array $search, private array $aliases)
+            {
+                parent::__construct('test_trakt_key');
+            }
+
+            /** The recorder must be shared with the copy the movie lookup works on. */
+            public function throwingOnTransientFailure(): static
+            {
+                return $this;
+            }
+
+            public function getMovieSummary(string $movie, string $extended = 'min'): ?array
+            {
+                $answer = count($this->summaries) > 1 ? array_shift($this->summaries) : ($this->summaries[0] ?? null);
+
+                return $answer instanceof TvProviderException ? throw $answer : $answer;
+            }
+
+            public function searchMovies(string $query): ?array
+            {
+                return $this->search;
+            }
+
+            public function getMovieAliases(string $movie): ?array
+            {
+                $this->aliasRequests[] = $movie;
+
+                return $this->aliases;
+            }
+        };
+    }
+
+    private function useTraktClient(MovieService $service, TraktService $client): void
+    {
+        $provider = new TraktProvider;
+        $provider->client = $client;
+        $service->traktTv = $provider;
+        $this->setMovieServiceProperty($service, 'traktcheck', 'test-key');
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function traktGodfather(): array
+    {
+        return [
+            'title' => 'The Godfather',
+            'year' => 1972,
+            'ids' => ['trakt' => 196, 'imdb' => 'tt0068646', 'tmdb' => 238],
+            'overview' => 'A chronicle of the fictional Italian-American Corleone crime family.',
+            'genres' => ['crime', 'drama'],
+            'rating' => 8.9,
+        ];
+    }
+
+    /**
+     * A service that gets a plot and a cover from TMDB and this trailer from Trakt, and never downloads images.
+     */
+    private function movieServiceWithTmdbAndTrakt(string $trailer): MovieService
+    {
+        config(['tvdb.api_key' => 'tvdb-key', 'nntmux_api.mdblist_api_key' => '']);
+
+        $service = new class extends MovieService
+        {
+            public string $trailer = '';
+
+            public function fetchTMDBProperties(string $imdbId, bool $text = false): array|false
+            {
+                return ['title' => 'The Godfather', 'tmdbid' => 238, 'year' => 1972, 'plot' => 'A crime family chronicle.', 'cover' => 'https://image.tmdb.org/t/p/original/poster.jpg', 'backdrop' => ''];
+            }
+
+            public function fetchIMDBProperties(string $imdbId): array|false
+            {
+                return false;
+            }
+
+            public function fetchTraktTVProperties(string $imdbId): array|false
+            {
+                return ['id' => 196, 'title' => 'The Godfather', 'year' => 1972, 'trailer' => $this->trailer];
+            }
+
+            public function fetchOmdbAPIProperties(string $imdbId): array|false
+            {
+                return false;
+            }
+
+            protected function fetchFanartTVProperties(string $imdbId): false|array
+            {
+                return false;
+            }
+
+            protected function hasCover(string $imdbId): bool
+            {
+                return true;
+            }
+
+            public function withoutImageDownloads(): static
+            {
+                $this->releaseImage = Mockery::mock(ReleaseImageService::class, [
+                    'saveRemoteImage' => ImageProcessingResult::failure('downloads are off in this test'),
+                ]);
+
+                return $this;
+            }
+        };
+        $service->echooutput = false;
+        $service->trailer = $trailer;
+
+        return $service->withoutImageDownloads();
+    }
+
+    /**
+     * Fakes TVDB with a working login and configures a key.
+     *
+     * @param  array<string, mixed>  $responses
+     */
+    private function fakeTvdb(array $responses): void
+    {
+        config(['tvdb.api_key' => 'tvdb-key']);
+        Http::fake(['api4.thetvdb.com/v4/login' => Http::response(['status' => 'success', 'data' => ['token' => 'token']])] + $responses);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function tvdbSearchRow(): array
+    {
+        return [
+            'tvdb_id' => '275',
+            'name' => 'The Godfather',
+            'year' => '1972',
+            'aliases' => ["Mario Puzo's The Godfather"],
+            'translations' => ['deu' => 'Der Pate', 'eng' => 'The Godfather', 'fra' => 'Le Parrain'],
+            'remote_ids' => [
+                ['id' => 'thegodfather', 'type' => 5, 'sourceName' => 'Facebook'],
+                ['id' => 'tt0068646', 'type' => 2, 'sourceName' => 'IMDB'],
+                ['id' => '238', 'type' => 10, 'sourceName' => 'TheMovieDB.com'],
+            ],
+        ];
+    }
+
+    /**
+     * A TVDB extended movie record, cut down to what the movie lookup reads. No poster, so nothing is downloaded.
+     *
+     * @return array<string, mixed>
+     */
+    private function tvdbMovieRecord(): array
+    {
+        return [
+            'id' => 275,
+            'name' => 'The Godfather',
+            'image' => '',
+            'year' => '1972',
+            'aliases' => [['language' => 'eng', 'name' => "Mario Puzo's The Godfather"]],
+            'genres' => [['id' => 14, 'name' => 'Crime'], ['id' => 12, 'name' => 'Drama']],
+            'trailers' => [
+                ['name' => 'Trailer', 'url' => 'https://www.youtube.com/watch?v=bmtuIhesQWA', 'language' => 'fra'],
+                ['name' => 'Trailer', 'url' => 'https://www.youtube.com/watch?v=1x0GpEZnwa8', 'language' => 'eng'],
+            ],
+            'translations' => [
+                'nameTranslations' => [
+                    ['name' => 'Der Pate', 'language' => 'deu'],
+                    ['name' => 'The Godfather', 'tagline' => "An offer you can't refuse.", 'language' => 'eng', 'isPrimary' => true],
+                ],
+                'overviewTranslations' => [
+                    ['overview' => 'Ein abschreckendes Portrait über Aufstieg und Fall eines sizilianischen Clans.', 'language' => 'deu'],
+                    ['overview' => 'Don Corleone, the ageing patriarch of an organised crime dynasty, transfers control to his reluctant son.', 'language' => 'eng', 'isPrimary' => true],
+                ],
+            ],
+        ];
     }
 
     private function disableOtherMovieProviders(): void

@@ -43,6 +43,11 @@ class MovieService
 
     private const TMDB_SEARCH_RESULT_LIMIT = 5;
 
+    /** Each Trakt result that needs its aliases costs one more throttled request. */
+    private const TRAKT_SEARCH_RESULT_LIMIT = 3;
+
+    private const TVDB_SEARCH_RESULT_LIMIT = 5;
+
     private const IMDB_SEARCH_CANDIDATE_LIMIT = 3;
 
     private const MAX_ALTERNATE_TITLES = 3;
@@ -227,7 +232,7 @@ class MovieService
             return false;
         }
 
-        $data['trailer'] = $this->traktTrailerUrl($data['trailer'] ?? '');
+        $data['trailer'] = $this->embeddableTrailerUrl($data['trailer'] ?? '');
         $imdbId = (string) $data['ids']['imdb'];
         $imdbId = str_starts_with($imdbId, 'tt') ? substr($imdbId, 2) : $imdbId;
         $genres = $data['genres'] ?? [];
@@ -254,9 +259,9 @@ class MovieService
     }
 
     /**
-     * Trakt's YouTube trailer link as an embeddable https URL.
+     * A YouTube trailer link from Trakt or TVDB as an embeddable https URL.
      */
-    private function traktTrailerUrl(mixed $trailer): string
+    private function embeddableTrailerUrl(mixed $trailer): string
     {
         if (! is_string($trailer) || $trailer === '') {
             return '';
@@ -429,7 +434,7 @@ class MovieService
     public function updateMovieInfo(string $imdbId): bool
     {
         if ($this->echooutput && $this->service !== '') {
-            cli()->primary('Fetching IMDB info from TMDB/IMDB/Trakt/OMDB using IMDB id: '.$imdbId);
+            cli()->primary('Fetching IMDB info from TMDB/IMDB/Trakt/OMDB/TVDB using IMDB id: '.$imdbId);
         }
 
         // Check TMDB for IMDB info.
@@ -444,7 +449,10 @@ class MovieService
         // Check OMDb for movie info
         $omdb = $this->fetchOmdbAPIProperties($imdbId);
 
-        if (! $imdb && ! $tmdb && ! $trakt && ! $omdb) {
+        // TVDB is only asked for what the providers above left empty.
+        $tvdb = $this->tvdbCanFillGap($imdb, $tmdb, $trakt, $omdb) ? $this->fetchTvdbProperties($imdbId) : false;
+
+        if (! $imdb && ! $tmdb && ! $trakt && ! $omdb && ! $tvdb) {
             return false;
         }
 
@@ -460,7 +468,7 @@ class MovieService
         $mov['tmdbid'] = (! isset($tmdb['tmdbid']) || $tmdb['tmdbid'] === '') ? 0 : $tmdb['tmdbid'];
         $mov['traktid'] = (! isset($trakt['id']) || $trakt['id'] === '') ? 0 : $trakt['id'];
 
-        // Prefer Fanart.tv cover over TMDB, TMDB over IMDB and IMDB over OMDB.
+        // Prefer Fanart.tv cover over TMDB, TMDB over IMDB, IMDB over OMDB and OMDB over TVDB.
         if (! empty($fanart['cover'])) {
             try {
                 $mov['cover'] = $this->saveRemoteAsset($imdbId.'-cover', $fanart['cover']);
@@ -509,6 +517,18 @@ class MovieService
             }
         }
 
+        if ($mov['cover'] === 0 && ! empty($tvdb['cover'])) {
+            try {
+                $mov['cover'] = $this->saveRemoteAsset($imdbId.'-cover', $tvdb['cover']);
+                if ($mov['cover'] === 0) {
+                    Log::warning('Failed to save TVDB cover for '.$imdbId.' from URL: '.$tvdb['cover']);
+                }
+            } catch (\Throwable $e) {
+                Log::error('Error saving TVDB cover for '.$imdbId.': '.$e->getMessage());
+                $mov['cover'] = 0;
+            }
+        }
+
         // Backdrops.
         if (! empty($fanart['backdrop'])) {
             try {
@@ -538,12 +558,12 @@ class MovieService
             }
         }
 
-        $mov['title'] = $this->setVariables($imdb['title'] ?? '', $tmdb['title'] ?? '', $trakt['title'] ?? '', $omdb['title'] ?? '');
+        $mov['title'] = $this->setVariables($imdb['title'] ?? '', $tmdb['title'] ?? '', $trakt['title'] ?? '', $omdb['title'] ?? '', $tvdb['title'] ?? '');
         $mov['rating'] = $this->setVariables($imdb['rating'] ?? '', $tmdb['rating'] ?? '', $trakt['rating'] ?? '', $omdb['rating'] ?? '');
-        $mov['plot'] = $this->setVariables($imdb['plot'] ?? '', $tmdb['plot'] ?? '', $trakt['overview'] ?? '', $omdb['plot'] ?? '');
-        $mov['tagline'] = $this->setVariables($imdb['tagline'] ?? '', $tmdb['tagline'] ?? '', $trakt['tagline'] ?? '', '');
-        $mov['year'] = $this->setVariables($imdb['year'] ?? '', $tmdb['year'] ?? '', $trakt['year'] ?? '', $omdb['year'] ?? '');
-        $mov['genre'] = $this->setVariables($imdb['genre'] ?? '', $tmdb['genre'] ?? '', $trakt['genres'] ?? '', $omdb['genre'] ?? '');
+        $mov['plot'] = $this->setVariables($imdb['plot'] ?? '', $tmdb['plot'] ?? '', $trakt['overview'] ?? '', $omdb['plot'] ?? '', $tvdb['plot'] ?? '');
+        $mov['tagline'] = $this->setVariables($imdb['tagline'] ?? '', $tmdb['tagline'] ?? '', $trakt['tagline'] ?? '', $tvdb['tagline'] ?? '');
+        $mov['year'] = $this->setVariables($imdb['year'] ?? '', $tmdb['year'] ?? '', $trakt['year'] ?? '', $omdb['year'] ?? '', $tvdb['year'] ?? '');
+        $mov['genre'] = $this->setVariables($imdb['genre'] ?? '', $tmdb['genre'] ?? '', $trakt['genres'] ?? '', $omdb['genre'] ?? '', $tvdb['genre'] ?? '');
 
         if (! empty($imdb['type'])) {
             $mov['type'] = $imdb['type'];
@@ -598,7 +618,7 @@ class MovieService
             'title' => $mov['title'],
             'tmdbid' => $mov['tmdbid'],
             'traktid' => $mov['traktid'],
-            'trailer' => $this->traktTrailerUrl($trakt['trailer'] ?? ''),
+            'trailer' => $this->embeddableTrailerUrl(($trakt['trailer'] ?? '') ?: ($tvdb['trailer'] ?? '')),
             'type' => html_entity_decode(ucwords(preg_replace('/[._]/', ' ', $mov['type'])), ENT_QUOTES, 'UTF-8'),
             'year' => $mov['year'],
         ]);
@@ -890,69 +910,98 @@ class MovieService
     /**
      * Fetch movie information from Trakt.tv using IMDB ID.
      *
-     * @return array<string, mixed>
+     * The provider data is cached as is and checked against the current release on every read.
      *
-     * @throws GuzzleException
+     * @return array<string, mixed>|false
      */
     public function fetchTraktTVProperties(string $imdbId): array|false
     {
-        if ($this->traktcheck === null) {
+        $client = $this->traktClient();
+        if ($client === null) {
             return false;
         }
 
         $cacheKey = 'trakt_movie_'.md5($imdbId);
-        $expiresAt = now()->addDays(7);
-
-        if (Cache::has($cacheKey)) {
-            $cached = Cache::get($cacheKey);
-            if ($cached === false) {
-                return false;
-            }
-
-            return $this->matchesCurrentContext($cached['title'] ?? '', $cached['year'] ?? '') ? $cached : false;
-        }
 
         try {
-            $resp = $this->traktTv->client->getMovieSummary('tt'.$imdbId, 'full');
+            $movieData = Cache::get($cacheKey);
+            if (! is_array($movieData) && $movieData !== false) {
+                $resp = $client->getMovieSummary('tt'.$imdbId, 'full');
 
-            if ($resp === null || empty($resp['title'])) {
-                Cache::put($cacheKey, false, now()->addHours(6));
+                $movieData = $resp === null || empty($resp['title']) ? false : [
+                    'id' => $resp['ids']['trakt'] ?? null,
+                    'title' => $resp['title'],
+                    'overview' => $resp['overview'] ?? '',
+                    'tagline' => $resp['tagline'] ?? '',
+                    'year' => $resp['year'] ?? '',
+                    'genres' => $resp['genres'] ?? '',
+                    'rating' => $resp['rating'] ?? '',
+                    'votes' => $resp['votes'] ?? 0,
+                    'language' => $resp['language'] ?? '',
+                    'runtime' => $resp['runtime'] ?? 0,
+                    'trailer' => $resp['trailer'] ?? '',
+                ];
 
+                Cache::put($cacheKey, $movieData, $movieData === false ? now()->addHours(6) : now()->addDays(7));
+            }
+
+            if ($movieData === false) {
                 return false;
             }
 
-            $movieData = [
-                'id' => $resp['ids']['trakt'] ?? null,
-                'title' => $resp['title'],
-                'overview' => $resp['overview'] ?? '',
-                'tagline' => $resp['tagline'] ?? '',
-                'year' => $resp['year'] ?? '',
-                'genres' => $resp['genres'] ?? '',
-                'rating' => $resp['rating'] ?? '',
-                'votes' => $resp['votes'] ?? 0,
-                'language' => $resp['language'] ?? '',
-                'runtime' => $resp['runtime'] ?? 0,
-                'trailer' => $resp['trailer'] ?? '',
-            ];
-
-            Cache::put($cacheKey, $movieData, $expiresAt);
-
-            if (! $this->matchesCurrentContext($movieData['title'], $movieData['year'])) {
-                return false;
+            // The country aliases ("Der Pate") cost one more request: only ask when they can change the verdict.
+            $titles = [(string) $movieData['title']];
+            if (! $this->fitsCurrentContext($titles, $movieData['year'] ?? '') && $this->yearAllowsAlternateTitle($movieData['year'] ?? '')) {
+                $titles = $this->traktKnownTitles($client, $titles[0], 'tt'.$imdbId);
             }
-
-            if ($this->echooutput) {
-                cli()->info('Trakt found '.$movieData['title']);
-            }
-
-            return $movieData;
-
-        } catch (\Throwable $e) {
+        } catch (TvProviderException $e) {
+            // A rate limit or an outage says nothing about the movie, so it isn't cached as a miss.
             Log::warning('Trakt API error for '.$imdbId.': '.$e->getMessage());
-            Cache::put($cacheKey, false, now()->addHours(6));
 
             return false;
         }
+
+        if (! $this->matchesCurrentContext($titles, $movieData['year'] ?? '')) {
+            return false;
+        }
+
+        if ($this->echooutput) {
+            cli()->info('Trakt found '.$movieData['title']);
+        }
+
+        return $movieData;
+    }
+
+    /**
+     * The Trakt client for movie lookups, or null without a key. Transient failures are thrown
+     * (the default client sleeps up to 300s on a 429 and reports an outage as "not found").
+     */
+    private function traktClient(): ?TraktService
+    {
+        if ($this->traktcheck === null || $this->traktTv === null) {
+            return null;
+        }
+
+        return $this->traktTv->client->throwingOnTransientFailure();
+    }
+
+    /**
+     * A Trakt movie's title followed by the titles it goes by in other countries.
+     *
+     * @return list<string>
+     *
+     * @throws TvProviderException
+     */
+    private function traktKnownTitles(TraktService $client, string $title, string $traktId): array
+    {
+        $titles = [$title];
+        foreach ($client->getMovieAliases($traktId) ?? [] as $alias) {
+            if (is_string($alias['title'] ?? null) && $alias['title'] !== '') {
+                $titles[] = $alias['title'];
+            }
+        }
+
+        return $titles;
     }
 
     /**
@@ -992,6 +1041,110 @@ class MovieService
         }
 
         return $movieData;
+    }
+
+    /**
+     * Whether the main providers left a plot, cover or trailer for TVDB to fill in.
+     *
+     * @param  array<string, mixed>|false  $imdb
+     * @param  array<string, mixed>|false  $tmdb
+     * @param  array<string, mixed>|false  $trakt
+     * @param  array<string, mixed>|false  $omdb
+     */
+    private function tvdbCanFillGap(array|false $imdb, array|false $tmdb, array|false $trakt, array|false $omdb): bool
+    {
+        $hasPlot = ! empty($imdb['plot']) || ! empty($tmdb['plot']) || ! empty($trakt['overview']) || ! empty($omdb['plot']);
+        $hasCover = ! empty($tmdb['cover']) || ! empty($imdb['cover']) || ! empty($omdb['cover']);
+
+        return ! $hasPlot || ! $hasCover || empty($trakt['trailer']);
+    }
+
+    /**
+     * Fetch movie information from TVDB using IMDB ID.
+     *
+     * The provider data is cached as is and checked against the current release on every read.
+     *
+     * @return array<string, mixed>|false
+     */
+    public function fetchTvdbProperties(string $imdbId): array|false
+    {
+        $tvdbClient = app(TvdbClient::class);
+        if (! $tvdbClient->isConfigured()) {
+            return false;
+        }
+
+        $cacheKey = 'tvdb_movie_v1_'.$imdbId;
+        $movieData = Cache::get($cacheKey);
+        if (! is_array($movieData) && $movieData !== false) {
+            try {
+                $record = $tvdbClient->movieByImdbId('tt'.$imdbId);
+            } catch (TvProviderException $e) {
+                // An outage or a rejected key says nothing about the movie, so it isn't cached as a miss.
+                Log::warning('TVDB API error for '.$imdbId.': '.$e->getMessage());
+
+                return false;
+            }
+
+            $movieData = $record !== null ? $this->mapTvdbMovie($record) : false;
+            if ($movieData !== false && $movieData['title'] === '') {
+                $movieData = false;
+            }
+
+            Cache::put($cacheKey, $movieData, $movieData === false ? now()->addHours(6) : now()->addDays(7));
+        }
+
+        if ($movieData === false || ! $this->matchesCurrentContext($movieData['known_titles'], $movieData['year'])) {
+            return false;
+        }
+
+        if ($this->echooutput) {
+            cli()->info('TVDB found '.$movieData['title']);
+        }
+
+        return $movieData;
+    }
+
+    /**
+     * English texts where TVDB has them, otherwise those of the movie's own language.
+     *
+     * @param  array<string, mixed>  $record  TVDB extended movie record with translations
+     * @return array{tvdbid: int, title: string, known_titles: list<string>, plot: string, tagline: string, year: string, genre: list<string>, cover: string, trailer: string}
+     */
+    private function mapTvdbMovie(array $record): array
+    {
+        $translations = is_array($record['translations'] ?? null) ? $record['translations'] : [];
+        $names = array_filter((array) ($translations['nameTranslations'] ?? []), 'is_array');
+        $overviews = array_filter((array) ($translations['overviewTranslations'] ?? []), 'is_array');
+        $trailers = array_filter((array) ($record['trailers'] ?? []), 'is_array');
+
+        $preferred = static function (array $rows, string $field): string {
+            $ranked = [...array_filter($rows, static fn (array $row): bool => ($row['language'] ?? '') === 'eng'),
+                ...array_filter($rows, static fn (array $row): bool => ! empty($row['isPrimary'])),
+            ];
+            foreach ($ranked as $row) {
+                if (is_string($row[$field] ?? null) && $row[$field] !== '') {
+                    return $row[$field];
+                }
+            }
+
+            return '';
+        };
+
+        $name = is_string($record['name'] ?? null) ? $record['name'] : '';
+        $knownTitles = [$name, ...array_column($names, 'name'), ...array_column(array_filter((array) ($record['aliases'] ?? []), 'is_array'), 'name')];
+        $image = is_string($record['image'] ?? null) ? $record['image'] : '';
+
+        return [
+            'tvdbid' => (int) ($record['id'] ?? 0),
+            'title' => $preferred($names, 'name') ?: $name,
+            'known_titles' => array_values(array_unique(array_filter($knownTitles, static fn (mixed $known): bool => is_string($known) && $known !== ''))),
+            'plot' => $preferred($overviews, 'overview'),
+            'tagline' => $preferred($names, 'tagline'),
+            'year' => is_scalar($record['year'] ?? null) ? (string) $record['year'] : '',
+            'genre' => array_values(array_filter(array_column(array_filter((array) ($record['genres'] ?? []), 'is_array'), 'name'), 'is_string')),
+            'cover' => str_starts_with($image, 'http') ? $image : '',
+            'trailer' => $preferred($trailers, 'url') ?: (string) (array_column($trailers, 'url')[0] ?? ''),
+        ];
     }
 
     /**
@@ -1236,8 +1389,9 @@ class MovieService
 
             $found = $this->searchLocalDatabase($releaseId)
                 || $this->searchIMDb($releaseId)
-                || $this->searchTraktTV($releaseId, $movieName)
-                || $this->searchTMDB($releaseId);
+                || $this->searchTraktTV($releaseId)
+                || $this->searchTMDB($releaseId)
+                || $this->searchTVDB($releaseId);
 
             if ($found) {
                 if ($this->echooutput) {
@@ -1345,29 +1499,55 @@ class MovieService
         return false;
     }
 
-    private function searchTraktTV(int $releaseId, string $movieName): bool
+    /**
+     * Search Trakt by title. Trakt answers with English titles, so a result that doesn't
+     * resemble the release is checked again against its country aliases ("Der Pate").
+     */
+    private function searchTraktTV(int $releaseId): bool
     {
-        if ($this->traktcheck === null || $this->traktTv === null) {
+        $client = $this->traktClient();
+        if ($client === null) {
             return false;
         }
 
         try {
-            $data = $this->traktTv->client->getMovieSummary($movieName, 'full');
-            if ($data === null || empty($data['ids']['imdb'])) {
-                return false;
+            $candidates = [];
+            foreach ($client->searchMovies($this->currentTitle) ?? [] as $result) {
+                $movie = is_array($result) && is_array($result['movie'] ?? null) ? $result['movie'] : [];
+                $imdbId = $movie['ids']['imdb'] ?? '';
+                $title = $movie['title'] ?? '';
+
+                // Trakt doesn't filter by year, so drop what a matching title couldn't save anyway.
+                if (is_string($imdbId) && $imdbId !== '' && is_string($title) && $title !== '' && $this->yearAllowsAlternateTitle($movie['year'] ?? '')) {
+                    $candidates[] = [
+                        'imdbid' => $imdbId,
+                        'title' => $title,
+                        'year' => $movie['year'] ?? '',
+                        'exactYear' => $this->yearDifference($movie['year'] ?? '') === 0,
+                        'position' => count($candidates),
+                    ];
+                }
             }
 
-            if (! $this->isAcceptableSearchCandidate([(string) ($data['title'] ?? '')], $data['year'] ?? '')) {
-                return false;
+            // Exact-year matches first, then Trakt's own ranking.
+            usort($candidates, static fn (array $left, array $right): int => [$right['exactYear'], $left['position']] <=> [$left['exactYear'], $right['position']]);
+
+            foreach (array_slice($candidates, 0, self::TRAKT_SEARCH_RESULT_LIMIT) as $candidate) {
+                if (! $this->isAcceptableSearchCandidate([$candidate['title']], $candidate['year'])
+                    && ! $this->isAcceptableSearchCandidate($this->traktKnownTitles($client, $candidate['title'], $candidate['imdbid']), $candidate['year'])) {
+                    continue;
+                }
+
+                // doMovieUpdate builds the full movieinfo row from every provider once the match is accepted.
+                if ($this->doMovieUpdate($candidate['imdbid'], 'Trakt', $releaseId) !== false) {
+                    return true;
+                }
             }
-
-            // doMovieUpdate builds the full movieinfo row from every provider once the match is accepted.
-            return $this->doMovieUpdate((string) $data['ids']['imdb'], 'Trakt', $releaseId) !== false;
-        } catch (\Exception $e) {
-            Log::error('Trakt.tv error: '.$e->getMessage());
-
-            return false;
+        } catch (\Throwable $e) {
+            Log::warning('Trakt API error: '.$e->getMessage());
         }
+
+        return false;
     }
 
     private function searchTMDB(int $releaseId): bool
@@ -1379,7 +1559,7 @@ class MovieService
                 return false;
             }
 
-            foreach ($this->tmdbSearchQueries() as $query) {
+            foreach ($this->titleSearchQueries() as $query) {
                 $results = $this->tmdbSearchResults($tmdbClient, $query);
 
                 foreach (array_slice($results, 0, self::TMDB_SEARCH_RESULT_LIMIT) as $result) {
@@ -1439,11 +1619,85 @@ class MovieService
     }
 
     /**
+     * Search TVDB by title. A search row already carries the translated titles and the
+     * IMDb id, so judging a candidate costs no further request.
+     */
+    private function searchTVDB(int $releaseId): bool
+    {
+        try {
+            $tvdbClient = app(TvdbClient::class);
+
+            if (! $tvdbClient->isConfigured()) {
+                return false;
+            }
+
+            foreach ($this->titleSearchQueries() as $query) {
+                foreach (array_slice($this->tvdbSearchResults($tvdbClient, $query), 0, self::TVDB_SEARCH_RESULT_LIMIT) as $row) {
+                    $imdbId = $this->tvdbRowImdbId($row);
+                    if ($imdbId === null) {
+                        continue;
+                    }
+
+                    $titles = [$row['name'] ?? '', ...array_values((array) ($row['translations'] ?? [])), ...array_values((array) ($row['aliases'] ?? []))];
+                    if (! $this->isAcceptableSearchCandidate($titles, $row['year'] ?? '')) {
+                        continue;
+                    }
+
+                    if ($this->doMovieUpdate($imdbId, 'TVDB', $releaseId) !== false) {
+                        return true;
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::warning('TVDB API error: '.$e->getMessage());
+        }
+
+        return false;
+    }
+
+    /**
+     * TVDB search rows for a query, retried without the year filter when the release year finds
+     * nothing (TVDB's filter is exact, release groups sometimes are a year off).
+     *
+     * @return list<array<string, mixed>>
+     *
+     * @throws TvProviderException
+     */
+    private function tvdbSearchResults(TvdbClient $tvdbClient, string $query): array
+    {
+        if ($this->currentYear !== '') {
+            $results = $tvdbClient->searchMovies($query, (int) $this->currentYear);
+            if ($results !== []) {
+                return $results;
+            }
+        }
+
+        return $tvdbClient->searchMovies($query);
+    }
+
+    /**
+     * The IMDb id ("tt0068646") among the remote ids of a TVDB search row.
+     *
+     * @param  array<string, mixed>  $row
+     */
+    private function tvdbRowImdbId(array $row): ?string
+    {
+        foreach ((array) ($row['remote_ids'] ?? []) as $remoteId) {
+            if (is_array($remoteId) && ($remoteId['sourceName'] ?? '') === 'IMDB'
+                && is_string($remoteId['id'] ?? null) && preg_match('/^tt\d{5,}$/', $remoteId['id']) === 1) {
+                return $remoteId['id'];
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * The current title, plus a German spelling with umlauts restored ("traegt" → "trägt").
      *
      * @return list<string>
      */
-    private function tmdbSearchQueries(): array
+    private function titleSearchQueries(): array
     {
         $queries = [$this->currentTitle];
 
@@ -1672,6 +1926,22 @@ class MovieService
      */
     private function matchesCurrentContext(string|array|null $titles, mixed $year): bool
     {
+        if ($this->fitsCurrentContext($titles, $year)) {
+            return true;
+        }
+
+        $this->candidateMismatch = true;
+
+        return false;
+    }
+
+    /**
+     * The verdict of {@see matchesCurrentContext()} without recording a mismatch.
+     *
+     * @param  string|array<int|string, mixed>|null  $titles
+     */
+    private function fitsCurrentContext(string|array|null $titles, mixed $year): bool
+    {
         if ($this->currentTitle === '') {
             return true;
         }
@@ -1686,21 +1956,13 @@ class MovieService
         // matched to "Moana 2" (2024)). Near-exact titles get a ±1 year tolerance:
         // release groups occasionally mislabel the year (festival vs streaming release).
         if ($yearDifference !== null && $yearDifference > ($nearExactTitle ? 1 : 0)) {
-            $this->candidateMismatch = true;
-
             return false;
         }
 
         // Alternate/international titles are acceptable when the exact year confirms
         // the movie (e.g. a "Salve Geral Irmandade" (2026) release vs the locally
         // stored international title "State of Fear" (2026)).
-        if ($titlePercent < self::MATCH_PERCENT && ! $yearMatches) {
-            $this->candidateMismatch = true;
-
-            return false;
-        }
-
-        return true;
+        return $titlePercent >= self::MATCH_PERCENT || $yearMatches;
     }
 
     /**
@@ -1742,6 +2004,17 @@ class MovieService
         }
 
         return abs((int) $this->currentYear - (int) $hits[1]);
+    }
+
+    /**
+     * Whether a candidate of this year could still match under another of its titles:
+     * more than a year apart is a different movie whatever it is called.
+     */
+    private function yearAllowsAlternateTitle(mixed $year): bool
+    {
+        $yearDifference = $this->yearDifference($year);
+
+        return $yearDifference === null || $yearDifference <= 1;
     }
 
     /**
@@ -2072,6 +2345,17 @@ class MovieService
             }
         } catch (\Throwable $e) {
             Log::debug('OMDB cover fetch failed for '.$imdbId.': '.$e->getMessage());
+        }
+
+        try {
+            $tvdb = $this->fetchTvdbProperties($imdbId);
+            if (! empty($tvdb['cover'])) {
+                if ($this->saveRemoteAsset($imdbId.'-cover', $tvdb['cover']) === 1) {
+                    return true;
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::debug('TVDB cover fetch failed for '.$imdbId.': '.$e->getMessage());
         }
 
         return false;

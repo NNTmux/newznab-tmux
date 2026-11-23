@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Log;
 /**
  * TheTVDB API v4 client built on Laravel's HTTP client.
  *
- * Covers the four requests the TV pipeline makes and returns the decoded JSON as is.
+ * Covers the requests the TV pipeline and the movie lookup make and returns the decoded JSON as is.
  * The bearer token is cached and shared by every worker; TVDB tokens last a month.
  */
 class TvdbClient
@@ -62,12 +62,55 @@ class TvdbClient
      */
     public function searchSeries(string $name, ?int $year = null): array
     {
-        $query = ['query' => $name, 'type' => 'series'];
-        if ($year !== null) {
-            $query['year'] = $year;
+        return $this->search($name, 'series', $year);
+    }
+
+    /**
+     * Movies matching a title, best match first. A row carries the movie's translated titles
+     * and its remote ids (IMDb, TMDB), so a match needs no second request.
+     *
+     * @param  int|null  $year  TVDB only returns movies of exactly this year
+     * @return list<array<string, mixed>>
+     *
+     * @throws TvProviderException
+     */
+    public function searchMovies(string $name, ?int $year = null): array
+    {
+        return $this->search($name, 'movie', $year);
+    }
+
+    /**
+     * The extended record, with translations, of the movie that has this IMDb id ("tt0068646"),
+     * or null when TVDB doesn't know the id.
+     *
+     * @return array<string, mixed>|null
+     *
+     * @throws TvProviderException
+     */
+    public function movieByImdbId(string $imdbId): ?array
+    {
+        foreach (self::rows($this->get('/search/remoteid/'.rawurlencode($imdbId))['data'] ?? null) as $row) {
+            $id = (int) ($row['movie']['id'] ?? 0);
+            if ($id > 0) {
+                return $this->movieExtended($id);
+            }
         }
 
-        return self::rows($this->get('/search', $query)['data'] ?? null);
+        return null;
+    }
+
+    /**
+     * The extended record of a movie with its translations, or null when TVDB has none.
+     *
+     * @return array<string, mixed>|null
+     *
+     * @throws TvProviderException
+     */
+    public function movieExtended(int $id): ?array
+    {
+        $data = $this->get('/movies/'.$id.'/extended', ['meta' => 'translations', 'short' => 'true'])['data'] ?? null;
+
+        return \is_array($data) && $data !== [] ? $data : null;
     }
 
     /**
@@ -125,6 +168,21 @@ class TvdbClient
     public function seriesPosters(int $id): array
     {
         return self::rows($this->get('/series/'.$id.'/artworks', ['type' => self::ARTWORK_TYPE_POSTER])['data']['artworks'] ?? null);
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     *
+     * @throws TvProviderException
+     */
+    private function search(string $name, string $type, ?int $year): array
+    {
+        $query = ['query' => $name, 'type' => $type];
+        if ($year !== null) {
+            $query['year'] = $year;
+        }
+
+        return self::rows($this->get('/search', $query)['data'] ?? null);
     }
 
     /**

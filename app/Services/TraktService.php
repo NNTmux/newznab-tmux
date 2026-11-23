@@ -486,6 +486,37 @@ class TraktService
     }
 
     /**
+     * The titles a movie goes by in other countries ("Der Pate" for The Godfather).
+     *
+     * @param  string  $movie  Movie slug or ID
+     * @return list<array<string, mixed>>|null Rows of title and country, or null on failure
+     */
+    public function getMovieAliases(string $movie): ?array
+    {
+        $movieId = $this->formatMediaId($movie);
+        if ($movieId === null) {
+            return null;
+        }
+
+        $aliases = Cache::remember('trakt_movie_'.md5($movieId).'_aliases', now()->addHours(self::CACHE_TTL_HOURS), function () use ($movieId) {
+            return $this->get("movies/{$movieId}/aliases");
+        });
+
+        return is_array($aliases) ? array_values(array_filter($aliases, 'is_array')) : null;
+    }
+
+    /**
+     * Search for a movie by title. Trakt also matches translated titles and country aliases,
+     * and ignores a year filter, so callers check the year of each result themselves.
+     *
+     * @return array<string, mixed>|null Search results, best match first, or null on failure
+     */
+    public function searchMovies(string $query): ?array
+    {
+        return $this->searchShows($query, 'movie');
+    }
+
+    /**
      * Search by external ID.
      *
      * @param  int|string  $id  The ID to search for
@@ -747,6 +778,7 @@ class TraktService
         if ($movieId !== null) {
             Cache::forget('trakt_movie_'.md5($movieId).'_min');
             Cache::forget('trakt_movie_'.md5($movieId).'_full');
+            Cache::forget('trakt_movie_'.md5($movieId).'_aliases');
         }
     }
 

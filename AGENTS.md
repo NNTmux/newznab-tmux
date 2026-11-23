@@ -191,7 +191,7 @@ After resolving merge conflicts, stage every resolved path with `git add <paths>
 
 ## External APIs
 
-Requires `.env` keys: TMDB, TVDB, TVMaze, Trakt, OMDB, MDBList (TV/Movies; `TvdbClient`, `OmdbClient` and `MdbListClient` in `app/Services/` are in-house HTTP clients, and Rotten Tomatoes scores come from MDBList with OMDB as fallback); IGDB, GiantBomb, Steam (Games); AniList, AniDB (Anime); NNTP credentials.
+Requires `.env` keys: TMDB, TVDB, TVMaze, Trakt, OMDB, MDBList (TV/Movies; `TvdbClient`, `OmdbClient` and `MdbListClient` in `app/Services/` are in-house HTTP clients, and Rotten Tomatoes scores come from MDBList with OMDB as fallback; movies are also searched by title on Trakt and TVDB, and TVDB fills in a missing plot, cover or trailer); IGDB, GiantBomb, Steam (Games); AniList, AniDB (Anime); NNTP credentials.
 
 ## Frontend
 

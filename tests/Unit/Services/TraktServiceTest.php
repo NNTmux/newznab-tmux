@@ -190,4 +190,32 @@ class TraktServiceTest extends TestCase
                 && $request['extended'] === 'episodes';
         });
     }
+
+    public function test_movie_search_asks_the_movie_index_for_the_title(): void
+    {
+        Http::fake([
+            'https://api.trakt.tv/search/movie*' => Http::response([
+                ['type' => 'movie', 'movie' => ['title' => 'The Godfather', 'year' => 1972, 'ids' => ['imdb' => 'tt0068646']]],
+            ], 200),
+        ]);
+
+        $results = $this->service->searchMovies('Der Pate');
+
+        $this->assertSame('tt0068646', $results[0]['movie']['ids']['imdb'] ?? null);
+        Http::assertSent(fn ($request) => str_starts_with($request->url(), 'https://api.trakt.tv/search/movie?')
+            && $request['query'] === 'Der Pate');
+    }
+
+    public function test_movie_aliases_are_requested_by_imdb_id(): void
+    {
+        Http::fake([
+            'https://api.trakt.tv/movies/tt0068646/aliases' => Http::response([
+                ['title' => 'Der Pate', 'country' => 'de'],
+            ], 200),
+        ]);
+
+        $aliases = $this->service->getMovieAliases('tt0068646');
+
+        $this->assertSame([['title' => 'Der Pate', 'country' => 'de']], $aliases);
+    }
 }
