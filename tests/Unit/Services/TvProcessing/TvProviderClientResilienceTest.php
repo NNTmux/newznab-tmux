@@ -9,12 +9,6 @@ use App\Services\TmdbClient;
 use App\Services\TraktService;
 use App\Services\TvMazeClient;
 use App\Services\TvProcessing\Providers\TvdbProvider;
-use CanIHaveSomeCoffee\TheTVDbAPI\Route\RouteFactory;
-use CanIHaveSomeCoffee\TheTVDbAPI\TheTVDbAPI;
-use GuzzleHttp\Client;
-use GuzzleHttp\Handler\MockHandler;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
@@ -32,6 +26,7 @@ class TvProviderClientResilienceTest extends TestCase
             'nntmux_api.trakttv_retry_times' => 1,
             'nntmux_api.tvmaze_retry_times' => 1,
             'tvdb.api_key' => 'tvdb-key',
+            'tvdb.retry_times' => 1,
         ]);
         Cache::flush();
     }
@@ -84,22 +79,47 @@ class TvProviderClientResilienceTest extends TestCase
 
     public function test_tvdb_rate_limit_is_transient_and_not_found_is_a_miss(): void
     {
-        $login = new Response(200, [], (string) json_encode(['data' => ['token' => 'token']]));
-        $provider = $this->tvdbProvider(new MockHandler([$login, new Response(404, [], '{}'), new Response(429, [], '{}')]));
+        $this->fakeTvdb(['api4.thetvdb.com/v4/search*' => Http::sequence()
+            ->push(['status' => 'failure', 'data' => null], 404)
+            ->push(['status' => 'failure', 'data' => null], 429, ['Retry-After' => '30'])]);
+        $provider = new TvdbProvider;
 
         $this->assertFalse($provider->getShowInfo('No Such Show'));
 
-        $this->expectException(TvProviderException::class);
-        $provider->getShowInfo('Severance');
+        try {
+            $provider->getShowInfo('Severance');
+            $this->fail('Expected a transient TVDB failure.');
+        } catch (TvProviderException $e) {
+            $this->assertSame(['tvdb', 429, 30], [$e->provider, $e->statusCode, $e->retryAfterSeconds]);
+        }
     }
 
     public function test_tvdb_logs_in_again_once_when_the_token_expires(): void
     {
-        $token = static fn (): Response => new Response(200, [], (string) json_encode(['data' => ['token' => 'token']]));
-        $handler = new MockHandler([$token(), new Response(401, [], '{}'), $token(), new Response(404, [], '{}')]);
+        $this->fakeTvdb(['api4.thetvdb.com/v4/series/*' => Http::sequence()
+            ->push(['message' => 'Unauthorized'], 401)
+            ->push(['status' => 'failure', 'data' => null], 404)]);
 
-        $this->assertNull($this->tvdbProvider($handler)->seriesExtended(371980));
-        $this->assertSame(0, $handler->count(), 'Expected login, 401, a second login and the retried request.');
+        $this->assertNull((new TvdbProvider)->showById(371980));
+        Http::assertSentCount(4);
+    }
+
+    public function test_tvdb_token_is_shared_by_every_provider_instance(): void
+    {
+        $this->fakeTvdb(['api4.thetvdb.com/v4/search*' => Http::response(['status' => 'success', 'data' => []])]);
+
+        (new TvdbProvider)->getShowInfo('Severance');
+        (new TvdbProvider)->getShowInfo('Severance');
+
+        Http::assertSentCount(3);
+    }
+
+    public function test_an_unreadable_tvdb_body_is_transient_and_not_a_miss(): void
+    {
+        $this->fakeTvdb(['api4.thetvdb.com/v4/search*' => Http::response('<html>Bad gateway</html>')]);
+
+        $this->expectException(TvProviderException::class);
+        (new TvdbProvider)->getShowInfo('Severance');
     }
 
     public function test_blocked_or_rejected_requests_are_never_reported_as_not_found(): void
@@ -128,10 +148,10 @@ class TvProviderClientResilienceTest extends TestCase
 
     public function test_rejected_tvdb_credentials_pause_lookups_instead_of_missing_every_show(): void
     {
-        $handler = new MockHandler([new Response(401, [], '{}')]);
-        $provider = $this->tvdbProvider($handler);
+        Http::fake(['api4.thetvdb.com/v4/login' => Http::response(['status' => 'failure', 'message' => 'InvalidAPIKey: apikey invalid', 'data' => null], 401)]);
 
-        foreach ([1, 2] as $attempt) {
+        // A second provider stands in for another worker: the pause is shared.
+        foreach ([new TvdbProvider, new TvdbProvider] as $provider) {
             try {
                 $provider->getShowInfo('Severance');
                 $this->fail('Expected a rejected login to be retried later, not a miss.');
@@ -141,33 +161,30 @@ class TvProviderClientResilienceTest extends TestCase
             }
         }
 
-        $this->assertSame(0, $handler->count(), 'The second lookup must not log in again during the pause.');
+        Http::assertSentCount(1);
     }
 
     public function test_tvdb_forbidden_and_failed_logins_are_transient(): void
     {
-        $login = new Response(200, [], (string) json_encode(['data' => ['token' => 'token']]));
+        $this->fakeTvdb(['api4.thetvdb.com/v4/search*' => Http::response([], 403)]);
 
         $this->expectException(TvProviderException::class);
-        $this->tvdbProvider(new MockHandler([$login, new Response(403, [], '{}')]))->getShowInfo('Severance');
+        (new TvdbProvider)->getShowInfo('Severance');
     }
 
     public function test_tvdb_login_server_error_is_transient(): void
     {
+        Http::fake(['api4.thetvdb.com/v4/login' => Http::response([], 503)]);
+
         $this->expectException(TvProviderException::class);
-        $this->tvdbProvider(new MockHandler([new Response(503, [], '{}')]))->getShowInfo('Severance');
+        (new TvdbProvider)->getShowInfo('Severance');
     }
 
-    private function tvdbProvider(MockHandler $handler): TvdbProvider
+    /**
+     * @param  array<string, mixed>  $responses
+     */
+    private function fakeTvdb(array $responses): void
     {
-        // The library caches route objects per process; drop them so they bind to this client.
-        (new \ReflectionProperty(RouteFactory::class, 'routeInstances'))->setValue(null, []);
-
-        $client = new Client([
-            'base_uri' => TheTVDbAPI::API_BASE_URI,
-            'handler' => HandlerStack::create($handler),
-        ]);
-
-        return new TvdbProvider(new TheTVDbAPI('eng', '', $client));
+        Http::fake(['api4.thetvdb.com/v4/login' => Http::response(['status' => 'success', 'data' => ['token' => 'token']])] + $responses);
     }
 }

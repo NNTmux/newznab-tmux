@@ -17,6 +17,8 @@ final class MetadataSources
 
     public const string OMDB = 'omdb';
 
+    public const string MDBLIST = 'mdblist';
+
     public const string TVDB = 'tvdb';
 
     public const string FANARTTV = 'fanarttv';
@@ -41,6 +43,7 @@ final class MetadataSources
         return [
             self::TMDB => 'TMDB',
             self::OMDB => 'OMDb',
+            self::MDBLIST => 'MDBList',
             self::TVDB => 'TVDB',
             self::FANARTTV => 'Fanart.tv',
             self::TRAKT => 'Trakt',
@@ -59,6 +62,7 @@ final class MetadataSources
         return match ($source) {
             self::TMDB => self::missingKey('tmdb.api_key', 'TMDB_APIKEY'),
             self::OMDB => self::missingKey('nntmux_api.omdb_api_key', 'OMDB_APIKEY'),
+            self::MDBLIST => self::missingKey('nntmux_api.mdblist_api_key', 'MDBLIST_APIKEY'),
             self::TVDB => self::missingKey('tvdb.api_key', 'TVDB_APIKEY'),
             self::FANARTTV => self::missingKey('nntmux_api.fanarttv_api_key', 'FANARTTV_APIKEY'),
             self::TRAKT => self::missingKey('nntmux_api.trakttv_api_key', 'TRAKTTV_APIKEY'),

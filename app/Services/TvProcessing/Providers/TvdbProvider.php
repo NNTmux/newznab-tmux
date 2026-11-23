@@ -6,13 +6,7 @@ namespace App\Services\TvProcessing\Providers;
 
 use App\Exceptions\TvProviderException;
 use App\Services\TmdbClient;
-use App\Support\MetadataSources;
-use CanIHaveSomeCoffee\TheTVDbAPI\Exception\ResourceNotFoundException;
-use CanIHaveSomeCoffee\TheTVDbAPI\Exception\UnauthorizedException;
-use CanIHaveSomeCoffee\TheTVDbAPI\Model\SeriesExtendedRecord;
-use CanIHaveSomeCoffee\TheTVDbAPI\TheTVDbAPI;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
+use App\Services\TvdbClient;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -20,40 +14,12 @@ use Illuminate\Support\Facades\Log;
  */
 class TvdbProvider extends AbstractTvProvider
 {
-    public TheTVDbAPI $client;
+    public TvdbClient $client;
 
-    /**
-     * @var string Authorization token for the TVDB API
-     */
-    public string $token = '';
-
-    /** True when TVDB is unconfigured. */
-    private bool $local = false;
-
-    /** Seconds to stop logging in after TVDB rejected the credentials. */
-    private const int REJECTED_LOGIN_PAUSE = 600;
-
-    /** Unix time until which a rejected login isn't retried. */
-    private int $loginRejectedUntil = 0;
-
-    private bool $authorized = false;
-
-    /**
-     * One client per process: the library's RouteFactory caches its route objects
-     * statically, so every route keeps using the first TheTVDbAPI instance it saw.
-     */
-    private static ?TheTVDbAPI $sharedClient = null;
-
-    public function __construct(?TheTVDbAPI $client = null)
+    public function __construct(?TvdbClient $client = null)
     {
         parent::__construct();
-        $this->client = $client ?? self::$sharedClient ??= new TheTVDbAPI('eng', '', new Client([
-            'base_uri' => TheTVDbAPI::API_BASE_URI,
-            'timeout' => (int) config('tvdb.timeout', 30),
-            'connect_timeout' => 10,
-            'headers' => ['accept' => 'application/json'],
-        ]));
-        $this->local = ! MetadataSources::isAvailable(MetadataSources::TVDB);
+        $this->client = $client ?? app(TvdbClient::class);
     }
 
     /**
@@ -67,16 +33,10 @@ class TvdbProvider extends AbstractTvProvider
         // so an unconvincing year-filtered search is retried without the year.
         $highest = null;
         if ($year !== null) {
-            $highest = $this->bestSearchResult(
-                $this->call(fn (TheTVDbAPI $client) => $client->search()->search($name, ['type' => 'series', 'year' => $year])),
-                $name, $year, $country,
-            );
+            $highest = $this->bestSearchResult($this->client->searchSeries($name, $year), $name, $year, $country);
         }
         if ($highest === null) {
-            $highest = $this->bestSearchResult(
-                $this->call(fn (TheTVDbAPI $client) => $client->search()->search($name, ['type' => 'series'])),
-                $name, $year, $country,
-            );
+            $highest = $this->bestSearchResult($this->client->searchSeries($name), $name, $year, $country);
         }
 
         return $highest !== null ? $this->formatShowInfo($highest) : false;
@@ -85,16 +45,15 @@ class TvdbProvider extends AbstractTvProvider
     /**
      * The highest scoring series of a search response, comparing its name, English
      * translation and aliases; null when nothing scores.
+     *
+     * @param  list<array<string, mixed>>  $response
      */
-    private function bestSearchResult(mixed $response, string $name, ?int $year, string $country): ?object
+    private function bestSearchResult(array $response, string $name, ?int $year, string $country): ?object
     {
-        if (! \is_array($response)) {
-            return null;
-        }
-
         $highestScore = 0.0;
         $highest = null;
-        foreach ($response as $show) {
+        foreach ($response as $row) {
+            $show = (object) $row;
             if (! $this->checkRequiredAttr($show, 'tvdbS')) {
                 continue;
             }
@@ -142,28 +101,34 @@ class TvdbProvider extends AbstractTvProvider
             return 0;
         }
 
-        $episodes = $this->call(fn (TheTVDbAPI $client) => $client->series()->allEpisodes($siteId));
+        $episodes = $this->client->seriesEpisodes($siteId, [], 'eng');
 
         // Shows without an English translation come back empty from the /eng listing.
-        if ($episodes === [] || $episodes === null) {
-            $series = $this->call(fn (TheTVDbAPI $client) => $client->series()->extended($siteId));
-            if (\is_object($series) && ($series->originalLanguage ?? 'eng') !== 'eng') {
-                $episodes = $this->call(fn (TheTVDbAPI $client) => $client->series()->allEpisodesOriginalLanguage($series));
+        if ($episodes === []) {
+            $language = (string) ($this->client->seriesExtended($siteId)['originalLanguage'] ?? 'eng');
+            if ($language !== '' && $language !== 'eng') {
+                $episodes = $this->client->seriesEpisodes($siteId, [], $language);
             }
         }
 
-        if (! \is_array($episodes)) {
-            return 0;
-        }
+        return $this->addEpisodes($videoId, $this->formatEpisodes($episodes));
+    }
 
+    /**
+     * @param  list<array<string, mixed>>  $episodes
+     * @return list<array<string, mixed>>
+     */
+    private function formatEpisodes(array $episodes): array
+    {
         $formatted = [];
-        foreach ($episodes as $episode) {
+        foreach ($episodes as $row) {
+            $episode = (object) $row;
             if ($this->checkRequiredAttr($episode, 'tvdbE')) {
                 $formatted[] = $this->formatEpisodeInfo($episode);
             }
         }
 
-        return $this->addEpisodes($videoId, $formatted);
+        return $formatted;
     }
 
     public function supportsAirdateLookup(): bool
@@ -178,19 +143,9 @@ class TvdbProvider extends AbstractTvProvider
             return 0;
         }
 
-        $episodes = $this->call(fn (TheTVDbAPI $client) => $client->series()->episodes($siteId, 0, 0, 'default', '', -1, $date));
-        if (! \is_array($episodes)) {
-            return 0;
-        }
-
-        $formatted = [];
-        foreach ($episodes as $episode) {
-            if ($this->checkRequiredAttr($episode, 'tvdbE')) {
-                $formatted[] = $this->formatEpisodeInfo($episode);
-            }
-        }
-
-        return $this->addEpisodes($videoId, $formatted);
+        return $this->addEpisodes($videoId, $this->formatEpisodes(
+            $this->client->seriesEpisodes($siteId, ['airDate' => $date->format('Y-m-d')]),
+        ));
     }
 
     /**
@@ -202,8 +157,8 @@ class TvdbProvider extends AbstractTvProvider
             return false;
         }
 
-        $episodes = $this->call(fn (TheTVDbAPI $client) => $client->series()->episodes($siteId, $season, 0, 'default', '', $episode));
-        foreach (\is_array($episodes) ? $episodes : [] as $record) {
+        foreach ($this->client->seriesEpisodes($siteId, ['season' => $season, 'episodeNumber' => $episode]) as $row) {
+            $record = (object) $row;
             if ($this->checkRequiredAttr($record, 'tvdbE') && (int) $record->seasonNumber === $season && (int) $record->number === $episode) {
                 return $this->formatEpisodeInfo($record);
             }
@@ -224,9 +179,8 @@ class TvdbProvider extends AbstractTvProvider
         if (! empty($show->image_url)) {
             $this->posterUrl = (string) $show->image_url;
         } else {
-            $artworks = $this->callQuietly(fn (TheTVDbAPI $client) => $client->series()->artworks($tvdbId));
-            $poster = collect(\is_array($artworks) ? $artworks : [])->where('type', 2)->sortByDesc('score')->first();
-            $this->posterUrl = ! empty($poster->image) ? (string) $poster->image : '';
+            $poster = collect($this->postersQuietly($tvdbId))->sortByDesc('score')->first();
+            $this->posterUrl = (string) ($poster['image'] ?? '');
         }
 
         // Store English titles; the original-language name stays findable as an alias.
@@ -240,12 +194,7 @@ class TvdbProvider extends AbstractTvProvider
         $overviews = \is_array($show->overviews ?? null) ? $show->overviews : [];
         $summary = (string) ($overviews['eng'] ?? ($show->overview ?? ''));
 
-        $imdbId = '';
-        $extended = $this->callQuietly(fn (TheTVDbAPI $client) => $client->series()->extended($tvdbId));
-        if (\is_object($extended)) {
-            preg_match('/tt(?P<imdbid>\d{6,})$/i', (string) ($extended->getIMDBId() ?? ''), $imdb);
-            $imdbId = (string) ($imdb['imdbid'] ?? '');
-        }
+        $imdbId = $this->imdbId($show);
 
         $externalIds = $this->lookupExternalIds($tvdbId, $imdbId);
 
@@ -254,7 +203,7 @@ class TvdbProvider extends AbstractTvProvider
             'title' => $title,
             'summary' => $summary,
             'started' => (string) ($show->first_air_time ?? ''),
-            'publisher' => \is_object($extended) ? (string) ($extended->originalNetwork->name ?? '') : '',
+            'publisher' => (string) ($show->network ?? ''),
             'country' => (string) ($show->country ?? ''),
             'poster' => $this->posterUrl,
             'source' => parent::SOURCE_TVDB,
@@ -285,135 +234,82 @@ class TvdbProvider extends AbstractTvProvider
     }
 
     /**
-     * The library client, logged in; null when TVDB is unconfigured or rejected the credentials.
+     * A series by its TVDB id, shaped like a search result so formatShowInfo() can read it;
+     * null when TVDB has none.
+     *
+     * @throws TvProviderException
      */
-    public function authorizedClient(): ?TheTVDbAPI
+    public function showById(int $tvdbId): ?object
     {
-        try {
-            return $this->authorize() ? $this->client : null;
-        } catch (TvProviderException) {
+        $series = $this->client->seriesExtended($tvdbId);
+        if ($series === null) {
             return null;
         }
-    }
 
-    /**
-     * The extended record of a series, or null when TVDB has none.
-     */
-    public function seriesExtended(int $tvdbId): ?SeriesExtendedRecord
-    {
-        return $this->call(fn (TheTVDbAPI $client) => $client->series()->extended($tvdbId));
-    }
-
-    /**
-     * Run a TVDB request: null when TVDB has nothing (404) or is unconfigured.
-     *
-     * Re-authorises once on 401. Every other failure (rate limit, server error, rejected
-     * credentials, other 4xx, connection error) surfaces as TvProviderException, so the
-     * release is retried later instead of being recorded as "show not found". Responses
-     * the library can't parse stay a miss for that one request.
-     *
-     * @template T
-     *
-     * @param  callable(TheTVDbAPI): T  $request
-     * @return T|null
-     */
-    private function call(callable $request): mixed
-    {
-        for ($attempt = 0; $attempt < 2; $attempt++) {
-            if (! $this->authorize($attempt > 0)) {
-                return null;
-            }
-
-            try {
-                return $request($this->client);
-            } catch (ResourceNotFoundException) {
-                return null;
-            } catch (UnauthorizedException) {
-                $this->authorized = false;
-
-                continue;
-            } catch (GuzzleException $e) {
-                throw new TvProviderException('tvdb', 'TVDB request failed: '.$e->getMessage(), null, null, $e);
-            } catch (\Exception $e) {
-                $status = self::statusOf($e);
-                if ($status !== null) {
-                    throw new TvProviderException('tvdb', $e->getMessage(), $status, null, $e);
-                }
-
-                Log::warning('TVDB response could not be read', ['error' => $e->getMessage()]);
-
-                return null;
+        $aliases = [];
+        foreach (\is_array($series['aliases'] ?? null) ? $series['aliases'] : [] as $alias) {
+            $aliasName = \is_array($alias) ? ($alias['name'] ?? null) : $alias;
+            if (\is_string($aliasName) && $aliasName !== '') {
+                $aliases[] = $aliasName;
             }
         }
 
-        throw new TvProviderException('tvdb', 'TVDB keeps answering 401 after a fresh login', 401, self::REJECTED_LOGIN_PAUSE);
-    }
+        $translations = \is_array($series['translations'] ?? null) ? $series['translations'] : [];
 
-    /** The HTTP status the library puts in its generic exception message, if any. */
-    private static function statusOf(\Exception $e): ?int
-    {
-        return preg_match('/Got status code (\d{3})/', $e->getMessage(), $status) === 1 ? (int) $status[1] : null;
+        return (object) [
+            'tvdb_id' => (string) ($series['id'] ?? $tvdbId),
+            'name' => (string) ($series['name'] ?? ''),
+            'overview' => (string) ($series['overview'] ?? ''),
+            'first_air_time' => (string) ($series['firstAired'] ?? ''),
+            'aliases' => $aliases,
+            'image_url' => (string) ($series['image'] ?? ''),
+            'country' => (string) ($series['originalCountry'] ?? ''),
+            'network' => (string) ($series['originalNetwork']['name'] ?? ''),
+            'remote_ids' => \is_array($series['remoteIds'] ?? null) ? $series['remoteIds'] : [],
+            'translations' => array_filter(['eng' => self::englishTranslation($translations['nameTranslations'] ?? null, 'name')]),
+            'overviews' => array_filter(['eng' => self::englishTranslation($translations['overviewTranslations'] ?? null, 'overview')]),
+        ];
     }
 
     /**
-     * Like call(), for optional enrichment: transient failures are logged instead of thrown.
-     *
-     * @template T
-     *
-     * @param  callable(TheTVDbAPI): T  $request
-     * @return T|null
+     * The English entry of a TVDB translation list, skipping alternative titles; '' when there is none.
      */
-    private function callQuietly(callable $request): mixed
+    private static function englishTranslation(mixed $translations, string $field): string
+    {
+        foreach (\is_array($translations) ? $translations : [] as $translation) {
+            if (\is_array($translation) && ($translation['language'] ?? '') === 'eng' && empty($translation['isAlias'])) {
+                return trim((string) ($translation[$field] ?? ''));
+            }
+        }
+
+        return '';
+    }
+
+    /** The numeric IMDb id among a series' remote ids, or '' when TVDB lists none. */
+    private function imdbId(object $show): string
+    {
+        foreach (\is_array($show->remote_ids ?? null) ? $show->remote_ids : [] as $remote) {
+            if (\is_array($remote) && preg_match('/^tt(?P<imdbid>\d{6,})$/i', (string) ($remote['id'] ?? ''), $imdb) === 1) {
+                return $imdb['imdbid'];
+            }
+        }
+
+        return '';
+    }
+
+    /**
+     * The posters of a series. Optional enrichment: a failure is logged instead of thrown.
+     *
+     * @return list<array<string, mixed>>
+     */
+    private function postersQuietly(int $tvdbId): array
     {
         try {
-            return $this->call($request);
+            return $this->client->seriesPosters($tvdbId);
         } catch (TvProviderException $e) {
             Log::info('TVDB enrichment request failed', ['error' => $e->getMessage()]);
 
-            return null;
+            return [];
         }
-    }
-
-    /**
-     * Log in on first use, or again when $force is set after a 401.
-     */
-    private function authorize(bool $force = false): bool
-    {
-        if ($this->local) {
-            return false;
-        }
-
-        if ($this->authorized && ! $force) {
-            return true;
-        }
-
-        $pauseLeft = $this->loginRejectedUntil - time();
-        if ($pauseLeft > 0) {
-            throw new TvProviderException('tvdb', 'TVDB rejected the configured credentials', 401, $pauseLeft);
-        }
-
-        $pin = config('tvdb.user_pin');
-
-        try {
-            $this->token = $this->client->authentication()->login(
-                (string) config('tvdb.api_key'),
-                \is_string($pin) && $pin !== '' ? $pin : null,
-            );
-        } catch (UnauthorizedException|ResourceNotFoundException $e) {
-            // Not a reason to call every show "not found": the releases wait and retry.
-            Log::warning('TVDB rejected the configured credentials; TVDB lookups pause and are retried later.', ['error' => $e->getMessage()]);
-            $this->loginRejectedUntil = time() + self::REJECTED_LOGIN_PAUSE;
-
-            throw new TvProviderException('tvdb', 'TVDB rejected the configured credentials', 401, self::REJECTED_LOGIN_PAUSE, $e);
-        } catch (GuzzleException $e) {
-            throw new TvProviderException('tvdb', 'TVDB login failed: '.$e->getMessage(), null, null, $e);
-        } catch (\Exception $e) {
-            throw new TvProviderException('tvdb', 'TVDB login failed: '.$e->getMessage(), self::statusOf($e), null, $e);
-        }
-
-        $this->client->setToken($this->token);
-        $this->authorized = true;
-
-        return true;
     }
 }

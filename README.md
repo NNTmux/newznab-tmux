@@ -138,7 +138,8 @@ TVDB_API_KEY=your_tvdb_key
 TVMAZE_API_KEY=              # Optional, no key required for basic usage
 TRAKT_CLIENT_ID=your_trakt_client_id
 TRAKT_CLIENT_SECRET=your_trakt_secret
-OMDB_API_KEY=your_omdb_key
+OMDB_APIKEY=your_omdb_key
+MDBLIST_APIKEY=your_mdblist_key   # Rotten Tomatoes scores
 FANART_API_KEY=your_fanart_key
 GIANTBOMB_API_KEY=your_giantbomb_key
 

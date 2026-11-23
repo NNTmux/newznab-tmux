@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Tests\Unit\Services;
 
 use App\Services\FanartTvService;
+use App\Services\MdbListClient;
+use App\Services\OmdbClient;
 use App\Services\TmdbClient;
 use App\Services\TraktService;
 use App\Services\TvProcessing\Providers\TraktProvider;
@@ -24,6 +26,8 @@ class UnconfiguredMetadataSourceTest extends TestCase
             'tmdb.api_key' => '',
             'nntmux_api.fanarttv_api_key' => '',
             'nntmux_api.trakttv_api_key' => '',
+            'nntmux_api.omdb_api_key' => '',
+            'nntmux_api.mdblist_api_key' => '',
         ]);
 
         Cache::flush();
@@ -36,14 +40,20 @@ class UnconfiguredMetadataSourceTest extends TestCase
         $trakt = new TraktService;
         $tmdb = new TmdbClient;
         $fanart = new FanartTvService;
+        $omdb = new OmdbClient;
+        $mdbList = new MdbListClient;
 
         $this->assertFalse($trakt->isConfigured());
         $this->assertFalse($tmdb->isConfigured());
         $this->assertFalse($fanart->isConfigured());
+        $this->assertFalse($omdb->isConfigured());
+        $this->assertFalse($mdbList->isConfigured());
 
         $this->assertNull($trakt->searchShows('Breaking Bad'));
         $this->assertNull($tmdb->searchTv('Breaking Bad'));
         $this->assertNull($fanart->getMovieProperties('0137523'));
+        $this->assertNull($omdb->movieByImdbId('0137523'));
+        $this->assertSame([], $mdbList->tomatometerScores(['0137523']));
 
         Http::assertNothingSent();
         Log::shouldNotHaveReceived('debug');

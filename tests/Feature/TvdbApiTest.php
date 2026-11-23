@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Services\TvProcessing\Providers\TvdbProvider;
-use CanIHaveSomeCoffee\TheTVDbAPI\TheTVDbAPI;
+use App\Exceptions\TvProviderException;
+use App\Services\TvdbClient;
 use Tests\TestCase;
 
 /**
@@ -13,120 +13,68 @@ use Tests\TestCase;
  */
 class TvdbApiTest extends TestCase
 {
-    private ?TvdbProvider $tvdbProvider = null;
+    private const int BREAKING_BAD = 81189;
 
-    private ?TheTVDbAPI $client = null;
+    private TvdbClient $client;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        try {
-            $this->tvdbProvider = new TvdbProvider;
-            $this->client = $this->tvdbProvider->authorizedClient();
-        } catch (\Exception $e) {
-            $this->tvdbProvider = null;
-        }
+        $this->client = new TvdbClient;
 
-        if ($this->client === null) {
-            $this->tvdbProvider = null;
+        if (! $this->client->isConfigured()) {
+            $this->markTestSkipped('TVDB API key is not configured.');
         }
-    }
-
-    public function test_tvdb_provider_can_be_instantiated(): void
-    {
-        if ($this->tvdbProvider === null) {
-            $this->markTestSkipped('TVDB API is not configured or unavailable.');
-        }
-
-        $this->assertInstanceOf(TvdbProvider::class, $this->tvdbProvider);
     }
 
     public function test_can_search_for_series(): void
     {
-        if ($this->tvdbProvider === null) {
-            $this->markTestSkipped('TVDB API is not configured or unavailable.');
-        }
+        $results = $this->search('Breaking Bad');
 
-        try {
-            $results = $this->client->search()->search('Breaking Bad', ['type' => 'series']);
-
-            $this->assertNotEmpty($results);
-            $this->assertIsArray($results);
-        } catch (\Throwable $e) {
-            $this->markTestSkipped('TVDB API search failed: '.$e->getMessage());
-        }
-    }
-
-    public function test_can_get_series_episodes(): void
-    {
-        if ($this->tvdbProvider === null) {
-            $this->markTestSkipped('TVDB API is not configured or unavailable.');
-        }
-
-        try {
-            // First search for Breaking Bad
-            $results = $this->client->search()->search('Breaking Bad', ['type' => 'series']);
-
-            if (empty($results)) {
-                $this->markTestSkipped('Could not find Breaking Bad on TVDB.');
-            }
-
-            $tvdbId = $results[0]->tvdb_id;
-            $episodes = $this->client->series()->episodes($tvdbId);
-
-            $this->assertNotEmpty($episodes);
-        } catch (\Throwable $e) {
-            $this->markTestSkipped('TVDB API episode fetch failed: '.$e->getMessage());
-        }
+        $this->assertNotEmpty($results);
+        $this->assertContains((string) self::BREAKING_BAD, array_column($results, 'tvdb_id'));
     }
 
     public function test_can_find_specific_episode(): void
     {
-        if ($this->tvdbProvider === null) {
-            $this->markTestSkipped('TVDB API is not configured or unavailable.');
-        }
-
         try {
-            // Search for Breaking Bad
-            $results = $this->client->search()->search('Breaking Bad', ['type' => 'series']);
-
-            if (empty($results)) {
-                $this->markTestSkipped('Could not find Breaking Bad on TVDB.');
-            }
-
-            $tvdbId = $results[0]->tvdb_id;
-            $episodes = $this->client->series()->episodes($tvdbId);
-
-            // Find Season 1 Episode 1
-            $foundEpisode = null;
-            foreach ($episodes as $episode) {
-                if ($episode->seasonNumber === 1 && $episode->number === 1) {
-                    $foundEpisode = $episode;
-                    break;
-                }
-            }
-
-            $this->assertNotNull($foundEpisode, 'Should find S01E01 of Breaking Bad');
-        } catch (\Throwable $e) {
-            $this->markTestSkipped('TVDB API episode search failed: '.$e->getMessage());
+            $episodes = $this->client->seriesEpisodes(self::BREAKING_BAD, ['season' => 1, 'episodeNumber' => 1]);
+        } catch (TvProviderException $e) {
+            $this->markTestSkipped('TVDB API is unavailable: '.$e->getMessage());
         }
+
+        $this->assertCount(1, $episodes);
+        $this->assertSame(1, $episodes[0]['seasonNumber']);
+        $this->assertSame(1, $episodes[0]['number']);
+        $this->assertSame('2008-01-20', $episodes[0]['aired']);
     }
 
-    public function test_handles_invalid_search_gracefully(): void
+    public function test_finds_a_regular_episode_by_airdate(): void
     {
-        if ($this->tvdbProvider === null) {
-            $this->markTestSkipped('TVDB API is not configured or unavailable.');
+        try {
+            $episodes = $this->client->seriesEpisodes(self::BREAKING_BAD, ['airDate' => '2008-01-20']);
+        } catch (TvProviderException $e) {
+            $this->markTestSkipped('TVDB API is unavailable: '.$e->getMessage());
         }
 
-        try {
-            $results = $this->client->search()->search('xyznonexistentshow99999', ['type' => 'series']);
+        $this->assertSame([[1, 1]], array_map(static fn (array $episode): array => [$episode['seasonNumber'], $episode['number']], $episodes));
+    }
 
-            // Should return empty or null for non-existent shows
-            $this->assertTrue(empty($results) || $results === null);
-        } catch (\Throwable $e) {
-            // API might throw exception for no results, which is acceptable
-            $this->assertTrue(true);
+    public function test_returns_no_results_for_an_unknown_show(): void
+    {
+        $this->assertSame([], $this->search('xyznonexistentshow99999'));
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    private function search(string $name): array
+    {
+        try {
+            return $this->client->searchSeries($name);
+        } catch (TvProviderException $e) {
+            $this->markTestSkipped('TVDB API is unavailable: '.$e->getMessage());
         }
     }
 }

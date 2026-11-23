@@ -9,8 +9,9 @@ Path-scoped and standing agent rules for NNTmux. Hand-written entries live here;
 | `app/Console/Commands/OptimizeCbpStorage.php` | [migrations.md](./migrations.md) | Keep `CBP_STORAGE_MIGRATION_EXECUTE` false after maintenance |
 | `**` | [git-workflow.md](./git-workflow.md) | Agents never commit or push; stage task files only; final replies require a change summary, file list, and a linked temporary Markdown file containing the complete diff |
 | `app/Services/TvProcessing/**` | [tv-processing.md](./tv-processing.md) | Provider errors never become ShowNotFound; local relink before API retries; title-normalized show matching |
-| `app/Services/{TmdbClient,TraktService,TvMazeClient}.php` | [tv-processing.md](./tv-processing.md) | Only 404/empty is a miss; throw `TvProviderException` otherwise |
+| `app/Services/{TmdbClient,TraktService,TvMazeClient,TvdbClient}.php` | [tv-processing.md](./tv-processing.md) | Only 404/empty is a miss; throw `TvProviderException` otherwise |
 | `app/Services/{MovieService,MoviesProcessor}.php` | [movie-processing.md](./movie-processing.md) | Cache raw provider data and validate per release; normalized title comparison; TMDB translations for German titles |
+| `app/Services/{OmdbClient,MdbListClient}.php` | [movie-processing.md](./movie-processing.md) | Rotten Tomatoes score from MDBList then OMDb; never blank a stored score; failures are not misses |
 | `app/Console/Commands/{RelinkLocalTvEpisodes,RepairTvReleaseLinks,ReprocessUnmatchedTvReleases,ReprocessMissingEpisodes}.php` | [tv-processing.md](./tv-processing.md) | Local relink first, API requeue last |
 
 Before editing, also `grep -rin 'keyword' .ai/rules` for related notes.

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Services;
 
-use aharen\OMDbAPI;
 use App\Facades\Search;
 use App\Models\MovieInfo;
 use App\Models\Release;
@@ -23,6 +22,7 @@ use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Mockery;
@@ -821,44 +821,60 @@ class MovieServiceTest extends ImdbScraperTestCase
     }
 
     #[Test]
-    public function it_skips_an_omdb_search_result_whose_title_does_not_match(): void
+    public function it_does_not_cache_an_omdb_failure_as_a_miss(): void
     {
         Cache::flush();
+        Log::spy();
+        config(['nntmux_api.omdb_api_key' => 'test-key']);
+        Http::fake(['www.omdbapi.com/*' => Http::sequence()
+            ->push(['Response' => 'False', 'Error' => 'Request limit reached!'], 401)
+            ->push(['Response' => 'True', 'Title' => 'Example Movie', 'Year' => '2024', 'Director' => 'Jane Doe'])]);
 
-        $service = new class extends MovieService
-        {
-            public function updateMovieInfo(string $imdbId): bool
-            {
-                return true;
-            }
-        };
+        $service = new MovieService;
         $service->echooutput = false;
-        $service->omdbapikey = 'test-key';
-        $omdbApi = Mockery::mock(OMDbAPI::class);
-        $service->omdbApi = $omdbApi;
-        $omdbApi->shouldReceive('search')->andReturn((object) [
-            'message' => 'OK',
-            'data' => (object) [
-                'Response' => 'True',
-                'Search' => [
-                    (object) ['Title' => 'Completely Different', 'Year' => '2024', 'imdbID' => 'tt1111111', 'Type' => 'movie'],
-                    (object) ['Title' => 'Example Movie', 'Year' => '2024', 'imdbID' => 'tt0137523', 'Type' => 'movie'],
-                ],
-            ],
-        ]);
-        Search::shouldReceive('updateRelease')->with(7)->once();
 
-        Release::query()->insert([
-            'id' => 7,
-            'searchname' => 'Example.Movie.2024.1080p.BluRay.x264-GRP',
-            'categories_id' => 2040,
-            'imdbid' => null,
-        ]);
-        $this->invokeParse($service, 'Example.Movie.2024.1080p.BluRay.x264-GRP');
+        $duringOutage = $service->fetchOmdbAPIProperties('0137523');
+        $afterOutage = $service->fetchOmdbAPIProperties('0137523');
 
-        $method = new \ReflectionMethod($service, 'searchOMDbAPI');
-        $this->assertTrue($method->invoke($service, 7));
-        $this->assertSame('0137523', Release::query()->whereKey(7)->value('imdbid'));
+        $this->assertFalse($duringOutage);
+        $this->assertIsArray($afterOutage);
+        $this->assertSame('Jane Doe', $afterOutage['director']);
+        Log::shouldHaveReceived('warning')->once();
+    }
+
+    #[Test]
+    public function it_prefers_the_mdblist_rotten_tomatoes_score_over_omdb(): void
+    {
+        Http::fake(['api.mdblist.com/*' => Http::response(['ratings' => [['id' => 'tt0137523', 'rating' => 83]]])]);
+        $service = $this->movieServiceScoredBy(omdbScore: '70%');
+
+        $service->updateMovieInfo('0137523');
+
+        $this->assertSame('83%', MovieInfo::query()->where('imdbid', '0137523')->value('rtrating'));
+    }
+
+    #[Test]
+    public function it_uses_the_omdb_rotten_tomatoes_score_when_mdblist_has_none(): void
+    {
+        Http::fake(['api.mdblist.com/*' => Http::response(['ratings' => []])]);
+        $service = $this->movieServiceScoredBy(omdbScore: '70%');
+
+        $service->updateMovieInfo('0137523');
+
+        $this->assertSame('70%', MovieInfo::query()->where('imdbid', '0137523')->value('rtrating'));
+    }
+
+    #[Test]
+    public function it_keeps_the_stored_rotten_tomatoes_score_when_no_source_has_one(): void
+    {
+        Log::spy();
+        Http::fake(['api.mdblist.com/*' => Http::response(['error' => 'Daily API limit exceeded!'], 429, ['Retry-After' => '60'])]);
+        MovieInfo::query()->insert(['imdbid' => '0137523', 'title' => 'Example Movie', 'year' => '2024', 'rtrating' => '91%']);
+        $service = $this->movieServiceScoredBy(omdbScore: '');
+
+        $service->updateMovieInfo('0137523');
+
+        $this->assertSame('91%', MovieInfo::query()->where('imdbid', '0137523')->value('rtrating'));
     }
 
     #[Test]
@@ -997,6 +1013,51 @@ class MovieServiceTest extends ImdbScraperTestCase
         $this->app->instance(TmdbClient::class, $tmdb);
 
         return $tmdb;
+    }
+
+    /**
+     * A service whose only metadata comes from TMDB and OMDb, with MDBList configured.
+     */
+    private function movieServiceScoredBy(string $omdbScore): MovieService
+    {
+        Cache::flush();
+        config(['nntmux_api.mdblist_api_key' => 'test-key']);
+        Search::shouldReceive('insertMovie');
+        Search::shouldReceive('updateMovie');
+
+        $service = new class extends MovieService
+        {
+            public string $omdbScore = '';
+
+            public function fetchTMDBProperties(string $imdbId, bool $text = false): array|false
+            {
+                return ['title' => 'Example Movie', 'tmdbid' => 550, 'rating' => 7.8, 'year' => 2024, 'cover' => '', 'backdrop' => ''];
+            }
+
+            public function fetchIMDBProperties(string $imdbId): array|false
+            {
+                return false;
+            }
+
+            public function fetchTraktTVProperties(string $imdbId): array|false
+            {
+                return false;
+            }
+
+            public function fetchOmdbAPIProperties(string $imdbId): array|false
+            {
+                return ['title' => 'Example Movie', 'year' => '2024', 'rtRating' => $this->omdbScore];
+            }
+
+            protected function fetchFanartTVProperties(string $imdbId): false|array
+            {
+                return false;
+            }
+        };
+        $service->echooutput = false;
+        $service->omdbScore = $omdbScore;
+
+        return $service;
     }
 
     private function disableOtherMovieProviders(): void

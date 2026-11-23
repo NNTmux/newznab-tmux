@@ -134,38 +134,12 @@ class TvShowAdder
     private function fetchTvdb(TvdbProvider $provider, int $tvdbId): ?object
     {
         try {
-            $extended = $provider->seriesExtended($tvdbId);
+            return $provider->showById($tvdbId);
         } catch (\Throwable $e) {
             Log::warning('TvShowAdder: TVDB lookup failed', ['id' => $tvdbId, 'error' => $e->getMessage()]);
 
             return null;
         }
-
-        if ($extended === null) {
-            return null;
-        }
-
-        // TvdbProvider::formatShowInfo() expects fields shaped like SearchResult
-        // (tvdb_id, name, overview, first_air_time, aliases). The extended
-        // endpoint returns SeriesExtendedRecord (camelCase). Adapt it.
-        $aliases = [];
-        if (! empty($extended->aliases) && is_array($extended->aliases)) {
-            foreach ($extended->aliases as $alias) {
-                if (is_object($alias) && isset($alias->name)) {
-                    $aliases[] = (string) $alias->name;
-                } elseif (is_string($alias)) {
-                    $aliases[] = $alias;
-                }
-            }
-        }
-
-        return (object) [
-            'tvdb_id' => (string) ($extended->id ?? $tvdbId),
-            'name' => (string) ($extended->name ?? ''),
-            'overview' => (string) ($extended->overview ?? ''),
-            'first_air_time' => (string) ($extended->firstAired ?? ''),
-            'aliases' => $aliases,
-        ];
     }
 
     /**

@@ -1,0 +1,50 @@
+{
+  "status": "success",
+  "data": {
+    "id": 81189,
+    "name": "Breaking Bad",
+    "originalLanguage": "eng",
+    "episodes": [
+      {
+        "id": 3859781,
+        "seriesId": 81189,
+        "name": "Good Cop / Bad Cop",
+        "aired": "2009-02-17",
+        "overview": "Hank and Marie try to spice up their relationship on Valentine's Day.",
+        "seasonNumber": 0,
+        "number": 1,
+        "absoluteNumber": 0,
+        "runtime": 3
+      },
+      {
+        "id": 349232,
+        "seriesId": 81189,
+        "name": "Pilot",
+        "aired": "2008-01-20",
+        "overview": "When an unassuming high school chemistry teacher discovers he has a rare form of lung cancer, he dec",
+        "seasonNumber": 1,
+        "number": 1,
+        "absoluteNumber": 1,
+        "runtime": 58
+      },
+      {
+        "id": 349233,
+        "seriesId": 81189,
+        "name": "Cat's in the Bag...",
+        "aired": "2008-01-27",
+        "overview": "Walt and Jesse attempt to tie up loose ends. The desperate situation gets more complicated with the ",
+        "seasonNumber": 1,
+        "number": 2,
+        "absoluteNumber": 2,
+        "runtime": 48
+      }
+    ]
+  },
+  "links": {
+    "prev": null,
+    "self": "https://api4.thetvdb.com/v4/series/81189/episodes/default/eng?page=0",
+    "next": null,
+    "total_items": 80,
+    "page_size": 500
+  }
+}

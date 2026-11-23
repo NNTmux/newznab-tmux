@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use aharen\OMDbAPI;
 use App\Enums\ImageAssetProfile;
+use App\Exceptions\TvProviderException;
 use App\Facades\Search;
 use App\Models\Category;
 use App\Models\MovieInfo;
@@ -99,8 +99,6 @@ class MovieService
 
     public ?string $fanartapikey;
 
-    public ?string $omdbapikey;
-
     public bool $imdburl;
 
     public int $movieqty;
@@ -113,7 +111,9 @@ class MovieService
 
     public ?TraktProvider $traktTv = null;
 
-    public ?OMDbAPI $omdbApi = null;
+    public OmdbClient $omdbClient;
+
+    public MdbListClient $mdbListClient;
 
     protected ?string $traktcheck;
 
@@ -132,11 +132,8 @@ class MovieService
         $fanartApiKey = trim((string) config('nntmux_api.fanarttv_api_key', ''));
         $this->fanartapikey = $fanartApiKey !== '' ? $fanartApiKey : null;
         $this->fanart = new FanartTvService($this->fanartapikey);
-        $omdbApiKey = trim((string) config('nntmux_api.omdb_api_key', ''));
-        $this->omdbapikey = $omdbApiKey !== '' ? $omdbApiKey : null;
-        if ($this->omdbapikey !== null) {
-            $this->omdbApi = new OMDbAPI($this->omdbapikey);
-        }
+        $this->omdbClient = new OmdbClient;
+        $this->mdbListClient = new MdbListClient;
 
         $this->lookuplanguage = app(ConfigurationProvider::class)->metadata()->movieLanguage !== '' ? (string) app(ConfigurationProvider::class)->metadata()->movieLanguage : 'en';
         $cacheDir = storage_path('framework/cache/imdb_cache');
@@ -423,7 +420,7 @@ class MovieService
     }
 
     /**
-     * Fetch IMDB/TMDB/TRAKT/OMDB/iTunes info for the movie.
+     * Fetch IMDB/TMDB/TRAKT/OMDB info for the movie.
      *
      * @phpstan-impure
      *
@@ -432,7 +429,7 @@ class MovieService
     public function updateMovieInfo(string $imdbId): bool
     {
         if ($this->echooutput && $this->service !== '') {
-            cli()->primary('Fetching IMDB info from TMDB/IMDB/Trakt/OMDB/iTunes using IMDB id: '.$imdbId);
+            cli()->primary('Fetching IMDB info from TMDB/IMDB/Trakt/OMDB using IMDB id: '.$imdbId);
         }
 
         // Check TMDB for IMDB info.
@@ -463,7 +460,7 @@ class MovieService
         $mov['tmdbid'] = (! isset($tmdb['tmdbid']) || $tmdb['tmdbid'] === '') ? 0 : $tmdb['tmdbid'];
         $mov['traktid'] = (! isset($trakt['id']) || $trakt['id'] === '') ? 0 : $trakt['id'];
 
-        // Prefer Fanart.tv cover over TMDB,TMDB over IMDB,IMDB over OMDB and OMDB over iTunes.
+        // Prefer Fanart.tv cover over TMDB, TMDB over IMDB and IMDB over OMDB.
         if (! empty($fanart['cover'])) {
             try {
                 $mov['cover'] = $this->saveRemoteAsset($imdbId.'-cover', $fanart['cover']);
@@ -541,15 +538,10 @@ class MovieService
             }
         }
 
-        // RottenTomatoes rating from OmdbAPI
-        if ($omdb !== false && ! empty($omdb['rtRating'])) {
-            $mov['rtrating'] = $omdb['rtRating'];
-        }
-
         $mov['title'] = $this->setVariables($imdb['title'] ?? '', $tmdb['title'] ?? '', $trakt['title'] ?? '', $omdb['title'] ?? '');
         $mov['rating'] = $this->setVariables($imdb['rating'] ?? '', $tmdb['rating'] ?? '', $trakt['rating'] ?? '', $omdb['rating'] ?? '');
         $mov['plot'] = $this->setVariables($imdb['plot'] ?? '', $tmdb['plot'] ?? '', $trakt['overview'] ?? '', $omdb['plot'] ?? '');
-        $mov['tagline'] = $this->setVariables($imdb['tagline'] ?? '', $tmdb['tagline'] ?? '', $trakt['tagline'] ?? '', $omdb['tagline'] ?? '');
+        $mov['tagline'] = $this->setVariables($imdb['tagline'] ?? '', $tmdb['tagline'] ?? '', $trakt['tagline'] ?? '', '');
         $mov['year'] = $this->setVariables($imdb['year'] ?? '', $tmdb['year'] ?? '', $trakt['year'] ?? '', $omdb['year'] ?? '');
         $mov['genre'] = $this->setVariables($imdb['genre'] ?? '', $tmdb['genre'] ?? '', $trakt['genres'] ?? '', $omdb['genre'] ?? '');
 
@@ -600,7 +592,8 @@ class MovieService
             'language' => html_entity_decode($mov['language'], ENT_QUOTES, 'UTF-8'),
             'plot' => html_entity_decode(preg_replace('/\s+See full summary »/u', ' ', $mov['plot']), ENT_QUOTES, 'UTF-8'),
             'rating' => is_numeric($mov['rating']) ? round((float) $mov['rating'], 1) : '',
-            'rtrating' => $mov['rtrating'] ?? 'N/A',
+            // Empty when no source has a score right now: update() then keeps the stored one.
+            'rtrating' => $this->rottenTomatoesScore($imdbId, $omdb),
             'tagline' => html_entity_decode($mov['tagline'], ENT_QUOTES, 'UTF-8'),
             'title' => $mov['title'],
             'tmdbid' => $mov['tmdbid'],
@@ -971,14 +964,22 @@ class MovieService
      */
     public function fetchOmdbAPIProperties(string $imdbId): array|false
     {
-        if ($this->omdbapikey === null || $this->omdbApi === null) {
+        if (! $this->omdbClient->isConfigured()) {
             return false;
         }
 
-        $cacheKey = 'omdb_movie_v2_'.$imdbId;
+        $cacheKey = 'omdb_movie_v3_'.$imdbId;
         $movieData = Cache::get($cacheKey);
         if (! is_array($movieData) && $movieData !== false) {
-            $movieData = $this->fetchOmdbMovieData($imdbId);
+            try {
+                $movieData = $this->omdbClient->movieByImdbId($imdbId) ?? false;
+            } catch (TvProviderException $e) {
+                // A spent quota or an outage says nothing about the movie, so it isn't cached as a miss.
+                Log::warning('OMDB API error for '.$imdbId.': '.$e->getMessage());
+
+                return false;
+            }
+
             Cache::put($cacheKey, $movieData, $movieData === false ? now()->addHours(6) : now()->addDays(7));
         }
 
@@ -994,44 +995,47 @@ class MovieService
     }
 
     /**
-     * @return array<string, mixed>|false
+     * The Tomatometer score ("83%") of a movie: MDBList first, then OMDb; '' when neither has one.
+     *
+     * @param  array<string, mixed>|false  $omdb
      */
-    private function fetchOmdbMovieData(string $imdbId): array|false
+    private function rottenTomatoesScore(string $imdbId, array|false $omdb): string
     {
+        $score = $this->fetchMdbListScore($imdbId);
+        if ($score !== null) {
+            return $score.'%';
+        }
+
+        return $omdb !== false ? (string) ($omdb['rtRating'] ?? '') : '';
+    }
+
+    /**
+     * The Tomatometer score MDBList has for an IMDb id, or null when it has none or can't be asked.
+     */
+    private function fetchMdbListScore(string $imdbId): ?int
+    {
+        if (! $this->mdbListClient->isConfigured()) {
+            return null;
+        }
+
+        $cacheKey = 'mdblist_rt_v1_'.$imdbId;
+        $cached = Cache::get($cacheKey);
+        if (is_int($cached) || $cached === false) {
+            return $cached === false ? null : $cached;
+        }
+
         try {
-            $resp = $this->omdbApi?->fetch('i', 'tt'.$imdbId);
-        } catch (\Throwable $e) {
-            Log::warning('OMDB API error for '.$imdbId.': '.$e->getMessage());
+            $score = $this->mdbListClient->tomatometerScores([$imdbId])[$imdbId] ?? null;
+        } catch (TvProviderException $e) {
+            // A spent quota or an outage says nothing about the movie, so it isn't cached as a miss.
+            Log::debug('MDBList error for '.$imdbId.': '.$e->getMessage());
 
-            return false;
+            return null;
         }
 
-        if (! is_object($resp) || ($resp->message ?? '') !== 'OK' || ($resp->data->Response ?? '') !== 'True') {
-            return false;
-        }
+        Cache::put($cacheKey, $score ?? false, now()->addDays(7));
 
-        $rtRating = '';
-        foreach (is_array($resp->data->Ratings ?? null) ? $resp->data->Ratings : [] as $rating) {
-            if (is_object($rating) && ($rating->Source ?? '') === 'Rotten Tomatoes') {
-                $rtRating = (string) ($rating->Value ?? '');
-                break;
-            }
-        }
-
-        return [
-            'title' => $resp->data->Title ?? '',
-            'cover' => $resp->data->Poster ?? '',
-            'genre' => $resp->data->Genre ?? '',
-            'year' => $resp->data->Year ?? '',
-            'plot' => $resp->data->Plot ?? '',
-            'rating' => $resp->data->imdbRating ?? '',
-            'rtRating' => $rtRating,
-            'tagline' => $resp->data->Tagline ?? '',
-            'director' => $resp->data->Director ?? '',
-            'actors' => $resp->data->Actors ?? '',
-            'language' => $resp->data->Language ?? '',
-            'boxOffice' => $resp->data->BoxOffice ?? '',
-        ];
+        return $score;
     }
 
     /**
@@ -1232,7 +1236,6 @@ class MovieService
 
             $found = $this->searchLocalDatabase($releaseId)
                 || $this->searchIMDb($releaseId)
-                || $this->searchOMDbAPI($releaseId)
                 || $this->searchTraktTV($releaseId, $movieName)
                 || $this->searchTMDB($releaseId);
 
@@ -1340,61 +1343,6 @@ class MovieService
         }
 
         return false;
-    }
-
-    private function searchOMDbAPI(int $releaseId): bool
-    {
-        if ($this->omdbapikey === null || $this->omdbApi === null) {
-            return false;
-        }
-
-        $omdbTitle = strtolower(str_replace(' ', '_', $this->currentTitle));
-
-        try {
-            $results = $this->currentYear !== ''
-                ? $this->omdbSearchResults($this->omdbApi->search($omdbTitle, 'movie', $this->currentYear))
-                : [];
-
-            if ($results === []) {
-                $results = $this->omdbSearchResults($this->omdbApi->search($omdbTitle, 'movie'));
-            }
-
-            foreach ($results as $result) {
-                $imdbId = (string) ($result->imdbID ?? '');
-                if ($imdbId === '' || (isset($result->Type) && $result->Type !== 'movie')) {
-                    continue;
-                }
-
-                if (! $this->isAcceptableSearchCandidate([(string) ($result->Title ?? '')], $result->Year ?? '')) {
-                    continue;
-                }
-
-                if ($this->doMovieUpdate($imdbId, 'OMDbAPI', $releaseId) !== false) {
-                    return true;
-                }
-            }
-        } catch (\Exception $e) {
-            Log::error('OMDb API error: '.$e->getMessage());
-        }
-
-        return false;
-    }
-
-    /**
-     * The result rows of an OMDb search response, or an empty list when the search failed.
-     *
-     * @return list<object>
-     */
-    private function omdbSearchResults(mixed $buffer): array
-    {
-        if (! is_object($buffer)
-            || ($buffer->message ?? '') !== 'OK'
-            || ($buffer->data->Response ?? '') !== 'True'
-            || ! is_array($buffer->data->Search ?? null)) {
-            return [];
-        }
-
-        return array_values(array_filter($buffer->data->Search, 'is_object'));
     }
 
     private function searchTraktTV(int $releaseId, string $movieName): bool

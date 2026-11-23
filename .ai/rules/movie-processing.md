@@ -4,6 +4,10 @@
 
 In `MovieService`, the TMDB, OMDb, IMDb and Trakt fetchers cache the provider's raw answer for an IMDb/TMDB id and check it against the current release (`matchesCurrentContext`) on every read. Never cache `false` because the data didn't match *this* release: the key is shared, so one wrong release used to hide the movie from the right one for days. The `doMovieUpdate` call would then store an `imdbid` with no `movieinfo` row. Cache `false` only for a real 404/empty answer.
 
+## Rotten Tomatoes scores
+
+`movieinfo.rtrating` ("83%") comes from MDBList (`MdbListClient`) first and from OMDb's by-id answer when MDBList has none. OMDb leaves the score out at random, even for titles it had the day before, so never write an empty value or `N/A` over a stored score: `rottenTomatoesScore()` returns `''` and `update()` skips it. A spent quota, a rejected key or an outage (`TvProviderException` from `OmdbClient`/`MdbListClient`) is never cached as a miss. OMDb is only asked by IMDb id; its title search was removed because it spent the 1,000/day quota. `movie:refresh-rt-scores` backfills old rows in batches and resumes from a cached cursor.
+
 ## Compare titles through the normalizer
 
 Title comparisons go through `titleSimilarity()` / `normalizeTitleForComparison()`: lowercase ASCII, `ä`=`ae`, `&`=`and`, no punctuation, no leading English article, and normalized titles of 3 characters or fewer only match exactly. Don't call `similar_text` on raw titles, and compare years with `yearDifference()`, not string similarity.

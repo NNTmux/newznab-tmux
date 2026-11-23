@@ -19,6 +19,7 @@ class MetadataSourcesTest extends TestCase
             'cache.default' => 'array',
             'tmdb.api_key' => 'tmdb-key',
             'nntmux_api.omdb_api_key' => 'omdb-key',
+            'nntmux_api.mdblist_api_key' => 'mdblist-key',
             'tvdb.api_key' => 'tvdb-key',
             'tvdb.user_pin' => '',
             'nntmux_api.fanarttv_api_key' => 'fanart-key',

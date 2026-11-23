@@ -1,0 +1,15 @@
+{
+  "provider_id": "imdb",
+  "provider_rating": "tomatoes",
+  "mediatype": "movie",
+  "ratings": [
+    {
+      "id": "tt0133093",
+      "rating": 83
+    },
+    {
+      "id": "tt3148348",
+      "rating": 79
+    }
+  ]
+}

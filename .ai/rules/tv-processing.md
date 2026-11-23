@@ -4,6 +4,8 @@
 
 In `app/Services/TvProcessing/`, only a 404 or an empty result from TVDB, TVMaze, TMDB or Trakt counts as a miss. Every other failure (429, 5xx, 401/403 rejected key, other 4xx, unreadable body, connection error, rejected TVDB login) must surface as `App\Exceptions\TvProviderException`, so the release is retried instead of being written as `TvLookupStatus::ShowNotFound` (-10), which is never retried automatically. TMDB and Trakt only throw through their `throwingOnTransientFailure()` copies; use those in the pipeline and for enrichment, never the default Trakt client (it sleeps up to 300s on a 429).
 
+TVDB goes through `App\Services\TvdbClient` (no vendor package). It always throws on a failure, and shares its token and its 10-minute pause after rejected credentials through the cache. Don't send `season` with an `airDate` filter: TVDB reads `season=0` as "specials only", which made every airdate lookup come back empty.
+
 ## Fix the backlog locally first
 
 Releases waiting for an episode are linked from stored `tv_episodes` by `tv:relink-local` (hourly; `--unmatched` daily for -10/-100). It calls no API and resumes from a cached cursor. `tv:repair-links --stuck` also links stored episodes before queueing an API retry. Run these before mass-requeueing releases into the API path (`tv:reprocess-unmatched --requeue`).

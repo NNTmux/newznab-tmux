@@ -1,0 +1,136 @@
+{
+  "status": "success",
+  "data": [
+    {
+      "objectID": "series-327417",
+      "tvdb_id": "327417",
+      "id": "series-327417",
+      "name": "La casa de papel",
+      "aliases": [
+        "La casa de papel",
+        "Papírový dům",
+        "La maison de papier",
+        "Casa de Papel",
+        "Money Heist",
+        "Money Heist",
+        "خانه کاغذی",
+        "منی ڈکیتی",
+        "ڈکیتی",
+        "بيت من ورق",
+        "لا كاسا دي بابيل"
+      ],
+      "country": "esp",
+      "first_air_time": "2017-05-02",
+      "year": "2017",
+      "image_url": "https://artworks.thetvdb.com/banners/series/327417/posters/5e824889ad675.jpg",
+      "network": "Antena 3",
+      "primary_language": "spa",
+      "overview": "Un golpe maestro ideado y perfeccionado durante años, planificado durante meses y ejecutado en pocos minutos para que el",
+      "overviews": {
+        "eng": "Eight thieves take hostages and lock themselves in the Royal Mint of Spain as a criminal mastermind manipulates the poli",
+        "spa": "Un golpe maestro ideado y perfeccionado durante años, planificado durante meses y ejecutado en pocos minutos para que el"
+      },
+      "translations": {
+        "deu": "Haus des Geldes",
+        "eng": "Money Heist",
+        "spa": "La casa de papel"
+      },
+      "remote_ids": [
+        {
+          "id": "lacasadepapelnetflix",
+          "type": 5,
+          "sourceName": "Facebook"
+        },
+        {
+          "id": "tt6468322",
+          "type": 2,
+          "sourceName": "IMDB"
+        },
+        {
+          "id": "lacasadepapel",
+          "type": 9,
+          "sourceName": "Instagram"
+        },
+        {
+          "id": "https://www.netflix.com/title/80192098",
+          "type": 4,
+          "sourceName": "Official Website"
+        },
+        {
+          "id": "LaCasaDePapel",
+          "type": 7,
+          "sourceName": "Reddit"
+        },
+        {
+          "id": "71446",
+          "type": 12,
+          "sourceName": "TheMovieDB.com"
+        },
+        {
+          "id": "lacasadepapel",
+          "type": 6,
+          "sourceName": "X (Twitter)"
+        },
+        {
+          "id": "UCI9tBPaYZ8kJEU0PaQLWfEw",
+          "type": 11,
+          "sourceName": "Youtube"
+        }
+      ],
+      "type": "series"
+    },
+    {
+      "objectID": "series-409534",
+      "tvdb_id": "409534",
+      "id": "series-409534",
+      "name": "La casa de papel: De Tokio a Berlín",
+      "aliases": [
+        "Money Heist: From Tokyo to Berlin (2021)",
+        "La Casa Di Carta - Da Tokio A Berlino",
+        "Papírový dům - Z Tokia do Berlína",
+        "纸房子：从东京到柏林"
+      ],
+      "country": "esp",
+      "first_air_time": "2021-09-03",
+      "year": "2021",
+      "image_url": "https://artworks.thetvdb.com/banners/v4/series/409534/posters/615c14f765f3f.jpg",
+      "network": "Netflix",
+      "primary_language": "spa",
+      "overview": "Los cineastas de La casa de papel y los intérpretes de personajes como Tokio y el Profesor hablan del proceso artístico ",
+      "overviews": {
+        "eng": "The filmmakers and actors behind \"Money Heist\" characters like Tokyo and the Professor talk about the emotional artistic",
+        "spa": "Los cineastas de La casa de papel y los intérpretes de personajes como Tokio y el Profesor hablan del proceso artístico "
+      },
+      "translations": {
+        "deu": "Haus des Geldes: Von Tokio bis Berlin",
+        "eng": "Money Heist: From Tokyo to Berlin",
+        "spa": "La casa de papel: De Tokio a Berlín"
+      },
+      "remote_ids": [
+        {
+          "id": "https://www.netflix.com/title/81488216",
+          "type": 4,
+          "sourceName": "Official Website"
+        },
+        {
+          "id": "132719",
+          "type": 12,
+          "sourceName": "TheMovieDB.com"
+        },
+        {
+          "id": "tt15384346",
+          "type": 2,
+          "sourceName": "IMDB"
+        }
+      ],
+      "type": "series"
+    }
+  ],
+  "links": {
+    "prev": null,
+    "self": "https://api4.thetvdb.com/v4/search?query=La casa de papel&type=series&limit=50&page=0",
+    "next": null,
+    "total_items": 4,
+    "page_size": 50
+  }
+}

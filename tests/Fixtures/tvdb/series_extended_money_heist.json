@@ -1,0 +1,113 @@
+{
+  "status": "success",
+  "data": {
+    "id": 327417,
+    "name": "La casa de papel",
+    "slug": "la-casa-de-papel",
+    "image": "https://artworks.thetvdb.com/banners/posters/5d30cc0b4a75d.jpg",
+    "firstAired": "2017-05-02",
+    "originalCountry": "esp",
+    "originalLanguage": "spa",
+    "overview": "Un golpe maestro ideado y perfeccionado durante años, planificado durante meses y ejecutado en pocos minutos para que el",
+    "aliases": [
+      {
+        "language": "ron",
+        "name": "Casa de Papel"
+      },
+      {
+        "language": "ron",
+        "name": "Money Heist"
+      },
+      {
+        "language": "fas",
+        "name": "خانه کاغذی"
+      }
+    ],
+    "remoteIds": [
+      {
+        "id": "lacasadepapelnetflix",
+        "type": 5,
+        "sourceName": "Facebook"
+      },
+      {
+        "id": "tt6468322",
+        "type": 2,
+        "sourceName": "IMDB"
+      },
+      {
+        "id": "lacasadepapel",
+        "type": 9,
+        "sourceName": "Instagram"
+      },
+      {
+        "id": "https://www.netflix.com/title/80192098",
+        "type": 4,
+        "sourceName": "Official Website"
+      },
+      {
+        "id": "LaCasaDePapel",
+        "type": 7,
+        "sourceName": "Reddit"
+      },
+      {
+        "id": "71446",
+        "type": 12,
+        "sourceName": "TheMovieDB.com"
+      },
+      {
+        "id": "lacasadepapel",
+        "type": 6,
+        "sourceName": "X (Twitter)"
+      },
+      {
+        "id": "UCI9tBPaYZ8kJEU0PaQLWfEw",
+        "type": 11,
+        "sourceName": "Youtube"
+      }
+    ],
+    "originalNetwork": {
+      "id": 22,
+      "name": "Antena 3",
+      "country": "esp"
+    },
+    "latestNetwork": {
+      "id": 535,
+      "name": "Netflix",
+      "country": "usa"
+    },
+    "translations": {
+      "nameTranslations": [
+        {
+          "name": "Money Heist",
+          "language": "eng"
+        },
+        {
+          "name": "La casa de papel",
+          "language": "spa",
+          "isPrimary": true
+        },
+        {
+          "name": "La casa de papel",
+          "isAlias": true,
+          "language": "eng"
+        },
+        {
+          "name": "Papírový dům",
+          "isAlias": true,
+          "language": "eng"
+        }
+      ],
+      "overviewTranslations": [
+        {
+          "overview": "Eight thieves take hostages and lock themselves in the Royal Mint of Spain as a criminal mastermind manipulates the poli",
+          "language": "eng"
+        },
+        {
+          "overview": "Un golpe maestro ideado y perfeccionado durante años, planificado durante meses y ejecutado en pocos minutos para que el",
+          "language": "spa",
+          "isPrimary": true
+        }
+      ]
+    }
+  }
+}

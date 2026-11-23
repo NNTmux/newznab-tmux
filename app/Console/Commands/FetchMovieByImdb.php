@@ -20,7 +20,7 @@ class FetchMovieByImdb extends Command
     /**
      * The console command description.
      */
-    protected $description = 'Force fetch/update movie data for a specific IMDb id from external providers (TMDB/IMDB/Trakt/OMDB/iTunes/Fanart), always updating local data.';
+    protected $description = 'Force fetch/update movie data for a specific IMDb id from external providers (TMDB/IMDB/Trakt/OMDB/MDBList/Fanart), always updating local data.';
 
     public function handle(): int
     {
@@ -46,7 +46,8 @@ class FetchMovieByImdb extends Command
         Cache::forget('trakt_movie_'.md5($imdbId));
         Cache::forget('imdb_movie_'.md5($imdbId));
         Cache::forget('imdb_scrape_id_'.$imdbId);
-        Cache::forget('omdb_movie_'.md5($imdbId));
+        Cache::forget('omdb_movie_v3_'.$imdbId);
+        Cache::forget('mdblist_rt_v1_'.$imdbId);
 
         $ok = $movie->updateMovieInfo($imdbId);
 
