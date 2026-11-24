@@ -13,6 +13,7 @@ use App\Services\ReleaseProcessingService;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class CbpReleaseEligibilityTest extends TestCase
@@ -257,24 +258,7 @@ class CbpReleaseEligibilityTest extends TestCase
 
     public function test_sized_collection_without_bytes_is_deleted_as_unwanted(): void
     {
-        if (DB::getDriverName() === 'sqlite') {
-            // The par2-only filter uses REGEXP; SQLite evaluates `X REGEXP Y` as regexp(Y, X).
-            DB::connection()->getPdo()->createFunction(
-                'REGEXP',
-                static fn (?string $pattern, ?string $subject): int => $pattern !== null && $subject !== null
-                    && preg_match('/'.str_replace('/', '\/', $pattern).'/i', $subject) === 1 ? 1 : 0,
-                2
-            );
-        }
-        if (! Schema::hasTable('usenet_groups')) {
-            Schema::create('usenet_groups', function (Blueprint $table): void {
-                $table->id();
-                $table->string('name');
-                $table->bigInteger('minsizetoformrelease')->nullable();
-                $table->integer('minfilestoformrelease')->nullable();
-            });
-        }
-        DB::table('usenet_groups')->insertOrIgnore(['id' => 1, 'name' => 'alt.test']);
+        $this->createReleaseFormingGroup();
 
         $empty = $this->collection(1, now()->subHours(3)->format('Y-m-d H:i:s'));
         DB::table('collections')->where('id', $empty)->update(['filecheck' => CollectionFileCheckStatus::Sized->value, 'filesize' => 0]);
@@ -285,6 +269,84 @@ class CbpReleaseEligibilityTest extends TestCase
 
         $this->assertFalse(DB::table('collections')->where('id', $empty)->exists());
         $this->assertTrue(DB::table('collections')->where('id', $otherGroup)->exists());
+    }
+
+    /**
+     * @param  list<string>  $binaryNames
+     */
+    #[DataProvider('par2OnlyCases')]
+    public function test_only_collections_made_entirely_of_par2_files_are_deleted(array $binaryNames, bool $deleted): void
+    {
+        $this->createReleaseFormingGroup();
+        $collectionId = $this->sizedCollection(1, $binaryNames);
+
+        (new ReleaseProcessingService(binariesConfig: new BinariesConfig(reconcileBatchSize: 2)))->deleteUnwantedCollections(1);
+
+        $this->assertSame(! $deleted, DB::table('collections')->where('id', $collectionId)->exists());
+    }
+
+    /**
+     * @return array<string, array{list<string>, bool}>
+     */
+    public static function par2OnlyCases(): array
+    {
+        return [
+            'index and recovery volumes only' => [['Release.par2', 'Release.vol003+04.par2'], true],
+            'upper-case extension' => [['RELEASE.PAR2'], true],
+            'par2 inside a quoted subject' => [['"Release.vol00+1.par2" yEnc'], true],
+            'par2 next to content' => [['Release.par2', 'Release.part01.rar'], false],
+            'content only' => [['Release.part01.rar'], false],
+            'par2 without the leading dot' => [['Release-par2.rar'], false],
+            'no binaries at all' => [[], false],
+        ];
+    }
+
+    public function test_par2_only_cleanup_for_one_group_leaves_other_groups_alone(): void
+    {
+        $this->createReleaseFormingGroup();
+        $ownGroup = $this->sizedCollection(1, ['Release.par2']);
+        $otherGroup = $this->sizedCollection(2, ['Release.par2']);
+
+        (new ReleaseProcessingService(binariesConfig: new BinariesConfig(reconcileBatchSize: 2)))->deleteUnwantedCollections(1);
+
+        $this->assertFalse(DB::table('collections')->where('id', $ownGroup)->exists());
+        $this->assertTrue(DB::table('collections')->where('id', $otherGroup)->exists());
+    }
+
+    private function createReleaseFormingGroup(): void
+    {
+        if (! Schema::hasTable('usenet_groups')) {
+            Schema::create('usenet_groups', function (Blueprint $table): void {
+                $table->id();
+                $table->string('name');
+                $table->bigInteger('minsizetoformrelease')->nullable();
+                $table->integer('minfilestoformrelease')->nullable();
+            });
+        }
+        DB::table('usenet_groups')->insertOrIgnore(['id' => 1, 'name' => 'alt.test']);
+    }
+
+    /**
+     * A sized collection with bytes, holding one binary per given name.
+     *
+     * @param  list<string>  $binaryNames
+     */
+    private function sizedCollection(int $groupId, array $binaryNames): int
+    {
+        $id = DB::table('collections')->insertGetId([
+            'groups_id' => $groupId,
+            'dateadded' => now(),
+            'added' => now(),
+            'last_seen_at' => now(),
+            'totalfiles' => max(1, \count($binaryNames)),
+            'filecheck' => CollectionFileCheckStatus::Sized->value,
+            'filesize' => 1_000_000_000,
+        ]);
+        foreach ($binaryNames as $name) {
+            DB::table('binaries')->insert(['collections_id' => $id, 'name' => $name, 'totalparts' => 1]);
+        }
+
+        return $id;
     }
 
     private function process(?int $groupId): void

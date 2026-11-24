@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Services\Binaries\BinariesConfig;
 use App\Services\Binaries\CbpOrphanPruner;
 use App\Services\Configuration\ConfigurationProvider;
+use App\Support\Database\RawSql;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -64,36 +65,32 @@ class CollectionCleanupService
         $ingestion = app(ConfigurationProvider::class)->ingestion();
         $delayCutoff = now()->subHours($ingestion->collectionDelayHours);
         $idleCutoff = now()->subHours($ingestion->partRetentionHours);
+        // Each pass: an extra leading condition and its bindings.
         $passes = Schema::hasColumn('collections', 'last_seen_at')
             ? [
-                static fn ($query) => $query->where('last_seen_at', '>=', $idleCutoff),
-                static fn ($query) => $query->whereNull('last_seen_at'),
+                ['last_seen_at >= ? AND ', [$idleCutoff]],
+                ['last_seen_at IS NULL AND ', []],
             ]
-            : [static fn ($query) => $query];
+            : [['', []]];
 
         $restarted = 0;
-        foreach ($passes as $filter) {
+        $batchSize = $this->sqlChunkSize();
+        foreach ($passes as [$filterSql, $filterBindings]) {
+            $selectSql = 'SELECT id FROM collections WHERE '.$filterSql
+                .'dateadded < ? AND id > ? ORDER BY id LIMIT '.$batchSize;
             $lastId = 0;
             do {
-                $ids = DB::table('collections')
-                    ->where($filter)
-                    ->where('dateadded', '<', $delayCutoff)
-                    ->where('id', '>', $lastId)
-                    ->orderBy('id')
-                    ->limit($this->sqlChunkSize())
-                    ->pluck('id')
-                    ->map(static fn (mixed $id): int => (int) $id)
-                    ->all();
+                $ids = RawSql::ids($selectSql, [...$filterBindings, $delayCutoff, $lastId]);
                 if ($ids === []) {
                     break;
                 }
 
                 $lastId = $ids[array_key_last($ids)];
-                $restarted += DB::table('collections')
-                    ->whereIn('id', $ids)
-                    ->where('dateadded', '<', $delayCutoff)
-                    ->update(['dateadded' => now()]);
-            } while (count($ids) === $this->sqlChunkSize());
+                $restarted += DB::update(
+                    'UPDATE collections SET dateadded = ? WHERE id IN ('.RawSql::placeholders(count($ids)).') AND dateadded < ?',
+                    [now(), ...$ids, $delayCutoff]
+                );
+            } while (count($ids) === $batchSize);
         }
 
         return $restarted;
@@ -130,19 +127,12 @@ class CollectionCleanupService
         $idleCutoff = now()->subHours($ingestion->partRetentionHours);
         $hardCutoff = now()->subHours(max($ingestion->partRetentionHours, $ingestion->collectionTimeoutHours));
         $batchDeleted = 0;
+        $retentionSql = 'SELECT id FROM collections WHERE '.($groupId !== null ? 'groups_id = ? AND ' : '')
+            .'(last_seen_at < ? OR (last_seen_at IS NULL AND (dateadded < ? OR dateadded IS NULL)) OR dateadded < ?)'
+            .' ORDER BY id LIMIT '.$this->sqlChunkSize();
+        $retentionBindings = [...($groupId !== null ? [$groupId] : []), $idleCutoff, $idleCutoff, $hardCutoff];
         do {
-            $ids = DB::table('collections')
-                ->when($groupId !== null, fn ($query) => $query->where('groups_id', $groupId))
-                ->where(fn ($query) => $query
-                    ->where('last_seen_at', '<', $idleCutoff)
-                    ->orWhere(fn ($idle) => $idle
-                        ->whereNull('last_seen_at')
-                        ->where(fn ($added) => $added->where('dateadded', '<', $idleCutoff)->orWhereNull('dateadded')))
-                    ->orWhere('dateadded', '<', $hardCutoff))
-                ->orderBy('id')
-                ->limit($this->sqlChunkSize())
-                ->pluck('id')
-                ->all();
+            $ids = RawSql::ids($retentionSql, $retentionBindings);
 
             if ($ids === []) {
                 break;
@@ -245,7 +235,7 @@ class CollectionCleanupService
      */
     private function deleteOrphanCollections(bool $echoCLI): int
     {
-        $maxId = DB::table('collections')->max('id');
+        $maxId = DB::scalar('SELECT MAX(id) FROM collections');
         if ($maxId === null) {
             Cache::forget(self::ORPHAN_CURSOR_CACHE_KEY);
 
@@ -257,7 +247,7 @@ class CollectionCleanupService
         if ($windowStart >= $maxId) {
             $windowStart = 0;
         }
-        $minId = (int) DB::table('collections')->where('id', '>', $windowStart)->min('id');
+        $minId = (int) DB::scalar('SELECT MIN(id) FROM collections WHERE id > ?', [$windowStart]);
         $windowStart = max($windowStart, $minId - 1);
         $windowEnd = $windowStart + $this->orphanCollectionWindow();
 
@@ -266,19 +256,13 @@ class CollectionCleanupService
         $batchSize = $this->sqlChunkSize();
         $lastId = $windowStart;
         $windowFinished = false;
+        $orphanSql = 'SELECT c.id FROM collections c
+             WHERE c.id > ? AND c.id <= ?
+               AND NOT EXISTS (SELECT 1 FROM binaries b WHERE b.collections_id = c.id)
+             ORDER BY c.id LIMIT '.$batchSize;
 
         for ($i = 0; $i < $maxBatches; $i++) {
-            $ids = DB::table('collections as c')
-                ->where('c.id', '>', $lastId)
-                ->where('c.id', '<=', $windowEnd)
-                ->whereNotExists(fn ($q) => $q->select(DB::raw(1))
-                    ->from('binaries as b')
-                    ->whereColumn('b.collections_id', 'c.id'))
-                ->orderBy('c.id')
-                ->limit($batchSize)
-                ->pluck('c.id')
-                ->map(static fn ($id): int => (int) $id)
-                ->all();
+            $ids = RawSql::ids($orphanSql, [$lastId, $windowEnd]);
 
             if ($ids === []) {
                 $windowFinished = true;
@@ -333,17 +317,15 @@ class CollectionCleanupService
         $maxBatches = 20;
         $batchSize = $this->sqlChunkSize();
 
+        // The releases_id filter lets the scan start from ix_collection_releaseid;
+        // without it MariaDB walks every collection in id order.
+        $missedSql = 'SELECT c.id FROM collections c
+             INNER JOIN releases r ON r.id = c.releases_id
+             WHERE c.releases_id IS NOT NULL AND r.nzbstatus = 1
+             ORDER BY c.id LIMIT '.$batchSize;
+
         for ($i = 0; $i < $maxBatches; $i++) {
-            // The releases_id filter lets the scan start from ix_collection_releaseid;
-            // without it MariaDB walks every collection in id order.
-            $ids = DB::table('collections as c')
-                ->join('releases as r', 'r.id', '=', 'c.releases_id')
-                ->whereNotNull('c.releases_id')
-                ->where('r.nzbstatus', '=', 1)
-                ->orderBy('c.id')
-                ->limit($batchSize)
-                ->pluck('c.id')
-                ->all();
+            $ids = RawSql::ids($missedSql);
 
             if ($ids === []) {
                 break;
@@ -379,7 +361,7 @@ class CollectionCleanupService
         $deletedCollections = 0;
 
         foreach (array_chunk($collectionIds, $this->sqlChunkSize()) as $chunk) {
-            $placeholders = implode(',', array_fill(0, count($chunk), '?'));
+            $placeholders = RawSql::placeholders(count($chunk));
             $deletedCollections += $this->retryOnLockError(
                 fn (): int => DB::transaction(
                     function () use ($chunk, $placeholders): int {

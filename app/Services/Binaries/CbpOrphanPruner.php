@@ -40,6 +40,9 @@ final class CbpOrphanPruner
 
     private const string CURSOR_CACHE_PREFIX = 'cbp:orphan_sweep_cursor:';
 
+    /** @var array<string, bool> */
+    private array $tableExists = [];
+
     /**
      * Sweep one table from $startAfter, optionally stopping after $maxBatches.
      *
@@ -54,12 +57,13 @@ final class CbpOrphanPruner
         ?callable $onBatch = null,
     ): array {
         [$rangeColumn, $foreignColumn, $parentTable] = $this->target($table);
-        if (! Schema::hasTable($table) || ! Schema::hasTable($parentTable)) {
+        if (! $this->tableExists($table) || ! $this->tableExists($parentTable)) {
             return ['deleted' => 0, 'cursor' => null];
         }
 
         $batchSize = max(1, $batchSize);
-        $ceiling = DB::table($table)->max($rangeColumn);
+        // Table and column names come from self::TARGETS, never from input.
+        $ceiling = DB::scalar("SELECT MAX({$rangeColumn}) FROM {$table}");
         if ($ceiling === null) {
             return ['deleted' => 0, 'cursor' => null];
         }
@@ -73,13 +77,11 @@ final class CbpOrphanPruner
                 return ['deleted' => $deleted, 'cursor' => $cursor];
             }
 
-            $upper = DB::table($table)
-                ->where($rangeColumn, '>', $cursor)
-                ->where($rangeColumn, '<=', $ceiling)
-                ->orderBy($rangeColumn)
-                ->offset($batchSize - 1)
-                ->limit(1)
-                ->value($rangeColumn);
+            $upper = DB::scalar(
+                "SELECT {$rangeColumn} FROM {$table} WHERE {$rangeColumn} > ? AND {$rangeColumn} <= ?
+                 ORDER BY {$rangeColumn} LIMIT 1 OFFSET ".($batchSize - 1),
+                [$cursor, $ceiling]
+            );
             $upper = $upper === null ? $ceiling : (int) $upper;
 
             $affected = $this->deleteOrphansInRange($table, $rangeColumn, $foreignColumn, $parentTable, $cursor, $upper);
@@ -129,7 +131,7 @@ final class CbpOrphanPruner
      */
     public function rebuildCollectionGroups(): array
     {
-        $before = (int) DB::table('collection_groups')->count();
+        $before = (int) DB::scalar('SELECT COUNT(*) FROM collection_groups');
         $hadForeignKey = $this->foreignKeyExists('collection_groups', 'fk_collection_groups_collection');
 
         DB::statement('DROP TABLE IF EXISTS collection_groups_rebuild');
@@ -153,7 +155,7 @@ final class CbpOrphanPruner
         // Refresh statistics so the optimizer sees the rebuilt table's size.
         DB::statement('ANALYZE TABLE collection_groups');
 
-        $kept = (int) DB::table('collection_groups')->count();
+        $kept = (int) DB::scalar('SELECT COUNT(*) FROM collection_groups');
 
         return ['kept' => $kept, 'removed' => max(0, $before - $kept)];
     }
@@ -172,6 +174,15 @@ final class CbpOrphanPruner
             ) stale',
             [max(0, $limit)]
         );
+    }
+
+    /**
+     * One schema probe per table for the life of this instance: a sweep over
+     * all targets asks about `collections` and `binaries` more than once.
+     */
+    private function tableExists(string $table): bool
+    {
+        return $this->tableExists[$table] ??= Schema::hasTable($table);
     }
 
     /**

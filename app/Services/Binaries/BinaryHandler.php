@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Binaries;
 
+use App\Support\Database\RawSql;
 use App\Support\SqlError;
 use App\Support\Utf8;
 use Illuminate\Support\Facades\DB;
@@ -207,13 +208,21 @@ final class BinaryHandler
         );
 
         if ($rowsToInsert !== []) {
+            $returnedIds = [];
             if (DB::getDriverName() === 'sqlite') {
                 $this->bulkInsertBinariesSqlite($rowsToInsert);
             } else {
-                $this->bulkInsertBinariesMysql($rowsToInsert);
+                // MariaDB hands the ids back with the insert itself.
+                $returnedIds = $this->bulkInsertBinariesMysql($rowsToInsert);
             }
+            $idsByKey = $returnedIds + $idsByKey;
 
-            foreach ($this->selectExistingBinaries($rowsToInsert) as $key => $row) {
+            // Look up only what the insert did not return.
+            $unresolved = array_values(array_filter(
+                $rowsToInsert,
+                fn (array $row): bool => ! isset($returnedIds[$this->binaryLookupKey((string) $row['hash'], (int) $row['collections_id'])])
+            ));
+            foreach ($this->selectExistingBinaries($unresolved) as $key => $row) {
                 $idsByKey[$key] = $row['id'];
             }
         }
@@ -238,10 +247,10 @@ final class BinaryHandler
     {
         foreach ($binaryIdsByTotalParts as $totalParts => $binaryIds) {
             foreach (array_chunk(array_values(array_unique($binaryIds)), $this->sqlChunkSize) as $chunk) {
-                DB::table('binaries')
-                    ->whereIn('id', $chunk)
-                    ->where('totalparts', '<', $totalParts)
-                    ->update(['totalparts' => $totalParts]);
+                DB::update(
+                    'UPDATE binaries SET totalparts = ? WHERE id IN ('.RawSql::placeholders(\count($chunk)).') AND totalparts < ?',
+                    [$totalParts, ...$chunk, $totalParts]
+                );
             }
         }
     }
@@ -284,9 +293,15 @@ final class BinaryHandler
         }
     }
 
-    /** @param  list<array<string, mixed>>  $rows */
-    private function bulkInsertBinariesMysql(array $rows): void
+    /**
+     * @param  list<array<string, mixed>>  $rows
+     * @return array<string, int> Ids keyed by binaryLookupKey(hash, collectionId), when the server returns them with the insert
+     */
+    private function bulkInsertBinariesMysql(array $rows): array
     {
+        $returning = RawSql::supportsInsertReturning();
+        $idsByKey = [];
+
         foreach (array_chunk($rows, $this->sqlChunkSize) as $chunk) {
             $placeholders = [];
             $bindings = [];
@@ -302,13 +317,22 @@ final class BinaryHandler
                 );
             }
 
-            DB::statement(
-                'INSERT INTO binaries (binaryhash, name, collections_id, totalparts, currentparts, filenumber, partsize) VALUES '
+            $sql = 'INSERT INTO binaries (binaryhash, name, collections_id, totalparts, currentparts, filenumber, partsize) VALUES '
                 .implode(',', $placeholders)
-                .' ON DUPLICATE KEY UPDATE totalparts = GREATEST(totalparts, VALUES(totalparts)), id = LAST_INSERT_ID(id)',
-                $bindings
-            );
+                .' ON DUPLICATE KEY UPDATE totalparts = GREATEST(totalparts, VALUES(totalparts)), id = LAST_INSERT_ID(id)';
+
+            if (! $returning) {
+                DB::statement($sql, $bindings);
+
+                continue;
+            }
+
+            foreach (RawSql::writeReturning($sql.' RETURNING id, collections_id, LOWER(HEX(binaryhash)) AS hashvalue', $bindings) as $row) {
+                $idsByKey[$this->binaryLookupKey((string) $row->hashvalue, (int) $row->collections_id)] = (int) $row->id;
+            }
         }
+
+        return $idsByKey;
     }
 
     /**
@@ -343,7 +367,7 @@ final class BinaryHandler
                     $current = ['disjuncts' => [], 'bindings' => [], 'hashes' => 0];
                 }
                 $current['disjuncts'][] = '(collections_id = ? AND binaryhash IN ('
-                    .implode(',', array_fill(0, \count($chunk), $hashPlaceholder)).'))';
+                    .RawSql::placeholders(\count($chunk), $hashPlaceholder).'))';
                 $current['bindings'][] = $collectionId;
                 array_push($current['bindings'], ...$chunk);
                 $current['hashes'] += \count($chunk);
@@ -483,7 +507,7 @@ final class BinaryHandler
 
             $chunkSize = max(1, min($chunkSize, $this->sqlChunkSize));
             foreach (array_chunk($binaryIds, $chunkSize) as $chunk) {
-                $placeholders = implode(',', array_fill(0, \count($chunk), '?'));
+                $placeholders = RawSql::placeholders(\count($chunk));
                 DB::update(
                     "UPDATE binaries b
                      INNER JOIN (

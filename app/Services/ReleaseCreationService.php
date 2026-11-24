@@ -6,7 +6,6 @@ namespace App\Services;
 
 use App\Enums\CollectionFileCheckStatus;
 use App\Models\Category;
-use App\Models\Collection;
 use App\Models\Predb;
 use App\Models\Release;
 use App\Models\ReleaseRegex;
@@ -21,6 +20,7 @@ use App\Services\NameFixing\ReversedNameDetectorService;
 use App\Services\NameFixing\SpamPrefixedFilenameCleanerService;
 use App\Services\Nzb\NzbService;
 use App\Services\Releases\ReleaseDuplicateFinder;
+use App\Support\Database\RawSql;
 use App\Support\SqlError;
 use App\Support\Utf8;
 use App\Traits\DetectsHashedNames;
@@ -46,6 +46,8 @@ class ReleaseCreationService
     private readonly ReversedNameDetectorService $reversedNameDetector;
 
     private readonly NzbSplitUnwrapper $nzbSplitUnwrapper;
+
+    private ?bool $hasCollectionGroupsTable = null;
 
     public function __construct(
         private readonly ReleaseCleaningService $releaseCleaning,
@@ -79,20 +81,24 @@ class ReleaseCreationService
             cli()->header('Process Releases -> Create releases from complete collections.');
         }
 
-        $collectionsQuery = Collection::query()
-            ->where('collections.filecheck', CollectionFileCheckStatus::Sized->value)
-            ->where('collections.filesize', '>', 0);
+        // Only the columns the loop reads: the row also carries the wide xref
+        // and noise columns, which add up over a full batch.
+        $bindings = [CollectionFileCheckStatus::Sized->value];
         if (! empty($groupID)) {
-            $collectionsQuery->where('collections.groups_id', $groupID);
+            $bindings[] = $groupID;
         }
-        $collectionsQuery->select(['collections.*', 'usenet_groups.name as gname'])
-            ->join('usenet_groups', 'usenet_groups.id', '=', 'collections.groups_id')
-            ->orderBy('collections.id')
-            ->limit($limit);
-        $collections = $collectionsQuery->get();
+        $collections = DB::select(
+            'SELECT c.id, c.subject, c.fromname, c.date, c.xref, c.groups_id, c.totalfiles, c.filesize,
+                    c.collection_regexes_id, g.name AS gname
+             FROM collections c
+             INNER JOIN usenet_groups g ON g.id = c.groups_id
+             WHERE c.filecheck = ? AND c.filesize > 0'.(! empty($groupID) ? ' AND c.groups_id = ?' : '').'
+             ORDER BY c.id LIMIT '.max(0, $limit),
+            $bindings
+        );
         $releaseGroupIds = $this->loadReleaseGroupIds($collections);
 
-        if ($echoCLI && $collections->count() > 0) {
+        if ($echoCLI && $collections !== []) {
             cli()->primary(\count($collections).' Collections ready to be converted to releases.', true);
         }
 
@@ -340,14 +346,16 @@ class ReleaseCreationService
             DB::beginTransaction();
             try {
                 $releaseId = Release::insertRelease($releaseData);
-                $claimed = $releaseId === null ? 0 : Collection::query()
-                    ->whereKey($collectionId)
-                    ->where('filecheck', CollectionFileCheckStatus::Sized->value)
-                    ->whereNull('releases_id')
-                    ->update([
-                        'filecheck' => CollectionFileCheckStatus::Inserted->value,
-                        'releases_id' => $releaseId,
-                    ]);
+                $claimed = $releaseId === null ? 0 : DB::update(
+                    'UPDATE collections SET filecheck = ?, releases_id = ?
+                     WHERE id = ? AND filecheck = ? AND releases_id IS NULL',
+                    [
+                        CollectionFileCheckStatus::Inserted->value,
+                        $releaseId,
+                        $collectionId,
+                        CollectionFileCheckStatus::Sized->value,
+                    ]
+                );
 
                 if ($claimed !== 1) {
                     DB::rollBack();
@@ -372,16 +380,22 @@ class ReleaseCreationService
      * Resolve all normalized cross-post groups for the selected collection
      * batch up front, avoiding release/group membership N+1 queries.
      *
-     * @param  \Illuminate\Support\Collection<int, Collection>  $collections
+     * @param  list<object>  $collections
      * @return array<int, list<int>>
      */
-    private function loadReleaseGroupIds(\Illuminate\Support\Collection $collections): array
+    private function loadReleaseGroupIds(array $collections): array
     {
         $namesByCollection = [];
-        $collectionIds = $collections->pluck('id')->map(static fn ($id): int => (int) $id)->all();
-        if (Schema::hasTable('collection_groups')) {
+        $collectionIds = array_map(static fn (object $collection): int => (int) $collection->id, $collections);
+        $this->hasCollectionGroupsTable ??= Schema::hasTable('collection_groups');
+        if ($this->hasCollectionGroupsTable) {
             foreach (array_chunk($collectionIds, 500) as $chunk) {
-                foreach (DB::table('collection_groups')->whereIn('collections_id', $chunk)->get() as $row) {
+                $rows = DB::select(
+                    'SELECT collections_id, group_name FROM collection_groups WHERE collections_id IN ('
+                    .RawSql::placeholders(\count($chunk)).')',
+                    $chunk
+                );
+                foreach ($rows as $row) {
                     $namesByCollection[(int) $row->collections_id][(string) $row->group_name] = true;
                 }
             }

@@ -615,7 +615,8 @@ class CbpCleanupServiceTest extends TestCase
             id INTEGER PRIMARY KEY,
             name VARCHAR(255),
             collections_id INTEGER,
-            totalparts INTEGER
+            totalparts INTEGER,
+            currentparts INTEGER NOT NULL DEFAULT 0
         )');
         DB::statement('CREATE TABLE parts (
             binaries_id INTEGER,

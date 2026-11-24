@@ -6,7 +6,6 @@ namespace App\Services;
 
 use App\Enums\CollectionFileCheckStatus;
 use App\Models\Category;
-use App\Models\Collection;
 use App\Models\MusicInfo;
 use App\Models\Release;
 use App\Models\ReleaseNzbCreationFailure;
@@ -27,9 +26,9 @@ use App\Support\Data\NzbCreationResult;
 use App\Support\Data\ProcessReleasesSettings;
 use App\Support\Data\ReleaseCreationResult;
 use App\Support\Data\ReleaseDeleteStats;
+use App\Support\Database\RawSql;
 use App\Support\ReleaseSearchIndexSync;
 use DateTimeInterface;
-use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -379,8 +378,9 @@ final class ReleaseProcessingService
         $this->assembleObfuscatedUploads($normalizedGroupId);
         $this->reconcileIncompleteCollections($normalizedGroupId);
 
-        $count = $this->countCompleteCollections($normalizedGroupId);
-        $this->outputStat('Complete collections found', $count);
+        if ($this->echoCLI) {
+            $this->outputStat('Complete collections found', $this->countCompleteCollections($normalizedGroupId));
+        }
         $this->outputElapsedTime($startTime);
     }
 
@@ -396,7 +396,7 @@ final class ReleaseProcessingService
 
         $groupIds = $groupId !== null
             ? [$groupId]
-            : UsenetGroup::getActiveIDs()->pluck('id')->map(static fn ($id): int => (int) $id)->all();
+            : RawSql::ids('SELECT id FROM usenet_groups WHERE active = 1 ORDER BY name');
 
         foreach ($groupIds as $id) {
             try {
@@ -423,22 +423,27 @@ final class ReleaseProcessingService
         $updated = 0;
         $lastId = 0;
         $normalizedGroupId = $this->normalizeGroupId($groupID);
+        $batchSize = $this->binariesConfig->reconcileBatchSize;
+        $complete = CollectionFileCheckStatus::CompleteParts->value;
+        $selectSql = 'SELECT id FROM collections WHERE id > ? AND filecheck = ?'
+            .($normalizedGroupId !== null ? ' AND groups_id = ?' : '')
+            .' ORDER BY id LIMIT '.$batchSize;
         do {
-            $query = Collection::query()
-                ->where('id', '>', $lastId)
-                ->where('filecheck', CollectionFileCheckStatus::CompleteParts->value)
-                ->when($normalizedGroupId !== null, static fn ($q) => $q->where('groups_id', $normalizedGroupId))
-                ->orderBy('id')
-                ->limit($this->binariesConfig->reconcileBatchSize);
-            $ids = $query->pluck('id')->map(static fn ($id): int => (int) $id)->all();
+            $ids = RawSql::ids(
+                $selectSql,
+                $normalizedGroupId !== null ? [$lastId, $complete, $normalizedGroupId] : [$lastId, $complete]
+            );
             if ($ids === []) {
                 break;
             }
             $lastId = (int) end($ids);
-            $updated += Collection::query()->whereIn('id', $ids)->update([
-                'filecheck' => CollectionFileCheckStatus::Sized->value,
-            ]);
-        } while (\count($ids) === $this->binariesConfig->reconcileBatchSize);
+            // Re-checks the status: a collection another worker moved on between
+            // the SELECT and this UPDATE must not be pulled back to Sized.
+            $updated += DB::update(
+                'UPDATE collections SET filecheck = ? WHERE id IN ('.RawSql::placeholders(\count($ids)).') AND filecheck = ?',
+                [CollectionFileCheckStatus::Sized->value, ...$ids, $complete]
+            );
+        } while (\count($ids) === $batchSize);
 
         $this->outputStat('Collections sized', $updated);
         $this->outputElapsedTime($startTime);
@@ -465,7 +470,8 @@ final class ReleaseProcessingService
         // CompleteParts first, so rows the stale pass moves there are not
         // reconciled twice in one call.
         $this->reconcileCollectionPages(
-            static fn ($query) => $query->where('filecheck', CollectionFileCheckStatus::CompleteParts->value),
+            'filecheck = ?',
+            [CollectionFileCheckStatus::CompleteParts->value],
             $groupId,
             $statuses,
         );
@@ -477,50 +483,47 @@ final class ReleaseProcessingService
         // over collections_dateadded_idx, so they cost one pass over the stale
         // backlog, and an empty backlog skips the pass entirely.
         $maxStaleId = max(
-            (int) Collection::query()->where('dateadded', '<', $cutoff)->max('id'),
-            (int) Collection::query()->whereNull('dateadded')->where('added', '<', $cutoff)->max('id'),
+            (int) DB::scalar('SELECT MAX(id) FROM collections WHERE dateadded < ?', [$cutoff]),
+            (int) DB::scalar('SELECT MAX(id) FROM collections WHERE dateadded IS NULL AND added < ?', [$cutoff]),
         );
         if ($maxStaleId === 0) {
             return;
         }
 
         $this->reconcileCollectionPages(
-            static fn ($query) => $query
-                ->where('id', '<=', $maxStaleId)
-                ->whereIn('filecheck', $staleStatuses)
-                ->where(static fn ($created) => $created
-                    ->where('dateadded', '<', $cutoff)
-                    ->orWhere(static fn ($legacy) => $legacy
-                        ->whereNull('dateadded')
-                        ->where('added', '<', $cutoff))),
+            'id <= ? AND filecheck IN ('.RawSql::placeholders(\count($staleStatuses)).')'
+                .' AND (dateadded < ? OR (dateadded IS NULL AND added < ?))',
+            [$maxStaleId, ...$staleStatuses, $cutoff, $cutoff],
             $groupId,
             $statuses,
         );
     }
 
     /**
-     * Keyset-page the collections matching $filter and reconcile each page.
+     * Keyset-page the collections matching the filter and reconcile each page.
      *
-     * @param  callable(\Illuminate\Database\Eloquent\Builder<Collection>): mixed  $filter
+     * @param  string  $filterSql  Extra WHERE condition on `collections`
+     * @param  array<int, mixed>  $filterBindings
      * @param  list<int>  $statuses
      */
-    private function reconcileCollectionPages(callable $filter, ?int $groupId, array $statuses): void
+    private function reconcileCollectionPages(string $filterSql, array $filterBindings, ?int $groupId, array $statuses): void
     {
+        $batchSize = $this->binariesConfig->reconcileBatchSize;
+        $sql = 'SELECT id FROM collections WHERE id > ?'
+            .($groupId !== null ? ' AND groups_id = ?' : '')
+            .' AND '.$filterSql
+            .' ORDER BY id LIMIT '.$batchSize;
+        $groupBindings = $groupId !== null ? [$groupId] : [];
+
         $lastId = 0;
         do {
-            $query = Collection::query()
-                ->where('id', '>', $lastId)
-                ->when($groupId !== null, static fn ($q) => $q->where('groups_id', $groupId))
-                ->orderBy('id')
-                ->limit($this->binariesConfig->reconcileBatchSize);
-            $filter($query);
-            $ids = $query->pluck('id')->map(static fn ($id): int => (int) $id)->all();
+            $ids = RawSql::ids($sql, [$lastId, ...$groupBindings, ...$filterBindings]);
             if ($ids === []) {
                 break;
             }
             $lastId = (int) end($ids);
             $this->reconcileCollectionIds($ids, $statuses);
-        } while (\count($ids) === $this->binariesConfig->reconcileBatchSize);
+        } while (\count($ids) === $batchSize);
     }
 
     /**
@@ -535,8 +538,8 @@ final class ReleaseProcessingService
             return;
         }
 
-        $idPlaceholders = implode(',', array_fill(0, \count($collectionIds), '?'));
-        $statusPlaceholders = implode(',', array_fill(0, \count($statuses), '?'));
+        $idPlaceholders = RawSql::placeholders(\count($collectionIds));
+        $statusPlaceholders = RawSql::placeholders(\count($statuses));
 
         DB::transaction(function () use ($collectionIds, $idPlaceholders, $statuses, $statusPlaceholders): void {
             DB::update(
@@ -675,69 +678,76 @@ final class ReleaseProcessingService
         $this->outputSubHeader('Filtering Collections by Size/File Count');
 
         $normalizedGroupId = $this->normalizeGroupId($groupID);
-        $groupIDs = $normalizedGroupId === null
-            ? UsenetGroup::getActiveIDs()
-            : [['id' => $normalizedGroupId]];
+        $sized = CollectionFileCheckStatus::Sized->value;
+        $groupSql = $normalizedGroupId !== null ? ' AND groups_id = ?' : '';
+        $groupBindings = $normalizedGroupId !== null ? [$normalizedGroupId] : [];
 
         $stats = ['minSize' => 0, 'maxSize' => 0, 'minFiles' => 0, 'par2Only' => 0];
 
-        // Delete collections where ALL binaries are par2 files (no actual content)
-        $par2OnlyCollectionIds = DB::table('collections as c')
-            ->join('binaries as b', 'c.id', '=', 'b.collections_id')
-            ->where('c.filecheck', CollectionFileCheckStatus::Sized->value)
-            ->where('c.filesize', '>', 0)
-            ->groupBy('c.id')
-            ->havingRaw("COUNT(b.id) = SUM(CASE WHEN b.name REGEXP '\\\\.(vol[0-9]+\\\\+[0-9]+\\\\.par2|par2)' THEN 1 ELSE 0 END)");
-        if ($normalizedGroupId !== null) {
-            $par2OnlyCollectionIds->where('c.groups_id', $normalizedGroupId);
+        // Delete collections where ALL binaries are par2 files (no actual content).
+        // NOT EXISTS stops at the first non-par2 binary of a collection instead of
+        // aggregating every binary, and `.par2` anywhere in the name is exactly what
+        // the former `\.(vol[0-9]+\+[0-9]+\.par2|par2)` pattern matched.
+        $par2OnlyIds = RawSql::ids(
+            'SELECT c.id FROM collections c
+             WHERE c.filecheck = ? AND c.filesize > 0'.($normalizedGroupId !== null ? ' AND c.groups_id = ?' : '')."
+               AND EXISTS (SELECT 1 FROM binaries b WHERE b.collections_id = c.id)
+               AND NOT EXISTS (
+                    SELECT 1 FROM binaries nb
+                    WHERE nb.collections_id = c.id AND nb.name NOT LIKE '%.par2%'
+               )
+             ORDER BY c.id",
+            [$sized, ...$groupBindings]
+        );
+        if ($par2OnlyIds !== []) {
+            $stats['par2Only'] += $this->collectionCleanupService->deleteCollectionsAndDescendants(
+                $par2OnlyIds,
+                'Par2-only cleanup',
+                $this->echoCLI
+            );
         }
-        $stats['par2Only'] += $this->deleteCollectionQueryInBatches($par2OnlyCollectionIds, 'Par2-only cleanup');
 
         // Sized collections with no bytes are never released and every size
         // filter below skips them, so they would linger until part retention.
-        $emptySized = Collection::query()
-            ->where('filecheck', CollectionFileCheckStatus::Sized->value)
-            ->where('filesize', 0);
-        if ($normalizedGroupId !== null) {
-            $emptySized->where('groups_id', $normalizedGroupId);
-        }
-        $stats['minSize'] += $this->deleteCollectionQueryInBatches($emptySized, 'Empty sized cleanup');
+        $stats['minSize'] += $this->deleteCollectionQueryInBatches(
+            'SELECT id FROM collections WHERE filecheck = ? AND filesize = 0'.$groupSql,
+            [$sized, ...$groupBindings],
+            'Empty sized cleanup'
+        );
 
-        foreach ($groupIDs as $grpID) {
-            $groupSettings = UsenetGroup::getGroupByID($grpID['id']);
-            $groupMinSize = (int) ($groupSettings['minsizetoformrelease'] ?? 0);
-            $groupMinFiles = (int) ($groupSettings['minfilestoformrelease'] ?? 0);
+        foreach ($this->releaseFormingGroups($normalizedGroupId) as $group) {
+            $groupId = (int) $group->id;
+            $groupMinSize = (int) ($group->minsizetoformrelease ?? 0);
+            $groupMinFiles = (int) ($group->minfilestoformrelease ?? 0);
 
-            if (! $this->hasSizedCollections((int) $grpID['id'])) {
+            if (! $this->hasSizedCollections($groupId)) {
                 continue;
             }
 
             $effectiveMinSize = max($groupMinSize, $this->settings->minSizeToFormRelease);
             if ($effectiveMinSize > 0) {
-                $ids = Collection::query()
-                    ->where('filecheck', CollectionFileCheckStatus::Sized->value)
-                    ->where('groups_id', (int) $grpID['id'])
-                    ->where('filesize', '>', 0)
-                    ->where('filesize', '<', $effectiveMinSize);
-                $stats['minSize'] += $this->deleteCollectionQueryInBatches($ids, 'Min-size cleanup');
+                $stats['minSize'] += $this->deleteCollectionQueryInBatches(
+                    'SELECT id FROM collections WHERE filecheck = ? AND groups_id = ? AND filesize > 0 AND filesize < ?',
+                    [$sized, $groupId, $effectiveMinSize],
+                    'Min-size cleanup'
+                );
             }
 
             if ($this->settings->maxSizeToFormRelease > 0) {
-                $ids = Collection::query()
-                    ->where('filecheck', CollectionFileCheckStatus::Sized->value)
-                    ->where('groups_id', (int) $grpID['id'])
-                    ->where('filesize', '>', $this->settings->maxSizeToFormRelease);
-                $stats['maxSize'] += $this->deleteCollectionQueryInBatches($ids, 'Max-size cleanup');
+                $stats['maxSize'] += $this->deleteCollectionQueryInBatches(
+                    'SELECT id FROM collections WHERE filecheck = ? AND groups_id = ? AND filesize > ?',
+                    [$sized, $groupId, $this->settings->maxSizeToFormRelease],
+                    'Max-size cleanup'
+                );
             }
 
             $effectiveMinFiles = max($groupMinFiles, $this->settings->minFilesToFormRelease);
             if ($effectiveMinFiles > 0) {
-                $ids = Collection::query()
-                    ->where('filecheck', CollectionFileCheckStatus::Sized->value)
-                    ->where('groups_id', (int) $grpID['id'])
-                    ->where('filesize', '>', 0)
-                    ->where('totalfiles', '<', $effectiveMinFiles);
-                $stats['minFiles'] += $this->deleteCollectionQueryInBatches($ids, 'Min-files cleanup');
+                $stats['minFiles'] += $this->deleteCollectionQueryInBatches(
+                    'SELECT id FROM collections WHERE filecheck = ? AND groups_id = ? AND filesize > 0 AND totalfiles < ?',
+                    [$sized, $groupId, $effectiveMinFiles],
+                    'Min-files cleanup'
+                );
             }
         }
 
@@ -896,11 +906,7 @@ final class ReleaseProcessingService
         try {
             $collectionIds = $result->collectionIds !== []
                 ? $result->collectionIds
-                : Collection::query()
-                    ->where('releases_id', $release->id)
-                    ->pluck('id')
-                    ->map(static fn (mixed $id): int => (int) $id)
-                    ->all();
+                : RawSql::ids('SELECT id FROM collections WHERE releases_id = ?', [$release->id]);
 
             if ($collectionIds !== []) {
                 $this->collectionCleanupService->deleteCollectionsAndDescendants(
@@ -1056,39 +1062,59 @@ final class ReleaseProcessingService
 
     private function countCompleteCollections(?int $groupId): int
     {
-        $query = Collection::query()
-            ->where('filecheck', CollectionFileCheckStatus::CompleteParts->value);
-
-        if ($groupId !== null) {
-            $query->where('groups_id', $groupId);
-        }
-
-        return $query->count('id');
+        return (int) DB::scalar(
+            'SELECT COUNT(*) FROM collections WHERE filecheck = ?'.($groupId !== null ? ' AND groups_id = ?' : ''),
+            $groupId !== null
+                ? [CollectionFileCheckStatus::CompleteParts->value, $groupId]
+                : [CollectionFileCheckStatus::CompleteParts->value]
+        );
     }
 
     private function hasSizedCollections(int $groupId): bool
     {
-        return Collection::query()
-            ->where('filecheck', CollectionFileCheckStatus::Sized->value)
-            ->where('groups_id', $groupId)
-            ->where('filesize', '>', 0)
-            ->exists();
+        return DB::selectOne(
+            'SELECT 1 AS present FROM collections WHERE filecheck = ? AND groups_id = ? AND filesize > 0 LIMIT 1',
+            [CollectionFileCheckStatus::Sized->value, $groupId]
+        ) !== null;
     }
 
-    /** @param Builder|\Illuminate\Database\Eloquent\Builder<Collection> $query */
-    private function deleteCollectionQueryInBatches(
-        Builder|\Illuminate\Database\Eloquent\Builder $query,
-        string $label,
-    ): int {
+    /**
+     * The groups whose size and file-count limits apply, with those limits, in one query.
+     *
+     * @return list<object>
+     */
+    private function releaseFormingGroups(?int $groupId): array
+    {
+        $columns = 'SELECT id, minsizetoformrelease, minfilestoformrelease FROM usenet_groups';
+        if ($groupId === null) {
+            return DB::select($columns.' WHERE active = 1 ORDER BY name');
+        }
+
+        $groups = DB::select($columns.' WHERE id = ?', [$groupId]);
+
+        // A group without a row still gets the site-wide limits.
+        return $groups !== []
+            ? $groups
+            : [(object) ['id' => $groupId, 'minsizetoformrelease' => 0, 'minfilestoformrelease' => 0]];
+    }
+
+    /**
+     * Delete the collections a query selects, one id-ordered batch at a time.
+     *
+     * @param  string  $selectSql  SELECT returning collection ids as `id`, without ORDER BY or LIMIT
+     * @param  array<int, mixed>  $bindings
+     */
+    private function deleteCollectionQueryInBatches(string $selectSql, array $bindings, string $label): int
+    {
         $deleted = 0;
-        $idColumn = $query instanceof \Illuminate\Database\Eloquent\Builder ? 'id' : 'c.id';
+        $batchSql = $selectSql.' ORDER BY id LIMIT '.self::BATCH_SIZE;
         do {
-            $ids = (clone $query)->orderBy($idColumn)->limit(self::BATCH_SIZE)->pluck($idColumn)->all();
+            $ids = RawSql::ids($batchSql, $bindings);
             if ($ids === []) {
                 break;
             }
             $affected = $this->collectionCleanupService->deleteCollectionsAndDescendants(
-                array_map('intval', $ids),
+                $ids,
                 $label,
                 $this->echoCLI
             );
@@ -1166,29 +1192,25 @@ final class ReleaseProcessingService
                 // No ORDER BY: every batch is deleted, so order is irrelevant, and
                 // sorting by id makes MariaDB walk the primary key instead of
                 // ranging over (groups_id, filecheck, last_seen_at).
-                $query = DB::table('collections')
-                    ->whereIn('filecheck', CollectionFileCheckStatus::stuckCleanupValues())
-                    ->limit(self::BATCH_SIZE);
+                $statuses = CollectionFileCheckStatus::stuckCleanupValues();
+                $sql = 'SELECT id FROM collections WHERE filecheck IN ('.RawSql::placeholders(\count($statuses)).')';
+                $bindings = $statuses;
                 $this->collectionsHaveLastSeenAt ??= Schema::hasColumn('collections', 'last_seen_at');
                 if ($this->collectionsHaveLastSeenAt) {
                     // Sargable form of COALESCE(last_seen_at, dateadded, added) < cutoff.
-                    $query->where(static fn ($idle) => $idle
-                        ->where('last_seen_at', '<', $cutoff)
-                        ->orWhere(static fn ($unseen) => $unseen
-                            ->whereNull('last_seen_at')
-                            ->where(static fn ($created) => $created
-                                ->where('dateadded', '<', $cutoff)
-                                ->orWhere(static fn ($legacy) => $legacy
-                                    ->whereNull('dateadded')
-                                    ->where('added', '<', $cutoff)))));
+                    $sql .= ' AND (last_seen_at < ? OR (last_seen_at IS NULL'
+                        .' AND (dateadded < ? OR (dateadded IS NULL AND added < ?))))';
+                    array_push($bindings, $cutoff, $cutoff, $cutoff);
                 } else {
-                    $query->where('added', '<', $cutoff);
+                    $sql .= ' AND added < ?';
+                    $bindings[] = $cutoff;
                 }
                 if ($groupID !== 0) {
-                    $query->where('groups_id', '=', $groupID);
+                    $sql .= ' AND groups_id = ?';
+                    $bindings[] = $groupID;
                 }
 
-                $ids = $query->pluck('id')->all();
+                $ids = RawSql::ids($sql.' LIMIT '.self::BATCH_SIZE, $bindings);
                 if ($ids === []) {
                     break;
                 }

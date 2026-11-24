@@ -431,7 +431,7 @@ class Tmux
         $counts = [];
 
         foreach (['binaries', 'parts', 'missed_parts'] as $table) {
-            $counts[] = (object) ['name' => $table, 'row_count' => DB::table($table)->count()];
+            $counts[] = (object) ['name' => $table, 'row_count' => (int) DB::scalar("SELECT COUNT(*) FROM {$table}")];
         }
 
         return $counts;

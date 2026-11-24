@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Services\Tmux;
 
 use App\Models\Category;
-use App\Models\Collection;
 use App\Models\Release;
 use App\Services\AdditionalProcessing\AdditionalCandidateQuery;
 use App\Services\Configuration\ProcessingRuntimeStateRepository;
@@ -309,7 +308,7 @@ class TmuxMonitorService
 
         try {
             // collections stays live: it drives the kill-switch and the progressive sleep.
-            $this->runVar['counts']['now']['collections_table'] = Collection::query()->count();
+            $this->runVar['counts']['now']['collections_table'] = (int) DB::scalar('SELECT COUNT(*) FROM collections');
 
             // Exact COUNT(*) on parts, releases and binaries scans millions of
             // rows, so those totals are cached for tmux.monitor.table_counts_ttl.

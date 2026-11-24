@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Services\Binaries;
 
 use App\Enums\CollectionFileCheckStatus;
-use App\Models\Collection;
 use App\Services\CollectionsCleaningService;
 use App\Services\XrefService;
+use App\Support\Database\RawSql;
 use App\Support\SqlError;
 use App\Support\Utf8;
 use Illuminate\Support\Facades\DB;
@@ -303,9 +303,8 @@ final class CollectionHandler
 
         $rows = [];
         foreach (array_chunk(array_values($missing), $this->sqlChunkSize) as $chunk) {
-            $placeholders = implode(',', array_fill(0, \count($chunk), '?'));
             $existingRows = DB::select(
-                "SELECT id, collectionhash FROM collections WHERE collectionhash IN ({$placeholders})",
+                'SELECT id, collectionhash FROM collections WHERE collectionhash IN ('.RawSql::placeholders(\count($chunk)).')',
                 $chunk
             );
             foreach ($existingRows as $row) {
@@ -357,13 +356,17 @@ final class CollectionHandler
             if (DB::getDriverName() === 'sqlite') {
                 $this->bulkInsertCollectionsSqlite($rowsToInsert);
             } else {
-                $this->bulkInsertCollectionsMysql($rowsToInsert);
+                // MariaDB hands the ids back with the insert itself.
+                foreach ($this->bulkInsertCollectionsMysql($rowsToInsert) as $hash => $id) {
+                    $idsByHash[$hash] = $id;
+                    $this->existingIdsByHash[$hash] = $id;
+                }
             }
         }
 
-        // Only resolve ids for the hashes we couldn't satisfy from the
-        // prefetch cache (i.e. the freshly inserted rows). For chunks where
-        // every collection already existed this issues zero extra SELECTs.
+        // Only resolve ids for the hashes neither the prefetch cache nor the
+        // insert returned. For chunks where every collection already existed,
+        // and on MariaDB for every chunk, this issues zero extra SELECTs.
         $newHashes = array_values(array_diff(array_unique($hashes), array_keys($idsByHash)));
         if ($newHashes !== []) {
             foreach ($this->resolveIdsByHash($newHashes) as $hash => $id) {
@@ -409,9 +412,13 @@ final class CollectionHandler
 
     /**
      * @param  array<string, array<string, mixed>>  $rowsByCollectionKey
+     * @return array<string, int> Ids keyed by collectionhash, when the server returns them with the insert
      */
-    private function bulkInsertCollectionsMysql(array $rowsByCollectionKey): void
+    private function bulkInsertCollectionsMysql(array $rowsByCollectionKey): array
     {
+        $returning = RawSql::supportsInsertReturning();
+        $idsByHash = [];
+
         foreach (array_chunk(array_values($rowsByCollectionKey), $this->sqlChunkSize) as $chunk) {
             $placeholders = [];
             $bindings = [];
@@ -435,16 +442,25 @@ final class CollectionHandler
             // "insert or do nothing" idiom that avoids re-writing existing
             // rows (and the redo/binlog churn that comes with it) while still
             // letting LAST_INSERT_ID() return the existing row's id.
-            DB::statement(
-                'INSERT INTO collections (subject, fromname, date, xref, groups_id, totalfiles, collectionhash, collection_regexes_id, dateadded, noise) VALUES '
+            $sql = 'INSERT INTO collections (subject, fromname, date, xref, groups_id, totalfiles, collectionhash, collection_regexes_id, dateadded, noise) VALUES '
                 .implode(',', $placeholders)
-                .' ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id)',
-                $bindings
-            );
+                .' ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id)';
+
+            if (! $returning) {
+                DB::statement($sql, $bindings);
+
+                continue;
+            }
+
+            foreach (RawSql::writeReturning($sql.' RETURNING id, collectionhash', $bindings) as $row) {
+                $idsByHash[(string) $row->collectionhash] = (int) $row->id;
+            }
         }
 
         // Cross-post groups are normalized in collection_groups. Avoid
         // rewriting the wide collections row for every new article number.
+
+        return $idsByHash;
     }
 
     /**
@@ -459,9 +475,8 @@ final class CollectionHandler
 
         $resolved = [];
         foreach (array_chunk($hashes, $this->sqlChunkSize) as $chunk) {
-            $placeholders = implode(',', array_fill(0, \count($chunk), '?'));
             foreach (DB::select(
-                "SELECT id, collectionhash FROM collections WHERE collectionhash IN ({$placeholders})",
+                'SELECT id, collectionhash FROM collections WHERE collectionhash IN ('.RawSql::placeholders(\count($chunk)).')',
                 $chunk
             ) as $row) {
                 $resolved[(string) $row->collectionhash] = (int) $row->id;
@@ -588,7 +603,7 @@ final class CollectionHandler
             return $lastId;
         }
 
-        return (int) (Collection::whereCollectionhash($collectionHash)->value('id') ?? 0);
+        return $this->collectionIdByHash($collectionHash);
     }
 
     /**
@@ -640,7 +655,14 @@ final class CollectionHandler
             return $lastId;
         }
 
-        return (int) (Collection::whereCollectionhash($collectionHash)->value('id') ?? 0);
+        return $this->collectionIdByHash($collectionHash);
+    }
+
+    private function collectionIdByHash(string $collectionHash): int
+    {
+        $row = DB::selectOne('SELECT id FROM collections WHERE collectionhash = ? LIMIT 1', [$collectionHash]);
+
+        return (int) ($row->id ?? 0);
     }
 
     /**
@@ -660,9 +682,16 @@ final class CollectionHandler
         }
         sort($collectionIds);
 
+        // SQLite has no row locks; its single writer already serializes chunks.
+        $lockClause = DB::getDriverName() === 'sqlite' ? '' : ' FOR UPDATE';
+
         try {
             foreach (array_chunk($collectionIds, $this->sqlChunkSize) as $chunk) {
-                DB::table('collections')->whereIn('id', $chunk)->orderBy('id')->lockForUpdate()->pluck('id');
+                DB::select(
+                    'SELECT id FROM collections WHERE id IN ('.RawSql::placeholders(\count($chunk)).') ORDER BY id'.$lockClause,
+                    $chunk,
+                    false
+                );
             }
 
             return true;
@@ -692,7 +721,10 @@ final class CollectionHandler
         try {
             $now = now()->format('Y-m-d H:i:s');
             foreach (array_chunk($collectionIds, max(1, min($chunkSize, $this->sqlChunkSize))) as $chunk) {
-                DB::table('collections')->whereIn('id', $chunk)->update(['last_seen_at' => $now]);
+                DB::update(
+                    'UPDATE collections SET last_seen_at = ? WHERE id IN ('.RawSql::placeholders(\count($chunk)).')',
+                    [$now, ...$chunk]
+                );
             }
 
             return true;
@@ -769,8 +801,8 @@ final class CollectionHandler
             }
 
             foreach (array_chunk($collectionIds, $chunkSize) as $chunk) {
-                $idPlaceholders = implode(',', array_fill(0, \count($chunk), '?'));
-                $statusPlaceholders = implode(',', array_fill(0, \count($inProgressStatuses), '?'));
+                $idPlaceholders = RawSql::placeholders(\count($chunk));
+                $statusPlaceholders = RawSql::placeholders(\count($inProgressStatuses));
                 DB::update(
                     "UPDATE collections c
                      INNER JOIN (

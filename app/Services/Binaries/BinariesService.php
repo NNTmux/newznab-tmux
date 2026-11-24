@@ -439,9 +439,7 @@ class BinariesService
         $partsRepaired = $missingCount - $remainingCount;
 
         // Update attempts on remaining parts
-        if (isset($missingParts[$missingCount - 1]->id)) {
-            $this->missedPartHandler->incrementAttempts($groupArr['id'], $lastPartNumber);
-        }
+        $this->missedPartHandler->incrementAttempts($groupArr['id'], $lastPartNumber);
 
         if ($this->config->echoCli) {
             cli()->primary(PHP_EOL.number_format($partsRepaired).' parts repaired.');

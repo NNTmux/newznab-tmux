@@ -330,7 +330,7 @@ class UsenetGroup extends Model
     public static function reset($id): int
     {
         // Remove rows from part repair.
-        MissedPart::query()->where('groups_id', $id)->delete();
+        DB::delete('DELETE FROM missed_parts WHERE groups_id = ?', [$id]);
 
         // Reset the group stats.
         return self::query()->where('id', $id)->update(

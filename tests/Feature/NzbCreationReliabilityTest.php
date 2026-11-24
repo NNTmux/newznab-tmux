@@ -279,6 +279,113 @@ class NzbCreationReliabilityTest extends TestCase
         $this->assertSame(0, DB::table('release_nzb_creation_failures')->count());
     }
 
+    public function test_writer_orders_files_by_collection_then_name_across_batches(): void
+    {
+        $this->insertRelease(1, 'i');
+        $this->insertWritableCbp(200, 2000, 1);
+        DB::table('collections')->insert([
+            'id' => 100, 'releases_id' => 1, 'fromname' => 'poster@example.test',
+            'date' => '2026-07-13 10:00:00', 'xref' => 'alt.test:1', 'groups_id' => 1,
+        ]);
+        DB::table('binaries')->where('id', 2000)->update(['name' => 'Charlie.rar', 'totalparts' => 2, 'currentparts' => 2]);
+        DB::table('binaries')->insert([
+            ['id' => 2001, 'collections_id' => 200, 'name' => 'Alpha.rar', 'totalparts' => 2, 'currentparts' => 2],
+            ['id' => 2002, 'collections_id' => 200, 'name' => 'Bravo.rar', 'totalparts' => 2, 'currentparts' => 2],
+            ['id' => 2003, 'collections_id' => 100, 'name' => 'Zulu.rar', 'totalparts' => 2, 'currentparts' => 2],
+        ]);
+        DB::table('parts')->where('binaries_id', 2000)->delete();
+        foreach ([2000, 2001, 2002, 2003] as $binaryId) {
+            DB::table('parts')->insert([
+                ['binaries_id' => $binaryId, 'messageid' => "<{$binaryId}-2@example.test>", 'partnumber' => 2, 'size' => 20],
+                ['binaries_id' => $binaryId, 'messageid' => "<{$binaryId}-1@example.test>", 'partnumber' => 1, 'size' => 10],
+            ]);
+        }
+
+        // A two-segment budget forces one batch per binary.
+        $xml = $this->writeNzb(new BinariesConfig(nzbStreamRows: 2));
+
+        $this->assertSame(
+            ['Zulu.rar (1/2)', 'Alpha.rar (1/2)', 'Bravo.rar (1/2)', 'Charlie.rar (1/2)'],
+            $this->attributeValues($xml, 'subject')
+        );
+        $this->assertSame(
+            ['2003-1', '2003-2', '2001-1', '2001-2', '2002-1', '2002-2', '2000-1', '2000-2'],
+            $this->segmentIds($xml)
+        );
+    }
+
+    public function test_writer_pages_a_binary_larger_than_the_segment_budget(): void
+    {
+        $this->insertRelease(1, 'j');
+        $this->insertWritableCbp(200, 2000, 1);
+        DB::table('binaries')->where('id', 2000)->update(['totalparts' => 5, 'currentparts' => 5]);
+        DB::table('parts')->where('binaries_id', 2000)->delete();
+        foreach ([4, 1, 5, 3, 2] as $partNumber) {
+            DB::table('parts')->insert([
+                'binaries_id' => 2000, 'messageid' => "<2000-{$partNumber}@example.test>", 'partnumber' => $partNumber, 'size' => 10,
+            ]);
+        }
+
+        $xml = $this->writeNzb(new BinariesConfig(nzbStreamRows: 2));
+
+        $this->assertSame(['2000-1', '2000-2', '2000-3', '2000-4', '2000-5'], $this->segmentIds($xml));
+        $this->assertSame(1, substr_count($xml, '<file '));
+    }
+
+    public function test_writer_fails_deterministically_when_a_binary_has_no_parts(): void
+    {
+        $this->insertRelease(1, 'k');
+        $this->insertWritableCbp(200, 2000, 1);
+        DB::table('binaries')->insert(['id' => 2001, 'collections_id' => 200, 'name' => 'Empty.rar', 'totalparts' => 1]);
+        $release = Release::query()->findOrFail(1);
+        $release->setRelation('category', (object) ['title' => 'Misc', 'parent' => (object) ['title' => 'Other']]);
+
+        $nzb = new NzbService(app(CollectionCleanupService::class));
+        $result = $nzb->createNzbForRelease($release);
+
+        $this->assertTrue($result->isDeterministicFailure());
+        $this->assertSame('Binary 2001 has no parts.', $result->reason);
+        $this->assertSame([200], $result->collectionIds);
+        $this->assertFileDoesNotExist($nzb->getNzbPath($release->guid));
+        $this->assertSame([], glob(\dirname($nzb->getNzbPath($release->guid)).'/*.tmp*') ?: []);
+    }
+
+    private function writeNzb(BinariesConfig $config): string
+    {
+        $release = Release::query()->findOrFail(1);
+        $release->setRelation('category', (object) ['title' => 'Misc', 'parent' => (object) ['title' => 'Other']]);
+
+        $result = (new NzbService(app(CollectionCleanupService::class), $config))->createNzbForRelease($release);
+
+        $this->assertTrue($result->success, $result->reason);
+        $xml = unzipGzipFile((string) $result->path);
+        $this->assertIsString($xml);
+
+        return $xml;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function attributeValues(string $xml, string $attribute): array
+    {
+        preg_match_all('/\b'.preg_quote($attribute, '/').'="([^"]*)"/', $xml, $matches);
+
+        return $matches[1];
+    }
+
+    /**
+     * Segment message ids in document order, without the surrounding markup and host.
+     *
+     * @return list<string>
+     */
+    private function segmentIds(string $xml): array
+    {
+        preg_match_all('/<segment [^>]*>(?:&lt;)?([^@<&]+)@/', $xml, $matches);
+
+        return $matches[1];
+    }
+
     public function test_stale_temporary_nzb_cleanup_deletes_only_old_temp_files(): void
     {
         $directory = $this->tempNzbPath.'/a';
@@ -431,7 +538,8 @@ class NzbCreationReliabilityTest extends TestCase
             id INTEGER PRIMARY KEY,
             collections_id INTEGER,
             name VARCHAR(255) NULL,
-            totalparts INTEGER NULL
+            totalparts INTEGER NULL,
+            currentparts INTEGER NOT NULL DEFAULT 0
         )');
         DB::statement('CREATE TABLE parts (
             binaries_id INTEGER,

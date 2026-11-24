@@ -8,6 +8,7 @@ use App\Services\Binaries\BinariesConfig;
 use App\Services\Binaries\CollectionHandler;
 use App\Services\Binaries\HeaderStorageService;
 use App\Services\CollectionsCleaningService;
+use App\Support\Database\RawSql;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
@@ -198,6 +199,50 @@ final class CbpMariaDbIngestionTest extends TestCase
         $this->assertSame(300, (int) DB::table('binaries')->value('partsize'));
     }
 
+    public function test_bulk_inserts_resolve_new_ids_without_a_follow_up_lookup(): void
+    {
+        $service = new HeaderStorageService(
+            new CollectionHandler(new class extends CollectionsCleaningService
+            {
+                public function collectionsCleaner(string $subject, string $groupName = ''): array
+                {
+                    return ['id' => 0, 'name' => $subject];
+                }
+            }),
+            config: new BinariesConfig(headerChunkSize: 10, sqlChunkSize: 50),
+        );
+        $headers = [
+            $this->header(2001, 1, 100, 'First.Release'),
+            $this->header(2002, 2, 100, 'First.Release'),
+            $this->header(2003, 1, 100, 'Second.Release'),
+        ];
+        $lookups = ['collections' => 0, 'binaries' => 0];
+        DB::listen(static function ($query) use (&$lookups): void {
+            if (str_starts_with($query->sql, 'SELECT id, collectionhash FROM collections')) {
+                $lookups['collections']++;
+            } elseif (str_starts_with($query->sql, 'SELECT id, LOWER(HEX(binaryhash))')) {
+                $lookups['binaries']++;
+            }
+        });
+
+        $this->assertSame([], $service->store($headers, ['id' => 1, 'name' => 'alt.binaries.test']));
+
+        // One prefetch each; with INSERT ... RETURNING no second lookup follows the insert.
+        $expectedLookups = RawSql::supportsInsertReturning() ? 1 : 2;
+        $this->assertSame(['collections' => $expectedLookups, 'binaries' => $expectedLookups], $lookups);
+        $this->assertSame(2, DB::table('collections')->count());
+        $this->assertSame(2, DB::table('binaries')->count());
+        $this->assertSame(3, DB::table('parts')->count());
+        $this->assertSame(
+            ['First.Release' => 2, 'Second.Release' => 1],
+            DB::table('binaries')->orderBy('name')->pluck('currentparts', 'name')->map(static fn ($parts): int => (int) $parts)->all()
+        );
+        $this->assertSame(
+            0,
+            DB::table('binaries')->leftJoin('collections', 'collections.id', '=', 'binaries.collections_id')->whereNull('collections.id')->count()
+        );
+    }
+
     private function restoreLegacyStorageShape(): void
     {
         DB::statement('ALTER TABLE parts DROP FOREIGN KEY fk_test_parts');
@@ -215,19 +260,19 @@ final class CbpMariaDbIngestionTest extends TestCase
     }
 
     /** @return array<string, mixed> */
-    private function header(int $number, int $part, int $bytes): array
+    private function header(int $number, int $part, int $bytes, string $name = 'Integration.Release'): array
     {
         return [
             'Number' => $number,
-            'Subject' => "Integration.Release ({$part}/2)",
+            'Subject' => "{$name} ({$part}/2)",
             'From' => 'poster@example.test',
             'Date' => time(),
             'Bytes' => $bytes,
             'Message-ID' => "<{$number}@example.test>",
             'Xref' => "news.example alt.binaries.test:{$number}",
             'matches' => [
-                0 => "Integration.Release ({$part}/2)",
-                1 => 'Integration.Release',
+                0 => "{$name} ({$part}/2)",
+                1 => $name,
                 2 => $part,
                 3 => 2,
             ],

@@ -97,4 +97,55 @@ class MissedPartHandlerTest extends TestCase
         $this->assertSame(1, (int) DB::table('missed_parts')->where(['groups_id' => 1, 'numberid' => 12])->value('attempts'));
         $this->assertSame(0, (int) DB::table('missed_parts')->where(['groups_id' => 2, 'numberid' => 12])->value('attempts'));
     }
+
+    public function test_get_missing_parts_returns_only_article_numbers(): void
+    {
+        $handler = new MissedPartHandler(partRepairLimit: 10, partRepairMaxTries: 3);
+        DB::table('missed_parts')->insert(['numberid' => 700, 'groups_id' => 4, 'attempts' => 1]);
+
+        $parts = $handler->getMissingParts(4);
+
+        $this->assertSame(['numberid'], array_keys((array) $parts[0]));
+        $this->assertSame(700, (int) $parts[0]->numberid);
+    }
+
+    public function test_remove_repaired_parts_spans_several_statements_for_a_long_list(): void
+    {
+        $chunkSize = 50;
+        $handler = new MissedPartHandler(partRepairLimit: 10, partRepairMaxTries: 3, chunkSize: $chunkSize);
+        $numbers = range(1000, 1000 + ($chunkSize * 2) + 4);
+        DB::table('missed_parts')->insert(array_map(
+            static fn (int $number): array => ['numberid' => $number, 'groups_id' => 3, 'attempts' => 1],
+            [...$numbers, 5000]
+        ));
+        $deletes = 0;
+        DB::listen(static function ($query) use (&$deletes): void {
+            if (str_starts_with($query->sql, 'DELETE FROM missed_parts')) {
+                $deletes++;
+            }
+        });
+
+        $handler->removeRepairedParts($numbers, 3);
+
+        $this->assertSame(3, $deletes);
+        $this->assertSame([5000], DB::table('missed_parts')->where('groups_id', 3)->pluck('numberid')->all());
+    }
+
+    public function test_increment_range_attempts_leaves_numbers_outside_the_range_alone(): void
+    {
+        $handler = new MissedPartHandler(partRepairLimit: 10, partRepairMaxTries: 3);
+        DB::table('missed_parts')->insert([
+            ['numberid' => 9, 'groups_id' => 1, 'attempts' => 0],
+            ['numberid' => 10, 'groups_id' => 1, 'attempts' => 0],
+            ['numberid' => 14, 'groups_id' => 1, 'attempts' => 0],
+            ['numberid' => 15, 'groups_id' => 1, 'attempts' => 0],
+        ]);
+
+        $handler->incrementRangeAttempts(1, 10, 14);
+
+        $this->assertSame(
+            [9 => 0, 10 => 1, 14 => 1, 15 => 0],
+            DB::table('missed_parts')->orderBy('numberid')->pluck('attempts', 'numberid')->map(static fn ($attempts): int => (int) $attempts)->all()
+        );
+    }
 }

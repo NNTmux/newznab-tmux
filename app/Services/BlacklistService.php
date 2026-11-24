@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Enums\BlacklistConstants;
 use App\Models\BinaryBlacklist;
+use App\Support\Database\RawSql;
 use Illuminate\Support\Facades\DB;
 
 class BlacklistService
@@ -33,6 +34,13 @@ class BlacklistService
      * @var array<int|string, int|string>
      */
     private array $idsToUpdate = [];
+
+    /**
+     * Day on which this process last wrote each rule's last_activity.
+     *
+     * @var array<int, string>
+     */
+    private array $activityStampedOn = [];
 
     /**
      * Check if an article (OVER header) is blacklisted for the given group.
@@ -100,10 +108,28 @@ class BlacklistService
      */
     public function updateBlacklistUsage(array $ids): void
     {
-        if (empty($ids)) {
+        // last_activity is a DATE: once a rule is stamped for today, later
+        // header chunks in this process have nothing new to write.
+        $today = now()->format('Y-m-d');
+        $pending = [];
+        foreach ($ids as $id) {
+            $id = (int) $id;
+            if (($this->activityStampedOn[$id] ?? null) !== $today) {
+                $pending[$id] = $id;
+            }
+        }
+        if ($pending === []) {
             return;
         }
-        BinaryBlacklist::query()->whereIn('id', $ids)->update(['last_activity' => now()]);
+
+        $pending = array_values($pending);
+        DB::update(
+            'UPDATE binaryblacklist SET last_activity = ? WHERE id IN ('.RawSql::placeholders(\count($pending)).')',
+            [$today, ...$pending]
+        );
+        foreach ($pending as $id) {
+            $this->activityStampedOn[$id] = $today;
+        }
     }
 
     /**

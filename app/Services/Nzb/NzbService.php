@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services\Nzb;
 
-use App\Models\Collection;
 use App\Models\Release;
 use App\Models\ReleaseNzbCreationFailure;
 use App\Services\Binaries\BinariesConfig;
@@ -12,6 +11,7 @@ use App\Services\CollectionCleanupService;
 use App\Services\Configuration\ConfigurationProvider;
 use App\Services\NameFixing\NzbSplitUnwrapper;
 use App\Support\Data\NzbCreationResult;
+use App\Support\Database\RawSql;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -64,6 +64,8 @@ class NzbService
 
     private ?NzbSplitUnwrapper $nzbSplitUnwrapper = null;
 
+    private ?bool $hasCollectionGroupsTable = null;
+
     public function __construct(
         private readonly CollectionCleanupService $collectionCleanupService,
         ?BinariesConfig $binariesConfig = null,
@@ -103,21 +105,26 @@ class NzbService
     public function createNzbForRelease(Release $release): NzbCreationResult
     {
         try {
-            $collections = Collection::whereReleasesId($release->id)
-                ->join('usenet_groups', 'collections.groups_id', '=', 'usenet_groups.id')
-                ->select(['collections.*', DB::raw('UNIX_TIMESTAMP(collections.date) AS udate'), 'usenet_groups.name as groupname'])
-                ->orderBy('collections.id')
-                ->get()
-                ->keyBy('id');
+            $collections = [];
+            $rows = DB::select(
+                'SELECT c.id, c.fromname, c.xref, UNIX_TIMESTAMP(c.date) AS udate
+                 FROM collections c
+                 INNER JOIN usenet_groups g ON g.id = c.groups_id
+                 WHERE c.releases_id = ? ORDER BY c.id',
+                [$release->id]
+            );
+            foreach ($rows as $row) {
+                $collections[(int) $row->id] = $row;
+            }
         } catch (Throwable $e) {
             return NzbCreationResult::transient('Failed to load release collections: '.$e->getMessage());
         }
 
-        if ($collections->isEmpty()) {
+        if ($collections === []) {
             return NzbCreationResult::deterministic('Release has no collections to write into an NZB.');
         }
 
-        $collectionIds = $collections->pluck('id')->map(static fn (mixed $id): int => (int) $id)->all();
+        $collectionIds = array_keys($collections);
         try {
             $emptyCollection = DB::selectOne(
                 'SELECT c.id FROM collections c
@@ -127,17 +134,6 @@ class NzbService
             );
             if ($emptyCollection !== null) {
                 return NzbCreationResult::deterministic("Collection {$emptyCollection->id} has no binaries.", $collectionIds);
-            }
-
-            $emptyBinary = DB::selectOne(
-                'SELECT b.id FROM binaries b
-                 INNER JOIN collections c ON c.id = b.collections_id
-                 LEFT JOIN parts p ON p.binaries_id = b.id
-                 WHERE c.releases_id = ? GROUP BY b.id HAVING COUNT(p.partnumber) = 0 LIMIT 1',
-                [$release->id]
-            );
-            if ($emptyBinary !== null) {
-                return NzbCreationResult::deterministic("Binary {$emptyBinary->id} has no parts.", $collectionIds);
             }
 
             $groupsByCollection = $this->loadCollectionGroups((int) $release->id, $collections);
@@ -184,64 +180,32 @@ class NzbService
                 return NzbCreationResult::transient("Failed to write NZB header to temporary file: {$tempPath}", $collectionIds, $path);
             }
 
-            $cursor = ['collection_id' => 0, 'name' => '', 'binary_id' => 0, 'partnumber' => 0];
-            $openBinaryId = 0;
-            do {
-                $page = $this->loadNzbRowPage((int) $release->id, $cursor);
-                foreach ($page as $row) {
-                    $binaryId = (int) $row->binary_id;
-                    if ($binaryId !== $openBinaryId) {
-                        if ($openBinaryId > 0) {
-                            $XMLWriter->endElement(); // segments
-                            $XMLWriter->endElement(); // file
-                            if (! $this->flushXmlWriter($XMLWriter, $gz)) {
-                                return NzbCreationResult::transient("Failed to write NZB file entry to temporary file: {$tempPath}", $collectionIds, $path);
-                            }
-                        }
-
-                        $collection = $collections->get((int) $row->collection_id);
-                        $groups = $groupsByCollection[(int) $row->collection_id] ?? [];
-                        if ($collection === null || $groups === []) {
-                            return NzbCreationResult::deterministic("Collection {$row->collection_id} has no valid cross-post groups.", $collectionIds, $path);
-                        }
-
-                        $subject = $this->buildBinarySubject((string) $row->binary_name, (int) $row->totalparts);
-                        $XMLWriter->startElement('file');
-                        $XMLWriter->writeAttribute('poster', (string) $collection->fromname);
-                        $XMLWriter->writeAttribute('date', (string) $collection->udate);
-                        $XMLWriter->writeAttribute('subject', (string) $subject);
-                        $XMLWriter->startElement('groups');
-                        foreach ($groups as $group) {
-                            $XMLWriter->writeElement('group', $group);
-                        }
-                        $XMLWriter->endElement(); // groups
-                        $XMLWriter->startElement('segments');
-                        $openBinaryId = $binaryId;
+            // Binaries arrive in output order from one sorted pass; their segments
+            // are then read per batch in primary-key order, so no page re-sorts
+            // the rest of the release.
+            $context = new NzbStreamContext($collections, $groupsByCollection, $collectionIds, $path, $tempPath);
+            $partBudget = max(1, $this->binariesConfig->nzbStreamRows);
+            $maxBatchBinaries = max(1, $this->binariesConfig->sqlChunkSize);
+            $batch = [];
+            $batchParts = 0;
+            foreach ($this->releaseBinaries((int) $release->id) as $binary) {
+                $expectedParts = max(1, (int) $binary->currentparts);
+                if ($batch !== [] && ($batchParts + $expectedParts > $partBudget || \count($batch) >= $maxBatchBinaries)) {
+                    $failure = $this->writeBinaryBatch($XMLWriter, $gz, $batch, $context);
+                    if ($failure !== null) {
+                        return $failure;
                     }
-
-                    $messageId = $this->normalizeSegmentMessageId($row->messageid);
-                    if ($messageId === '') {
-                        return NzbCreationResult::deterministic("Part {$row->partnumber} for binary {$binaryId} has an empty message ID.", $collectionIds, $path);
-                    }
-
-                    $XMLWriter->startElement('segment');
-                    $XMLWriter->writeAttribute('bytes', (string) $row->size);
-                    $XMLWriter->writeAttribute('number', (string) $row->partnumber);
-                    $XMLWriter->text($messageId);
-                    $XMLWriter->endElement();
-
-                    $cursor = [
-                        'collection_id' => (int) $row->collection_id,
-                        'name' => (string) $row->binary_name,
-                        'binary_id' => $binaryId,
-                        'partnumber' => (int) $row->partnumber,
-                    ];
+                    $batch = [];
+                    $batchParts = 0;
                 }
-            } while (\count($page) === $this->binariesConfig->nzbStreamRows);
-
-            if ($openBinaryId > 0) {
-                $XMLWriter->endElement(); // segments
-                $XMLWriter->endElement(); // file
+                $batch[] = $binary;
+                $batchParts += $expectedParts;
+            }
+            if ($batch !== []) {
+                $failure = $this->writeBinaryBatch($XMLWriter, $gz, $batch, $context);
+                if ($failure !== null) {
+                    return $failure;
+                }
             }
 
             $XMLWriter->writeComment($this->siteCommentString);
@@ -308,13 +272,14 @@ class NzbService
     }
 
     /**
-     * @param  \Illuminate\Support\Collection<int|string, mixed>  $collections
+     * @param  array<int, object>  $collections  Keyed by collection id
      * @return array<int, list<string>>
      */
-    private function loadCollectionGroups(int $releaseId, \Illuminate\Support\Collection $collections): array
+    private function loadCollectionGroups(int $releaseId, array $collections): array
     {
         $groups = [];
-        if (Schema::hasTable('collection_groups')) {
+        $this->hasCollectionGroupsTable ??= Schema::hasTable('collection_groups');
+        if ($this->hasCollectionGroupsTable) {
             $rows = DB::select(
                 'SELECT cg.collections_id, cg.group_name
                  FROM collection_groups cg INNER JOIN collections c ON c.id = cg.collections_id
@@ -326,8 +291,7 @@ class NzbService
             }
         }
 
-        foreach ($collections as $collection) {
-            $collectionId = (int) $collection->id;
+        foreach ($collections as $collectionId => $collection) {
             if (($groups[$collectionId] ?? []) === []) {
                 $groups[$collectionId] = $this->groupsFromXref((string) $collection->xref);
             }
@@ -337,34 +301,132 @@ class NzbService
     }
 
     /**
-     * @param  array{collection_id: int, name: string, binary_id: int, partnumber: int}  $cursor
+     * The release's binaries in NZB output order. This is the only sort the
+     * writer needs, and it covers binaries only, never binaries times parts.
+     *
+     * @return \Generator<int, object>
+     */
+    private function releaseBinaries(int $releaseId): \Generator
+    {
+        yield from DB::cursor(
+            'SELECT b.id, b.collections_id, b.name, b.totalparts, b.currentparts
+             FROM collections c
+             INNER JOIN binaries b ON b.collections_id = c.id
+             WHERE c.releases_id = ?
+             ORDER BY b.collections_id, b.name, b.id',
+            [$releaseId]
+        );
+    }
+
+    /**
+     * Write the file entries of one batch of binaries, in the order given.
+     *
+     * @param  list<object>  $batch
+     * @return NzbCreationResult|null A failure, or null when the batch was written
+     */
+    private function writeBinaryBatch(\XMLWriter $XMLWriter, mixed $gz, array $batch, NzbStreamContext $context): ?NzbCreationResult
+    {
+        $pageSize = max(1, $this->binariesConfig->nzbStreamRows);
+        // A lone binary larger than the budget is read a page at a time.
+        $paged = \count($batch) === 1 && (int) $batch[0]->currentparts > $pageSize;
+        $partsByBinary = $paged
+            ? []
+            : $this->loadPartsByBinary(array_map(static fn (object $binary): int => (int) $binary->id, $batch));
+
+        foreach ($batch as $binary) {
+            $binaryId = (int) $binary->id;
+            $collectionId = (int) $binary->collections_id;
+            $parts = $paged ? $this->loadBinaryPartPage($binaryId, 0, $pageSize) : ($partsByBinary[$binaryId] ?? []);
+            if ($parts === []) {
+                return NzbCreationResult::deterministic("Binary {$binaryId} has no parts.", $context->collectionIds, $context->path);
+            }
+
+            $collection = $context->collections[$collectionId] ?? null;
+            $groups = $context->groupsByCollection[$collectionId] ?? [];
+            if ($collection === null || $groups === []) {
+                return NzbCreationResult::deterministic("Collection {$collectionId} has no valid cross-post groups.", $context->collectionIds, $context->path);
+            }
+
+            $XMLWriter->startElement('file');
+            $XMLWriter->writeAttribute('poster', (string) $collection->fromname);
+            $XMLWriter->writeAttribute('date', (string) $collection->udate);
+            $XMLWriter->writeAttribute('subject', $this->buildBinarySubject((string) $binary->name, (int) $binary->totalparts));
+            $XMLWriter->startElement('groups');
+            foreach ($groups as $group) {
+                $XMLWriter->writeElement('group', $group);
+            }
+            $XMLWriter->endElement(); // groups
+            $XMLWriter->startElement('segments');
+
+            do {
+                $lastPartNumber = 0;
+                foreach ($parts as $part) {
+                    $messageId = $this->normalizeSegmentMessageId($part->messageid);
+                    if ($messageId === '') {
+                        return NzbCreationResult::deterministic("Part {$part->partnumber} for binary {$binaryId} has an empty message ID.", $context->collectionIds, $context->path);
+                    }
+
+                    $XMLWriter->startElement('segment');
+                    $XMLWriter->writeAttribute('bytes', (string) $part->size);
+                    $XMLWriter->writeAttribute('number', (string) $part->partnumber);
+                    $XMLWriter->text($messageId);
+                    $XMLWriter->endElement();
+                    $lastPartNumber = (int) $part->partnumber;
+                }
+
+                $morePages = $paged && \count($parts) === $pageSize;
+                if ($morePages) {
+                    if (! $this->flushXmlWriter($XMLWriter, $gz)) {
+                        return NzbCreationResult::transient("Failed to write NZB file entry to temporary file: {$context->tempPath}", $context->collectionIds, $context->path);
+                    }
+                    $parts = $this->loadBinaryPartPage($binaryId, $lastPartNumber, $pageSize);
+                }
+            } while ($morePages && $parts !== []);
+
+            $XMLWriter->endElement(); // segments
+            $XMLWriter->endElement(); // file
+            if (! $this->flushXmlWriter($XMLWriter, $gz)) {
+                return NzbCreationResult::transient("Failed to write NZB file entry to temporary file: {$context->tempPath}", $context->collectionIds, $context->path);
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Segments of several binaries, read in primary-key order.
+     *
+     * @param  list<int>  $binaryIds
+     * @return array<int, list<object>> Parts keyed by binary id, ordered by part number
+     */
+    private function loadPartsByBinary(array $binaryIds): array
+    {
+        $partsByBinary = [];
+        $rows = DB::select(
+            'SELECT binaries_id, partnumber, messageid, size FROM parts
+             WHERE binaries_id IN ('.RawSql::placeholders(\count($binaryIds)).')
+             ORDER BY binaries_id, partnumber',
+            $binaryIds
+        );
+        foreach ($rows as $row) {
+            $partsByBinary[(int) $row->binaries_id][] = $row;
+        }
+
+        return $partsByBinary;
+    }
+
+    /**
+     * One page of a single binary's segments after the given part number.
+     *
      * @return list<object>
      */
-    private function loadNzbRowPage(int $releaseId, array $cursor): array
+    private function loadBinaryPartPage(int $binaryId, int $afterPartNumber, int $pageSize): array
     {
-        $limit = $this->binariesConfig->nzbStreamRows;
-
         return DB::select(
-            'SELECT b.collections_id AS collection_id, b.id AS binary_id, b.name AS binary_name,
-                    b.totalparts, p.messageid, p.size, p.partnumber
-             FROM binaries b
-             INNER JOIN collections c ON c.id = b.collections_id
-             INNER JOIN parts p ON p.binaries_id = b.id
-             WHERE c.releases_id = ? AND (
-                b.collections_id > ? OR
-                (b.collections_id = ? AND b.name > ?) OR
-                (b.collections_id = ? AND b.name = ? AND b.id > ?) OR
-                (b.collections_id = ? AND b.name = ? AND b.id = ? AND p.partnumber > ?)
-             )
-             ORDER BY b.collections_id, b.name, b.id, p.partnumber
-             LIMIT '.$limit,
-            [
-                $releaseId,
-                $cursor['collection_id'],
-                $cursor['collection_id'], $cursor['name'],
-                $cursor['collection_id'], $cursor['name'], $cursor['binary_id'],
-                $cursor['collection_id'], $cursor['name'], $cursor['binary_id'], $cursor['partnumber'],
-            ]
+            'SELECT partnumber, messageid, size FROM parts
+             WHERE binaries_id = ? AND partnumber > ?
+             ORDER BY partnumber LIMIT '.$pageSize,
+            [$binaryId, $afterPartNumber]
         );
     }
 

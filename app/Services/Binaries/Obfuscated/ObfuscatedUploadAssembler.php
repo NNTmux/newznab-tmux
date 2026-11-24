@@ -7,7 +7,7 @@ namespace App\Services\Binaries\Obfuscated;
 use App\Enums\CollectionFileCheckStatus;
 use App\Services\Binaries\BinaryHandler;
 use App\Services\Binaries\CollectionHandler;
-use Illuminate\Database\Query\Builder;
+use App\Support\Database\RawSql;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -29,6 +29,12 @@ final class ObfuscatedUploadAssembler
 {
     /** collection_regexes_id written on merged collections, next to the generic (-10) and music (-20) ids. */
     public const int ASSEMBLED_REGEX_ID = -30;
+
+    /** A collection the pipeline has not turned into a release yet. */
+    private const string UNRELEASED_SQL = '(c.releases_id IS NULL OR c.releases_id = 0)';
+
+    private const string ARTICLE_COLUMNS = 'b.id AS binary_id, c.id AS collection_id, b.name, b.totalparts,'
+        .' p.partnumber, p.number, p.size, c.date, c.dateadded';
 
     private readonly ObfuscatedUploadPlanner $planner;
 
@@ -115,20 +121,21 @@ final class ObfuscatedUploadAssembler
      */
     private function signaturePosters(int $groupId): array
     {
-        return DB::table('collections as c')
-            ->join('binaries as b', 'b.collections_id', '=', 'c.id')
-            ->where('c.groups_id', $groupId)
-            ->whereIn('c.filecheck', [CollectionFileCheckStatus::Default->value, CollectionFileCheckStatus::ObfuscatedHold->value])
-            ->where('c.collection_regexes_id', '<>', self::ASSEMBLED_REGEX_ID)
-            ->where('b.currentparts', 1)
-            ->where('b.totalparts', '>', 1)
-            ->groupBy('c.fromname', 'c.totalfiles', 'b.totalparts')
-            ->havingRaw('COUNT(*) >= ?', [$this->config->minArticles])
-            ->pluck('c.fromname')
-            ->map(static fn ($poster): string => (string) $poster)
-            ->unique()
-            ->values()
-            ->all();
+        $rows = DB::select(
+            'SELECT c.fromname
+             FROM collections c
+             INNER JOIN binaries b ON b.collections_id = c.id
+             WHERE c.groups_id = ?
+               AND c.filecheck IN ('.$this->statusList([CollectionFileCheckStatus::Default, CollectionFileCheckStatus::ObfuscatedHold]).')
+               AND c.collection_regexes_id <> '.self::ASSEMBLED_REGEX_ID.'
+               AND b.currentparts = 1 AND b.totalparts > 1
+             GROUP BY c.fromname, c.totalfiles, b.totalparts
+             HAVING COUNT(*) >= ?',
+            [$groupId, $this->config->minArticles]
+        );
+
+        // One poster can match with several (file count, part count) shapes.
+        return array_values(array_unique(array_map(static fn (object $row): string => (string) $row->fromname, $rows)));
     }
 
     /**
@@ -136,18 +143,18 @@ final class ObfuscatedUploadAssembler
      */
     private function loadFiles(int $groupId, string $poster): array
     {
-        $keys = $this->candidateArticles($groupId, $poster)
-            ->selectRaw(
-                'c.totalfiles AS tf, b.filenumber AS fn, b.totalparts AS tp,
-                 COUNT(*) AS articles, COUNT(DISTINCT p.partnumber) AS parts,
-                 SUM(CASE WHEN b.filenumber = p.partnumber THEN 0 ELSE 1 END) AS mismatches,
-                 MIN(p.number) AS min_number, MAX(p.number) AS max_number,
-                 MIN(c.date) AS min_date, MAX(c.date) AS max_date,
-                 MAX(COALESCE(c.last_seen_at, c.dateadded)) AS last_seen,
-                 COALESCE(SUM(p.size), 0) AS bytes'
-            )
-            ->groupBy('c.totalfiles', 'b.filenumber', 'b.totalparts')
-            ->get();
+        $keys = DB::select(
+            'SELECT c.totalfiles AS tf, b.filenumber AS fn, b.totalparts AS tp,
+                    COUNT(*) AS articles, COUNT(DISTINCT p.partnumber) AS parts,
+                    SUM(CASE WHEN b.filenumber = p.partnumber THEN 0 ELSE 1 END) AS mismatches,
+                    MIN(p.number) AS min_number, MAX(p.number) AS max_number,
+                    MIN(c.date) AS min_date, MAX(c.date) AS max_date,
+                    MAX(COALESCE(c.last_seen_at, c.dateadded)) AS last_seen,
+                    COALESCE(SUM(p.size), 0) AS bytes'
+            .$this->candidateArticlesSql()
+            .' GROUP BY c.totalfiles, b.filenumber, b.totalparts',
+            [$groupId, $poster]
+        );
 
         $buckets = [];
         foreach ($keys as $key) {
@@ -235,7 +242,7 @@ final class ObfuscatedUploadAssembler
         }
 
         $articles = [];
-        foreach ($this->keyArticles($groupId, $poster, $totalFiles, $fileNumber, $totalParts, $counterIsPart)->get() as $row) {
+        foreach ($this->keyArticles($groupId, $poster, $totalFiles, $fileNumber, $totalParts, $counterIsPart) as $row) {
             $articles[] = [
                 'binary' => (int) $row->binary_id,
                 'part' => (int) $row->partnumber,
@@ -260,7 +267,7 @@ final class ObfuscatedUploadAssembler
         foreach ($upload->files as $file) {
             $rows = $file->binaryIds !== null
                 ? $this->articlesByBinaryIds($file->binaryIds)
-                : $this->keyArticles($groupId, $upload->poster, $file->totalFiles, $file->fileNumber, $file->totalParts, $file->counterIsPart)->get()->all();
+                : $this->keyArticles($groupId, $upload->poster, $file->totalFiles, $file->fileNumber, $file->totalParts, $file->counterIsPart);
             $parts = array_map(static fn ($row): int => (int) $row->partnumber, $rows);
             if ($rows === [] || \count(array_unique($parts)) !== \count($rows)) {
                 throw new RuntimeException('file changed since planning');
@@ -288,7 +295,7 @@ final class ObfuscatedUploadAssembler
 
         DB::transaction(function () use ($files, $targetCollection, $collectionHash, $subject, $sourceCollections, $dates, $added): void {
             $this->lockSources($sourceCollections);
-            if (DB::table('collections')->where('collectionhash', $collectionHash)->exists()) {
+            if (DB::selectOne('SELECT 1 AS present FROM collections WHERE collectionhash = ? LIMIT 1', [$collectionHash]) !== null) {
                 throw new RuntimeException('upload already assembled');
             }
 
@@ -300,22 +307,30 @@ final class ObfuscatedUploadAssembler
 
                 $others = array_map(static fn ($row): int => (int) $row->binary_id, \array_slice($rows, 1));
                 foreach (array_chunk($others, $this->config->sqlChunkSize) as $chunk) {
-                    DB::table('parts')->whereIn('binaries_id', $chunk)->update(['binaries_id' => $target]);
-                    DB::table('binaries')->whereIn('id', $chunk)->delete();
+                    $placeholders = RawSql::placeholders(\count($chunk));
+                    DB::update("UPDATE parts SET binaries_id = ? WHERE binaries_id IN ({$placeholders})", [$target, ...$chunk]);
+                    DB::delete("DELETE FROM binaries WHERE id IN ({$placeholders})", $chunk);
                 }
             }
 
             $this->moveGroupsAndDeleteSources($sourceCollections, $targetCollection);
 
-            DB::table('collections')->where('id', $targetCollection)->update([
-                'subject' => $subject,
-                'collectionhash' => $collectionHash,
-                'collection_regexes_id' => self::ASSEMBLED_REGEX_ID,
-                'totalfiles' => \count($files),
-                'date' => min($dates),
-                'dateadded' => $added === [] ? now()->format('Y-m-d H:i:s') : min($added),
-                'filecheck' => CollectionFileCheckStatus::Default->value,
-            ]);
+            DB::update(
+                'UPDATE collections
+                 SET subject = ?, collectionhash = ?, collection_regexes_id = ?, totalfiles = ?,
+                     date = ?, dateadded = ?, filecheck = ?
+                 WHERE id = ?',
+                [
+                    $subject,
+                    $collectionHash,
+                    self::ASSEMBLED_REGEX_ID,
+                    \count($files),
+                    min($dates),
+                    $added === [] ? now()->format('Y-m-d H:i:s') : min($added),
+                    CollectionFileCheckStatus::Default->value,
+                    $targetCollection,
+                ]
+            );
 
             if (! $this->binaryHandler->refreshAggregates($targetBinaries, $this->config->sqlChunkSize)
                 || ! $this->collectionHandler->refreshAggregates([$targetCollection], $this->config->sqlChunkSize)) {
@@ -331,13 +346,18 @@ final class ObfuscatedUploadAssembler
      */
     private function lockSources(array $collectionIds): void
     {
+        // SQLite has no row locks; its single writer already serializes merges.
+        $lockClause = DB::getDriverName() === 'sqlite' ? '' : ' FOR UPDATE';
         $locked = 0;
         foreach (array_chunk($collectionIds, $this->config->sqlChunkSize) as $chunk) {
-            $locked += $this->unreleased(DB::table('collections'))
-                ->whereIn('id', $chunk)
-                ->whereIn('filecheck', $this->mergeableStatuses())
-                ->lockForUpdate()
-                ->count();
+            $locked += (int) DB::scalar(
+                'SELECT COUNT(*) FROM collections c
+                 WHERE '.self::UNRELEASED_SQL.'
+                   AND c.id IN ('.RawSql::placeholders(\count($chunk)).')
+                   AND c.filecheck IN ('.$this->statusList($this->mergeableStatuses()).')'.$lockClause,
+                $chunk,
+                false
+            );
         }
         if ($locked !== \count($collectionIds)) {
             throw new RuntimeException('source collection claimed or removed');
@@ -368,19 +388,30 @@ final class ObfuscatedUploadAssembler
         $sources = array_values(array_diff($sourceCollections, [$targetCollection]));
         $this->hasCollectionGroups ??= Schema::hasTable('collection_groups');
 
+        $insertIgnore = DB::getDriverName() === 'sqlite' ? 'INSERT OR IGNORE' : 'INSERT IGNORE';
+
         foreach (array_chunk($sources, $this->config->sqlChunkSize) as $chunk) {
+            $placeholders = RawSql::placeholders(\count($chunk));
             if ($this->hasCollectionGroups) {
-                $groupNames = DB::table('collection_groups')->whereIn('collections_id', $chunk)->distinct()->pluck('group_name');
-                DB::table('collection_groups')->insertOrIgnore($groupNames->map(static fn ($name): array => [
-                    'collections_id' => $targetCollection,
-                    'group_name' => (string) $name,
-                ])->all());
-                DB::table('collection_groups')->whereIn('collections_id', $chunk)->delete();
+                $bindings = [];
+                foreach (DB::select("SELECT DISTINCT group_name FROM collection_groups WHERE collections_id IN ({$placeholders})", $chunk) as $row) {
+                    $bindings[] = $targetCollection;
+                    $bindings[] = (string) $row->group_name;
+                }
+                if ($bindings !== []) {
+                    DB::insert(
+                        $insertIgnore.' INTO collection_groups (collections_id, group_name) VALUES '
+                        .RawSql::placeholders(intdiv(\count($bindings), 2), '(?, ?)'),
+                        $bindings
+                    );
+                }
+                DB::delete("DELETE FROM collection_groups WHERE collections_id IN ({$placeholders})", $chunk);
             }
-            DB::table('collections')
-                ->whereIn('id', $chunk)
-                ->whereNotExists(static fn (Builder $query) => $query->selectRaw('1')->from('binaries')->whereColumn('binaries.collections_id', 'collections.id'))
-                ->delete();
+            DB::delete(
+                "DELETE FROM collections WHERE id IN ({$placeholders})
+                 AND NOT EXISTS (SELECT 1 FROM binaries WHERE binaries.collections_id = collections.id)",
+                $chunk
+            );
         }
     }
 
@@ -394,29 +425,28 @@ final class ObfuscatedUploadAssembler
         $limit = $this->config->sqlChunkSize * 10;
         $held = 0;
 
+        $holdable = $this->statusList([CollectionFileCheckStatus::Default, CollectionFileCheckStatus::Sized]);
+        $selectSql = 'SELECT c.id FROM collections c
+             WHERE '.self::UNRELEASED_SQL.'
+               AND c.groups_id = ? AND c.fromname = ?
+               AND c.filecheck IN ('.$holdable.')
+               AND c.collection_regexes_id <> '.self::ASSEMBLED_REGEX_ID.'
+               AND (c.last_seen_at >= ? OR (c.last_seen_at IS NULL AND c.dateadded >= ?))
+               AND EXISTS (SELECT 1 FROM binaries hb WHERE hb.collections_id = c.id AND hb.currentparts = 1)
+               AND NOT EXISTS (SELECT 1 FROM binaries mb WHERE mb.collections_id = c.id AND mb.currentparts <> 1)
+             LIMIT '.$limit;
+
         do {
-            $ids = $this->unreleased(DB::table('collections as c'), 'c.')
-                ->where('c.groups_id', $groupId)
-                ->where('c.fromname', $poster)
-                ->whereIn('c.filecheck', [CollectionFileCheckStatus::Default->value, CollectionFileCheckStatus::Sized->value])
-                ->where('c.collection_regexes_id', '<>', self::ASSEMBLED_REGEX_ID)
-                ->where(static fn (Builder $seen) => $seen
-                    ->where('c.last_seen_at', '>=', $cutoff)
-                    ->orWhere(static fn (Builder $unseen) => $unseen->whereNull('c.last_seen_at')->where('c.dateadded', '>=', $cutoff)))
-                ->whereExists(static fn (Builder $query) => $query->selectRaw('1')->from('binaries as hb')
-                    ->whereColumn('hb.collections_id', 'c.id')->where('hb.currentparts', 1))
-                ->whereNotExists(static fn (Builder $query) => $query->selectRaw('1')->from('binaries as mb')
-                    ->whereColumn('mb.collections_id', 'c.id')->where('mb.currentparts', '<>', 1))
-                ->limit($limit)
-                ->pluck('c.id')
-                ->all();
+            $ids = RawSql::ids($selectSql, [$groupId, $poster, $cutoff, $cutoff]);
             if ($ids === []) {
                 break;
             }
             foreach (array_chunk($ids, $this->config->sqlChunkSize) as $chunk) {
-                $held += DB::table('collections')->whereIn('id', $chunk)
-                    ->whereIn('filecheck', [CollectionFileCheckStatus::Default->value, CollectionFileCheckStatus::Sized->value])
-                    ->update(['filecheck' => CollectionFileCheckStatus::ObfuscatedHold->value]);
+                $held += DB::update(
+                    'UPDATE collections SET filecheck = ? WHERE id IN ('.RawSql::placeholders(\count($chunk)).')'
+                    .' AND filecheck IN ('.$holdable.')',
+                    [CollectionFileCheckStatus::ObfuscatedHold->value, ...$chunk]
+                );
             }
         } while (\count($ids) === $limit);
 
@@ -431,39 +461,46 @@ final class ObfuscatedUploadAssembler
     {
         $cutoff = $this->dateString($now - $this->config->holdMinutes * 60);
 
-        return DB::table('collections')
-            ->where('groups_id', $groupId)
-            ->where('filecheck', CollectionFileCheckStatus::ObfuscatedHold->value)
-            ->where(static fn (Builder $idle) => $idle
-                ->where('last_seen_at', '<', $cutoff)
-                ->orWhere(static fn (Builder $unseen) => $unseen->whereNull('last_seen_at')
-                    ->where(static fn (Builder $created) => $created->where('dateadded', '<', $cutoff)->orWhereNull('dateadded'))))
-            ->update(['filecheck' => CollectionFileCheckStatus::Default->value]);
+        return DB::update(
+            'UPDATE collections SET filecheck = ?
+             WHERE groups_id = ? AND filecheck = ?
+               AND (last_seen_at < ? OR (last_seen_at IS NULL AND (dateadded < ? OR dateadded IS NULL)))',
+            [
+                CollectionFileCheckStatus::Default->value,
+                $groupId,
+                CollectionFileCheckStatus::ObfuscatedHold->value,
+                $cutoff,
+                $cutoff,
+            ]
+        );
     }
 
     /**
-     * Articles of one poster that are still single-part collections the pipeline has not released.
+     * FROM and WHERE for the articles of one poster that are still single-part collections the
+     * pipeline has not released. Binds the group id, then the poster.
      */
-    private function candidateArticles(int $groupId, string $poster): Builder
+    private function candidateArticlesSql(): string
     {
-        return $this->unreleased(DB::table('collections as c'), 'c.')
-            ->join('binaries as b', 'b.collections_id', '=', 'c.id')
-            ->join('parts as p', 'p.binaries_id', '=', 'b.id')
-            ->where('c.groups_id', $groupId)
-            ->where('c.fromname', $poster)
-            ->whereIn('c.filecheck', $this->mergeableStatuses())
-            ->where('c.collection_regexes_id', '<>', self::ASSEMBLED_REGEX_ID)
-            ->where('b.currentparts', 1);
+        return ' FROM collections c
+             INNER JOIN binaries b ON b.collections_id = c.id
+             INNER JOIN parts p ON p.binaries_id = b.id
+             WHERE '.self::UNRELEASED_SQL.'
+               AND c.groups_id = ? AND c.fromname = ?
+               AND c.filecheck IN ('.$this->statusList($this->mergeableStatuses()).')
+               AND c.collection_regexes_id <> '.self::ASSEMBLED_REGEX_ID.'
+               AND b.currentparts = 1';
     }
 
-    private function keyArticles(int $groupId, string $poster, int $totalFiles, int $fileNumber, int $totalParts, bool $counterIsPart): Builder
+    /**
+     * @return list<object>
+     */
+    private function keyArticles(int $groupId, string $poster, int $totalFiles, int $fileNumber, int $totalParts, bool $counterIsPart): array
     {
-        $query = $this->candidateArticles($groupId, $poster)->where('b.totalparts', $totalParts);
-        $query = $counterIsPart
-            ? $query->where('c.totalfiles', $totalParts)->whereColumn('b.filenumber', 'p.partnumber')
-            : $query->where('c.totalfiles', $totalFiles)->where('b.filenumber', $fileNumber);
+        $sql = 'SELECT '.self::ARTICLE_COLUMNS.$this->candidateArticlesSql().' AND b.totalparts = ?';
 
-        return $query->select($this->articleColumns());
+        return $counterIsPart
+            ? DB::select($sql.' AND c.totalfiles = ? AND b.filenumber = p.partnumber', [$groupId, $poster, $totalParts, $totalParts])
+            : DB::select($sql.' AND c.totalfiles = ? AND b.filenumber = ?', [$groupId, $poster, $totalParts, $totalFiles, $fileNumber]);
     }
 
     /**
@@ -474,15 +511,17 @@ final class ObfuscatedUploadAssembler
     {
         $rows = [];
         foreach (array_chunk($binaryIds, $this->config->sqlChunkSize) as $chunk) {
-            array_push($rows, ...$this->unreleased(DB::table('collections as c'), 'c.')
-                ->join('binaries as b', 'b.collections_id', '=', 'c.id')
-                ->join('parts as p', 'p.binaries_id', '=', 'b.id')
-                ->whereIn('b.id', $chunk)
-                ->whereIn('c.filecheck', $this->mergeableStatuses())
-                ->where('b.currentparts', 1)
-                ->select($this->articleColumns())
-                ->get()
-                ->all());
+            array_push($rows, ...DB::select(
+                'SELECT '.self::ARTICLE_COLUMNS.'
+                 FROM collections c
+                 INNER JOIN binaries b ON b.collections_id = c.id
+                 INNER JOIN parts p ON p.binaries_id = b.id
+                 WHERE '.self::UNRELEASED_SQL.'
+                   AND b.id IN ('.RawSql::placeholders(\count($chunk)).')
+                   AND c.filecheck IN ('.$this->statusList($this->mergeableStatuses()).')
+                   AND b.currentparts = 1',
+                $chunk
+            ));
         }
         if (\count($rows) !== \count($binaryIds)) {
             throw new RuntimeException('file changed since planning');
@@ -492,21 +531,16 @@ final class ObfuscatedUploadAssembler
     }
 
     /**
-     * @return list<string>
+     * Status values as a literal SQL list; they come from the enum, never from input.
+     *
+     * @param  list<CollectionFileCheckStatus|int>  $statuses
      */
-    private function articleColumns(): array
+    private function statusList(array $statuses): string
     {
-        return [
-            'b.id as binary_id', 'c.id as collection_id', 'b.name', 'b.totalparts',
-            'p.partnumber', 'p.number', 'p.size', 'c.date', 'c.dateadded',
-        ];
-    }
-
-    private function unreleased(Builder $query, string $prefix = ''): Builder
-    {
-        return $query->where(static fn (Builder $release) => $release
-            ->whereNull($prefix.'releases_id')
-            ->orWhere($prefix.'releases_id', 0));
+        return implode(', ', array_map(
+            static fn (CollectionFileCheckStatus|int $status): int => $status instanceof CollectionFileCheckStatus ? $status->value : $status,
+            $statuses
+        ));
     }
 
     /**

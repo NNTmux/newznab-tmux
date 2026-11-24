@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Binaries;
 
-use App\Models\MissedPart;
+use App\Support\Database\RawSql;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -104,12 +104,14 @@ final class MissedPartHandler
         }
 
         try {
-            // Single DELETE — InnoDB autocommits one statement atomically, so
-            // an explicit transaction here would just add round-trips.
-            DB::table('missed_parts')
-                ->where('groups_id', $groupId)
-                ->whereIn('numberid', $numbers)
-                ->delete();
+            // Autocommit per statement: an explicit transaction would only add
+            // round-trips. Chunked so a large repair cannot build an unbounded IN list.
+            foreach (array_chunk(array_values(array_unique($numbers)), $this->chunkSize) as $chunk) {
+                DB::delete(
+                    'DELETE FROM missed_parts WHERE groups_id = ? AND numberid IN ('.RawSql::placeholders(\count($chunk)).')',
+                    [$groupId, ...$chunk]
+                );
+            }
         } catch (\Throwable $e) {
             if (config('app.debug') === true) {
                 Log::warning('removeRepairedParts failed: '.$e->getMessage());
@@ -118,20 +120,17 @@ final class MissedPartHandler
     }
 
     /**
-     * Get parts that need repair for a group.
+     * Get the article numbers that need repair for a group, lowest first.
      *
-     * @return array<int, \stdClass> Array of missed parts
+     * @return list<\stdClass> Rows carrying only `numberid`
      */
     public function getMissingParts(int $groupId): array
     {
         try {
-            return DB::table('missed_parts')
-                ->where('groups_id', $groupId)
-                ->where('attempts', '<', $this->partRepairMaxTries)
-                ->orderBy('numberid')
-                ->limit($this->partRepairLimit)
-                ->get()
-                ->all();
+            return DB::select(
+                'SELECT numberid FROM missed_parts WHERE groups_id = ? AND attempts < ? ORDER BY numberid LIMIT '.max(1, $this->partRepairLimit),
+                [$groupId, $this->partRepairMaxTries]
+            );
         } catch (\PDOException $e) {
             if ($e->getMessage() === 'SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction') {
                 Log::notice('Deadlock occurred while fetching missed parts');
@@ -146,10 +145,10 @@ final class MissedPartHandler
      */
     public function incrementAttempts(int $groupId, int $maxNumberId): void
     {
-        DB::table('missed_parts')
-            ->where('groups_id', $groupId)
-            ->where('numberid', '<=', $maxNumberId)
-            ->increment('attempts');
+        DB::update(
+            'UPDATE missed_parts SET attempts = attempts + 1 WHERE groups_id = ? AND numberid <= ?',
+            [$groupId, $maxNumberId]
+        );
     }
 
     /**
@@ -157,17 +156,11 @@ final class MissedPartHandler
      */
     public function incrementRangeAttempts(int $groupId, int $first, int $last): void
     {
-        if ($first === $last) {
-            MissedPart::query()
-                ->where('groups_id', $groupId)
-                ->where('numberid', $first)
-                ->increment('attempts');
-        } else {
-            MissedPart::query()
-                ->where('groups_id', $groupId)
-                ->whereIn('numberid', range($first, $last))
-                ->increment('attempts');
-        }
+        // A range predicate instead of listing every article number in between.
+        DB::update(
+            'UPDATE missed_parts SET attempts = attempts + 1, updated_at = ? WHERE groups_id = ? AND numberid BETWEEN ? AND ?',
+            [now()->format('Y-m-d H:i:s'), $groupId, min($first, $last), max($first, $last)]
+        );
     }
 
     /**
@@ -175,10 +168,12 @@ final class MissedPartHandler
      */
     public function getCount(int $groupId, int $maxNumberId): int
     {
-        return DB::table('missed_parts')
-            ->where('groups_id', $groupId)
-            ->where('numberid', '<=', $maxNumberId)
-            ->count('id');
+        $row = DB::selectOne(
+            'SELECT COUNT(*) AS remaining FROM missed_parts WHERE groups_id = ? AND numberid <= ?',
+            [$groupId, $maxNumberId]
+        );
+
+        return (int) ($row->remaining ?? 0);
     }
 
     /**
@@ -188,9 +183,9 @@ final class MissedPartHandler
     {
         // Single DELETE — InnoDB autocommits atomically; the explicit
         // transaction wrapper would just add round-trips.
-        DB::table('missed_parts')
-            ->where('groups_id', $groupId)
-            ->where('attempts', '>=', $this->partRepairMaxTries)
-            ->delete();
+        DB::delete(
+            'DELETE FROM missed_parts WHERE groups_id = ? AND attempts >= ?',
+            [$groupId, $this->partRepairMaxTries]
+        );
     }
 }

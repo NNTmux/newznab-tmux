@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 /**
  * App\Models\Collection.
@@ -64,8 +65,8 @@ class Collection extends Model
     public static function groupIdsWithCollections(): array
     {
         $groupIds = [];
-        foreach (static::query()->distinct()->pluck('groups_id') as $groupId) {
-            $groupIds[(int) $groupId] = true;
+        foreach (DB::select('SELECT DISTINCT groups_id FROM collections') as $row) {
+            $groupIds[(int) $row->groups_id] = true;
         }
 
         return $groupIds;

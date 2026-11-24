@@ -401,7 +401,7 @@ class BinariesStorageInternalsTest extends TestCase
         $statements = [];
         $lockAttempts = 0;
         DB::listen(static function (QueryExecuted $query) use (&$statements, &$lockAttempts): void {
-            if (preg_match('/^select "id" from "collections" where "id" in .* order by "id" asc$/', $query->sql)) {
+            if (preg_match('/^SELECT id FROM collections WHERE id IN \(.*\) ORDER BY id$/', $query->sql)) {
                 $statements[] = ['lock', $query->bindings];
                 // The first lock attempt hits contention; the chunk must be retried, not dropped.
                 if (++$lockAttempts === 1) {
