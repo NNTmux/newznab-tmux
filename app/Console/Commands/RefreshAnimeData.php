@@ -561,7 +561,7 @@ class RefreshAnimeData extends Command
 
             if ($timeSinceLastRequest < $minDelay) {
                 $waitTime = $minDelay - $timeSinceLastRequest;
-                if ($waitTime > 0 && $waitTime < 2) { // Only wait if less than 2 seconds
+                if ($waitTime < 2) { // Only wait if less than 2 seconds
                     usleep((int) ($waitTime * 1000000)); // Convert to microseconds
                     $now = time(); // Update now after waiting
                 }

@@ -842,12 +842,6 @@ parameters:
 			path: app/Services/Search/Drivers/ElasticSearchDriver.php
 
 		-
-			message: '#^Parameter \#1 \$params of method Elastic\\Elasticsearch\\Client\:\:delete\(\) expects array\{id\: string, index\: string, wait_for_active_shards\?\: string, refresh\?\: string, routing\?\: string, timeout\?\: int\|string, if_seq_no\?\: int, if_primary_term\?\: int, \.\.\.\}\|null, array\{index\: string, id\: int\<min, \-1\>\|int\<1, max\>\} given\.$#'
-			identifier: argument.type
-			count: 3
-			path: app/Services/Search/Drivers/ElasticSearchDriver.php
-
-		-
 			message: '#^Strict comparison using \=\=\= between int\|non\-falsy\-string and '''' will always evaluate to false\.$#'
 			identifier: identical.alwaysFalse
 			count: 2

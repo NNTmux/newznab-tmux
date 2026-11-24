@@ -1456,7 +1456,7 @@ class ElasticSearchDriver implements SearchDriverInterface
             $client = $this->getClient();
             $client->delete([
                 'index' => $this->getPredbIndex(),
-                'id' => $id,
+                'id' => (string) $id,
             ]);
 
         } catch (\Throwable $e) {
@@ -2135,7 +2135,7 @@ class ElasticSearchDriver implements SearchDriverInterface
             $client = $this->getClient();
             $client->delete([
                 'index' => $this->getMoviesIndex(),
-                'id' => $id,
+                'id' => (string) $id,
             ]);
         } catch (\Throwable $e) {
             if (ElasticsearchResponseHelper::isNotFound($e)) {
@@ -2522,7 +2522,7 @@ class ElasticSearchDriver implements SearchDriverInterface
             $client = $this->getClient();
             $client->delete([
                 'index' => $this->getTvShowsIndex(),
-                'id' => $id,
+                'id' => (string) $id,
             ]);
         } catch (\Throwable $e) {
             if (ElasticsearchResponseHelper::isNotFound($e)) {
