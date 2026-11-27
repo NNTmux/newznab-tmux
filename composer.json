@@ -71,7 +71,7 @@
         "spatie/laravel-suspicious-login": "^1.0",
         "spatie/laravel-typescript-transformer": "^3.3",
         "stechstudio/laravel-zipstream": "^5.4",
-        "symfony/process": "^7.0",
+        "symfony/process": "^8.1",
         "voku/simple_html_dom": "^5.1"
     },
     "require-dev": {
